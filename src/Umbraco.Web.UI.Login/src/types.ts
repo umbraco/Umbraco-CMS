@@ -22,9 +22,20 @@ export type ResetPasswordResponse = {
 export type ValidatePasswordResetCodeResponse = {
 	error?: string;
 	status: number;
+  data?: {
+    passwordConfiguration: PasswordConfigurationModel;
+  }
 };
 
 export type NewPasswordResponse = {
 	error?: string;
 	status: number;
 };
+
+export type PasswordConfigurationModel = {
+  minimumPasswordLength: number;
+  requireNonLetterOrDigit: boolean;
+  requireDigit: boolean;
+  requireLowercase: boolean;
+  requireUppercase: boolean;
+}

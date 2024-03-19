@@ -1,10 +1,11 @@
-import {
+import type {
   LoginRequestModel,
   LoginResponse,
   ResetPasswordResponse,
   ValidatePasswordResetCodeResponse,
   NewPasswordResponse,
-} from '../types.js';
+  PasswordConfigurationModel
+} from "../types.js";
 import {UmbAuthRepository} from './auth.repository.js';
 
 export class UmbAuthContext {
@@ -13,6 +14,7 @@ export class UmbAuthContext {
   twoFactorView = '';
   isMfaEnabled = false;
   mfaProviders: string[] = [];
+  passwordConfiguration?: PasswordConfigurationModel;
 
   #authRepository = new UmbAuthRepository();
 
@@ -61,16 +63,11 @@ export class UmbAuthContext {
   }
 
   async newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse> {
-    const userIdAsNumber = Number.parseInt(userId);
-    return this.#authRepository.newPassword(password, resetCode, userIdAsNumber);
+    return this.#authRepository.newPassword(password, resetCode, userId);
   }
 
   async newInvitedUserPassword(password: string): Promise<NewPasswordResponse> {
     return this.#authRepository.newInvitedUserPassword(password);
-  }
-
-  async getPasswordConfig(userId: string): Promise<any> {
-    return this.#authRepository.getPasswordConfig(userId);
   }
 
   async getInvitedUser(): Promise<any> {

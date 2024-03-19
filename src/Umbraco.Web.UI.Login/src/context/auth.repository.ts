@@ -1,9 +1,9 @@
-import type {
+import {
   LoginRequestModel,
   LoginResponse,
   ResetPasswordResponse,
-  ValidatePasswordResetCodeResponse,
-} from '../types.js';
+  ValidatePasswordResetCodeResponse
+} from "../types.js";
 import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
 export class UmbAuthRepository {
@@ -49,7 +49,7 @@ export class UmbAuthRepository {
   }
 
   public async resetPassword(email: string): Promise<ResetPasswordResponse> {
-    const request = new Request('backoffice/umbracoapi/authentication/PostRequestPasswordReset', {
+    const request = new Request('management/api/v1/security/forgot-password', {
       method: 'POST',
       body: JSON.stringify({
         email,
@@ -66,32 +66,44 @@ export class UmbAuthRepository {
     };
   }
 
-  public async validatePasswordResetCode(user: string, code: string): Promise<ValidatePasswordResetCodeResponse> {
-    const request = new Request('backoffice/umbracoapi/authentication/validatepasswordresetcode', {
+  public async validatePasswordResetCode(userId: string, resetCode: string): Promise<ValidatePasswordResetCodeResponse> {
+    const request = new Request('management/api/v1/security/forgot-password/verify', {
       method: 'POST',
       body: JSON.stringify({
-        userId: user,
-        resetCode: code,
+        user: {
+          id: userId
+        },
+        resetCode,
       }),
       headers: {
         'Content-Type': 'application/json',
       },
     });
     const response = await fetch(request);
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        status: response.status,
+        error: data.detail ?? 'The password reset token could not be verified',
+      };
+    }
 
     return {
       status: response.status,
-      error: response.ok ? undefined : await this.#getErrorText(response),
+      data
     };
   }
 
-  public async newPassword(password: string, resetCode: string, userId: number): Promise<LoginResponse> {
-    const request = new Request('backoffice/umbracoapi/authentication/PostSetPassword', {
+  public async newPassword(password: string, resetCode: string, userId: string): Promise<LoginResponse> {
+    const request = new Request('management/api/v1/security/forgot-password/reset', {
       method: 'POST',
       body: JSON.stringify({
         password,
         resetCode,
-        userId,
+        user: {
+          id: userId
+        },
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -99,9 +111,17 @@ export class UmbAuthRepository {
     });
     const response = await fetch(request);
 
+    if (!response.ok) {
+      const data = await response.json();
+
+      return {
+        status: response.status,
+        error: data.detail ?? 'The password reset token could not be verified',
+      };
+    }
+
     return {
-      status: response.status,
-      error: response.ok ? undefined : await this.#getErrorText(response),
+      status: response.status
     };
   }
 
@@ -120,34 +140,6 @@ export class UmbAuthRepository {
     return {
       status: response.status,
       error: response.ok ? undefined : await this.#getErrorText(response),
-    };
-  }
-
-  public async getPasswordConfig(userId: string): Promise<any> {
-    //TODO: Add type
-    const request = new Request(`backoffice/umbracoapi/authentication/GetPasswordConfig?userId=${userId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const response = await fetch(request);
-
-    // Check if response contains AngularJS response data
-    if (response.ok) {
-      let text = await response.text();
-      text = this.#removeAngularJSResponseData(text);
-      const data = JSON.parse(text);
-
-      return {
-        status: response.status,
-        data,
-      };
-    }
-
-    return {
-      status: response.status,
-      error: response.ok ? undefined : this.#getErrorText(response),
     };
   }
 

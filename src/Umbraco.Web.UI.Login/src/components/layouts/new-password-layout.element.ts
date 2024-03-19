@@ -1,6 +1,6 @@
 import type {UUIButtonState, UUIInputPasswordElement} from '@umbraco-ui/uui';
 import {CSSResultGroup, LitElement, css, html, nothing} from 'lit';
-import {customElement, property, query, state} from 'lit/decorators.js';
+import {customElement, property, query} from 'lit/decorators.js';
 import {until} from 'lit/directives/until.js';
 
 import {umbAuthContext} from '../../context/auth.context.js';
@@ -8,6 +8,9 @@ import {umbLocalizationContext} from '../../external/localization/localization-c
 
 @customElement('umb-new-password-layout')
 export default class UmbNewPasswordLayoutElement extends LitElement {
+  #passwordConfiguration = umbAuthContext.passwordConfiguration;
+  #passwordPattern = '';
+
   @query('#password')
   passwordElement!: UUIInputPasswordElement;
 
@@ -26,25 +29,31 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
   @property()
   userName?: string;
 
-  @state()
-  passwordConfig?: {
-    allowManuallyChangingPassword: boolean;
-    minNonAlphaNumericChars: number;
-    minPasswordLength: number;
-  };
+  constructor() {
+    super();
 
-  protected async firstUpdated(_changedProperties: any) {
-    super.firstUpdated(_changedProperties);
-
-    if (this.userId) {
-      const response = await umbAuthContext.getPasswordConfig(this.userId);
-      this.passwordConfig = response.data;
+    // Build a pattern
+    let pattern = '';
+    if (this.#passwordConfiguration?.requireDigit) {
+      pattern += '(?=.*\\d)';
     }
+    if (this.#passwordConfiguration?.requireLowercase) {
+      pattern += '(?=.*[a-z])';
+    }
+    if (this.#passwordConfiguration?.requireUppercase) {
+      pattern += '(?=.*[A-Z])';
+    }
+    if (this.#passwordConfiguration?.requireNonLetterOrDigit) {
+      pattern += '(?=.*\\W)';
+    }
+    pattern += `.{${this.#passwordConfiguration?.minimumPasswordLength ?? 10},}`;
+    this.#passwordPattern = pattern;
   }
 
   async #onSubmit(event: Event) {
     event.preventDefault();
-    if (!this.passwordConfig) return;
+    if (!this.#passwordConfiguration) return;
+
     const form = event.target as HTMLFormElement;
 
     this.passwordElement.setCustomValidity('');
@@ -59,13 +68,34 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 
     let passwordIsInvalid = false;
 
-    if (this.passwordConfig.minPasswordLength > 0 && password.length < this.passwordConfig.minPasswordLength) {
+    if (this.#passwordConfiguration.minimumPasswordLength > 0 && password.length < this.#passwordConfiguration.minimumPasswordLength) {
       passwordIsInvalid = true;
     }
 
-    if (this.passwordConfig.minNonAlphaNumericChars > 0) {
-      const nonAlphaNumericChars = password.replace(/[a-zA-Z0-9]/g, '').length; //TODO: How should we check for non-alphanumeric chars?
-      if (nonAlphaNumericChars < this.passwordConfig?.minNonAlphaNumericChars) {
+    if (this.#passwordConfiguration.requireNonLetterOrDigit) {
+      const hasNonLetterOrDigit = /\W/.test(password);
+      if (!hasNonLetterOrDigit) {
+        passwordIsInvalid = true;
+      }
+    }
+
+    if (this.#passwordConfiguration.requireDigit) {
+      const hasDigit = /\d/.test(password);
+      if (!hasDigit) {
+        passwordIsInvalid = true;
+      }
+    }
+
+    if (this.#passwordConfiguration.requireLowercase) {
+      const hasLowercase = /[a-z]/.test(password);
+      if (!hasLowercase) {
+        passwordIsInvalid = true;
+      }
+    }
+
+    if (this.#passwordConfiguration.requireUppercase) {
+      const hasUppercase = /[A-Z]/.test(password);
+      if (!hasUppercase) {
         passwordIsInvalid = true;
       }
     }
@@ -73,7 +103,7 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
     if (passwordIsInvalid) {
       const passwordValidityText = await umbLocalizationContext.localize(
         'errorHandling_errorInPasswordFormat',
-        [this.passwordConfig.minPasswordLength, this.passwordConfig.minNonAlphaNumericChars],
+        [this.#passwordConfiguration.minimumPasswordLength, this.#passwordConfiguration.requireNonLetterOrDigit ? 1 : 0],
         "The password doesn't meet the minimum requirements!"
       );
       this.passwordElement.setCustomValidity(passwordValidityText);
@@ -129,6 +159,9 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
               id="password"
               name="password"
               autocomplete="new-password"
+              pattern="${this.#passwordPattern}"
+              .minlength=${this.#passwordConfiguration?.minimumPasswordLength}
+              .minlengthMessage=${until(umbLocalizationContext.localize('user_passwordMinLength', [this.#passwordConfiguration?.minimumPasswordLength ?? 10], 'Password is too short'))}
               .label=${until(umbLocalizationContext.localize('user_newPassword', undefined, 'New password'))}
               required
               required-message=${until(
@@ -145,6 +178,9 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
               id="confirmPassword"
               name="confirmPassword"
               autocomplete="new-password"
+              pattern="${this.#passwordPattern}"
+              .minlength=${this.#passwordConfiguration?.minimumPasswordLength}
+              .minlengthMessage=${until(umbLocalizationContext.localize('user_passwordMinLength', [this.#passwordConfiguration?.minimumPasswordLength ?? 10], 'Password is too short'))}
               .label=${until(
                 umbLocalizationContext.localize('user_confirmNewPassword', undefined, 'Confirm new password')
               )}
