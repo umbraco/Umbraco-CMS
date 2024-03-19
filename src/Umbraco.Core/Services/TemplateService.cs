@@ -242,6 +242,14 @@ public class TemplateService : RepositoryService, ITemplateService
                 return Attempt.FailWithStatus(TemplateOperationStatus.MasterTemplateNotFound, template);
             }
 
+            // detect immediate circular references
+            if (masterTemplateAlias.IsNullOrWhiteSpace() == false
+            && masterTemplate?.MasterTemplateAlias is not null
+            && masterTemplate.MasterTemplateAlias.Equals(template.Alias))
+            {
+                return Attempt.FailWithStatus(TemplateOperationStatus.CircularMasterTemplateReference, template);
+            }
+
             await SetMasterTemplateAsync(template, masterTemplate, userKey);
 
             EventMessages eventMessages = EventMessagesFactory.Get();
