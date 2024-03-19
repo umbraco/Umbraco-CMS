@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -9,18 +8,16 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Cache;
 
 /// <summary>
-///     Implements <see cref="IAppPolicyCache" /> on top of a <see cref="MemoryCache" />.
+/// Implements <see cref="IAppPolicyCache" /> on top of a <see cref="MemoryCache" />.
 /// </summary>
 public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
 {
-    private readonly IOptions<MemoryCacheOptions> _options;
-    private readonly IHostEnvironment? _hostEnvironment;
     private readonly ISet<string> _keys = new HashSet<string>();
-    private static readonly TimeSpan _readLockTimeout = TimeSpan.FromSeconds(5);
-    private static readonly TimeSpan _writeLockTimeout = TimeSpan.FromSeconds(5);
-
     private readonly ReaderWriterLockSlim _locker = new(LockRecursionPolicy.SupportsRecursion);
     private bool _disposedValue;
+
+    private static readonly TimeSpan _readLockTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan _writeLockTimeout = TimeSpan.FromSeconds(5);
 
     /// <summary>
     /// Gets the internal memory cache, for tests only!
@@ -34,7 +31,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     /// Initializes a new instance of the <see cref="ObjectCacheAppCache" />.
     /// </summary>
     public ObjectCacheAppCache()
-        : this(Options.Create(new MemoryCacheOptions()), NullLoggerFactory.Instance, null)
+        : this(new MemoryCacheOptions(), NullLoggerFactory.Instance)
     { }
 
     /// <summary>
@@ -42,14 +39,8 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     /// </summary>
     /// <param name="options">The options.</param>
     /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="hostEnvironment">The host environment.</param>
-    public ObjectCacheAppCache(IOptions<MemoryCacheOptions> options, ILoggerFactory loggerFactory, IHostEnvironment? hostEnvironment)
-    {
-        _options = options;
-        _hostEnvironment = hostEnvironment;
-
-        MemoryCache = new MemoryCache(_options, loggerFactory);
-    }
+    public ObjectCacheAppCache(IOptions<MemoryCacheOptions> options, ILoggerFactory loggerFactory)
+        => MemoryCache = new MemoryCache(options, loggerFactory);
 
     /// <inheritdoc />
     public object? Get(string key)
@@ -127,8 +118,6 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null)
             {
                 result = SafeLazy.GetSafeLazy(factory);
-
-                MemoryCacheEntryOptions options = GetOptions(timeout, isSliding);
 
                 try
                 {
@@ -208,8 +197,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             _locker.EnterWriteLock();
 
-            MemoryCache.Dispose();
-            MemoryCache = new MemoryCache(_options);
+            MemoryCache.Clear();
             _keys.Clear();
         }
         finally
