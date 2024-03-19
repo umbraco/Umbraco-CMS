@@ -1,9 +1,6 @@
-using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Api.Management.Controllers.Security;
-using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
@@ -16,24 +13,19 @@ namespace Umbraco.Cms.Api.Management.Security;
 
 public class ForgotPasswordUriProvider : IForgotPasswordUriProvider
 {
-    private readonly LinkGenerator _linkGenerator;
+
     private readonly ICoreBackOfficeUserManager _userManager;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly WebRoutingSettings _webRoutingSettings;
 
     public ForgotPasswordUriProvider(
-        LinkGenerator linkGenerator,
         ICoreBackOfficeUserManager userManager,
         IHostingEnvironment hostingEnvironment,
-        IHttpContextAccessor httpContextAccessor,
-        IOptions<WebRoutingSettings> webRoutingSettings)
+        IHttpContextAccessor httpContextAccessor)
     {
-        _linkGenerator = linkGenerator;
         _userManager = userManager;
         _hostingEnvironment = hostingEnvironment;
         _httpContextAccessor = httpContextAccessor;
-        _webRoutingSettings = webRoutingSettings.Value;
     }
 
     public async Task<Attempt<Uri, UserOperationStatus>> CreateForgotPasswordUriAsync(IUser user)
