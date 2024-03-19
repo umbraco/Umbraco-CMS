@@ -1,4 +1,4 @@
-import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT } from './section-sidebar.context.js';
+import { UmbSectionSidebarContext } from './section-sidebar.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -6,11 +6,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-section-sidebar')
 export class UmbSectionSidebarElement extends UmbLitElement {
 	#sectionSidebarContext = new UmbSectionSidebarContext(this);
-
-	constructor() {
-		super();
-		this.provideContext(UMB_SECTION_SIDEBAR_CONTEXT, this.#sectionSidebarContext);
-	}
 
 	render() {
 		return html`

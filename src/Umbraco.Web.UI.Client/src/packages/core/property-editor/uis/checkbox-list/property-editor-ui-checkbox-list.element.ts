@@ -12,14 +12,13 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	#value: Array<string> = [];
 	@property({ type: Array })
-	public get value(): Array<string> {
-		return this.#value;
-	}
 	public set value(value: Array<string>) {
 		this.#value = value ?? [];
 	}
+	public get value(): Array<string> {
+		return this.#value;
+	}
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		const listData: Record<number, { value: string; sortOrder: number }> | undefined = config.getValueByAlias('items');
@@ -52,7 +51,7 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 	render() {
 		return html`<umb-input-checkbox-list
 			@change="${this.#onChange}"
-			.selectedIds="${this.#value}"
+			.selection="${this.#value}"
 			.list="${this._list}"></umb-input-checkbox-list>`;
 	}
 }

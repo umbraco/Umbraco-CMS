@@ -15,6 +15,7 @@ import {
 export const manifests: Array<ManifestEntityBulkAction> = [
 	{
 		type: 'entityBulkAction',
+		kind: 'default',
 		alias: 'Umb.EntityBulkAction.Document.Publish',
 		name: 'Publish Document Entity Bulk Action',
 		weight: 50,
@@ -36,6 +37,7 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 	},
 	{
 		type: 'entityBulkAction',
+		kind: 'default',
 		alias: 'Umb.EntityBulkAction.Document.Unpublish',
 		name: 'Unpublish Document Entity Bulk Action',
 		weight: 40,
@@ -57,6 +59,7 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 	},
 	{
 		type: 'entityBulkAction',
+		kind: 'default',
 		alias: 'Umb.EntityBulkAction.Document.Duplicate',
 		name: 'Duplicate Document Entity Bulk Action',
 		weight: 30,
@@ -78,6 +81,7 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 	},
 	{
 		type: 'entityBulkAction',
+		kind: 'default',
 		alias: 'Umb.EntityBulkAction.Document.Move',
 		name: 'Move Document Entity Bulk Action',
 		weight: 20,
@@ -99,6 +103,7 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 	},
 	{
 		type: 'entityBulkAction',
+		kind: 'default',
 		alias: 'Umb.EntityBulkAction.Document.Delete',
 		name: 'Delete Document Entity Bulk Action',
 		weight: 10,

@@ -118,6 +118,9 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		this.#uniquePaths.set(identifier, value);
 		this.#registerModal();
 	}
+	getUniquePathValue(identifier: string): string | undefined {
+		return this.#uniquePaths.get(identifier);
+	}
 
 	async #registerModal() {
 		await this.#init;

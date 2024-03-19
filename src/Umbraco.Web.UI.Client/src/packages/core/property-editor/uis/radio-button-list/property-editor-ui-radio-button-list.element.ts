@@ -12,14 +12,13 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	#value = '';
 	@property({ type: String })
-	public get value(): string {
-		return this.#value;
-	}
 	public set value(value: string | undefined) {
 		this.#value = value?.trim() || '';
 	}
+	public get value(): string {
+		return this.#value;
+	}
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		const listData: Record<number, { value: string; sortOrder: number }> | undefined = config.getValueByAlias('items');

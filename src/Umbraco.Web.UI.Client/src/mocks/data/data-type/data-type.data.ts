@@ -4,9 +4,7 @@ import type {
 	DataTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-type UmbMockDataTypeModelHack = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
-
-export interface UmbMockDataTypeModel extends Omit<UmbMockDataTypeModelHack, 'type'> {}
+export type UmbMockDataTypeModel = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
 
 export const data: Array<UmbMockDataTypeModel> = [
 	{
@@ -367,7 +365,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		name: 'Multiple Text String',
 		id: 'dt-multipleTextString',
 		parent: null,
-		editorAlias: 'Umbraco.MultipleTextString',
+		editorAlias: 'Umbraco.MultipleTextstring',
 		editorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 		hasChildren: false,
 		isFolder: false,

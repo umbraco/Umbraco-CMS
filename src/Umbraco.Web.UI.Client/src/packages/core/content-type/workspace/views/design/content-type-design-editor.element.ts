@@ -1,0 +1,608 @@
+import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
+import type { UmbContentTypeDesignEditorTabElement } from './content-type-design-editor-tab.element.js';
+import { UmbContentTypeDesignEditorContext } from './content-type-design-editor.context.js';
+import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import type { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms/backoffice/external/uui';
+import {
+	UMB_COMPOSITION_PICKER_MODAL,
+	UmbContentTypeContainerStructureHelper,
+	type UmbContentTypeModel,
+} from '@umbraco-cms/backoffice/content-type';
+import { encodeFolderName } from '@umbraco-cms/backoffice/router';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import {
+	CompositionTypeModel,
+	type PropertyTypeContainerModelBaseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import type {
+	ManifestWorkspaceViewContentTypeDesignEditorKind,
+	UmbWorkspaceViewElement,
+} from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+
+@customElement('umb-content-type-design-editor')
+export class UmbContentTypeDesignEditorElement extends UmbLitElement implements UmbWorkspaceViewElement {
+	#sorter = new UmbSorterController<PropertyTypeContainerModelBaseModel, UUITabElement>(this, {
+		getUniqueOfElement: (element) => element.getAttribute('data-umb-tabs-id'),
+		getUniqueOfModel: (tab) => tab.id,
+		identifier: 'content-type-tabs-sorter',
+		itemSelector: 'uui-tab',
+		containerSelector: 'uui-tab-group',
+		disabledItemSelector: '#root-tab',
+		resolvePlacement: (args) => args.relatedRect.left + args.relatedRect.width * 0.5 > args.pointerX,
+		onChange: ({ model }) => {
+			this._tabs = model;
+		},
+		onEnd: ({ item }) => {
+			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
+			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
+			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
+			 */
+			const model = this._tabs ?? [];
+			const newIndex = model.findIndex((entry) => entry.id === item.id);
+
+			// Doesn't exist in model
+			if (newIndex === -1) return;
+
+			// First in list
+			if (newIndex === 0 && model.length > 1) {
+				this._tabsStructureHelper.partialUpdateContainer(item.id, { sortOrder: model[1].sortOrder - 1 });
+				return;
+			}
+
+			// Not first in list
+			if (newIndex > 0 && model.length > 1) {
+				const prevItemSortOrder = model[newIndex - 1].sortOrder;
+
+				let weight = 1;
+				this._tabsStructureHelper.partialUpdateContainer(item.id, { sortOrder: prevItemSortOrder + weight });
+
+				// Check for overlaps
+				// TODO: Make sure this take inheritance into considerations.
+				model.some((entry, index) => {
+					if (index <= newIndex) return;
+					if (entry.sortOrder === prevItemSortOrder + weight) {
+						weight++;
+						this._tabsStructureHelper.partialUpdateContainer(entry.id, { sortOrder: prevItemSortOrder + weight });
+					}
+					// Break the loop
+					return true;
+				});
+			}
+		},
+	});
+
+	#workspaceContext?: (typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT)['TYPE'];
+	#designContext = new UmbContentTypeDesignEditorContext(this);
+
+	set manifest(value: ManifestWorkspaceViewContentTypeDesignEditorKind) {
+		this._compositionRepositoryAlias = value.meta.compositionRepositoryAlias;
+	}
+
+	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
+
+	@state()
+	_compositionRepositoryAlias?: string;
+	//private _hasRootProperties = false;
+
+	@state()
+	private _hasRootGroups = false;
+
+	@state()
+	private _routes: UmbRoute[] = [];
+
+	@state()
+	_tabs?: Array<PropertyTypeContainerModelBaseModel>;
+
+	@state()
+	private _routerPath?: string;
+
+	@state()
+	private _activePath = '';
+
+	private _activeTabId?: string;
+
+	@state()
+	private _sortModeActive?: boolean;
+
+	constructor() {
+		super();
+
+		this.#sorter.disable();
+
+		this.observe(
+			this.#designContext.isSorting,
+			(isSorting) => {
+				this._sortModeActive = isSorting;
+				if (isSorting) {
+					this.#sorter.enable();
+				} else {
+					this.#sorter.disable();
+				}
+			},
+			'_observeIsSorting',
+		);
+
+		//TODO: We need to differentiate between local and composition tabs (and hybrids)
+
+		this._tabsStructureHelper.setContainerChildType('Tab');
+		this._tabsStructureHelper.setIsRoot(true);
+		this.observe(this._tabsStructureHelper.mergedContainers, (tabs) => {
+			this._tabs = tabs;
+			this.#sorter.setModel(tabs);
+			this._createRoutes();
+		});
+
+		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
+
+		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#workspaceContext = workspaceContext;
+			this._tabsStructureHelper.setStructureManager(workspaceContext.structure);
+
+			this._observeRootGroups();
+		});
+	}
+
+	#toggleSortMode() {
+		this.#designContext?.setIsSorting(!this._sortModeActive);
+	}
+
+	private _observeRootGroups() {
+		if (!this.#workspaceContext) return;
+
+		this.observe(
+			this.#workspaceContext.structure.hasRootContainers('Group'),
+			(hasRootGroups) => {
+				this._hasRootGroups = hasRootGroups;
+				this._createRoutes();
+			},
+			'_observeGroups',
+		);
+	}
+
+	private _createRoutes() {
+		// TODO: How about storing a set of elements based on tab ids? to prevent re-initializing the element when renaming..[NL]
+		if (!this.#workspaceContext || !this._tabs || this._hasRootGroups === undefined) return;
+		const routes: UmbRoute[] = [];
+
+		// We gather the activeTab name to check for rename, this is a bit hacky way to redirect the user without noticing to the new name [NL]
+		let activeTabName: string | undefined = undefined;
+
+		if (this._tabs.length > 0) {
+			this._tabs?.forEach((tab) => {
+				const tabName = tab.name ?? '';
+				if (tab.id === this._activeTabId) {
+					activeTabName = tabName;
+				}
+				routes.push({
+					path: `tab/${encodeFolderName(tabName).toString()}`,
+					component: () => import('./content-type-design-editor-tab.element.js'),
+					setup: (component) => {
+						// Or just cache the current view here, and use it if the same is begin requested?. [NL]
+						//(component as UmbContentTypeDesignEditorTabElement).tabName = tabName;
+						(component as UmbContentTypeDesignEditorTabElement).containerId = tab.id;
+					},
+				});
+			});
+		}
+
+		routes.push({
+			path: 'root',
+			component: () => import('./content-type-design-editor-tab.element.js'),
+			setup: (component) => {
+				//(component as UmbContentTypeDesignEditorTabElement).noTabName = true;
+				(component as UmbContentTypeDesignEditorTabElement).containerId = null;
+			},
+		});
+
+		if (this._hasRootGroups) {
+			routes.push({
+				path: '',
+				redirectTo: 'root',
+				guards: [() => this._activeTabId === undefined],
+			});
+		} else if (routes.length !== 0) {
+			routes.push({
+				path: '',
+				redirectTo: routes[0]?.path,
+				guards: [() => this._activeTabId === undefined],
+			});
+			// TODO: Look at this case.
+		}
+
+		// If we have an active tab name, then we might have a active tab name re-name, then we will redirect to the new name if it has been changed: [NL]
+		if (activeTabName) {
+			if (this._activePath && this._routerPath) {
+				const oldPath = this._activePath.split(this._routerPath)[1];
+				const newPath = '/tab/' + encodeFolderName(activeTabName);
+				if (oldPath !== newPath) {
+					// Lets cheat a bit and update the activePath already, in this way our input does not loose focus [NL]
+					this._activePath = this._routerPath + newPath;
+					// Update the current URL, so we are still on this specific tab:
+					window.history.replaceState(null, '', this._activePath);
+					// TODO: We have some flickering when renaming, this could potentially be fixed if we cache the view and re-use it if the same is requested [NL]
+					// Or maybe its just about we just send the updated tabName to the view, and let it handle the update itself [NL]
+				}
+			}
+		}
+
+		this._routes = routes;
+	}
+
+	async #requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
+		// TODO: Localize this:
+		const modalData: UmbConfirmModalData = {
+			headline: 'Delete tab',
+			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}>
+					Are you sure you want to delete the tab <strong>${tab?.name ?? tab?.id}</strong>
+				</umb-localize>
+				<div style="color:var(--uui-color-danger-emphasis)">
+					<umb-localize key="contentTypeEditor_confirmDeleteTabNotice">
+						This will delete all items that doesn't belong to a composition.
+					</umb-localize>
+				</div>`,
+			confirmLabel: this.localize.term('actions_delete'),
+			color: 'danger',
+		};
+
+		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
+
+		await umbConfirmModal(this, modalData);
+
+		this.#remove(tab?.id);
+	}
+	#remove(tabId?: string) {
+		if (!tabId) return;
+		this.#workspaceContext?.structure.removeContainer(null, tabId);
+		// TODO: We should only navigate away if it was the last tab and if it was the active one...
+		this._tabsStructureHelper?.isOwnerChildContainer(tabId)
+			? window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'))
+			: '';
+	}
+	async #addTab() {
+		// If there is already a Tab with no name, then focus it instead of adding a new one:
+		// TODO: Optimize this so it looks at the data instead of the DOM [NL]
+		const inputEl = this.shadowRoot?.querySelector('uui-tab[active] uui-input') as UUIInputElement;
+		if (inputEl?.value === '') {
+			this.#focusInput();
+			return;
+		}
+
+		if (!this._tabs) return;
+
+		const len = this._tabs.length;
+		const sortOrder = len === 0 ? 0 : this._tabs[len - 1].sortOrder + 1;
+		const tab = await this.#workspaceContext?.structure.createContainer(null, null, 'Tab', sortOrder);
+		if (tab) {
+			const path = this._routerPath + (tab.name ? '/tab/' + encodeFolderName(tab.name) : '/tab');
+			window.history.replaceState(null, '', path);
+			this.#focusInput();
+		}
+	}
+
+	async #focusInput() {
+		setTimeout(() => {
+			(this.shadowRoot?.querySelector('uui-tab[active] uui-input') as UUIInputElement | undefined)?.focus();
+		}, 100);
+	}
+
+	async #tabNameChanged(event: InputEvent, tab: PropertyTypeContainerModelBaseModel) {
+		this._activeTabId = tab.id;
+		let newName = (event.target as HTMLInputElement).value;
+
+		const changedName = this.#workspaceContext?.structure.makeContainerNameUniqueForOwnerContentType(
+			newName,
+			'Tab',
+			tab.id,
+		);
+
+		// Check if it collides with another tab name of this same content-type, if so adjust name:
+		if (changedName) {
+			newName = changedName;
+			(event.target as HTMLInputElement).value = newName;
+		}
+
+		this._tabsStructureHelper.partialUpdateContainer(tab.id!, {
+			name: newName,
+		});
+	}
+
+	async #tabNameBlur() {
+		this._activeTabId = undefined;
+	}
+
+	async #openCompositionModal() {
+		if (!this.#workspaceContext || !this._compositionRepositoryAlias) return;
+
+		const unique = this.#workspaceContext.getUnique();
+		if (!unique) {
+			throw new Error('Content Type unique is undefined');
+		}
+		const contentTypes = this.#workspaceContext.structure.getContentTypes();
+		const ownerContentType = this.#workspaceContext.structure.getOwnerContentType();
+		if (!ownerContentType) {
+			throw new Error('Owner Content Type not found');
+		}
+
+		const compositionConfiguration = {
+			compositionRepositoryAlias: this._compositionRepositoryAlias,
+			unique: unique,
+			// Here we use the loaded content types to declare what we already inherit. That puts a pressure on cleaning up, but thats a good thing. [NL]
+			selection: contentTypes.map((contentType) => contentType.unique).filter((id) => id !== unique),
+			isElement: ownerContentType.isElement,
+			currentPropertyAliases: [],
+		};
+
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManagerContext.open(this, UMB_COMPOSITION_PICKER_MODAL, {
+			data: compositionConfiguration,
+		});
+		await modalContext?.onSubmit();
+
+		if (!modalContext?.value) return;
+
+		const compositionIds = modalContext.getValue().selection;
+
+		this.#workspaceContext?.setCompositions(
+			compositionIds.map((unique) => ({ contentType: { unique }, compositionType: CompositionTypeModel.COMPOSITION })),
+		);
+	}
+
+	render() {
+		return html`
+			<umb-body-layout header-fit-height>
+				<div id="header" slot="header">
+					<div id="container-list" class="flex">${this.renderTabsNavigation()} ${this.renderAddButton()}</div>
+					${this.renderActions()}
+				</div>
+				<umb-router-slot
+					.routes=${this._routes}
+					@init=${(event: UmbRouterSlotInitEvent) => {
+						this._routerPath = event.target.absoluteRouterPath;
+					}}
+					@change=${(event: UmbRouterSlotChangeEvent) => {
+						this._activePath = event.target.absoluteActiveViewPath || '';
+					}}>
+				</umb-router-slot>
+			</umb-body-layout>
+		`;
+	}
+
+	renderAddButton() {
+		// TODO: Localize this:
+		if (this._sortModeActive) return;
+		return html`<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab" compact>
+			<uui-icon name="icon-add"></uui-icon>
+			Add tab
+		</uui-button>`;
+	}
+
+	renderActions() {
+		const sortButtonText = this._sortModeActive
+			? this.localize.term('general_reorderDone')
+			: this.localize.term('general_reorder');
+
+		return html`<div class="tab-actions">
+			${this._compositionRepositoryAlias
+				? html`<uui-button
+						look="outline"
+						label=${this.localize.term('contentTypeEditor_compositions')}
+						compact
+						@click=${this.#openCompositionModal}>
+						<uui-icon name="icon-merge"></uui-icon>
+						${this.localize.term('contentTypeEditor_compositions')}
+					</uui-button>`
+				: ''}
+			<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
+				<uui-icon name="icon-navigation"></uui-icon>
+				${sortButtonText}
+			</uui-button>
+		</div>`;
+	}
+
+	renderTabsNavigation() {
+		if (!this._tabs) return;
+
+		return html`<div id="tabs-group" class="flex">
+			<uui-tab-group>
+				${this.renderRootTab()}
+				${repeat(
+					this._tabs,
+					(tab) => tab.id,
+					(tab) => this.renderTab(tab),
+				)}
+			</uui-tab-group>
+		</div>`;
+	}
+
+	renderRootTab() {
+		const rootTabPath = this._routerPath + '/root';
+		const rootTabActive = rootTabPath === this._activePath;
+		return html`<uui-tab
+			id="root-tab"
+			class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
+			label=${this.localize.term('general_content')}
+			.active=${rootTabActive}
+			href=${rootTabPath}>
+			${this.localize.term('general_content')}
+		</uui-tab>`;
+	}
+
+	renderTab(tab: PropertyTypeContainerModelBaseModel) {
+		const path = this._routerPath + (tab.name ? '/tab/' + encodeFolderName(tab.name) : '/tab');
+		const tabActive = path === this._activePath;
+		const ownedTab = this._tabsStructureHelper.isOwnerChildContainer(tab.id!) ?? false;
+
+		return html`<uui-tab
+			label=${tab.name ?? 'unnamed'}
+			.active=${tabActive}
+			href=${path}
+			data-umb-tabs-id=${ifDefined(tab.id)}>
+			${this.renderTabInner(tab, tabActive, ownedTab)}
+		</uui-tab>`;
+	}
+
+	renderTabInner(tab: PropertyTypeContainerModelBaseModel, tabActive: boolean, ownedTab: boolean) {
+		// TODO: Localize this:
+		if (this._sortModeActive) {
+			return html`<div class="no-edit">
+				${ownedTab
+					? html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
+							<uui-input
+								label="sort order"
+								type="number"
+								value=${ifDefined(tab.sortOrder)}
+								style="width:50px"
+								@change=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`
+					: html`<uui-icon class="external" name="icon-merge"></uui-icon>${tab.name!}`}
+			</div>`;
+		}
+
+		if (tabActive && ownedTab) {
+			return html`<div class="tab">
+				<uui-input
+					id="input"
+					look="placeholder"
+					placeholder="Unnamed"
+					label=${tab.name!}
+					value="${tab.name!}"
+					auto-width
+					@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
+					@input=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
+					@blur=${(e: InputEvent) => this.#tabNameBlur()}>
+					${this.renderDeleteFor(tab)}
+				</uui-input>
+			</div>`;
+		}
+
+		if (ownedTab) {
+			return html`<div class="no-edit">${tab.name!} ${this.renderDeleteFor(tab)}</div>`;
+		} else {
+			return html`<div class="no-edit"><uui-icon name="icon-merge"></uui-icon>${tab.name!}</div>`;
+		}
+	}
+
+	#changeOrderNumber(tab: PropertyTypeContainerModelBaseModel, e: UUIInputEvent) {
+		if (!e.target.value || !tab.id) return;
+		const sortOrder = Number(e.target.value);
+		this._tabsStructureHelper.partialUpdateContainer(tab.id, { sortOrder });
+	}
+
+	renderDeleteFor(tab: PropertyTypeContainerModelBaseModel) {
+		return html`<uui-button
+			label=${this.localize.term('actions_remove')}
+			class="trash"
+			slot="append"
+			@click=${() => this.#requestRemoveTab(tab)}
+			compact>
+			<uui-icon name="icon-trash"></uui-icon>
+		</uui-button>`;
+	}
+
+	static styles = [
+		UmbTextStyles,
+		css`
+			#buttons-wrapper {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				align-items: stretch;
+			}
+
+			:host {
+				position: relative;
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				--uui-tab-background: var(--uui-color-surface);
+			}
+
+			[drag-placeholder] {
+				opacity: 0.5;
+			}
+
+			[drag-placeholder] uui-input {
+				visibility: hidden;
+			}
+
+			/* TODO: This should be replaced with a general workspace bar — naming is hard */
+
+			#header {
+				width: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				flex-wrap: nowrap;
+			}
+
+			.flex {
+				display: flex;
+			}
+
+			uui-tab-group {
+				flex-wrap: nowrap;
+			}
+
+			.content-tab-is-empty {
+				align-self: center;
+				border-radius: 3px;
+				--uui-tab-text: var(--uui-color-text-alt);
+				border: dashed 1px var(--uui-color-border-emphasis);
+			}
+
+			uui-tab {
+				position: relative;
+				border-left: 1px hidden transparent;
+				border-right: 1px solid var(--uui-color-border);
+			}
+
+			.no-edit uui-input {
+				pointer-events: auto;
+			}
+
+			.no-edit {
+				pointer-events: none;
+				display: inline-flex;
+				padding-left: var(--uui-size-space-3);
+				border: 1px solid transparent;
+				align-items: center;
+				gap: var(--uui-size-space-3);
+			}
+
+			.trash {
+				opacity: 1;
+				transition: opacity 120ms;
+			}
+
+			uui-tab:not(:hover, :focus) .trash {
+				opacity: 0;
+				transition: opacity 120ms;
+			}
+
+			uui-input:not(:focus, :hover) {
+				border: 1px solid transparent;
+			}
+
+			.inherited {
+				vertical-align: sub;
+			}
+
+			[drag-placeholder] {
+				opacity: 0.2;
+			}
+		`,
+	];
+}
+
+export default UmbContentTypeDesignEditorElement;
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-content-type-design-editor': UmbContentTypeDesignEditorElement;
+	}
+}

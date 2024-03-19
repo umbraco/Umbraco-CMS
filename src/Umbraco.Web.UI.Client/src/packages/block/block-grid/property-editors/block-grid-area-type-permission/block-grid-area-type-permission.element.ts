@@ -14,12 +14,13 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ type: Array })
-	public get value(): Array<UmbBlockGridTypeAreaTypePermission> {
-		return this._value;
-	}
 	public set value(value: Array<UmbBlockGridTypeAreaTypePermission>) {
 		this._value = value ?? [];
 	}
+	public get value(): Array<UmbBlockGridTypeAreaTypePermission> {
+		return this._value;
+	}
+
 	@state()
 	private _value: Array<UmbBlockGridTypeAreaTypePermission> = [];
 
@@ -151,7 +152,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 						<umb-localize key="blockEditor_areaAllowedBlocksEmpty">
 							By default, all block types are allowed in an Area, Use this option to allow only selected types.
 						</umb-localize>
-				  </small>`
+					</small>`
 				: nothing} `;
 	}
 

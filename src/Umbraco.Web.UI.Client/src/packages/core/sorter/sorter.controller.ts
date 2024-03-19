@@ -73,8 +73,11 @@ export type resolvePlacementArgs<T, ElementType extends HTMLElement> = {
 };
 
 type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
-	getUniqueOfElement: (element: ElementType) => string | null | symbol | number;
-	getUniqueOfModel: (modeEntry: T) => string | null | symbol | number;
+	/**
+	 * Define how to retrive the unique identifier of an element. If this method returns undefined, the move will be cancelled.
+	 */
+	getUniqueOfElement: (element: ElementType) => string | null | symbol | number | undefined;
+	getUniqueOfModel: (modeEntry: T) => string | null | symbol | number | undefined;
 	/**
 	 * Optionally define a unique identifier for each sorter experience, all Sorters that uses the same identifier to connect with other sorters.
 	 */
@@ -266,18 +269,21 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	setModel(model: Array<T>): void {
 		if (this.#model) {
-			// TODO: Some updates might need to be done, as the modal is about to changed? Do make the changes after setting the model?..
+			// TODO: Some updates might need to be done, as the model is about to change? Do make the changes after setting the model?.. [NL]
+			this.#model = model;
 		}
-		this.#model = model;
 	}
 
 	hasItem(unique: string) {
 		return this.#model.find((x) => this.#config.getUniqueOfModel(x) === unique) !== undefined;
 	}
 
+	/*
 	getItem(unique: string) {
+		if (!unique) return undefined;
 		return this.#model.find((x) => this.#config.getUniqueOfModel(x) === unique);
 	}
+	*/
 
 	hostConnected() {
 		this.#isConnected = true;
@@ -381,12 +387,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		// If we have a currentItem and the element matches, we should set the currentElement to this element.
-		if (
-			UmbSorterController.activeItem &&
-			this.#config.getUniqueOfElement(element) === this.#config.getUniqueOfModel(UmbSorterController.activeItem)
-		) {
-			if (UmbSorterController.activeElement !== element) {
-				this.#setCurrentElement(element);
+		if (UmbSorterController.activeItem) {
+			const elUnique = this.#config.getUniqueOfElement(element);
+			const modelUnique = this.#config.getUniqueOfModel(UmbSorterController.activeItem);
+			if (elUnique === modelUnique && elUnique !== undefined) {
+				if (UmbSorterController.activeElement !== element) {
+					this.#setCurrentElement(element);
+				}
 			}
 		}
 	}
@@ -662,7 +669,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 						horizontalPlaceAfter: placeAfter,
 						pointerX: this.#dragX,
 						pointerY: this.#dragY,
-				  })
+					})
 				: true;
 
 			if (verticalDirection === null) {
@@ -929,15 +936,15 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				Math.abs(scrollRect.right - clientX) <= autoScrollSensitivity && scrollPosX + scrollRect.width < scrollWidth
 					? 1
 					: Math.abs(scrollRect.left - clientX) <= autoScrollSensitivity && !!scrollPosX
-					? -1
-					: 0;
+						? -1
+						: 0;
 
 			this.autoScrollY =
 				Math.abs(scrollRect.bottom - clientY) <= autoScrollSensitivity && scrollPosY + scrollRect.height < scrollHeight
 					? 1
 					: Math.abs(scrollRect.top - clientY) <= autoScrollSensitivity && !!scrollPosY
-					? -1
-					: 0;
+						? -1
+						: 0;
 
 			this.#autoScrollRAF = requestAnimationFrame(this.#performAutoScroll);
 		}

@@ -22,10 +22,16 @@ export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 	public set alias(value: string | undefined) {
 		this.myModalRegistration.setUniquePathValue('propertyAlias', value);
 	}
+	public get alias(): string | undefined {
+		return this.myModalRegistration.getUniquePathValue('propertyAlias');
+	}
 
 	@property()
 	public set variantId(value: string | UmbVariantId | undefined) {
 		this.myModalRegistration.setUniquePathValue('variantId', value?.toString());
+	}
+	public get variantId(): string | undefined {
+		return this.myModalRegistration.getUniquePathValue('variantId');
 	}
 
 	/**
@@ -91,8 +97,7 @@ export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 		this._urls = [...data]; // Unfreeze data coming from State, so we can manipulate it.
 		super.value = this._urls.map((x) => x.url).join(',');
 	}
-
-	get urls() {
+	get urls(): Array<UmbLinkPickerLink> {
 		return this._urls;
 	}
 

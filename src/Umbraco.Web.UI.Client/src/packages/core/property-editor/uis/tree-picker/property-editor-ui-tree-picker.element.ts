@@ -11,11 +11,10 @@ import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 /**
  * @element umb-property-editor-ui-tree-picker
  */
-
 @customElement('umb-property-editor-ui-tree-picker')
 export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	value = '';
+	@property({ type: Array })
+	value: UmbInputTreeElement['items'] = [];
 
 	@state()
 	type: UmbTreePickerSource['type'] = 'content';
@@ -42,9 +41,6 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 
 	#dynamicRootRepository = new UmbDynamicRootRepository(this);
 
-	#workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
-
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const startNode: UmbTreePickerSource | undefined = config?.getValueByAlias('startNode');
 		if (startNode) {
@@ -62,14 +58,6 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 		this.ignoreUserStartNodes = config?.getValueByAlias('ignoreUserStartNodes');
 	}
 
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#workspaceContext = workspaceContext;
-		});
-	}
-
 	connectedCallback() {
 		super.connectedCallback();
 
@@ -79,9 +67,10 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	async #setStartNodeId() {
 		if (this.startNodeId) return;
 
-		const unique = this.#workspaceContext?.getUnique();
 		// TODO: Awaiting the workspace context to have a parent entity ID value. [LK]
 		// e.g. const parentEntityId = this.#workspaceContext?.getParentEntityId();
+		const workspaceContext = await this.getContext(UMB_WORKSPACE_CONTEXT);
+		const unique = workspaceContext.getUnique();
 		if (unique && this.#dynamicRoot) {
 			const result = await this.#dynamicRootRepository.postDynamicRootQuery(this.#dynamicRoot, unique);
 			if (result && result.length > 0) {
@@ -91,13 +80,14 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	}
 
 	#onChange(e: CustomEvent) {
-		this.value = (e.target as UmbInputTreeElement).value as string;
+		const input = e.target as UmbInputTreeElement;
+		this.value = input.items;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
 		return html`<umb-input-tree
-			.value=${this.value}
+			.items=${this.value}
 			.type=${this.type}
 			.startNodeId=${this.startNodeId ?? ''}
 			.min=${this.min}

@@ -41,7 +41,7 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	}
 }
 
-const treeItemMapper = (model: UmbMockDocumentModel): Omit<DocumentTreeItemResponseModel, 'type'> => {
+const treeItemMapper = (model: UmbMockDocumentModel): DocumentTreeItemResponseModel => {
 	const documentType = umbDocumentTypeMockDb.read(model.documentType.id);
 	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
 

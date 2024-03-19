@@ -12,6 +12,12 @@ export const manifests = [
 			label: 'Settings',
 			pathname: 'settings',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionUserPermission',
+				match: UMB_SETTINGS_SECTION_ALIAS,
+			},
+		],
 	},
 	{
 		type: 'menu',

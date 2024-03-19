@@ -33,11 +33,11 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	 * @default 0
 	 */
 	@property({ type: Number })
-	public get min(): number {
-		return this.#pickerContext.min;
-	}
 	public set min(value: number) {
 		this.#pickerContext.min = value;
+	}
+	public get min(): number {
+		return this.#pickerContext.min;
 	}
 
 	/**
@@ -56,11 +56,11 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	 * @default Infinity
 	 */
 	@property({ type: Number })
-	public get max(): number {
-		return this.#pickerContext.max;
-	}
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+	}
+	public get max(): number {
+		return this.#pickerContext.max;
 	}
 
 	/**
@@ -73,20 +73,20 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
-	public set selectedIds(ids: Array<string> | undefined) {
+	public set selection(ids: Array<string> | undefined) {
 		this.#pickerContext.setSelection(ids ?? []);
 	}
-	public get selectedIds(): Array<string> {
+	public get selection(): Array<string> {
 		return this.#pickerContext.getSelection();
 	}
 
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIds = splitStringToArray(idsString);
+		this.selection = splitStringToArray(idsString);
 	}
 	public get value(): string {
-		return this.selectedIds.join(',');
+		return this.selection.join(',');
 	}
 
 	@state()
@@ -160,7 +160,7 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	}
 
 	#renderAddButton() {
-		if (this.max > 0 && this.selectedIds.length >= this.max) return nothing;
+		if (this.max > 0 && this.selection.length >= this.max) return nothing;
 		return html`
 			<uui-button
 				id="add-button"
