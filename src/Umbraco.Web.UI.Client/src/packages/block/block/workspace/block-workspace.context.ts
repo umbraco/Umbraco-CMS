@@ -41,7 +41,7 @@ export class UmbBlockWorkspaceContext<
 
 	#layout = new UmbObjectState<LayoutDataType | undefined>(undefined);
 	readonly layout = this.#layout.asObservable();
-	//readonly unique = this.#layout.asObservablePart((x) => x?.contentUdi);
+	readonly unique = this.#layout.asObservablePart((x) => x?.contentUdi);
 	readonly contentUdi = this.#layout.asObservablePart((x) => x?.contentUdi);
 
 	readonly content = new UmbBlockElementManager(this);
