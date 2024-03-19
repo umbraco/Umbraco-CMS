@@ -9,9 +9,10 @@ export class UmbWorkspaceElement extends UmbLitElement {
 
 	render() {
 		if (!this.entityType) return nothing;
-		return html`<umb-extension-slot
+		return html`<umb-extension-with-api-slot
 			type="workspace"
-			.filter=${(manifest: ManifestWorkspace) => manifest.meta.entityType === this.entityType}></umb-extension-slot>`;
+			.filter=${(manifest: ManifestWorkspace) =>
+				manifest.meta.entityType === this.entityType}></umb-extension-with-api-slot>`;
 	}
 }
 

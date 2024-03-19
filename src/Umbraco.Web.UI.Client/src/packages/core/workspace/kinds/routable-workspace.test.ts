@@ -1,16 +1,16 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbDocumentWorkspaceElement } from './document-workspace.element.js';
+import { UmbRoutableWorkspaceElement } from './routable-workspace.element.js';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
-describe('UmbDocumentWorkspaceElement', () => {
-	let element: UmbDocumentWorkspaceElement;
+describe('UmbRoutableWorkspaceElement', () => {
+	let element: UmbRoutableWorkspaceElement;
 
 	beforeEach(async () => {
-		element = await fixture(html`<umb-document-workspace></umb-document-workspace>`);
+		element = await fixture(html`<umb-routable-workspace></umb-routable-workspace>`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbDocumentWorkspaceElement);
+		expect(element).to.be.instanceOf(UmbRoutableWorkspaceElement);
 	});
 
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {

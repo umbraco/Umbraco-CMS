@@ -18,13 +18,20 @@ import {
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
+import { UmbDocumentWorkspaceEditorElement } from './document-workspace-editor.element.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbEditableWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEditableWorkspaceContextBase,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
+	UmbWorkspaceSplitViewManager,
+} from '@umbraco-cms/backoffice/workspace';
 import type {
 	UmbWorkspaceCollectionContextInterface,
 	UmbVariantableWorkspaceContextInterface,
 	UmbPublishableWorkspaceContextInterface,
+	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -46,6 +53,7 @@ type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements
+		UmbRoutableWorkspaceContext,
 		UmbVariantableWorkspaceContextInterface<UmbDocumentVariantModel>,
 		UmbPublishableWorkspaceContextInterface,
 		UmbWorkspaceCollectionContextInterface<UmbDocumentTypeDetailModel>
@@ -90,6 +98,7 @@ export class UmbDocumentWorkspaceContext
 	);
 	#varies?: boolean;
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly variantOptions = mergeObservables(
@@ -128,6 +137,33 @@ export class UmbDocumentWorkspaceContext
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 		this.observe(this.varies, (varies) => (this.#varies = varies));
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique',
+				component: () => new UmbDocumentWorkspaceEditorElement(),
+				setup: async (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					const documentTypeUnique = info.match.params.documentTypeUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: () => new UmbDocumentWorkspaceEditorElement(),
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 
 		this.loadLanguages();
 	}

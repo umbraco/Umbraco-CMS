@@ -1,4 +1,4 @@
-import type { UmbWorkspaceSplitViewManager } from '../workspace-split-view-manager.class.js';
+import type { UmbWorkspaceSplitViewManager } from '../controllers/workspace-split-view-manager.controller.js';
 import type { UmbPropertyDatasetContext } from '../../property/property-dataset/property-dataset-context.interface.js';
 import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';

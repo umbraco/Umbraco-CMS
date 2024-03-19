@@ -172,7 +172,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 					this._permitted,
 					(ext) => ext.alias,
 					(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component),
-			  )
+				)
 			: html`<slot></slot>`;
 	}
 
