@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -16,8 +17,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.User;
 public class CreateInitialPasswordUserController : UserControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public CreateInitialPasswordUserController(IUserService userService) => _userService = userService;
+    public CreateInitialPasswordUserController(IUserService userService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    {
+        _userService = userService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+    }
 
     [AllowAnonymous]
     [HttpPost("invite/create-password")]
@@ -27,7 +33,7 @@ public class CreateInitialPasswordUserController : UserControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateInitialPassword(CreateInitialPasswordUserRequestModel model)
     {
-        Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.CreateInitialPasswordAsync(model.User.Id, model.Token, model.Password);
+        Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.CreateInitialPasswordAsync(CurrentUserKey(_backOfficeSecurityAccessor), model.User.Id, model.Token, model.Password);
 
         return response.Success
             ? Ok()
