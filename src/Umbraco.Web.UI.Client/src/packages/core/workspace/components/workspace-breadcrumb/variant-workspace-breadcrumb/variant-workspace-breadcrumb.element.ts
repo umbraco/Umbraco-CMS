@@ -8,7 +8,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
-import { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
+import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-variant-workspace-breadcrumb')
 export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
@@ -20,7 +20,7 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	_name: string = '';
 
 	@state()
-	_structure: any[] = [];
+	_structure: Array<UmbVariantStructureItemModel> = [];
 
 	@state()
 	_workspaceActiveVariantId?: UmbVariantId;
@@ -28,7 +28,7 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	@state()
 	_appDefaultCulture?: string;
 
-	#sectionContext?: any;
+	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
 	constructor() {
 		super();
