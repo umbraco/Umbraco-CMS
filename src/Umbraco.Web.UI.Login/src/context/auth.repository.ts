@@ -2,6 +2,7 @@ import {
   LoginRequestModel,
   LoginResponse,
   ResetPasswordResponse,
+  ValidateInviteCodeResponse,
   ValidatePasswordResetCodeResponse
 } from "../types.js";
 import { umbLocalizationContext } from '../external/localization/localization-context.js';
@@ -60,9 +61,16 @@ export class UmbAuthRepository {
     });
     const response = await fetch(request);
 
+    if (!response.ok) {
+      const error = await this.#getErrorDetailText(response, 'Could not reset the password');
+      return {
+        status: response.status,
+        error,
+      };
+    }
+
     return {
-      status: response.status,
-      error: response.ok ? undefined : await this.#getErrorText(response),
+      status: response.status
     };
   }
 
@@ -80,14 +88,17 @@ export class UmbAuthRepository {
       },
     });
     const response = await fetch(request);
-    const data = await response.json();
 
     if (!response.ok) {
+      const error = await this.#getErrorDetailText(response, 'The password reset token could not be verified');
+
       return {
         status: response.status,
-        error: data.detail ?? 'The password reset token could not be verified',
+        error,
       };
     }
+
+    const data = await response.json();
 
     return {
       status: response.status,
@@ -112,11 +123,11 @@ export class UmbAuthRepository {
     const response = await fetch(request);
 
     if (!response.ok) {
-      const data = await response.json();
+      const error = await this.#getErrorDetailText(response, 'Could not reset the password');
 
       return {
         status: response.status,
-        error: data.detail ?? 'The password reset token could not be verified',
+        error,
       };
     }
 
@@ -125,11 +136,15 @@ export class UmbAuthRepository {
     };
   }
 
-  public async newInvitedUserPassword(newPassWord: string): Promise<LoginResponse> {
-    const request = new Request('backoffice/umbracoapi/authentication/PostSetInvitedUserPassword', {
+  public async newInvitedUserPassword(password: string, token: string, userId: string): Promise<LoginResponse> {
+    const request = new Request('management/api/v1/user/invite/create-password', {
       method: 'POST',
       body: JSON.stringify({
-        newPassWord,
+        password,
+        token,
+        user: {
+          id: userId
+        }
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -137,37 +152,48 @@ export class UmbAuthRepository {
     });
     const response = await fetch(request);
 
+    if (!response.ok) {
+      const error = await this.#getErrorDetailText(response, 'Could not create a password for the invited user');
+
+      return {
+        status: response.status,
+        error,
+      };
+    }
+
     return {
       status: response.status,
-      error: response.ok ? undefined : await this.#getErrorText(response),
     };
   }
 
-  public async getInvitedUser(): Promise<any> {
-    //TODO: Add type
-    const request = new Request('backoffice/umbracoapi/authentication/GetCurrentInvitedUser', {
-      method: 'GET',
+  public async validateInviteCode(token: string, userId: string): Promise<ValidateInviteCodeResponse> {
+    const request = new Request('management/api/v1/user/invite/verify', {
+      method: 'POST',
+      body: JSON.stringify({
+        token,
+        user: {
+          id: userId
+        }
+      }),
       headers: {
         'Content-Type': 'application/json',
       },
     });
     const response = await fetch(request);
 
-    // Check if response contains AngularJS response data
-    if (response.ok) {
-      let text = await response.text();
-      text = this.#removeAngularJSResponseData(text);
-      const user = JSON.parse(text);
-
+    if (!response.ok) {
+      const error = await this.#getErrorDetailText(response, 'Could not validate the invite code');
       return {
         status: response.status,
-        user,
+        error,
       };
     }
 
+    const data = await response.json();
+
     return {
       status: response.status,
-      error: this.#getErrorText(response),
+      data
     };
   }
 
@@ -186,17 +212,35 @@ export class UmbAuthRepository {
     const response = await fetch(request);
 
     if (!response.ok) {
-      const data = await response.json();
+      const error = await this.#getErrorDetailText(response, 'Could not validate the 2-factor authentication code');
 
       return {
         status: response.status,
-        error: data.title ?? 'An unknown error occurred.',
+        error,
       };
     }
 
     return {
       status: response.status,
     };
+  }
+
+  async #getErrorDetailText(response: Response, fallbackText?: string): Promise<string> {
+    try {
+      // Unauthorized special message
+      if (response.status === 401) {
+        return umbLocalizationContext.localize(
+          'login_userFailedLogin',
+          undefined,
+          "Oops! We couldn't log you in. Please check your credentials and try again."
+        );
+      }
+
+      const data = await response.json();
+      return data.title ?? fallbackText ?? 'An unknown error occurred.';
+    } catch {
+      return fallbackText ?? 'An unknown error occurred.';
+    }
   }
 
   async #getErrorText(response: Response): Promise<string> {
@@ -233,16 +277,5 @@ export class UmbAuthRepository {
           ))
         );
     }
-  }
-
-  /**
-   * AngularJS adds a prefix to the response data, which we need to remove
-   */
-  #removeAngularJSResponseData(text: string) {
-    if (text.startsWith(")]}',\n")) {
-      text = text.split('\n')[1];
-    }
-
-    return text;
   }
 }
