@@ -17,13 +17,9 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 			throw new Error('Unique ID is required to fetch a collection.');
 		}
 
-		if (!query.dataTypeId) {
-			throw new Error('Data type ID is required to fetch a collection.');
-		}
-
 		const params = {
 			id: query.unique,
-			dataTypeId: query.dataTypeId,
+			dataTypeId: query.dataTypeId ?? '',
 			orderBy: query.orderBy ?? 'updateDate',
 			orderCulture: query.orderCulture ?? 'en-US',
 			orderDirection: query.orderDirection === 'asc' ? DirectionModel.ASCENDING : DirectionModel.DESCENDING,

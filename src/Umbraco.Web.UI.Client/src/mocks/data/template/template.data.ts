@@ -7,9 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { TemplateQueryPropertyTypeModel, OperatorModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-type UmbMockTemplateModelHack = TemplateResponseModel & NamedEntityTreeItemResponseModel & TemplateItemResponseModel;
-
-export interface UmbMockTemplateModel extends Omit<UmbMockTemplateModelHack, 'type'> {}
+export type UmbMockTemplateModel = TemplateResponseModel & NamedEntityTreeItemResponseModel & TemplateItemResponseModel;
 
 export const data: Array<UmbMockTemplateModel> = [
 	{

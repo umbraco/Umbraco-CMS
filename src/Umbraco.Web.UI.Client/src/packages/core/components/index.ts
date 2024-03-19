@@ -15,6 +15,7 @@ export * from './history/index.js';
 export * from './icon/index.js';
 export * from './input-collection-configuration/index.js';
 export * from './input-color/index.js';
+export * from './input-content-type-property/index.js';
 export * from './input-date/index.js';
 export * from './input-dropdown/index.js';
 export * from './input-eye-dropper/index.js';

@@ -3,10 +3,14 @@ import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
 import type { UmbMediaTypeDetailModel } from '../types.js';
 import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
-import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type {
+	UmbContentTypeCompositionModel,
+	UmbContentTypeSortModel,
+	UmbContentTypeWorkspaceContext,
+} from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -16,8 +20,9 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 type EntityType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbSaveableWorkspaceContextInterface
+	implements UmbContentTypeWorkspaceContext<EntityType>
 {
+	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
 	//
 	public readonly repository: UmbMediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 	// Draft is located in structure manager
@@ -33,14 +38,13 @@ export class UmbMediaTypeWorkspaceContext
 	readonly icon;
 
 	readonly allowedAtRoot;
+	readonly variesByCulture;
+	readonly variesBySegment;
 	readonly allowedContentTypes;
 	readonly compositions;
 	readonly collection;
 
-	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
-
-	#isSorting = new UmbBooleanState(undefined);
-	isSorting = this.#isSorting.asObservable();
+	readonly structure = new UmbContentTypeStructureManager<EntityType>(this, this.repository);
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.MediaType');
@@ -52,22 +56,16 @@ export class UmbMediaTypeWorkspaceContext
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
 		this.icon = this.structure.ownerContentTypeObservablePart((data) => data?.icon);
 		this.allowedAtRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAtRoot);
+		this.variesByCulture = this.structure.ownerContentTypeObservablePart((data) => data?.variesByCulture);
+		this.variesBySegment = this.structure.ownerContentTypeObservablePart((data) => data?.variesBySegment);
 		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
 		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
 	}
 
-	protected resetState() {
-		this.#persistedData.setValue(undefined);
+	protected resetState(): void {
 		super.resetState();
-	}
-
-	getIsSorting() {
-		return this.#isSorting.getValue();
-	}
-
-	setIsSorting(isSorting: boolean) {
-		this.#isSorting.setValue(isSorting);
+		this.#persistedData.setValue(undefined);
 	}
 
 	getData() {
@@ -103,6 +101,18 @@ export class UmbMediaTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ allowedAtRoot });
 	}
 
+	setVariesByCulture(variesByCulture: boolean) {
+		this.structure.updateOwnerContentType({ variesByCulture });
+	}
+
+	setVariesBySegment(variesBySegment: boolean) {
+		this.structure.updateOwnerContentType({ variesBySegment });
+	}
+
+	setIsElement(isElement: boolean) {
+		this.structure.updateOwnerContentType({ isElement });
+	}
+
 	setAllowedContentTypes(allowedContentTypes: Array<UmbContentTypeSortModel>) {
 		this.structure.updateOwnerContentType({ allowedContentTypes });
 	}
@@ -122,20 +132,29 @@ export class UmbMediaTypeWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
-		this.setIsSorting(false);
 		this.#persistedData.setValue(data);
 		return data;
 	}
 
-	async load(entityId: string) {
+	async load(unique: string) {
 		this.resetState();
-		const { data } = await this.structure.loadType(entityId);
-		if (!data) return undefined;
+		const { data, asObservable } = await this.structure.loadType(unique);
 
-		this.setIsNew(false);
-		this.setIsSorting(false);
-		this.#persistedData.setValue(data);
-		return data;
+		if (data) {
+			this.setIsNew(false);
+			this.#persistedData.update(data);
+		}
+
+		if (asObservable) {
+			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbMediaTypeStoreObserver');
+		}
+	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/settings/workspace/media-type-root');
+		}
 	}
 
 	/**
@@ -179,7 +198,6 @@ export class UmbMediaTypeWorkspaceContext
 	public destroy(): void {
 		this.#persistedData.destroy();
 		this.structure.destroy();
-		this.#isSorting.destroy();
 		this.repository.destroy();
 		super.destroy();
 	}

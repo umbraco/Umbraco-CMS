@@ -4,7 +4,6 @@ import { html, nothing, customElement, property, state } from '@umbraco-cms/back
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LoggerResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-//TODO: implement the saved searches pagination when the API total bug is fixed
 @customElement('umb-log-viewer-log-level-overview')
 export class UmbLogViewerLogLevelOverviewElement extends UmbLitElement {
 	#logViewerContext?: UmbLogViewerWorkspaceContext;

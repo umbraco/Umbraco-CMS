@@ -33,7 +33,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#onSectionsChange(event: UmbChangeEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputSectionElement;
-		this.#workspaceContext?.updateProperty('sections', target.value);
+		this.#workspaceContext?.updateProperty('sections', target.selection);
 	}
 
 	#onDocumentStartNodeChange(event: CustomEvent) {
@@ -98,7 +98,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					description=${this.localize.term('user_sectionsHelp')}>
 					<umb-input-section
 						slot="editor"
-						.value=${this._userGroup.sections ?? []}
+						.selection=${this._userGroup.sections ?? []}
 						@change=${this.#onSectionsChange}></umb-input-section>
 				</umb-property-layout>
 				<umb-property-layout

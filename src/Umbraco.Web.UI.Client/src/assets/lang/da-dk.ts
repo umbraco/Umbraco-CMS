@@ -308,7 +308,7 @@ export default {
 		languagesToSendForApproval: 'Hvilke sprog vil du gerne sende til godkendelse?',
 		languagesToSchedule: 'Hvilke sprog vil du gerne planlægge?',
 		languagesToUnpublish:
-			'Vælg sproget du vil afpublicere. Afpublicering af et obligatorisk sprog vil\n      afpublicere alle sprog.\n    ',
+			'Vælg sproget du vil afpublicere. Afpublicering af et obligatorisk sprog vil afpublicere alle sprog.',
 		resetFocalPoint: 'Nulstil fokuspunkt',
 		variantsWillBeSaved: 'Alle nye varianter vil blive gemt.',
 		publishRequiresVariants: 'De følgende varianter er krævet for at en udgivelse kan finde sted:',
@@ -2124,6 +2124,10 @@ export default {
 			'This item or its descendants is being referenced. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
 		deleteDisabledWarning: 'This item or its descendants is being referenced. Therefore, deletion has been disabled.',
 		listViewDialogWarning: 'The following items you are trying to %0% are referenced by other content.',
+		labelMoreReferences: (count: number) => {
+			if (count === 1) return '...og en mere';
+			return `...og ${count} andre`;
+		},
 	},
 	logViewer: {
 		deleteSavedSearch: 'Slet gemte søgning',
