@@ -58,7 +58,7 @@ class UmbLoginData {
 			email: '2fa@umbraco.com',
 			password: 'html',
 			twoFactor: true,
-			twoFactorView: '/src/mocks/customViews/my-custom-view.html',
+      twoFactorLoginView: '/src/mocks/customViews/my-custom-view.html',
       enabledTwoFactorProviderNames: ['sms', 'email']
 		},
 		{
@@ -67,7 +67,7 @@ class UmbLoginData {
 			email: '2fa@umbraco.com',
 			password: 'js',
 			twoFactor: true,
-			twoFactorView: '/src/mocks/customViews/my-custom-view.js',
+      twoFactorLoginView: '/src/mocks/customViews/my-custom-view.js',
       enabledTwoFactorProviderNames: ['sms', 'email']
 		},
 		{
