@@ -8,8 +8,10 @@ import {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
+// TODO: Turn this into a Repository with a Store that holds the cache [NL]
 /**
  * A context for fetching and caching the document configuration.
+ * @deprecated Do not use this one, it will have ot change in near future.
  */
 export class UmbDocumentConfigurationContext extends UmbControllerBase implements UmbApi {
 	/**
@@ -44,6 +46,9 @@ export class UmbDocumentConfigurationContext extends UmbControllerBase implement
 // Export as default to work as a global context:
 export default UmbDocumentConfigurationContext;
 
+/**
+ * @deprecated Do not use this one, it will have ot change in near future.
+ */
 export const UMB_DOCUMENT_CONFIGURATION_CONTEXT = new UmbContextToken<UmbDocumentConfigurationContext>(
 	'UmbDocumentConfigurationContext',
 );
