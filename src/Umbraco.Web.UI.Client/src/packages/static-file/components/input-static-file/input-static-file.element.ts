@@ -14,11 +14,11 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 	 * @default 0
 	 */
 	@property({ type: Number })
-	public get min(): number {
-		return this.#pickerContext.min;
-	}
 	public set min(value: number) {
 		this.#pickerContext.min = value;
+	}
+	public get min(): number {
+		return this.#pickerContext.min;
 	}
 
 	/**
@@ -37,11 +37,11 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 	 * @default Infinity
 	 */
 	@property({ type: Number })
-	public get max(): number {
-		return this.#pickerContext.max;
-	}
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+	}
+	public get max(): number {
+		return this.#pickerContext.max;
 	}
 
 	/**
@@ -53,18 +53,21 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of files';
 
-	public get selectedPaths(): Array<string> {
-		return this.#pickerContext.getSelection();
-	}
-	public set selectedPaths(paths: Array<string>) {
+	public set selection(paths: Array<string>) {
 		this.#pickerContext.setSelection(paths);
+	}
+	public get selection(): Array<string> {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property()
 	// get value is handled by super class.
 	public set value(pathsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedPaths = splitStringToArray(pathsString);
+		this.selection = splitStringToArray(pathsString);
+	}
+	public get value(): string {
+		return this.selection.join(',');
 	}
 
 	@state()
@@ -104,14 +107,14 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 							(item) => item.unique,
 							(item) => this._renderItem(item),
 						)}
-				  </uui-ref-list>`
+					</uui-ref-list>`
 				: ''}
 			${this.#renderAddButton()}
 		`;
 	}
 
 	#renderAddButton() {
-		if (this.max > 0 && this.selectedPaths.length >= this.max) return;
+		if (this.max === 1 && this.selection.length >= this.max) return;
 		return html`<uui-button
 			id="add-button"
 			look="placeholder"

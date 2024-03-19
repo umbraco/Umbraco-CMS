@@ -21,13 +21,13 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 	@property()
 	public set value(value: string) {
 		if (value) {
-			this.#selectedIds = value.split(',');
+			this.#selection = value.split(',');
 		} else {
-			this.#selectedIds = [];
+			this.#selection = [];
 		}
 	}
 	public get value(): string {
-		return this.#selectedIds.join(',');
+		return this.#selection.join(',');
 	}
 
 	@state()
@@ -73,20 +73,20 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 	#onChange(event: CustomEvent) {
 		switch (this.sourceType) {
 			case 'content':
-				this.#setValue((<UmbInputDocumentTypeElement>event.target).selectedIds);
+				this.#setValue((<UmbInputDocumentTypeElement>event.target).selection);
 				break;
 			case 'media':
-				this.#setValue((<UmbInputMediaTypeElement>event.target).selectedIds);
+				this.#setValue((<UmbInputMediaTypeElement>event.target).selection);
 				break;
 			case 'member':
-				this.#setValue((<UmbInputMemberTypeElement>event.target).selectedIds);
+				this.#setValue((<UmbInputMemberTypeElement>event.target).selection);
 				break;
 			default:
 				break;
 		}
 	}
 
-	#selectedIds: Array<string> = [];
+	#selection: Array<string> = [];
 
 	#setValue(value: string[]) {
 		this.value = value.join(',');
@@ -113,19 +113,17 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 	#renderTypeContent() {
 		return html`<umb-input-document-type
 			@change=${this.#onChange}
-			.selectedIds=${this.#selectedIds}></umb-input-document-type>`;
+			.selection=${this.#selection}></umb-input-document-type>`;
 	}
 
 	#renderTypeMedia() {
-		return html`<umb-input-media-type
-			@change=${this.#onChange}
-			.selectedIds=${this.#selectedIds}></umb-input-media-type>`;
+		return html`<umb-input-media-type @change=${this.#onChange} .selection=${this.#selection}></umb-input-media-type>`;
 	}
 
 	#renderTypeMember() {
 		return html`<umb-input-member-type
 			@change=${this.#onChange}
-			.selectedIds=${this.#selectedIds}></umb-input-member-type>`;
+			.selection=${this.#selection}></umb-input-member-type>`;
 	}
 }
 

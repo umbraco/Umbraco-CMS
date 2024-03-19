@@ -14,14 +14,13 @@ export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
 	private _value: Array<UmbBlockGridTypeGroupType> = [];
 
 	@property({ type: Array })
-	public get value(): Array<UmbBlockGridTypeGroupType> {
-		return this._value;
-	}
 	public set value(value: Array<UmbBlockGridTypeGroupType>) {
 		this._value = value || [];
 	}
+	public get value(): Array<UmbBlockGridTypeGroupType> {
+		return this._value;
+	}
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {}
 
 	#addGroup() {

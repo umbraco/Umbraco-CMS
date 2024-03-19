@@ -26,7 +26,6 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		settingsData: [],
 	};
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -56,9 +55,6 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	private _layoutColumns?: number;
 
 	@property({ attribute: false })
-	public get value(): UmbBlockGridValueModel {
-		return this._value;
-	}
 	public set value(value: UmbBlockGridValueModel | undefined) {
 		const buildUpValue: Partial<UmbBlockGridValueModel> = value ? { ...value } : {};
 		buildUpValue.layout ??= {};
@@ -69,6 +65,9 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		this.#context.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS] ?? []);
 		this.#context.setContents(buildUpValue.contentData);
 		this.#context.setSettings(buildUpValue.settingsData);
+	}
+	public get value(): UmbBlockGridValueModel {
+		return this._value;
 	}
 
 	constructor() {

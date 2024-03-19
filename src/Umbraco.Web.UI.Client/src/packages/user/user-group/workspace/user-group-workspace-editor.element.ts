@@ -39,13 +39,13 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#onDocumentStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputDocumentElement;
-		this.#workspaceContext?.updateProperty('documentStartNode', { unique: target.selectedIds[0] });
+		this.#workspaceContext?.updateProperty('documentStartNode', { unique: target.selection[0] });
 	}
 
 	#onMediaStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputMediaElement;
-		this.#workspaceContext?.updateProperty('mediaStartNode', { unique: target.selectedIds[0] });
+		this.#workspaceContext?.updateProperty('mediaStartNode', { unique: target.selection[0] });
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -107,7 +107,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					<umb-input-document
 						slot="editor"
 						max="1"
-						.selectedIds=${this._userGroup.documentStartNode?.unique ? [this._userGroup.documentStartNode.unique] : []}
+						.selection=${this._userGroup.documentStartNode?.unique ? [this._userGroup.documentStartNode.unique] : []}
 						@change=${this.#onDocumentStartNodeChange}></umb-input-document>
 				</umb-property-layout>
 				<umb-property-layout
@@ -116,7 +116,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					<umb-input-media
 						slot="editor"
 						max="1"
-						.selectedIds=${this._userGroup.mediaStartNode?.unique ? [this._userGroup.mediaStartNode.unique] : []}
+						.selection=${this._userGroup.mediaStartNode?.unique ? [this._userGroup.mediaStartNode.unique] : []}
 						@change=${this.#onMediaStartNodeChange}></umb-input-media>
 				</umb-property-layout>
 			</uui-box>

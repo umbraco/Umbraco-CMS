@@ -13,11 +13,11 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 	private _value: Array<string> = [];
 
 	@property({ type: Array })
-	public get value(): Array<string> {
-		return this._value;
-	}
 	public set value(value: Array<string>) {
 		this._value = value || [];
+	}
+	public get value(): Array<string> {
+		return this._value;
 	}
 
 	@state()
@@ -27,7 +27,6 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 	private _culture?: string | null;
 	//TODO: Use type from VariantID
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._group = config?.getValueByAlias('group');
 		this.value = config?.getValueByAlias('items') ?? [];

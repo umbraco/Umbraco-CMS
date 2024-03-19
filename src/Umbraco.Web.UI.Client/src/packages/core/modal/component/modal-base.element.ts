@@ -38,20 +38,20 @@ export abstract class UmbModalBaseElement<
 	#modalContext?: UmbModalContext<ModalDataType, ModalValueType> | undefined;
 
 	@property({ attribute: false })
-	public get data(): ModalDataType | undefined {
-		return this._data;
-	}
 	public set data(value: ModalDataType | undefined) {
 		this._data = value;
+	}
+	public get data(): ModalDataType | undefined {
+		return this._data;
 	}
 	private _data?: ModalDataType | undefined;
 
 	@property({ attribute: false })
-	public get value(): ModalValueType {
-		return this.#value;
-	}
 	public set value(value: ModalValueType) {
 		this.#modalContext?.setValue(value);
+	}
+	public get value(): ModalValueType {
+		return this.#value;
 	}
 
 	public updateValue(partialValue: Partial<ModalValueType>) {

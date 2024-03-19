@@ -13,15 +13,15 @@ import '../../../components/input-number-range/input-number-range.element.js';
 @customElement('umb-property-editor-ui-number-range')
 export class UmbPropertyEditorUINumberRangeElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
-	private _value: NumberRangeValueType = { min: undefined, max: undefined };
-	public get value() {
-		return this._value;
-	}
 	public set value(value: NumberRangeValueType | undefined) {
 		this._value = value || { min: undefined, max: undefined };
 		this._minValue = value?.min;
 		this._maxValue = value?.max;
 	}
+	public get value() {
+		return this._value;
+	}
+	private _value: NumberRangeValueType = { min: undefined, max: undefined };
 
 	@property({ attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;

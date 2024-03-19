@@ -24,7 +24,6 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 	@state()
 	private _css?: any;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._maxChars = config?.getValueByAlias('maxChars');
 		this._rows = config?.getValueByAlias('rows');

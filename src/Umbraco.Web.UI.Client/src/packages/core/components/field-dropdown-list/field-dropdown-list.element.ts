@@ -39,14 +39,14 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 
 	private _value: FieldPickerValue | undefined;
 	@property({ type: Object })
-	public get value(): FieldPickerValue | undefined {
-		return this._value;
-	}
 	public set value(val: FieldPickerValue | undefined) {
 		const oldVal = this._value;
 		this._value = val;
 		this.requestUpdate('value', oldVal);
 		this.dispatchEvent(new UmbChangeEvent());
+	}
+	public get value(): FieldPickerValue | undefined {
+		return this._value;
 	}
 
 	@state()
@@ -168,7 +168,7 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 								display-value=${this.localize.term('content_mediatype')}>
 								<strong> ${this.localize.term('content_mediatype')} </strong>
 								${this.localize.term('defaultdialogs_treepicker')}
-						  </uui-combobox-list-option>`
+							</uui-combobox-list-option>`
 						: nothing}
 				</uui-combobox-list>
 			</uui-combobox>

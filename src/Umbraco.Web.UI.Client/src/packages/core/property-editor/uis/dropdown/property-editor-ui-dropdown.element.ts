@@ -11,11 +11,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	#value = '';
 	@property({ type: String })
-	public get value(): string {
-		return this.#value;
-	}
 	public set value(value: string | undefined) {
 		this.#value = value?.trim() || '';
+	}
+	public get value(): string {
+		return this.#value;
 	}
 
 	@state()
@@ -24,7 +24,6 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	@state()
 	private _list: Array<Option> = [];
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		this._multiple = config?.getValueByAlias('multiple');

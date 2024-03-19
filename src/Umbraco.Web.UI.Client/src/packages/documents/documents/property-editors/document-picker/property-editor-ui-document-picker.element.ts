@@ -12,7 +12,6 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	@property()
 	public value?: string;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const validationLimit = config?.find((x) => x.alias === 'validationLimit');
 
@@ -29,7 +28,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	private _limitMax?: number;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputDocumentElement).selectedIds.join(',');
+		this.value = (event.target as UmbInputDocumentElement).selection.join(',');
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
