@@ -74,6 +74,7 @@ const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel =
 			return {
 				name: variant.name,
 				culture: variant.culture || null,
+				segment: null, // TODO: add segment to the backend API?
 				state: variant.state,
 			};
 		}),
