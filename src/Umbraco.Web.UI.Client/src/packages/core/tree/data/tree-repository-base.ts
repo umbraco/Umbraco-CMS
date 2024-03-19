@@ -2,11 +2,11 @@ import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '../types.js
 import type { UmbTreeStore } from './tree-store.interface.js';
 import type { UmbTreeRepository } from './tree-repository.interface.js';
 import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
+import type { UmbTreeAncestorsOfRequestArgs } from './types.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbTreeAncestorsOfRequestArgs } from './types.js';
 
 /**
  * Base class for a tree repository.
