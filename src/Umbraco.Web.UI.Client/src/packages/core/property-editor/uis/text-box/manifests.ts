@@ -32,7 +32,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 	},
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.Email',
+		alias: 'Umb.PropertyEditorUi.EmailAddress',
 		name: 'Email Property Editor UI',
 		element: () => import('./property-editor-ui-text-box.element.js'),
 		meta: {
