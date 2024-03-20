@@ -1,4 +1,4 @@
-import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE } from '../entity.js';
+import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE } from '../../entity.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -23,5 +23,7 @@ export class UmbWebhookWorkspaceContext extends UmbControllerBase implements Umb
 		this.provideContext(UMB_APP_WEBHOOK_CONTEXT, this);
 	}
 }
+
+export { UmbWebhookWorkspaceContext as api };
 
 export const UMB_APP_WEBHOOK_CONTEXT = new UmbContextToken<UmbWebhookWorkspaceContext>(UmbWebhookWorkspaceContext.name);

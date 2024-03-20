@@ -1,4 +1,5 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from './logviewer.context-token.js';
 import { UmbBasicState, UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type {
 	LogLevelCountsReponseModel,
@@ -11,7 +12,6 @@ import type {
 import { DirectionModel, LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { query } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -115,6 +115,17 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		this.#repository = new UmbLogViewerRepository(host);
 	}
 
+	hostConnected() {
+		super.hostConnected();
+		window.addEventListener('changestate', this.onChangeState);
+		this.onChangeState();
+	}
+
+	hostDisconnected(): void {
+		super.hostDisconnected();
+		window.removeEventListener('changestate', this.onChangeState);
+	}
+
 	onChangeState = () => {
 		const searchQuery = query();
 		let sanitizedQuery = '';
@@ -173,7 +184,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		if (data) {
 			this.#savedSearches.setValue(data);
 		} else {
-			//falback to some default searches resembling Umbraco <= 12
+			//fallback to some default searches resembling Umbraco <= 13
 			this.#savedSearches.setValue({
 				items: [
 					{
@@ -327,6 +338,4 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 	}
 }
 
-export const UMB_APP_LOG_VIEWER_CONTEXT = new UmbContextToken<UmbLogViewerWorkspaceContext>(
-	UmbLogViewerWorkspaceContext.name,
-);
+export { UmbLogViewerWorkspaceContext as api };

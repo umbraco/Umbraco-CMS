@@ -8,7 +8,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Package',
 	name: 'Package Workspace',
-	js: () => import('./workspace/workspace-package.element.js'),
+	element: () => import('./workspace/workspace-package.element.js'),
 	meta: {
 		entityType: 'package',
 	},

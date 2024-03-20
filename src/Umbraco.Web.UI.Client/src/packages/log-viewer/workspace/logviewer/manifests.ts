@@ -11,7 +11,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: workspaceAlias,
 	name: 'LogViewer Root Workspace',
-	js: () => import('./logviewer-workspace.element.js'),
+	element: () => import('./logviewer-workspace.element.js'),
 	meta: {
 		entityType: 'logviewer',
 	},

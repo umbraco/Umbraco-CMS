@@ -1,31 +1,12 @@
 // TODO: Niels: I don't feel sure this is good, seems wrong:
 import '../../components/index.js';
-import { UmbLogViewerWorkspaceContext } from '../logviewer.context.js';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbDefaultWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')
 export class UmbLogViewerWorkspaceElement extends UmbLitElement {
-	// TODO: This context is not used as the API, it needs some refactoring to be able to be used as a workspace api: [NL]
-	#logViewerContext = new UmbLogViewerWorkspaceContext(this);
-
-	firstUpdated(props: PropertyValueMap<unknown>) {
-		super.firstUpdated(props);
-
-		// TODO: This should be moved to the log viewer context:
-		window.addEventListener('changestate', this.#logViewerContext.onChangeState);
-		this.#logViewerContext.onChangeState();
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		window.removeEventListener('changestate', this.#logViewerContext.onChangeState);
-	}
-
 	load(): void {
 		// Not relevant for this workspace -added to prevent the error from popping up
 	}
@@ -68,9 +49,6 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 }
 
 export { UmbLogViewerWorkspaceElement as element };
-
-// TODO: This does have its own context, but it needs some refactoring to be able to be used as a standalone workspace context: [NL]
-export { UmbDefaultWorkspaceContext as api };
 
 declare global {
 	interface HTMLElementTagNameMap {
