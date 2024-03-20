@@ -1,6 +1,12 @@
 import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
-import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
+import {
+	UmbEditableWorkspaceContextBase,
+	UmbWorkspaceRouteManager,
+	type UmbRoutableWorkspaceContext,
+	UmbWorkspaceIsNewRedirectController,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
@@ -10,11 +16,13 @@ import {
 	type UmbBlockWorkspaceData,
 } from '@umbraco-cms/backoffice/block';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
-export class UmbBlockWorkspaceContext<
-	LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
-> extends UmbEditableWorkspaceContextBase<LayoutDataType> {
+export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
+	extends UmbEditableWorkspaceContextBase<LayoutDataType>
+	implements UmbRoutableWorkspaceContext
+{
 	// Just for context token safety:
 	public readonly IS_BLOCK_WORKSPACE_CONTEXT = true;
 	//
@@ -52,6 +60,8 @@ export class UmbBlockWorkspaceContext<
 	#label = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#label.asObservable();
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
+
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
@@ -79,6 +89,36 @@ export class UmbBlockWorkspaceContext<
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
 			this.#blockEntries = context;
 		}).asPromise();
+	}
+
+	set manifest(manifest: ManifestWorkspace) {
+		this.routes.setRoutes([
+			{
+				path: 'create/:elementTypeKey',
+				component: UmbBlockWorkspaceEditorElement,
+				setup: async (component, info) => {
+					(component as UmbBlockWorkspaceEditorElement).workspaceAlias = manifest.alias;
+
+					const elementTypeKey = info.match.params.elementTypeKey;
+					this.create(elementTypeKey);
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:udi',
+				component: UmbBlockWorkspaceEditorElement,
+				setup: (component, info) => {
+					(component as UmbBlockWorkspaceEditorElement).workspaceAlias = manifest.alias;
+					const udi = decodeFilePath(info.match.params.udi);
+					this.load(udi);
+				},
+			},
+		]);
 	}
 
 	async load(unique: string) {

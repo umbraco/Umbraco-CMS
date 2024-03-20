@@ -22,11 +22,10 @@ export const manifests: Array<ManifestTypes> = [
 	},
 	{
 		type: 'workspace',
+		kind: 'routable',
 		name: 'Block List Type Workspace',
 		alias: UMB_BLOCK_WORKSPACE_ALIAS,
-		element: () => import('./block-workspace.element.js'),
 		api: () => import('./block-workspace.context.js'),
-		weight: 900,
 		meta: {
 			entityType: 'block',
 		},
