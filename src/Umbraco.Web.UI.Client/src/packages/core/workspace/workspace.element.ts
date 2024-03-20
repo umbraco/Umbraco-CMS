@@ -1,4 +1,3 @@
-import { UmbDefaultWorkspaceContext } from './contexts/default-workspace.context.js';
 import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
@@ -17,6 +16,7 @@ export class UmbWorkspaceElement extends UmbLitElement {
 		if (!this.entityType) return nothing;
 		return html`<umb-extension-with-api-slot
 			type="workspace"
+			.defaultApi=${() => import('./contexts/default-workspace.context.js')}
 			.apiArgs=${apiArgsCreator}
 			.filter=${(manifest: ManifestWorkspace) =>
 				manifest.meta.entityType === this.entityType}></umb-extension-with-api-slot>`;

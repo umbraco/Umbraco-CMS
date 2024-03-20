@@ -1,7 +1,6 @@
 import { UMB_LANGUAGE_COLLECTION_ALIAS } from '../../collection/index.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbDefaultWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
@@ -13,8 +12,6 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 }
 
 export { UmbLanguageRootWorkspaceElement as element };
-
-export { UmbDefaultWorkspaceContext as api };
 
 declare global {
 	interface HTMLElementTagNameMap {

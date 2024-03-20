@@ -27,3 +27,5 @@ export abstract class UmbDefaultWorkspaceContext
 		return this.#entityType;
 	}
 }
+
+export { UmbDefaultWorkspaceContext as api };
