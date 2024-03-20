@@ -425,7 +425,7 @@ public class TemplateService : RepositoryService, ITemplateService
     private async Task<bool> HasCircularReference(string parsedMasterTemplateAlias, ITemplate template, ITemplate masterTemplate)
     {
         // quick check without extra DB calls as we already have both templates
-        if (parsedMasterTemplateAlias.IsNullOrWhiteSpace() == false
+        if (parsedMasterTemplateAlias.IsNullOrWhiteSpace() is false
             && masterTemplate.MasterTemplateAlias is not null
             && masterTemplate.MasterTemplateAlias.Equals(template.Alias))
         {
@@ -449,7 +449,7 @@ public class TemplateService : RepositoryService, ITemplateService
         }
 
         ITemplate? masterTemplate = await GetAsync(masterTemplateAlias);
-        if (masterTemplate == null)
+        if (masterTemplate is null)
         {
             // this should not happen unless somebody manipulated the data by hand as this function is only called between persisted items
             return false;
