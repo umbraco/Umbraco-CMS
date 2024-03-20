@@ -1,4 +1,5 @@
 import { UMB_USER_COLLECTION_ALIAS } from '../collection/manifests.js';
+import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
@@ -17,7 +18,11 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 		},
 		{
 			path: 'user',
-			component: () => import('../workspace/user-workspace.element.js'),
+			component: () => {
+				const element = document.createElement('umb-workspace');
+				element.setAttribute('alias', UMB_USER_ENTITY_TYPE);
+				return element;
+			},
 		},
 		{
 			path: '',

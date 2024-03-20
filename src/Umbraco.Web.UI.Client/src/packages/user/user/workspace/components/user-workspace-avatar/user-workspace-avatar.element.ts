@@ -1,5 +1,5 @@
 import type { UmbUserDetailModel } from '../../../types.js';
-import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
+import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import { css, html, customElement, query, nothing, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -132,7 +132,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 									type="button"
 									label=${this.localize.term('user_removePhoto')}
 									@click=${this.#deleteAvatar}></uui-button>
-						  `
+							`
 						: nothing}
 				</form>
 			</uui-box>
