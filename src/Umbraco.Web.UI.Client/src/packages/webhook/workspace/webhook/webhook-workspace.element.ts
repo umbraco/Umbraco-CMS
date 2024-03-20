@@ -1,6 +1,7 @@
 import { UmbWebhookWorkspaceContext } from '../webhook.context.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbDefaultWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-webhook-workspace')
 export class UmbWebhookWorkspaceElement extends UmbLitElement {
@@ -18,8 +19,9 @@ export class UmbWebhookWorkspaceElement extends UmbLitElement {
 	}
 }
 
-export default UmbWebhookWorkspaceElement;
+export { UmbWebhookWorkspaceElement as element };
 
+export { UmbDefaultWorkspaceContext as api };
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-webhook-workspace': UmbWebhookWorkspaceElement;

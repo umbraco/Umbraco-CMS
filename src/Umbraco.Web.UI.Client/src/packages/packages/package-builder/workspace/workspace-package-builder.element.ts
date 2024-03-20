@@ -20,6 +20,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbDefaultWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-workspace-package-builder')
 export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
@@ -288,8 +289,9 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	];
 }
 
-export default UmbWorkspacePackageBuilderElement;
+export { UmbWorkspacePackageBuilderElement as element };
 
+export { UmbDefaultWorkspaceContext as api };
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-workspace-package-builder': UmbWorkspacePackageBuilderElement;

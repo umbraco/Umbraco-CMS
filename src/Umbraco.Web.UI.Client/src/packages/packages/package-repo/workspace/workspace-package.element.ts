@@ -1,6 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbDefaultWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-workspace-package')
 export class UmbWorkspacePackageElement extends UmbLitElement {
@@ -52,7 +53,9 @@ export class UmbWorkspacePackageElement extends UmbLitElement {
 	];
 }
 
-export default UmbWorkspacePackageElement;
+export { UmbWorkspacePackageElement as element };
+
+export { UmbDefaultWorkspaceContext as api };
 
 declare global {
 	interface HTMLElementTagNameMap {

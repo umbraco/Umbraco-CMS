@@ -1,3 +1,4 @@
+export * from './default-workspace.context.js';
 export * from './editable-workspace-context-base.js';
 export * from './property-structure-workspace-context.interface.js';
 export * from './publishable-workspace-context.interface.js';

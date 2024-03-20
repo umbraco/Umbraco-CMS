@@ -5,10 +5,12 @@ import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbDefaultWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')
 export class UmbLogViewerWorkspaceElement extends UmbLitElement {
+	// TODO: This context is not used as the API, it needs some refactoring to be able to be used as a workspace api: [NL]
 	#logViewerContext = new UmbLogViewerWorkspaceContext(this);
 
 	firstUpdated(props: PropertyValueMap<unknown>) {
@@ -65,7 +67,10 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 	];
 }
 
-export default UmbLogViewerWorkspaceElement;
+export { UmbLogViewerWorkspaceElement as element };
+
+// TODO: This does have its own context, but it needs some refactoring to be able to be used as a standalone workspace context: [NL]
+export { UmbDefaultWorkspaceContext as api };
 
 declare global {
 	interface HTMLElementTagNameMap {
