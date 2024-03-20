@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Attributes;
@@ -109,7 +110,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Delete_Blueprint()
+    public async Task Delete_Blueprint()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -125,7 +126,10 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         ContentService.SaveBlueprint(blueprint);
 
-        ContentService.DeleteBlueprint(blueprint);
+        var result = await ContentService.DeleteBlueprintAsync(blueprint.Key, Constants.Security.SuperUserKey);
+        Assert.True(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.NotNull(result.Result);
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();
         Assert.AreEqual(0, found.Length);
