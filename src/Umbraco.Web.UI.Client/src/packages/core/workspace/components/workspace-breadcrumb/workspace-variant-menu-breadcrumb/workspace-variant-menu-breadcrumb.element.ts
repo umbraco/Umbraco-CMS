@@ -10,8 +10,8 @@ import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
-@customElement('umb-variant-workspace-breadcrumb')
-export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
+@customElement('umb-workspace-variant-menu-breadcrumb')
+export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	@state()
 	_name: string = '';
 
@@ -128,10 +128,10 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	static styles = [UmbTextStyles];
 }
 
-export default UmbVariantWorkspaceBreadcrumbElement;
+export default UmbWorkspaceVariantMenuBreadcrumbElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-variant-workspace-breadcrumb': UmbVariantWorkspaceBreadcrumbElement;
+		'umb-workspace-variant-menu-breadcrumb': UmbWorkspaceVariantMenuBreadcrumbElement;
 	}
 }

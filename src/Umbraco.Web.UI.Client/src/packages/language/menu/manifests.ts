@@ -25,7 +25,7 @@ export const manifests = [
 	},
 	{
 		type: 'workspaceFooterApp',
-		kind: 'breadcrumb',
+		kind: 'menuBreadcrumb',
 		alias: 'Umb.WorkspaceFooterApp.Language.Breadcrumb',
 		name: 'Language Breadcrumb Workspace Footer App',
 		conditions: [

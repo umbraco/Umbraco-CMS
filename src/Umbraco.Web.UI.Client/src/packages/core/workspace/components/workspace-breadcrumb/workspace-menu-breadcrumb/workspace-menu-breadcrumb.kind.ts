@@ -2,13 +2,13 @@ import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extensio
 
 export const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.WorkspaceFooterApp.Breadcrumb',
-	matchKind: 'breadcrumb',
+	alias: 'Umb.Kind.WorkspaceFooterApp.MenuBreadcrumb',
+	matchKind: 'menuBreadcrumb',
 	matchType: 'workspaceFooterApp',
 	manifest: {
 		type: 'workspaceFooterApp',
-		kind: 'breadcrumb',
-		element: () => import('./workspace-breadcrumb.element.js'),
+		kind: 'menuBreadcrumb',
+		element: () => import('./workspace-menu-breadcrumb.element.js'),
 		weight: 1000,
 	},
 };

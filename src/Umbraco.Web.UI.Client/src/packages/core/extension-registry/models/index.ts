@@ -45,8 +45,8 @@ import type { ManifestWorkspaceActionMenuItem } from './workspace-action-menu-it
 import type { ManifestWorkspaceContext } from './workspace-context.model.js';
 import type {
 	ManifestWorkspaceFooterApp,
-	ManifestWorkspaceFooterAppBreadcrumbKind,
-	ManifestWorkspaceFooterAppVariantBreadcrumbKind,
+	ManifestWorkspaceFooterAppMenuBreadcrumbKind,
+	ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind,
 } from './workspace-footer-app.model.js';
 import type {
 	ManifestWorkspaceView,
@@ -116,8 +116,8 @@ export type ManifestEntityActions =
 
 export type ManifestWorkspaceFooterApps =
 	| ManifestWorkspaceFooterApp
-	| ManifestWorkspaceFooterAppBreadcrumbKind
-	| ManifestWorkspaceFooterAppVariantBreadcrumbKind;
+	| ManifestWorkspaceFooterAppMenuBreadcrumbKind
+	| ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind;
 
 export type ManifestPropertyActions = ManifestPropertyAction | ManifestPropertyActionDefaultKind;
 

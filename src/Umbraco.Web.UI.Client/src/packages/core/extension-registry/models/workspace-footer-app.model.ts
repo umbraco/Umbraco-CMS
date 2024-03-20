@@ -8,12 +8,12 @@ export interface ManifestWorkspaceFooterApp
 	type: 'workspaceFooterApp';
 }
 
-export interface ManifestWorkspaceFooterAppBreadcrumbKind extends ManifestWorkspaceFooterApp {
+export interface ManifestWorkspaceFooterAppMenuBreadcrumbKind extends ManifestWorkspaceFooterApp {
 	type: 'workspaceFooterApp';
-	kind: 'breadcrumb';
+	kind: 'menuBreadcrumb';
 }
 
-export interface ManifestWorkspaceFooterAppVariantBreadcrumbKind extends ManifestWorkspaceFooterApp {
+export interface ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind extends ManifestWorkspaceFooterApp {
 	type: 'workspaceFooterApp';
-	kind: 'variantBreadcrumb';
+	kind: 'variantMenuBreadcrumb';
 }

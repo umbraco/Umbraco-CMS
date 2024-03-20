@@ -1,4 +1,4 @@
-import { manifest as workspaceBreadcrumbKind } from './workspace-breadcrumb/workspace-breadcrumb.kind.js';
-import { manifest as variantBreadcrumbKind } from './variant-workspace-breadcrumb/variant-workspace-breadcrumb.kind.js';
+import { manifest as workspaceBreadcrumbKind } from './workspace-menu-breadcrumb/workspace-menu-breadcrumb.kind.js';
+import { manifest as variantBreadcrumbKind } from './workspace-variant-menu-breadcrumb/workspace-variant-menu-breadcrumb.kind.js';
 
 export const manifests = [workspaceBreadcrumbKind, variantBreadcrumbKind];

@@ -38,7 +38,7 @@ export const manifests = [
 	},
 	{
 		type: 'workspaceFooterApp',
-		kind: 'variantBreadcrumb',
+		kind: 'variantMenuBreadcrumb',
 		alias: 'Umb.WorkspaceFooterApp.Media.Breadcrumb',
 		name: 'Media Breadcrumb Workspace Footer App',
 		conditions: [
