@@ -252,6 +252,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 				if (value === true) {
 					const isSelectable = this.treeContext?.selectableFilter?.(this.getTreeItem()!) ?? true;
 					this.#isSelectable.setValue(isSelectable);
+					this.#checkIsActive();
 				}
 			},
 			'observeIsSelectable',
@@ -355,6 +356,14 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
 
 	#checkIsActive() {
+		// don't set the active state if the item is selectable
+		const isSelectable = this.#isSelectable.getValue();
+
+		if (isSelectable) {
+			this.#isActive.setValue(false);
+			return;
+		}
+
 		const path = this.#path.getValue();
 		const location = window.location.pathname;
 		const isActive = location.includes(path);
