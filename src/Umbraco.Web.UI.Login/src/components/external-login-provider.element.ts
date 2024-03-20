@@ -1,5 +1,5 @@
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
-import { css, CSSResultGroup, html, nothing, customElement, property, until } from '@umbraco-cms/backoffice/external/lit';
+import { css, CSSResultGroup, html, nothing, customElement, property, until, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 
 import { loadCustomView, renderCustomView } from '../utils/load-custom-view.function.js';
@@ -31,7 +31,7 @@ export class UmbExternalLoginProviderElement extends UmbLitElement {
    * @attr custom-view
    */
   @property({attribute: 'custom-view'})
-  customView?: string;
+  customView = '';
 
   /**
    * Gets or sets the display name of the provider.
@@ -127,10 +127,10 @@ export class UmbExternalLoginProviderElement extends UmbLitElement {
   }
 
   protected render() {
-    return this.customView
-      ? until(this.renderCustomView(), html`
-        <uui-loader-bar></uui-loader-bar>`)
-      : this.renderDefaultView();
+    return when(!!this.customView,
+    () => until(this.renderCustomView(), html`<uui-loader-bar></uui-loader-bar>`),
+      () => this.renderDefaultView()
+    );
   }
 
   protected renderDefaultView() {
@@ -158,8 +158,6 @@ export class UmbExternalLoginProviderElement extends UmbLitElement {
   }
 
   protected async renderCustomView() {
-    if (!this.customView) return;
-
     try {
       const customView = await loadCustomView<ExternalLoginCustomViewElement>(this.customView);
 
@@ -178,9 +176,9 @@ export class UmbExternalLoginProviderElement extends UmbLitElement {
       console.log('Custom view', this.customView);
       console.error('Failed to load custom view:', error);
       console.groupEnd();
-
-      return;
     }
+
+    return nothing;
   }
 
   static styles: CSSResultGroup = [
