@@ -23,7 +23,7 @@ export class UmbInputColorElement extends FormControlMixin(UmbLitElement) {
 
 	#onChange(event: UUIColorSwatchesEvent) {
 		event.stopPropagation();
-		super.value = event.target.value;
+		this.value = event.target.value;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
