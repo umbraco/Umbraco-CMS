@@ -39496,18 +39496,13 @@
       "RecycleBinItemResponseModelBaseModel": {
         "required": [
           "hasChildren",
-          "id",
-          "type"
+          "id"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
-          },
-          "type": {
-            "minLength": 1,
-            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
