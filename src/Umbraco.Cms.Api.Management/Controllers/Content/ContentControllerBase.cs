@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
-public class ContentControllerBase : ManagementApiControllerBase
+public abstract class ContentControllerBase : ManagementApiControllerBase
 {
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
