@@ -38,10 +38,9 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 	constructor(host: UmbControllerHost, args: { manifest: ManifestWorkspace }) {
 		super(host, args.manifest.alias);
-		this.#entityType = args.manifest.meta?.entityType;
-	}
+		const manifest = args.manifest;
+		this.#entityType = manifest.meta?.entityType;
 
-	public set manifest(manifest: ManifestWorkspace) {
 		this.routes.setRoutes([
 			{
 				// Would it make more sense to have groupKey before elementTypeKey?
