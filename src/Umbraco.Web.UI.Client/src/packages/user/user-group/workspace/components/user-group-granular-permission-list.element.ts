@@ -1,4 +1,4 @@
-import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context.js';
+import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context-token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/extension-registry';
@@ -67,9 +67,9 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 		const schemaType = target.manifest?.meta.schemaType;
 		if (!schemaType) throw new Error('Schema type is not available');
 
-		/* Remove all permissions of the same schema type from 
+		/* Remove all permissions of the same schema type from
 		the user group and append the new permissions.
-		We do it this way to support appends, updates and deletion without we know the 
+		We do it this way to support appends, updates and deletion without we know the
 		exact action but on the changed value */
 		const storedValueWithoutSchemaTypeItems = filterFrozenArray(
 			this.#workspaceContext?.getPermissions() || [],
