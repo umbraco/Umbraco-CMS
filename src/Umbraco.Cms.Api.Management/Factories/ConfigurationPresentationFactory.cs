@@ -5,14 +5,14 @@ using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
 public class ConfigurationPresentationFactory : IConfigurationPresentationFactory
 {
-    private readonly MemberPropertySettings _memberPropertySettings;
-    private readonly ContentPropertySettings _contentPropertySettings;
+    private readonly IReservedFieldNamesService _reservedFieldNamesService;
     private readonly GlobalSettings _globalSettings;
     private readonly ContentSettings _contentSettings;
     private readonly SegmentSettings _segmentSettings;
@@ -21,11 +21,9 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         IOptionsSnapshot<GlobalSettings> globalSettings,
         IOptionsSnapshot<ContentSettings> contentSettings,
         IOptionsSnapshot<SegmentSettings> segmentSettings,
-        IOptionsSnapshot<ContentPropertySettings> contentPropertySettings,
-        IOptionsSnapshot<MemberPropertySettings> memberPropertySettings)
+        IReservedFieldNamesService reservedFieldNamesService)
     {
-        _memberPropertySettings = memberPropertySettings.Value;
-        _contentPropertySettings = contentPropertySettings.Value;
+        _reservedFieldNamesService = reservedFieldNamesService;
         _globalSettings = globalSettings.Value;
         _contentSettings = contentSettings.Value;
         _segmentSettings = segmentSettings.Value;
@@ -39,13 +37,13 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
             SanitizeTinyMce = _globalSettings.SanitizeTinyMce,
             AllowEditInvariantFromNonDefault = _contentSettings.AllowEditInvariantFromNonDefault,
             AllowNonExistingSegmentsCreation = _segmentSettings.AllowCreation,
-            ReservedFieldNames = GetDocumentReservedFieldNames(),
+            ReservedFieldNames = _reservedFieldNamesService.GetDocumentReservedFieldNames(),
         };
 
     public MemberConfigurationResponseModel CreateMemberConfigurationResponseModel() =>
         new()
         {
-            ReservedFieldNames = GetMemberReservedFieldNames(),
+            ReservedFieldNames = _reservedFieldNamesService.GetMemberReservedFieldNames(),
         };
 
     public MediaConfigurationResponseModel CreateMediaConfigurationResponseModel()
@@ -55,38 +53,8 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
             SanitizeTinyMce = _globalSettings.SanitizeTinyMce,
-            ReservedFieldNames = GetMediaReservedFieldNames(),
+            ReservedFieldNames = _reservedFieldNamesService.GetMediaReservedFieldNames(),
         };
         return responseModel;
-    }
-
-    private ISet<string> GetMediaReservedFieldNames()
-    {
-        var reservedProperties = typeof(IPublishedContent).GetPublicProperties().Select(x => x.Name).ToHashSet();
-        var reservedMethods = typeof(IPublishedContent).GetPublicMethods().Select(x => x.Name).ToHashSet();
-        reservedProperties.UnionWith(reservedMethods);
-        reservedProperties.UnionWith(_memberPropertySettings.ReservedFieldNames);
-
-        return reservedProperties;
-    }
-
-    private ISet<string> GetMemberReservedFieldNames()
-    {
-        var reservedProperties = typeof(IPublishedContent).GetPublicProperties().Select(x => x.Name).ToHashSet();
-        var reservedMethods = typeof(IPublishedContent).GetPublicMethods().Select(x => x.Name).ToHashSet();
-        reservedProperties.UnionWith(reservedMethods);
-        reservedProperties.UnionWith(_memberPropertySettings.ReservedFieldNames);
-
-        return reservedProperties;
-    }
-
-    private ISet<string> GetDocumentReservedFieldNames()
-    {
-        var reservedProperties = typeof(IPublishedContent).GetPublicProperties().Select(x => x.Name).ToHashSet();
-        var reservedMethods = typeof(IPublishedContent).GetPublicMethods().Select(x => x.Name).ToHashSet();
-        reservedProperties.UnionWith(reservedMethods);
-        reservedProperties.UnionWith(_contentPropertySettings.ReservedFieldNames);
-
-        return reservedProperties;
     }
 }
