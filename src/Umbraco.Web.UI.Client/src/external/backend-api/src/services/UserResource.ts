@@ -800,7 +800,6 @@ export class UserResource {
             responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
-                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });

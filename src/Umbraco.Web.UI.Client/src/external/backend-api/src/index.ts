@@ -284,7 +284,7 @@ export type { PagedProblemDetailsModel } from './models/PagedProblemDetailsModel
 export type { PagedRedirectUrlResponseModel } from './models/PagedRedirectUrlResponseModel';
 export type { PagedRelationItemResponseModel } from './models/PagedRelationItemResponseModel';
 export type { PagedRelationResponseModel } from './models/PagedRelationResponseModel';
-export type { PagedRelationTypeTreeItemResponseModel } from './models/PagedRelationTypeTreeItemResponseModel';
+export type { PagedRelationTypeResponseModel } from './models/PagedRelationTypeResponseModel';
 export type { PagedSavedLogSearchResponseModel } from './models/PagedSavedLogSearchResponseModel';
 export type { PagedSearcherResponseModel } from './models/PagedSearcherResponseModel';
 export type { PagedSearchResultResponseModel } from './models/PagedSearchResultResponseModel';
@@ -318,6 +318,7 @@ export type { RedirectUrlResponseModel } from './models/RedirectUrlResponseModel
 export type { RedirectUrlStatusResponseModel } from './models/RedirectUrlStatusResponseModel';
 export type { ReferenceByIdModel } from './models/ReferenceByIdModel';
 export type { RelationItemResponseModel } from './models/RelationItemResponseModel';
+export type { RelationReferenceModel } from './models/RelationReferenceModel';
 export type { RelationResponseModel } from './models/RelationResponseModel';
 export type { RelationTypeBaseModel } from './models/RelationTypeBaseModel';
 export type { RelationTypeItemResponseModel } from './models/RelationTypeItemResponseModel';
