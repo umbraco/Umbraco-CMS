@@ -10,9 +10,10 @@ export const UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DocumentType';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: 'Umb.Workspace.DocumentType',
 	name: 'Document Type Workspace',
-	element: () => import('./document-type-workspace.element.js'),
+	api: () => import('./document-type-workspace.context.js'),
 	meta: {
 		entityType: 'document-type',
 	},
