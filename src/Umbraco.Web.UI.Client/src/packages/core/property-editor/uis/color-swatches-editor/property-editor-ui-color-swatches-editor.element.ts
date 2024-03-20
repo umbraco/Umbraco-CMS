@@ -18,7 +18,6 @@ export class UmbPropertyEditorUIColorSwatchesEditorElement extends UmbLitElement
 	@state()
 	private _showLabels = this.#defaultShowLabels;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._showLabels = config?.getValueByAlias('useLabel') ?? this.#defaultShowLabels;
 	}

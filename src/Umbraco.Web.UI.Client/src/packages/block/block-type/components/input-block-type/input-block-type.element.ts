@@ -13,11 +13,11 @@ export class UmbInputBlockTypeElement<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 > extends UmbLitElement {
 	@property({ type: Array, attribute: false })
-	public get value() {
-		return this._items;
-	}
 	public set value(items) {
 		this._items = items ?? [];
+	}
+	public get value() {
+		return this._items;
 	}
 
 	@property({ type: String })
@@ -26,6 +26,7 @@ export class UmbInputBlockTypeElement<
 	@state()
 	private _items: Array<BlockType> = [];
 
+	// TODO: Seems no need to have these initially, then can be retrieved inside the `create` method. [NL]
 	#datasetContext?: UmbPropertyDatasetContext;
 	#filter: Array<UmbBlockTypeBaseModel> = [];
 

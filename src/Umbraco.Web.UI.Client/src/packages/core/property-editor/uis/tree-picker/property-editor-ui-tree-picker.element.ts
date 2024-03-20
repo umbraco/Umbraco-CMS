@@ -41,7 +41,6 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 
 	#dynamicRootRepository = new UmbDynamicRootRepository(this);
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const startNode: UmbTreePickerSource | undefined = config?.getValueByAlias('startNode');
 		if (startNode) {

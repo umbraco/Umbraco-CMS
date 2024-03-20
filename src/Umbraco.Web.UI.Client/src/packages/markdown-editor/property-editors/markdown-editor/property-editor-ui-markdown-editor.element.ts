@@ -20,7 +20,6 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 	@state()
 	private _overlaySize?: UUIModalSidebarSize;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._preview = config?.getValueByAlias('preview');
 		this._overlaySize = config?.getValueByAlias('overlaySize') ?? undefined;

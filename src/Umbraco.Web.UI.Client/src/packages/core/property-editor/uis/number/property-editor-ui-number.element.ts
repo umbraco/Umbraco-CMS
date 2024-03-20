@@ -18,7 +18,6 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 	@state()
 	private _step?: number;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._min = config?.getValueByAlias('min');
 		this._max = config?.getValueByAlias('max');

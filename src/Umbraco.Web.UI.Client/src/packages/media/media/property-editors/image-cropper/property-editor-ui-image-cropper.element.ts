@@ -36,7 +36,6 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 		}
 	}
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.crops = config?.getValueByAlias<UmbImageCropperPropertyEditorValue['crops']>('crops') ?? [];
 	}
