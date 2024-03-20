@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -3547,18 +3548,32 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
+    [Obsolete("Please use DeleteBlueprintAsync. Will be removed in V16.")]
     public void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
     {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+        DeleteBlueprintAsync(content.Key, currentUserKey).GetAwaiter().GetResult();
+    }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+    /// <inheritdoc />
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteBlueprintAsync(Guid id, Guid userKey)
+    {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IContent? blueprint = await Task.FromResult(GetBlueprintById(id));
+        if (blueprint is null)
         {
-            scope.WriteLock(Constants.Locks.ContentTree);
-            _documentBlueprintRepository.Delete(content);
-            scope.Notifications.Publish(new ContentDeletedBlueprintNotification(content, evtMsgs));
-            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.Remove, evtMsgs));
-            scope.Complete();
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, blueprint);
         }
+
+        scope.WriteLock(Constants.Locks.ContentTree);
+        _documentBlueprintRepository.Delete(blueprint);
+        scope.Notifications.Publish(new ContentDeletedBlueprintNotification(blueprint, eventMessages));
+        scope.Notifications.Publish(new ContentTreeChangeNotification(blueprint, TreeChangeTypes.Remove, eventMessages));
+        scope.Complete();
+
+        return Attempt.SucceedWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, blueprint);
     }
 
     private static readonly string?[] ArrayOfOneNullString = { null };
