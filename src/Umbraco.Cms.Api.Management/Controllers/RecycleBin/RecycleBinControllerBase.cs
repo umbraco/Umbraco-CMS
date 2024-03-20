@@ -26,7 +26,7 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
 
     protected abstract UmbracoObjectTypes ItemObjectType { get; }
 
-    protected abstract Guid RecycleBindRootKey { get; }
+    protected abstract Guid RecycleBinRootKey { get; }
 
     protected async Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
     {
@@ -112,7 +112,7 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
     private IEntitySlim[] GetPagedRootEntities(int skip, int take, out long totalItems)
     {
         IEntitySlim[] rootEntities = _entityService
-            .GetPagedTrashedChildren(RecycleBindRootKey, ItemObjectType, skip, take, out totalItems)
+            .GetPagedTrashedChildren(RecycleBinRootKey, ItemObjectType, skip, take, out totalItems)
             .ToArray();
 
         return rootEntities;
