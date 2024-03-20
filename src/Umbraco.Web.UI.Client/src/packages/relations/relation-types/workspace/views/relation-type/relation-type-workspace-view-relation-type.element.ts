@@ -1,4 +1,4 @@
-import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from '../../relation-type-workspace.context.js';
+import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from '../../relation-type-workspace.context-token.js';
 import type {
 	UUIBooleanInputEvent,
 	UUIRadioGroupElement,
