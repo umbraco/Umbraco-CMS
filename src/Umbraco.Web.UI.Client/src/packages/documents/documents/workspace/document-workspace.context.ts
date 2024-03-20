@@ -143,7 +143,7 @@ export class UmbDocumentWorkspaceContext
 		this.routes.setRoutes([
 			{
 				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique',
-				component: () => new UmbDocumentWorkspaceEditorElement(),
+				component: UmbDocumentWorkspaceEditorElement,
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
@@ -159,7 +159,7 @@ export class UmbDocumentWorkspaceContext
 			},
 			{
 				path: 'edit/:unique',
-				component: () => new UmbDocumentWorkspaceEditorElement(),
+				component: UmbDocumentWorkspaceEditorElement,
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
