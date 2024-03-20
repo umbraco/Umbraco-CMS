@@ -26,14 +26,14 @@ public class ByKeyDocumentBlueprintController : DocumentBlueprintControllerBase
      ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
-        IContent? content = _contentService.GetBlueprintById(id);
+        IContent? blueprint = _contentService.GetBlueprintById(id);
 
-        if (content == null)
+        if (blueprint == null)
         {
             return DocumentBlueprintNotFound();
         }
 
-        DocumentResponseModel model = await _documentPresentationFactory.CreateResponseModelAsync(content);
+        DocumentResponseModel model = await _documentPresentationFactory.CreateResponseModelAsync(blueprint);
         return Ok(model);
     }
 }
