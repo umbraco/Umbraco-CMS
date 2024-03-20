@@ -36,9 +36,9 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 	readonly routes = new UmbWorkspaceRouteManager(this);
 
-	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
-		super(host, workspaceArgs.manifest.alias);
-		this.#entityType = workspaceArgs.manifest.meta?.entityType;
+	constructor(host: UmbControllerHost, args: { manifest: ManifestWorkspace }) {
+		super(host, args.manifest.alias);
+		this.#entityType = args.manifest.meta?.entityType;
 	}
 
 	public set manifest(manifest: ManifestWorkspace) {

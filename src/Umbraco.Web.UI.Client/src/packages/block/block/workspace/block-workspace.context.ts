@@ -64,8 +64,11 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
-		this.#entityType = workspaceArgs.manifest.meta?.entityType;
-		this.workspaceAlias = workspaceArgs.manifest.alias;
+		const manifest = workspaceArgs.manifest;
+		this.#entityType = manifest.meta?.entityType;
+		this.workspaceAlias = manifest.alias;
+
+		console.log('BLOCK WORKSPACE CONTEXT', this, manifest);
 
 		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this.#modalContext = context;
@@ -89,9 +92,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
 			this.#blockEntries = context;
 		}).asPromise();
-	}
 
-	set manifest(manifest: ManifestWorkspace) {
 		this.routes.setRoutes([
 			{
 				path: 'create/:elementTypeKey',
@@ -373,4 +374,4 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 }
 
-export default UmbBlockWorkspaceContext;
+export { UmbBlockWorkspaceContext as api };
