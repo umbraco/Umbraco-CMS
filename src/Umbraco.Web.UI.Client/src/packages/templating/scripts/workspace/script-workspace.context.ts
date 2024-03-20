@@ -2,15 +2,26 @@ import { UmbScriptDetailRepository } from '../repository/index.js';
 import type { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
+import { UmbScriptWorkspaceEditorElement } from './script-workspace-editor.element.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEditableWorkspaceContextBase,
+	type UmbRoutableWorkspaceContext,
+	type UmbSaveableWorkspaceContextInterface,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
+} from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
-export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<UmbScriptDetailModel> {
+export class UmbScriptWorkspaceContext
+	extends UmbEditableWorkspaceContextBase<UmbScriptDetailModel>
+	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+{
 	public readonly repository = new UmbScriptDetailRepository(this);
 
 	#parent?: { entityType: string; unique: string | null };
@@ -24,9 +35,37 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_SCRIPT_WORKSPACE_ALIAS);
 		this.#loadCodeEditor();
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique',
+				component: UmbScriptWorkspaceEditorElement,
+				setup: async (component: PageComponent, info: IRoutingInfo) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique });
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbScriptWorkspaceEditorElement,
+				setup: (component: PageComponent, info: IRoutingInfo) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	protected resetState(): void {
