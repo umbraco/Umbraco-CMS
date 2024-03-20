@@ -342,6 +342,8 @@ public static class ImageCropperTemplateCoreExtensions
     /// furtherOptions: "bgcolor=fff"
     /// ]]></example>
     /// </param>
+    /// <param name="sourceWidth">The width of the source image.</param>
+    /// <param name="sourceHeight">The height of the source image.</param>
     /// <returns>
     ///     The URL of the cropped image.
     /// </returns>
@@ -358,7 +360,9 @@ public static class ImageCropperTemplateCoreExtensions
         bool preferFocalPoint = false,
         bool useCropDimensions = false,
         string? cacheBusterValue = null,
-        string? furtherOptions = null)
+        string? furtherOptions = null,
+        int? sourceWidth = null,
+        int? sourceHeight = null)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
         {
@@ -385,7 +389,9 @@ public static class ImageCropperTemplateCoreExtensions
             preferFocalPoint,
             useCropDimensions,
             cacheBusterValue,
-            furtherOptions);
+            furtherOptions,
+            sourceWidth,
+            sourceHeight);
     }
 
     /// <summary>
@@ -422,6 +428,8 @@ public static class ImageCropperTemplateCoreExtensions
     /// furtherOptions: "bgcolor=fff"
     /// ]]></example>
     /// </param>
+    /// <param name="sourceWidth">The width of the source image.</param>
+    /// <param name="sourceHeight">The height of the source image.</param>
     /// <returns>
     ///     The URL of the cropped image.
     /// </returns>
@@ -438,7 +446,9 @@ public static class ImageCropperTemplateCoreExtensions
         bool preferFocalPoint = false,
         bool useCropDimensions = false,
         string? cacheBusterValue = null,
-        string? furtherOptions = null)
+        string? furtherOptions = null,
+        int? sourceWidth = null,
+        int? sourceHeight = null)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
         {
@@ -491,6 +501,8 @@ public static class ImageCropperTemplateCoreExtensions
         options.Height = height;
         options.FurtherOptions = furtherOptions;
         options.CacheBusterValue = cacheBusterValue;
+        options.SourceWidth = sourceWidth;
+        options.SourceHeight = sourceHeight;
 
         return imageUrlGenerator.GetImageUrl(options);
     }
@@ -560,6 +572,9 @@ public static class ImageCropperTemplateCoreExtensions
         var cacheBusterValue =
             cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString("x", CultureInfo.InvariantCulture) : null;
 
+        var sourceWidth = mediaItem.Value<int?>(Constants.Conventions.Media.Width);
+        var sourceHeight = mediaItem.Value<int?>(Constants.Conventions.Media.Height);
+
         return GetCropUrl(
             mediaItemUrl,
             imageUrlGenerator,
@@ -573,6 +588,8 @@ public static class ImageCropperTemplateCoreExtensions
             preferFocalPoint,
             useCropDimensions,
             cacheBusterValue,
-            furtherOptions);
+            furtherOptions,
+            sourceWidth,
+            sourceHeight);
     }
 }
