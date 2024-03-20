@@ -2,7 +2,7 @@ import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffic
 import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 import { type InputType, type UUIFormLayoutItemElement, type UUILabelElement } from "@umbraco-cms/backoffice/external/uui";
 
-import { UMB_AUTH_CONTEXT, UmbAuthContext } from "./context/auth.context.js";
+import { UMB_AUTH_CONTEXT, UmbAuthContext } from "./contexts";
 import type { UmbLoginInputElement } from "./components";
 import { UmbSlimBackofficeController } from "./controllers";
 

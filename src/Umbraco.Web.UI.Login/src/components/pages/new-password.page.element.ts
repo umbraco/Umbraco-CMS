@@ -1,8 +1,8 @@
-import type {UUIButtonState} from '@umbraco-cms/backoffice/external/uui';
-import {html, customElement, state} from '@umbraco-cms/backoffice/external/lit';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import {umbAuthContext} from '../../context/auth.context.js';
+import { UMB_AUTH_CONTEXT } from "../../contexts";
 
 @customElement('umb-new-password-page')
 export default class UmbNewPasswordPageElement extends UmbLitElement {
@@ -24,9 +24,14 @@ export default class UmbNewPasswordPageElement extends UmbLitElement {
   @state()
   loading = true;
 
+  #authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+
   constructor() {
     super();
-    this.#init();
+    this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+      this.#authContext = authContext;
+      this.#init();
+    });
   }
 
   async #init() {
@@ -40,10 +45,12 @@ export default class UmbNewPasswordPageElement extends UmbLitElement {
       return;
     }
 
+    if (!this.#authContext) return;
+
     this.resetCode = resetCode;
     this.userId = userId;
 
-    const verifyResponse = await umbAuthContext.validatePasswordResetCode(this.userId, this.resetCode);
+    const verifyResponse = await this.#authContext.validatePasswordResetCode(this.userId, this.resetCode);
 
     if (verifyResponse.error) {
       this.page = 'error';
@@ -52,17 +59,20 @@ export default class UmbNewPasswordPageElement extends UmbLitElement {
       return;
     }
 
-    umbAuthContext.passwordConfiguration = verifyResponse.data?.passwordConfiguration;
+    this.#authContext.passwordConfiguration = verifyResponse.data?.passwordConfiguration;
 
     this.loading = false;
   }
 
   async #onSubmit(event: CustomEvent) {
     event.preventDefault();
+
+    if (!this.#authContext) return;
+
     const password = event.detail.password;
 
     this.state = 'waiting';
-    const response = await umbAuthContext.newPassword(password, this.resetCode, this.userId);
+    const response = await this.#authContext.newPassword(password, this.resetCode, this.userId);
 
     if (response.status === 204) {
       this.state = 'success';

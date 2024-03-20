@@ -2,7 +2,7 @@ import type {UUIButtonState} from '@umbraco-cms/backoffice/external/uui';
 import {type CSSResultGroup, css, html, nothing, customElement, state} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 
-import { umbAuthContext } from '../../context/auth.context.js';
+import { UMB_AUTH_CONTEXT } from '../../contexts';
 
 @customElement('umb-reset-password-page')
 export default class UmbResetPasswordPageElement extends UmbLitElement {
@@ -23,7 +23,8 @@ export default class UmbResetPasswordPageElement extends UmbLitElement {
     const username = formData.get('email') as string;
 
     this.resetCallState = 'waiting';
-    const response = await umbAuthContext.resetPassword(username);
+    const authContext = await this.getContext(UMB_AUTH_CONTEXT);
+    const response = await authContext.resetPassword(username);
     this.resetCallState = response.status === 200 ? 'success' : 'failed';
     this.error = response.error || '';
   };

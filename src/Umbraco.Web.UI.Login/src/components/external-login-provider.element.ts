@@ -158,9 +158,9 @@ export class UmbExternalLoginProviderElement extends UmbLitElement {
   }
 
   protected async renderCustomView() {
-    try {
-      if (!this.customView) return;
+    if (!this.customView) return;
 
+    try {
       const customView = await loadCustomView<ExternalLoginCustomViewElement>(this.customView);
 
       if (typeof customView === 'object') {
@@ -178,6 +178,8 @@ export class UmbExternalLoginProviderElement extends UmbLitElement {
       console.log('Custom view', this.customView);
       console.error('Failed to load custom view:', error);
       console.groupEnd();
+
+      return;
     }
   }
 

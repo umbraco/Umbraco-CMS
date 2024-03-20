@@ -1,14 +1,11 @@
-import type {UUIButtonState, UUIInputPasswordElement} from '@umbraco-cms/backoffice/external/uui';
-import {CSSResultGroup, css, html, nothing, customElement, property, query} from '@umbraco-cms/backoffice/external/lit';
+import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
+import { type CSSResultGroup, css, html, nothing, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 
-import { umbAuthContext } from '../../context/auth.context.js';
+import { UMB_AUTH_CONTEXT } from '../../contexts';
 
 @customElement('umb-new-password-layout')
 export default class UmbNewPasswordLayoutElement extends UmbLitElement {
-  #passwordConfiguration = umbAuthContext.passwordConfiguration;
-  #passwordPattern = '';
-
   @query('#password')
   passwordElement!: UUIInputPasswordElement;
 
@@ -27,30 +24,39 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
   @property({ type: Boolean, attribute: 'is-invite' })
   isInvite = false;
 
+  @state()
+  _passwordConfiguration?: typeof UMB_AUTH_CONTEXT.TYPE['passwordConfiguration'];
+
+  @state()
+  _passwordPattern = '';
+
   constructor() {
     super();
 
-    // Build a pattern
-    let pattern = '';
-    if (this.#passwordConfiguration?.requireDigit) {
-      pattern += '(?=.*\\d)';
-    }
-    if (this.#passwordConfiguration?.requireLowercase) {
-      pattern += '(?=.*[a-z])';
-    }
-    if (this.#passwordConfiguration?.requireUppercase) {
-      pattern += '(?=.*[A-Z])';
-    }
-    if (this.#passwordConfiguration?.requireNonLetterOrDigit) {
-      pattern += '(?=.*\\W)';
-    }
-    pattern += `.{${this.#passwordConfiguration?.minimumPasswordLength ?? 10},}`;
-    this.#passwordPattern = pattern;
+    this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+      this._passwordConfiguration = authContext.passwordConfiguration;
+      // Build a pattern
+      let pattern = '';
+      if (this._passwordConfiguration?.requireDigit) {
+        pattern += '(?=.*\\d)';
+      }
+      if (this._passwordConfiguration?.requireLowercase) {
+        pattern += '(?=.*[a-z])';
+      }
+      if (this._passwordConfiguration?.requireUppercase) {
+        pattern += '(?=.*[A-Z])';
+      }
+      if (this._passwordConfiguration?.requireNonLetterOrDigit) {
+        pattern += '(?=.*\\W)';
+      }
+      pattern += `.{${this._passwordConfiguration?.minimumPasswordLength ?? 10},}`;
+      this._passwordPattern = pattern;
+    });
   }
 
   #onSubmit(event: Event) {
     event.preventDefault();
-    if (!this.#passwordConfiguration) return;
+    if (!this._passwordConfiguration) return;
 
     const form = event.target as HTMLFormElement;
 
@@ -66,32 +72,32 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
 
     let passwordIsInvalid = false;
 
-    if (this.#passwordConfiguration.minimumPasswordLength > 0 && password.length < this.#passwordConfiguration.minimumPasswordLength) {
+    if (this._passwordConfiguration.minimumPasswordLength > 0 && password.length < this._passwordConfiguration.minimumPasswordLength) {
       passwordIsInvalid = true;
     }
 
-    if (this.#passwordConfiguration.requireNonLetterOrDigit) {
+    if (this._passwordConfiguration.requireNonLetterOrDigit) {
       const hasNonLetterOrDigit = /\W/.test(password);
       if (!hasNonLetterOrDigit) {
         passwordIsInvalid = true;
       }
     }
 
-    if (this.#passwordConfiguration.requireDigit) {
+    if (this._passwordConfiguration.requireDigit) {
       const hasDigit = /\d/.test(password);
       if (!hasDigit) {
         passwordIsInvalid = true;
       }
     }
 
-    if (this.#passwordConfiguration.requireLowercase) {
+    if (this._passwordConfiguration.requireLowercase) {
       const hasLowercase = /[a-z]/.test(password);
       if (!hasLowercase) {
         passwordIsInvalid = true;
       }
     }
 
-    if (this.#passwordConfiguration.requireUppercase) {
+    if (this._passwordConfiguration.requireUppercase) {
       const hasUppercase = /[A-Z]/.test(password);
       if (!hasUppercase) {
         passwordIsInvalid = true;
@@ -101,8 +107,8 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
     if (passwordIsInvalid) {
       const passwordValidityText = this.localize.term(
         'errorHandling_errorInPasswordFormat',
-        this.#passwordConfiguration.minimumPasswordLength,
-        this.#passwordConfiguration.requireNonLetterOrDigit ? 1 : 0
+        this._passwordConfiguration.minimumPasswordLength,
+        this._passwordConfiguration.requireNonLetterOrDigit ? 1 : 0
       ) ?? 'The password does not meet the minimum requirements!';
       this.passwordElement.setCustomValidity(passwordValidityText);
       return;
@@ -155,9 +161,9 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
               id="password"
               name="password"
               autocomplete="new-password"
-              pattern="${this.#passwordPattern}"
-              .minlength=${this.#passwordConfiguration?.minimumPasswordLength}
-              .minlengthMessage=${this.localize.term('user_passwordMinLength', this.#passwordConfiguration?.minimumPasswordLength ?? 10)}
+              pattern="${this._passwordPattern}"
+              .minlength=${this._passwordConfiguration?.minimumPasswordLength}
+              .minlengthMessage=${this.localize.term('user_passwordMinLength', this._passwordConfiguration?.minimumPasswordLength ?? 10)}
               .label=${this.localize.term('user_newPassword')}
               required
               required-message=${this.localize.term('user_passwordIsBlank')}>
@@ -173,9 +179,9 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
               id="confirmPassword"
               name="confirmPassword"
               autocomplete="new-password"
-              pattern="${this.#passwordPattern}"
-              .minlength=${this.#passwordConfiguration?.minimumPasswordLength}
-              .minlengthMessage=${this.localize.term('user_passwordMinLength', this.#passwordConfiguration?.minimumPasswordLength ?? 10)}
+              pattern="${this._passwordPattern}"
+              .minlength=${this._passwordConfiguration?.minimumPasswordLength}
+              .minlengthMessage=${this.localize.term('user_passwordMinLength', this._passwordConfiguration?.minimumPasswordLength ?? 10)}
               .label=${this.localize.term('user_confirmNewPassword')}
               required
               required-message=${this.localize.term('general_required')}></uui-input-password>

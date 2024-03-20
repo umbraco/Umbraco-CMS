@@ -2,8 +2,8 @@ import type {UUIButtonState, UUIInputElement} from '@umbraco-cms/backoffice/exte
 import {css, html, nothing, customElement, state, until} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 
-import { umbAuthContext } from '../../context/auth.context.js';
 import { loadCustomView, renderCustomView } from '../../utils/load-custom-view.function.js';
+import { UMB_AUTH_CONTEXT } from "../../contexts";
 
 type MfaCustomViewElement = HTMLElement & {
   providers?: string[];
@@ -21,13 +21,18 @@ export default class UmbMfaPageElement extends UmbLitElement {
   @state()
   private error: string | null = null;
 
+  #authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+
   constructor() {
     super();
-    this.#loadProviders();
+    this.consumeContext(UMB_AUTH_CONTEXT, authContext => {
+      this.#authContext = authContext;
+      this.#loadProviders();
+    });
   }
 
   #loadProviders() {
-    this.providers = umbAuthContext.mfaProviders.map((provider) => ({name: provider, value: provider, selected: false}));
+    this.providers = this.#authContext?.mfaProviders.map((provider) => ({name: provider, value: provider, selected: false})) ?? [];
 
     if (this.providers.length) {
       this.providers[0].selected = true;
@@ -38,6 +43,8 @@ export default class UmbMfaPageElement extends UmbLitElement {
 
   async #handleSubmit(e: SubmitEvent) {
     e.preventDefault();
+
+    if (!this.#authContext) return;
 
     this.error = null;
 
@@ -78,7 +85,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
     this.buttonState = 'waiting';
 
     try {
-      const response = await umbAuthContext.validateMfaCode(code, provider);
+      const response = await this.#authContext.validateMfaCode(code, provider);
       if (response.error) {
         if (codeInput) {
           codeInput.error = true;
@@ -92,7 +99,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
 
       this.buttonState = 'success';
 
-      const returnPath = umbAuthContext.returnPath;
+      const returnPath = this.#authContext.returnPath;
       if (returnPath) {
         location.href = returnPath;
       }
@@ -176,14 +183,14 @@ export default class UmbMfaPageElement extends UmbLitElement {
   }
 
   protected async renderCustomView() {
-    const view = umbAuthContext.twoFactorView;
+    const view = this.#authContext?.twoFactorView;
     if (!view) return nothing;
 
     try {
       const customView = await loadCustomView<MfaCustomViewElement>(view);
       if (typeof customView === 'object') {
         customView.providers = this.providers.map((provider) => provider.value);
-        customView.returnPath = umbAuthContext.returnPath;
+        customView.returnPath = this.#authContext?.returnPath ?? '';
       }
       return renderCustomView(customView);
     } catch (e) {
@@ -198,7 +205,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
   }
 
   protected render() {
-    return umbAuthContext.twoFactorView
+    return this.#authContext?.twoFactorView
         ? until(this.renderCustomView(), html`
           <uui-loader-bar></uui-loader-bar>`)
         : this.renderDefaultView();

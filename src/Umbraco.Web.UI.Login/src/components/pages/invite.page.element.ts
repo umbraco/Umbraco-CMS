@@ -1,8 +1,7 @@
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-
-import { umbAuthContext } from '../../context/auth.context.js';
+import { UMB_AUTH_CONTEXT } from "../../contexts";
 
 @customElement('umb-invite-page')
 export default class UmbInvitePageElement extends UmbLitElement {
@@ -18,9 +17,15 @@ export default class UmbInvitePageElement extends UmbLitElement {
   @state()
   loading = true;
 
+  #authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+
   constructor() {
     super();
-    this.#init();
+
+    this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+      this.#authContext = authContext;
+      this.#init();
+    });
   }
 
   async #init() {
@@ -34,10 +39,12 @@ export default class UmbInvitePageElement extends UmbLitElement {
       return;
     }
 
+    if (!this.#authContext) return;
+
     this.#token = token;
     this.#userId = userId;
 
-    const response = await umbAuthContext.validateInviteCode(this.#token, this.#userId);
+    const response = await this.#authContext.validateInviteCode(this.#token, this.#userId);
 
     if (response.error) {
       this.error = response.error;
@@ -45,7 +52,7 @@ export default class UmbInvitePageElement extends UmbLitElement {
       return;
     }
 
-    umbAuthContext.passwordConfiguration = response.data?.passwordConfiguration;
+    this.#authContext.passwordConfiguration = response.data?.passwordConfiguration;
     this.loading = false;
   }
 
@@ -55,8 +62,10 @@ export default class UmbInvitePageElement extends UmbLitElement {
 
     if (!password) return;
 
+    if (!this.#authContext) return;
+
     this.state = 'waiting';
-    const response = await umbAuthContext.newInvitedUserPassword(password, this.#token, this.#userId);
+    const response = await this.#authContext.newInvitedUserPassword(password, this.#token, this.#userId);
 
     if (response.error) {
       this.error = response.error;
@@ -65,7 +74,7 @@ export default class UmbInvitePageElement extends UmbLitElement {
     }
 
     this.state = 'success';
-    window.location.href = umbAuthContext.returnPath;
+    window.location.href = this.#authContext.returnPath;
   }
 
   render() {

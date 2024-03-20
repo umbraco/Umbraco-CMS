@@ -1,8 +1,8 @@
-import type { UUIButtonState } from '@umbraco-ui/uui';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, type CSSResultGroup, html, nothing, when, customElement, property, queryAssignedElements, state } from '@umbraco-cms/backoffice/external/lit';
 
-import { umbAuthContext } from '../../context/auth.context.js';
+import { UMB_AUTH_CONTEXT } from '../../contexts';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends UmbLitElement {
@@ -22,11 +22,24 @@ export default class UmbLoginPageElement extends UmbLitElement {
   private _loginError = '';
 
   @state()
-  private get disableLocalLogin() {
-    return umbAuthContext.disableLocalLogin;
-  }
+  disableLocalLogin = true;
+
+  @state()
+  supportPersistLogin = false;
 
   #formElement?: HTMLFormElement;
+
+  #authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+
+  constructor() {
+    super();
+
+    this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+      this.#authContext = authContext;
+      this.disableLocalLogin = authContext.disableLocalLogin;
+      this.supportPersistLogin = authContext.supportsPersistLogin;
+    });
+  }
 
   async #onSlotChanged() {
     this.#formElement = this.slottedElements?.find((el) => el.id === 'umb-login-form');
@@ -38,6 +51,8 @@ export default class UmbLoginPageElement extends UmbLitElement {
 
   #handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
+
+    if (!this.#authContext) return;
 
     const form = e.target as HTMLFormElement;
     if (!form) return;
@@ -52,7 +67,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 
     this._loginState = 'waiting';
 
-    const response = await umbAuthContext.login({
+    const response = await this.#authContext.login({
       username,
       password,
       persist,
@@ -63,12 +78,12 @@ export default class UmbLoginPageElement extends UmbLitElement {
 
     // Check for 402 status code indicating that MFA is required
     if (response.status === 402) {
-      umbAuthContext.isMfaEnabled = true;
+      this.#authContext.isMfaEnabled = true;
       if (response.twoFactorView) {
-        umbAuthContext.twoFactorView = response.twoFactorView;
+        this.#authContext.twoFactorView = response.twoFactorView;
       }
       if (response.twoFactorProviders) {
-        umbAuthContext.mfaProviders = response.twoFactorProviders;
+        this.#authContext.mfaProviders = response.twoFactorProviders;
       }
 
       this.dispatchEvent(new CustomEvent('umb-login-flow', {composed: true, detail: {flow: 'mfa'}}));
@@ -80,7 +95,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
       return;
     }
 
-    const returnPath = umbAuthContext.returnPath;
+    const returnPath = this.#authContext.returnPath;
 
     if (returnPath) {
       location.href = returnPath;
@@ -119,7 +134,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
           <slot @slotchange=${this.#onSlotChanged}></slot>
           <div id="secondary-actions">
             ${when(
-              umbAuthContext.supportsPersistLogin,
+              this.supportPersistLogin,
               () => html`
                 <uui-form-layout-item>
                   <uui-checkbox
