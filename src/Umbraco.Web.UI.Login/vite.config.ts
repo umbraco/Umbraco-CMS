@@ -9,12 +9,7 @@ export default defineConfig({
       fileName: 'login'
 		},
     rollupOptions: {
-      external: [/^@umbraco-cms/],
-      output: {
-        manualChunks: {
-          'uui': ['@umbraco-ui/uui']
-        },
-      }
+      external: [/^@umbraco-cms/]
     },
 		target: 'esnext',
 		sourcemap: true,
