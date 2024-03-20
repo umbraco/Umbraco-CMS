@@ -1,13 +1,14 @@
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type { ManifestWorkspace, ManifestWorkspaceActions } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspaces, ManifestWorkspaceActions } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_PARTIAL_VIEW_WORKSPACE_ALIAS = 'Umb.Workspace.PartialView';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: UMB_PARTIAL_VIEW_WORKSPACE_ALIAS,
 	name: 'Partial View Workspace',
-	js: () => import('./partial-view-workspace.element.js'),
+	api: () => import('./partial-view-workspace.context.js'),
 	meta: {
 		entityType: 'partial-view',
 	},

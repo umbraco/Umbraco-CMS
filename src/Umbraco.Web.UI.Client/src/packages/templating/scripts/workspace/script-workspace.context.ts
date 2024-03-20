@@ -167,3 +167,5 @@ export class UmbScriptWorkspaceContext
 		this.#data.destroy();
 	}
 }
+
+export { UmbScriptWorkspaceContext as api };
