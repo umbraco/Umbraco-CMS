@@ -89,40 +89,38 @@
     </div>
 </noscript>
 
-<umb-backoffice-icon-registry>
-    <umb-auth
-        return-url="@backOfficePath"
-        logo-image="@loginLogoImage"
-        logo-image-alternative="@loginLogoImageAlternative"
-        background-image="@loginBackgroundImage"
-        username-is-email="@usernameIsEmail"
-        allow-user-invite="@allowUserInvite"
-        allow-password-reset="@allowPasswordReset"
-        disable-local-login="@disableLocalLogin">
-        @foreach (var provider in externalLoginProviders)
-        {
-            <umb-external-login-provider
-                slot="external"
-                display-name="@provider.AuthenticationScheme.DisplayName"
-                provider-name="@provider.ExternalLoginProvider.AuthenticationType"
-                icon="@provider.ExternalLoginProvider.Options.Icon"
-                external-login-url="@externalLoginsUrl"
-                button-look="@provider.ExternalLoginProvider.Options.ButtonLook.ToString().ToLowerInvariant()"
-                button-color="@provider.ExternalLoginProvider.Options.ButtonColor.ToString().ToLowerInvariant()"
-                custom-view="@provider.ExternalLoginProvider.Options.CustomBackOfficeView">
-            </umb-external-login-provider>
-        }
-        @if (externalSignInErrors?.Errors?.Count() > 0)
-        {
-            <div slot="subheadline" style="color:var(--uui-color-danger-standalone)">
-                @foreach (var error in externalSignInErrors.Errors)
-                {
-                    <div>@error</div>
-                }
-            </div>
-        }
-    </umb-auth>
-</umb-backoffice-icon-registry>
+<umb-auth
+    return-url="@backOfficePath"
+    logo-image="@loginLogoImage"
+    logo-image-alternative="@loginLogoImageAlternative"
+    background-image="@loginBackgroundImage"
+    username-is-email="@usernameIsEmail"
+    allow-user-invite="@allowUserInvite"
+    allow-password-reset="@allowPasswordReset"
+    disable-local-login="@disableLocalLogin">
+    @foreach (var provider in externalLoginProviders)
+    {
+        <umb-external-login-provider
+            slot="external"
+            display-name="@provider.AuthenticationScheme.DisplayName"
+            provider-name="@provider.ExternalLoginProvider.AuthenticationType"
+            icon="@provider.ExternalLoginProvider.Options.Icon"
+            external-login-url="@externalLoginsUrl"
+            button-look="@provider.ExternalLoginProvider.Options.ButtonLook.ToString().ToLowerInvariant()"
+            button-color="@provider.ExternalLoginProvider.Options.ButtonColor.ToString().ToLowerInvariant()"
+            custom-view="@provider.ExternalLoginProvider.Options.CustomBackOfficeView">
+        </umb-external-login-provider>
+    }
+    @if (externalSignInErrors?.Errors?.Count() > 0)
+    {
+        <div slot="subheadline" style="color:var(--uui-color-danger-standalone)">
+            @foreach (var error in externalSignInErrors.Errors)
+            {
+                <div>@error</div>
+            }
+        </div>
+    }
+</umb-auth>
 
 @if (isDebug)
 {
