@@ -12,7 +12,6 @@ export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement imp
 	@property()
 	public value?: string;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (config) {
 			const validationLimit = config.getValueByAlias<any>('validationLimit');
@@ -30,7 +29,7 @@ export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement imp
 	private _limitMax?: number;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputMediaTypeElement).selectedIds.join(',');
+		this.value = (event.target as UmbInputMediaTypeElement).selection.join(',');
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 

@@ -55,34 +55,34 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 
 	@property({ type: Array })
 	public set items(items: Array<UmbReferenceByUniqueAndType>) {
-		this.#selectedIds = items?.map((item) => item.unique) ?? [];
+		this.#selection = items?.map((item) => item.unique) ?? [];
 		this.value = items?.map((item) => item.unique).join(',');
 	}
 	public get items(): Array<UmbReferenceByUniqueAndType> {
-		return this.#selectedIds.map((id) => ({ type: this.#entityTypeLookup[this._type], unique: id }));
+		return this.#selection.map((id) => ({ type: this.#entityTypeLookup[this._type], unique: id }));
 	}
 
-	#selectedIds: Array<string> = [];
+	#selection: Array<string> = [];
 
 	#onChange(event: CustomEvent) {
 		switch (this._type) {
 			case 'content':
 				{
 					const input = event.target as UmbInputDocumentElement;
-					this.#selectedIds = input.selectedIds;
-					this.value = input.selectedIds.join(',');
+					this.#selection = input.selection;
+					this.value = input.selection.join(',');
 				}
 				break;
 			case 'media': {
 				const input = event.target as UmbInputMediaElement;
-				this.#selectedIds = input.selectedIds;
-				this.value = input.selectedIds.join(',');
+				this.#selection = input.selection;
+				this.value = input.selection.join(',');
 				break;
 			}
 			case 'member': {
 				const input = event.target as UmbInputMemberElement;
-				this.#selectedIds = input.selectedIds;
-				this.value = input.selectedIds.join(',');
+				this.#selection = input.selection;
+				this.value = input.selection.join(',');
 				break;
 			}
 			default:
@@ -111,7 +111,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 
 	#renderDocumentPicker() {
 		return html`<umb-input-document
-			.selectedIds=${this.#selectedIds}
+			.selection=${this.#selection}
 			.startNodeId=${this.startNodeId}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
@@ -124,7 +124,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	#renderMediaPicker() {
 		// TODO: [LK] Review the data structure of this input editor.
 		return html`<umb-input-media
-			.selectedIds=${this.#selectedIds}
+			.selection=${this.#selection}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
 			.max=${this.max}
@@ -135,7 +135,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 
 	#renderMemberPicker() {
 		return html`<umb-input-member
-			.selectedIds=${this.#selectedIds}
+			.selection=${this.#selection}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
 			.max=${this.max}

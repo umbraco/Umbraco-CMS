@@ -14,7 +14,6 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 	@property({ type: Array })
 	value?: Array<string>;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._limitMin = config?.getValueByAlias('minNumber');
 		this._limitMax = config?.getValueByAlias('maxNumber');

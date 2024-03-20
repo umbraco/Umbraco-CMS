@@ -54,9 +54,8 @@ export class UmbInputNumberRangeElement extends FormControlMixin(UmbLitElement) 
 			this.maxValue = getNumberOrUndefined(splittedValue[1]);
 		}
 	}
-
-	constructor() {
-		super();
+	public get value(): string {
+		return this.minValue || this.maxValue ? (this.minValue || '') + ',' + (this.maxValue || '') : '';
 	}
 
 	protected getFormElement() {

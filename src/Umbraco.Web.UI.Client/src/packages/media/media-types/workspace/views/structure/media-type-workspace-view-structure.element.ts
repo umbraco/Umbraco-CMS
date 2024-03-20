@@ -81,11 +81,11 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 					<div slot="editor">
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
 						<umb-input-media-type
-							.selectedIds=${this._allowedContentTypeIDs ?? []}
+							.selection=${this._allowedContentTypeIDs ?? []}
 							@change="${(e: CustomEvent) => {
 								const sortedContentTypesList: Array<UmbContentTypeSortModel> = (
 									e.target as UmbInputMediaTypeElement
-								).selectedIds.map((id, index) => ({
+								).selection.map((id, index) => ({
 									contentType: { unique: id },
 									sortOrder: index,
 								}));

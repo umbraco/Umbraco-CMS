@@ -17,18 +17,18 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 	private _value: Array<string> = [];
 
 	@property({ type: Array })
-	public get value(): Array<string> {
-		return this._value;
-	}
 	public set value(value: Array<string>) {
 		this._value = value || [];
 	}
+	public get value(): Array<string> {
+		return this._value;
+	}
 
 	@property({ attribute: false })
-	public set config(config: UmbPropertyEditorConfigCollection | undefined) {}
+	public config?: UmbPropertyEditorConfigCollection;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputStaticFileElement).selectedPaths;
+		this.value = (event.target as UmbInputStaticFileElement).selection;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
@@ -37,7 +37,7 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 		return html`
 			<umb-input-static-file
 				@change=${this._onChange}
-				.selectedIds=${this._value}
+				.selection=${this._value}
 				.min=${0}
 				.max=${1}></umb-input-static-file>
 			<br />

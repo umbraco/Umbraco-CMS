@@ -1,17 +1,14 @@
-import type {
-	UmbCollectionBulkActionPermissions,
-	UmbCollectionConfiguration,
-} from '../../../../core/collection/types.js';
 import type { UmbPropertyEditorConfigCollection } from '../../config/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/document';
-import { UMB_MEDIA_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/media';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_WORKSPACE_CONTEXT, UMB_WORKSPACE_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
-import type { UmbMediaWorkspaceContext } from '@umbraco-cms/backoffice/media';
+import { UMB_WORKSPACE_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbCollectionBulkActionPermissions,
+	UmbCollectionConfiguration,
+} from '@umbraco-cms/backoffice/collection';
 
 /**
  * @element umb-property-editor-ui-collection-view
@@ -27,7 +24,6 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 	@state()
 	private _config?: UmbCollectionConfiguration;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._config = this.#mapDataTypeConfigToCollectionConfig(config);
 	}
