@@ -1,10 +1,16 @@
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
+import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import type { UmbInvariantableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbInvariantableWorkspaceContextInterface,
+	UmbRoutableWorkspaceContext,
+} from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbEditableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -27,7 +33,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbInvariantableWorkspaceContextInterface
+	implements UmbInvariantableWorkspaceContextInterface, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
@@ -72,9 +78,37 @@ export class UmbDataTypeWorkspaceContext
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DataType');
 		this.#observePropertyEditorUIAlias();
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique',
+				component: UmbDataTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique });
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbDataTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	resetState() {
@@ -326,3 +360,5 @@ export class UmbDataTypeWorkspaceContext
 		super.destroy();
 	}
 }
+
+export { UmbDataTypeWorkspaceContext as api };
