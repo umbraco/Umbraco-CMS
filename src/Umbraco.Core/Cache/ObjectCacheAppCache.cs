@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -9,18 +8,16 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Cache;
 
 /// <summary>
-///     Implements <see cref="IAppPolicyCache" /> on top of a <see cref="MemoryCache" />.
+/// Implements <see cref="IAppPolicyCache" /> on top of a <see cref="MemoryCache" />.
 /// </summary>
 public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
 {
-    private readonly IOptions<MemoryCacheOptions> _options;
-    private readonly IHostEnvironment? _hostEnvironment;
     private readonly ISet<string> _keys = new HashSet<string>();
-    private static readonly TimeSpan _readLockTimeout = TimeSpan.FromSeconds(5);
-    private static readonly TimeSpan _writeLockTimeout = TimeSpan.FromSeconds(5);
-
     private readonly ReaderWriterLockSlim _locker = new(LockRecursionPolicy.SupportsRecursion);
     private bool _disposedValue;
+
+    private static readonly TimeSpan _readLockTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan _writeLockTimeout = TimeSpan.FromSeconds(5);
 
     /// <summary>
     /// Gets the internal memory cache, for tests only!
@@ -34,7 +31,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     /// Initializes a new instance of the <see cref="ObjectCacheAppCache" />.
     /// </summary>
     public ObjectCacheAppCache()
-        : this(Options.Create(new MemoryCacheOptions()), NullLoggerFactory.Instance, null)
+        : this(new MemoryCacheOptions(), NullLoggerFactory.Instance)
     { }
 
     /// <summary>
@@ -42,14 +39,8 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     /// </summary>
     /// <param name="options">The options.</param>
     /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="hostEnvironment">The host environment.</param>
-    public ObjectCacheAppCache(IOptions<MemoryCacheOptions> options, ILoggerFactory loggerFactory, IHostEnvironment? hostEnvironment)
-    {
-        _options = options;
-        _hostEnvironment = hostEnvironment;
-
-        MemoryCache = new MemoryCache(_options, loggerFactory);
-    }
+    internal ObjectCacheAppCache(IOptions<MemoryCacheOptions> options, ILoggerFactory loggerFactory)
+        => MemoryCache = new MemoryCache(options, loggerFactory);
 
     /// <inheritdoc />
     public object? Get(string key)
@@ -59,8 +50,9 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             if (_locker.TryEnterReadLock(_readLockTimeout) is false)
             {
-                throw new TimeoutException("Timeout exceeded to the memory cache when getting item");
+                throw new TimeoutException("Timeout exceeded to the memory cache when getting item by key.");
             }
+
             result = MemoryCache.Get(key) as Lazy<object?>; // null if key not found
         }
         finally
@@ -71,7 +63,9 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             }
         }
 
-        return result == null ? null : SafeLazy.GetSafeLazyValue(result); // return exceptions as null
+        return result is null
+            ? null
+            : SafeLazy.GetSafeLazyValue(result); // return exceptions as null
     }
 
     /// <inheritdoc />
@@ -88,10 +82,13 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         object[] entries;
         try
         {
-            _locker.EnterReadLock();
+            if (_locker.TryEnterReadLock(_readLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when searching items by predicate.");
+            }
 
             entries = _keys.Where(predicate)
-                .Select(key => MemoryCache.Get(key))
+                .Select(MemoryCache.Get)
                 .WhereNotNull()
                 .ToArray(); // evaluate while locked
         }
@@ -114,25 +111,29 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     {
         // see notes in HttpRuntimeAppCache
         Lazy<object?>? result;
-
         try
         {
-            _locker.EnterUpgradeableReadLock();
+            if (_locker.TryEnterUpgradeableReadLock(_readLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when getting item by key.");
+            }
 
             result = MemoryCache.Get(key) as Lazy<object?>;
 
             // get non-created as NonCreatedValue & exceptions as null
-            if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null)
+            if (result is null || SafeLazy.GetSafeLazyValue(result, true) is null)
             {
                 result = SafeLazy.GetSafeLazy(factory);
-                MemoryCacheEntryOptions options = GetOptions(timeout, isSliding);
 
                 try
                 {
-                    _locker.EnterWriteLock();
+                    if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+                    {
+                        throw new TimeoutException("Timeout exceeded to the memory cache when inserting item.");
+                    }
 
                     // NOTE: This does an add or update
-                    MemoryCache.Set(key, result, options);
+                    MemoryCache.Set(key, result, GetOptions(timeout, isSliding));
                     _keys.Add(key);
                 }
                 finally
@@ -152,7 +153,6 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             }
         }
 
-        // return result.Value;
         var value = result.Value; // will not throw (safe lazy)
         if (value is SafeLazy.ExceptionHolder eh)
         {
@@ -169,16 +169,29 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         // and make sure we don't store a null value.
         Lazy<object?> result = SafeLazy.GetSafeLazy(factory);
         var value = result.Value; // force evaluation now
-        if (value == null)
+        if (value is null)
         {
             return; // do not store null values (backward compat)
         }
 
-        MemoryCacheEntryOptions options = GetOptions(timeout, isSliding);
+        try
+        {
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when inserting item.");
+            }
 
-        // NOTE: This does an add or update
-        MemoryCache.Set(key, result, options);
-        _keys.Add(key);
+            // NOTE: This does an add or update
+            MemoryCache.Set(key, result, GetOptions(timeout, isSliding));
+            _keys.Add(key);
+        }
+        finally
+        {
+            if (_locker.IsWriteLockHeld)
+            {
+                _locker.ExitWriteLock();
+            }
+        }
     }
 
     /// <inheritdoc />
@@ -186,10 +199,12 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     {
         try
         {
-            _locker.EnterWriteLock();
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing all items.");
+            }
 
-            MemoryCache.Dispose();
-            MemoryCache = new MemoryCache(_options);
+            MemoryCache.Clear();
             _keys.Clear();
         }
         finally
@@ -208,7 +223,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
             {
-                throw new TimeoutException("Timeout exceeded to the memory cache when clearing item");
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing item by key.");
             }
 
             MemoryCache.Remove(key);
@@ -296,7 +311,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
             {
-                throw new TimeoutException("Timeout exceeded to the memory cache.");
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing items by predicate.");
             }
 
             // ToArray required to remove
@@ -315,9 +330,9 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
     }
 
-    public void Dispose() =>
+    public void Dispose()
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(true);
+        => Dispose(true);
 
     protected virtual void Dispose(bool disposing)
     {
@@ -333,7 +348,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
     }
 
-    private MemoryCacheEntryOptions GetOptions(TimeSpan? timeout = null, bool isSliding = false)
+    private MemoryCacheEntryOptions GetOptions(TimeSpan? timeout, bool isSliding)
     {
         var options = new MemoryCacheEntryOptions();
 
@@ -348,6 +363,24 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
 
         // Ensure key is removed from set when evicted from cache
-        return options.RegisterPostEvictionCallback((key, _, _, _) => _keys.Remove((string)key));
+        return options.RegisterPostEvictionCallback((key, _, _, _) =>
+        {
+            try
+            {
+                if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+                {
+                    throw new TimeoutException("Timeout exceeded to the memory cache when removing key.");
+                }
+
+                _keys.Remove((string)key);
+            }
+            finally
+            {
+                if (_locker.IsWriteLockHeld)
+                {
+                    _locker.ExitWriteLock();
+                }
+            }
+        });
     }
 }
