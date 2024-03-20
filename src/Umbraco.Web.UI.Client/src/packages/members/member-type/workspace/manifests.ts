@@ -9,7 +9,7 @@ export const UMB_MEMBER_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.MemberType';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
-	kind: 'routes',
+	kind: 'routable',
 	alias: UMB_MEMBER_TYPE_WORKSPACE_ALIAS,
 	name: 'Member Type Workspace',
 	api: () => import('./member-type-workspace.context.js'),
