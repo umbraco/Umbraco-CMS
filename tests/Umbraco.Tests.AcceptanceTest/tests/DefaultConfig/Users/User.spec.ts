@@ -41,7 +41,7 @@ test.describe('User tests', () => {
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await umbracoUi.user.clickTextButtonWithName(wrongName);
-    await umbracoUi.user.updateNameOfUser(nameOfTheUser);
+    await umbracoUi.user.enterUpdatedNameOfUser(nameOfTheUser);
     await umbracoUi.user.clickSaveButton();
 
     // Assert
