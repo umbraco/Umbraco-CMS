@@ -1,14 +1,11 @@
-import type {UUIButtonState} from '@umbraco-ui/uui';
-import {css, CSSResultGroup, html, LitElement, nothing} from 'lit';
-import {customElement, property, queryAssignedElements, state} from 'lit/decorators.js';
-import {when} from 'lit/directives/when.js';
-import {until} from 'lit/directives/until.js';
+import type { UUIButtonState } from '@umbraco-ui/uui';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, type CSSResultGroup, html, nothing, when, customElement, property, queryAssignedElements, state } from '@umbraco-cms/backoffice/external/lit';
 
-import {umbAuthContext} from '../../context/auth.context.js';
-import {umbLocalizationContext} from '../../external/localization/localization-context.js';
+import { umbAuthContext } from '../../context/auth.context.js';
 
 @customElement('umb-login-page')
-export default class UmbLoginPageElement extends LitElement {
+export default class UmbLoginPageElement extends UmbLitElement {
   @property({type: Boolean, attribute: 'username-is-email'})
   usernameIsEmail = false;
 
@@ -127,7 +124,7 @@ export default class UmbLoginPageElement extends LitElement {
                 <uui-form-layout-item>
                   <uui-checkbox
                     name="persist"
-                    .label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
+                    .label=${this.localize.term('user_rememberMe')}>
                     <umb-localize key="user_rememberMe">Remember me</umb-localize>
                   </uui-checkbox>
                 </uui-form-layout-item>`
@@ -146,7 +143,7 @@ export default class UmbLoginPageElement extends LitElement {
             id="umb-login-button"
             look="primary"
             @click=${this.#onSubmitClick}
-            .label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'), 'Login')}
+            .label=${this.localize.term('general_login')}
             color="default"
             .state=${this._loginState}></uui-button>
 

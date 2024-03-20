@@ -1,13 +1,11 @@
-import type {UUIButtonState, UUIInputPasswordElement} from '@umbraco-ui/uui';
-import {CSSResultGroup, LitElement, css, html, nothing} from 'lit';
-import {customElement, property, query} from 'lit/decorators.js';
-import {until} from 'lit/directives/until.js';
+import type {UUIButtonState, UUIInputPasswordElement} from '@umbraco-cms/backoffice/external/uui';
+import {CSSResultGroup, css, html, nothing, customElement, property, query} from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 
-import {umbAuthContext} from '../../context/auth.context.js';
-import {umbLocalizationContext} from '../../external/localization/localization-context.js';
+import { umbAuthContext } from '../../context/auth.context.js';
 
 @customElement('umb-new-password-layout')
-export default class UmbNewPasswordLayoutElement extends LitElement {
+export default class UmbNewPasswordLayoutElement extends UmbLitElement {
   #passwordConfiguration = umbAuthContext.passwordConfiguration;
   #passwordPattern = '';
 
@@ -50,7 +48,7 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
     this.#passwordPattern = pattern;
   }
 
-  async #onSubmit(event: Event) {
+  #onSubmit(event: Event) {
     event.preventDefault();
     if (!this.#passwordConfiguration) return;
 
@@ -101,21 +99,19 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
     }
 
     if (passwordIsInvalid) {
-      const passwordValidityText = await umbLocalizationContext.localize(
+      const passwordValidityText = this.localize.term(
         'errorHandling_errorInPasswordFormat',
-        [this.#passwordConfiguration.minimumPasswordLength, this.#passwordConfiguration.requireNonLetterOrDigit ? 1 : 0],
-        "The password doesn't meet the minimum requirements!"
-      );
+        this.#passwordConfiguration.minimumPasswordLength,
+        this.#passwordConfiguration.requireNonLetterOrDigit ? 1 : 0
+      ) ?? 'The password does not meet the minimum requirements!';
       this.passwordElement.setCustomValidity(passwordValidityText);
       return;
     }
 
     if (password !== passwordConfirm) {
-      const passwordValidityText = await umbLocalizationContext.localize(
-        'user_passwordMismatch',
-        undefined,
-        "The confirmed password doesn't match the new password!"
-      );
+      const passwordValidityText = this.localize.term(
+        'user_passwordMismatch'
+      ) ?? "The confirmed password doesn't match the new password!";
       this.confirmPasswordElement.setCustomValidity(passwordValidityText);
       return;
     }
@@ -161,12 +157,11 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
               autocomplete="new-password"
               pattern="${this.#passwordPattern}"
               .minlength=${this.#passwordConfiguration?.minimumPasswordLength}
-              .minlengthMessage=${until(umbLocalizationContext.localize('user_passwordMinLength', [this.#passwordConfiguration?.minimumPasswordLength ?? 10], 'Password is too short'))}
-              .label=${until(umbLocalizationContext.localize('user_newPassword', undefined, 'New password'))}
+              .minlengthMessage=${this.localize.term('user_passwordMinLength', this.#passwordConfiguration?.minimumPasswordLength ?? 10)}
+              .label=${this.localize.term('user_newPassword')}
               required
-              required-message=${until(
-                umbLocalizationContext.localize('user_passwordIsBlank', undefined, 'Your new password cannot be blank!')
-              )}></uui-input-password>
+              required-message=${this.localize.term('user_passwordIsBlank')}>
+            </uui-input-password>
           </uui-form-layout-item>
 
           <uui-form-layout-item>
@@ -180,21 +175,17 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
               autocomplete="new-password"
               pattern="${this.#passwordPattern}"
               .minlength=${this.#passwordConfiguration?.minimumPasswordLength}
-              .minlengthMessage=${until(umbLocalizationContext.localize('user_passwordMinLength', [this.#passwordConfiguration?.minimumPasswordLength ?? 10], 'Password is too short'))}
-              .label=${until(
-                umbLocalizationContext.localize('user_confirmNewPassword', undefined, 'Confirm new password')
-              )}
+              .minlengthMessage=${this.localize.term('user_passwordMinLength', this.#passwordConfiguration?.minimumPasswordLength ?? 10)}
+              .label=${this.localize.term('user_confirmNewPassword')}
               required
-              required-message=${until(
-                umbLocalizationContext.localize('general_required', undefined, 'Required')
-              )}></uui-input-password>
+              required-message=${this.localize.term('general_required')}></uui-input-password>
           </uui-form-layout-item>
 
           ${this.#renderErrorMessage()}
 
           <uui-button
             type="submit"
-            label=${until(umbLocalizationContext.localize('general_continue', undefined, 'Continue'))}
+            label=${this.localize.term('general_continue')}
             look="primary"
             color="default"
             .state=${this.state}></uui-button>

@@ -1,8 +1,8 @@
-import { CSSResultGroup, LitElement, css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { CSSResultGroup, css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-back-to-login-button')
-export default class UmbBackToLoginButtonElement extends LitElement {
+export default class UmbBackToLoginButtonElement extends UmbLitElement {
 	render() {
 		return html`
 			<button type="button" @click=${this.#handleClick}>
@@ -39,7 +39,7 @@ export default class UmbBackToLoginButtonElement extends LitElement {
 				display: inline-flex;
 				line-height: 1;
 				font-size: 14px;
-				font-family: var(--uui-font-family);
+				font-family: var(--uui-font-family),sans-serif;
 			}
 			button svg {
 				width: 1rem;

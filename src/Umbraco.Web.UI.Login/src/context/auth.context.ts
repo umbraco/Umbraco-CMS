@@ -6,9 +6,11 @@ import type {
   NewPasswordResponse,
   PasswordConfigurationModel, ValidateInviteCodeResponse
 } from "../types.js";
-import {UmbAuthRepository} from './auth.repository.js';
+import { UmbAuthRepository } from './auth.repository.js';
+import { UmbContextBase } from "@umbraco-cms/backoffice/class-api";
+import { UmbContextToken } from "@umbraco-cms/backoffice/context-api";
 
-export class UmbAuthContext {
+export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
   readonly supportsPersistLogin = false;
   disableLocalLogin = false;
   twoFactorView = '';
@@ -16,7 +18,7 @@ export class UmbAuthContext {
   mfaProviders: string[] = [];
   passwordConfiguration?: PasswordConfigurationModel;
 
-  #authRepository = new UmbAuthRepository();
+  #authRepository = new UmbAuthRepository(this);
 
   #returnPath = '';
 
@@ -79,4 +81,4 @@ export class UmbAuthContext {
   }
 }
 
-export const umbAuthContext = new UmbAuthContext();
+export const UMB_AUTH_CONTEXT = new UmbContextToken<UmbAuthContext>('UmbAuthContext');

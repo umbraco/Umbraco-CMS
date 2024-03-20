@@ -1,10 +1,8 @@
-import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-ui/uui';
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { until } from 'lit/directives/until.js';
+import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
+import { css, CSSResultGroup, html, nothing, customElement, property, until } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 
 import { loadCustomView, renderCustomView } from '../utils/load-custom-view.function.js';
-import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
 type UserViewState = 'loggingIn' | 'loggedIn' | 'loggedOut' | 'timedOut';
 
@@ -21,7 +19,7 @@ type ExternalLoginCustomViewElement = HTMLElement & {
  * @element umb-external-login-provider
  */
 @customElement('umb-external-login-provider')
-export class UmbExternalLoginProviderElement extends LitElement {
+export class UmbExternalLoginProviderElement extends UmbLitElement {
   /**
    * Gets or sets the path to the module that should be loaded as the custom view.
    * The module should export a default class that extends HTMLElement.
@@ -137,20 +135,19 @@ export class UmbExternalLoginProviderElement extends LitElement {
 
   protected renderDefaultView() {
     return html`
-      <form id="defaultView" method="post" action=${this.externalLoginUrl}>
+      <form id="defaultView" method="get" action=${this.externalLoginUrl}>
         <uui-button
           type="submit"
           name="provider"
-          .value=${this.providerName}
-          .label=${until(umbLocalizationContext.localize('login_signInWith', undefined, 'Sign in with').then(str => `${str} ${this.displayName}`))}
+          value=${this.providerName}
+          .label=${this.localize.term('login_signInWith', this.displayName)}
           .look=${this.buttonLook}
           .color=${this.buttonColor}>
           ${this.displayName
             ? html`
               <div>
                 <uui-icon name=${this.icon}></uui-icon>
-                <umb-localize key="login_signInWith">Sign in with</umb-localize>
-                ${this.displayName}
+                <umb-localize key="login_signInWith" .args="${[this.displayName]}">Sign in with ${this.displayName}</umb-localize>
               </div>
             `
             : nothing}

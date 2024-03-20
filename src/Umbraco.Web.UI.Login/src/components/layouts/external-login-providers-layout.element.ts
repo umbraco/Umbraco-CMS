@@ -1,10 +1,8 @@
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
-import { customElement, property, queryAssignedElements } from 'lit/decorators.js';
-import { until } from 'lit/directives/until.js';
-import { umbLocalizationContext } from '../../external/localization/localization-context.js';
+import { css, CSSResultGroup, html, nothing, customElement, property, queryAssignedElements } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-external-login-providers-layout')
-export class UmbExternalLoginProvidersLayoutElement extends LitElement {
+export class UmbExternalLoginProvidersLayoutElement extends UmbLitElement {
   @property({ type: Boolean, attribute: 'divider' })
   showDivider = true;
 
@@ -20,7 +18,9 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
       ${this.showDivider
         ? html`
           <div id="divider" aria-hidden="true">
-            <span>${until(umbLocalizationContext.localize('general_or', undefined, 'or').then(str => str.toLocaleLowerCase()))}</span>
+            <span>
+              <umb-localize key="general_or">or</umb-localize>
+            </span>
           </div>
         `
         : nothing}
@@ -50,11 +50,11 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 
       #divider {
         width: calc(100% - 18px);
-        margin: 0 auto;
-        margin-bottom: 16px;
+        margin: 0 auto 16px;
         text-align: center;
         z-index: 0;
         overflow: hidden;
+        text-transform: lowercase;
       }
 
       #divider span {

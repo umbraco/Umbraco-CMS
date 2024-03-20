@@ -1,10 +1,9 @@
-import type {UUIButtonState, UUIInputElement} from '@umbraco-ui/uui';
-import {LitElement, css, html, nothing} from 'lit';
-import {customElement, state} from 'lit/decorators.js';
-import {until} from 'lit/directives/until.js';
-import {umbAuthContext} from '../../context/auth.context.js';
-import {umbLocalizationContext} from '../../external/localization/localization-context.js';
-import {loadCustomView, renderCustomView} from '../../utils/load-custom-view.function.js';
+import type {UUIButtonState, UUIInputElement} from '@umbraco-cms/backoffice/external/uui';
+import {css, html, nothing, customElement, state, until} from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
+
+import { umbAuthContext } from '../../context/auth.context.js';
+import { loadCustomView, renderCustomView } from '../../utils/load-custom-view.function.js';
 
 type MfaCustomViewElement = HTMLElement & {
   providers?: string[];
@@ -12,7 +11,7 @@ type MfaCustomViewElement = HTMLElement & {
 };
 
 @customElement('umb-mfa-page')
-export default class UmbMfaPageElement extends LitElement {
+export default class UmbMfaPageElement extends UmbLitElement {
   @state()
   protected providers: Array<{ name: string; value: string; selected: boolean }> = [];
 
@@ -152,16 +151,10 @@ export default class UmbMfaPageElement extends LitElement {
               name="token"
               inputmode="numeric"
               autocomplete="one-time-code"
-              placeholder=${until(
-                umbLocalizationContext.localize('login_2faCodeInputHelp'),
-                'Please enter the verification code'
-              )}
+              placeholder=${this.localize.term('login_2faCodeInputHelp')}
               aria-required="true"
               required
-              required-message=${until(
-                umbLocalizationContext.localize('login_2faCodeInputHelp'),
-                'Please enter the verification code'
-              )}
+              required-message=${this.localize.term('login_2faCodeInputHelp')}
               style="width:100%;">
             </uui-input>
           </uui-form-layout-item>
@@ -173,7 +166,7 @@ export default class UmbMfaPageElement extends LitElement {
             button-style="success"
             look="primary"
             color="default"
-            label=${until(umbLocalizationContext.localize('general_validate', undefined, 'Validate'), 'Validate')}
+            label=${this.localize.term('general_validate')}
             type="submit"></uui-button>
         </form>
       </uui-form>

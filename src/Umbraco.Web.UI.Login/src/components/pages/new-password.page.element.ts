@@ -1,13 +1,11 @@
-import type {UUIButtonState} from '@umbraco-ui/uui';
-import {LitElement, html} from 'lit';
-import {customElement, state} from 'lit/decorators.js';
-import {until} from 'lit/directives/until.js';
+import type {UUIButtonState} from '@umbraco-cms/backoffice/external/uui';
+import {html, customElement, state} from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import {umbAuthContext} from '../../context/auth.context.js';
-import {umbLocalizationContext} from '../../external/localization/localization-context.js';
 
 @customElement('umb-new-password-page')
-export default class UmbNewPasswordPageElement extends LitElement {
+export default class UmbNewPasswordPageElement extends UmbLitElement {
   @state()
   state: UUIButtonState = undefined;
 
@@ -89,22 +87,14 @@ export default class UmbNewPasswordPageElement extends LitElement {
       case 'error':
         return html`
           <umb-error-layout
-            header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))}
-            message=${this.error ?? until(
-              umbLocalizationContext.localize('errors_defaultError', undefined, 'An unknown failure has occured')
-            )}>
+            header=${this.localize.term('general_error')}
+            message=${this.error ?? this.localize.term('errors_defaultError')}>
           </umb-error-layout>`;
       case 'done':
         return html`
           <umb-confirmation-layout
-            header=${until(umbLocalizationContext.localize('general_success', undefined, 'Success'))}
-            message=${until(
-              umbLocalizationContext.localize(
-                'login_setPasswordConfirmation',
-                undefined,
-                'Your new password has been set and you may now use it to log in.'
-              )
-            )}>
+            header=${this.localize.term('general_success')}
+            message=${this.localize.term('login_setPasswordConfirmation')}>
           </umb-confirmation-layout>`;
     }
   }

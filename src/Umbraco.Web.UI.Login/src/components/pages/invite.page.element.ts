@@ -1,13 +1,11 @@
-import type { UUIButtonState } from '@umbraco-ui/uui';
-import { LitElement, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { until } from 'lit/directives/until.js';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import { umbAuthContext } from '../../context/auth.context.js';
-import { umbLocalizationContext } from '../../external/localization/localization-context.js';
 
 @customElement('umb-invite-page')
-export default class UmbInvitePageElement extends LitElement {
+export default class UmbInvitePageElement extends UmbLitElement {
   #token = '';
   #userId = '';
 
@@ -75,10 +73,8 @@ export default class UmbInvitePageElement extends LitElement {
       this.error
         ? html`
           <umb-error-layout
-            header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))}
-            message=${this.error ?? until(
-              umbLocalizationContext.localize('errors_defaultError', undefined, 'An unknown failure has occured')
-            )}>
+            header=${this.localize.term('general_error')}
+            message=${this.error ?? this.localize.term('errors_defaultError')}>
           </umb-error-layout>`
       : html`
         <umb-new-password-layout
