@@ -250,6 +250,11 @@ public class ManifestParser : IManifestParser
             return Array.Empty<string>();
         }
 
-        return Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
+        var files = Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
+
+        // Ensure a consistent sorting of paths
+        Array.Sort(files);
+
+        return files;
     }
 }
