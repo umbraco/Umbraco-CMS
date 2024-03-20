@@ -1,4 +1,12 @@
-import { css, html, customElement, repeat, nothing, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	customElement,
+	repeat,
+	nothing,
+	when,
+	ifDefined,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbItemPickerModalData, UmbItemPickerModel } from '@umbraco-cms/backoffice/modal';
@@ -24,16 +32,20 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 						items.length,
 						() => html`
 							<uui-box>
-								${repeat(
-									items,
-									(item) => item.value,
-									(item) => html`
-										<uui-button @click=${() => this.#submit(item)} look="placeholder" label="${item.label}">
-											<h4>${item.label}</h4>
-											<p>${item.description}</p>
-										</uui-button>
-									`,
-								)}
+								<uui-ref-list>
+									${repeat(
+										items,
+										(item) => item.value,
+										(item) => html`
+											<umb-ref-item
+												name=${item.label}
+												detail=${ifDefined(item.description)}
+												icon=${ifDefined(item.icon)}
+												@click=${() => this.#submit(item)}>
+											</umb-ref-item>
+										`,
+									)}
+								</uui-ref-list>
 							</uui-box>
 						`,
 						() => html`<p>There are no items to select.</p>`,
