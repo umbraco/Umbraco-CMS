@@ -1,17 +1,20 @@
 import { UmbMemberGroupDetailRepository } from '../repository/index.js';
 import type { UmbMemberGroupDetailModel } from '../types.js';
 import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './manifests.js';
+import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
+	UmbWorkspaceRouteManager,
+	UmbWorkspaceIsNewRedirectController,
+	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbMemberGroupWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMemberGroupDetailModel>
-	implements UmbSaveableWorkspaceContextInterface
+	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbMemberGroupDetailRepository(this);
 	#getDataPromise?: Promise<any>;
@@ -22,8 +25,34 @@ export class UmbMemberGroupWorkspaceContext
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEMBER_GROUP_WORKSPACE_ALIAS);
+
+		this.routes.setRoutes([
+			{
+				path: 'create',
+				component: UmbMemberGroupWorkspaceEditorElement,
+				setup: () => {
+					this.create();
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbMemberGroupWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	public isLoaded() {
@@ -112,11 +141,4 @@ export class UmbMemberGroupWorkspaceContext
 	}
 }
 
-export const UMB_MEMBER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbMemberGroupWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbMemberGroupWorkspaceContext => context.getEntityType?.() === 'member-group',
-);
+export { UmbMemberGroupWorkspaceContext as api };

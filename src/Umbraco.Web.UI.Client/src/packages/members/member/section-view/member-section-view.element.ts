@@ -1,8 +1,9 @@
 import { UMB_MEMBER_COLLECTION_ALIAS } from '../collection/manifests.js';
+import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-member-section-view')
 export class UmbMemberSectionViewElement extends UmbLitElement {
@@ -17,9 +18,10 @@ export class UmbMemberSectionViewElement extends UmbLitElement {
 		},
 		{
 			path: 'member',
-			component: () => import('src/packages/core/workspace/workspace.element.js'),
-			setup(component: PageComponent) {
-				(component as any).entityType = 'member';
+			component: () => {
+				const element = document.createElement('umb-workspace');
+				element.setAttribute('entityType', UMB_MEMBER_ENTITY_TYPE);
+				return element;
 			},
 		},
 		{
