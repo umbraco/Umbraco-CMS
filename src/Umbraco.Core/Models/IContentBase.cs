@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Models;
 ///     <para>Content items are documents, medias and members.</para>
 ///     <para>Content items have a content type, and properties.</para>
 /// </remarks>
-public interface IContentBase : IUmbracoEntity, IRememberBeingDirty
+public interface IContentBase : IUmbracoEntity, IRememberBeingDirty, IHaveAlternateVersions
 {
     /// <summary>
     ///     Integer Id of the default ContentType

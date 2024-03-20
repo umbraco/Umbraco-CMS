@@ -46,8 +46,7 @@ public class ContentItemBinder : IModelBinder
         }
 
         ContentItemSave? model =
-            await _modelBinderHelper.BindModelFromMultipartRequestAsync<ContentItemSave>(_jsonSerializer,
-                _hostingEnvironment, bindingContext);
+            await _modelBinderHelper.BindModelFromMultipartRequestAsync<ContentItemSave>(_jsonSerializer, _hostingEnvironment, bindingContext);
 
         if (model is null)
         {
@@ -55,13 +54,15 @@ public class ContentItemBinder : IModelBinder
         }
 
         IContent? persistedContent =
-            ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
+            ContentControllerBase.IsCreatingAction(model.Action) || (model.IsAlternateVersion && model.VersionId == 0) ? CreateNew(model) : GetExisting(model);
+
         BindModel(model, persistedContent!, _modelBinderHelper, _umbracoMapper);
 
         bindingContext.Result = ModelBindingResult.Success(model);
     }
 
-    protected virtual IContent? GetExisting(ContentItemSave model) => _contentService.GetById(model.Id);
+    protected virtual IContent? GetExisting(ContentItemSave model) =>
+        model.IsAlternateVersion ? _contentService.GetVersion(model.VersionId) : _contentService.GetById(model.Id);
 
     private IContent CreateNew(ContentItemSave model)
     {
@@ -77,29 +78,36 @@ public class ContentItemBinder : IModelBinder
             contentType);
     }
 
-    internal static void BindModel(ContentItemSave model, IContent persistedContent,
-        ContentModelBinderHelper modelBinderHelper, IUmbracoMapper umbracoMapper)
+    internal static void BindModel(
+        ContentItemSave model,
+        IContent persistedContent,
+        ContentModelBinderHelper modelBinderHelper,
+        IUmbracoMapper umbracoMapper)
     {
-        model.PersistedContent = persistedContent;
-
-        //create the dto from the persisted model
-        if (model.PersistedContent != null)
+        // if no content, we can't bind anything
+        if (persistedContent is null)
         {
-            foreach (ContentVariantSave variant in model.Variants)
-            {
-                //map the property dto collection with the culture of the current variant
-                variant.PropertyCollectionDto = umbracoMapper.Map<ContentPropertyCollectionDto>(
-                    model.PersistedContent,
-                    context =>
-                    {
-                        // either of these may be null and that is ok, if it's invariant they will be null which is what is expected
-                        context.SetCulture(variant.Culture);
-                        context.SetSegment(variant.Segment);
-                    });
+            return;
+        }
 
-                //now map all of the saved values to the dto
-                modelBinderHelper.MapPropertyValuesFromSaved(variant, variant.PropertyCollectionDto);
-            }
+        // create the dto from the persisted model
+        model.PersistedContent = persistedContent;
+        model.PersistedContent.IsAlternateVersion = model.IsAlternateVersion;
+
+        foreach (ContentVariantSave variant in model.Variants)
+        {
+            // map the property dto collection with the culture of the current variant
+            variant.PropertyCollectionDto = umbracoMapper.Map<ContentPropertyCollectionDto>(
+                model.PersistedContent,
+                context =>
+                {
+                    // either of these may be null and that is ok, if it's invariant they will be null which is what is expected
+                    context.SetCulture(variant.Culture);
+                    context.SetSegment(variant.Segment);
+                });
+
+            // now map all of the saved values to the dto
+            modelBinderHelper.MapPropertyValuesFromSaved(variant, variant.PropertyCollectionDto);
         }
     }
 }

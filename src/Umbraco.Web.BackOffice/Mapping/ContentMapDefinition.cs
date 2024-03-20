@@ -153,6 +153,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.IsChildOfListView = source.IsChildOfListView;
         target.IsContainer = source.IsContainer;
         target.IsElement = source.IsElement;
+        target.IsAlternateVersion = source.IsAlternateVersion;
         target.Key = source.Key;
         target.Owner = source.Owner;
         target.ParentId = source.ParentId;
@@ -168,6 +169,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.Updater = source.Updater;
         target.Urls = source.Urls;
         target.Variants = context.MapEnumerable<ContentVariantDisplay, ContentVariantScheduleDisplay>(source.Variants);
+        target.VersionId = source.VersionId;
 
         foreach (BackOfficeNotification backOfficeNotification in source.Notifications)
         {
@@ -232,6 +234,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.IsChildOfListView = source.IsChildOfListView;
         target.IsContainer = source.IsContainer;
         target.IsElement = source.IsElement;
+        target.IsAlternateVersion = source.IsAlternateVersion;
         target.Key = source.Key;
         target.Owner = source.Owner;
         target.ParentId = source.ParentId;
@@ -247,6 +250,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.Updater = source.Updater;
         target.Urls = source.Urls;
         target.Variants = source.Variants;
+        target.VersionId = source.VersionId;
     }
 
     // Umbraco.Code.MapAll
@@ -285,6 +289,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.IsChildOfListView = DetermineIsChildOfListView(source, parent, context);
         target.IsContainer = source.ContentType.IsContainer;
         target.IsElement = source.ContentType.IsElement;
+        target.IsAlternateVersion = source.IsAlternateVersion;
         target.Key = source.Key;
         target.Owner = _commonMapper.GetOwner(source, context);
         target.ParentId = source.ParentId;
@@ -300,6 +305,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.Updater = _commonMapper.GetCreator(source, context);
         target.Urls = GetUrls(source);
         target.Variants = _contentVariantMapper.Map<TVariant>(source, context);
+        target.VersionId = source.VersionId;
 
         target.ContentDto = new ContentPropertyCollectionDto
         {

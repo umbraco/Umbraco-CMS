@@ -356,6 +356,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             // get properties - indexed by version id
             var versionId = dto.DocumentVersionDto.Id;
 
+            content.IsAlternateVersion = dto.DocumentVersionDto.ContentVersionDto.Alternate;
+
             // TODO: shall we get published properties or not?
             //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
             var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;
@@ -1080,11 +1082,23 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         }
 
         // whatever we do, we must check that we are saving the current version
-        ContentVersionDto? version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>()
-            .From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == entity.VersionId)).FirstOrDefault();
-        if (version == null || !version.Current)
+        // but since we can be saving an alternate version, we still need the name of the current
+        // to ensure the saved nodeDto keeps the correct name
+        IEnumerable<ContentVersionDto> versionAndCurrent = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>()
+            .From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == entity.VersionId || (x.NodeId == entity.Id && x.Current)));
+
+        ContentVersionDto? version = versionAndCurrent.FirstOrDefault(x => x.Id == entity.VersionId);
+        ContentVersionDto? current = versionAndCurrent.FirstOrDefault(x => x.Current);
+
+        if (version == null || current == null || (!version.Current && !version.Alternate))
         {
-            throw new InvalidOperationException("Cannot save a non-current version.");
+            throw new InvalidOperationException("Cannot save a non-current or non-alternate version.");
+        }
+
+        // alt version is never current
+        if (entity.IsAlternateVersion)
+        {
+            version.Current = false;
         }
 
         // update
@@ -1133,6 +1147,14 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
         // update the node dto
         NodeDto nodeDto = dto.ContentDto.NodeDto;
+
+        // don't update node name when saving an alternate
+        // only update on publishing
+        if (version.Alternate && !publishing)
+        {
+            nodeDto.Text = current.Text;
+        }
+
         nodeDto.ValidatePathWithException();
         Database.Update(nodeDto);
 
@@ -1148,6 +1170,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             {
                 documentVersionDto.Published = true; // now published
                 contentVersionDto.Current = false; // no more current
+                contentVersionDto.Alternate = false; // no longer alternate since it is published
             }
 
             // Ensure existing version retains current preventCleanup flag (both saving and publishing).
@@ -1163,6 +1186,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
                 contentVersionDto.Id = 0; // want a new id
                 contentVersionDto.Current = true; // current version
+                contentVersionDto.Alternate = false; // no longer alternate once published
                 contentVersionDto.Text = entity.Name;
                 contentVersionDto.PreventCleanup = false; // new draft version disregards prevent cleanup flag
                 Database.Insert(contentVersionDto);
@@ -1233,9 +1257,12 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 Database.Execute(deleteContentVariations);
 
                 // replace the document version variations (rather than updating)
-                Sql<ISqlContext> deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>()
-                    .Where<DocumentCultureVariationDto>(x => x.NodeId == entity.Id);
-                Database.Execute(deleteDocumentVariations);
+                if (!entity.IsAlternateVersion)
+                {
+                    Sql<ISqlContext> deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>()
+                        .Where<DocumentCultureVariationDto>(x => x.NodeId == entity.Id);
+                    Database.Execute(deleteDocumentVariations);
+                }
 
                 // TODO: NPoco InsertBulk issue?
                 // we should use the native NPoco InsertBulk here but it causes problems (not sure exactly all scenarios)
@@ -1247,7 +1274,10 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
 
                 // insert document variations
-                Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures!));
+                if (!entity.IsAlternateVersion)
+                {
+                    Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures!));
+                }
             }
 
             // update the document dto
