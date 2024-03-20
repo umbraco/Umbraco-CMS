@@ -138,6 +138,8 @@ export class UmbDocumentWorkspaceContext
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 		this.observe(this.varies, (varies) => (this.#varies = varies));
 
+		this.loadLanguages();
+
 		this.routes.setRoutes([
 			{
 				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique',
@@ -164,8 +166,6 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
-
-		this.loadLanguages();
 	}
 
 	resetState() {
