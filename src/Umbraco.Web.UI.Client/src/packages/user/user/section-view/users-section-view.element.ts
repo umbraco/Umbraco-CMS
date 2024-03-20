@@ -20,7 +20,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 			path: 'user',
 			component: () => {
 				const element = document.createElement('umb-workspace');
-				element.setAttribute('alias', UMB_USER_ENTITY_TYPE);
+				element.setAttribute('entityType', UMB_USER_ENTITY_TYPE);
 				return element;
 			},
 		},

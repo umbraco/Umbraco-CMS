@@ -1,4 +1,4 @@
-import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../language-workspace.context.js';
+import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../language-workspace.context-token.js';
 import type { UmbInputLanguageElement } from '../../../components/input-language/input-language.element.js';
 import type { UmbLanguageDetailModel } from '../../../types.js';
 import type { UmbLanguageItemModel } from '../../../repository/index.js';
