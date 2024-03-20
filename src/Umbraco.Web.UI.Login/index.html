@@ -16,7 +16,7 @@
   </script>
   <link rel="stylesheet" href="/user-defined.css" />
 </head>
-<body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
+<body style="margin: 0; padding: 0; overflow: hidden">
 <noscript>
   <style>
     #noscript-container {
@@ -39,32 +39,30 @@
                        style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
     </div>
   </noscript>
-  <umb-backoffice-icon-registry>
-    <umb-auth
-      logo-image="/logo_dark.svg"
-      logo-image-alternative="/logo_dark.svg"
-      background-image="/login.jpg"
-      username-is-email="true"
-      allow-password-reset
-      allow-user-invite>
-      <umb-external-login-provider
-        slot="external"
-        display-name="Google"
-        provider-name="Umbraco.Google"
-        icon="lock"
-        external-logins-url="https://google.com"></umb-external-login-provider>
-      <umb-external-login-provider
-        slot="external"
-        display-name="Azure ID"
-        provider-name="Umbraco.Azure"
-        icon="lock"
-        external-logins-url="https://microsoft.com"></umb-external-login-provider>
-      <umb-external-login-provider
-        slot="external"
-        display-name="My provider"
-        provider-name="MyCustomScheme"
-        custom-view="/src/mocks/customViews/my-custom-view.js"></umb-external-login-provider>
-    </umb-auth>
-  </umb-backoffice-icon-registry>
+  <umb-auth
+    logo-image="/logo_dark.svg"
+    logo-image-alternative="/logo_dark.svg"
+    background-image="/login.jpg"
+    username-is-email="true"
+    allow-password-reset
+    allow-user-invite>
+    <umb-external-login-provider
+      slot="external"
+      display-name="Google"
+      provider-name="Umbraco.Google"
+      icon="lock"
+      external-logins-url="https://google.com"></umb-external-login-provider>
+    <umb-external-login-provider
+      slot="external"
+      display-name="Azure ID"
+      provider-name="Umbraco.Azure"
+      icon="lock"
+      external-logins-url="https://microsoft.com"></umb-external-login-provider>
+    <umb-external-login-provider
+      slot="external"
+      display-name="My provider"
+      provider-name="MyCustomScheme"
+      custom-view="/src/mocks/customViews/my-custom-view.js"></umb-external-login-provider>
+  </umb-auth>
 </body>
 </html>
