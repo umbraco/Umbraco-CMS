@@ -14377,6 +14377,27 @@
             }
           },
           {
+            "name": "memberGroupName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isApproved",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "isLockedOut",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "orderBy",
             "in": "query",
             "schema": {
@@ -19658,9 +19679,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -19745,6 +19763,9 @@
               }
             }
           },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
           "403": {
             "description": "The authenticated user do not have access to this resource",
             "headers": {
@@ -19760,7 +19781,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/security/forgot-password/reset": {
@@ -20007,31 +20033,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            }
           }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
+        }
       }
     },
     "/umbraco/management/api/v1/server/configuration": {
@@ -25923,6 +25926,16 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           }
@@ -26785,9 +26798,6 @@
               }
             }
           },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
           "403": {
             "description": "The authenticated user do not have access to this resource",
             "headers": {
@@ -26803,12 +26813,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
+        }
       }
     },
     "/umbraco/management/api/v1/user/set-user-groups": {
@@ -27985,14 +27990,10 @@
           "hasChildren",
           "id",
           "isTrashed",
-          "noAccess",
-          "type"
+          "noAccess"
         ],
         "type": "object",
         "properties": {
-          "type": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -35469,14 +35470,10 @@
       },
       "TreeItemPresentationModel": {
         "required": [
-          "hasChildren",
-          "type"
+          "hasChildren"
         ],
         "type": "object",
         "properties": {
-          "type": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           }
