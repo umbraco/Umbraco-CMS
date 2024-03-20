@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
 
-namespace Umbraco.Cms.Web.BackOffice.Services;
+namespace Umbraco.Cms.Api.Management.Services;
 
 public class ConflictingRouteService : IConflictingRouteService
 {

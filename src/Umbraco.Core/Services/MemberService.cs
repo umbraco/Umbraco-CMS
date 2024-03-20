@@ -101,6 +101,20 @@ namespace Umbraco.Cms.Core.Services
 
         #region Create
 
+        public async Task<PagedModel<IMember>> FilterAsync(
+            MemberFilter memberFilter,
+            string orderBy = "username",
+            Direction orderDirection = Direction.Ascending,
+            int skip = 0,
+            int take = 100)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTypes);
+            scope.ReadLock(Constants.Locks.MemberTree);
+
+            return await _memberRepository.GetPagedByFilterAsync(memberFilter, skip, take, Ordering.By(orderBy, orderDirection));
+        }
+
         /// <summary>
         /// Creates an <see cref="IMember"/> object without persisting it
         /// </summary>

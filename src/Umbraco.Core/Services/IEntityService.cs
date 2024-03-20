@@ -202,8 +202,27 @@ public interface IEntityService
     IEnumerable<IEntitySlim> GetDescendants(int id, UmbracoObjectTypes objectType);
 
     IEnumerable<IEntitySlim> GetPagedChildren(
-        Guid? key,
-        UmbracoObjectTypes objectType,
+        Guid? parentKey,
+        UmbracoObjectTypes childObjectType,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+        => GetPagedChildren(
+            parentKey,
+            new[] { childObjectType },
+            childObjectType,
+            skip,
+            take,
+            out totalRecords,
+            filter,
+            ordering);
+
+    IEnumerable<IEntitySlim> GetPagedChildren(
+        Guid? parentKey,
+        IEnumerable<UmbracoObjectTypes> parentObjectTypes,
+        UmbracoObjectTypes childObjectType,
         int skip,
         int take,
         out long totalRecords,

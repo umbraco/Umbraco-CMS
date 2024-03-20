@@ -12,8 +12,6 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 {
     protected abstract IFileSystem FileSystem { get; }
 
-    protected abstract string ItemType(string path);
-
     protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetRoot(int skip, int take)
     {
         FileSystemTreeItemPresentationModel[] viewModels = GetPathViewModels(string.Empty, skip, take, out var totalItems);
@@ -77,7 +75,6 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
             Path = path.SystemPathToVirtualPath(),
             Name = name,
             HasChildren = isFolder && DirectoryHasChildren(path),
-            Type = ItemType(path),
             IsFolder = isFolder,
             Parent = parentPath.IsNullOrWhiteSpace()
                 ? null
