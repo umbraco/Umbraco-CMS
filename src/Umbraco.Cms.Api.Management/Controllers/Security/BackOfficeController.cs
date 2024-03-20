@@ -2,6 +2,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -49,9 +51,9 @@ public class BackOfficeController : SecurityControllerBase
 
     // FIXME: this is a temporary solution to get the new backoffice auth rolling.
     //        once the old backoffice auth is no longer necessary, clean this up and merge with 2FA handling etc.
-    // [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [HttpPost("login")]
     [MapToApiVersion("1.0")]
+    [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     public async Task<IActionResult> Login(LoginRequestModel model)
     {
         var validated = await _backOfficeUserManager.ValidateCredentialsAsync(model.Username, model.Password);
@@ -87,6 +89,7 @@ public class BackOfficeController : SecurityControllerBase
         return Ok();
     }
 
+    [AllowAnonymous]
     [HttpPost("verify-2fa")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Verify2FACode(Verify2FACodeModel model)
@@ -137,7 +140,7 @@ public class BackOfficeController : SecurityControllerBase
         public required string Password { get; init; }
     }
 
-    // [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
+    [AllowAnonymous]
     [HttpGet("authorize")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Authorize()
@@ -160,6 +163,7 @@ public class BackOfficeController : SecurityControllerBase
             : await AuthorizeExternal(request);
     }
 
+    [AllowAnonymous]
     [HttpGet("signout")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Signout()

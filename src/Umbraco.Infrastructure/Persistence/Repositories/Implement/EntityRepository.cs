@@ -472,7 +472,8 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
                         x => x.Icon,
                         x => x.Thumbnail,
                         x => x.ListView,
-                        x => x.Variations);
+                        x => x.Variations)
+                    .AndSelect<NodeDto>("ContentTypeNode", x => Alias(x.UniqueId, "ContentTypeKey"));
             }
 
             if (isContent)
@@ -498,7 +499,9 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
                 .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
                 .LeftJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
                 .LeftJoin<ContentTypeDto>()
-                .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId);
+                .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId)
+                .LeftJoin<NodeDto>("ContentTypeNode")
+                .On<NodeDto, ContentTypeDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "ContentTypeNode");
         }
 
         if (isContent)
@@ -605,7 +608,8 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
                     x => x.Icon,
                     x => x.Thumbnail,
                     x => x.ListView,
-                    x => x.Variations);
+                    x => x.Variations)
+                .AndBy<NodeDto>("ContentTypeNode", x => x.UniqueId);
         }
 
         if (defaultSort)
@@ -730,6 +734,10 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         public string? Thumbnail { get; set; }
         public bool IsContainer { get; set; }
 
+        public Guid ContentTypeKey { get; set; }
+
+        public Guid? ListView { get; set; }
+
         // ReSharper restore UnusedAutoPropertyAccessor.Local
         // ReSharper restore UnusedMember.Local
     }
@@ -786,6 +794,8 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         entity.ContentTypeAlias = dto.Alias;
         entity.ContentTypeIcon = dto.Icon;
         entity.ContentTypeThumbnail = dto.Thumbnail;
+        entity.ContentTypeKey = dto.ContentTypeKey;
+        entity.ListViewKey = dto.ListView;
     }
 
     private MediaEntitySlim BuildMediaEntity(BaseDto dto)
