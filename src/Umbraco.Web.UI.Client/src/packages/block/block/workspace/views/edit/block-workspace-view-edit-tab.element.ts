@@ -77,27 +77,25 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	render() {
-		return this._containerId
-			? html`
-					${this._hasProperties
-						? html` <umb-block-workspace-view-edit-properties
-								.managerName=${this.#managerName}
-								class="properties"
-								.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>`
-						: ''}
-					${repeat(
-						this._groups,
-						(group) => group.name,
-						(group) =>
-							html` <uui-box .headline=${group.name || ''}
-								><umb-block-workspace-view-edit-properties
-									.managerName=${this.#managerName}
-									class="properties"
-									.containerId=${group.id}></umb-block-workspace-view-edit-properties
-							></uui-box>`,
-					)}
-				`
-			: '';
+		return html`
+			${this._hasProperties
+				? html` <umb-block-workspace-view-edit-properties
+						.managerName=${this.#managerName}
+						class="properties"
+						.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>`
+				: ''}
+			${repeat(
+				this._groups,
+				(group) => group.id,
+				(group) =>
+					html` <uui-box .headline=${group.name || ''}
+						><umb-block-workspace-view-edit-properties
+							.managerName=${this.#managerName}
+							class="properties"
+							.containerId=${group.id}></umb-block-workspace-view-edit-properties
+					></uui-box>`,
+			)}
+		`;
 	}
 
 	static styles = [

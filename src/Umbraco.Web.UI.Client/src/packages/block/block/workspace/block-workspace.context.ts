@@ -26,7 +26,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	// Just for context token safety:
 	public readonly IS_BLOCK_WORKSPACE_CONTEXT = true;
 	//
-	readonly workspaceAlias;
 
 	#blockManager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#retrieveBlockManager;
@@ -66,9 +65,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		super(host, workspaceArgs.manifest.alias);
 		const manifest = workspaceArgs.manifest;
 		this.#entityType = manifest.meta?.entityType;
-		this.workspaceAlias = manifest.alias;
-
-		console.log('BLOCK WORKSPACE CONTEXT', this, manifest);
 
 		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this.#modalContext = context;

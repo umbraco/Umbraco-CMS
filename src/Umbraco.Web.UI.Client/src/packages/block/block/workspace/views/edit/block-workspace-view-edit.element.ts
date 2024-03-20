@@ -48,6 +48,14 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 
 		this.#tabsStructureHelper.setIsRoot(true);
 		this.#tabsStructureHelper.setContainerChildType('Tab');
+		this.observe(
+			this.#tabsStructureHelper.mergedContainers,
+			(tabs) => {
+				this._tabs = tabs;
+				this._createRoutes();
+			},
+			null,
+		);
 
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
@@ -72,14 +80,6 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 				this._createRoutes();
 			},
 			'observeGroups',
-		);
-		this.observe(
-			this.#tabsStructureHelper.mergedContainers,
-			(tabs) => {
-				this._tabs = tabs;
-				this._createRoutes();
-			},
-			'observeTabs',
 		);
 	}
 
