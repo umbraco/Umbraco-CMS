@@ -7,6 +7,7 @@ import { css, html, customElement, state, repeat, when } from '@umbraco-cms/back
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
+import { type ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-data-type-picker-flow-data-type-picker-modal')
 export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBaseElement<
@@ -18,6 +19,8 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 
 	private _propertyEditorUiAlias!: string;
 
+	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
+
 	connectedCallback(): void {
 		super.connectedCallback();
 
@@ -26,6 +29,13 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 		this._propertyEditorUiAlias = this.data.propertyEditorUiAlias;
 
 		this._observeDataTypesOf(this._propertyEditorUiAlias);
+
+		this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
+			// Only include Property Editor UIs which has Property Editor Schema Alias
+			this.#propertyEditorUIs = propertyEditorUIs.filter(
+				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,
+			);
+		});
 	}
 
 	private async _observeDataTypesOf(propertyEditorUiAlias: string) {
@@ -86,7 +96,10 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 								? html` <li class="item">
 										<uui-button label="dataType.name" type="button" @click="${() => this._handleClick(dataType)}">
 											<div class="item-content">
-												<uui-icon name="${'icon-bug'}" class="icon"></uui-icon>
+												<uui-icon
+													name=${this.#propertyEditorUIs.find((ui) => ui.alias === dataType.propertyEditorUiAlias)?.meta
+														.icon ?? 'icon-bug'}
+													class="icon"></uui-icon>
 												${dataType.name}
 											</div>
 										</uui-button>

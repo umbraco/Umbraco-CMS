@@ -278,7 +278,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 					html`<li class="item" ?selected=${this.value.selection.includes(dataType.unique)}>
 						<uui-button .label=${dataType.name} type="button" @click="${() => this._handleDataTypeClick(dataType)}">
 							<div class="item-content">
-								<uui-icon name="${'icon-bug'}" class="icon"></uui-icon>
+								<uui-icon
+									name="${this.#propertyEditorUIs.find((ui) => ui.alias === dataType.propertyEditorUiAlias)?.meta
+										.icon ?? 'icon-bug'}"
+									class="icon"></uui-icon>
 								${dataType.name}
 							</div>
 						</uui-button>
