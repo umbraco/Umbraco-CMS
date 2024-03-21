@@ -27,7 +27,7 @@ public class PublicPackageManifestController : PackageControllerBase
     [ProducesResponseType(typeof(IEnumerable<PackageManifestResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> PublicPackageManifests()
     {
-        PackageManifest[] packageManifests = (await _packageManifestService.GetPublicPackageManifestsAsync()).Where(m => m.AllowPublicAccess).ToArray();
+        PackageManifest[] packageManifests = (await _packageManifestService.GetPublicPackageManifestsAsync()).ToArray();
         return Ok(_umbracoMapper.MapEnumerable<PackageManifest, PackageManifestResponseModel>(packageManifests));
     }
 }
