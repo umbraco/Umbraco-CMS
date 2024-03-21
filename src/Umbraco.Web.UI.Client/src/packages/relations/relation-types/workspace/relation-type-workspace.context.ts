@@ -1,29 +1,20 @@
-import { UmbRelationTypeRepository } from '../repository/relation-type.repository.js';
+import { UmbRelationTypeDetailRepository } from '../repository/detail/index.js';
+import type { UmbRelationTypeDetailModel } from '../types.js';
 import { UmbRelationTypeWorkspaceEditorElement } from './relation-type-workspace-editor.element.js';
-import {
-	type UmbSaveableWorkspaceContextInterface,
-	UmbEditableWorkspaceContextBase,
-	type UmbRoutableWorkspaceContext,
-	UmbWorkspaceRouteManager,
-	UmbWorkspaceIsNewRedirectController,
-} from '@umbraco-cms/backoffice/workspace';
-import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbRelationTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<RelationTypeResponseModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
-{
+export class UmbRelationTypeWorkspaceContext extends UmbContextBase<UmbRelationTypeWorkspaceContext> {
 	//
-	public readonly repository: UmbRelationTypeRepository = new UmbRelationTypeRepository(this);
+	public readonly repository = new UmbRelationTypeDetailRepository(this);
 
-	#parent?: { entityType: string; unique: string | null };
-
-	#data = new UmbObjectState<RelationTypeResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<UmbRelationTypeDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
-	readonly id = this.#data.asObservablePart((data) => data?.id);
 
 	readonly routes = new UmbWorkspaceRouteManager(this);
 
@@ -31,21 +22,6 @@ export class UmbRelationTypeWorkspaceContext
 		super(host, 'Umb.Workspace.RelationType');
 
 		this.routes.setRoutes([
-			{
-				path: 'create/parent/:entityType/:parentUnique',
-				component: UmbRelationTypeWorkspaceEditorElement,
-				setup: (_component, info) => {
-					const parentEntityType = info.match.params.entityType;
-					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					this.create({ entityType: parentEntityType, unique: parentUnique });
-
-					new UmbWorkspaceIsNewRedirectController(
-						this,
-						this,
-						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
-					);
-				},
-			},
 			{
 				path: 'edit/:unique',
 				component: UmbRelationTypeWorkspaceEditorElement,
@@ -57,33 +33,12 @@ export class UmbRelationTypeWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
-		super.resetState();
-		this.#data.setValue(undefined);
-	}
-
-	async load(id: string) {
-		this.resetState();
-		const { data } = await this.repository.requestById(id);
+	async load(unique: string) {
+		const { data } = await this.repository.requestByUnique(unique);
 
 		if (data) {
-			this.setIsNew(false);
 			this.#data.update(data);
 		}
-	}
-
-	async create(parent: { entityType: string; unique: string | null }) {
-		this.resetState();
-		this.#parent = parent;
-		const { data } = await this.repository.createScaffold();
-		if (!data) return;
-		this.setIsNew(true);
-		this.#data.setValue(data);
-	}
-
-	async getRelations() {
-		//TODO: How do we test this?
-		return await this.repository.requestRelationsById(this.getUnique());
 	}
 
 	getData() {
@@ -91,41 +46,11 @@ export class UmbRelationTypeWorkspaceContext
 	}
 
 	getUnique() {
-		return this.getData()?.id || '';
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {
 		return 'relation-type';
-	}
-
-	setName(name: string) {
-		this.#data.update({ name });
-	}
-
-	async save() {
-		if (!this.#data.value) return;
-		if (!this.#data.value.id) return;
-
-		let response = undefined;
-
-		if (this.getIsNew()) {
-			response = await this.repository.create(this.#data.value);
-		} else {
-			response = await this.repository.save(this.#data.value.id, this.#data.value);
-		}
-
-		if (response.error) return;
-
-		// If it went well, then its not new anymore?.
-		this.setIsNew(false);
-	}
-
-	update<K extends keyof RelationTypeBaseModel>(id: K, value: RelationTypeBaseModel[K]) {
-		this.#data.update({ [id]: value });
-	}
-
-	async delete(id: string) {
-		await this.repository.delete(id);
 	}
 
 	public destroy(): void {
