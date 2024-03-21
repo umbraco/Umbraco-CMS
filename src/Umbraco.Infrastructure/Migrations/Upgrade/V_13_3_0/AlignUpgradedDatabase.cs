@@ -35,8 +35,20 @@ public class AlignUpgradedDatabase : MigrationBase
         RemoveUserGroupDefault(columns);
     }
 
-    private void DropCacheInstructionDefaultConstraint(IEnumerable<ColumnInfo> columns)
-        => RemoveDefaultConstraint("umbracoCacheInstruction", "jsonInstruction", columns);
+    private void MakeIndexUnique<TDto>(string tableName, string indexName, IEnumerable<Tuple<string, string, string, bool>> indexes)
+    {
+        // Let's only mess with the indexes if we have to.
+        Tuple<string, string, string, bool>? loginProviderIndex = indexes.FirstOrDefault(x =>
+            x.Item1 == tableName && x.Item2 == indexName);
+
+        // Item4 == IsUnique
+        if (loginProviderIndex?.Item4 is false)
+        {
+            // The recommended way to change an index from non-unique to unique is to drop and recreate it.
+            DeleteIndex<TDto>(indexName);
+            CreateIndex<TDto>(indexName);
+        }
+    }
 
     private void RemoveDefaultConstraint(string tableName, string columnName, IEnumerable<ColumnInfo> columns)
     {
@@ -45,7 +57,7 @@ public class AlignUpgradedDatabase : MigrationBase
 
         if (targetColumn is null)
         {
-            throw new InvalidOperationException("Could not find cache instruction column");
+            throw new InvalidOperationException("Could not find target column.");
         }
 
         if (targetColumn.ColumnDefault is null)
@@ -57,6 +69,26 @@ public class AlignUpgradedDatabase : MigrationBase
             .OnTable(tableName)
             .OnColumn(columnName).Do();
     }
+
+    private void RenameColumn(string tableName, string oldColumnName, string newColumnName, IEnumerable<ColumnInfo> columns)
+    {
+        ColumnInfo? targetColumn = columns
+            .FirstOrDefault(x => x.TableName == tableName && x.ColumnName == oldColumnName);
+
+        if (targetColumn is null)
+        {
+            // The column was not found I.E. the column is correctly named
+            return;
+        }
+
+        Rename.Column(oldColumnName)
+            .OnTable(tableName)
+            .To(newColumnName)
+            .Do();
+    }
+
+    private void DropCacheInstructionDefaultConstraint(IEnumerable<ColumnInfo> columns)
+        => RemoveDefaultConstraint("umbracoCacheInstruction", "jsonInstruction", columns);
 
     private void AlignContentVersionTable(ColumnInfo[] columns)
     {
@@ -82,23 +114,6 @@ public class AlignUpgradedDatabase : MigrationBase
         Database.Execute(renameConstraintQuery);
     }
 
-    private void RenameColumn(string tableName, string oldColumnName, string newColumnName, IEnumerable<ColumnInfo> columns)
-    {
-        ColumnInfo? targetColumn = columns
-            .FirstOrDefault(x => x.TableName == tableName && x.ColumnName == oldColumnName);
-
-        if (targetColumn is null)
-        {
-            // The column was not found I.E. the column is correctly named
-            return;
-        }
-
-        Rename.Column(oldColumnName)
-            .OnTable(tableName)
-            .To(newColumnName)
-            .Do();
-    }
-
     private void UpdateExternalLoginIndexes(IEnumerable<Tuple<string, string, string, bool>> indexes)
     {
         const string userMemberOrKeyIndexName = "IX_umbracoExternalLogin_userOrMemberKey";
@@ -111,21 +126,6 @@ public class AlignUpgradedDatabase : MigrationBase
         }
 
         CreateIndex<ExternalLoginDto>(userMemberOrKeyIndexName);
-    }
-
-    private void MakeIndexUnique<TDto>(string tableName, string indexName, IEnumerable<Tuple<string, string, string, bool>> indexes)
-    {
-        // Let's only mess with the indexes if we have to.
-        Tuple<string, string, string, bool>? loginProviderIndex = indexes.FirstOrDefault(x =>
-            x.Item1 == tableName && x.Item2 == indexName);
-
-        // Item4 == IsUnique
-        if (loginProviderIndex?.Item4 is false)
-        {
-            // The recommended way to change an index from non-unique to unique is to drop and recreate it.
-            DeleteIndex<TDto>(indexName);
-            CreateIndex<TDto>(indexName);
-        }
     }
 
     private void AlignNodeTable(ColumnInfo[] columns)
