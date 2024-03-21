@@ -1,5 +1,4 @@
-// import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
-import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context.js';
+import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-token.js';
 import type { UmbMemberDetailModel } from '../../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';

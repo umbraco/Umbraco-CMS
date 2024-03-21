@@ -1,3 +1,4 @@
+import type { ConditionTypes } from '../conditions/types.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
@@ -9,7 +10,7 @@ import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
  */
 export interface ManifestEntityAction<MetaType extends MetaEntityAction = MetaEntityAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbEntityAction<MetaType>>,
-		ManifestWithDynamicConditions {
+		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'entityAction';
 	forEntityTypes: Array<string>;
 	meta: MetaType;

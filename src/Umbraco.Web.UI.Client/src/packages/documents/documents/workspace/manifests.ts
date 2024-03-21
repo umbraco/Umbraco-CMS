@@ -5,7 +5,7 @@ import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-pub
 import { UmbDocumentPublishWithDescendantsWorkspaceAction } from './actions/publish-with-descendants.action.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceActionMenuItem,
 	ManifestWorkspaceView,
@@ -13,11 +13,11 @@ import type {
 
 export const UMB_DOCUMENT_WORKSPACE_ALIAS = 'Umb.Workspace.Document';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: UMB_DOCUMENT_WORKSPACE_ALIAS,
 	name: 'Document Workspace',
-	element: () => import('./document-workspace.element.js'),
 	api: () => import('./document-workspace.context.js'),
 	meta: {
 		entityType: UMB_DOCUMENT_ENTITY_TYPE,
