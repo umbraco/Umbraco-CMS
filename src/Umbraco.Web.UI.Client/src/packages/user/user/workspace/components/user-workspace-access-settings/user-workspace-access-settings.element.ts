@@ -1,4 +1,4 @@
-import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
+import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

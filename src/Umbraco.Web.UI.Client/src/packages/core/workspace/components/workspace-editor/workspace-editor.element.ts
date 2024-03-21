@@ -95,7 +95,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 								<slot name="footer-info"></slot>
 								<slot name="actions" slot="actions"></slot>
 							</umb-workspace-footer>
-					  `}
+						`}
 			</umb-body-layout>
 		`;
 	}
@@ -119,7 +119,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 								`,
 							)}
 						</uui-tab-group>
-				  `
+					`
 				: nothing}
 		`;
 	}
@@ -137,7 +137,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 							@change=${(event: UmbRouterSlotChangeEvent) => {
 								this._activePath = event.target.localActiveViewPath;
 							}}></umb-router-slot>
-				  `
+					`
 				: nothing}
 		`;
 	}

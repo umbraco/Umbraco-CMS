@@ -1,4 +1,4 @@
-import { UMB_VARIANT_WORKSPACE_CONTEXT } from '../../workspace-context/index.js';
+import { UMB_VARIANT_WORKSPACE_CONTEXT } from '../../contexts/index.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

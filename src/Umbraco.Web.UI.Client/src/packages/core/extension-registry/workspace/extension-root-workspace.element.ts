@@ -14,7 +14,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	}
 }
 
-export default UmbExtensionRootWorkspaceElement;
+export { UmbExtensionRootWorkspaceElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

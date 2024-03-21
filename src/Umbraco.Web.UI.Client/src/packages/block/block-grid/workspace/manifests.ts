@@ -6,11 +6,10 @@ export const manifests: Array<ManifestTypes> = [
 	...workspaceViewManifests,
 	{
 		type: 'workspace',
+		kind: 'routable',
 		name: 'Block Grid Type Workspace',
 		alias: UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS,
-		element: () => import('../../block-type/workspace/block-type-workspace.element.js'),
 		api: () => import('../../block-type/workspace/block-type-workspace.context.js'),
-		weight: 900,
 		meta: {
 			entityType: 'block-grid-type',
 		},

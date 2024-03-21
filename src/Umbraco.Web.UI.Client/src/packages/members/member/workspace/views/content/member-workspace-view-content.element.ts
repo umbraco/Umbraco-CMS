@@ -1,4 +1,4 @@
-import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context.js';
+import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-token.js';
 import type { UmbMemberWorkspaceViewContentTabElement } from './member-workspace-view-content-tab.element.js';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

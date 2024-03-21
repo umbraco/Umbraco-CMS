@@ -1,8 +1,14 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentTypeDetailModel } from '../types.js';
+import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEditableWorkspaceContextBase,
+	type UmbRoutableWorkspaceContext,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type {
 	UmbContentTypeCompositionModel,
@@ -18,7 +24,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbContentTypeWorkspaceContext<EntityType>
+	implements UmbContentTypeWorkspaceContext<EntityType>, UmbRoutableWorkspaceContext
 {
 	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
 	//
@@ -48,6 +54,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly defaultTemplate;
 	readonly cleanup;
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly structure = new UmbContentTypeStructureManager<EntityType>(this, this.repository);
 
 	constructor(host: UmbControllerHost) {
@@ -71,6 +78,33 @@ export class UmbDocumentTypeWorkspaceContext
 		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplates);
 		this.defaultTemplate = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
 		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique',
+				component: UmbDocumentTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique });
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:id',
+				component: UmbDocumentTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					this.removeControllerByAlias('isNewRedirectController');
+					const id = info.match.params.id;
+					this.load(id);
+				},
+			},
+		]);
 	}
 
 	protected resetState(): void {
@@ -220,3 +254,5 @@ export class UmbDocumentTypeWorkspaceContext
 		super.destroy();
 	}
 }
+
+export { UmbDocumentTypeWorkspaceContext as api };

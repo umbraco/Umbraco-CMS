@@ -1,17 +1,18 @@
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_TEMPLATE_WORKSPACE_ALIAS = 'Umb.Workspace.Template';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: 'Umb.Workspace.Template',
 	name: 'Template Workspace',
-	js: () => import('./template-workspace.element.js'),
+	api: () => import('./template-workspace.context.js'),
 	meta: {
 		entityType: 'template',
 	},

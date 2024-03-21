@@ -9,7 +9,12 @@ import type {
 	UmbWorkspaceCollectionContextInterface,
 	UmbVariantableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbEditableWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEditableWorkspaceContextBase,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
+	UmbWorkspaceSplitViewManager,
+} from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
 	jsonStringComparison,
@@ -24,6 +29,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
+import UmbMediaWorkspaceEditorElement from './media-workspace-editor.element.js';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
@@ -68,6 +74,7 @@ export class UmbMediaWorkspaceContext
 	);
 	#varies?: boolean;
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly variantOptions = mergeObservables(
@@ -108,6 +115,33 @@ export class UmbMediaWorkspaceContext
 		this.observe(this.varies, (varies) => (this.#varies = varies));
 
 		this.loadLanguages();
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique/:mediaTypeUnique',
+				component: UmbMediaWorkspaceEditorElement,
+				setup: async (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					const mediaTypeUnique = info.match.params.mediaTypeUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique }, mediaTypeUnique);
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbMediaWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	resetState() {
@@ -401,4 +435,4 @@ export class UmbMediaWorkspaceContext
 	}
 }
 
-export default UmbMediaWorkspaceContext;
+export { UmbMediaWorkspaceContext as api };
