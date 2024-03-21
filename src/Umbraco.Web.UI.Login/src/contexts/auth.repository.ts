@@ -73,7 +73,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 
     if (response.error) {
       return {
-        error: this.#getApiErrorDetailText(response.error, 'Could not validate the 2FA code'),
+        error: this.#getApiErrorDetailText(response.error, 'Could not validate the MFA code'),
       };
     }
 
@@ -199,7 +199,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
         return this.#localize.term('auth_userFailedLogin');
 
       case 402:
-        return this.#localize.term('auth_2faText');
+        return this.#localize.term('auth_mfaText');
 
       case 500:
         return this.#localize.term('auth_receivedErrorFromServer');

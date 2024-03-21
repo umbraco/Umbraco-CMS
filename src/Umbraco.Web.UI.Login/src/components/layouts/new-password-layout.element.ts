@@ -130,7 +130,7 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
       return html`
         <h1>Hi!</h1>
         <span>
-          <umb-localize key="user_userinviteWelcomeMessage">
+          <umb-localize key="auth_userInviteWelcomeMessage">
             Welcome to Umbraco! Just need to get your password setup and then you're good to go
           </umb-localize>
         </span>
@@ -138,10 +138,10 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
     } else {
       return html`
         <h1>
-          <umb-localize key="user_newPassword">New password</umb-localize>
+          <umb-localize key="auth_newPassword">New password</umb-localize>
         </h1>
         <span>
-            <umb-localize key="login_setPasswordInstruction">Please provide a new password.</umb-localize>
+            <umb-localize key="auth_setPasswordInstruction">Please provide a new password.</umb-localize>
         </span>
       `;
     }
@@ -154,7 +154,7 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
           <header id="header">${this.renderHeader()}</header>
           <uui-form-layout-item>
             <uui-label id="passwordLabel" for="password" slot="label" required>
-              <umb-localize key="user_newPassword">New password</umb-localize>
+              <umb-localize key="auth_newPassword">New password</umb-localize>
             </uui-label>
             <uui-input-password
               type="password"
@@ -172,7 +172,7 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
 
           <uui-form-layout-item>
             <uui-label id="confirmPasswordLabel" for="confirmPassword" slot="label" required>
-              <umb-localize key="user_confirmNewPassword">Confirm new password</umb-localize>
+              <umb-localize key="auth_confirmNewPassword">Confirm new password</umb-localize>
             </uui-label>
             <uui-input-password
               type="password"

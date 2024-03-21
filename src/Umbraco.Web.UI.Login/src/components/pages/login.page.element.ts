@@ -149,7 +149,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
               () =>
                 html`
                   <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
-                    <umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
+                    <umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
                   </button>`
             )}
           </div>

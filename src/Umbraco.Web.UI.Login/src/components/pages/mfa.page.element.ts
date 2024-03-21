@@ -51,7 +51,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
     const form = e.target as HTMLFormElement;
     if (!form) return;
 
-    const codeInput = form.elements.namedItem('2facode') as UUIInputElement;
+    const codeInput = form.elements.namedItem('mfacode') as UUIInputElement;
 
     if (codeInput) {
       codeInput.error = false;
@@ -124,11 +124,11 @@ export default class UmbMfaPageElement extends UmbLitElement {
         <form id="LoginForm" @submit=${this.#handleSubmit}>
           <header id="header">
             <h1>
-              <umb-localize key="login_2faTitle">One last step</umb-localize>
+              <umb-localize key="auth_mfaTitle">One last step</umb-localize>
             </h1>
 
             <p>
-              <umb-localize key="login_2faText">
+              <umb-localize key="auth_mfaText">
                 You have enabled 2-factor authentication and must verify your identity.
               </umb-localize>
             </p>
@@ -137,9 +137,9 @@ export default class UmbMfaPageElement extends UmbLitElement {
           <!-- if there's only one provider active, it will skip this step! -->
           ${this.providers.length > 1
             ? html`
-              <uui-form-layout-item label="@login_2faMultipleText">
+              <uui-form-layout-item>
                 <uui-label id="providerLabel" for="provider" slot="label" required>
-                  <umb-localize key="login_2faMultipleText">Please choose a 2-factor provider</umb-localize>
+                  <umb-localize key="auth_mfaMultipleText">Please choose a 2-factor provider</umb-localize>
                 </uui-label>
                 <uui-select id="provider" name="provider" .options=${this.providers} aria-required="true" required></uui-select>
               </uui-form-layout-item>
@@ -147,13 +147,13 @@ export default class UmbMfaPageElement extends UmbLitElement {
             : nothing}
 
           <uui-form-layout-item>
-            <uui-label id="2facodeLabel" for="2facode" slot="label" required>
-              <umb-localize key="login_2faCodeInput">Verification code</umb-localize>
+            <uui-label id="mfacodeLabel" for="mfacode" slot="label" required>
+              <umb-localize key="auth_mfaCodeInput">Verification code</umb-localize>
             </uui-label>
 
             <uui-input
               autofocus
-              id="2facode"
+              id="mfacode"
               type="text"
               name="token"
               inputmode="numeric"
