@@ -18,7 +18,6 @@ public class AlignUpgradedDatabase : MigrationBase
     protected override void Migrate()
     {
         // We ignore SQLite since it's considered a development DB
-
         if (DatabaseType == DatabaseType.SQLite)
         {
             return;
@@ -27,9 +26,9 @@ public class AlignUpgradedDatabase : MigrationBase
         ColumnInfo[] columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
 
         DropCacheInstructionDefaultConstraint(columns);
-        RenameVersionDateColumn(columns);
+        AlignContentVersionTable(columns);
         UpdateExternalLoginIndexes();
-
+        AlignNodeTable(columns);
     }
 
     private void DropCacheInstructionDefaultConstraint(IEnumerable<ColumnInfo> columns)
@@ -52,7 +51,7 @@ public class AlignUpgradedDatabase : MigrationBase
         }
     }
 
-    private void RenameVersionDateColumn(IEnumerable<ColumnInfo> columns)
+    private void AlignContentVersionTable(ColumnInfo[] columns)
     {
         const string tableName = "umbracoContentVersion";
         const string columnName = "VersionDate";
@@ -65,10 +64,7 @@ public class AlignUpgradedDatabase : MigrationBase
             return;
         }
 
-        Rename.Column(columnName)
-            .OnTable(tableName)
-            .To("versionDate")
-            .Do();
+        RenameColumn(tableName, columnName, "versionDate", columns);
 
         // Renames the default constraint for the column,
         // apparently the content version table used to be prefixed with cms and not umbraco
@@ -77,6 +73,23 @@ public class AlignUpgradedDatabase : MigrationBase
         Sql<ISqlContext> renameConstraintQuery = Database.SqlContext.Sql(
             "EXEC sp_rename N'DF_cmsContentVersion_VersionDate', N'DF_umbracoContentVersion_versionDate', N'OBJECT'");
         Database.Execute(renameConstraintQuery);
+    }
+
+    private void RenameColumn(string tableName, string oldColumnName, string newColumnName, IEnumerable<ColumnInfo> columns)
+    {
+        ColumnInfo? targetColumn = columns
+            .FirstOrDefault(x => x.TableName == tableName && x.ColumnName == oldColumnName);
+
+        if (targetColumn is null)
+        {
+            // The column was not found I.E. the column is correctly named
+            return;
+        }
+
+        Rename.Column(oldColumnName)
+            .OnTable(tableName)
+            .To(newColumnName)
+            .Do();
     }
 
     private void UpdateExternalLoginIndexes()
@@ -104,5 +117,18 @@ public class AlignUpgradedDatabase : MigrationBase
         }
 
         CreateIndex<ExternalLoginDto>(userMemberOrKeyIndexName);
+    }
+
+    private void AlignNodeTable(ColumnInfo[] columns)
+    {
+        const string tableName = "umbracoNode";
+        RenameColumn(tableName, "parentID", "parentId", columns);
+        RenameColumn(tableName, "uniqueID", "uniqueId", columns);
+
+        const string extraIndexName = "IX_umbracoNode_ParentId";
+        if (IndexExists(extraIndexName))
+        {
+            DeleteIndex<NodeDto>(extraIndexName);
+        }
     }
 }
