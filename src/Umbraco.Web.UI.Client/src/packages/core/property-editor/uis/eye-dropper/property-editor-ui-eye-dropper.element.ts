@@ -1,8 +1,9 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-property-editor-ui-eye-dropper
@@ -20,25 +21,45 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implemen
 	@state()
 	private _swatches: string[] = [];
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		if (config) {
-			this._opacity = config.getValueByAlias('showAlpha') ?? this.#defaultOpacity;
-			this._swatches = config.getValueByAlias('palette') ?? [];
+		this._opacity = config?.getValueByAlias('showAlpha') ?? this.#defaultOpacity;
+
+		const showPalette = config?.getValueByAlias('showPalette') ?? false;
+
+		if (showPalette) {
+			// TODO: This is a temporary solution until we have a proper way to get the palette from the config. [LK]
+			this._swatches = [
+				'#d0021b',
+				'#f5a623',
+				'#f8e71c',
+				'#8b572a',
+				'#7ed321',
+				'#417505',
+				'#bd10e0',
+				'#9013fe',
+				'#4a90e2',
+				'#50e3c2',
+				'#b8e986',
+				'#000',
+				'#444',
+				'#888',
+				'#ccc',
+				'#fff',
+			];
 		}
 	}
 
-	private _onChange(event: UUIColorPickerChangeEvent) {
+	#onChange(event: UUIColorPickerChangeEvent) {
 		this.value = event.target.value;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	// TODO: This should use the given value:
 	render() {
 		return html`<umb-input-eye-dropper
-			@change="${this._onChange}"
+			.opacity=${this._opacity}
 			.swatches=${this._swatches}
-			.opacity="${this._opacity}"></umb-input-eye-dropper>`;
+			.value=${this.value}
+			@change=${this.#onChange}></umb-input-eye-dropper>`;
 	}
 }
 

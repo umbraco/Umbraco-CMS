@@ -12,7 +12,6 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 	@property()
 	value = '';
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 

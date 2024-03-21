@@ -14,11 +14,11 @@ export class UmbInputLanguageElement extends FormControlMixin(UmbLitElement) {
 	 * @default 0
 	 */
 	@property({ type: Number })
-	public get min(): number {
-		return this.#pickerContext.min;
-	}
 	public set min(value: number) {
 		this.#pickerContext.min = value;
+	}
+	public get min(): number {
+		return this.#pickerContext.min;
 	}
 
 	/**
@@ -37,11 +37,11 @@ export class UmbInputLanguageElement extends FormControlMixin(UmbLitElement) {
 	 * @default Infinity
 	 */
 	@property({ type: Number })
-	public get max(): number {
-		return this.#pickerContext.max;
-	}
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+	}
+	public get max(): number {
+		return this.#pickerContext.max;
 	}
 
 	/**
@@ -56,17 +56,20 @@ export class UmbInputLanguageElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Object, attribute: false })
 	public filter: (language: UmbLanguageItemModel) => boolean = () => true;
 
-	public get selectedUniques(): Array<string> {
-		return this.#pickerContext.getSelection();
-	}
-	public set selectedUniques(uniques: Array<string>) {
+	public set selection(uniques: Array<string>) {
 		this.#pickerContext.setSelection(uniques);
+	}
+	public get selection(): Array<string> {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property()
 	public set value(uniques: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedUniques = splitStringToArray(uniques);
+		this.selection = splitStringToArray(uniques);
+	}
+	public get value(): string {
+		return this.selection.join(',');
 	}
 
 	@state()

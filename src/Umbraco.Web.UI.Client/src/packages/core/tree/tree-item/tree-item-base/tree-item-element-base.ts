@@ -17,6 +17,9 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	}
 
 	@state()
+	private _isActive = false;
+
+	@state()
 	private _childItems?: TreeItemModelType[];
 
 	@state()
@@ -62,6 +65,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 			this.observe(this.#treeItemContext.treeItem, (value) => (this._item = value));
 			this.observe(this.#treeItemContext.childItems, (value) => (this._childItems = value));
 			this.observe(this.#treeItemContext.hasChildren, (value) => (this._hasChildren = value));
+			this.observe(this.#treeItemContext.isActive, (value) => (this._isActive = value));
 			this.observe(this.#treeItemContext.isLoading, (value) => (this._isLoading = value));
 			this.observe(this.#treeItemContext.isSelectableContext, (value) => (this._isSelectableContext = value));
 			this.observe(this.#treeItemContext.isSelectable, (value) => (this._isSelectable = value));
@@ -107,6 +111,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 				@show-children=${this._onShowChildren}
 				@selected=${this._handleSelectedItem}
 				@deselected=${this._handleDeselectedItem}
+				?active=${this._isActive}
 				?disabled=${this._isSelectableContext && !this._isSelectable}
 				?selectable=${this._isSelectable}
 				?selected=${this._isSelected}

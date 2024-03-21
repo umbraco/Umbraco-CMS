@@ -1,12 +1,14 @@
 import type { UmbUserItemModel } from '../../repository/index.js';
 import { UmbUserPickerContext } from './user-input.context.js';
-import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-user-input')
 export class UmbUserInputElement extends FormControlMixin(UmbLitElement) {
+	// TODO: [LK] Add sorting!
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -53,17 +55,20 @@ export class UmbUserInputElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selectedIds(): Array<string> {
+	public get selection(): Array<string> {
 		return this.#pickerContext.getSelection();
 	}
-	public set selectedIds(ids: Array<string>) {
+	public set selection(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
 	}
 
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIds = splitStringToArray(idsString);
+		this.selection = splitStringToArray(idsString);
+	}
+	public get value(): string {
+		return this.selection.join(',');
 	}
 
 	@state()
@@ -102,31 +107,42 @@ export class UmbUserInputElement extends FormControlMixin(UmbLitElement) {
 		return undefined;
 	}
 
+	#openPicker() {
+		this.#pickerContext.openPicker({});
+	}
+
 	render() {
 		return html`
-			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open"
-				>Add</uui-button
-			>
+			<uui-ref-list> ${this._items?.map((item) => this.#renderItem(item))} </uui-ref-list>
+			${this.#renderAddButton()}
 		`;
 	}
 
-	private _renderItem(item: UmbUserItemModel) {
+	#renderItem(item: UmbUserItemModel) {
 		if (!item.unique) return;
 		return html`
-			<uui-ref-node-user name=${ifDefined(item.name)}>
+			<uui-ref-node-user name=${item.name}>
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.unique)} label="Remove ${item.name}"
-						>Remove</uui-button
-					>
+					<uui-button
+						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
+						label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node-user>
 		`;
 	}
 
+	#renderAddButton() {
+		if (this.max === 1 && this.selection.length >= this.max) return nothing;
+		return html`<uui-button
+			id="btn-add"
+			look="placeholder"
+			@click=${this.#openPicker}
+			label=${this.localize.term('general_add')}></uui-button>`;
+	}
+
 	static styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 		`,

@@ -1,8 +1,9 @@
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, property, map, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
+import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /*
  * This wraps the UUI library uui-color-swatches component
@@ -16,35 +17,35 @@ export class UmbInputColorElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Array })
 	swatches?: UmbSwatchDetails[];
 
-	constructor() {
-		super();
-	}
-
 	protected getFormElement() {
 		return undefined;
 	}
 
-	private _onChange(e: UUIColorSwatchesEvent) {
-		e.stopPropagation();
-		super.value = e.target.value;
-		this.dispatchEvent(new CustomEvent('change'));
+	#onChange(event: UUIColorSwatchesEvent) {
+		event.stopPropagation();
+		this.value = event.target.value;
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	render() {
 		return html`
-			<uui-color-swatches @change="${this._onChange}" label="Color picker" value=${this.value ?? ''}
-				>${this._renderColors()}</uui-color-swatches
-			>
+			<uui-color-swatches label="Color picker" value="#${this.value ?? ''}" @change=${this.#onChange}>
+				${this.#renderColors()}
+			</uui-color-swatches>
 		`;
 	}
 
-	private _renderColors() {
-		return html`${this.swatches?.map((swatch) => {
-			return html`<uui-color-swatch
-				label="${swatch.label}"
-				value="${swatch.value}"
-				.showLabel=${this.showLabels}></uui-color-swatch>`;
-		})}`;
+	#renderColors() {
+		if (!this.swatches) return nothing;
+		return map(
+			this.swatches,
+			(swatch) => html`
+				<uui-color-swatch
+					label="${swatch.label}"
+					value="#${swatch.value}"
+					.showLabel=${this.showLabels}></uui-color-swatch>
+			`,
+		);
 	}
 }
 

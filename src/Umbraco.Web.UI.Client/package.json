@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "14.0.0-beta002",
+	"version": "14.0.0-beta003",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -153,7 +153,8 @@
 		"wc-analyze": "wca **/*.element.ts --outFile dist-cms/custom-elements.json",
 		"generate:tsconfig": "node ./devops/tsconfig/index.js",
 		"generate:manifest": "node ./devops/build/create-umbraco-package.js",
-		"package:validate": "node ./devops/package/validate-exports.js"
+		"package:validate": "node ./devops/package/validate-exports.js",
+		"generate:api-docs": "typedoc --options typedoc.config.js"
 	},
 	"engines": {
 		"node": ">=20.9 <21",
@@ -226,6 +227,7 @@
 		"storybook": "^7.6.17",
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.8",
+		"typedoc": "^0.25.10",
 		"typescript": "^5.3.3",
 		"typescript-json-schema": "^0.63.0",
 		"vite": "^5.1.1",
