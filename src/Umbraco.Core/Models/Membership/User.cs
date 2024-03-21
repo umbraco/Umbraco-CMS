@@ -38,7 +38,6 @@ public class User : EntityBase, IUser, IProfile
     private int _sessionTimeout;
     private int[]? _startContentIds;
     private int[]? _startMediaIds;
-    private string? _tourData;
     private HashSet<IReadOnlyUserGroup> _userGroups;
 
     private string _username;
@@ -308,17 +307,6 @@ public class User : EntityBase, IUser, IProfile
     {
         get => _avatar;
         set => SetPropertyValueAndDetectChanges(value, ref _avatar, nameof(Avatar));
-    }
-
-    /// <summary>
-    ///     A Json blob stored for recording tour data for a user
-    /// </summary>
-    [DataMember]
-    [Obsolete("Superseded by userdata, scheduled for removal in v16")]
-    public string? TourData
-    {
-        get => _tourData;
-        set => SetPropertyValueAndDetectChanges(value, ref _tourData, nameof(TourData));
     }
 
     /// <summary>
