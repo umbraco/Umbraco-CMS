@@ -48,7 +48,9 @@ export class UmbRelationTypeTableCollectionViewElement extends UmbLitElement {
 				data: [
 					{
 						columnAlias: 'relationTypeName',
-						value: relationType.name,
+						value: html`<a href=${'section/settings/workspace/relation-type/edit/' + relationType.unique}
+							>${relationType.name}</a
+						>`,
 					},
 				],
 			};
