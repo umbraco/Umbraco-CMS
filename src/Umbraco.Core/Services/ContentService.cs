@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -3560,27 +3559,6 @@ public class ContentService : RepositoryService, IContentService
             scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.Remove, evtMsgs));
             scope.Complete();
         }
-    }
-
-    /// <inheritdoc />
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteBlueprintAsync(Guid id, Guid userKey)
-    {
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        IContent? blueprint = await Task.FromResult(GetBlueprintById(id));
-        if (blueprint is null)
-        {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, blueprint);
-        }
-
-        scope.WriteLock(Constants.Locks.ContentTree);
-        _documentBlueprintRepository.Delete(blueprint);
-        scope.Notifications.Publish(new ContentDeletedBlueprintNotification(blueprint, eventMessages));
-        scope.Notifications.Publish(new ContentTreeChangeNotification(blueprint, TreeChangeTypes.Remove, eventMessages));
-        scope.Complete();
-
-        return Attempt.SucceedWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, blueprint);
     }
 
     private static readonly string?[] ArrayOfOneNullString = { null };

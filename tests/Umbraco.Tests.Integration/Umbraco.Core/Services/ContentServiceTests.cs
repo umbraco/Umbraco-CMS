@@ -110,7 +110,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public async Task Delete_Blueprint()
+    public void Delete_Blueprint()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
@@ -126,10 +126,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         ContentService.SaveBlueprint(blueprint);
 
-        var result = await ContentService.DeleteBlueprintAsync(blueprint.Key, Constants.Security.SuperUserKey);
-        Assert.True(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        Assert.NotNull(result.Result);
+        ContentService.DeleteBlueprint(blueprint);
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();
         Assert.AreEqual(0, found.Length);
