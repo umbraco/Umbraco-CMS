@@ -16,8 +16,8 @@ export class UmbRelationTypeTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableColumns: Array<UmbTableColumn> = [
 		{
-			name: 'Name',
-			alias: 'name',
+			name: 'Relation Type',
+			alias: 'relationTypeName',
 		},
 	];
 
@@ -47,7 +47,7 @@ export class UmbRelationTypeTableCollectionViewElement extends UmbLitElement {
 				icon: 'icon-trafic',
 				data: [
 					{
-						columnAlias: 'name',
+						columnAlias: 'relationTypeName',
 						value: relationType.name,
 					},
 				],
