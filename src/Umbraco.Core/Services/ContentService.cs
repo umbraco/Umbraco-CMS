@@ -3548,11 +3548,18 @@ public class ContentService : RepositoryService, IContentService
         }
     }
 
-    [Obsolete("Please use DeleteBlueprintAsync. Will be removed in V16.")]
     public void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
     {
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-        DeleteBlueprintAsync(content.Key, currentUserKey).GetAwaiter().GetResult();
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+            _documentBlueprintRepository.Delete(content);
+            scope.Notifications.Publish(new ContentDeletedBlueprintNotification(content, evtMsgs));
+            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.Remove, evtMsgs));
+            scope.Complete();
+        }
     }
 
     /// <inheritdoc />

@@ -51,15 +51,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Deletes a blueprint.
     /// </summary>
-    [Obsolete("Please use DeleteBlueprintAsync. Will be removed in V16.")]
     void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Deletes a blueprint as <see cref="IContent" />.
-    /// </summary>
-    /// <param name="id">The guid Id of the <see cref="IContent" /> representing the blueprint to delete.</param>
-    /// <param name="userKey">Key of the user issuing the deletion.</param>
-    Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteBlueprintAsync(Guid id, Guid userKey);
 
     /// <summary>
     ///     Creates a new content item from a blueprint.
