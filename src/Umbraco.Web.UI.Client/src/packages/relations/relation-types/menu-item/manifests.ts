@@ -7,8 +7,8 @@ const menuItem: ManifestTypes = {
 	weight: 500,
 	meta: {
 		label: 'Relation Types',
-		icon: 'icon-globe',
-		entityType: 'relation-types-root',
+		icon: 'icon-trafic',
+		entityType: 'relation-type-root',
 		menus: ['Umb.Menu.Settings'],
 	},
 };
