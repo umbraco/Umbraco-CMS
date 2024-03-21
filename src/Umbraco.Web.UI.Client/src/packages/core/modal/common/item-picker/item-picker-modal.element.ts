@@ -5,6 +5,7 @@ import {
 	repeat,
 	nothing,
 	when,
+	state,
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -13,8 +14,24 @@ import type { UmbItemPickerModalData, UmbItemPickerModel } from '@umbraco-cms/ba
 
 @customElement('umb-item-picker-modal')
 export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPickerModalData, UmbItemPickerModel> {
+	@state()
+	private _filtered: Array<UmbItemPickerModel> = [];
+
 	#close() {
 		this.modalContext?.reject();
+	}
+
+	#filter(event: { target: HTMLInputElement }) {
+		if (!this.data) return;
+
+		if (event.target.value) {
+			const query = event.target.value.toLowerCase();
+			this._filtered = this.data.items.filter(
+				(item) => item.label.toLowerCase().includes(query) || item.value.toLowerCase().includes(query),
+			);
+		} else {
+			this._filtered = this.data.items;
+		}
 	}
 
 	#submit(item: UmbItemPickerModel) {
@@ -22,12 +39,24 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 		this.modalContext?.submit();
 	}
 
+	connectedCallback() {
+		super.connectedCallback();
+
+		if (!this.data) return;
+		this._filtered = this.data.items;
+	}
+
 	render() {
 		if (!this.data) return nothing;
-		const items = this.data.items;
+		const items = this._filtered;
 		return html`
 			<umb-body-layout headline=${this.data.headline}>
-				<div>
+				<div id="main">
+					<uui-input type="search" placeholder=${this.localize.term('placeholders_filter')} @input=${this.#filter}>
+						<div slot="prepend">
+							<uui-icon name="search"></uui-icon>
+						</div>
+					</uui-input>
 					${when(
 						items.length,
 						() => html`
@@ -61,6 +90,16 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 	static styles = [
 		UmbTextStyles,
 		css`
+			#main {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-5);
+			}
+
+			uui-box > uui-input {
+				width: 100%;
+			}
+
 			uui-box > uui-button {
 				display: block;
 				--uui-button-content-align: flex-start;
