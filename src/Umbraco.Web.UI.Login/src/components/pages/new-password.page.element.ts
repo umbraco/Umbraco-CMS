@@ -59,13 +59,22 @@ export default class UmbNewPasswordPageElement extends UmbLitElement {
       return;
     }
 
-    this.#authContext.passwordConfiguration = verifyResponse.data?.passwordConfiguration;
+    if (!verifyResponse.passwordConfiguration) {
+      this.page = 'error';
+      this.error = 'Password configuration is missing';
+      this.loading = false;
+      return;
+    }
+
+    this.#authContext.passwordConfiguration = verifyResponse.passwordConfiguration;
 
     this.loading = false;
   }
 
   async #onSubmit(event: CustomEvent) {
     event.preventDefault();
+    
+    this.error = '';
 
     if (!this.#authContext) return;
 
@@ -74,15 +83,14 @@ export default class UmbNewPasswordPageElement extends UmbLitElement {
     this.state = 'waiting';
     const response = await this.#authContext.newPassword(password, this.resetCode, this.userId);
 
-    if (response.status === 204) {
-      this.state = 'success';
-      this.page = 'done';
-      this.error = '';
+    if (response.error) {
+      this.state = 'failed';
+      this.error = response.error;
       return;
     }
 
-    this.state = 'failed';
-    this.error = response.error ?? 'Could not set new password';
+    this.state = 'success';
+    this.page = 'done';
   }
 
   #renderRoutes() {

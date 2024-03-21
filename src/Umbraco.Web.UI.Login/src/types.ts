@@ -1,3 +1,5 @@
+import type { PasswordConfigurationResponseModel } from "@umbraco-cms/backoffice/external/backend-api";
+
 export type LoginRequestModel = {
 	username: string;
 	password: string;
@@ -16,20 +18,15 @@ export type LoginResponse = {
 
 export type ResetPasswordResponse = {
 	error?: string;
-	status: number;
 };
 
 export type ValidatePasswordResetCodeResponse = {
 	error?: string;
-	status: number;
-  data?: {
-    passwordConfiguration: PasswordConfigurationModel;
-  }
+  passwordConfiguration?: PasswordConfigurationModel;
 };
 
 export type NewPasswordResponse = {
 	error?: string;
-	status: number;
 };
 
 export type ValidateInviteCodeResponse = {
@@ -40,10 +37,4 @@ export type ValidateInviteCodeResponse = {
   }
 };
 
-export type PasswordConfigurationModel = {
-  minimumPasswordLength: number;
-  requireNonLetterOrDigit: boolean;
-  requireDigit: boolean;
-  requireLowercase: boolean;
-  requireUppercase: boolean;
-}
+export type PasswordConfigurationModel = PasswordConfigurationResponseModel;

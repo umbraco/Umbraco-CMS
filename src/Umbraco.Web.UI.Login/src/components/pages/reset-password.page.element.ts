@@ -25,7 +25,7 @@ export default class UmbResetPasswordPageElement extends UmbLitElement {
     this.resetCallState = 'waiting';
     const authContext = await this.getContext(UMB_AUTH_CONTEXT);
     const response = await authContext.resetPassword(username);
-    this.resetCallState = response.status === 200 ? 'success' : 'failed';
+    this.resetCallState = response.error ? 'failed' : 'success';
     this.error = response.error || '';
   };
 

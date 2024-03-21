@@ -1,12 +1,15 @@
 import {
   LoginRequestModel,
   LoginResponse,
+  NewPasswordResponse,
   ResetPasswordResponse,
   ValidateInviteCodeResponse,
   ValidatePasswordResetCodeResponse
 } from "../types.js";
 import { UmbRepositoryBase } from "@umbraco-cms/backoffice/repository";
 import { UmbLocalizationController } from "@umbraco-cms/backoffice/localization-api";
+import { ApiError, CancelError, SecurityResource } from "@umbraco-cms/backoffice/external/backend-api";
+import { tryExecute } from "@umbraco-cms/backoffice/resources";
 
 export class UmbAuthRepository extends UmbRepositoryBase {
   #localize = new UmbLocalizationController(this);
@@ -53,90 +56,66 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   }
 
   public async resetPassword(email: string): Promise<ResetPasswordResponse> {
-    const request = new Request('management/api/v1/security/forgot-password', {
-      method: 'POST',
-      body: JSON.stringify({
-        email,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const response = await fetch(request);
+    const response = await tryExecute(SecurityResource.postSecurityForgotPassword({
+      requestBody: {
+        email
+      }
+    }))
 
-    if (!response.ok) {
-      const error = await this.#getErrorDetailText(response, 'Could not reset the password');
+    if (response.error) {
       return {
-        status: response.status,
-        error,
+        error: this.#getApiErrorDetailText(response.error, 'Could not reset the password'),
       };
     }
 
-    return {
-      status: response.status
-    };
+    return {};
   }
 
   public async validatePasswordResetCode(userId: string, resetCode: string): Promise<ValidatePasswordResetCodeResponse> {
-    const request = new Request('management/api/v1/security/forgot-password/verify', {
-      method: 'POST',
-      body: JSON.stringify({
+    const { data, error } = await tryExecute(SecurityResource.postSecurityForgotPasswordVerify({
+      requestBody: {
         user: {
           id: userId
         },
-        resetCode,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const response = await fetch(request);
+        resetCode
+      }
+    }));
 
-    if (!response.ok) {
-      const error = await this.#getErrorDetailText(response, 'The password reset token could not be verified');
-
+    if (error) {
       return {
-        status: response.status,
-        error,
+        error: this.#getApiErrorDetailText(error, 'Could not validate the password reset code')
       };
     }
 
-    const data = await response.json();
+    if (!data) {
+      return {
+        error: 'Could not validate the password reset code'
+      };
+    }
 
     return {
-      status: response.status,
-      data
+      passwordConfiguration: data.passwordConfiguration
     };
   }
 
-  public async newPassword(password: string, resetCode: string, userId: string): Promise<LoginResponse> {
-    const request = new Request('management/api/v1/security/forgot-password/reset', {
-      method: 'POST',
-      body: JSON.stringify({
+  public async newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse> {
+    const response = await tryExecute(SecurityResource.postSecurityForgotPasswordReset({
+      requestBody: {
         password,
         resetCode,
         user: {
           id: userId
-        },
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const response = await fetch(request);
+        }
+      }
+    }));
 
-    if (!response.ok) {
-      const error = await this.#getErrorDetailText(response, 'Could not reset the password');
-
+    if (response.error) {
       return {
-        status: response.status,
-        error,
+        error: this.#getApiErrorDetailText(response.error, 'Could not reset the password'),
       };
     }
 
-    return {
-      status: response.status
-    };
+    return {};
   }
 
   public async newInvitedUserPassword(password: string, token: string, userId: string): Promise<LoginResponse> {
@@ -226,6 +205,20 @@ export class UmbAuthRepository extends UmbRepositoryBase {
     return {
       status: response.status,
     };
+  }
+
+  #getApiErrorDetailText(error: ApiError | CancelError | undefined, fallbackText?: string): string | undefined {
+    if (error instanceof ApiError) {
+      // Try to parse the body
+      return error.body ? error.body.title ?? fallbackText : fallbackText ?? 'An unknown error occurred.';
+    }
+
+    // Ignore cancel errors (user cancelled the request)
+    if (error instanceof CancelError) {
+      return undefined;
+    }
+
+    return fallbackText ?? 'An unknown error occurred.';
   }
 
   async #getErrorDetailText(response: Response, fallbackText?: string): Promise<string> {
