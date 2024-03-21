@@ -314,6 +314,7 @@ public class User : EntityBase, IUser, IProfile
     ///     A Json blob stored for recording tour data for a user
     /// </summary>
     [DataMember]
+    [Obsolete("Superseded by userdata, scheduled for removal in v16")]
     public string? TourData
     {
         get => _tourData;
