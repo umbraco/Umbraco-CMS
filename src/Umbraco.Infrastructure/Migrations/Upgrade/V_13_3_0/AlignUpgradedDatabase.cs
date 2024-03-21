@@ -32,26 +32,30 @@ public class AlignUpgradedDatabase : MigrationBase
         UpdateExternalLoginIndexes(indexes);
         AlignNodeTable(columns);
         MakeRelationTypeIndexUnique(indexes);
+        RemoveUserGroupDefault(columns);
     }
 
     private void DropCacheInstructionDefaultConstraint(IEnumerable<ColumnInfo> columns)
-    {
-        const string cacheTableName = "umbracoCacheInstruction";
-        const string cacheColumnName = "jsonInstruction";
-        ColumnInfo? jsonInstructionColumn = columns
-            .FirstOrDefault(x => x is { TableName: cacheTableName, ColumnName: cacheColumnName });
+        => RemoveDefaultConstraint("umbracoCacheInstruction", "jsonInstruction", columns);
 
-        if (jsonInstructionColumn is null)
+    private void RemoveDefaultConstraint(string tableName, string columnName, IEnumerable<ColumnInfo> columns)
+    {
+        ColumnInfo? targetColumn = columns
+            .FirstOrDefault(x => x.TableName == tableName && x.ColumnName == columnName);
+
+        if (targetColumn is null)
         {
             throw new InvalidOperationException("Could not find cache instruction column");
         }
 
-        if (jsonInstructionColumn.ColumnDefault != null)
+        if (targetColumn.ColumnDefault is null)
         {
-            Delete.DefaultConstraint()
-                .OnTable(cacheTableName)
-                .OnColumn(cacheColumnName).Do();
+            return;
         }
+
+        Delete.DefaultConstraint()
+            .OnTable(tableName)
+            .OnColumn(columnName).Do();
     }
 
     private void AlignContentVersionTable(ColumnInfo[] columns)
@@ -138,8 +142,8 @@ public class AlignUpgradedDatabase : MigrationBase
     }
 
     private void MakeRelationTypeIndexUnique(Tuple<string, string, string, bool>[] indexes)
-    {
-        MakeIndexUnique<RelationTypeDto>("umbracoRelationType", "IX_umbracoRelationType_alias", indexes);
-    }
+        => MakeIndexUnique<RelationTypeDto>("umbracoRelationType", "IX_umbracoRelationType_alias", indexes);
 
+    private void RemoveUserGroupDefault(ColumnInfo[] columns)
+        => RemoveDefaultConstraint("umbracoUserGroup", "hasAccessToAllLanguages", columns);
 }
