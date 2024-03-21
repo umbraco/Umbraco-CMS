@@ -1,4 +1,4 @@
-import { UMB_BLOCK_TYPE_WORKSPACE_CONTEXT } from './block-type-workspace.context.js';
+import { UMB_BLOCK_TYPE_WORKSPACE_CONTEXT } from './block-type-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, css, html, state, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -51,7 +51,7 @@ export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 						alias=${this.workspaceAlias}
 						headline=${this.localize.term('blockEditor_blockConfigurationOverlayTitle', [this._name])}>
 					</umb-workspace-editor>
-			  `
+				`
 			: '';
 	}
 

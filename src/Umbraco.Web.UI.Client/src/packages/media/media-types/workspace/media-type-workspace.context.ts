@@ -1,10 +1,14 @@
 import { UmbMediaTypeDetailRepository } from '../repository/detail/media-type-detail.repository.js';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
 import type { UmbMediaTypeDetailModel } from '../types.js';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import { UmbMediaTypeWorkspaceEditorElement } from './media-type-workspace-editor.element.js';
+import {
+	UmbEditableWorkspaceContextBase,
+	type UmbRoutableWorkspaceContext,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type {
 	UmbContentTypeCompositionModel,
@@ -20,7 +24,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 type EntityType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbContentTypeWorkspaceContext<EntityType>
+	implements UmbContentTypeWorkspaceContext<EntityType>, UmbRoutableWorkspaceContext
 {
 	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
 	//
@@ -47,6 +51,7 @@ export class UmbMediaTypeWorkspaceContext
 	readonly compositions;
 	readonly collection;
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly structure = new UmbContentTypeStructureManager<EntityType>(this, this.repository);
 
 	constructor(host: UmbControllerHost) {
@@ -65,6 +70,32 @@ export class UmbMediaTypeWorkspaceContext
 		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
 		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique',
+				component: UmbMediaTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique });
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:id',
+				component: UmbMediaTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const id = info.match.params.id;
+					this.load(id);
+				},
+			},
+		]);
 	}
 
 	protected resetState(): void {
@@ -208,11 +239,4 @@ export class UmbMediaTypeWorkspaceContext
 	}
 }
 
-export const UMB_MEDIA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbMediaTypeWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbMediaTypeWorkspaceContext => context.getEntityType?.() === UMB_MEDIA_TYPE_ENTITY_TYPE,
-);
+export { UmbMediaTypeWorkspaceContext as api };

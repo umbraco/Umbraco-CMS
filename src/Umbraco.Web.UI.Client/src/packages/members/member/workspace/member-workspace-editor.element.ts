@@ -1,5 +1,5 @@
 import type { UmbMemberVariantOptionModel } from '../types.js';
-import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context.js';
+import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context-token.js';
 import { UmbMemberWorkspaceSplitViewElement } from './member-workspace-split-view.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';

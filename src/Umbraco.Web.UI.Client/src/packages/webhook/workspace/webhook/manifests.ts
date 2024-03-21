@@ -5,7 +5,8 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: UMB_WEBHOOK_WORKSPACE,
 	name: 'Webhook Root Workspace',
-	js: () => import('./webhook-workspace.element.js'),
+	element: () => import('./webhook-workspace.element.js'),
+	api: () => import('./webhook-workspace.context.js'),
 	meta: {
 		entityType: UMB_WEBHOOK_ENTITY_TYPE,
 	},

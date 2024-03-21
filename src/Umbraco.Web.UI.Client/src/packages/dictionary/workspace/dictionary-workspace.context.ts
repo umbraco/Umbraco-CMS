@@ -1,19 +1,22 @@
 import { UmbDictionaryDetailRepository } from '../repository/index.js';
 import type { UmbDictionaryDetailModel } from '../types.js';
+import { UmbDictionaryWorkspaceEditorElement } from './dictionary-workspace-editor.element.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
+	UmbWorkspaceRouteManager,
+	UmbWorkspaceIsNewRedirectController,
+	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbDictionaryWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDictionaryDetailModel>
-	implements UmbSaveableWorkspaceContextInterface
+	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly detailRepository = new UmbDictionaryDetailRepository(this);
@@ -27,8 +30,36 @@ export class UmbDictionaryWorkspaceContext
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly dictionary = this.#data.asObservablePart((data) => data);
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Dictionary');
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique',
+				component: UmbDictionaryWorkspaceEditorElement,
+				setup: async (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique });
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbDictionaryWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	protected resetState(): void {
@@ -137,11 +168,4 @@ export class UmbDictionaryWorkspaceContext
 	}
 }
 
-export const UMB_DICTIONARY_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbDictionaryWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbDictionaryWorkspaceContext => context.getEntityType?.() === 'dictionary',
-);
+export { UmbDictionaryWorkspaceContext as api };

@@ -87,7 +87,7 @@ describe('Create Extension Element and Api Method', () => {
 			js: () => Promise.resolve(apiJsModuleWithApiExport),
 		};
 
-		const { element, api } = await createExtensionElementWithApi(manifest, 'umb-extension-api-true-test-element');
+		const { element, api } = await createExtensionElementWithApi(manifest, [], 'umb-extension-api-true-test-element');
 		expect(element).to.not.be.undefined;
 		expect(api).to.not.be.undefined;
 		if (element) {
@@ -106,7 +106,7 @@ describe('Create Extension Element and Api Method', () => {
 			js: () => Promise.resolve(apiJsModuleWithApiExport),
 		};
 
-		const { element, api } = await createExtensionElementWithApi(manifest, 'umb-extension-api-true-test-element');
+		const { element, api } = await createExtensionElementWithApi(manifest, [], 'umb-extension-api-true-test-element');
 		expect(element).to.not.be.undefined;
 		expect(api).to.not.be.undefined;
 		if (element) {

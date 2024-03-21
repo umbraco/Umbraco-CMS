@@ -1,18 +1,19 @@
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../entity.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_MEMBER_GROUP_WORKSPACE_ALIAS = 'Umb.Workspace.MemberGroup';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: UMB_MEMBER_GROUP_WORKSPACE_ALIAS,
 	name: 'MemberGroup Workspace',
-	js: () => import('./member-group-workspace.element.js'),
+	api: () => import('./member-group-workspace.context.js'),
 	meta: {
 		entityType: UMB_MEMBER_GROUP_ENTITY_TYPE,
 	},

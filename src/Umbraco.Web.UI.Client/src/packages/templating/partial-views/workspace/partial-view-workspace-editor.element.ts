@@ -1,6 +1,6 @@
 import type { UmbTemplatingInsertMenuElement } from '../../components/index.js';
 import { getQuerySnippet } from '../../utils/index.js';
-import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context.js';
+import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context-token.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '@umbraco-cms/backoffice/template';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';

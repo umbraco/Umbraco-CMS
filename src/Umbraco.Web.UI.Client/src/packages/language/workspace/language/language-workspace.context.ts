@@ -1,17 +1,20 @@
 import { UmbLanguageDetailRepository } from '../../repository/index.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
+import { UmbLanguageWorkspaceEditorElement } from './language-workspace-editor.element.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
+	UmbWorkspaceRouteManager,
+	UmbWorkspaceIsNewRedirectController,
+	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { ApiError } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbLanguageWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbLanguageDetailModel>
-	implements UmbSaveableWorkspaceContextInterface
+	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
 {
 	public readonly repository: UmbLanguageDetailRepository = new UmbLanguageDetailRepository(this);
 
@@ -25,8 +28,34 @@ export class UmbLanguageWorkspaceContext
 	#validationErrors = new UmbObjectState<any | undefined>(undefined);
 	readonly validationErrors = this.#validationErrors.asObservable();
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Language');
+
+		this.routes.setRoutes([
+			{
+				path: 'create',
+				component: UmbLanguageWorkspaceEditorElement,
+				setup: async () => {
+					this.create();
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbLanguageWorkspaceEditorElement,
+				setup: (_component, info) => {
+					this.removeControllerByAlias('isNewRedirectController');
+					this.load(info.match.params.unique);
+				},
+			},
+		]);
 	}
 
 	protected resetState(): void {
@@ -119,11 +148,4 @@ export class UmbLanguageWorkspaceContext
 	}
 }
 
-export const UMB_LANGUAGE_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbLanguageWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbLanguageWorkspaceContext => context.getEntityType?.() === 'language',
-);
+export { UmbLanguageWorkspaceContext as api };

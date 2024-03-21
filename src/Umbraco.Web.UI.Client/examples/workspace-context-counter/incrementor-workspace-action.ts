@@ -5,9 +5,8 @@ import { EXAMPLE_COUNTER_CONTEXT } from './counter-workspace-context';
 export class ExampleIncrementorWorkspaceAction extends UmbWorkspaceActionBase implements UmbWorkspaceAction {
 	// This method is executed
 	async execute() {
-		await this.consumeContext(EXAMPLE_COUNTER_CONTEXT, (context) => {
-			context.increment();
-		}).asPromise();
+		const context = await this.getContext(EXAMPLE_COUNTER_CONTEXT);
+		context.increment();
 	}
 }
 

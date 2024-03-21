@@ -1,4 +1,4 @@
-import { UMB_MEMBER_TYPE_WORKSPACE_CONTEXT } from './member-type-workspace.context.js';
+import { UMB_MEMBER_TYPE_WORKSPACE_CONTEXT } from './member-type-workspace.context-token.js';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
