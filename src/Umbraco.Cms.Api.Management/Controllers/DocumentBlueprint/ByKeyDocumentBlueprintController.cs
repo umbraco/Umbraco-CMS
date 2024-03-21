@@ -11,23 +11,22 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 [ApiVersion("1.0")]
 public class ByKeyDocumentBlueprintController : DocumentBlueprintControllerBase
 {
-    private readonly IContentService _contentService;
+    private readonly IContentBlueprintEditingService _contentBlueprintEditingService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
-    public ByKeyDocumentBlueprintController(IContentService contentService, IDocumentPresentationFactory documentPresentationFactory)
+    public ByKeyDocumentBlueprintController(IContentBlueprintEditingService contentBlueprintEditingService, IDocumentPresentationFactory documentPresentationFactory)
     {
-        _contentService = contentService;
+        _contentBlueprintEditingService = contentBlueprintEditingService;
         _documentPresentationFactory = documentPresentationFactory;
     }
 
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(DocumentResponseModel), StatusCodes.Status200OK),
-     ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(DocumentResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
-        IContent? blueprint = _contentService.GetBlueprintById(id);
-
+        IContent? blueprint = await _contentBlueprintEditingService.GetAsync(id);
         if (blueprint == null)
         {
             return DocumentBlueprintNotFound();

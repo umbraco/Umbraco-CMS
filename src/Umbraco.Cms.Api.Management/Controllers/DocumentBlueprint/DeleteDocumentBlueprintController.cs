@@ -12,12 +12,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 [ApiVersion("1.0")]
 public class DeleteDocumentBlueprintController : DocumentBlueprintControllerBase
 {
-    private readonly IContentService _contentService;
+    private readonly IContentBlueprintEditingService _contentBlueprintEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public DeleteDocumentBlueprintController(IContentService contentService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public DeleteDocumentBlueprintController(IContentBlueprintEditingService contentBlueprintEditingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _contentService = contentService;
+        _contentBlueprintEditingService = contentBlueprintEditingService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -28,7 +28,7 @@ public class DeleteDocumentBlueprintController : DocumentBlueprintControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        Attempt<IContent?, ContentEditingOperationStatus> result = await _contentService.DeleteBlueprintAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IContent?, ContentEditingOperationStatus> result = await _contentBlueprintEditingService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()
