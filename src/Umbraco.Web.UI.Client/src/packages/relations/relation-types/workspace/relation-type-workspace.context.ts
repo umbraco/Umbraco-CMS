@@ -7,7 +7,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 
 export class UmbRelationTypeWorkspaceContext extends UmbContextBase<UmbRelationTypeWorkspaceContext> {
-	//
+	readonly workspaceAlias = 'Umb.Workspace.RelationType';
 	public readonly repository = new UmbRelationTypeDetailRepository(this);
 
 	#data = new UmbObjectState<UmbRelationTypeDetailModel | undefined>(undefined);
