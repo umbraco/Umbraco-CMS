@@ -11,7 +11,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_3_0;
 /// </summary>
 public class AlignUpgradedDatabase : MigrationBase
 {
-    public AlignUpgradedDatabase(IMigrationContext context) : base(context)
+    public AlignUpgradedDatabase(IMigrationContext context)
+        : base(context)
     {
     }
 
@@ -24,7 +25,6 @@ public class AlignUpgradedDatabase : MigrationBase
         }
 
         ColumnInfo[] columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
-        // Indexes are in format TableName, IndexName, ColumnName, IsUnique
         Tuple<string, string, string, bool>[] indexes = SqlSyntax.GetDefinedIndexes(Database).ToArray();
 
         DropCacheInstructionDefaultConstraint(columns);
@@ -40,6 +40,7 @@ public class AlignUpgradedDatabase : MigrationBase
     private void MakeIndexUnique<TDto>(string tableName, string indexName, IEnumerable<Tuple<string, string, string, bool>> indexes)
     {
         // Let's only mess with the indexes if we have to.
+        // Indexes are in format TableName, IndexName, ColumnName, IsUnique
         Tuple<string, string, string, bool>? loginProviderIndex = indexes.FirstOrDefault(x =>
             x.Item1 == tableName && x.Item2 == indexName);
 
@@ -59,7 +60,7 @@ public class AlignUpgradedDatabase : MigrationBase
 
         if (targetColumn is null)
         {
-            throw new InvalidOperationException("Could not find target column.");
+            throw new InvalidOperationException($"Could not find {columnName} column on {tableName} table.");
         }
 
         if (targetColumn.ColumnDefault is null)
