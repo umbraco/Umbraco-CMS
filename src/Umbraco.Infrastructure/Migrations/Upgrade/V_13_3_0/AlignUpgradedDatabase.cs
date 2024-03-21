@@ -33,6 +33,8 @@ public class AlignUpgradedDatabase : MigrationBase
         AlignNodeTable(columns);
         MakeRelationTypeIndexUnique(indexes);
         RemoveUserGroupDefault(columns);
+        MakeWebhookUrlNotNullable(columns);
+        MakeWebhoolLogUrlNotNullable(columns);
     }
 
     private void MakeIndexUnique<TDto>(string tableName, string indexName, IEnumerable<Tuple<string, string, string, bool>> indexes)
@@ -67,7 +69,8 @@ public class AlignUpgradedDatabase : MigrationBase
 
         Delete.DefaultConstraint()
             .OnTable(tableName)
-            .OnColumn(columnName).Do();
+            .OnColumn(columnName)
+            .Do();
     }
 
     private void RenameColumn(string tableName, string oldColumnName, string newColumnName, IEnumerable<ColumnInfo> columns)
@@ -84,6 +87,27 @@ public class AlignUpgradedDatabase : MigrationBase
         Rename.Column(oldColumnName)
             .OnTable(tableName)
             .To(newColumnName)
+            .Do();
+    }
+
+    private void MakeNvarCharColumnNotNullable(string tableName, string columnName, IEnumerable<ColumnInfo> columns)
+    {
+        ColumnInfo? targetColumn = columns.FirstOrDefault(x => x.TableName == tableName && x.ColumnName == columnName);
+
+        if (targetColumn is null)
+        {
+            throw new InvalidOperationException($"Could not find {columnName} column in {tableName} table.");
+        }
+
+        if (targetColumn.IsNullable is false)
+        {
+            return;
+        }
+
+        Alter.Table(tableName)
+            .AlterColumn(columnName)
+            .AsCustom("nvarchar(max)")
+            .NotNullable()
             .Do();
     }
 
@@ -146,4 +170,10 @@ public class AlignUpgradedDatabase : MigrationBase
 
     private void RemoveUserGroupDefault(ColumnInfo[] columns)
         => RemoveDefaultConstraint("umbracoUserGroup", "hasAccessToAllLanguages", columns);
+
+    private void MakeWebhookUrlNotNullable(ColumnInfo[] columns)
+        => MakeNvarCharColumnNotNullable("umbracoWebhook", "url", columns);
+
+    private void MakeWebhoolLogUrlNotNullable(ColumnInfo[] columns)
+        => MakeNvarCharColumnNotNullable("umbracoWebhookLog", "url", columns);
 }
