@@ -1,20 +1,41 @@
-import type { UmbBlockTypeBaseModel } from '../../types.js';
+import type { UmbBlockTypeCardElement } from '../block-type-card/index.js';
+import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../../types.js';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import '../block-type-card/index.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/document-type';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-input-block-type')
 export class UmbInputBlockTypeElement<
-	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
+	BlockType extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey,
 > extends UmbLitElement {
+	#sorter = new UmbSorterController<BlockType, UmbBlockTypeCardElement>(this, {
+		getUniqueOfElement: (element) => element.contentElementTypeKey,
+		getUniqueOfModel: (modelEntry) => modelEntry.contentElementTypeKey!,
+		itemSelector: 'umb-block-type-card',
+		identifier: 'umb-block-type-sorter',
+		containerSelector: '#blocks',
+		onChange: ({ model }) => {
+			this._items = model;
+		},
+		onContainerChange: ({ model, item }) => {
+			this._items = model;
+			this.dispatchEvent(new CustomEvent('change', { detail: { item } }));
+		},
+		onEnd: () => {
+			this.dispatchEvent(new CustomEvent('change', { detail: { moveComplete: true } }));
+		},
+	});
+
 	@property({ type: Array, attribute: false })
 	public set value(items) {
 		this._items = items ?? [];
+		this.#sorter.setModel(this._items);
 	}
 	public get value() {
 		return this._items;
@@ -67,7 +88,7 @@ export class UmbInputBlockTypeElement<
 
 	deleteItem(contentElementTypeKey: string) {
 		this.value = this.value.filter((x) => x.contentElementTypeKey !== contentElementTypeKey);
-		this.dispatchEvent(new UmbChangeEvent());
+		this.dispatchEvent(new UmbDeleteEvent());
 	}
 
 	protected getFormElement() {
@@ -85,7 +106,7 @@ export class UmbInputBlockTypeElement<
 	}
 
 	render() {
-		return html`<div>
+		return html`<div id="blocks">
 			${repeat(this.value, (block) => block.contentElementTypeKey, this.#renderItem)} ${this.#renderButton()}
 		</div>`;
 	}
@@ -93,6 +114,7 @@ export class UmbInputBlockTypeElement<
 	#renderItem = (block: BlockType) => {
 		return html`
 			<umb-block-type-card
+				.data-umb-content-element-key=${block.contentElementTypeKey}
 				.name=${block.label}
 				.iconColor=${block.iconColor}
 				.backgroundColor=${block.backgroundColor}
@@ -123,6 +145,10 @@ export class UmbInputBlockTypeElement<
 				gap: var(--uui-size-space-3);
 				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
+			}
+
+			[drag-placeholder] {
+				opacity: 0.5;
 			}
 
 			#add-button {

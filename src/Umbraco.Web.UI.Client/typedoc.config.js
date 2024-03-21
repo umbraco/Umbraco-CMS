@@ -18,5 +18,5 @@ for (const [key, value] of Object.entries(packageJsonExports || {})) {
 
 export default {
 	entryPoints,
-	out: 'api-docs',
+	out: 'ui-api',
 };
