@@ -1,6 +1,7 @@
 import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 import { type InputType, type UUIFormLayoutItemElement, type UUILabelElement } from "@umbraco-cms/backoffice/external/uui";
+import { umbExtensionsRegistry } from "@umbraco-cms/backoffice/extension-registry";
 
 import { UMB_AUTH_CONTEXT, UmbAuthContext } from "./contexts";
 import type { UmbLoginInputElement } from "./components";
@@ -9,9 +10,8 @@ import { UmbSlimBackofficeController } from "./controllers";
 // We import the authStyles here so that we can inline it in the shadow DOM that is created outside of the UmbAuthElement.
 import authStyles from './auth-styles.css?inline';
 
-// We import what we need from the Backoffice app.
-// In the future the login screen app will be a part of the Backoffice app, and we will not need to import these.
-import '@umbraco-cms/backoffice/localization';
+// Import the main bundle
+import { extensions } from './umbraco-package.js';
 
 const createInput = (opts: {
   id: string;
@@ -135,9 +135,11 @@ export default class UmbAuthElement extends UmbLitElement {
       this.requestUpdate();
     });
 
+    // Bind the (slim) Backoffice controller to this element so that we can use utilities from the Backoffice app.
     new UmbSlimBackofficeController(this);
 
-
+    // Register the main package for Umbraco.Auth
+    umbExtensionsRegistry.registerMany(extensions);
   }
 
   firstUpdated() {

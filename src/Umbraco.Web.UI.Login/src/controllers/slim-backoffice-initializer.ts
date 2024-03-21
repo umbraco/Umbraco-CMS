@@ -8,6 +8,10 @@ import { UmbControllerBase } from "@umbraco-cms/backoffice/class-api";
 import { UmbIconRegistry } from "@umbraco-cms/backoffice/icon";
 import { UUIIconRegistryEssential } from "@umbraco-cms/backoffice/external/uui";
 
+// We import what we need from the Backoffice app.
+// In the future the login screen app will be a part of the Backoffice app, and we will not need to import these.
+import '@umbraco-cms/backoffice/localization';
+
 /**
  * This is the initializer for the slim backoffice.
  * It is responsible for initializing the backoffice and only the extensions that is needed to run the login screen.
