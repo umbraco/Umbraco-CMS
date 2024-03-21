@@ -1,6 +1,6 @@
-import {
+import type {
   LoginRequestModel,
-  LoginResponse,
+  LoginResponse, MfaCodeResponse,
   NewPasswordResponse,
   ResetPasswordResponse,
   ValidateInviteCodeResponse,
@@ -8,7 +8,7 @@ import {
 } from "../types.js";
 import { UmbRepositoryBase } from "@umbraco-cms/backoffice/repository";
 import { UmbLocalizationController } from "@umbraco-cms/backoffice/localization-api";
-import { ApiError, CancelError, SecurityResource } from "@umbraco-cms/backoffice/external/backend-api";
+import { ApiError, CancelError, SecurityResource, UserResource } from "@umbraco-cms/backoffice/external/backend-api";
 import { tryExecute } from "@umbraco-cms/backoffice/resources";
 
 export class UmbAuthRepository extends UmbRepositoryBase {
@@ -55,6 +55,31 @@ export class UmbAuthRepository extends UmbRepositoryBase {
     }
   }
 
+  public async validateMfaCode(code: string, provider: string): Promise<MfaCodeResponse> {
+    const requestData = new Request('management/api/v1/security/back-office/verify-2fa', {
+      method: 'POST',
+      body: JSON.stringify({
+        code,
+        provider,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const request = fetch(requestData);
+
+    const response = await tryExecute(request);
+
+    if (response.error) {
+      return {
+        error: this.#getApiErrorDetailText(response.error, 'Could not validate the 2FA code'),
+      };
+    }
+
+    return {};
+  }
+
   public async resetPassword(email: string): Promise<ResetPasswordResponse> {
     const response = await tryExecute(SecurityResource.postSecurityForgotPassword({
       requestBody: {
@@ -81,15 +106,9 @@ export class UmbAuthRepository extends UmbRepositoryBase {
       }
     }));
 
-    if (error) {
+    if (error || !data) {
       return {
         error: this.#getApiErrorDetailText(error, 'Could not validate the password reset code')
-      };
-    }
-
-    if (!data) {
-      return {
-        error: 'Could not validate the password reset code'
       };
     }
 
@@ -118,93 +137,45 @@ export class UmbAuthRepository extends UmbRepositoryBase {
     return {};
   }
 
-  public async newInvitedUserPassword(password: string, token: string, userId: string): Promise<LoginResponse> {
-    const request = new Request('management/api/v1/user/invite/create-password', {
-      method: 'POST',
-      body: JSON.stringify({
+  public async validateInviteCode(token: string, userId: string): Promise<ValidateInviteCodeResponse> {
+    const { data, error } = await tryExecute(UserResource.postUserInviteVerify({
+      requestBody: {
+        token,
+        user: {
+          id: userId
+        }
+      }
+    }));
+
+    if (error || !data) {
+      return {
+        error: this.#getApiErrorDetailText(error, 'Could not validate the invite code')
+      };
+    }
+
+    return {
+      passwordConfiguration: data.passwordConfiguration
+    };
+  }
+
+  public async newInvitedUserPassword(password: string, token: string, userId: string): Promise<NewPasswordResponse> {
+    const response = await tryExecute(UserResource.postUserInviteCreatePassword({
+      requestBody: {
         password,
         token,
         user: {
           id: userId
         }
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const response = await fetch(request);
+      }
+    }));
 
-    if (!response.ok) {
-      const error = await this.#getErrorDetailText(response, 'Could not create a password for the invited user');
-
+    if (response.error) {
       return {
-        status: response.status,
-        error,
+        error: this.#getApiErrorDetailText(response.error, 'Could not create a password for the invited user')
       };
     }
 
-    return {
-      status: response.status,
-    };
-  }
-
-  public async validateInviteCode(token: string, userId: string): Promise<ValidateInviteCodeResponse> {
-    const request = new Request('management/api/v1/user/invite/verify', {
-      method: 'POST',
-      body: JSON.stringify({
-        token,
-        user: {
-          id: userId
-        }
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const response = await fetch(request);
-
-    if (!response.ok) {
-      const error = await this.#getErrorDetailText(response, 'Could not validate the invite code');
-      return {
-        status: response.status,
-        error,
-      };
-    }
-
-    const data = await response.json();
-
-    return {
-      status: response.status,
-      data
-    };
-  }
-
-  public async validateMfaCode(code: string, provider: string): Promise<LoginResponse> {
-    const request = new Request('management/api/v1/security/back-office/verify-2fa', {
-      method: 'POST',
-      body: JSON.stringify({
-        code,
-        provider,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    const response = await fetch(request);
-
-    if (!response.ok) {
-      const error = await this.#getErrorDetailText(response, 'Could not validate the 2-factor authentication code');
-
-      return {
-        status: response.status,
-        error,
-      };
-    }
-
-    return {
-      status: response.status,
-    };
+    return {};
   }
 
   #getApiErrorDetailText(error: ApiError | CancelError | undefined, fallbackText?: string): string | undefined {
@@ -219,21 +190,6 @@ export class UmbAuthRepository extends UmbRepositoryBase {
     }
 
     return fallbackText ?? 'An unknown error occurred.';
-  }
-
-  async #getErrorDetailText(response: Response, fallbackText?: string): Promise<string> {
-    try {
-      // Unauthorized special message
-      if (response.status === 401) {
-        return this.#localize.term('login_userFailedLogin');
-      }
-
-      const data = await response.json();
-      console.error('Error encountered with last request', response, data);
-      return data.title ?? fallbackText ?? 'An unknown error occurred.';
-    } catch {
-      return fallbackText ?? 'An unknown error occurred.';
-    }
   }
 
   async #getErrorText(response: Response): Promise<string> {

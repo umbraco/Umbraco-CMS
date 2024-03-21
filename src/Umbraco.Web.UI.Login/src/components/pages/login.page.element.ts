@@ -91,7 +91,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
     }
 
     if (response.error) {
-      this.dispatchEvent(new CustomEvent('umb-login-failed', {bubbles: true, composed: true, detail: response}));
+      this.dispatchEvent(new CustomEvent('umb-login-failed', {bubbles: true, composed: true}));
       return;
     }
 

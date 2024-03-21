@@ -1,10 +1,10 @@
-import type {
+import {
   LoginRequestModel,
   LoginResponse,
   ResetPasswordResponse,
   ValidatePasswordResetCodeResponse,
   NewPasswordResponse,
-  PasswordConfigurationModel, ValidateInviteCodeResponse
+  PasswordConfigurationModel, ValidateInviteCodeResponse, MfaCodeResponse
 } from "../types.js";
 import { UmbAuthRepository } from './auth.repository.js';
 import { UmbContextBase } from "@umbraco-cms/backoffice/class-api";
@@ -76,7 +76,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
     return this.#authRepository.validateInviteCode(token, userId);
   }
 
-  validateMfaCode(code: string, provider: string): Promise<LoginResponse> {
+  validateMfaCode(code: string, provider: string): Promise<MfaCodeResponse> {
     return this.#authRepository.validateMfaCode(code, provider);
   }
 }

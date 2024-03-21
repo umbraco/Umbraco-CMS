@@ -16,6 +16,10 @@ export type LoginResponse = {
   twoFactorProviders?: string[];
 };
 
+export type MfaCodeResponse = {
+  error?: string;
+};
+
 export type ResetPasswordResponse = {
 	error?: string;
 };
@@ -31,10 +35,7 @@ export type NewPasswordResponse = {
 
 export type ValidateInviteCodeResponse = {
   error?: string;
-  status: number;
-  data?: {
-    passwordConfiguration: PasswordConfigurationModel;
-  }
+  passwordConfiguration?: PasswordConfigurationModel;
 };
 
 export type PasswordConfigurationModel = PasswordConfigurationResponseModel;

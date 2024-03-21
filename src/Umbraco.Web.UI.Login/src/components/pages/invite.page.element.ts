@@ -52,7 +52,13 @@ export default class UmbInvitePageElement extends UmbLitElement {
       return;
     }
 
-    this.#authContext.passwordConfiguration = response.data?.passwordConfiguration;
+    if (!response.passwordConfiguration) {
+      this.error = 'There is no password configuration for the invite code. Please contact the administrator.';
+      this.loading = false;
+      return;
+    }
+
+    this.#authContext.passwordConfiguration = response.passwordConfiguration;
     this.loading = false;
   }
 

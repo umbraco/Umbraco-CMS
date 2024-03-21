@@ -105,7 +105,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
       }
 
       this.dispatchEvent(
-        new CustomEvent('umb-login-success', {bubbles: true, composed: true, detail: response.data})
+        new CustomEvent('umb-login-success', {bubbles: true, composed: true})
       );
     } catch (e) {
       if (e instanceof Error) {
@@ -114,7 +114,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
         this.error = 'Unknown error';
       }
       this.buttonState = 'failed';
-      this.dispatchEvent(new CustomEvent('umb-login-failed', {bubbles: true, composed: true, detail: e}));
+      this.dispatchEvent(new CustomEvent('umb-login-failed', {bubbles: true, composed: true}));
     }
   }
 
