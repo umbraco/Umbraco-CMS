@@ -55,25 +55,4 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
-const workspaceActions: Array<ManifestWorkspaceActions> = [
-	{
-		type: 'workspaceAction',
-		kind: 'default',
-		alias: 'Umb.WorkspaceAction.RelationType.Save',
-		name: 'Save Relation Type Workspace Action',
-		api: UmbSaveWorkspaceAction,
-		meta: {
-			label: 'Save',
-			look: 'primary',
-			color: 'positive',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
-			},
-		],
-	},
-];
-
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews];
