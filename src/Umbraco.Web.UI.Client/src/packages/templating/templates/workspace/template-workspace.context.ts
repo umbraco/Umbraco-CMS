@@ -9,7 +9,7 @@ import type {
 	UmbSaveableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
@@ -21,7 +21,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbTemplateWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbTemplateDetailModel>
+	extends UmbSaveableWorkspaceContextBase<UmbTemplateDetailModel>
 	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
 {
 	public readonly detailRepository = new UmbTemplateDetailRepository(this);
@@ -36,7 +36,7 @@ export class UmbTemplateWorkspaceContext
 	name = this.#data.asObservablePart((data) => data?.name);
 	alias = this.#data.asObservablePart((data) => data?.alias);
 	content = this.#data.asObservablePart((data) => data?.content);
-	unique = this.#data.asObservablePart((data) => data?.unique);
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	masterTemplateUnique = this.#data.asObservablePart((data) => data?.masterTemplate?.unique);
 
 	#isCodeEditorReady = new UmbBooleanState(false);

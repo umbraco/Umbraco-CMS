@@ -1,13 +1,15 @@
-import { UMB_WORKSPACE_CONTEXT } from './workspace-context.token.js';
-import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
+import { UmbWorkspaceRouteManager } from '../controllers/workspace-route-manager.controller.js';
+import { UMB_WORKSPACE_CONTEXT } from './tokens/workspace-context.token.js';
+import type { UmbSaveableWorkspaceContextInterface } from './tokens/saveable-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
-export abstract class UmbEditableWorkspaceContextBase<WorkspaceDataModelType>
-	extends UmbContextBase<UmbEditableWorkspaceContextBase<WorkspaceDataModelType>>
+export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
+	extends UmbContextBase<UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	public readonly workspaceAlias: string;
@@ -15,8 +17,12 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceDataModelType>
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique (instead of the object type)
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
 
+	abstract readonly unique: Observable<string | null | undefined>;
+
 	#isNew = new UmbBooleanState(undefined);
 	isNew = this.#isNew.asObservable();
+
+	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	/*
 		Concept notes: [NL]
@@ -61,3 +67,11 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceDataModelType>
 	abstract getData(): WorkspaceDataModelType | undefined;
 	abstract save(): Promise<void>;
 }
+
+/*
+ * @deprecated Use UmbSaveableWorkspaceContextBase instead — Will be removed before RC.
+ * TODO: Delete before RC.
+ */
+export abstract class UmbEditableWorkspaceContextBase<
+	WorkspaceDataModelType,
+> extends UmbSaveableWorkspaceContextBase<WorkspaceDataModelType> {}

@@ -6,7 +6,7 @@ import { UmbScriptWorkspaceEditorElement } from './script-workspace-editor.eleme
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	type UmbSaveableWorkspaceContextInterface,
 	UmbWorkspaceIsNewRedirectController,
@@ -19,7 +19,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbScriptWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbScriptDetailModel>
+	extends UmbSaveableWorkspaceContextBase<UmbScriptDetailModel>
 	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbScriptDetailRepository(this);
@@ -28,6 +28,7 @@ export class UmbScriptWorkspaceContext
 
 	#data = new UmbObjectState<UmbScriptDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly content = this.#data.asObservablePart((data) => data?.content);
 	readonly path = this.#data.asObservablePart((data) => data?.path);

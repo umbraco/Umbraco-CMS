@@ -1,5 +1,5 @@
-import type { UmbRoutableWorkspaceContext } from '../../workspace/contexts/routable-workspace-context.interface.js';
-import type { UmbWorkspaceContextInterface } from '../../workspace/contexts/workspace-context.interface.js';
+import type { UmbRoutableWorkspaceContext } from '../../workspace/contexts/tokens/routable-workspace-context.interface.js';
+import type { UmbWorkspaceContextInterface } from '../../workspace/contexts/tokens/workspace-context.interface.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
 

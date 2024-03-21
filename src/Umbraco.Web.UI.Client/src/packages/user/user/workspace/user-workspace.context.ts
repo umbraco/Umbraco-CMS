@@ -5,14 +5,14 @@ import { UmbUserAvatarRepository } from '../repository/avatar/index.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
 import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import { UmbEditableWorkspaceContextBase, UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextBase, UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = UmbUserDetailModel;
 
 export class UmbUserWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
+	extends UmbSaveableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	public readonly detailRepository: UmbUserDetailRepository = new UmbUserDetailRepository(this);

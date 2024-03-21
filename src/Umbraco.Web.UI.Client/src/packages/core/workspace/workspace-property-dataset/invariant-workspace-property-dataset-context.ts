@@ -3,13 +3,13 @@ import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbInvariantableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type { UmbInvariantDatasetWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 
 /**
  * A property dataset context that hooks directly into the workspace context.
  */
 export class UmbInvariantWorkspacePropertyDatasetContext<
-		WorkspaceType extends UmbInvariantableWorkspaceContextInterface = UmbInvariantableWorkspaceContextInterface,
+		WorkspaceType extends UmbInvariantDatasetWorkspaceContextInterface = UmbInvariantDatasetWorkspaceContextInterface,
 	>
 	extends UmbContextBase<UmbPropertyDatasetContext>
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext

@@ -22,14 +22,14 @@ import { UmbDocumentWorkspaceEditorElement } from './document-workspace-editor.e
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import type {
 	UmbWorkspaceCollectionContextInterface,
-	UmbVariantableWorkspaceContextInterface,
+	UmbVariantDatasetWorkspaceContextInterface,
 	UmbPublishableWorkspaceContextInterface,
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
@@ -51,10 +51,10 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
+	extends UmbSaveableWorkspaceContextBase<EntityType>
 	implements
 		UmbRoutableWorkspaceContext,
-		UmbVariantableWorkspaceContextInterface<UmbDocumentVariantModel>,
+		UmbVariantDatasetWorkspaceContextInterface<UmbDocumentVariantModel>,
 		UmbPublishableWorkspaceContextInterface,
 		UmbWorkspaceCollectionContextInterface<UmbDocumentTypeDetailModel>
 {

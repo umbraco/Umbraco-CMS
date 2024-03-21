@@ -7,7 +7,7 @@ import type {
 	UmbSaveableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
@@ -15,7 +15,7 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbUserGroupDetailModel>
+	extends UmbSaveableWorkspaceContextBase<UmbUserGroupDetailModel>
 	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
 {
 	//
@@ -24,6 +24,7 @@ export class UmbUserGroupWorkspaceContext
 	#data = new UmbObjectState<UmbUserGroupDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name || '');
 	readonly icon = this.#data.asObservablePart((data) => data?.icon || null);
 	readonly sections = this.#data.asObservablePart((data) => data?.sections || []);

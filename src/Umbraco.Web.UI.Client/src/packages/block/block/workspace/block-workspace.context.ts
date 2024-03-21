@@ -2,7 +2,7 @@ import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceRouteManager,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
@@ -20,7 +20,7 @@ import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
-	extends UmbEditableWorkspaceContextBase<LayoutDataType>
+	extends UmbSaveableWorkspaceContextBase<LayoutDataType>
 	implements UmbRoutableWorkspaceContext
 {
 	// Just for context token safety:
@@ -48,7 +48,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#layout = new UmbObjectState<LayoutDataType | undefined>(undefined);
 	readonly layout = this.#layout.asObservable();
-	//readonly unique = this.#layout.asObservablePart((x) => x?.contentUdi);
+	readonly unique = this.#layout.asObservablePart((x) => x?.contentUdi);
 	readonly contentUdi = this.#layout.asObservablePart((x) => x?.contentUdi);
 
 	readonly content = new UmbBlockElementManager(this);

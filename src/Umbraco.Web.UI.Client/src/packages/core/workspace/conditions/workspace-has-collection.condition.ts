@@ -1,4 +1,4 @@
-import { UMB_WORKSPACE_COLLECTION_CONTEXT } from '../contexts/workspace-collection-context.token.js';
+import { UMB_WORKSPACE_COLLECTION_CONTEXT } from '../contexts/tokens/workspace-collection-context.token.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestCondition,

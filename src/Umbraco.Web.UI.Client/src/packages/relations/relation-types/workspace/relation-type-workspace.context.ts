@@ -2,7 +2,7 @@ import { UmbRelationTypeRepository } from '../repository/relation-type.repositor
 import { UmbRelationTypeWorkspaceEditorElement } from './relation-type-workspace-editor.element.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
@@ -12,7 +12,7 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbRelationTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<RelationTypeResponseModel>
+	extends UmbSaveableWorkspaceContextBase<RelationTypeResponseModel>
 	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
 {
 	//
@@ -22,6 +22,7 @@ export class UmbRelationTypeWorkspaceContext
 
 	#data = new UmbObjectState<RelationTypeResponseModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+	readonly unique = this.#data.asObservablePart((data) => data?.id);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly id = this.#data.asObservablePart((data) => data?.id);
 

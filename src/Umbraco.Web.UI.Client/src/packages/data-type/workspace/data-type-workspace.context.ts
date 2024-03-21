@@ -3,11 +3,11 @@ import type { UmbDataTypeDetailModel } from '../types.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type {
-	UmbInvariantableWorkspaceContextInterface,
+	UmbInvariantDatasetWorkspaceContextInterface,
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
@@ -32,8 +32,8 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 
 type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbInvariantableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	extends UmbSaveableWorkspaceContextBase<EntityType>
+	implements UmbInvariantDatasetWorkspaceContextInterface, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
@@ -343,6 +343,11 @@ export class UmbDataTypeWorkspaceContext
 
 		this.setIsNew(false);
 		this.workspaceComplete(this.#currentData.value);
+	}
+
+	protected workspaceComplete(data: EntityType | undefined) {
+		this.dispatchEvent(new CustomEvent('workspace-complete'));
+		super.workspaceComplete(data);
 	}
 
 	async delete(unique: string) {

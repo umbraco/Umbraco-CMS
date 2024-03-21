@@ -1,9 +1,10 @@
 import { UmbValidationInvalidEvent } from '../events/validation-invalid.event.js';
 import { UmbValidationValidEvent } from '../events/validation-valid.event.js';
+import { UmbValidityState } from './validity-state.class.js';
 import { property, type LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 
-type NativeFormControlElement = HTMLInputElement | HTMLTextAreaElement | HTMLFormElement; // Eventually use a specific interface or list multiple options like appending these types: ... | HTMLTextAreaElement | HTMLSelectElement
+type NativeFormControlElement = HTMLInputElement | HTMLTextAreaElement; // Eventually use a specific interface or list multiple options like appending these types: ... | HTMLTextAreaElement | HTMLSelectElement
 
 /* FlagTypes type options originate from:
  * https://developer.mozilla.org/en-US/docs/Web/API/ValidityState
@@ -33,7 +34,6 @@ export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> exten
 	formAssociated: boolean;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
-	name: string;
 	formResetCallback(): void;
 	checkValidity(): boolean;
 	get validationMessage(): string;
@@ -48,7 +48,7 @@ export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> exten
 }
 
 export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValueType>
-	extends HTMLElement
+	extends LitElement
 	implements UmbFormControlMixinInterface<ValueType, DefaultValueType>
 {
 	protected _internals: ElementInternals;
@@ -60,7 +60,6 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 	formAssociated: boolean;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
-	name: string;
 	formResetCallback(): void;
 	checkValidity(): boolean;
 	get validationMessage(): string;
@@ -80,7 +79,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
  * @param {Object} superClass - superclass to be extended.
  * @mixin
  */
-export const UUIFormControlMixin = <
+export const UmbFormControlMixin = <
 	ValueType = FormDataEntryValue | FormData,
 	T extends HTMLElementConstructor<LitElement> = HTMLElementConstructor<LitElement>,
 	DefaultValueType = unknown,
@@ -98,36 +97,23 @@ export const UUIFormControlMixin = <
 		static readonly formAssociated = true;
 
 		/**
-		 * This is a name property of the component.
-		 * @type {string}
-		 * @attr
-		 * @default ''
-		 */
-		@property({ type: String })
-		name = '';
-
-		/**
 		 * Value of this form control.
 		 * If you dont want the setFormValue to be called on the ElementInternals, then prevent calling this method, by not calling super.value = newValue in your implementation of the value setter method.
 		 * @type {string}
 		 * @attr value
 		 * @default ''
 		 */
-		@property() // Do not 'reflect' as the attribute is used as fallback.
+		@property({ reflect: false }) // Do not 'reflect' as the attribute is used as fallback.
 		get value(): ValueType | DefaultValueType {
 			return this.#value;
 		}
 		set value(newValue: ValueType | DefaultValueType) {
-			const oldValue = this.#value;
 			this.#value = newValue;
-			if ('ElementInternals' in window && 'setFormValue' in window.ElementInternals.prototype) {
-				this._internals.setFormValue((this.#value as any) ?? null);
-			}
-			this.requestUpdate('value', oldValue);
+			this._runValidators();
 		}
 
 		// Validation
-		private _validityState: any = {};
+		private _validityState = new UmbValidityState();
 
 		/**
 		 * Determines wether the form control has been touched or interacted with, this determines wether the validation-status of this form control should be made visible.
@@ -138,37 +124,8 @@ export const UUIFormControlMixin = <
 		@property({ type: Boolean, reflect: true })
 		pristine: boolean = true;
 
-		/**
-		 * Apply validation rule for requiring a value of this form control.
-		 * @attr
-		 * @default false
-		 */
-		@property({ type: Boolean, reflect: true })
-		required = false;
-
-		/**
-		 * Required validation message.
-		 * @attr
-		 */
-		@property({ type: String, attribute: 'required-message' })
-		requiredMessage = 'This field is required';
-
-		/**
-		 * Apply custom error on this input.
-		 * @attr
-		 */
-		@property({ type: Boolean, reflect: true })
-		error = false;
-
-		/**
-		 * Custom error message.
-		 * @attr
-		 */
-		@property({ type: String, attribute: 'error-message' })
-		errorMessage = 'This field is invalid';
-
 		#value: ValueType | DefaultValueType = defaultValue;
-		_internals: ElementInternals;
+		protected _internals: ElementInternals;
 		#form: HTMLFormElement | null = null;
 		#validators: Validator[] = [];
 		#formCtrlElements: NativeFormControlElement[] = [];
@@ -177,29 +134,10 @@ export const UUIFormControlMixin = <
 			super(...args);
 			this._internals = this.attachInternals();
 
-			this.addValidator(
-				'valueMissing',
-				() => this.requiredMessage,
-				() => this.hasAttribute('required') && this.hasValue() === false,
-			);
-			this.addValidator(
-				'customError',
-				() => this.errorMessage,
-				() => this.error,
-			);
-
-			this.addEventListener('blur', () => {
+			this.addEventListener('focusout', () => {
 				this.pristine = false;
+				this.checkValidity();
 			});
-		}
-
-		/**
-		 * Determine wether this FormControl has a value.
-		 * @method hasValue
-		 * @returns {boolean}
-		 */
-		public hasValue(): boolean {
-			return this.value !== this.getDefaultValue();
 		}
 
 		/**
@@ -231,7 +169,7 @@ export const UUIFormControlMixin = <
 		 *  () => 'This input contains too many characters',
 		 *  () => this._value.length > 10
 		 * );
-		 * @method hasValue
+		 * @method addValidator
 		 * @param {FlagTypes} flagKey the type of validation.
 		 * @param {method} getMessageMethod method to retrieve relevant message. Is executed every time the validator is re-executed.
 		 * @param {method} checkMethod method to determine if this validator should invalidate this form control. Return true if this should prevent submission.
@@ -260,30 +198,12 @@ export const UUIFormControlMixin = <
 		 */
 		protected addFormControlElement(element: NativeFormControlElement) {
 			this.#formCtrlElements.push(element);
-		}
-
-		private _customValidityObject?: Validator;
-
-		/**
-		 * @method setCustomValidity
-		 * @description Set custom validity state, set to empty string to remove the custom message.
-		 * @param message {string} - The message to be shown
-		 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/setCustomValidity|HTMLObjectElement:setCustomValidity}
-		 */
-		protected setCustomValidity(message: string | null) {
-			if (this._customValidityObject) {
-				this.removeValidator(this._customValidityObject);
-			}
-
-			if (message != null && message !== '') {
-				this._customValidityObject = this.addValidator(
-					'customError',
-					(): string => message,
-					() => true,
-				);
-			}
-
-			this._runValidators();
+			/*element.addEventListener(UmbValidationInvalidEvent.TYPE, () => {
+				this._runValidators();
+			});
+			element.addEventListener(UmbValidationValidEvent.TYPE, () => {
+				this._runValidators();
+			});*/
 		}
 
 		/**
@@ -294,14 +214,15 @@ export const UUIFormControlMixin = <
 		 * Such are mainly properties that are not declared as a Lit state and or Lit property.
 		 */
 		protected _runValidators() {
-			this._validityState = {};
+			this._validityState = new UmbValidityState();
 
 			// Loop through inner native form controls to adapt their validityState.
 			this.#formCtrlElements.forEach((formCtrlEl) => {
-				for (const key in formCtrlEl.validity) {
-					if (key !== 'valid' && (formCtrlEl.validity as any)[key]) {
-						(this as any)._validityState[key] = true;
-						this._internals.setValidity((this as any)._validityState, formCtrlEl.validationMessage, formCtrlEl);
+				let key: keyof ValidityState;
+				for (key in formCtrlEl.validity) {
+					if (key !== 'valid' && formCtrlEl.validity[key]) {
+						this._validityState[key] = true;
+						this._internals.setValidity(this._validityState, formCtrlEl.validationMessage, formCtrlEl);
 					}
 				}
 			});
@@ -320,8 +241,10 @@ export const UUIFormControlMixin = <
 			this._validityState.valid = !hasError;
 
 			if (hasError) {
+				console.log('HAS ERROR', this.validationMessage, this.pristine);
 				this.dispatchEvent(new UmbValidationInvalidEvent());
 			} else {
+				console.log('IS VALID', this.validationMessage, this.pristine);
 				this._internals.setValidity({});
 				this.dispatchEvent(new UmbValidationValidEvent());
 			}
@@ -335,10 +258,6 @@ export const UUIFormControlMixin = <
 		#onFormSubmit = () => {
 			this.pristine = false;
 		};
-
-		public submit() {
-			this.#form?.requestSubmit();
-		}
 
 		public formAssociatedCallback() {
 			this.#removeFormListeners();

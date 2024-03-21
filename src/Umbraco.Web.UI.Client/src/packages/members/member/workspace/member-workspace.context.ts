@@ -5,14 +5,14 @@ import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
 import { UmbMemberTypeDetailRepository } from '@umbraco-cms/backoffice/member-type';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import type {
 	UmbRoutableWorkspaceContext,
-	UmbVariantableWorkspaceContextInterface,
+	UmbVariantDatasetWorkspaceContextInterface,
 	UmbWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -30,9 +30,9 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 type EntityType = UmbMemberDetailModel;
 export class UmbMemberWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
+	extends UmbSaveableWorkspaceContextBase<EntityType>
 	implements
-		UmbVariantableWorkspaceContextInterface<UmbMemberVariantModel>,
+		UmbVariantDatasetWorkspaceContextInterface<UmbMemberVariantModel>,
 		UmbRoutableWorkspaceContext,
 		UmbWorkspaceContextInterface
 {
@@ -52,6 +52,7 @@ export class UmbMemberWorkspaceContext
 	}
 
 	readonly data = this.#currentData.asObservable();
+	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 	readonly name = this.#currentData.asObservablePart((data) => data?.variants[0].name);
 	readonly createDate = this.#currentData.asObservablePart((data) => data?.variants[0].createDate);
 	readonly updateDate = this.#currentData.asObservablePart((data) => data?.variants[0].updateDate);
@@ -64,8 +65,6 @@ export class UmbMemberWorkspaceContext
 	#varies?: boolean;
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
-
-	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 
 	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly splitView = new UmbWorkspaceSplitViewManager();
