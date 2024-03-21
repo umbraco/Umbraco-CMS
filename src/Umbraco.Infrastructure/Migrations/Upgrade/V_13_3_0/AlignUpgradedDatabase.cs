@@ -1,6 +1,6 @@
 ﻿using NPoco;
-using Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Expressions;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_3_0;
@@ -28,6 +28,7 @@ public class AlignUpgradedDatabase : MigrationBase
 
         DropCacheInstructionDefaultConstraint(columns);
         RenameVersionDateColumn(columns);
+        UpdateExternalLoginIndexes();
 
     }
 
@@ -76,5 +77,32 @@ public class AlignUpgradedDatabase : MigrationBase
         Sql<ISqlContext> renameConstraintQuery = Database.SqlContext.Sql(
             "EXEC sp_rename N'DF_cmsContentVersion_VersionDate', N'DF_umbracoContentVersion_versionDate', N'OBJECT'");
         Database.Execute(renameConstraintQuery);
+    }
+
+    private void UpdateExternalLoginIndexes()
+    {
+        const string loginProviderIndexName = "IX_umbracoExternalLogin_LoginProvider";
+        const string userMemberOrKeyIndexName = "IX_umbracoExternalLogin_userOrMemberKey";
+
+        // Indexes are in format TableName, IndexName, ColumnName, IsUnique
+        IEnumerable<Tuple<string, string, string, bool>> indexes = SqlSyntax.GetDefinedIndexes(Database);
+
+        // Let's only mess with the indexes if we have to.
+        Tuple<string, string, string, bool>? loginProviderIndex = indexes.FirstOrDefault(x =>
+            x is { Item1: "umbracoExternalLogin", Item2: loginProviderIndexName });
+
+        if (loginProviderIndex?.Item4 is false)
+        {
+            // The recommended way to change an index from non-unique to unique is to drop and recreate it.
+            DeleteIndex<ExternalLoginDto>(loginProviderIndexName);
+            CreateIndex<ExternalLoginDto>(loginProviderIndexName);
+        }
+
+        if (IndexExists(userMemberOrKeyIndexName))
+        {
+            return;
+        }
+
+        CreateIndex<ExternalLoginDto>(userMemberOrKeyIndexName);
     }
 }
