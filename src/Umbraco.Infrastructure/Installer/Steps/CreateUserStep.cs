@@ -92,7 +92,7 @@ public class CreateUserStep : StepBase, IInstallStep
                 return FailWithMessage("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
             }
 
-            _metricsConsentService.SetConsentLevel(model.TelemetryLevel);
+            await _metricsConsentService.SetConsentLevelAsync(model.TelemetryLevel);
 
             if (model.User.SubscribeToNewsletter)
             {
