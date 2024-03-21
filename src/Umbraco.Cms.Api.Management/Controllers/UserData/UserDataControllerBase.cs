@@ -24,7 +24,7 @@ public class UserDataControllerBase : ManagementApiControllerBase
                 .WithDetail("A userData entry with the given key already exists")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
-                .WithTitle("Unknown tour operation status.")
+                .WithTitle("Unknown userData operation status.")
                 .Build()),
         });
 }
