@@ -10,6 +10,7 @@ import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/document-type';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
+/** TODO: Look into sending a "change" event when there is a change, rather than create, delete, and change event. Make sure it doesn't break move for RTE/List/Grid. [LI] */
 @customElement('umb-input-block-type')
 export class UmbInputBlockTypeElement<
 	BlockType extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey,
