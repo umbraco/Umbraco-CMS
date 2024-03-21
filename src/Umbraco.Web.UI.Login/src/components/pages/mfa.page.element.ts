@@ -158,10 +158,10 @@ export default class UmbMfaPageElement extends UmbLitElement {
               name="token"
               inputmode="numeric"
               autocomplete="one-time-code"
-              placeholder=${this.localize.term('login_2faCodeInputHelp')}
+              placeholder=${this.localize.term('auth_mfaCodeInputHelp')}
               aria-required="true"
               required
-              required-message=${this.localize.term('login_2faCodeInputHelp')}
+              required-message=${this.localize.term('auth_mfaCodeInputHelp')}
               style="width:100%;">
             </uui-input>
           </uui-form-layout-item>
@@ -173,7 +173,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
             button-style="success"
             look="primary"
             color="default"
-            label=${this.localize.term('general_validate')}
+            label=${this.localize.term('auth_validate')}
             type="submit"></uui-button>
         </form>
       </uui-form>

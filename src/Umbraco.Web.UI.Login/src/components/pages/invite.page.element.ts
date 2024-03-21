@@ -88,8 +88,8 @@ export default class UmbInvitePageElement extends UmbLitElement {
       this.error
         ? html`
           <umb-error-layout
-            header=${this.localize.term('general_error')}
-            message=${this.error ?? this.localize.term('errors_defaultError')}>
+            header=${this.localize.term('auth_error')}
+            message=${this.error ?? this.localize.term('auth_defaultError')}>
           </umb-error-layout>`
       : html`
         <umb-new-password-layout

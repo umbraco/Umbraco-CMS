@@ -106,13 +106,13 @@ export default class UmbLoginPageElement extends UmbLitElement {
 
   get #greetingLocalizationKey() {
     return [
-      'login_greeting0',
-      'login_greeting1',
-      'login_greeting2',
-      'login_greeting3',
-      'login_greeting4',
-      'login_greeting5',
-      'login_greeting6',
+      'auth_greeting0',
+      'auth_greeting1',
+      'auth_greeting2',
+      'auth_greeting3',
+      'auth_greeting4',
+      'auth_greeting5',
+      'auth_greeting6',
     ][new Date().getDay()];
   }
 
@@ -139,8 +139,8 @@ export default class UmbLoginPageElement extends UmbLitElement {
                 <uui-form-layout-item>
                   <uui-checkbox
                     name="persist"
-                    .label=${this.localize.term('user_rememberMe')}>
-                    <umb-localize key="user_rememberMe">Remember me</umb-localize>
+                    .label=${this.localize.term('auth_rememberMe')}>
+                    <umb-localize key="auth_rememberMe">Remember me</umb-localize>
                   </uui-checkbox>
                 </uui-form-layout-item>`
             )}
@@ -158,7 +158,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
             id="umb-login-button"
             look="primary"
             @click=${this.#onSubmitClick}
-            .label=${this.localize.term('general_login')}
+            .label=${this.localize.term('auth_login')}
             color="default"
             .state=${this._loginState}></uui-button>
 

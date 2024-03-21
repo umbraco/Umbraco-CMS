@@ -19,7 +19,7 @@ export class UmbExternalLoginProvidersLayoutElement extends UmbLitElement {
         ? html`
           <div id="divider" aria-hidden="true">
             <span>
-              <umb-localize key="general_or">or</umb-localize>
+              <umb-localize key="auth_or">or</umb-localize>
             </span>
           </div>
         `

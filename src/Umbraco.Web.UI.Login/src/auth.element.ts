@@ -165,10 +165,10 @@ export default class UmbAuthElement extends UmbLitElement {
    */
   #initializeForm() {
     const labelUsername = this.usernameIsEmail
-      ? this.localize.term('general_email')
-      : this.localize.term('general_username');
-    const labelPassword = this.localize.term('general_password');
-    const requiredMessage = this.localize.term('general_required');
+      ? this.localize.term('auth_email')
+      : this.localize.term('auth_username');
+    const labelPassword = this.localize.term('auth_password');
+    const requiredMessage = this.localize.term('auth_required');
 
     this._usernameInput = createInput({
       id: 'username-input',
@@ -190,10 +190,10 @@ export default class UmbAuthElement extends UmbLitElement {
     });
     this._usernameLabel = createLabel({
       forId: 'username-input',
-      localizeAlias: this.usernameIsEmail ? 'general_email' : 'general_username',
+      localizeAlias: this.usernameIsEmail ? 'auth_email' : 'auth_username',
       localizeFallback: this.usernameIsEmail ? 'Email' : 'Username',
     });
-    this._passwordLabel = createLabel({forId: 'password-input', localizeAlias: 'general_password', localizeFallback: 'Password'});
+    this._passwordLabel = createLabel({forId: 'password-input', localizeAlias: 'auth_password', localizeFallback: 'Password'});
 
     this._usernameLayoutItem = createFormLayoutItem(this._usernameLabel, this._usernameInput);
     this._passwordLayoutItem = createFormLayoutItem(this._passwordLabel, this._passwordInput);
@@ -223,7 +223,7 @@ export default class UmbAuthElement extends UmbLitElement {
       return html`
         <umb-error-layout
           header="Hi there"
-          message=${this.localize.term('login_resetCodeExpired')}>
+          message=${this.localize.term('auth_resetCodeExpired')}>
         </umb-error-layout>`;
     }
 
@@ -231,7 +231,7 @@ export default class UmbAuthElement extends UmbLitElement {
       return html`
         <umb-error-layout
           header="Hi there"
-          message=${this.localize.term('user_userinviteExpiredMessage')}>
+          message=${this.localize.term('auth_userInviteExpiredMessage')}>
         </umb-error-layout>`;
     }
 

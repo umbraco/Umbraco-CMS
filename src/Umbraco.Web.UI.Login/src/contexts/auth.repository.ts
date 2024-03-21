@@ -196,18 +196,18 @@ export class UmbAuthRepository extends UmbRepositoryBase {
     switch (response.status) {
       case 400:
       case 401:
-        return this.#localize.term('login_userFailedLogin');
+        return this.#localize.term('auth_userFailedLogin');
 
       case 402:
-        return this.#localize.term('login_2faText');
+        return this.#localize.term('auth_2faText');
 
       case 500:
-        return this.#localize.term('errors_receivedErrorFromServer');
+        return this.#localize.term('auth_receivedErrorFromServer');
 
       default:
         return (
           response.statusText ??
-          this.#localize.term('errors_receivedErrorFromServer')
+          this.#localize.term('auth_receivedErrorFromServer')
         );
     }
   }
