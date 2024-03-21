@@ -346,7 +346,7 @@ public static class FriendlyPublishedContentExtensions
     /// <remarks>
     ///     <para>Children are sorted by their sortOrder.</para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? Children(
+    public static IEnumerable<IPublishedContent> Children(
         this IPublishedContent content,
         Func<IPublishedContent, bool> predicate,
         string? culture = null)
