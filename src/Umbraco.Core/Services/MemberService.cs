@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly IMemberGroupRepository _memberGroupRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IMemberGroupService _memberGroupService;
-        private readonly Lazy<IIdKeyMap> _idKeyMap;
+        private readonly IIdKeyMap _idKeyMap;
 
         #region Constructor
 
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Services
             IMemberTypeRepository memberTypeRepository,
             IMemberGroupRepository memberGroupRepository,
             IAuditRepository auditRepository,
-            Lazy<IIdKeyMap> idKeyMap)
+            IIdKeyMap idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _memberRepository = memberRepository;
@@ -1071,7 +1071,7 @@ namespace Umbraco.Cms.Core.Services
         private void Audit(AuditType type, int userId, int objectId, string? message = null) => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Member), message));
 
         private IMember? GetMemberFromRepository(Guid id)
-            => _idKeyMap.Value.GetIdForKey(id, UmbracoObjectTypes.Member) switch
+            => _idKeyMap.GetIdForKey(id, UmbracoObjectTypes.Member) switch
             {
                 { Success: false } => null,
                 { Result: var intId } => _memberRepository.Get(intId),
