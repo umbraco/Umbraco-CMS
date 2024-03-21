@@ -1,21 +1,21 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 
-namespace Umbraco.Cms.Api.Management.Controllers.TrackedReference;
+namespace Umbraco.Cms.Api.Management.Controllers.Document.References;
 
 [ApiVersion("1.0")]
-public class ByIdTrackedReferenceController : TrackedReferenceControllerBase
+public class ReferencesDocumentController : DocumentControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public ByIdTrackedReferenceController(ITrackedReferencesService trackedReferencesService, IUmbracoMapper umbracoMapper)
+    public ReferencesDocumentController(ITrackedReferencesService trackedReferencesService, IUmbracoMapper umbracoMapper)
     {
         _trackedReferencesService = trackedReferencesService;
         _umbracoMapper = umbracoMapper;
@@ -30,19 +30,18 @@ public class ByIdTrackedReferenceController : TrackedReferenceControllerBase
     /// </remarks>
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<RelationItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RelationItemResponseModel>>> Get(
+    [ProducesResponseType(typeof(PagedViewModel<DocumentReferenceResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<DocumentReferenceResponseModel>>> Get(
         Guid id,
         int skip = 0,
-        int take = 20,
-        bool filterMustBeIsDependency = false)
+        int take = 20)
     {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, filterMustBeIsDependency);
+        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, false);
 
-        var pagedViewModel = new PagedViewModel<RelationItemResponseModel>
+        var pagedViewModel = new PagedViewModel<DocumentReferenceResponseModel>
         {
             Total = relationItems.Total,
-            Items = _umbracoMapper.MapEnumerable<RelationItemModel, RelationItemResponseModel>(relationItems.Items),
+            Items = _umbracoMapper.MapEnumerable<RelationItemModel, DocumentReferenceResponseModel>(relationItems.Items),
         };
 
         return await Task.FromResult(pagedViewModel);
