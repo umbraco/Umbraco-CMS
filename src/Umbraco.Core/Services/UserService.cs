@@ -1718,14 +1718,6 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
-    public IEnumerable<IUser> GetNextUsers(Guid key, int count)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _userRepository.GetNextUsers(key, count);
-        }
-    }
-
     /// <summary>
     ///     Gets a list of <see cref="IUser" /> objects associated with a given group
     /// </summary>

@@ -141,6 +141,4 @@ public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
     int ClearLoginSessions(TimeSpan timespan);
 
     void ClearLoginSession(Guid sessionId);
-
-    IEnumerable<IUser> GetNextUsers(Guid key, int count);
 }

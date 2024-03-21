@@ -1176,23 +1176,5 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         return sql;
     }
-
-    public IEnumerable<IUser> GetNextUsers(Guid key, int count)
-    {
-        Sql<ISqlContext> idsQuery = SqlContext.Sql()
-            .Select<UserDto>(x => x.Key)
-            .From<UserDto>()
-            .Where<UserDto>(x => x.Key >= key)
-            .OrderBy<UserDto>(x => x.Key);
-
-        // first page is index 1, not zero
-        Guid[] ids = Database.Page<Guid>(1, count, idsQuery).Items.ToArray();
-
-        // now get the actual users and ensure they are ordered properly (same clause)
-        return ids.Length == 0
-            ? Enumerable.Empty<IUser>()
-            : GetMany(ids).OrderBy(x => x.Id) ?? Enumerable.Empty<IUser>();
-    }
-
     #endregion
 }
