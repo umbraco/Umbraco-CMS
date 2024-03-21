@@ -1,6 +1,7 @@
 import { UmbRelationTypeDetailRepository } from '../../repository/detail/index.js';
 import type { UmbRelationTypeDetailModel } from '../../types.js';
 import { UmbRelationTypeWorkspaceEditorElement } from './relation-type-workspace-editor.element.js';
+import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from './relation-type-workspace.context-token.js';
 import { UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -15,11 +16,12 @@ export class UmbRelationTypeWorkspaceContext extends UmbContextBase<UmbRelationT
 
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
+	readonly alias = this.#data.asObservablePart((data) => data?.alias);
 
 	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.RelationType');
+		super(host, UMB_RELATION_TYPE_WORKSPACE_CONTEXT);
 
 		this.routes.setRoutes([
 			{
