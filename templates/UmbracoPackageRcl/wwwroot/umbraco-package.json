@@ -1,6 +1,31 @@
 {
+  "$schema": "../../umbraco-package-schema.json",
   "id": "UmbracoPackage",
   "name": "UmbracoPackage",
+  "version": "0.1.0",
   "allowPackageTelemetry": true,
-  "extensions": []
+  "extensions": [
+    {
+      "type": "dashboard",
+      "alias": "My.Dashboard.MyExtension",
+      "name": "My Dashboard",
+      "js": "/App_Plugins/UmbracoPackage/dist/my-welcome-dashboard.js",
+      "meta": {
+        "label": "My Dashboard",
+        "pathname": "my-dashboard"
+      }
+    },
+    {
+      "type": "propertyEditorUi",
+      "alias": "My.PropertyEditorUi",
+      "name": "My Property Editor UI",
+      "js": "/App_Plugins/UmbracoPackage/dist/my-property-editor-ui.js",
+      "meta": {
+        "label": "My Property Editor UI",
+        "icon": "umb:list",
+        "group": "common",
+        "propertyEditorSchemaAlias": "Umbraco.TextBox"
+      }
+    }
+  ]
 }
