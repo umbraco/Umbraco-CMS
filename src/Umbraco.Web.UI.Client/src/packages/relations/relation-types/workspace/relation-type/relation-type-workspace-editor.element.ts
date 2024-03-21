@@ -1,9 +1,8 @@
 import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from './relation-type-workspace.context-token.js';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+
 /**
  * @element umb-relation-type-workspace-editor
  * @description - Element for displaying a Relation Type Workspace
@@ -13,7 +12,10 @@ export class UmbRelationTypeWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_RELATION_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	private _relationType?: RelationTypeResponseModel;
+	private _name?: string = '';
+
+	@state()
+	private _alias?: string = '';
 
 	constructor() {
 		super();
@@ -26,26 +28,18 @@ export class UmbRelationTypeWorkspaceEditorElement extends UmbLitElement {
 
 	#observeRelationType() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.data, (data) => (this._relationType = data));
-	}
-
-	// TODO. find a way where we don't have to do this for all workspaces.
-	private _handleInput(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.setName(target.value);
-			}
-		}
+		this.observe(observeMultiple([this.#workspaceContext.name, this.#workspaceContext.alias]), ([name, alias]) => {
+			this._name = name;
+			this._alias = alias;
+		});
 	}
 
 	render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.RelationType">
 				<div id="header" slot="header">
-					<uui-input id="name" .value=${this._relationType?.name} @input="${this._handleInput}">
-						<div id="alias" slot="append">${this._relationType?.alias}</div>
+					<uui-input id="name" .value=${this._name} readonly>
+						<div id="alias" slot="append">${this._alias}</div>
 					</uui-input>
 				</div>
 			</umb-workspace-editor>
