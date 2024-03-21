@@ -111,9 +111,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	}
 
 	render() {
-		// TODO: Are we supposed to have the debug element here?
 		return html`
-			<umb-debug visible dialog></umb-debug>
 			<uui-box headline="Published Cache Status">
 				<p>${this._publishedStatusText}</p>
 				<uui-button
