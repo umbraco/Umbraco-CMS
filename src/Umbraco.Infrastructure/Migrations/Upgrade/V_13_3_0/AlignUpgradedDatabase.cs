@@ -24,11 +24,14 @@ public class AlignUpgradedDatabase : MigrationBase
         }
 
         ColumnInfo[] columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
+        // Indexes are in format TableName, IndexName, ColumnName, IsUnique
+        Tuple<string, string, string, bool>[] indexes = SqlSyntax.GetDefinedIndexes(Database).ToArray();
 
         DropCacheInstructionDefaultConstraint(columns);
         AlignContentVersionTable(columns);
-        UpdateExternalLoginIndexes();
+        UpdateExternalLoginIndexes(indexes);
         AlignNodeTable(columns);
+        MakeRelationTypeIndexUnique(indexes);
     }
 
     private void DropCacheInstructionDefaultConstraint(IEnumerable<ColumnInfo> columns)
@@ -92,24 +95,11 @@ public class AlignUpgradedDatabase : MigrationBase
             .Do();
     }
 
-    private void UpdateExternalLoginIndexes()
+    private void UpdateExternalLoginIndexes(IEnumerable<Tuple<string, string, string, bool>> indexes)
     {
-        const string loginProviderIndexName = "IX_umbracoExternalLogin_LoginProvider";
         const string userMemberOrKeyIndexName = "IX_umbracoExternalLogin_userOrMemberKey";
 
-        // Indexes are in format TableName, IndexName, ColumnName, IsUnique
-        IEnumerable<Tuple<string, string, string, bool>> indexes = SqlSyntax.GetDefinedIndexes(Database);
-
-        // Let's only mess with the indexes if we have to.
-        Tuple<string, string, string, bool>? loginProviderIndex = indexes.FirstOrDefault(x =>
-            x is { Item1: "umbracoExternalLogin", Item2: loginProviderIndexName });
-
-        if (loginProviderIndex?.Item4 is false)
-        {
-            // The recommended way to change an index from non-unique to unique is to drop and recreate it.
-            DeleteIndex<ExternalLoginDto>(loginProviderIndexName);
-            CreateIndex<ExternalLoginDto>(loginProviderIndexName);
-        }
+        MakeIndexUnique<ExternalLoginDto>("umbracoExternalLogin", "IX_umbracoExternalLogin_LoginProvider", indexes);
 
         if (IndexExists(userMemberOrKeyIndexName))
         {
@@ -117,6 +107,21 @@ public class AlignUpgradedDatabase : MigrationBase
         }
 
         CreateIndex<ExternalLoginDto>(userMemberOrKeyIndexName);
+    }
+
+    private void MakeIndexUnique<TDto>(string tableName, string indexName, IEnumerable<Tuple<string, string, string, bool>> indexes)
+    {
+        // Let's only mess with the indexes if we have to.
+        Tuple<string, string, string, bool>? loginProviderIndex = indexes.FirstOrDefault(x =>
+            x.Item1 == tableName && x.Item2 == indexName);
+
+        // Item4 == IsUnique
+        if (loginProviderIndex?.Item4 is false)
+        {
+            // The recommended way to change an index from non-unique to unique is to drop and recreate it.
+            DeleteIndex<TDto>(indexName);
+            CreateIndex<TDto>(indexName);
+        }
     }
 
     private void AlignNodeTable(ColumnInfo[] columns)
@@ -131,4 +136,10 @@ public class AlignUpgradedDatabase : MigrationBase
             DeleteIndex<NodeDto>(extraIndexName);
         }
     }
+
+    private void MakeRelationTypeIndexUnique(Tuple<string, string, string, bool>[] indexes)
+    {
+        MakeIndexUnique<RelationTypeDto>("umbracoRelationType", "IX_umbracoRelationType_alias", indexes);
+    }
+
 }
