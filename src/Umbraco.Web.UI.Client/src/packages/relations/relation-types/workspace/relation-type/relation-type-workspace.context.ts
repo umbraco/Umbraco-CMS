@@ -1,5 +1,5 @@
-import { UmbRelationTypeDetailRepository } from '../repository/detail/index.js';
-import type { UmbRelationTypeDetailModel } from '../types.js';
+import { UmbRelationTypeDetailRepository } from '../../repository/detail/index.js';
+import type { UmbRelationTypeDetailModel } from '../../types.js';
 import { UmbRelationTypeWorkspaceEditorElement } from './relation-type-workspace-editor.element.js';
 import { UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
