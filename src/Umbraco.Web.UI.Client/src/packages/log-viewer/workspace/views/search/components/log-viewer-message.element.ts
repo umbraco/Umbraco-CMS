@@ -1,5 +1,5 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer.context.js';
-import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
+import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
@@ -89,18 +89,18 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			label: 'Search Umbraco Source',
 			title: 'Search within Umbraco source code on Github',
 			href: () =>
-				`https://github.com/umbraco/Umbraco-CMS/search?q=${this.properties.find(
-					(property) => property.name === 'SourceContext',
-				)?.value}`,
+				`https://github.com/umbraco/Umbraco-CMS/search?q=${
+					this.properties.find((property) => property.name === 'SourceContext')?.value
+				}`,
 			icon: 'https://github.githubassets.com/favicon.ico',
 		},
 		{
 			label: 'Search Umbraco Issues',
 			title: 'Search Umbraco Issues on Github',
 			href: () =>
-				`https://github.com/umbraco/Umbraco-CMS/issues?q=${this.properties.find(
-					(property) => property.name === 'SourceContext',
-				)?.value}`,
+				`https://github.com/umbraco/Umbraco-CMS/issues?q=${
+					this.properties.find((property) => property.name === 'SourceContext')?.value
+				}`,
 			icon: 'https://github.githubassets.com/favicon.ico',
 		},
 	];
@@ -168,7 +168,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 													property,
 												)}`}>
 												<uui-icon name="icon-search"></uui-icon>
-										  </uui-button>`
+											</uui-button>`
 										: ''}
 								</div>
 							</li>`,

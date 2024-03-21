@@ -39,7 +39,7 @@ import type { ManifestLocalization } from './localization.model.js';
 import type { ManifestTree } from './tree.model.js';
 import type { ManifestTreeItem } from './tree-item.model.js';
 import type { ManifestUserProfileApp } from './user-profile-app.model.js';
-import type { ManifestWorkspace } from './workspace.model.js';
+import type { ManifestWorkspace, ManifestWorkspaceRoutableKind } from './workspace.model.js';
 import type { ManifestWorkspaceAction, ManifestWorkspaceActionDefaultKind } from './workspace-action.model.js';
 import type { ManifestWorkspaceActionMenuItem } from './workspace-action-menu-item.model.js';
 import type { ManifestWorkspaceContext } from './workspace-context.model.js';
@@ -114,6 +114,7 @@ export type ManifestPropertyActions = ManifestPropertyAction | ManifestPropertyA
 
 export type ManifestWorkspaceActions = ManifestWorkspaceAction | ManifestWorkspaceActionDefaultKind;
 
+export type ManifestWorkspaces = ManifestWorkspace | ManifestWorkspaceRoutableKind;
 export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceViewContentTypeDesignEditorKind;
 
 export type ManifestTypes =
@@ -157,7 +158,7 @@ export type ManifestTypes =
 	| ManifestTreeItem
 	| ManifestTreeStore
 	| ManifestUserProfileApp
-	| ManifestWorkspace
+	| ManifestWorkspaces
 	| ManifestWorkspaceActions
 	| ManifestWorkspaceActionMenuItem
 	| ManifestWorkspaceContext

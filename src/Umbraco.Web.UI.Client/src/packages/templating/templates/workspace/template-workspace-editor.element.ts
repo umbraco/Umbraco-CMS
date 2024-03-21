@@ -2,7 +2,7 @@ import { UMB_TEMPLATING_SECTION_PICKER_MODAL } from '../../modals/templating-sec
 import type { UmbTemplatingInsertMenuElement } from '../../components/templating-item-menu/templating-item-menu.element.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/query-builder/index.js';
 import { getQuerySnippet } from '../../utils/index.js';
-import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context.js';
+import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context-token.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { toCamelCase } from '@umbraco-cms/backoffice/utils';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
@@ -174,7 +174,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				${this._masterTemplateName
 					? html`<uui-button look="secondary" label=${this.localize.term('actions_remove')} compact>
 							<uui-icon name="icon-delete" @click=${this.#resetMasterTemplate}></uui-icon>
-					  </uui-button>`
+						</uui-button>`
 					: nothing}
 			</uui-button-group>
 		`;
@@ -224,7 +224,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					? this.#renderCodeEditor()
 					: html`<div id="loader-container">
 							<uui-loader></uui-loader>
-					  </div>`}
+						</div>`}
 			</uui-box>
 		</umb-workspace-editor>`;
 	}

@@ -1,5 +1,5 @@
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceViews,
 } from '@umbraco-cms/backoffice/extension-registry';
@@ -8,11 +8,12 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_MEDIA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.MediaType';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: UMB_MEDIA_TYPE_WORKSPACE_ALIAS,
 	name: 'Media Type Workspace',
-	js: () => import('./media-type-workspace.element.js'),
+	api: () => import('./media-type-workspace.context.js'),
 	meta: {
 		entityType: 'media-type',
 	},

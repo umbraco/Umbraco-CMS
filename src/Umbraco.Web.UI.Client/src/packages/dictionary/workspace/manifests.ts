@@ -1,16 +1,17 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: 'Umb.Workspace.Dictionary',
 	name: 'Dictionary Workspace',
-	js: () => import('./dictionary-workspace.element.js'),
+	api: () => import('./dictionary-workspace.context.js'),
 	meta: {
 		entityType: UMB_DICTIONARY_ENTITY_TYPE,
 	},

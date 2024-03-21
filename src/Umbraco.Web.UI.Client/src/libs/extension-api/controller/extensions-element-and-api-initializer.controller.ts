@@ -1,4 +1,4 @@
-import type { ManifestBase } from '../types/index.js';
+import type { ApiLoaderProperty, ManifestBase } from '../types/index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import type { UmbApiConstructorArgumentsMethodType } from '../index.js';
@@ -28,6 +28,7 @@ export class UmbExtensionsElementAndApiInitializer<
 	//
 	#extensionRegistry;
 	#defaultElement?: string;
+	#defaultApi?: ApiLoaderProperty;
 	#constructorArgs: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType> | undefined;
 	#elProps?: Record<string, unknown>;
 	#apiProps?: Record<string, unknown>;
@@ -61,11 +62,13 @@ export class UmbExtensionsElementAndApiInitializer<
 		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
 		controllerAlias?: string,
 		defaultElement?: string,
+		defaultApi?: ApiLoaderProperty,
 	) {
 		super(host, extensionRegistry, type, filter, onChange, controllerAlias);
 		this.#extensionRegistry = extensionRegistry;
 		this.#constructorArgs = constructorArguments;
 		this.#defaultElement = defaultElement;
+		this.#defaultApi = defaultApi;
 		this._init();
 	}
 
@@ -77,6 +80,7 @@ export class UmbExtensionsElementAndApiInitializer<
 			this.#constructorArgs,
 			this._extensionChanged,
 			this.#defaultElement,
+			this.#defaultApi as any,
 		) as ControllerType;
 
 		extController.elementProps = this.#elProps;

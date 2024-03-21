@@ -1,4 +1,4 @@
-import type { UmbSaveableWorkspaceContextInterface } from '../../../../workspace-context/saveable-workspace-context.interface.js';
+import type { UmbSaveableWorkspaceContextInterface } from '../../../../contexts/saveable-workspace-context.interface.js';
 import { UmbWorkspaceActionBase } from '../../workspace-action-base.controller.js';
 import { UMB_SAVEABLE_WORKSPACE_CONTEXT, type UmbWorkspaceActionArgs } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

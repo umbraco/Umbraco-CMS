@@ -1,6 +1,6 @@
 import type { UmbApi } from '../models/api.interface.js';
 import type { ManifestElementAndApi } from '../types/base.types.js';
-import type { ClassConstructor } from '../types/utils.js';
+import type { ApiLoaderProperty, ClassConstructor } from '../types/utils.js';
 import { loadManifestApi } from './load-manifest-api.function.js';
 import { loadManifestElement } from './load-manifest-element.function.js';
 import type { UmbApiConstructorArgumentsMethodType } from './types.js';
@@ -11,10 +11,11 @@ export async function createExtensionElementWithApi<
 	ApiType extends UmbApi = UmbApi,
 >(
 	manifest: ManifestElementAndApi<ElementType, ApiType>,
-	fallbackElement?: string,
 	constructorArgs?: unknown[] | UmbApiConstructorArgumentsMethodType<ManifestElementAndApi<ElementType, ApiType>>,
+	fallbackElement?: string,
+	fallbackApi?: ApiLoaderProperty<ApiType>,
 ): Promise<{ element?: ElementType; api?: ApiType }> {
-	const apiPropValue = manifest.api ?? manifest.js;
+	const apiPropValue = manifest.api ?? manifest.js ?? fallbackApi;
 	if (!apiPropValue) {
 		console.error(
 			`-- Extension of alias "${manifest.alias}" did not succeed creating an api class instance, missing a JavaScript file via the 'api' or 'js' property, using either a 'api' or 'default'(not supported on the JS property) export`,
