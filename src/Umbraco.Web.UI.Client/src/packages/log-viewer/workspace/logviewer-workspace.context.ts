@@ -1,5 +1,5 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
-import { UMB_APP_LOG_VIEWER_CONTEXT } from './logviewer.context-token.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from './logviewer-workspace.context-token.js';
 import { UmbBasicState, UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type {
 	LogLevelCountsReponseModel,
@@ -109,6 +109,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 
 	constructor(host: UmbControllerHost) {
 		super(host);
+		console.log('log-viewer context');
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
 		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token.
 		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT, this);

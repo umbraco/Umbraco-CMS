@@ -1,20 +1,11 @@
-// TODO: Niels: I don't feel sure this is good, seems wrong:
-import '../../components/index.js';
+// TODO: I don't feel sure this is good, seems wrong: [NL]
+import '../components/index.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-//TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')
 export class UmbLogViewerWorkspaceElement extends UmbLitElement {
-	load(): void {
-		// Not relevant for this workspace -added to prevent the error from popping up
-	}
-
-	create(): void {
-		// Not relevant for this workspace
-	}
-
 	render() {
 		return html`
 			<umb-workspace-editor
