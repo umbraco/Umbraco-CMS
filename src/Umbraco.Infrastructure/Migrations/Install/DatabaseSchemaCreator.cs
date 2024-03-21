@@ -87,6 +87,7 @@ public class DatabaseSchemaCreator
         typeof(Webhook2HeadersDto),
         typeof(WebhookLogDto),
         typeof(WebhookRequestDto),
+        typeof(UserDataDto),
     };
 
     private readonly IUmbracoDatabase _database;

@@ -276,7 +276,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IUserGroupService, UserGroupService>();
             Services.AddUnique<IUserPermissionService, UserPermissionService>();
             Services.AddUnique<IUserService, UserService>();
-            Services.AddUnique<ITourService, TourService>();
             Services.AddUnique<IWebProfilerService, WebProfilerService>();
             Services.AddUnique<ILocalizationService, LocalizationService>();
             Services.AddUnique<IDictionaryItemService, DictionaryItemService>();

@@ -52,7 +52,6 @@ public static partial class Constants
         public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification + ":Version";
         public const string ConfigSecurity = ConfigPrefix + "Security";
         public const string ConfigBasicAuth = ConfigPrefix + "BasicAuth";
-        public const string ConfigTours = ConfigPrefix + "Tours";
         public const string ConfigTypeFinder = ConfigPrefix + "TypeFinder";
         public const string ConfigWebRouting = ConfigPrefix + "WebRouting";
         public const string ConfigUserPassword = ConfigPrefix + "Security:UserPassword";

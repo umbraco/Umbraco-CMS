@@ -74,7 +74,6 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<RequestHandlerSettings>()
             .AddUmbracoOptions<RuntimeSettings>()
             .AddUmbracoOptions<SecuritySettings>()
-            .AddUmbracoOptions<TourSettings>()
             .AddUmbracoOptions<TypeFinderSettings>()
             .AddUmbracoOptions<UserPasswordConfigurationSettings>()
             .AddUmbracoOptions<WebRoutingSettings>()
