@@ -36,6 +36,7 @@ public static class DistributedCacheExtensions
         foreach (IUser user in users)
         {
             dc.Refresh(UserCacheRefresher.UniqueId, user.Key);
+            dc.Refresh(UserCacheRefresher.UniqueId, user.Id);
         }
     }
 

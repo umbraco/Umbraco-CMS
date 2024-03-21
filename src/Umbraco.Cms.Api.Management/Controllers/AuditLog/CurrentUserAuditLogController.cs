@@ -35,7 +35,12 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
     [ProducesResponseType(typeof(PagedViewModel<AuditLogWithUsernameResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> CurrentUser(Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
-        IUser user = CurrentUser(_backOfficeSecurityAccessor);
+        IUser? user = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+
+        if (user is null)
+        {
+            throw new PanicException("Could not find current user");
+        }
 
         PagedModel<IAuditItem> result = await _auditService.GetPagedItemsByUserAsync(
             user.Key,
