@@ -43,5 +43,6 @@ export default {
     mfaMultipleText: 'Please choose a 2-factor provider',
     mfaCodeInput: 'Verification code',
     signInWith: 'Sign in with {0}',
+    returnToLogin: 'Return to login',
   },
 } satisfies UmbLocalizationDictionary;

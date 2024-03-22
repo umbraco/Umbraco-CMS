@@ -43,5 +43,6 @@ export default {
     mfaMultipleText: 'Vælg venligst en godkendelsesmetode',
     mfaCodeInput: 'Kode',
     signInWith: 'Log ind med {0}',
+    returnToLogin: 'Tilbage til log ind',
   },
 } satisfies UmbLocalizationDictionary;
