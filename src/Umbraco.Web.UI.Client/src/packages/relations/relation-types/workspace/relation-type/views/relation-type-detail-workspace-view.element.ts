@@ -117,6 +117,20 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 	];
 
 	private get _tableItems(): UmbTableItem[] {
+		if (this._relations.length === 0) {
+			return [
+				{
+					id: 'no-relations',
+					data: [
+						{
+							columnAlias: 'parent',
+							value: 'No relations found',
+						},
+					],
+				},
+			];
+		}
+
 		return this._relations.map((relation) => {
 			return {
 				id: relation.unique,
