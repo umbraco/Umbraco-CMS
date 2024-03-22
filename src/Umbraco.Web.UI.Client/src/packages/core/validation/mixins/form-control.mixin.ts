@@ -134,7 +134,7 @@ export const UmbFormControlMixin = <
 			super(...args);
 			this._internals = this.attachInternals();
 
-			this.addEventListener('focusout', () => {
+			this.addEventListener('blur', () => {
 				this.pristine = false;
 				this.checkValidity();
 			});
@@ -198,12 +198,12 @@ export const UmbFormControlMixin = <
 		 */
 		protected addFormControlElement(element: NativeFormControlElement) {
 			this.#formCtrlElements.push(element);
-			/*element.addEventListener(UmbValidationInvalidEvent.TYPE, () => {
+			element.addEventListener(UmbValidationInvalidEvent.TYPE, () => {
 				this._runValidators();
 			});
 			element.addEventListener(UmbValidationValidEvent.TYPE, () => {
 				this._runValidators();
-			});*/
+			});
 		}
 
 		/**
@@ -241,10 +241,8 @@ export const UmbFormControlMixin = <
 			this._validityState.valid = !hasError;
 
 			if (hasError) {
-				console.log('HAS ERROR', this.validationMessage, this.pristine);
 				this.dispatchEvent(new UmbValidationInvalidEvent());
 			} else {
-				console.log('IS VALID', this.validationMessage, this.pristine);
 				this._internals.setValidity({});
 				this.dispatchEvent(new UmbValidationValidEvent());
 			}
