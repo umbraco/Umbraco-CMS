@@ -1,5 +1,5 @@
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { html, customElement, property, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 function getNumberOrUndefined(value: string) {
