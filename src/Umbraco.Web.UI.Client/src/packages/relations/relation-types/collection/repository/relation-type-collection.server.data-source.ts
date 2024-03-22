@@ -37,28 +37,26 @@ export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionD
 			const items = data.items.map((item) => {
 				const model: UmbRelationTypeDetailModel = {
 					alias: item.alias || '',
-					child:
-						item.childObjectType && item.childObjectTypeName
-							? {
-									objectType: {
-										unique: item.childObjectType,
-										name: item.childObjectTypeName,
-									},
-								}
-							: null,
+					child: item.childObject
+						? {
+								objectType: {
+									unique: item.childObject.id,
+									name: item.childObject.name || '',
+								},
+							}
+						: null,
 					entityType: UMB_RELATION_TYPE_ENTITY_TYPE,
 					isBidirectional: item.isBidirectional,
 					isDependency: item.isDependency,
 					name: item.name,
-					parent:
-						item.childObjectType && item.childObjectTypeName
-							? {
-									objectType: {
-										unique: item.childObjectType,
-										name: item.childObjectTypeName,
-									},
-								}
-							: null,
+					parent: item.parentObject
+						? {
+								objectType: {
+									unique: item.parentObject.id,
+									name: item.parentObject.name || '',
+								},
+							}
+						: null,
 					unique: item.id,
 				};
 

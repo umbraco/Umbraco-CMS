@@ -44,28 +44,26 @@ export class UmbRelationTypeServerDataSource implements UmbReadDetailDataSource<
 		// TODO: make data mapper to prevent errors
 		const relationType: UmbRelationTypeDetailModel = {
 			alias: data.alias || '',
-			child:
-				data.childObjectType && data.childObjectTypeName
-					? {
-							objectType: {
-								unique: data.childObjectType,
-								name: data.childObjectTypeName,
-							},
-						}
-					: null,
+			child: data.childObject
+				? {
+						objectType: {
+							unique: data.childObject.id,
+							name: data.childObject.name || '',
+						},
+					}
+				: null,
 			entityType: UMB_RELATION_TYPE_ENTITY_TYPE,
 			isBidirectional: data.isBidirectional,
 			isDependency: data.isDependency,
 			name: data.name,
-			parent:
-				data.childObjectType && data.childObjectTypeName
-					? {
-							objectType: {
-								unique: data.childObjectType,
-								name: data.childObjectTypeName,
-							},
-						}
-					: null,
+			parent: data.parentObject
+				? {
+						objectType: {
+							unique: data.parentObject.id,
+							name: data.parentObject.name || '',
+						},
+					}
+				: null,
 			unique: data.id,
 		};
 
