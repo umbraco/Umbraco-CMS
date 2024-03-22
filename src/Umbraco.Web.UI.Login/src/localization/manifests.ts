@@ -51,4 +51,14 @@ export const manifests: ManifestLocalization[] = [
       culture: "sv-se",
     }
   },
+  {
+    type: "localization",
+    alias: "Umb.Auth.Localization.NbNo",
+    name: "Norwegian Bokmål (NO)",
+    weight: 0,
+    js: () => import("./lang/nb-no.js"),
+    meta: {
+      culture: "nb-no",
+    }
+  },
 ]
