@@ -1,7 +1,8 @@
-import type {
+import {
   LoginRequestModel,
   LoginResponse, MfaCodeResponse,
   NewPasswordResponse,
+  PasswordConfigurationModel,
   ResetPasswordResponse,
   ValidateInviteCodeResponse,
   ValidatePasswordResetCodeResponse
@@ -113,7 +114,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
     }
 
     return {
-      passwordConfiguration: data.passwordConfiguration
+      passwordConfiguration: (data as unknown as {passwordConfiguration: PasswordConfigurationModel}).passwordConfiguration // TODO: Fix this when the API schema has been updated
     };
   }
 
@@ -154,7 +155,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
     }
 
     return {
-      passwordConfiguration: data.passwordConfiguration
+      passwordConfiguration: (data as unknown as {passwordConfiguration: PasswordConfigurationModel}).passwordConfiguration // TODO: Fix this when the API schema has been updated
     };
   }
 
