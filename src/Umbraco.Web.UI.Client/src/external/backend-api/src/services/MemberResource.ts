@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { CreateMemberRequestModel } from '../models/CreateMemberRequestModel';
 import type { DirectionModel } from '../models/DirectionModel';
+import type { MemberConfigurationResponseModel } from '../models/MemberConfigurationResponseModel';
 import type { MemberItemResponseModel } from '../models/MemberItemResponseModel';
 import type { MemberResponseModel } from '../models/MemberResponseModel';
 import type { PagedMemberResponseModel } from '../models/PagedMemberResponseModel';
@@ -203,6 +204,20 @@ export class MemberResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getMemberConfiguration(): CancelablePromise<MemberConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/member/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
