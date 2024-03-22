@@ -9,7 +9,7 @@ import type { UmbRelationDetailModel } from '@umbraco-cms/backoffice/relations';
 import { UmbRelationCollectionRepository } from '@umbraco-cms/backoffice/relations';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
-import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-relation-type-detail-workspace-view')
 export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
