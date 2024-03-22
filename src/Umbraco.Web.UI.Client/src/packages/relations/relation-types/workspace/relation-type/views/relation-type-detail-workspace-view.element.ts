@@ -1,13 +1,15 @@
 import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from '../relation-type-workspace.context-token.js';
 import type { UmbRelationTypeDetailModel } from '../../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRelationDetailModel } from '@umbraco-cms/backoffice/relations';
 import { UmbRelationCollectionRepository } from '@umbraco-cms/backoffice/relations';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-relation-type-detail-workspace-view')
 export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -26,14 +28,25 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 	@state()
 	_isDependency?: UmbRelationTypeDetailModel['isDependency'];
 
-	#skip = 0;
-	#take = 50;
+	@state()
+	_currentPageNumber = 1;
+
+	@state()
+	_totalPages = 1;
 
 	#workspaceContext?: typeof UMB_RELATION_TYPE_WORKSPACE_CONTEXT.TYPE;
 	#relationCollectionRepository = new UmbRelationCollectionRepository(this);
+	#paginationManager = new UmbPaginationManager();
 
 	constructor() {
 		super();
+
+		this.#paginationManager.setPageSize(2);
+
+		this.observe(this.#paginationManager.currentPage, (number) => (this._currentPageNumber = number));
+		this.observe(this.#paginationManager.totalPages, (number) => (this._totalPages = number));
+
+		this.#paginationManager.addEventListener('change', () => {});
 
 		this.consumeContext(UMB_RELATION_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -62,20 +75,21 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 	}
 
 	async #requestRelations() {
-		if (!this.#workspaceContext) {
-			return;
-		}
+		const relationTypeUnique = this.#workspaceContext?.getUnique();
+		if (!relationTypeUnique) throw new Error('Relation type unique is required');
 
-		/*
 		const { data } = await this.#relationCollectionRepository.requestCollection({
-			skip: this.#skip,
-			take: this.#take,
+			relationType: {
+				unique: relationTypeUnique,
+			},
+			skip: this.#paginationManager.getSkip(),
+			take: this.#paginationManager.getPageSize(),
 		});
 
 		if (data) {
-			console.log(data);
+			this._relations = data.items;
+			this.#paginationManager.setTotalItems(data.total);
 		}
-		*/
 	}
 
 	private _tableConfig: UmbTableConfig = {
@@ -128,15 +142,30 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 		});
 	}
 
+	#onPageChange(event: UUIPaginationEvent) {
+		this.#paginationManager.setCurrentPageNumber(event.target?.current);
+		this.#requestRelations();
+	}
+
 	render() {
 		return html`${this.#renderRelations()}${this.#renderDetails()}`;
 	}
 
 	#renderRelations() {
-		return html` <umb-table
-			.config=${this._tableConfig}
-			.columns=${this._tableColumns}
-			.items=${this._tableItems}></umb-table>`;
+		return html`
+			<div>
+				<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
+
+				${this._totalPages > 1
+					? html`
+							<uui-pagination
+								.current=${this._currentPageNumber}
+								.total=${this._totalPages}
+								@change=${this.#onPageChange}></uui-pagination>
+						`
+					: nothing}
+			</div>
+		`;
 	}
 
 	#renderDetails() {
@@ -164,6 +193,11 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 				gap: var(--uui-size-layout-1);
 				padding: var(--uui-size-layout-1);
 				grid-template-columns: 1fr 350px;
+			}
+
+			uui-pagination {
+				margin-top: var(--uui-size-layout-1);
+				display: block;
 			}
 		`,
 	];
