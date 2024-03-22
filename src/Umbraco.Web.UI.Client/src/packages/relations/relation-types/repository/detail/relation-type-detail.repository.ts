@@ -32,7 +32,6 @@ export class UmbRelationTypeDetailRepository
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async requestByUnique(unique: string) {
-		debugger;
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
