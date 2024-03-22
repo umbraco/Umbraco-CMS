@@ -78,7 +78,6 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	private _onMaxInput(e: InputEvent) {
 		this.maxValue = Number((e.target as HTMLInputElement).value);
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
-		this._runValidators();
 	}
 
 	render() {
