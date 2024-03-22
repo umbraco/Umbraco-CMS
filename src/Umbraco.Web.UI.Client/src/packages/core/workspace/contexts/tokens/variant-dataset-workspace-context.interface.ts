@@ -29,7 +29,7 @@ export interface UmbVariantDatasetWorkspaceContextInterface<VariantType extends 
 	createPropertyDatasetContext(host: UmbControllerHost, variantId?: UmbVariantId): UmbPropertyDatasetContext;
 }
 
-/*
+/**
  * @deprecated Use UmbVariantWorkspaceContextInterface instead — Will be removed before RC.
  * TODO: Delete before RC.
  */

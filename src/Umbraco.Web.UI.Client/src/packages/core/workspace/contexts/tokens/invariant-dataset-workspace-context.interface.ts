@@ -18,7 +18,7 @@ export interface UmbInvariantDatasetWorkspaceContextInterface extends UmbSaveabl
 	createPropertyDatasetContext(host: UmbControllerHost, variantId?: UmbVariantId): UmbPropertyDatasetContext;
 }
 
-/*
+/**
  * @deprecated Use UmbInvariantWorkspaceContextInterface instead — Will be removed before RC.
  * TODO: Delete before RC.
  */

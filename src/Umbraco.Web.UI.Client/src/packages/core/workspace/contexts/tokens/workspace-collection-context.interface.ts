@@ -14,5 +14,4 @@ export interface UmbCollectionWorkspaceContextInterface<T extends UmbContentType
  * TODO: Delete before RC.
  */
 export interface UmbWorkspaceCollectionContextInterface<T extends UmbContentTypeModel>
-	extends UmbCollectionWorkspaceContextInterface<T>
-
+	extends UmbCollectionWorkspaceContextInterface<T> {}
