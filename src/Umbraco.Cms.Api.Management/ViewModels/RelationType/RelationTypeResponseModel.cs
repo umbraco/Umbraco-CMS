@@ -8,8 +8,6 @@ public class RelationTypeResponseModel : RelationTypeBaseModel
 
     public string? Alias { get; set; }
 
-    public bool IsDeletable { get; set; }
-
     /// <summary>
     ///     Gets or sets the Parent's object type name.
     /// </summary>
