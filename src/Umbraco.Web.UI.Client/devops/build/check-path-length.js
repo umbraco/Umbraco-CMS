@@ -29,7 +29,7 @@ function checkPathLength(dir) {
 			if (IS_AZURE_PIPELINES) {
 				console.error(`##vso[task.logissue type=warning;sourcepath=${filePath};]Path exceeds maximum length of ${MAX_PATH_LENGTH} characters: ${filePath} with ${filePath.length} characters`);
 			} else if (IS_GITHUB_ACTIONS) {
-				console.error(`::warning file=${filePath},title=Path exceeds ${MAX_PATH_LENGTH} characters::Paths should not be longer than ${MAX_PATH_LENGTH} characters to support WIN32 systems.\nThe file ${filePath} exceeds that with ${filePath.length - MAX_PATH_LENGTH} characters.`);
+				console.error(`::warning file=${filePath},title=Path exceeds ${MAX_PATH_LENGTH} characters::Paths should not be longer than ${MAX_PATH_LENGTH} characters to support WIN32 systems. The file ${filePath} exceeds that with ${filePath.length - MAX_PATH_LENGTH} characters.`);
 			} else {
 				console.error(`Path exceeds maximum length of ${MAX_PATH_LENGTH} characters: ${FILE_PATH_COLOR}`, filePath, filePath.length - MAX_PATH_LENGTH);
 			}
