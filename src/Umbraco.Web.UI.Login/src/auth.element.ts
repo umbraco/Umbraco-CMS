@@ -143,7 +143,11 @@ export default class UmbAuthElement extends UmbLitElement {
   }
 
   firstUpdated() {
-    this.#initializeForm();
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        this.#initializeForm();
+      });
+    }, 100);
   }
 
   disconnectedCallback() {
