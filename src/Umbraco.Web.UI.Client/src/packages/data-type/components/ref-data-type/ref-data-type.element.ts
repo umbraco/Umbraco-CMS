@@ -33,7 +33,9 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 						this.name = dataType.name ?? '';
 						this.propertyEditorUiAlias = dataType.editorUiAlias ?? '';
 						this.propertyEditorSchemaAlias = dataType.editorAlias ?? '';
-						this.#getIconFromRegistry();
+						if (this.propertyEditorUiAlias) {
+							this.#getIconFromRegistry();
+						}
 					}
 				},
 				'dataType',
