@@ -1,5 +1,5 @@
 import type { UmbCurrentUserModel } from '../types.js';
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { SecurityResource, UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -45,6 +45,20 @@ export class UmbCurrentUserServerDataSource {
 				allowedSections: data.allowedSections,
 			};
 			return { data: user };
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Get the current user's available MFA login providers
+	 * @memberof UmbCurrentUserServerDataSource
+	 */
+	async getMfaLoginProviders() {
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getUserCurrent2Fa());
+
+		if (data) {
+			return { data };
 		}
 
 		return { error };

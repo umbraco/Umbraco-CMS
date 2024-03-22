@@ -41,6 +41,14 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 		return { data, error, asObservable: () => this.#currentUserStore!.data };
 	}
+
+	/**
+	 * Request the current user's available MFA login providers
+	 * @memberof UmbCurrentUserRepository
+	 */
+	async requestMfaLoginProviders() {
+		return this.#currentUserSource.getMfaLoginProviders();
+	}
 }
 
 export default UmbCurrentUserRepository;
