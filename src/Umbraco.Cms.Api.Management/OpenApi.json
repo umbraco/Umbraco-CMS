@@ -20609,101 +20609,48 @@
       }
     },
     "/umbraco/management/api/v1/relation-type": {
-      "post": {
+      "get": {
         "tags": [
           "Relation Type"
         ],
-        "operationId": "PostRelationType",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/CreateRelationTypeRequestModel"
-                  }
-                ]
-              }
-            },
-            "text/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/CreateRelationTypeRequestModel"
-                  }
-                ]
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/CreateRelationTypeRequestModel"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "headers": {
-              "Umb-Generated-Resource": {
-                "description": "Identifier of the newly created resource",
-                "schema": {
-                  "type": "string",
-                  "description": "Identifier of the newly created resource"
-                }
-              },
-              "Location": {
-                "description": "Location of the newly created resource",
-                "schema": {
-                  "type": "string",
-                  "description": "Location of the newly created resource",
-                  "format": "uri"
-                }
-              },
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
+        "operationId": "GetRelationType",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/PagedRelationTypeResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/PagedRelationTypeResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/PagedRelationTypeResponseModel"
                 }
               }
             }
@@ -20785,379 +20732,6 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Relation Type"
-        ],
-        "operationId": "DeleteRelationTypeById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "Relation Type"
-        ],
-        "operationId": "PutRelationTypeById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateRelationTypeRequestModel"
-                  }
-                ]
-              }
-            },
-            "text/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateRelationTypeRequestModel"
-                  }
-                ]
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateRelationTypeRequestModel"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/RelationTypeResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/RelationTypeResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/RelationTypeResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "headers": {
-              "Umb-Notifications": {
-                "description": "The list of notifications produced during the request.",
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/tree/relation-type/root": {
-      "get": {
-        "tags": [
-          "Relation Type"
-        ],
-        "operationId": "GetTreeRelationTypeRoot",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationTypeTreeItemResponseModel"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationTypeTreeItemResponseModel"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationTypeTreeItemResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/relation/child-relation/{childId}": {
-      "get": {
-        "tags": [
-          "Relation"
-        ],
-        "operationId": "GetRelationChildRelationByChildId",
-        "parameters": [
-          {
-            "name": "childId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          },
-          {
-            "name": "relationTypeAlias",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "default": ""
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationResponseModel"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationResponseModel"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationResponseModel"
                 }
               }
             }
@@ -33569,22 +33143,6 @@
         ],
         "additionalProperties": false
       },
-      "CreateRelationTypeRequestModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/RelationTypeBaseModel"
-          }
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "CreateScriptFolderRequestModel": {
         "type": "object",
         "allOf": [
@@ -38003,7 +37561,7 @@
         },
         "additionalProperties": false
       },
-      "PagedRelationTypeTreeItemResponseModel": {
+      "PagedRelationTypeResponseModel": {
         "required": [
           "items",
           "total"
@@ -38019,7 +37577,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
+                  "$ref": "#/components/schemas/RelationTypeResponseModel"
                 }
               ]
             }
@@ -38783,29 +38341,57 @@
         },
         "additionalProperties": false
       },
-      "RelationResponseModel": {
+      "RelationReferenceModel": {
         "required": [
-          "childId",
-          "createDate",
-          "parentId"
+          "id"
         ],
         "type": "object",
         "properties": {
-          "parentId": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "parentName": {
+          "name": {
             "type": "string",
             "nullable": true
-          },
-          "childId": {
+          }
+        },
+        "additionalProperties": false
+      },
+      "RelationResponseModel": {
+        "required": [
+          "child",
+          "createDate",
+          "id",
+          "parent",
+          "relationType"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "childName": {
-            "type": "string",
-            "nullable": true
+          "relationType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RelationReferenceModel"
+              }
+            ]
+          },
+          "child": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RelationReferenceModel"
+              }
+            ]
           },
           "createDate": {
             "type": "string",
@@ -38833,16 +38419,6 @@
           "isBidirectional": {
             "type": "boolean"
           },
-          "parentObjectType": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "childObjectType": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
           "isDependency": {
             "type": "boolean"
           }
@@ -38868,9 +38444,7 @@
       },
       "RelationTypeResponseModel": {
         "required": [
-          "id",
-          "isDeletable",
-          "path"
+          "id"
         ],
         "type": "object",
         "allOf": [
@@ -38887,19 +38461,20 @@
             "type": "string",
             "nullable": true
           },
-          "path": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "isDeletable": {
-            "type": "boolean"
-          },
-          "parentObjectTypeName": {
-            "type": "string",
+          "parentObject": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ObjectTypeResponseModel"
+              }
+            ],
             "nullable": true
           },
-          "childObjectTypeName": {
-            "type": "string",
+          "childObject": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ObjectTypeResponseModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -40512,15 +40087,6 @@
         "allOf": [
           {
             "$ref": "#/components/schemas/FileSystemFileUpdateRequestModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "UpdateRelationTypeRequestModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/RelationTypeBaseModel"
           }
         ],
         "additionalProperties": false
