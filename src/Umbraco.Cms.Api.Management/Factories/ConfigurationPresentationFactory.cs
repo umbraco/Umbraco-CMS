@@ -3,10 +3,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -18,10 +15,10 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
     private readonly SegmentSettings _segmentSettings;
 
     public ConfigurationPresentationFactory(
-        IOptionsSnapshot<GlobalSettings> globalSettings,
-        IOptionsSnapshot<ContentSettings> contentSettings,
-        IOptionsSnapshot<SegmentSettings> segmentSettings,
-        IReservedFieldNamesService reservedFieldNamesService)
+        IReservedFieldNamesService reservedFieldNamesService,
+        IOptions<GlobalSettings> globalSettings,
+        IOptions<ContentSettings> contentSettings,
+        IOptions<SegmentSettings> segmentSettings)
     {
         _reservedFieldNamesService = reservedFieldNamesService;
         _globalSettings = globalSettings.Value;
@@ -29,7 +26,7 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         _segmentSettings = segmentSettings.Value;
     }
 
-    public DocumentConfigurationResponseModel CreateDocumentConfigurationModel() =>
+    public DocumentConfigurationResponseModel CreateDocumentConfigurationResponseModel() =>
         new()
         {
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
@@ -46,15 +43,12 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
             ReservedFieldNames = _reservedFieldNamesService.GetMemberReservedFieldNames(),
         };
 
-    public MediaConfigurationResponseModel CreateMediaConfigurationResponseModel()
-    {
-        var responseModel = new MediaConfigurationResponseModel
+    public MediaConfigurationResponseModel CreateMediaConfigurationResponseModel() =>
+        new()
         {
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
             SanitizeTinyMce = _globalSettings.SanitizeTinyMce,
             ReservedFieldNames = _reservedFieldNamesService.GetMediaReservedFieldNames(),
         };
-        return responseModel;
-    }
 }

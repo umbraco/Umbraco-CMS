@@ -2,7 +2,7 @@
 
 public class ContentPropertySettings
 {
-    private readonly HashSet<string> _reservedFieldNames = [];
+    private readonly HashSet<string> _reservedFieldNames = new();
 
     /// <summary>
     /// Gets a set of standard names for fields that cannot be used for custom properties.

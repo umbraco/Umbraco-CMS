@@ -6,7 +6,9 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IConfigurationPresentationFactory
 {
-    DocumentConfigurationResponseModel CreateDocumentConfigurationModel();
+    DocumentConfigurationResponseModel CreateDocumentConfigurationResponseModel();
+
     MemberConfigurationResponseModel CreateMemberConfigurationResponseModel();
+
     MediaConfigurationResponseModel CreateMediaConfigurationResponseModel();
 }

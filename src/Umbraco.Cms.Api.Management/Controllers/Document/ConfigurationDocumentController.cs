@@ -20,7 +20,7 @@ public class ConfigurationDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(DocumentConfigurationResponseModel), StatusCodes.Status200OK)]
     public Task<IActionResult> Configuration()
     {
-        DocumentConfigurationResponseModel responseModel = _configurationPresentationFactory.CreateDocumentConfigurationModel();
+        DocumentConfigurationResponseModel responseModel = _configurationPresentationFactory.CreateDocumentConfigurationResponseModel();
         return Task.FromResult<IActionResult>(Ok(responseModel));
     }
 }

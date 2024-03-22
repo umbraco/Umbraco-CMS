@@ -12,7 +12,8 @@ public class ConfigurationMediaController : MediaControllerBase
     private readonly IConfigurationPresentationFactory _configurationPresentationFactory;
 
 
-    public ConfigurationMediaController(IConfigurationPresentationFactory configurationPresentationFactory) => _configurationPresentationFactory = configurationPresentationFactory;
+    public ConfigurationMediaController(IConfigurationPresentationFactory configurationPresentationFactory)
+        => _configurationPresentationFactory = configurationPresentationFactory;
 
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]

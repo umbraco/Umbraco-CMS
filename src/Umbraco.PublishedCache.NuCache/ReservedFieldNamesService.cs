@@ -12,7 +12,10 @@ internal class ReservedFieldNamesService : IReservedFieldNamesService
     private readonly MemberPropertySettings _memberPropertySettings;
     private readonly MediaPropertySettings _mediaPropertySettings;
 
-    public ReservedFieldNamesService(IOptionsSnapshot<ContentPropertySettings> contentPropertySettings, IOptionsSnapshot<MemberPropertySettings> memberPropertySettings, IOptionsSnapshot<MediaPropertySettings> mediaPropertySettings)
+    public ReservedFieldNamesService(
+        IOptions<ContentPropertySettings> contentPropertySettings,
+        IOptions<MemberPropertySettings> memberPropertySettings,
+        IOptions<MediaPropertySettings> mediaPropertySettings)
     {
         _contentPropertySettings = contentPropertySettings.Value;
         _memberPropertySettings = memberPropertySettings.Value;
