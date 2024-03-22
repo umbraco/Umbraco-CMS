@@ -48,7 +48,6 @@ export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionD
 							: null,
 					entityType: UMB_RELATION_TYPE_ENTITY_TYPE,
 					isBidirectional: item.isBidirectional,
-					isDeletable: item.isDeletable,
 					isDependency: item.isDependency,
 					name: item.name,
 					parent:

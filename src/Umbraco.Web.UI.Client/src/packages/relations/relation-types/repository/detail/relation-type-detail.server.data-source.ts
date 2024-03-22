@@ -55,7 +55,6 @@ export class UmbRelationTypeServerDataSource implements UmbReadDetailDataSource<
 					: null,
 			entityType: UMB_RELATION_TYPE_ENTITY_TYPE,
 			isBidirectional: data.isBidirectional,
-			isDeletable: data.isDeletable,
 			isDependency: data.isDependency,
 			name: data.name,
 			parent:
