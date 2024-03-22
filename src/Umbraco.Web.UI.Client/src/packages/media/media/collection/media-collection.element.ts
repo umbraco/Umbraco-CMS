@@ -1,6 +1,5 @@
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
-
 import './media-collection-toolbar.element.js';
 import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTemporaryFileManager, type UmbTemporaryFileQueueModel } from '@umbraco-cms/backoffice/temporary-file';
@@ -43,10 +42,9 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		if (!files.length) return;
 
 		const items = await this.#fileManager.upload(files);
-		if (!items) return;
+		if (!items.length) return;
 
 		console.log('uploadComplete', items);
-		/*TODO Add the files to collection */
 	}
 
 	protected renderToolbar() {

@@ -22,14 +22,12 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 	#queue = new UmbArrayState<UmbTemporaryFileModel>([], (item) => item.unique);
 	public readonly queue = this.#queue.asObservable();
 
-	#filesCompleted: Array<UmbTemporaryFileModel> = [];
-
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(host);
 	}
 
-	uploadOne(queueItem: UmbTemporaryFileQueueModel): Promise<Array<UmbTemporaryFileModel> | undefined> {
+	async uploadOne(queueItem: UmbTemporaryFileQueueModel): Promise<Array<UmbTemporaryFileModel>> {
 		const item: UmbTemporaryFileModel = {
 			file: queueItem.file,
 			unique: queueItem.unique ?? UmbId.new(),
@@ -39,7 +37,7 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 		return this.handleQueue();
 	}
 
-	upload(queueItems: Array<UmbTemporaryFileQueueModel>): Promise<Array<UmbTemporaryFileModel> | undefined> {
+	async upload(queueItems: Array<UmbTemporaryFileQueueModel>): Promise<Array<UmbTemporaryFileModel>> {
 		const items = queueItems.map(
 			(item): UmbTemporaryFileModel => ({
 				file: item.file,
@@ -60,10 +58,10 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 	}
 
 	private async handleQueue() {
-		this.#filesCompleted = [];
+		const filesCompleted: Array<UmbTemporaryFileModel> = [];
 		const queue = this.#queue.getValue();
 
-		if (!queue.length) return;
+		if (!queue.length) return filesCompleted;
 
 		for (const item of queue) {
 			if (!item.unique) throw new Error(`Unique is missing for item ${item}`);
@@ -76,9 +74,10 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 			} else {
 				this.#queue.updateOne(item.unique, { ...item, status: 'success' });
 			}
-			this.#filesCompleted = [...this.#filesCompleted, item];
+			filesCompleted.push(item);
 			this.removeOne(item.unique);
 		}
-		return this.#filesCompleted;
+
+		return filesCompleted;
 	}
 }
