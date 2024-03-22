@@ -11,7 +11,7 @@ import type { UmbReadDetailDataSource } from '@umbraco-cms/backoffice/repository
  * @class UmbRelationTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbRelationTypeServerDataSource implements UmbReadDetailDataSource<UmbRelationTypeDetailModel> {
+export class UmbRelationTypeDetailServerDataSource implements UmbReadDetailDataSource<UmbRelationTypeDetailModel> {
 	#host: UmbControllerHost;
 
 	/**
