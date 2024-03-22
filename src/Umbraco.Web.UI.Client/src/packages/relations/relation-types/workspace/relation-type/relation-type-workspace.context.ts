@@ -17,6 +17,10 @@ export class UmbRelationTypeWorkspaceContext extends UmbContextBase<UmbRelationT
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly alias = this.#data.asObservablePart((data) => data?.alias);
+	readonly parent = this.#data.asObservablePart((data) => data?.parent);
+	readonly child = this.#data.asObservablePart((data) => data?.child);
+	readonly isBidirectional = this.#data.asObservablePart((data) => data?.isBidirectional);
+	readonly isDependency = this.#data.asObservablePart((data) => data?.isDependency);
 
 	readonly routes = new UmbWorkspaceRouteManager(this);
 
@@ -39,7 +43,7 @@ export class UmbRelationTypeWorkspaceContext extends UmbContextBase<UmbRelationT
 		const { data } = await this.repository.requestByUnique(unique);
 
 		if (data) {
-			this.#data.update(data);
+			this.#data.setValue(data);
 		}
 	}
 
