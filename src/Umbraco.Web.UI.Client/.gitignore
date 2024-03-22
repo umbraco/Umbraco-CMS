@@ -42,7 +42,7 @@ playwright/.cache/
 storybook-static/
 
 # API Docs
-api-docs/
+ui-api/
 
 custom-elements.json
 
