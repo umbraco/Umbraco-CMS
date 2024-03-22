@@ -10,7 +10,6 @@ export interface UmbRelationTypeDetailModel {
 	} | null;
 	entityType: UmbRelationTypeEntityType;
 	isBidirectional: boolean;
-	isDeletable: boolean;
 	isDependency: boolean;
 	name: string;
 	parent: {
