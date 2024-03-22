@@ -8,4 +8,8 @@ export const handlers = [
 		const loggedInUser = umbUserMockDb.getCurrentUser();
 		return res(ctx.status(200), ctx.json(loggedInUser));
 	}),
+	rest.get(umbracoPath(`${UMB_SLUG}/current/2fa`), (_req, res, ctx) => {
+		const mfaLoginProviders = umbUserMockDb.getMfaLoginProviders();
+		return res(ctx.status(200), ctx.json(mfaLoginProviders));
+	}),
 ];

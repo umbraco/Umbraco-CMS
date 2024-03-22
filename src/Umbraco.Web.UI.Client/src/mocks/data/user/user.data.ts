@@ -1,4 +1,8 @@
-import type { UserItemResponseModel, UserResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	UserItemResponseModel,
+	UserResponseModel,
+	UserTwoFactorProviderModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbMockUserModel = UserResponseModel & UserItemResponseModel;
@@ -93,5 +97,20 @@ export const data: Array<UmbMockUserModel> = [
 		userGroupIds: ['user-group-administrators-id'],
 		userName: '',
 		avatarUrls: [],
+	},
+];
+
+export const mfaLoginProviders: Array<UserTwoFactorProviderModel> = [
+	{
+		isEnabledOnUser: true,
+		providerName: 'Google Authenticator',
+	},
+	{
+		isEnabledOnUser: false,
+		providerName: 'SMS',
+	},
+	{
+		isEnabledOnUser: true,
+		providerName: 'Email',
 	},
 ];
