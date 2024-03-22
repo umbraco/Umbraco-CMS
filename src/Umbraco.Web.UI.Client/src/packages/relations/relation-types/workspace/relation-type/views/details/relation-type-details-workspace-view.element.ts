@@ -5,7 +5,7 @@ import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { RelationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
-import UmbRelationDetailRepository from 'src/packages/relations/relations/repository/relation.repository.js';
+import { UmbRelationCollectionRepository } from '@umbraco-cms/backoffice/relations';
 
 @customElement('umb-workspace-view-relation-type-relation')
 export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -14,7 +14,7 @@ export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement i
 	_relations: Array<RelationResponseModel> = [];
 
 	#workspaceContext?: typeof UMB_RELATION_TYPE_WORKSPACE_CONTEXT.TYPE;
-	#relationDetailRepository = new UmbRelationDetailRepository(this);
+	#relationDetailRepository = new UmbRelationCollectionRepository(this);
 
 	constructor() {
 		super();
