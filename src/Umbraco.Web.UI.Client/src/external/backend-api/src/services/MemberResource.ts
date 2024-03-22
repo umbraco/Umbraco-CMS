@@ -21,6 +21,9 @@ export class MemberResource {
      */
     public static getFilterMember({
         memberTypeId,
+        memberGroupName,
+        isApproved,
+        isLockedOut,
         orderBy = 'username',
         orderDirection,
         filter,
@@ -28,6 +31,9 @@ export class MemberResource {
         take = 100,
     }: {
         memberTypeId?: string,
+        memberGroupName?: string,
+        isApproved?: boolean,
+        isLockedOut?: boolean,
         orderBy?: string,
         orderDirection?: DirectionModel,
         filter?: string,
@@ -39,6 +45,9 @@ export class MemberResource {
             url: '/umbraco/management/api/v1/filter/member',
             query: {
                 'memberTypeId': memberTypeId,
+                'memberGroupName': memberGroupName,
+                'isApproved': isApproved,
+                'isLockedOut': isLockedOut,
                 'orderBy': orderBy,
                 'orderDirection': orderDirection,
                 'filter': filter,
