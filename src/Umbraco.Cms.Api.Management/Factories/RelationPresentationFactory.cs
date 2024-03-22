@@ -27,6 +27,7 @@ public class RelationPresentationFactory : IRelationPresentationFactory
             new RelationReferenceModel(parent.Key),
             new RelationReferenceModel(child.Key))
         {
+            Id = relation.Key,
             Comment = relation.Comment,
             CreateDate = relation.CreateDate,
         };
