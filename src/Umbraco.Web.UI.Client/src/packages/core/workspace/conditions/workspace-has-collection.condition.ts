@@ -1,4 +1,4 @@
-import { UMB_WORKSPACE_COLLECTION_CONTEXT } from '../contexts/tokens/workspace-collection-context.token.js';
+import { UMB_COLLECTION_WORKSPACE_CONTEXT } from '../contexts/tokens/collection-workspace-context.token.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestCondition,
@@ -15,7 +15,7 @@ export class UmbWorkspaceHasCollectionCondition
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<WorkspaceHasCollectionConditionConfig>) {
 		super(host, args);
 
-		this.consumeContext(UMB_WORKSPACE_COLLECTION_CONTEXT, (context) => {
+		this.consumeContext(UMB_COLLECTION_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
 				context.contentTypeHasCollection,
 				(hasCollection) => {
