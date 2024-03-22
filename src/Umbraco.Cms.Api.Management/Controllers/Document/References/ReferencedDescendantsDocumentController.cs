@@ -32,9 +32,9 @@ public class ReferencedDescendantsDocumentController : DocumentControllerBase
     [HttpGet("{id:guid}/referenced-descendants")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> ReferencedDescendants(Guid parentId, int skip = 0, int take = 20)
+    public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> ReferencedDescendants(Guid id, int skip = 0, int take = 20)
     {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesSkipTakeService.GetPagedDescendantsInReferencesAsync(parentId, skip, take, true);
+        PagedModel<RelationItemModel> relationItems = await _trackedReferencesSkipTakeService.GetPagedDescendantsInReferencesAsync(id, skip, take, true);
         var pagedViewModel = new PagedViewModel<ReferenceByIdModel>
         {
             Total = relationItems.Total,

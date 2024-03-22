@@ -28,7 +28,6 @@ public class AreReferencedDocumentController : DocumentControllerBase
     ///     Used when bulk deleting content/media and bulk unpublishing content (delete and unpublish on List view).
     ///     This is basically finding children of relations.
     /// </remarks>
-    // [HttpGet("item")]
     [HttpGet("are-referenced")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]

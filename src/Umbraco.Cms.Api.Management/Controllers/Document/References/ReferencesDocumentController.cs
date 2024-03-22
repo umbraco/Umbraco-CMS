@@ -28,7 +28,7 @@ public class ReferencesDocumentController : DocumentControllerBase
     ///     Used by info tabs on content, media etc. and for the delete and unpublish of single items.
     ///     This is basically finding parents of relations.
     /// </remarks>
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}/references")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentReferenceResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<DocumentReferenceResponseModel>>> Get(
