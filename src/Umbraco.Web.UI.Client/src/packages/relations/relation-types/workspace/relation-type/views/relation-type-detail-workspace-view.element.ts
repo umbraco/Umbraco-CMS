@@ -41,7 +41,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 	constructor() {
 		super();
 
-		this.#paginationManager.setPageSize(2);
+		this.#paginationManager.setPageSize(50);
 
 		this.observe(this.#paginationManager.currentPage, (number) => (this._currentPageNumber = number));
 		this.observe(this.#paginationManager.totalPages, (number) => (this._totalPages = number));
