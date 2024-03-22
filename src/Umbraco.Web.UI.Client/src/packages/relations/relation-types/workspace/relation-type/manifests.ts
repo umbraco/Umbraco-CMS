@@ -16,7 +16,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.RelationType.Details',
 		name: 'Relation Type Details Workspace View',
-		js: () => import('./views/details/relation-type-details-workspace-view.element.js'),
+		js: () => import('./views/relation-type-detail-workspace-view.element.js'),
 		weight: 20,
 		meta: {
 			label: 'Details',
