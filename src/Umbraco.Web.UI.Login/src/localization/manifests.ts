@@ -41,4 +41,14 @@ export const manifests: ManifestLocalization[] = [
       culture: "nl-nl",
     }
   },
+  {
+    type: "localization",
+    alias: "Umb.Auth.Localization.SvSe",
+    name: "Swedish (SE)",
+    weight: 0,
+    js: () => import("./lang/sv-se.js"),
+    meta: {
+      culture: "sv-se",
+    }
+  },
 ]
