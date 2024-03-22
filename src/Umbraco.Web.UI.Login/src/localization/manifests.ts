@@ -20,5 +20,15 @@ export const manifests: ManifestLocalization[] = [
     meta: {
       culture: "da-dk",
     }
-  }
+  },
+  {
+    type: "localization",
+    alias: "Umb.Auth.Localization.DeDe",
+    name: "German (DE)",
+    weight: 0,
+    js: () => import("./lang/de-de.js"),
+    meta: {
+      culture: "de-de",
+    }
+  },
 ]
