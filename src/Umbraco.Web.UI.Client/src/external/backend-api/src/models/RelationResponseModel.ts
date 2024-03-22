@@ -7,6 +7,7 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 import type { RelationReferenceModel } from './RelationReferenceModel';
 
 export type RelationResponseModel = {
+    id: string;
     relationType: ReferenceByIdModel;
     parent: RelationReferenceModel;
     child: RelationReferenceModel;

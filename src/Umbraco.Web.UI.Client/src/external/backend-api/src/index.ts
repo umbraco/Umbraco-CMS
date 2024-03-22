@@ -69,7 +69,6 @@ export type { CreateMemberTypeRequestModel } from './models/CreateMemberTypeRequ
 export type { CreatePackageRequestModel } from './models/CreatePackageRequestModel';
 export type { CreatePartialViewFolderRequestModel } from './models/CreatePartialViewFolderRequestModel';
 export type { CreatePartialViewRequestModel } from './models/CreatePartialViewRequestModel';
-export type { CreateRelationTypeRequestModel } from './models/CreateRelationTypeRequestModel';
 export type { CreateScriptFolderRequestModel } from './models/CreateScriptFolderRequestModel';
 export type { CreateScriptRequestModel } from './models/CreateScriptRequestModel';
 export type { CreateStylesheetFolderRequestModel } from './models/CreateStylesheetFolderRequestModel';
@@ -409,7 +408,6 @@ export type { UpdateMemberTypePropertyTypeRequestModel } from './models/UpdateMe
 export type { UpdateMemberTypeRequestModel } from './models/UpdateMemberTypeRequestModel';
 export type { UpdatePackageRequestModel } from './models/UpdatePackageRequestModel';
 export type { UpdatePartialViewRequestModel } from './models/UpdatePartialViewRequestModel';
-export type { UpdateRelationTypeRequestModel } from './models/UpdateRelationTypeRequestModel';
 export type { UpdateScriptRequestModel } from './models/UpdateScriptRequestModel';
 export type { UpdateStylesheetRequestModel } from './models/UpdateStylesheetRequestModel';
 export type { UpdateTemplateRequestModel } from './models/UpdateTemplateRequestModel';
