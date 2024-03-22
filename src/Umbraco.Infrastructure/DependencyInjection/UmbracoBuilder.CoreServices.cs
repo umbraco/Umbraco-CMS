@@ -453,6 +453,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiMediaQueryService, NoopApiMediaQueryService>();
         builder.Services.AddSingleton<IApiMediaUrlProvider, ApiMediaUrlProvider>();
         builder.Services.AddSingleton<IApiContentRouteBuilder, ApiContentRouteBuilder>();
+        builder.Services.AddSingleton<IApiContentPathProvider, ApiContentPathProvider>();
+        builder.Services.AddSingleton<IApiContentPathResolver, ApiContentPathResolver>();
         builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();
         builder.Services.AddSingleton<IApiRichTextElementParser, ApiRichTextElementParser>();
         builder.Services.AddSingleton<IApiRichTextMarkupParser, ApiRichTextMarkupParser>();
