@@ -34,7 +34,7 @@ public class AlignUpgradedDatabase : MigrationBase
         MakeRelationTypeIndexUnique(indexes);
         RemoveUserGroupDefault(columns);
         MakeWebhookUrlNotNullable(columns);
-        MakeWebhoolLogUrlNotNullable(columns);
+        MakeWebhookLogUrlNotNullable(columns);
     }
 
     private void MakeIndexUnique<TDto>(string tableName, string indexName, IEnumerable<Tuple<string, string, string, bool>> indexes)
@@ -117,6 +117,7 @@ public class AlignUpgradedDatabase : MigrationBase
 
     private void AlignContentVersionTable(ColumnInfo[] columns)
     {
+        // We need to do this to ensure we don't try to rename the constraint if it doesn't exist.
         const string tableName = "umbracoContentVersion";
         const string columnName = "VersionDate";
         ColumnInfo? versionDateColumn = columns
@@ -175,6 +176,6 @@ public class AlignUpgradedDatabase : MigrationBase
     private void MakeWebhookUrlNotNullable(ColumnInfo[] columns)
         => MakeNvarCharColumnNotNullable("umbracoWebhook", "url", columns);
 
-    private void MakeWebhoolLogUrlNotNullable(ColumnInfo[] columns)
+    private void MakeWebhookLogUrlNotNullable(ColumnInfo[] columns)
         => MakeNvarCharColumnNotNullable("umbracoWebhookLog", "url", columns);
 }
