@@ -17429,6 +17429,56 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/member/configuration": {
+      "get": {
+        "tags": [
+          "Member"
+        ],
+        "operationId": "GetMemberConfiguration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MemberConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MemberConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MemberConfigurationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/member/validate": {
       "post": {
         "tags": [
@@ -34492,6 +34542,7 @@
           "allowNonExistingSegmentsCreation",
           "disableDeleteWhenReferenced",
           "disableUnpublishWhenReferenced",
+          "reservedFieldNames",
           "sanitizeTinyMce"
         ],
         "type": "object",
@@ -34510,6 +34561,13 @@
           },
           "allowNonExistingSegmentsCreation": {
             "type": "boolean"
+          },
+          "reservedFieldNames": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
@@ -36206,6 +36264,7 @@
         "required": [
           "disableDeleteWhenReferenced",
           "disableUnpublishWhenReferenced",
+          "reservedFieldNames",
           "sanitizeTinyMce"
         ],
         "type": "object",
@@ -36218,6 +36277,13 @@
           },
           "sanitizeTinyMce": {
             "type": "boolean"
+          },
+          "reservedFieldNames": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
@@ -36554,6 +36620,22 @@
             "$ref": "#/components/schemas/VariantResponseModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "MemberConfigurationResponseModel": {
+        "required": [
+          "reservedFieldNames"
+        ],
+        "type": "object",
+        "properties": {
+          "reservedFieldNames": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
         "additionalProperties": false
       },
       "MemberGroupItemResponseModel": {
