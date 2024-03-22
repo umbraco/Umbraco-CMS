@@ -13,7 +13,6 @@ import {
 import type {
 	UmbRoutableWorkspaceContext,
 	UmbVariantDatasetWorkspaceContextInterface,
-	UmbWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -31,10 +30,7 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 type EntityType = UmbMemberDetailModel;
 export class UmbMemberWorkspaceContext
 	extends UmbSaveableWorkspaceContextBase<EntityType>
-	implements
-		UmbVariantDatasetWorkspaceContextInterface<UmbMemberVariantModel>,
-		UmbRoutableWorkspaceContext,
-		UmbWorkspaceContextInterface
+	implements UmbVariantDatasetWorkspaceContextInterface<UmbMemberVariantModel>, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbMemberDetailRepository(this);
 

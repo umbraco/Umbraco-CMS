@@ -16,9 +16,8 @@ export class UmbEditableWorkspaceElement extends UmbLitElement {
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [api]);
 	}
 
-	// TODO: Should it be save, or should it be submit()? [NL]
 	render() {
-		return html` <uui-form>
+		return html`<uui-form>
 			<form>
 				<umb-router-slot .routes="${this._routes}"></umb-router-slot>
 			</form>

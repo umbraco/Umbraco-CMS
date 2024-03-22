@@ -39,8 +39,9 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 					if (propertyAlias) {
 						// Gets the Data Type ID for the current property.
 						const property = await workspaceContext.structure.getPropertyStructureByAlias(propertyAlias);
-						if (property && this._config) {
-							this._config.unique = workspaceContext.getUnique();
+						const unique = workspaceContext.getUnique();
+						if (unique && property && this._config) {
+							this._config.unique = unique;
 							this._config.dataTypeId = property.dataType.unique;
 							this.requestUpdate('_config');
 						}

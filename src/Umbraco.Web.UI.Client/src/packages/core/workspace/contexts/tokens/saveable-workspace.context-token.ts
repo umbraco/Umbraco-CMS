@@ -1,5 +1,8 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbWorkspaceContextInterface, UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbWorkspaceContextInterface,
+	UmbSaveableWorkspaceContextInterface,
+} from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_SAVEABLE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbWorkspaceContextInterface,
@@ -7,6 +10,5 @@ export const UMB_SAVEABLE_WORKSPACE_CONTEXT = new UmbContextToken<
 >(
 	'UmbWorkspaceContext',
 	undefined,
-	(context): context is UmbSaveableWorkspaceContextInterface =>
-		(context as UmbSaveableWorkspaceContextInterface).getIsNew !== undefined,
+	(context): context is UmbSaveableWorkspaceContextInterface => 'getIsNew' in context,
 );

@@ -39,10 +39,6 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		return 'Log Viewer';
 	}
 
-	getUnique() {
-		return undefined;
-	}
-
 	get today() {
 		const today = new Date();
 		const dd = String(today.getDate()).padStart(2, '0');
@@ -109,7 +105,6 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-		console.log('log-viewer context');
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
 		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token.
 		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT, this);

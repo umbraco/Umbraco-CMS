@@ -12,10 +12,6 @@ export class UmbWebhookWorkspaceContext extends UmbControllerBase implements Umb
 		return UMB_WEBHOOK_ENTITY_TYPE;
 	}
 
-	getUnique() {
-		return undefined;
-	}
-
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);

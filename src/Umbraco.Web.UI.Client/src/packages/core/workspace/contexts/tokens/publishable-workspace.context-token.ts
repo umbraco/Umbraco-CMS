@@ -1,14 +1,14 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type {
 	UmbPublishableWorkspaceContextInterface,
-	UmbSaveableWorkspaceContextInterface,
+	UmbWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_PUBLISHABLE_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
+	UmbWorkspaceContextInterface,
 	UmbPublishableWorkspaceContextInterface
 >(
 	'UmbWorkspaceContext',
 	undefined,
-	(context): context is UmbPublishableWorkspaceContextInterface => (context as any).publish !== undefined,
+	(context): context is UmbPublishableWorkspaceContextInterface => 'publish' in context,
 );
