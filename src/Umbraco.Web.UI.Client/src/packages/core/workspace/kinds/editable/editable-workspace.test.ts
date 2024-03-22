@@ -6,7 +6,7 @@ describe('UmbEditableWorkspaceElement', () => {
 	let element: UmbEditableWorkspaceElement;
 
 	beforeEach(async () => {
-		element = await fixture(html`<umb-routable-workspace></umb-routable-workspace>`);
+		element = await fixture(html`<umb-editable-workspace></umb-editable-workspace>`);
 	});
 
 	it('is defined with its own instance', () => {
