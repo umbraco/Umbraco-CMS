@@ -8,7 +8,7 @@ export const manifests: ManifestLocalization[] = [
     weight: 0,
     js: () => import("./lang/en-us.js"),
     meta: {
-      culture: "en-US",
+      culture: "en-us",
     }
   },
   {
