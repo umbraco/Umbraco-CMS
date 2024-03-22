@@ -147,7 +147,7 @@ export class UmbExternalLoginProviderElement extends UmbLitElement {
             ? html`
               <div>
                 <uui-icon name=${this.icon}></uui-icon>
-                <umb-localize key="auth_signInWith" .args="${[this.displayName]}">Sign in with ${this.displayName}</umb-localize>
+                ${this.localize.term('auth_signInWith', this.displayName)}
               </div>
             `
             : nothing}
