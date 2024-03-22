@@ -28,7 +28,7 @@ import {
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import type {
-	UmbWorkspaceCollectionContextInterface,
+	UmbCollectionWorkspaceContextInterface,
 	UmbVariantDatasetWorkspaceContextInterface,
 	UmbPublishableWorkspaceContextInterface,
 	UmbRoutableWorkspaceContext,
@@ -56,7 +56,7 @@ export class UmbDocumentWorkspaceContext
 		UmbRoutableWorkspaceContext,
 		UmbVariantDatasetWorkspaceContextInterface<UmbDocumentVariantModel>,
 		UmbPublishableWorkspaceContextInterface,
-		UmbWorkspaceCollectionContextInterface<UmbDocumentTypeDetailModel>
+		UmbCollectionWorkspaceContextInterface<UmbDocumentTypeDetailModel>
 {
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);

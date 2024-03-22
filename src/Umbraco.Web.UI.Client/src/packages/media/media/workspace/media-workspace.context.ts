@@ -6,7 +6,7 @@ import type { UmbMediaDetailModel, UmbMediaVariantModel, UmbMediaVariantOptionMo
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import type {
-	UmbWorkspaceCollectionContextInterface,
+	UmbCollectionWorkspaceContextInterface,
 	UmbVariantDatasetWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import {
@@ -36,7 +36,7 @@ export class UmbMediaWorkspaceContext
 	extends UmbSaveableWorkspaceContextBase<EntityType>
 	implements
 		UmbVariantDatasetWorkspaceContextInterface,
-		UmbWorkspaceCollectionContextInterface<UmbMediaTypeDetailModel>
+		UmbCollectionWorkspaceContextInterface<UmbMediaTypeDetailModel>
 {
 	//
 	public readonly repository = new UmbMediaDetailRepository(this);
