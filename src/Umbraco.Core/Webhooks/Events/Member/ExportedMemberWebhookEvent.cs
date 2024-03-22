@@ -20,7 +20,7 @@ public class ExportedMemberWebhookEvent : WebhookEventBase<ExportedMemberNotific
 
     public override string Alias => Constants.WebhookEvents.Aliases.ExportedMember;
 
-    public override object? ConvertNotificationToRequestPayload(ExportedMemberNotification notification)
+    public override object ConvertNotificationToRequestPayload(ExportedMemberNotification notification)
     {
         // No need to return the original member in the notification as well
         return new

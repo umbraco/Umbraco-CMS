@@ -18,6 +18,6 @@ public class DateTimeValueTypeConverter : ValueTypePropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
+    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         => DatePickerValueConverter.ParseDateTimeValue(source); // reuse the value conversion from the default "Umbraco.DateTime" value converter
 }

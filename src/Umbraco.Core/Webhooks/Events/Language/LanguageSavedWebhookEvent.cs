@@ -20,7 +20,7 @@ public class LanguageSavedWebhookEvent : WebhookEventBase<LanguageSavedNotificat
 
     public override string Alias => Constants.WebhookEvents.Aliases.LanguageSaved;
 
-    public override object? ConvertNotificationToRequestPayload(LanguageSavedNotification notification)
+    public override object ConvertNotificationToRequestPayload(LanguageSavedNotification notification)
         => notification.SavedEntities;
 }
 

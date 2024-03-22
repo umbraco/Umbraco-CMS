@@ -20,6 +20,6 @@ public class StylesheetDeletedWebhookEvent : WebhookEventBase<StylesheetDeletedN
 
     public override string Alias => Constants.WebhookEvents.Aliases.StylesheetDeleted;
 
-    public override object? ConvertNotificationToRequestPayload(StylesheetDeletedNotification notification) =>
+    public override object ConvertNotificationToRequestPayload(StylesheetDeletedNotification notification) =>
         notification.DeletedEntities;
 }

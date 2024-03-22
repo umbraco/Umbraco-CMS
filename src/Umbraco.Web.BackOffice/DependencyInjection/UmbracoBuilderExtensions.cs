@@ -77,7 +77,7 @@ public static partial class UmbracoBuilderExtensions
     /// <summary>
     ///     Gets the back office tree collection builder
     /// </summary>
-    public static TreeCollectionBuilder? Trees(this IUmbracoBuilder builder)
+    public static TreeCollectionBuilder Trees(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<TreeCollectionBuilder>();
 
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)

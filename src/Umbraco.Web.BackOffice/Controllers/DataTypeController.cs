@@ -522,7 +522,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
         /// </remarks>
         [Authorize(Policy = AuthorizationPolicies.SectionAccessForDataTypeReading)]
-        public IEnumerable<DataTypeBasic>? GetAll()
+        public IEnumerable<DataTypeBasic> GetAll()
         {
             return _dataTypeService
                      .GetAll()

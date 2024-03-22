@@ -53,7 +53,7 @@ public class TagsValueConverter : PropertyValueConverterBase
         => PropertyCacheLevel.Element;
 
     /// <inheritdoc />
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
+    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         string? sourceString = source?.ToString();
         if (string.IsNullOrEmpty(sourceString))

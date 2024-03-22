@@ -188,7 +188,7 @@ public static class UserExtensions
     /// <summary>
     ///     Calculate start nodes, combining groups' and user's, and excluding what's in the bin
     /// </summary>
-    public static int[]? CalculateAllowedLanguageIds(this IUser user, ILocalizationService localizationService)
+    public static int[] CalculateAllowedLanguageIds(this IUser user, ILocalizationService localizationService)
     {
         var hasAccessToAllLanguages = user.Groups.Any(x => x.HasAccessToAllLanguages);
 

@@ -88,7 +88,7 @@ public class EntitySlim : IEntitySlim
 
     /// <inheritdoc />
     [DataMember]
-    public IDictionary<string, object?>? AdditionalData =>
+    public IDictionary<string, object?> AdditionalData =>
 _additionalData ??= new Dictionary<string, object?>();
 
     /// <inheritdoc />

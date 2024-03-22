@@ -252,7 +252,7 @@ public class DictionaryController : BackOfficeNotificationsController
     /// </summary>
     /// <param name="move"></param>
     /// <returns></returns>
-    public IActionResult? PostMove(MoveOrCopy move)
+    public IActionResult PostMove(MoveOrCopy move)
     {
         IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(move.Id);
         if (dictionaryItem == null)

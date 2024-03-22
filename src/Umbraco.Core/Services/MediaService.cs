@@ -452,7 +452,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="level">The level to retrieve Media from</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         /// <remarks>Contrary to most methods, this method filters out trashed media items.</remarks>
-        public IEnumerable<IMedia>? GetByLevel(int level)
+        public IEnumerable<IMedia> GetByLevel(int level)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MediaTree);
