@@ -209,6 +209,7 @@ export type { MediaUrlInfoModel } from './models/MediaUrlInfoModel';
 export type { MediaValueModel } from './models/MediaValueModel';
 export type { MediaVariantRequestModel } from './models/MediaVariantRequestModel';
 export type { MediaVariantResponseModel } from './models/MediaVariantResponseModel';
+export type { MemberConfigurationResponseModel } from './models/MemberConfigurationResponseModel';
 export type { MemberGroupItemResponseModel } from './models/MemberGroupItemResponseModel';
 export type { MemberGroupPresentationBaseModel } from './models/MemberGroupPresentationBaseModel';
 export type { MemberGroupResponseModel } from './models/MemberGroupResponseModel';

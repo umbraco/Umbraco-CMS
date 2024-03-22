@@ -98,9 +98,9 @@ export class UmbSearchModalElement extends LitElement {
 									this._groups,
 									(group) => group.name,
 									(group) => this.#renderGroup(group.name, group.items),
-							  )
+								)
 							: html`<div id="no-results">Only mock data for now <strong>Search for blog</strong></div>`}
-				  </div>`
+					</div>`
 				: nothing}
 		`;
 	}
@@ -190,8 +190,7 @@ export class UmbSearchModalElement extends LitElement {
 			:host {
 				display: flex;
 				flex-direction: column;
-				height: 100%;
-				width: 100%;
+				width: min(500px, 100vw);
 				height: 100%;
 				background-color: var(--uui-color-background);
 				box-sizing: border-box;
