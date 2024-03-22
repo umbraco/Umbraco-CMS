@@ -1,7 +1,8 @@
 import type { UmbCollectionColumnConfiguration } from '../../../../../collection/types.js';
-import { html, customElement, property, repeat, css, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, repeat, css, state, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbInputContentTypePropertyElement } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -15,6 +16,9 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+
+	// TODO: [LK] Add sorting.
+
 	@property({ type: Array })
 	value?: Array<UmbCollectionColumnConfiguration> = [];
 
@@ -24,7 +28,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	@state()
 	private _field?: UmbInputContentTypePropertyElement['selectedProperty'];
 
-	#onChange(e: CustomEvent) {
+	#onAdd(e: CustomEvent) {
 		const element = e.target as UmbInputContentTypePropertyElement;
 
 		if (!element.selectedProperty) return;
@@ -49,6 +53,15 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
+	#onChangeLabel(e: UUIInputEvent, configuration: UmbCollectionColumnConfiguration) {
+		this.value = this.value?.map(
+			(config): UmbCollectionColumnConfiguration =>
+				config.alias === configuration.alias ? { ...config, header: e.target.value as string } : config,
+		);
+
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
 	#onRemove(unique: string) {
 		const newValue: Array<UmbCollectionColumnConfiguration> = [];
 
@@ -60,105 +73,86 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	#onHeaderChange(e: UUIInputEvent, configuration: UmbCollectionColumnConfiguration) {
-		this.value = this.value?.map(
-			(config): UmbCollectionColumnConfiguration =>
-				config.alias === configuration.alias ? { ...config, header: e.target.value as string } : config,
-		);
-
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	}
-
-	#onTemplateChange(e: UUIInputEvent, configuration: UmbCollectionColumnConfiguration) {
-		this.value = this.value?.map(
-			(config): UmbCollectionColumnConfiguration =>
-				config.alias === configuration.alias ? { ...config, nameTemplate: e.target.value as string } : config,
-		);
-
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	}
-
 	render() {
+		if (!this.value) return nothing;
 		return html`
-			${this.#renderTable()}
-
+			<div id="layout-wrapper">
+				${repeat(
+					this.value,
+					(column) => column.alias,
+					(column) => this.#renderField(column),
+				)}
+			</div>
 			<umb-input-content-type-property
 				document-types
 				media-types
-				@change=${this.#onChange}></umb-input-content-type-property>
+				@change=${this.#onAdd}></umb-input-content-type-property>
 		`;
 	}
 
-	#renderTable() {
-		if (!this.value?.length) return;
+	#renderField(column: UmbCollectionColumnConfiguration) {
 		return html`
-			<uui-table>
-				<uui-table-row>
-					<uui-table-head-cell style="width:0"></uui-table-head-cell>
-					<uui-table-head-cell>Alias</uui-table-head-cell>
-					<uui-table-head-cell>Header</uui-table-head-cell>
-					<uui-table-head-cell>Template</uui-table-head-cell>
-					<uui-table-head-cell style="width:0"></uui-table-head-cell>
-				</uui-table-row>
-				${repeat(
-					this.value,
-					(configuration) => configuration.alias,
-					(configuration) => html`
-						<uui-table-row>
-							<uui-table-cell><uui-icon name="icon-navigation"></uui-icon></uui-table-cell>
-							${configuration.isSystem === 1
-								? this.#renderSystemFieldRow(configuration)
-								: this.#renderCustomFieldRow(configuration)}
-							<uui-table-cell>
-								<uui-button
-									label=${this.localize.term('general_remove')}
-									look="secondary"
-									@click=${() => this.#onRemove(configuration.alias)}></uui-button>
-							</uui-table-cell>
-						</uui-table-row>
-					`,
-				)}
-			</uui-table>
-		`;
-	}
+			<div class="layout-item">
+				<uui-icon name="icon-navigation"></uui-icon>
 
-	#renderSystemFieldRow(configuration: UmbCollectionColumnConfiguration) {
-		return html`
-			<uui-table-cell><strong>${configuration.alias}</strong> <small>(system field)</small></uui-table-cell>
-			<uui-table-cell>${configuration.header}</uui-table-cell>
-			<uui-table-cell></uui-table-cell>
-		`;
-	}
-
-	#renderCustomFieldRow(configuration: UmbCollectionColumnConfiguration) {
-		return html`
-			<uui-table-cell><strong>${configuration.alias}</strong></uui-table-cell>
-			<uui-table-cell>
 				<uui-input
-					label="header"
-					.value=${configuration.header ?? ''}
 					required
-					@change=${(e: UUIInputEvent) => this.#onHeaderChange(e, configuration)}></uui-input>
-			</uui-table-cell>
-			<uui-table-cell>
+					label="label"
+					placeholder="Enter a label..."
+					.value=${column.header ?? ''}
+					@change=${(e: UUIInputEvent) => this.#onChangeLabel(e, column)}></uui-input>
+
+				<div class="alias">
+					<code>${column.alias}</code>
+				</div>
+
 				<uui-input
+					disabled
 					label="template"
-					.value=${configuration.nameTemplate ?? ''}
-					@change=${(e: UUIInputEvent) => this.#onTemplateChange(e, configuration)}></uui-input>
-			</uui-table-cell>
+					placeholder="Enter a name template..."
+					.value=${column.nameTemplate ?? ''}></uui-input>
+
+				<div class="actions">
+					<uui-button
+						label=${this.localize.term('general_remove')}
+						look="secondary"
+						@click=${() => this.#onRemove(column.alias)}></uui-button>
+				</div>
+			</div>
 		`;
 	}
 
 	static styles = [
+		UmbTextStyles,
 		css`
-			:host {
+			#layout-wrapper {
 				display: flex;
 				flex-direction: column;
-				gap: var(--uui-size-space-1);
+				gap: 1px;
+				margin-bottom: var(--uui-size-1);
 			}
 
-			uui-input {
-				width: 100%;
+			.layout-item {
+				background-color: var(--uui-color-surface-alt);
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-6);
+				padding: var(--uui-size-3) var(--uui-size-6);
+			}
+
+			.layout-item > uui-icon {
+				flex: 0 0 var(--uui-size-6);
+			}
+
+			.layout-item > uui-input,
+			.layout-item > .alias {
+				flex: 1;
+			}
+
+			.layout-item > .actions {
+				flex: 0 0 auto;
+				display: flex;
+				justify-content: flex-end;
 			}
 		`,
 	];

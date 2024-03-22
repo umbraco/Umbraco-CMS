@@ -210,6 +210,17 @@ export class PackageResource {
     }
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getPackageManifestPublic(): CancelablePromise<Array<PackageManifestResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/package/manifest/public',
+        });
+    }
+
+    /**
      * @returns PagedPackageMigrationStatusResponseModel Success
      * @throws ApiError
      */

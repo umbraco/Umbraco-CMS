@@ -6,8 +6,9 @@ export type UmbItemPickerModalData = {
 };
 
 export type UmbItemPickerModel = {
-	label: string;
 	description?: string;
+	icon?: string;
+	label: string;
 	value: string;
 };
 

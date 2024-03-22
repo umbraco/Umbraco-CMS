@@ -52,19 +52,22 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 
 	render() {
 		return html`
-			<umb-body-layout headline="${this.localize.term('dynamicRoot_pickDynamicRootQueryStepTitle')}">
+			<umb-body-layout headline=${this.localize.term('dynamicRoot_pickDynamicRootQueryStepTitle')}>
 				<div id="main">
 					<uui-box>
-						${repeat(
-							this._querySteps,
-							(item) => item.alias,
-							(item) => html`
-								<uui-button @click=${() => this.#choose(item)} look="placeholder" label="${ifDefined(item.meta.label)}">
-									<h3>${item.meta.label}</h3>
-									<p>${item.meta.description}</p>
-								</uui-button>
-							`,
-						)}
+						<uui-ref-list>
+							${repeat(
+								this._querySteps,
+								(item) => item.alias,
+								(item) => html`
+									<umb-ref-item
+										name=${ifDefined(item.meta.label)}
+										detail=${ifDefined(item.meta.description)}
+										icon=${ifDefined(item.meta.icon)}
+										@click=${() => this.#choose(item)}></umb-ref-item>
+								`,
+							)}
+						</uui-ref-list>
 					</uui-box>
 				</div>
 				<div slot="actions">
