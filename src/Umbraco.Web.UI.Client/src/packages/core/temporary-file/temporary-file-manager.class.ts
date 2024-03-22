@@ -1,38 +1,54 @@
 import { UmbTemporaryFileRepository } from './temporary-file.repository.js';
-import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
-export type TemporaryFileStatus = 'complete' | 'waiting' | 'error';
+export type TemporaryFileStatus = 'success' | 'waiting' | 'error';
 
-export interface TemporaryFileQueueItem {
-	unique: string;
+export interface UmbTemporaryFileModel {
 	file: File;
-	status?: TemporaryFileStatus;
+	unique: string;
+	status: TemporaryFileStatus;
+}
+
+export interface UmbTemporaryFileQueueModel extends Partial<UmbTemporaryFileModel> {
+	file: File;
 }
 
 export class UmbTemporaryFileManager extends UmbControllerBase {
 	#temporaryFileRepository;
 
-	#queue = new UmbArrayState<TemporaryFileQueueItem>([], (item) => item.unique);
+	#queue = new UmbArrayState<UmbTemporaryFileModel>([], (item) => item.unique);
 	public readonly queue = this.#queue.asObservable();
 
-	#isReady = new UmbBooleanState(true);
-	public readonly isReady = this.#isReady.asObservable();
+	#filesCompleted: Array<UmbTemporaryFileModel> = [];
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(host);
 	}
 
-	uploadOne(unique: string, file: File, status: TemporaryFileStatus = 'waiting') {
-		this.#queue.appendOne({ unique, file, status });
-		this.handleQueue();
+	uploadOne(queueItem: UmbTemporaryFileQueueModel): Promise<Array<UmbTemporaryFileModel> | undefined> {
+		const item: UmbTemporaryFileModel = {
+			file: queueItem.file,
+			unique: queueItem.unique ?? UmbId.new(),
+			status: queueItem.status ?? 'waiting',
+		};
+		this.#queue.appendOne(item);
+		return this.handleQueue();
 	}
 
-	upload(queueItems: Array<TemporaryFileQueueItem>) {
-		this.#queue.append(queueItems);
-		this.handleQueue();
+	upload(queueItems: Array<UmbTemporaryFileQueueModel>): Promise<Array<UmbTemporaryFileModel> | undefined> {
+		const items = queueItems.map(
+			(item): UmbTemporaryFileModel => ({
+				file: item.file,
+				unique: item.unique ?? UmbId.new(),
+				status: item.status ?? 'waiting',
+			}),
+		);
+		this.#queue.append(items);
+		return this.handleQueue();
 	}
 
 	removeOne(unique: string) {
@@ -44,14 +60,13 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 	}
 
 	private async handleQueue() {
+		this.#filesCompleted = [];
 		const queue = this.#queue.getValue();
 
-		if (!queue.length && this.getIsReady()) return;
+		if (!queue.length) return;
 
-		this.#isReady.setValue(false);
-
-		queue.forEach(async (item) => {
-			if (item.status !== 'waiting') return;
+		for (const item of queue) {
+			if (!item.unique) throw new Error(`Unique is missing for item ${item}`);
 
 			const { error } = await this.#temporaryFileRepository.upload(item.unique, item.file);
 			await new Promise((resolve) => setTimeout(resolve, (Math.random() + 0.5) * 1000)); // simulate small delay so that the upload badge is properly shown
@@ -59,16 +74,11 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 			if (error) {
 				this.#queue.updateOne(item.unique, { ...item, status: 'error' });
 			} else {
-				this.#queue.updateOne(item.unique, { ...item, status: 'complete' });
+				this.#queue.updateOne(item.unique, { ...item, status: 'success' });
 			}
-		});
-
-		if (!queue.find((item) => item.status === 'waiting') && !this.getIsReady()) {
-			this.#isReady.setValue(true);
+			this.#filesCompleted = [...this.#filesCompleted, item];
+			this.removeOne(item.unique);
 		}
-	}
-
-	getIsReady() {
-		return this.#queue.getValue();
+		return this.#filesCompleted;
 	}
 }

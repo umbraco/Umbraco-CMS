@@ -2,9 +2,14 @@ import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 
 import './media-collection-toolbar.element.js';
+import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTemporaryFileManager, type UmbTemporaryFileQueueModel } from '@umbraco-cms/backoffice/temporary-file';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 @customElement('umb-media-collection')
 export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
+	#fileManager = new UmbTemporaryFileManager(this);
+
 	constructor() {
 		super();
 		document.addEventListener('dragenter', this.#handleDragEnter.bind(this));
@@ -33,8 +38,15 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		this.toggleAttribute('dragging', false);
 	}
 
-	#onFileChange(event: Event) {
-		console.log('#onFileChange', event);
+	async #onFileUpload(event: UUIFileDropzoneEvent) {
+		const files: Array<UmbTemporaryFileQueueModel> = event.detail.files.map((file) => ({ file, unique: UmbId.new() }));
+		if (!files.length) return;
+
+		const items = await this.#fileManager.upload(files);
+		if (!items) return;
+
+		console.log('uploadComplete', items);
+		/*TODO Add the files to collection */
 	}
 
 	protected renderToolbar() {
@@ -44,7 +56,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 			<uui-file-dropzone
 				id="dropzone"
 				multiple
-				@file-change=${this.#onFileChange}
+				@change=${this.#onFileUpload}
 				label="${this.localize.term('media_dragAndDropYourFilesIntoTheArea')}"
 				accept=""></uui-file-dropzone>
 		`;
