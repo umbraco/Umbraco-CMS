@@ -1,18 +1,14 @@
-import { UmbDocumentTypePickerContext } from '../../../documents/document-types/components/input-document-type/input-document-type.context.js';
-import { UmbMediaTypePickerContext } from '../../../media/media-types/components/input-media-type/input-media-type.context.js';
-import { UmbMemberTypePickerContext } from '../../../members/member-type/components/input-member-type/input-member-type.context.js';
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import { UmbChangeEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbMediaTypeDetailRepository } from '@umbraco-cms/backoffice/media-type';
-import { UmbMemberTypeDetailRepository } from '@umbraco-cms/backoffice/member-type';
-import { UMB_ITEM_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_DOCUMENT_TYPE_PICKER_MODAL, UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import { UMB_MEMBER_TYPE_PICKER_MODAL, UmbMemberTypeDetailRepository } from '@umbraco-cms/backoffice/member-type';
+import { UMB_ITEM_PICKER_MODAL, UMB_MEDIA_TYPE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import type { UmbItemPickerModel } from '@umbraco-cms/backoffice/modal';
-import type { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
+import type { UmbItemPickerModel, UmbModalToken, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
 export type UmbContentTypePropertyValue = {
 	label: string;
@@ -22,7 +18,7 @@ export type UmbContentTypePropertyValue = {
 
 type UmbInputContentTypePropertyConfigurationItem = {
 	item: UmbItemPickerModel;
-	pickerContext(): UmbPickerInputContext<any>;
+	pickerModal(): UmbModalToken<any, UmbPickerModalValue>;
 	pickableFilter?(item: any): boolean;
 	repository(): UmbDetailRepositoryBase<any>;
 	systemProperties?: Array<UmbItemPickerModel>;
@@ -43,22 +39,19 @@ export class UmbInputContentTypePropertyElement extends FormControlMixin(UmbLitE
 				label: this.localize.term('content_documentType'),
 				description: this.localize.term('defaultdialogs_selectContentType'),
 				value: 'documentTypes',
+				icon: 'icon-document',
 			},
-			pickerContext: () => new UmbDocumentTypePickerContext(this),
+			pickerModal: () => UMB_DOCUMENT_TYPE_PICKER_MODAL,
 			pickableFilter: (docType) => !docType.isElement,
 			repository: () => new UmbDocumentTypeDetailRepository(this),
 			systemProperties: [
-				{
-					label: this.localize.term('content_documentType'),
-					description: 'contentTypeAlias',
-					value: 'contentTypeAlias',
-				},
-				{ label: this.localize.term('content_createDate'), description: 'createDate', value: 'createDate' },
-				{ label: this.localize.term('content_createBy'), description: 'owner', value: 'owner' },
-				{ label: this.localize.term('content_isPublished'), description: 'published', value: 'published' },
-				{ label: this.localize.term('general_sort'), description: 'sortOrder', value: 'sortOrder' },
-				{ label: this.localize.term('content_updateDate'), description: 'updateDate', value: 'updateDate' },
-				{ label: this.localize.term('content_updatedBy'), description: 'updater', value: 'updater' },
+				{ label: this.localize.term('content_documentType'), description: 'contentTypeAlias', value: 'contentTypeAlias', icon: 'icon-settings' },
+				{ label: this.localize.term('content_createDate'), description: 'createDate', value: 'createDate', icon: 'icon-settings' },
+				{ label: this.localize.term('content_createBy'), description: 'owner', value: 'owner', icon: 'icon-settings' },
+				{ label: this.localize.term('content_isPublished'), description: 'published', value: 'published', icon: 'icon-settings' },
+				{ label: this.localize.term('general_sort'), description: 'sortOrder', value: 'sortOrder', icon: 'icon-settings' },
+				{ label: this.localize.term('content_updateDate'), description: 'updateDate', value: 'updateDate', icon: 'icon-settings' },
+				{ label: this.localize.term('content_updatedBy'), description: 'updater', value: 'updater', icon: 'icon-settings' },
 			],
 		},
 		elementTypes: {
@@ -66,8 +59,9 @@ export class UmbInputContentTypePropertyElement extends FormControlMixin(UmbLitE
 				label: this.localize.term('create_elementType'),
 				description: this.localize.term('content_nestedContentSelectElementTypeModalTitle'),
 				value: 'elementTypes',
+				icon: 'icon-plugin',
 			},
-			pickerContext: () => new UmbDocumentTypePickerContext(this),
+			pickerModal: () => UMB_DOCUMENT_TYPE_PICKER_MODAL,
 			pickableFilter: (docType) => docType.isElement,
 			repository: () => new UmbDocumentTypeDetailRepository(this),
 			systemProperties: [
@@ -83,20 +77,17 @@ export class UmbInputContentTypePropertyElement extends FormControlMixin(UmbLitE
 				label: this.localize.term('content_mediatype'),
 				description: this.localize.term('defaultdialogs_selectMediaType'),
 				value: 'mediaTypes',
+				icon: 'icon-picture',
 			},
-			pickerContext: () => new UmbMediaTypePickerContext(this),
+			pickerModal: () => UMB_MEDIA_TYPE_PICKER_MODAL,
 			repository: () => new UmbMediaTypeDetailRepository(this),
 			systemProperties: [
-				{
-					label: this.localize.term('content_documentType'),
-					description: 'contentTypeAlias',
-					value: 'contentTypeAlias',
-				},
-				{ label: this.localize.term('content_createDate'), description: 'createDate', value: 'createDate' },
-				{ label: this.localize.term('content_createBy'), description: 'owner', value: 'owner' },
-				{ label: this.localize.term('general_sort'), description: 'sortOrder', value: 'sortOrder' },
-				{ label: this.localize.term('content_updateDate'), description: 'updateDate', value: 'updateDate' },
-				{ label: this.localize.term('content_updatedBy'), description: 'updater', value: 'updater' },
+				{ label: this.localize.term('content_documentType'), description: 'contentTypeAlias', value: 'contentTypeAlias', icon: 'icon-settings' },
+				{ label: this.localize.term('content_createDate'), description: 'createDate', value: 'createDate', icon: 'icon-settings' },
+				{ label: this.localize.term('content_createBy'), description: 'owner', value: 'owner', icon: 'icon-settings' },
+				{ label: this.localize.term('general_sort'), description: 'sortOrder', value: 'sortOrder', icon: 'icon-settings' },
+				{ label: this.localize.term('content_updateDate'), description: 'updateDate', value: 'updateDate', icon: 'icon-settings' },
+				{ label: this.localize.term('content_updatedBy'), description: 'updater', value: 'updater', icon: 'icon-settings' },
 			],
 		},
 		memberTypes: {
@@ -104,19 +95,16 @@ export class UmbInputContentTypePropertyElement extends FormControlMixin(UmbLitE
 				label: this.localize.term('content_membertype'),
 				description: this.localize.term('defaultdialogs_selectMemberType'),
 				value: 'memberTypes',
+				icon: 'icon-user',
 			},
-			pickerContext: () => new UmbMemberTypePickerContext(this),
+			pickerModal: () => UMB_MEMBER_TYPE_PICKER_MODAL,
 			repository: () => new UmbMemberTypeDetailRepository(this),
 			systemProperties: [
-				{
-					label: this.localize.term('content_documentType'),
-					description: 'contentTypeAlias',
-					value: 'contentTypeAlias',
-				},
-				{ label: this.localize.term('content_createDate'), description: 'createDate', value: 'createDate' },
-				{ label: this.localize.term('general_email'), description: 'email', value: 'email' },
-				{ label: this.localize.term('content_updateDate'), description: 'updateDate', value: 'updateDate' },
-				{ label: this.localize.term('general_username'), description: 'username', value: 'username' },
+				{ label: this.localize.term('content_documentType'), description: 'contentTypeAlias', value: 'contentTypeAlias', icon: 'icon-settings' },
+				{ label: this.localize.term('content_createDate'), description: 'createDate', value: 'createDate', icon: 'icon-settings' },
+				{ label: this.localize.term('general_email'), description: 'email', value: 'email', icon: 'icon-settings' },
+				{ label: this.localize.term('content_updateDate'), description: 'updateDate', value: 'updateDate', icon: 'icon-settings' },
+				{ label: this.localize.term('general_username'), description: 'username', value: 'username', icon: 'icon-settings' },
 			],
 		},
 	};
@@ -195,28 +183,33 @@ export class UmbInputContentTypePropertyElement extends FormControlMixin(UmbLitE
 		const config = this.#configuration[configKey];
 		if (!config) return;
 
-		const pickerContext = config.pickerContext();
+		const pickerModal = config.pickerModal();
 
-		pickerContext.max = 1;
-
-		await pickerContext.openPicker({
-			hideTreeRoot: true,
-			multiple: false,
-			pickableFilter: config.pickableFilter,
+		const pickerContext = this.#modalManager?.open(this, pickerModal, {
+			data: {
+				hideTreeRoot: true,
+				multiple: false,
+				pickableFilter: config.pickableFilter,
+			},
 		});
 
-		const selectedItems = pickerContext.getSelection();
+		// NOTE: We listen for the selection change event to submit the picker.
+		// This is to enforce a single selection and progress to the next modal.
+		pickerContext?.addEventListener(UmbSelectionChangeEvent.TYPE, pickerContext.submit);
+
+		const pickerValue = await pickerContext?.onSubmit();
+
+		const selectedItems = pickerValue?.selection ?? [];
 		if (selectedItems.length === 0) return;
 
 		const repository = config.repository();
-		const { data } = await repository.requestByUnique(selectedItems[0]);
-
+		const { data } = await repository.requestByUnique(selectedItems[0] ?? '');
 		if (!data) return;
 
-		this.#openPropertyPicker(data, config.systemProperties);
+		this.#openPropertyPicker(data, config);
 	}
 
-	async #openPropertyPicker(contentType?: UmbContentTypeModel, systemProperties?: Array<UmbItemPickerModel>) {
+	async #openPropertyPicker(contentType: UmbContentTypeModel, config: UmbInputContentTypePropertyConfigurationItem) {
 		if (!contentType) return;
 		if (!this.#modalManager) return;
 
@@ -225,9 +218,10 @@ export class UmbInputContentTypePropertyElement extends FormControlMixin(UmbLitE
 				label: property.name,
 				value: property.alias,
 				description: property.alias,
+				icon: config.item.icon,
 			})) ?? [];
 
-		const items = [...(systemProperties ?? []), ...properties];
+		const items = [...(config.systemProperties ?? []), ...properties];
 
 		const modalContext = this.#modalManager.open(this, UMB_ITEM_PICKER_MODAL, {
 			data: {
@@ -243,7 +237,7 @@ export class UmbInputContentTypePropertyElement extends FormControlMixin(UmbLitE
 		this.selectedProperty = {
 			label: modalValue.label,
 			alias: modalValue.value,
-			isSystem: systemProperties?.some((property) => property.value === modalValue.value) ?? false,
+			isSystem: config.systemProperties?.some((property) => property.value === modalValue.value) ?? false,
 		};
 
 		this.dispatchEvent(new UmbChangeEvent());
