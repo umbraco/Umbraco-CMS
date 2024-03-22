@@ -3,7 +3,7 @@ import { UmbBlockTypeWorkspaceEditorElement } from './block-type-workspace-edito
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
-	UmbInvariantDatasetWorkspaceContextInterface,
+	UmbInvariantDatasetWorkspaceContext,
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
@@ -18,7 +18,7 @@ import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
 	extends UmbSaveableWorkspaceContextBase<BlockTypeData>
-	implements UmbInvariantDatasetWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	// Just for context token safety:
 	public readonly IS_BLOCK_TYPE_WORKSPACE_CONTEXT = true;

@@ -4,10 +4,7 @@ import { UmbTemplateDetailRepository, UmbTemplateItemRepository } from '../repos
 import { UMB_TEMPLATE_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbTemplateWorkspaceEditorElement } from './template-workspace-editor.element.js';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import type {
-	UmbRoutableWorkspaceContext,
-	UmbSaveableWorkspaceContextInterface,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbRoutableWorkspaceContext, UmbSaveableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
@@ -22,7 +19,7 @@ import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router
 
 export class UmbTemplateWorkspaceContext
 	extends UmbSaveableWorkspaceContextBase<UmbTemplateDetailModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly detailRepository = new UmbTemplateDetailRepository(this);
 	public readonly itemRepository = new UmbTemplateItemRepository(this);

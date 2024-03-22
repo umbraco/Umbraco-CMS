@@ -8,7 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbSaveableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
-	type UmbSaveableWorkspaceContextInterface,
+	type UmbSaveableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
@@ -20,7 +20,7 @@ import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router
 
 export class UmbScriptWorkspaceContext
 	extends UmbSaveableWorkspaceContextBase<UmbScriptDetailModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbScriptDetailRepository(this);
 

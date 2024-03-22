@@ -1,10 +1,7 @@
 import type { UmbBlockGridTypeAreaType } from '../../../types.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type {
-	UmbInvariantDatasetWorkspaceContextInterface,
-	UmbWorkspaceContextInterface,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbInvariantDatasetWorkspaceContext, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbSaveableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
@@ -16,7 +13,7 @@ import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco
 
 export class UmbBlockGridAreaTypeWorkspaceContext
 	extends UmbSaveableWorkspaceContextBase<UmbBlockGridTypeAreaType>
-	implements UmbInvariantDatasetWorkspaceContextInterface
+	implements UmbInvariantDatasetWorkspaceContext
 {
 	// Just for context token safety:
 	public readonly IS_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT = true;
@@ -132,7 +129,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 export default UmbBlockGridAreaTypeWorkspaceContext;
 
 export const UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbWorkspaceContextInterface,
+	UmbWorkspaceContext,
 	UmbBlockGridAreaTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',

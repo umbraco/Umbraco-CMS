@@ -1,6 +1,6 @@
 import { UmbWorkspaceRouteManager } from '../controllers/workspace-route-manager.controller.js';
 import { UMB_WORKSPACE_CONTEXT } from './tokens/workspace.context-token.js';
-import type { UmbSaveableWorkspaceContextInterface } from './tokens/saveable-workspace-context.interface.js';
+import type { UmbSaveableWorkspaceContext } from './tokens/saveable-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -10,7 +10,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	extends UmbContextBase<UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>>
-	implements UmbSaveableWorkspaceContextInterface
+	implements UmbSaveableWorkspaceContext
 {
 	public readonly workspaceAlias: string;
 

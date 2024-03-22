@@ -4,7 +4,7 @@ import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
 import { UMB_STYLESHEET_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbStylesheetWorkspaceEditorElement } from './stylesheet-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContextInterface,
+	type UmbSaveableWorkspaceContext,
 	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
@@ -20,7 +20,7 @@ import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router
 
 export class UmbStylesheetWorkspaceContext
 	extends UmbSaveableWorkspaceContextBase<UmbStylesheetDetailModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbStylesheetDetailRepository(this);
 

@@ -3,7 +3,7 @@ import type { UmbDataTypeDetailModel } from '../types.js';
 import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import type {
-	UmbInvariantDatasetWorkspaceContextInterface,
+	UmbInvariantDatasetWorkspaceContext,
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
@@ -33,7 +33,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
 	extends UmbSaveableWorkspaceContextBase<EntityType>
-	implements UmbInvariantDatasetWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);

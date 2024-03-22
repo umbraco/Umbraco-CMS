@@ -1,7 +1,7 @@
 import { UmbRelationTypeRepository } from '../repository/relation-type.repository.js';
 import { UmbRelationTypeWorkspaceEditorElement } from './relation-type-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContextInterface,
+	type UmbSaveableWorkspaceContext,
 	UmbSaveableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceRouteManager,
@@ -13,7 +13,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbRelationTypeWorkspaceContext
 	extends UmbSaveableWorkspaceContextBase<RelationTypeResponseModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly repository: UmbRelationTypeRepository = new UmbRelationTypeRepository(this);

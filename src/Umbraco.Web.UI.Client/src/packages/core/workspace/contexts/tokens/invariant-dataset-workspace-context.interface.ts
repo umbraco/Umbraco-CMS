@@ -1,10 +1,10 @@
 import type { UmbVariantId } from '../../../variant/variant-id.class.js';
 import type { UmbPropertyDatasetContext } from '../../../property/property-dataset/property-dataset-context.interface.js';
-import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
+import type { UmbSaveableWorkspaceContext } from './saveable-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
-export interface UmbInvariantDatasetWorkspaceContextInterface extends UmbSaveableWorkspaceContextInterface {
+export interface UmbInvariantDatasetWorkspaceContext extends UmbSaveableWorkspaceContext {
 	// Name:
 	name: Observable<string | undefined>;
 	getName(): string | undefined;
@@ -22,4 +22,4 @@ export interface UmbInvariantDatasetWorkspaceContextInterface extends UmbSaveabl
  * @deprecated Use UmbInvariantWorkspaceContextInterface instead — Will be removed before RC.
  * TODO: Delete before RC.
  */
-export interface UmbInvariantableWorkspaceContextInterface extends UmbInvariantDatasetWorkspaceContextInterface {}
+export interface UmbInvariantableWorkspaceContextInterface extends UmbInvariantDatasetWorkspaceContext {}

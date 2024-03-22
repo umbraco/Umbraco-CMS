@@ -1,12 +1,12 @@
 import type { UmbWorkspaceSplitViewManager } from '../../controllers/workspace-split-view-manager.controller.js';
 import type { UmbPropertyDatasetContext } from '../../../property/property-dataset/property-dataset-context.interface.js';
-import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
+import type { UmbSaveableWorkspaceContext } from './saveable-workspace-context.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId, UmbVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export interface UmbVariantDatasetWorkspaceContextInterface<VariantType extends UmbVariantModel = UmbVariantModel>
-	extends UmbSaveableWorkspaceContextInterface {
+export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbVariantModel = UmbVariantModel>
+	extends UmbSaveableWorkspaceContext {
 	// Name:
 	getName(variantId?: UmbVariantId): string | undefined;
 	setName(name: string, variantId?: UmbVariantId): void;
@@ -33,4 +33,4 @@ export interface UmbVariantDatasetWorkspaceContextInterface<VariantType extends 
  * @deprecated Use UmbVariantWorkspaceContextInterface instead — Will be removed before RC.
  * TODO: Delete before RC.
  */
-export interface UmbVariantableWorkspaceContextInterface extends UmbVariantDatasetWorkspaceContextInterface {}
+export interface UmbVariantableWorkspaceContextInterface extends UmbVariantDatasetWorkspaceContext {}

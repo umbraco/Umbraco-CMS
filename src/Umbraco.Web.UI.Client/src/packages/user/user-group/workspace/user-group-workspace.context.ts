@@ -2,10 +2,7 @@ import { UmbUserGroupDetailRepository } from '../repository/detail/index.js';
 import type { UmbUserGroupDetailModel } from '../types.js';
 import { UmbUserGroupWorkspaceEditorElement } from './user-group-workspace-editor.element.js';
 import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
-import type {
-	UmbRoutableWorkspaceContext,
-	UmbSaveableWorkspaceContextInterface,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbRoutableWorkspaceContext, UmbSaveableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
@@ -16,7 +13,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbSaveableWorkspaceContextBase<UmbUserGroupDetailModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly repository: UmbUserGroupDetailRepository = new UmbUserGroupDetailRepository(this);

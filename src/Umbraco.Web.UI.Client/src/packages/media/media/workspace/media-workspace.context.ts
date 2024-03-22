@@ -6,8 +6,8 @@ import type { UmbMediaDetailModel, UmbMediaVariantModel, UmbMediaVariantOptionMo
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import type {
-	UmbCollectionWorkspaceContextInterface,
-	UmbVariantDatasetWorkspaceContextInterface,
+	UmbCollectionWorkspaceContext,
+	UmbVariantDatasetWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbSaveableWorkspaceContextBase,
@@ -34,9 +34,7 @@ import UmbMediaWorkspaceEditorElement from './media-workspace-editor.element.js'
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
 	extends UmbSaveableWorkspaceContextBase<EntityType>
-	implements
-		UmbVariantDatasetWorkspaceContextInterface,
-		UmbCollectionWorkspaceContextInterface<UmbMediaTypeDetailModel>
+	implements UmbVariantDatasetWorkspaceContext, UmbCollectionWorkspaceContext<UmbMediaTypeDetailModel>
 {
 	//
 	public readonly repository = new UmbMediaDetailRepository(this);

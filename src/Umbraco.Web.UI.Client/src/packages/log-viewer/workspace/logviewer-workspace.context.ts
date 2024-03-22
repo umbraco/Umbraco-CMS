@@ -13,7 +13,7 @@ import { DirectionModel, LogLevelModel } from '@umbraco-cms/backoffice/external/
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { query } from '@umbraco-cms/backoffice/router';
-import type { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 export type PoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
@@ -27,7 +27,7 @@ export interface LogViewerDateRange {
 }
 
 // TODO: Revisit usage of workspace for this case...
-export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements UmbWorkspaceContextInterface {
+export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements UmbWorkspaceContext {
 	public readonly workspaceAlias: string = 'Umb.Workspace.LogViewer';
 	#repository: UmbLogViewerRepository;
 

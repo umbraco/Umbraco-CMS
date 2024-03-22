@@ -3,7 +3,7 @@ import type { UmbMemberGroupDetailModel } from '../types.js';
 import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContextInterface,
+	type UmbSaveableWorkspaceContext,
 	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
@@ -14,7 +14,7 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbMemberGroupWorkspaceContext
 	extends UmbSaveableWorkspaceContextBase<UmbMemberGroupDetailModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbMemberGroupDetailRepository(this);
 	#getDataPromise?: Promise<any>;
