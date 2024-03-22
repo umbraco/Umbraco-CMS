@@ -66,7 +66,7 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 				const icon = manifestPropertyEditorUi?.meta.icon;
 				/** [LI] We have the icon name now, but because this element extends from uui-ref-node, it wants the icon via the icon slot.
 				 * From what I can see, this is not possible via this file, but this is the file that have the datatype data....
-				 * Instead, overwriting the fallback icon which requires a SVG... */
+				 * Instead, overwriting the fallbackIcon property which requires a SVG... */
 				if (icon) {
 					this.#requestIconSVG(icon);
 				}
