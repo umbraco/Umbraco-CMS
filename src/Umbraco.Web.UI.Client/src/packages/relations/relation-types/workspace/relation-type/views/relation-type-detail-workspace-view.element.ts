@@ -145,7 +145,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 					},
 					{
 						columnAlias: 'created',
-						value: relation.createDate,
+						value: this.localize.date(relation.createDate, { dateStyle: 'long', timeStyle: 'medium' }),
 					},
 					{
 						columnAlias: 'comment',
