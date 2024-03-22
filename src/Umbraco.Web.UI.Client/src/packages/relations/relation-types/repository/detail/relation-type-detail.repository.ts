@@ -1,16 +1,60 @@
 import type { UmbRelationTypeDetailModel } from '../../types.js';
-import { UmbRelationTypeServerDataSource } from './relation-type-detail.server.data-source.js';
+import { UmbRelationTypeDetailServerDataSource } from './relation-type-detail.server.data-source.js';
 import { UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT } from './relation-type-detail.store.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { UmbReadDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 
-export class UmbRelationTypeDetailRepository extends UmbDetailRepositoryBase<UmbRelationTypeDetailModel> {
+// TODO: create read detail repository mixin
+export class UmbRelationTypeDetailRepository
+	extends UmbRepositoryBase
+	implements UmbReadDetailRepository<UmbRelationTypeDetailModel>
+{
+	#init: Promise<unknown>;
+	#detailStore?: UmbDetailStore<UmbRelationTypeDetailModel>;
+	#detailSource = new UmbRelationTypeDetailServerDataSource(this);
+
 	constructor(host: UmbControllerHost) {
-		super(host, UmbRelationTypeServerDataSource, UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT);
+		super(host);
+
+		this.#init = Promise.all([
+			this.consumeContext(UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
+				this.#detailStore = instance;
+			}).asPromise(),
+		]);
 	}
 
-	async create(model: UmbRelationTypeDetailModel) {
-		return super.create(model, null);
+	/**
+	 * Requests the detail for the given unique
+	 * @param {string} unique
+	 * @return {*}
+	 * @memberof UmbDetailRepositoryBase
+	 */
+	async requestByUnique(unique: string) {
+		debugger;
+		if (!unique) throw new Error('Unique is missing');
+		await this.#init;
+
+		const { data, error } = await this.#detailSource.read(unique);
+
+		if (data) {
+			this.#detailStore!.append(data);
+		}
+
+		return { data, error, asObservable: () => this.#detailStore!.byUnique(unique) };
+	}
+
+	/**
+	 * Returns a promise with an observable of the detail for the given unique
+	 * @param {string} unique
+	 * @return {*}
+	 * @memberof UmbDetailRepositoryBase
+	 */
+	async byUnique(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
+		await this.#init;
+		return this.#detailStore!.byUnique(unique);
 	}
 }
 
