@@ -34,7 +34,7 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 						this.propertyEditorUiAlias = dataType.editorUiAlias ?? '';
 						this.propertyEditorSchemaAlias = dataType.editorAlias ?? '';
 						if (this.propertyEditorUiAlias) {
-							this.#getIconFromRegistry();
+							this.#getIconFromUiAlias();
 						}
 					}
 				},
@@ -59,7 +59,7 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 	@state()
 	propertyEditorSchemaAlias = '';
 
-	async #getIconFromRegistry() {
+	async #getIconFromUiAlias() {
 		this.observe(
 			umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', this.propertyEditorUiAlias),
 			async (manifestPropertyEditorUi) => {
