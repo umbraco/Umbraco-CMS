@@ -49,9 +49,7 @@ export class UmbIconElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
-				display: inline-block;
-				width: 1.15em;
-				height: 1.15em;
+				display: contents;
 			}
 		`,
 	];

@@ -1,3 +1,4 @@
+import { UMB_SEARCH_MODAL } from './search-modal/search-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -18,7 +19,7 @@ export class UmbSearchHeaderAppElement extends UmbLitElement {
 	}
 
 	#onSearchClick() {
-		alert('implement search search modal');
+		this._modalContext?.open(this, UMB_SEARCH_MODAL);
 	}
 
 	render() {

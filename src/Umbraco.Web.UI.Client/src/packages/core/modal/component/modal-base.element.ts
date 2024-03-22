@@ -16,10 +16,8 @@ export abstract class UmbModalBaseElement<
 	@property({ type: Object, attribute: false })
 	public manifest?: ModalManifestType;
 
+	#modalContext?: UmbModalContext<ModalDataType, ModalValueType> | undefined;
 	@property({ attribute: false })
-	public get modalContext(): UmbModalContext<ModalDataType, ModalValueType> | undefined {
-		return this.#modalContext;
-	}
 	public set modalContext(context: UmbModalContext<ModalDataType, ModalValueType> | undefined) {
 		this.#modalContext = context;
 		if (context) {
@@ -35,7 +33,9 @@ export abstract class UmbModalBaseElement<
 			);
 		}
 	}
-	#modalContext?: UmbModalContext<ModalDataType, ModalValueType> | undefined;
+	public get modalContext(): UmbModalContext<ModalDataType, ModalValueType> | undefined {
+		return this.#modalContext;
+	}
 
 	@property({ attribute: false })
 	public set data(value: ModalDataType | undefined) {

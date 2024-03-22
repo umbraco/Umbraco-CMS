@@ -7,5 +7,8 @@ import type { DataTypeChangeModeModel } from './DataTypeChangeModeModel';
 
 export type DatatypeConfigurationResponseModel = {
     canBeChanged: DataTypeChangeModeModel;
+    documentListViewId: string;
+    mediaListViewId: string;
+    memberListViewId: string;
 };
 
