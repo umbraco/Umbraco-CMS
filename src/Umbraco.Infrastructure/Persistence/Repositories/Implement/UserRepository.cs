@@ -896,6 +896,16 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return Database.ExecuteScalar<int>(sql);
     }
 
+    protected override bool PerformExists(Guid key)
+    {
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .SelectCount()
+            .From<UserDto>()
+            .Where<UserDto>(x => x.Key == key);
+
+        return Database.ExecuteScalar<int>(sql) > 0;
+    }
+
     public bool Exists(string username) => ExistsByUserName(username);
 
     public bool ExistsByUserName(string username)
