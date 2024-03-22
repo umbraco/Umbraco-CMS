@@ -15,7 +15,7 @@ export default {
     forgottenPasswordInstruction: 'Es wird eine E-Mail mit einem Kennwort-Zurücksetzen-Link an die angegebene Adresse geschickt.',
     requestPasswordResetConfirmation: 'Es wird eine E-Mail mit Anweisungen zum Zurücksetzen des Kennwortes an die angegebene Adresse geschickt sofern diese im Datenbestand gefunden wurde.',
     setPasswordConfirmation: 'Ihr Kennwort wurde aktualisiert',
-    rememberMe: 'Remember me',
+    rememberMe: 'Angemeldet bleiben',
     or: 'oder',
     error: 'Fehler',
     defaultError: 'Ein unbekannter Fehler ist passiert.',
