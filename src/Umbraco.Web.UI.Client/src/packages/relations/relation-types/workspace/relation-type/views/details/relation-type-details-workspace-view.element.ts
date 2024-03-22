@@ -5,6 +5,7 @@ import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { RelationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import UmbRelationDetailRepository from 'src/packages/relations/relations/repository/relation.repository.js';
 
 @customElement('umb-workspace-view-relation-type-relation')
 export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -13,23 +14,23 @@ export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement i
 	_relations: Array<RelationResponseModel> = [];
 
 	#workspaceContext?: typeof UMB_RELATION_TYPE_WORKSPACE_CONTEXT.TYPE;
+	#relationDetailRepository = new UmbRelationDetailRepository(this);
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_RELATION_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.#getRelations();
+			this.#requestRelations();
 		});
 	}
 
-	async #getRelations() {
+	async #requestRelations() {
 		if (!this.#workspaceContext) {
 			return;
 		}
 
-		const response = await this.#workspaceContext.getRelations();
-		this._relations = response.data?.items ?? [];
+		const { data, error } = await this.#relationDetailRepository.read(this.#workspaceContext.unique);
 	}
 
 	private _tableConfig: UmbTableConfig = {
@@ -59,15 +60,15 @@ export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement i
 	private get _tableItems(): UmbTableItem[] {
 		return this._relations.map((relation) => {
 			return {
-				id: relation.parentId + '-' + relation.childId, // Add the missing id property
+				id: relation.unique + '-' + relation.childId, // Add the missing id property
 				data: [
 					{
 						columnAlias: 'parent',
-						value: relation.parentName,
+						value: relation.parent.name,
 					},
 					{
 						columnAlias: 'child',
-						value: relation.childName,
+						value: relation.child.name,
 					},
 					{
 						columnAlias: 'created',
@@ -83,17 +84,28 @@ export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement i
 	}
 
 	render() {
-		return html`<uui-box headline="Relations">
-			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
-		</uui-box>`;
+		return html`${this.#renderRelations()}${this.#renderDetails()}`;
+	}
+
+	#renderRelations() {
+		return html` <umb-table
+			.config=${this._tableConfig}
+			.columns=${this._tableColumns}
+			.items=${this._tableItems}></umb-table>`;
+	}
+
+	#renderDetails() {
+		return html`<uui-box>Details</uui-box>`;
 	}
 
 	static styles = [
 		UmbTextStyles,
 		css`
 			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
+				display: grid;
+				gap: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
+				grid-template-columns: 1fr 350px;
 			}
 		`,
 	];
