@@ -5,7 +5,7 @@ import type {
 	UmbCollectionWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 
-export const UMB_WORKSPACE_COLLECTION_CONTEXT = new UmbContextToken<
+export const UMB_COLLECTION_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbWorkspaceContextInterface,
 	UmbCollectionWorkspaceContextInterface<UmbContentTypeModel>
 >(
@@ -14,3 +14,9 @@ export const UMB_WORKSPACE_COLLECTION_CONTEXT = new UmbContextToken<
 	(context): context is UmbCollectionWorkspaceContextInterface<UmbContentTypeModel> =>
 		(context as UmbCollectionWorkspaceContextInterface<UmbContentTypeModel>).contentTypeHasCollection !== undefined,
 );
+
+/**
+ * @deprecated Use `UMB_COLLECTION_WORKSPACE_CONTEXT` instead. This token will be removed in the RC version.
+ * TODO: Remove in RC
+ */
+export const UMB_WORKSPACE_COLLECTION_CONTEXT = UMB_COLLECTION_WORKSPACE_CONTEXT;
