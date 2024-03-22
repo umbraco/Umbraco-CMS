@@ -9,5 +9,6 @@ export type DocumentConfigurationResponseModel = {
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
     allowNonExistingSegmentsCreation: boolean;
+    reservedFieldNames: Array<string>;
 };
 
