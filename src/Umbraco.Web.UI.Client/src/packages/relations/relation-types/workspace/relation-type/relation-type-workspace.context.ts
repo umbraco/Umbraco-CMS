@@ -1,5 +1,5 @@
 import { UmbRelationTypeDetailRepository } from '../../repository/detail/index.js';
-import type { UmbRelationTypeDetailModel } from '../../repository/detail/types.js';
+import type { UmbRelationTypeDetailModel } from '../../types.js';
 import { UmbRelationTypeWorkspaceEditorElement } from './relation-type-workspace-editor.element.js';
 import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from './relation-type-workspace.context-token.js';
 import { UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';

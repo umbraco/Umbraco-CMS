@@ -1,4 +1,4 @@
-import type { UmbRelationTypeDetailModel } from '../../../repository/detail/types.js';
+import type { UmbRelationTypeDetailModel } from '../../../types.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';

@@ -1,4 +1,4 @@
-import type { UmbRelationTypeEntityType } from '../../entity.js';
+import type { UmbRelationTypeEntityType } from './entity.js';
 
 export interface UmbRelationTypeDetailModel {
 	alias: string;

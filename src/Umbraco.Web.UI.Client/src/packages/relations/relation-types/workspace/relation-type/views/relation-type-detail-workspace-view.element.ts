@@ -1,20 +1,22 @@
-import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from '../../relation-type-workspace.context-token.js';
+import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from '../relation-type-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { RelationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbRelationDetailModel } from '@umbraco-cms/backoffice/relations';
 import { UmbRelationCollectionRepository } from '@umbraco-cms/backoffice/relations';
 
-@customElement('umb-workspace-view-relation-type-relation')
-export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	//TODO Use real data
+@customElement('umb-relation-type-detail-workspace-view')
+export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
-	_relations: Array<RelationResponseModel> = [];
+	_relations: Array<UmbRelationDetailModel> = [];
+
+	#skip = 0;
+	#take = 50;
 
 	#workspaceContext?: typeof UMB_RELATION_TYPE_WORKSPACE_CONTEXT.TYPE;
-	#relationDetailRepository = new UmbRelationCollectionRepository(this);
+	#relationCollectionRepository = new UmbRelationCollectionRepository(this);
 
 	constructor() {
 		super();
@@ -30,7 +32,16 @@ export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement i
 			return;
 		}
 
-		const { data, error } = await this.#relationDetailRepository.read(this.#workspaceContext.unique);
+		/*
+		const { data } = await this.#relationCollectionRepository.requestCollection({
+			skip: this.#skip,
+			take: this.#take,
+		});
+
+		if (data) {
+			console.log(data);
+		}
+		*/
 	}
 
 	private _tableConfig: UmbTableConfig = {
@@ -60,7 +71,7 @@ export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement i
 	private get _tableItems(): UmbTableItem[] {
 		return this._relations.map((relation) => {
 			return {
-				id: relation.unique + '-' + relation.childId, // Add the missing id property
+				id: relation.unique,
 				data: [
 					{
 						columnAlias: 'parent',
@@ -111,10 +122,10 @@ export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement i
 	];
 }
 
-export default UmbWorkspaceViewRelationTypeRelationElement;
+export default UmbRelationTypeDetailWorkspaceViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-relation-type-relation': UmbWorkspaceViewRelationTypeRelationElement;
+		'umb-relation-type-detail-workspace-view': UmbRelationTypeDetailWorkspaceViewElement;
 	}
 }

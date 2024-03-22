@@ -1,4 +1,4 @@
-import type { UmbRelationTypeDetailModel } from './types.js';
+import type { UmbRelationTypeDetailModel } from '../../types.js';
 import { UmbRelationTypeServerDataSource } from './relation-type-detail.server.data-source.js';
 import { UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT } from './relation-type-detail.store.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
