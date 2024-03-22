@@ -71,9 +71,6 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 			}
-			umb-table {
-				padding: 0;
-			}
 		`,
 	];
 }

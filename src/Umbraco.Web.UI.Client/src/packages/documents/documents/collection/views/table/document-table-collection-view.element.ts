@@ -203,11 +203,6 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				padding: var(--uui-size-space-3) 0;
 			}
 
-			/* TODO: Should we have embedded padding in the table component? */
-			umb-table {
-				padding: 0; /* To fix the embedded padding in the table component. */
-			}
-
 			.container {
 				display: flex;
 				justify-content: center;
