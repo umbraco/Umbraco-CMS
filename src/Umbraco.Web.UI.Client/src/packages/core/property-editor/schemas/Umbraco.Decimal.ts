@@ -25,6 +25,12 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Step size',
 					description: 'Enter the intervals amount between each step of number to be entered',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
+					config: [
+						{
+							alias: 'step',
+							value: '0.01',
+						},
+					],
 				},
 			],
 		},
