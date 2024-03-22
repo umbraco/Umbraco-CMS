@@ -106,7 +106,7 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos) =>
         dtos.Select(x => UserFactory.BuildEntity(_globalSettings, x, _permissionMappers));
 
-    #region Overrides of RepositoryBase<int,IUser>
+    #region Overrides of RepositoryBase<Guid,IUser>
 
     protected override IUser? PerformGet(Guid key)
     {
@@ -124,6 +124,8 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
         PerformGetReferencedDtos(dtos);
         return UserFactory.BuildEntity(_globalSettings, dtos[0], _permissionMappers);
     }
+
+    protected override Guid GetEntityId(IUser entity) => entity.Key;
 
     /// <summary>
     ///     Returns a user by username
@@ -330,7 +332,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     {
         List<UserDto> dtos = ids?.Length == 0
             ? GetDtosWith(null, true)
-            : GetDtosWith(sql => sql.WhereIn<UserDto>(x => x.Id, ids), true);
+            : GetDtosWith(sql => sql.WhereIn<UserDto>(x => x.Key, ids), true);
         var users = new IUser[dtos.Count];
         var i = 0;
         foreach (UserDto dto in dtos)
@@ -664,12 +666,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         };
         return list;
     }
+
     protected override void PersistDeletedItem(IUser entity)
     {
         IEnumerable<string> deletes = GetDeleteClauses();
         foreach (var delete in deletes)
         {
-            Database.Execute(delete, new { id = GetEntityId(entity), key = entity.Key });
+            Database.Execute(delete, new { id = entity.Id, key = GetEntityId(entity) });
         }
 
         entity.DeleteDate = DateTime.Now;
