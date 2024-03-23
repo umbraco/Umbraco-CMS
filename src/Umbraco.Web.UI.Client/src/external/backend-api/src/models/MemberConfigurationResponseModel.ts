@@ -3,10 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type MediaConfigurationResponseModel = {
-    disableDeleteWhenReferenced: boolean;
-    disableUnpublishWhenReferenced: boolean;
-    sanitizeTinyMce: boolean;
+export type MemberConfigurationResponseModel = {
     reservedFieldNames: Array<string>;
 };
 
