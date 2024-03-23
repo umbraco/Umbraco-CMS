@@ -49,7 +49,9 @@ export class UmbIconElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
-				display: contents;
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 		`,
 	];
