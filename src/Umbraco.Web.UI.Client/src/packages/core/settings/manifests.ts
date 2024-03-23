@@ -23,9 +23,6 @@ export const manifests = [
 		type: 'menu',
 		alias: 'Umb.Menu.Settings',
 		name: 'Settings Menu',
-		meta: {
-			label: 'Settings',
-		},
 	},
 	{
 		type: 'sectionSidebarApp',
@@ -48,9 +45,6 @@ export const manifests = [
 		type: 'menu',
 		alias: 'Umb.Menu.AdvancedSettings',
 		name: 'Advanced Settings Menu',
-		meta: {
-			label: 'Advanced',
-		},
 	},
 	{
 		type: 'sectionSidebarApp',

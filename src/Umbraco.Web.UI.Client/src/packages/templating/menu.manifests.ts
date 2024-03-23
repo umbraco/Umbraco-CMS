@@ -6,9 +6,6 @@ const menu: ManifestMenu = {
 	type: 'menu',
 	alias: 'Umb.Menu.Templating',
 	name: 'Templating Menu',
-	meta: {
-		label: 'Templating',
-	},
 };
 
 const menuSectionSidebarApp: ManifestTypes = {
