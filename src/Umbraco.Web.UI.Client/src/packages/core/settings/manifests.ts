@@ -32,10 +32,35 @@ export const manifests = [
 		kind: 'menu',
 		alias: 'Umb.SectionSidebarMenu.Settings',
 		name: 'Settings Section Sidebar Menu',
-		weight: 200,
+		weight: 300,
 		meta: {
 			label: 'Settings',
 			menu: 'Umb.Menu.Settings',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: UMB_SETTINGS_SECTION_ALIAS,
+			},
+		],
+	},
+	{
+		type: 'menu',
+		alias: 'Umb.Menu.AdvancedSettings',
+		name: 'Advanced Settings Menu',
+		meta: {
+			label: 'Advanced',
+		},
+	},
+	{
+		type: 'sectionSidebarApp',
+		kind: 'menu',
+		alias: 'Umb.SectionSidebarMenu.AdvancedSettings',
+		name: 'Advanced Settings Section Sidebar Menu',
+		weight: 100,
+		meta: {
+			label: 'Advanced',
+			menu: 'Umb.Menu.AdvancedSettings',
 		},
 		conditions: [
 			{
