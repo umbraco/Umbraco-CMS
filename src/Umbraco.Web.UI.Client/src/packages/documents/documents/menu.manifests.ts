@@ -6,9 +6,6 @@ const menu: ManifestMenu = {
 	type: 'menu',
 	alias: UMB_CONTENT_MENU_ALIAS,
 	name: 'Content Menu',
-	meta: {
-		label: 'Content',
-	},
 };
 
 export const manifests = [menu];
