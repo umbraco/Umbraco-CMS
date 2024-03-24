@@ -3,7 +3,7 @@ import { html, nothing, customElement, property, state } from '@umbraco-cms/back
 import type { UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import { UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
@@ -32,7 +32,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	private _numberOfActions = 0;
 
 	@state()
-	private _firstActionManifest?: ManifestEntityAction;
+	private _firstActionManifest?: ManifestEntityActionDefaultKind;
 
 	@state()
 	private _firstActionApi?: UmbEntityAction<unknown>;
