@@ -1,9 +1,9 @@
 import type { UmbEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import { UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestEntityAction, ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
@@ -53,7 +53,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			async (manifests) => {
 				const actions = manifests.filter((manifest) => manifest.forEntityTypes.includes(this.entityType!));
 				this._numberOfActions = actions.length;
-				this._firstActionManifest = this._numberOfActions > 0 ? actions[0] : undefined;
+				this._firstActionManifest =
+					this._numberOfActions > 0 ? (actions[0] as ManifestEntityActionDefaultKind) : undefined;
 				if (!this._firstActionManifest) return;
 				this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
 					{ unique: this.unique, entityType: this.entityType },
@@ -88,8 +89,10 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	#renderFirstAction() {
 		if (!this._firstActionApi) return nothing;
-		return html`<uui-button label=${this._firstActionManifest?.meta.label} @click=${this.#onFirstActionClick}>
-			<uui-icon name=${this._firstActionManifest?.meta.icon}></uui-icon>
+		return html`<uui-button
+			label=${ifDefined(this._firstActionManifest?.meta.label)}
+			@click=${this.#onFirstActionClick}>
+			<uui-icon name=${ifDefined(this._firstActionManifest?.meta.icon)}></uui-icon>
 		</uui-button>`;
 	}
 }
