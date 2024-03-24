@@ -1,4 +1,5 @@
 import type { UmbEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import { UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
@@ -9,18 +10,8 @@ import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-entity-actions-bundle')
 export class UmbEntityActionsBundleElement extends UmbLitElement {
-	private _entityType?: string;
 	@property({ type: String, attribute: 'entity-type' })
-	public get entityType() {
-		return this._entityType;
-	}
-	public set entityType(value: string | undefined) {
-		const oldValue = this._entityType;
-		if (oldValue === value) return;
-		this._entityType = value;
-		this.#observeEntityActions();
-		this.requestUpdate('entityType', oldValue);
-	}
+	entityType?: string;
 
 	@property({ type: String })
 	unique?: string | null;
@@ -45,6 +36,12 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT, (sectionContext) => {
 			this.#sectionSidebarContext = sectionContext;
 		});
+	}
+
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		if (_changedProperties.has('entityType') && _changedProperties.has('unique')) {
+			this.#observeEntityActions();
+		}
 	}
 
 	#observeEntityActions() {
