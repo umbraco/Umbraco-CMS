@@ -3,7 +3,7 @@ import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import { UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestEntityAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-entity-actions-bundle')
 export class UmbEntityActionsBundleElement extends UmbLitElement {
@@ -15,7 +15,6 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	public set entityType(value: string | undefined) {
 		const oldValue = this._entityType;
 		if (oldValue === value) return;
-
 		this._entityType = value;
 		this.#observeEntityActions();
 		this.requestUpdate('entityType', oldValue);
@@ -30,6 +29,9 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	@state()
 	private _hasActions = false;
 
+	@state()
+	private _firstAction?: ManifestEntityAction;
+
 	#sectionSidebarContext?: UmbSectionSidebarContext;
 
 	constructor() {
@@ -42,11 +44,11 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	#observeEntityActions() {
 		this.observe(
-			umbExtensionsRegistry
-				.byType('entityAction')
-				.pipe(map((actions) => actions.some((action) => action.forEntityTypes.includes(this.entityType!)))),
-			(hasActions) => {
-				this._hasActions = hasActions;
+			umbExtensionsRegistry.byType('entityAction'),
+			(manifests) => {
+				const actions = manifests.filter((manifest) => manifest.forEntityTypes.includes(this.entityType!));
+				this._hasActions = actions.length > 0;
+				this._firstAction = this._hasActions ? actions[0] : undefined;
 			},
 			'umbEntityActionsObserver',
 		);
@@ -66,8 +68,9 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 							<uui-button @click=${this._openActions} label="Open actions menu">
 								<uui-symbol-more></uui-symbol-more>
 							</uui-button>
+							<uui-button><uui-icon name=${this._firstAction?.meta.icon}></uui-icon></uui-button>
 						</uui-action-bar>
-				  `
+					`
 				: nothing}
 		`;
 	}
