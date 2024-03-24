@@ -29,7 +29,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	public label?: string;
 
 	@state()
-	private _hasActions = false;
+	private _numberOfActions = 0;
 
 	@state()
 	private _firstActionManifest?: ManifestEntityAction;
@@ -52,8 +52,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			umbExtensionsRegistry.byType('entityAction'),
 			async (manifests) => {
 				const actions = manifests.filter((manifest) => manifest.forEntityTypes.includes(this.entityType!));
-				this._hasActions = actions.length > 0;
-				this._firstActionManifest = this._hasActions ? actions[0] : undefined;
+				this._numberOfActions = actions.length;
+				this._firstActionManifest = this._numberOfActions > 0 ? actions[0] : undefined;
 				if (!this._firstActionManifest) return;
 				this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
 					{ unique: this.unique, entityType: this.entityType },
@@ -75,14 +75,12 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`
-			${this._hasActions
-				? html` <uui-action-bar slot="actions"> ${this.#renderFirstAction()} ${this.#renderMore()} </uui-action-bar> `
-				: nothing}
-		`;
+		if (this._numberOfActions === 0) return nothing;
+		return html`<uui-action-bar slot="actions"> ${this.#renderFirstAction()} ${this.#renderMore()} </uui-action-bar>`;
 	}
 
 	#renderMore() {
+		if (this._numberOfActions === 1) return nothing;
 		return html`<uui-button @click=${this.#openContextMenu} label="Open actions menu">
 			<uui-symbol-more></uui-symbol-more>
 		</uui-button>`;
