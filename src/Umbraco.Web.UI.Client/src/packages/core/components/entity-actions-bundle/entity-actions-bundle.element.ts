@@ -1,9 +1,11 @@
+import type { UmbEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import { UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { ManifestEntityAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-entity-actions-bundle')
 export class UmbEntityActionsBundleElement extends UmbLitElement {
@@ -30,7 +32,10 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	private _hasActions = false;
 
 	@state()
-	private _firstAction?: ManifestEntityAction;
+	private _firstActionManifest?: ManifestEntityAction;
+
+	@state()
+	private _firstActionApi?: UmbEntityAction<unknown>;
 
 	#sectionSidebarContext?: UmbSectionSidebarContext;
 
@@ -45,34 +50,49 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	#observeEntityActions() {
 		this.observe(
 			umbExtensionsRegistry.byType('entityAction'),
-			(manifests) => {
+			async (manifests) => {
 				const actions = manifests.filter((manifest) => manifest.forEntityTypes.includes(this.entityType!));
 				this._hasActions = actions.length > 0;
-				this._firstAction = this._hasActions ? actions[0] : undefined;
+				this._firstActionManifest = this._hasActions ? actions[0] : undefined;
+				if (!this._firstActionManifest) return;
+				this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
+					{ unique: this.unique, entityType: this.entityType },
+				]);
 			},
 			'umbEntityActionsObserver',
 		);
 	}
 
-	private _openActions() {
+	#openContextMenu() {
 		if (!this.entityType) throw new Error('Entity type is not defined');
 		if (this.unique === undefined) throw new Error('Unique is not defined');
 		this.#sectionSidebarContext?.toggleContextMenu(this.entityType, this.unique, this.label);
 	}
 
+	async #onFirstActionClick(event: PointerEvent) {
+		event.stopPropagation();
+		await this._firstActionApi?.execute();
+	}
+
 	render() {
 		return html`
 			${this._hasActions
-				? html`
-						<uui-action-bar slot="actions">
-							<uui-button @click=${this._openActions} label="Open actions menu">
-								<uui-symbol-more></uui-symbol-more>
-							</uui-button>
-							<uui-button><uui-icon name=${this._firstAction?.meta.icon}></uui-icon></uui-button>
-						</uui-action-bar>
-					`
+				? html` <uui-action-bar slot="actions"> ${this.#renderFirstAction()} ${this.#renderMore()} </uui-action-bar> `
 				: nothing}
 		`;
+	}
+
+	#renderMore() {
+		return html`<uui-button @click=${this.#openContextMenu} label="Open actions menu">
+			<uui-symbol-more></uui-symbol-more>
+		</uui-button>`;
+	}
+
+	#renderFirstAction() {
+		if (!this._firstActionApi) return nothing;
+		return html`<uui-button label=${this._firstActionManifest?.meta.label} @click=${this.#onFirstActionClick}>
+			<uui-icon name=${this._firstActionManifest?.meta.icon}></uui-icon>
+		</uui-button>`;
 	}
 }
 
