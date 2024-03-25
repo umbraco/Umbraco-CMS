@@ -1,8 +1,6 @@
 @using System.Globalization
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.AspNetCore.Routing
 @using Microsoft.Extensions.Options;
-@using Umbraco.Cms.Api.Management.Controllers.Security
 @using Umbraco.Cms.Api.Management.Extensions
 @using Umbraco.Cms.Api.Management.Security
 @using Umbraco.Cms.Core.Configuration.Models
@@ -20,7 +18,6 @@
 @inject IOptions<GlobalSettings> GlobalSettings
 @inject IProfilerHtml ProfilerHtml
 @inject IBackOfficeExternalLoginProviders ExternalLogins
-@inject LinkGenerator LinkGenerator
 @inject IBackOfficePathGenerator BackOfficePathGenerator
 @inject IPackageManifestService PackageManifestService
 @inject IJsonSerializer JsonSerializer
@@ -34,7 +31,7 @@
     var allowUserInvite = EmailSender.CanSendRequiredEmail();
     var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
     var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
-    var externalLoginsUrl = LinkGenerator.GetPathByAction(nameof(BackOfficeController.Authorize), ControllerExtensions.GetControllerName<BackOfficeController>()) ?? "/umbraco/management/api/v1/security/back-office/authorize";
+    const string externalLoginsUrl = "/umbraco/management/api/v1/security/back-office/login-external";
     var externalLoginProviders = await ExternalLogins.GetBackOfficeProvidersAsync();
     var externalSignInErrors = ViewData.GetExternalSignInProviderErrors();
 }
