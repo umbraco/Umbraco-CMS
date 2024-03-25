@@ -9,9 +9,6 @@ public abstract class RecycleBinItemResponseModelBase
     public Guid Id { get; set; }
 
     [Required]
-    public string Type { get; set; } = string.Empty;
-
-    [Required]
     public bool HasChildren { get; set; }
 
     public ItemReferenceByIdResponseModel? Parent { get; set; }
