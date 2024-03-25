@@ -1,8 +1,8 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -12,17 +12,17 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 public class ByKeyDocumentBlueprintController : DocumentBlueprintControllerBase
 {
     private readonly IContentBlueprintEditingService _contentBlueprintEditingService;
-    private readonly IDocumentPresentationFactory _documentPresentationFactory;
+    private readonly IUmbracoMapper _umbracoMapper;
 
-    public ByKeyDocumentBlueprintController(IContentBlueprintEditingService contentBlueprintEditingService, IDocumentPresentationFactory documentPresentationFactory)
+    public ByKeyDocumentBlueprintController(IContentBlueprintEditingService contentBlueprintEditingService, IUmbracoMapper umbracoMapper)
     {
         _contentBlueprintEditingService = contentBlueprintEditingService;
-        _documentPresentationFactory = documentPresentationFactory;
+        _umbracoMapper = umbracoMapper;
     }
 
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(DocumentResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(DocumentBlueprintResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
@@ -32,7 +32,6 @@ public class ByKeyDocumentBlueprintController : DocumentBlueprintControllerBase
             return DocumentBlueprintNotFound();
         }
 
-        DocumentResponseModel model = await _documentPresentationFactory.CreateResponseModelAsync(blueprint);
-        return Ok(model);
+        return Ok(_umbracoMapper.Map<DocumentBlueprintResponseModel>(blueprint));
     }
 }
