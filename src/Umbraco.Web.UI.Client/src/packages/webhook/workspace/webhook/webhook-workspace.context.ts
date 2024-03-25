@@ -2,18 +2,14 @@ import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE } from '../../entity.js'
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
-export class UmbWebhookWorkspaceContext extends UmbControllerBase implements UmbWorkspaceContextInterface {
+export class UmbWebhookWorkspaceContext extends UmbControllerBase implements UmbWorkspaceContext {
 	public readonly workspaceAlias = UMB_WEBHOOK_WORKSPACE;
 
 	getEntityType() {
 		return UMB_WEBHOOK_ENTITY_TYPE;
-	}
-
-	getUnique() {
-		return undefined;
 	}
 
 	constructor(host: UmbControllerHost) {

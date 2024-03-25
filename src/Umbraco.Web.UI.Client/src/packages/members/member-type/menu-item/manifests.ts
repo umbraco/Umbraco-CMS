@@ -10,7 +10,7 @@ const menuItem: ManifestTypes = {
 	meta: {
 		label: 'Member Types',
 		treeAlias: UMB_MEMBER_TYPE_TREE_ALIAS,
-		menus: ['Umb.Menu.Settings'],
+		menus: ['Umb.Menu.StructureSettings'],
 	},
 };
 

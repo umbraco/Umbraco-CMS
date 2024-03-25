@@ -10,7 +10,7 @@ const menuItem: ManifestTypes = {
 	meta: {
 		label: 'Media Types',
 		treeAlias: UMB_MEDIA_TYPE_TREE_ALIAS,
-		menus: ['Umb.Menu.Settings'],
+		menus: ['Umb.Menu.StructureSettings'],
 	},
 };
 
