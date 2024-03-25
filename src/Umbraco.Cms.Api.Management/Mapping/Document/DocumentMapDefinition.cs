@@ -1,6 +1,7 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -22,6 +23,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     {
         mapper.Define<IContent, DocumentResponseModel>((_, _) => new DocumentResponseModel(), Map);
         mapper.Define<IContent, DocumentCollectionResponseModel>((_, _) => new DocumentCollectionResponseModel(), Map);
+        mapper.Define<IContent, DocumentBlueprintResponseModel>((_, _) => new DocumentBlueprintResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll -Urls -Template
@@ -63,6 +65,24 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         }
 
         target.Values = MapValueViewModels(properties);
+        target.Variants = MapVariantViewModels(
+            source,
+            (culture, _, documentVariantViewModel) =>
+            {
+                documentVariantViewModel.State = DocumentVariantStateHelper.GetState(source, culture);
+                documentVariantViewModel.PublishDate = culture == null
+                    ? source.PublishDate
+                    : source.GetPublishDate(culture);
+            });
+    }
+
+
+    // Umbraco.Code.MapAll
+    private void Map(IContent source, DocumentBlueprintResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.DocumentType = context.Map<DocumentTypeReferenceResponseModel>(source.ContentType)!;
+        target.Values = MapValueViewModels(source.Properties);
         target.Variants = MapVariantViewModels(
             source,
             (culture, _, documentVariantViewModel) =>
