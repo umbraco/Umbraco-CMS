@@ -1,3 +1,3 @@
-import { manifest as routableKindManifest } from './routable-workspace.kind.js';
+import { manifest as routableKindManifest } from './routable/routable-workspace.kind.js';
 
 export const manifests = [routableKindManifest];

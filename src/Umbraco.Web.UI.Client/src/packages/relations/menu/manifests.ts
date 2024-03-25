@@ -4,12 +4,12 @@ const menuItem: ManifestTypes = {
 	type: 'menuItem',
 	alias: 'Umb.MenuItem.Relations',
 	name: 'Relations Menu Item',
-	weight: 500,
+	weight: 800,
 	meta: {
 		label: 'Relations',
 		icon: 'icon-trafic',
 		entityType: 'relation-type-root',
-		menus: ['Umb.Menu.Settings'],
+		menus: ['Umb.Menu.AdvancedSettings'],
 	},
 };
 

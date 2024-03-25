@@ -22,15 +22,15 @@ import { UmbDocumentWorkspaceEditorElement } from './document-workspace-editor.e
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import type {
-	UmbWorkspaceCollectionContextInterface,
-	UmbVariantableWorkspaceContextInterface,
-	UmbPublishableWorkspaceContextInterface,
+	UmbCollectionWorkspaceContext,
+	UmbVariantDatasetWorkspaceContext,
+	UmbPublishableWorkspaceContext,
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
@@ -51,12 +51,12 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
+	extends UmbSaveableWorkspaceContextBase<EntityType>
 	implements
 		UmbRoutableWorkspaceContext,
-		UmbVariantableWorkspaceContextInterface<UmbDocumentVariantModel>,
-		UmbPublishableWorkspaceContextInterface,
-		UmbWorkspaceCollectionContextInterface<UmbDocumentTypeDetailModel>
+		UmbVariantDatasetWorkspaceContext<UmbDocumentVariantModel>,
+		UmbPublishableWorkspaceContext,
+		UmbCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
 {
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);

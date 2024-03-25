@@ -10,7 +10,7 @@ const menuItem: ManifestMenuItemTreeKind = {
 		label: 'Data Types',
 		entityType: 'data-type',
 		treeAlias: 'Umb.Tree.DataType',
-		menus: ['Umb.Menu.Settings'],
+		menus: ['Umb.Menu.StructureSettings'],
 	},
 };
 

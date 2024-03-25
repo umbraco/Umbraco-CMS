@@ -1,5 +1,5 @@
-import type { UmbRoutableWorkspaceContext } from '../../workspace/contexts/routable-workspace-context.interface.js';
-import type { UmbWorkspaceContextInterface } from '../../workspace/contexts/workspace-context.interface.js';
+import type { UmbRoutableWorkspaceContext } from '../../workspace/contexts/tokens/routable-workspace-context.interface.js';
+import type { UmbWorkspaceContext } from '../../workspace/contexts/tokens/workspace-context.interface.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
 
@@ -7,7 +7,7 @@ import type { ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-ap
 export interface ManifestWorkspace<
 	MetaType extends MetaWorkspace = MetaWorkspace,
 	ElementType extends UmbControllerHostElement = UmbControllerHostElement,
-	ApiType extends UmbWorkspaceContextInterface = UmbWorkspaceContextInterface,
+	ApiType extends UmbWorkspaceContext = UmbWorkspaceContext,
 > extends ManifestElementAndApi<ElementType, ApiType> {
 	type: 'workspace';
 	meta: MetaType;
