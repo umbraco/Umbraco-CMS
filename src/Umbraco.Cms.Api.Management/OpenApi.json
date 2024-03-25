@@ -34497,7 +34497,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/PropertyTypeModelBaseModel"
+            "$ref": "#/components/schemas/MemberTypePropertyTypeModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -34739,6 +34739,7 @@
           "email",
           "fallbackPermissions",
           "hasAccessToAllLanguages",
+          "hasAccessToSensitiveData",
           "id",
           "languages",
           "mediaStartNodeIds",
@@ -34794,6 +34795,9 @@
             }
           },
           "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "hasAccessToSensitiveData": {
             "type": "boolean"
           },
           "fallbackPermissions": {
@@ -37652,13 +37656,113 @@
         ],
         "additionalProperties": false
       },
+      "MemberTypePropertyTypeModelBaseModel": {
+        "required": [
+          "alias",
+          "appearance",
+          "dataType",
+          "id",
+          "isSensitive",
+          "name",
+          "sortOrder",
+          "validation",
+          "variesByCulture",
+          "variesBySegment",
+          "visibility"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "container": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "alias": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "variesByCulture": {
+            "type": "boolean"
+          },
+          "variesBySegment": {
+            "type": "boolean"
+          },
+          "validation": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PropertyTypeValidationModel"
+              }
+            ]
+          },
+          "appearance": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PropertyTypeAppearanceModel"
+              }
+            ]
+          },
+          "isSensitive": {
+            "type": "boolean"
+          },
+          "visibility": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MemberTypePropertyTypeVisibilityModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "MemberTypePropertyTypeResponseModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/PropertyTypeModelBaseModel"
+            "$ref": "#/components/schemas/MemberTypePropertyTypeModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "MemberTypePropertyTypeVisibilityModel": {
+        "required": [
+          "memberCanEdit",
+          "memberCanView"
+        ],
+        "type": "object",
+        "properties": {
+          "memberCanView": {
+            "type": "boolean"
+          },
+          "memberCanEdit": {
+            "type": "boolean"
+          }
+        },
         "additionalProperties": false
       },
       "MemberTypeReferenceResponseModel": {
@@ -41472,7 +41576,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/PropertyTypeModelBaseModel"
+            "$ref": "#/components/schemas/MemberTypePropertyTypeModelBaseModel"
           }
         ],
         "additionalProperties": false
