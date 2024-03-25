@@ -223,8 +223,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		}
 
 		// set the maximum image size
-		const maxImageSize = this.configuration?.getValueByAlias<string>('maxImageSize');
-		if (maxImageSize !== undefined) {
+		const maxImageSize = this.configuration?.getValueByAlias<number>('maxImageSize');
+		if (maxImageSize) {
 			configurationOptions.maxImageSize = maxImageSize;
 		}
 
@@ -335,7 +335,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				}
 			});
 		});
-
 		editor.on('init', () => editor.setContent(this.value?.toString() ?? ''));
 	}
 
