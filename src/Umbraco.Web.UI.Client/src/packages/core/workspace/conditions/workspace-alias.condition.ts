@@ -1,4 +1,4 @@
-import { UMB_WORKSPACE_CONTEXT, type UmbWorkspaceContextInterface } from '../contexts/index.js';
+import { UMB_WORKSPACE_CONTEXT, type UmbWorkspaceContext } from '../contexts/index.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestCondition,
@@ -15,12 +15,11 @@ export class UmbWorkspaceAliasCondition
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<WorkspaceAliasConditionConfig>) {
 		super(host, args);
 
-		let permissionCheck: ((context: UmbWorkspaceContextInterface) => boolean) | undefined = undefined;
+		let permissionCheck: ((context: UmbWorkspaceContext) => boolean) | undefined = undefined;
 		if (this.config.match) {
-			permissionCheck = (context: UmbWorkspaceContextInterface) => context.workspaceAlias === this.config.match;
+			permissionCheck = (context: UmbWorkspaceContext) => context.workspaceAlias === this.config.match;
 		} else if (this.config.oneOf) {
-			permissionCheck = (context: UmbWorkspaceContextInterface) =>
-				this.config.oneOf!.indexOf(context.workspaceAlias) !== -1;
+			permissionCheck = (context: UmbWorkspaceContext) => this.config.oneOf!.indexOf(context.workspaceAlias) !== -1;
 		}
 
 		if (permissionCheck !== undefined) {

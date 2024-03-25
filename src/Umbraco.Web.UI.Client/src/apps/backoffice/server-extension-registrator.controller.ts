@@ -1,4 +1,8 @@
-import { PackageResource, OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
+import {
+	PackageResource,
+	OpenAPI,
+	type PackageManifestResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -14,56 +18,66 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	constructor(host: UmbControllerHost, extensionRegistry: UmbBackofficeExtensionRegistry) {
 		super(host, UmbServerExtensionRegistrator.name);
 		this.#extensionRegistry = extensionRegistry;
-		this.#loadServerPackages();
 	}
 
-	async #loadServerPackages() {
-		/* TODO: we need a new endpoint here, to remove the dependency on the package repository, to get the modules available for the backoffice scope
-		/ we will need a similar endpoint for the login, installer etc at some point.
-			We should expose more information about the packages when not authorized so the end point should only return a list of modules from the manifest with
-			with the correct scope.
-
-			This code is copy pasted from the package repository. We probably don't need this is the package repository anymore.
-		*/
+	/**
+	 * Registers all extensions from the server.
+	 * This is used to register all extensions that are available to the user (including private extensions).
+	 * @remark Users must have the BACKOFFICE_ACCESS permission to access this method.
+	 */
+	public async registerAllExtensions() {
 		const { data: packages } = await tryExecuteAndNotify(this, PackageResource.getPackageManifest());
-
 		if (packages) {
-			// Append packages to the store but only if they have a name
-			//store.appendItems(packages.filter((p) => p.name?.length));
-			const extensions: ManifestBase[] = [];
-
-			packages.forEach((p) => {
-				p.extensions?.forEach((e) => {
-					// Crudely validate that the extension at least follows a basic manifest structure
-					// Idea: Use `Zod` to validate the manifest
-					if (isManifestBaseType(e)) {
-						/**
-						 * Crude check to see if extension is of type "js" since it is safe to assume we do not
-						 * need to load any other types of extensions in the backoffice (we need a js file to load)
-						 */
-
-						// TODO: add helper to check for relative paths
-						// Add base url if the js path is relative
-						if ('js' in e && typeof e.js === 'string' && !e.js.startsWith('http')) {
-							e.js = `${this.#apiBaseUrl}${e.js}`;
-						}
-
-						// Add base url if the element path is relative
-						if ('element' in e && typeof e.element === 'string' && !e.element.startsWith('http')) {
-							e.element = `${this.#apiBaseUrl}${e.element}`;
-						}
-
-						// Add base url if the element path api relative
-						if ('api' in e && typeof e.api === 'string' && !e.api.startsWith('http')) {
-							e.api = `${this.#apiBaseUrl}${e.api}`;
-						}
-
-						extensions.push(e);
-					}
-				});
-			});
-
-			this.#extensionRegistry.registerMany(extensions);
+			await this.#loadServerPackages(packages);
 		}
+	}
+
+	/**
+	 * Registers all public extensions from the server.
+	 * This is used to register all extensions that are available to the user (excluding private extensions) such as login extensions.
+	 * @remark Any user can access this method without any permissions.
+	 */
+	public async registerPublicExtensions() {
+		const { data: packages } = await tryExecuteAndNotify(this, PackageResource.getPackageManifestPublic());
+		if (packages) {
+			await this.#loadServerPackages(packages);
+		}
+	}
+
+	async #loadServerPackages(packages: PackageManifestResponseModel[]) {
+		const extensions: ManifestBase[] = [];
+
+		packages.forEach((p) => {
+			p.extensions?.forEach((e) => {
+				// Crudely validate that the extension at least follows a basic manifest structure
+				// Idea: Use `Zod` to validate the manifest
+				if (isManifestBaseType(e)) {
+					/**
+					 * Crude check to see if extension is of type "js" since it is safe to assume we do not
+					 * need to load any other types of extensions in the backoffice (we need a js file to load)
+					 */
+
+					// TODO: add helper to check for relative paths
+					// Add base url if the js path is relative
+					if ('js' in e && typeof e.js === 'string' && !e.js.startsWith('http')) {
+						e.js = `${this.#apiBaseUrl}${e.js}`;
+					}
+
+					// Add base url if the element path is relative
+					if ('element' in e && typeof e.element === 'string' && !e.element.startsWith('http')) {
+						e.element = `${this.#apiBaseUrl}${e.element}`;
+					}
+
+					// Add base url if the element path api relative
+					if ('api' in e && typeof e.api === 'string' && !e.api.startsWith('http')) {
+						e.api = `${this.#apiBaseUrl}${e.api}`;
+					}
+
+					extensions.push(e);
+				}
+			});
+		});
+
+		this.#extensionRegistry.registerMany(extensions);
 	}
 }

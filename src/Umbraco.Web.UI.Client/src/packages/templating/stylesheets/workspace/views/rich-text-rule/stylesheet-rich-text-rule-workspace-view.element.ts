@@ -1,10 +1,9 @@
-import type { UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
 import type { UmbStylesheetRule } from '../../../types.js';
 import type { UmbStylesheetRuleInputElement } from '../../../components/index.js';
 import { UmbStylesheetRuleManager } from '../../../utils/index.js';
+import { UMB_STYLESHEET_WORKSPACE_CONTEXT } from '../../stylesheet-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -13,15 +12,15 @@ export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement
 	@state()
 	_rules: UmbStylesheetRule[] = [];
 
-	#context?: UmbStylesheetWorkspaceContext;
+	#context?: typeof UMB_STYLESHEET_WORKSPACE_CONTEXT.TYPE;
 	#stylesheetRuleManager = new UmbStylesheetRuleManager();
 	#stylesheetContent = '';
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#context = workspaceContext as UmbStylesheetWorkspaceContext;
+		this.consumeContext(UMB_STYLESHEET_WORKSPACE_CONTEXT, (context) => {
+			this.#context = context;
 			this.#observeContent();
 		});
 	}

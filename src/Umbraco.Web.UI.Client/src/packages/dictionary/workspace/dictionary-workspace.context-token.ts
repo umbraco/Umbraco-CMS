@@ -1,9 +1,9 @@
 import type { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type { UmbSaveableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_DICTIONARY_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
+	UmbSaveableWorkspaceContext,
 	UmbDictionaryWorkspaceContext
 >(
 	'UmbWorkspaceContext',
