@@ -74,9 +74,9 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
-    public DocumentBlueprintResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity)
+    public DocumentBlueprintItemResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity)
     {
-        var responseModel = new DocumentBlueprintResponseModel()
+        var responseModel = new DocumentBlueprintItemResponseModel()
         {
             Id = entity.Key,
         };
