@@ -100,15 +100,6 @@ public class BackOfficeController : SecurityControllerBase
         return Ok();
     }
 
-    [HttpPost("login-external")]
-    [MapToApiVersion("1.0")]
-    [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
-    public async Task<IActionResult> LoginExternal([FromForm] LoginExternalRequestModel model)
-    {
-        AuthenticationProperties properties = _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(model.Provider, null);
-        return await Task.FromResult(new ChallengeResult(model.Provider, properties));
-    }
-
     [AllowAnonymous]
     [HttpPost("verify-2fa")]
     [MapToApiVersion("1.0")]
