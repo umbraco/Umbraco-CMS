@@ -4,12 +4,9 @@ import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import { UmbPartialViewWorkspaceEditorElement } from './partial-view-workspace-editor.element.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	UmbRoutableWorkspaceContext,
-	UmbSaveableWorkspaceContextInterface,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbRoutableWorkspaceContext, UmbSaveableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
@@ -22,8 +19,8 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbPartialViewWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbPartialViewDetailModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	extends UmbSaveableWorkspaceContextBase<UmbPartialViewDetailModel>
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbPartialViewDetailRepository(this);
 
@@ -31,6 +28,7 @@ export class UmbPartialViewWorkspaceContext
 
 	#data = new UmbObjectState<UmbPartialViewDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly content = this.#data.asObservablePart((data) => data?.content);
 	readonly path = this.#data.asObservablePart((data) => data?.path);

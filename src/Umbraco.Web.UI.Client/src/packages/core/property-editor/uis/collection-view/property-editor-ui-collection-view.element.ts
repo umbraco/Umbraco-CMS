@@ -3,7 +3,7 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/document';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_WORKSPACE_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_COLLECTION_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	UmbCollectionBulkActionPermissions,
@@ -31,7 +31,7 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_COLLECTION_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._collectionAlias = workspaceContext.getCollectionAlias();
 
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
@@ -39,8 +39,9 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 					if (propertyAlias) {
 						// Gets the Data Type ID for the current property.
 						const property = await workspaceContext.structure.getPropertyStructureByAlias(propertyAlias);
-						if (property && this._config) {
-							this._config.unique = workspaceContext.getUnique();
+						const unique = workspaceContext.getUnique();
+						if (unique && property && this._config) {
+							this._config.unique = unique;
 							this._config.dataTypeId = property.dataType.unique;
 							this.requestUpdate('_config');
 						}

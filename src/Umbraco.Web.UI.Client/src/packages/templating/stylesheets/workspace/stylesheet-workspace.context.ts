@@ -4,8 +4,8 @@ import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
 import { UMB_STYLESHEET_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbStylesheetWorkspaceEditorElement } from './stylesheet-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContextInterface,
-	UmbEditableWorkspaceContextBase,
+	type UmbSaveableWorkspaceContext,
+	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
@@ -19,8 +19,8 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbStylesheetWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbStylesheetDetailModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	extends UmbSaveableWorkspaceContextBase<UmbStylesheetDetailModel>
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbStylesheetDetailRepository(this);
 
@@ -28,6 +28,7 @@ export class UmbStylesheetWorkspaceContext
 
 	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly content = this.#data.asObservablePart((data) => data?.content);
 	readonly path = this.#data.asObservablePart((data) => data?.path);

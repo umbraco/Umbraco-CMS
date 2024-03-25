@@ -1,12 +1,12 @@
-import { UMB_WORKSPACE_CONTEXT } from './workspace-context.token.js';
-import type { UmbWorkspaceContextInterface } from './workspace-context.interface.js';
+import { UMB_WORKSPACE_CONTEXT } from './tokens/workspace.context-token.js';
+import type { UmbWorkspaceContext } from './tokens/workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 
 export abstract class UmbDefaultWorkspaceContext
 	extends UmbContextBase<UmbDefaultWorkspaceContext>
-	implements UmbWorkspaceContextInterface
+	implements UmbWorkspaceContext
 {
 	public workspaceAlias!: string;
 	#entityType!: string;
