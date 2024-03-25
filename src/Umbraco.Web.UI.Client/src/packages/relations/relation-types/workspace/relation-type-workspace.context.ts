@@ -18,7 +18,8 @@ export class UmbRelationTypeWorkspaceContext
 	//
 	public readonly repository: UmbRelationTypeRepository = new UmbRelationTypeRepository(this);
 
-	#parent?: { entityType: string; unique: string | null };
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 
 	#data = new UmbObjectState<RelationTypeResponseModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
@@ -75,7 +76,7 @@ export class UmbRelationTypeWorkspaceContext
 
 	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		const { data } = await this.repository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);

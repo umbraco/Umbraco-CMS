@@ -7,3 +7,13 @@ export interface ManifestWorkspaceFooterApp
 		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'workspaceFooterApp';
 }
+
+export interface ManifestWorkspaceFooterAppMenuBreadcrumbKind extends ManifestWorkspaceFooterApp {
+	type: 'workspaceFooterApp';
+	kind: 'menuBreadcrumb';
+}
+
+export interface ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind extends ManifestWorkspaceFooterApp {
+	type: 'workspaceFooterApp';
+	kind: 'variantMenuBreadcrumb';
+}

@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { FileSystemTreeItemPresentationModel } from '../models/FileSystemTreeItemPresentationModel';
 import type { PagedFileSystemTreeItemPresentationModel } from '../models/PagedFileSystemTreeItemPresentationModel';
 import type { StaticFileItemResponseModel } from '../models/StaticFileItemResponseModel';
 
@@ -25,6 +26,27 @@ export class StaticFileResource {
             url: '/umbraco/management/api/v1/item/static-file',
             query: {
                 'path': path,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreeStaticFileAncestors({
+        descendantPath,
+    }: {
+        descendantPath?: string,
+    }): CancelablePromise<Array<FileSystemTreeItemPresentationModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/static-file/ancestors',
+            query: {
+                'descendantPath': descendantPath,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
