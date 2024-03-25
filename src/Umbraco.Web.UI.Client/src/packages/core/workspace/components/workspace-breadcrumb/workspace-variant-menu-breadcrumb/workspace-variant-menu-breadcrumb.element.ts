@@ -1,9 +1,8 @@
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbVariantableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type { UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
@@ -25,7 +24,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 	_appDefaultCulture?: string;
 
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
-	#workspaceContext?: UmbVariantableWorkspaceContextInterface<UmbVariantModel>;
+	#workspaceContext?: UmbVariantDatasetWorkspaceContext;
 	#appLanguageContext?: UmbAppLanguageContext;
 	#structureContext?: any;
 
