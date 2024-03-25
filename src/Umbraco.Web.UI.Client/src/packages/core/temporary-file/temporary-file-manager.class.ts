@@ -22,6 +22,9 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 	#queue = new UmbArrayState<UmbTemporaryFileModel>([], (item) => item.unique);
 	public readonly queue = this.#queue.asObservable();
 
+	#completed = new UmbArrayState<UmbTemporaryFileModel>([], (item) => item.unique);
+	public readonly completed = this.#completed.asObservable();
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(host);
@@ -75,7 +78,9 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 				this.#queue.updateOne(item.unique, { ...item, status: 'success' });
 			}
 			filesCompleted.push(item);
-			this.removeOne(item.unique);
+
+			this.#completed.appendOne(item);
+			this.#queue.removeOne(item.unique);
 		}
 
 		return filesCompleted;
