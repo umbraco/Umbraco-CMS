@@ -1,6 +1,10 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentTreeItemModel } from './types.js';
-import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
@@ -25,6 +29,7 @@ export class UmbDocumentTreeServerDataSource extends UmbTreeServerDataSourceBase
 		super(host, {
 			getRootItems,
 			getChildrenOf,
+			getAncestorsOf,
 			mapper,
 		});
 	}
@@ -45,6 +50,12 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	}
 };
 
+const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	DocumentResource.getTreeDocumentAncestors({
+		descendantId: args.descendantUnique,
+	});
+
 const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel => {
 	return {
 		unique: item.id,
@@ -63,6 +74,7 @@ const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel =
 			return {
 				name: variant.name,
 				culture: variant.culture || null,
+				segment: null, // TODO: add segment to the backend API?
 				state: variant.state,
 			};
 		}),

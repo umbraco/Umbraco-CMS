@@ -21,7 +21,8 @@ export class UmbDictionaryWorkspaceContext
 	//
 	public readonly detailRepository = new UmbDictionaryDetailRepository(this);
 
-	#parent?: { entityType: string; unique: string | null };
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 
 	#data = new UmbObjectState<UmbDictionaryDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
@@ -115,7 +116,7 @@ export class UmbDictionaryWorkspaceContext
 
 	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		const { data } = await this.detailRepository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
@@ -127,8 +128,9 @@ export class UmbDictionaryWorkspaceContext
 		if (!this.#data.value.unique) return;
 
 		if (this.getIsNew()) {
-			if (!this.#parent) throw new Error('Parent is not set');
-			const { error } = await this.detailRepository.create(this.#data.value, this.#parent.unique);
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
+			const { error } = await this.detailRepository.create(this.#data.value, parent.unique);
 			if (error) {
 				return;
 			}
@@ -136,8 +138,8 @@ export class UmbDictionaryWorkspaceContext
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: this.#parent.entityType,
-				unique: this.#parent.unique,
+				entityType: parent.entityType,
+				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
 

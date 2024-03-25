@@ -5,7 +5,7 @@ import type {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
-export const UMB_STYLESHEET_WORKSPACE_ALIAS = 'Umb.Workspace.StyleSheet';
+export const UMB_STYLESHEET_WORKSPACE_ALIAS = 'Umb.Workspace.Stylesheet';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',

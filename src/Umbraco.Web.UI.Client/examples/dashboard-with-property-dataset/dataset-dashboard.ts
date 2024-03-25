@@ -39,11 +39,7 @@ export class ExampleDatasetDashboard extends UmbElementMixin(LitElement) {
 							},
 							{
 								alias: 'items',
-								value: {
-									0: { sortOrder: 1, value: 'First Option' },
-									1: { sortOrder: 2, value: 'Second Option' },
-									2: { sortOrder: 3, value: 'Third Option' },
-								},
+								value: [ 'First Option' , 'Second Option', 'Third Option' ],
 							},
 						]}
 						property-editor-ui-alias="Umb.PropertyEditorUi.Dropdown"></umb-property>

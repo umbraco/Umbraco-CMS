@@ -1,4 +1,4 @@
-import { UMB_CONTENT_MENU_ALIAS } from '../../menu.manifests.js';
+import { UMB_CONTENT_MENU_ALIAS } from '../../menu/manifests.js';
 import type { ManifestMenuItemTreeKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestMenuItemTreeKind = {
