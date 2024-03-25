@@ -1,16 +1,16 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_RELATION_TYPE_ROOT_ENTITY_TYPE } from '../relation-types/index.js';
 
-const menuItem: ManifestTypes = {
-	type: 'menuItem',
-	alias: 'Umb.MenuItem.Relations',
-	name: 'Relations Menu Item',
-	weight: 800,
-	meta: {
-		label: 'Relations',
-		icon: 'icon-trafic',
-		entityType: 'relation-type-root',
-		menus: ['Umb.Menu.AdvancedSettings'],
+export const manifests = [
+	{
+		type: 'menuItem',
+		alias: 'Umb.MenuItem.Relations',
+		name: 'Relations Menu Item',
+		weight: 800,
+		meta: {
+			label: 'Relations',
+			icon: 'icon-trafic',
+			entityType: UMB_RELATION_TYPE_ROOT_ENTITY_TYPE,
+			menus: ['Umb.Menu.AdvancedSettings'],
+		},
 	},
-};
-
-export const manifests = [menuItem];
+];
