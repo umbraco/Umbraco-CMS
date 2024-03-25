@@ -1,6 +1,7 @@
 import {
   UmbBundleExtensionInitializer,
-  UmbEntryPointExtensionInitializer
+  UmbEntryPointExtensionInitializer,
+  UmbServerExtensionRegistrator
 } from "@umbraco-cms/backoffice/extension-api";
 import { umbExtensionsRegistry } from "@umbraco-cms/backoffice/extension-registry";
 import type { UmbElement } from "@umbraco-cms/backoffice/element-api";
@@ -24,7 +25,7 @@ export class UmbSlimBackofficeController extends UmbControllerBase {
     super(host);
     new UmbBundleExtensionInitializer(host, umbExtensionsRegistry);
     new UmbEntryPointExtensionInitializer(host, umbExtensionsRegistry);
-    //new UmbServerExtensionRegistrator(host, umbExtensionsRegistry); // TODO: We need an unauthorized endpoint to register public extensions.
+    new UmbServerExtensionRegistrator(host, umbExtensionsRegistry).registerPublicExtensions();
 
     this.#umbIconRegistry.attach(host);
     this.#uuiIconRegistry.attach(host);
