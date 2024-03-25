@@ -9,7 +9,7 @@ const menuItem: ManifestMenuItem = {
 		label: 'Languages',
 		icon: 'icon-globe',
 		entityType: 'language-root',
-		menus: ['Umb.Menu.Settings'],
+		menus: ['Umb.Menu.StructureSettings'],
 	},
 };
 
