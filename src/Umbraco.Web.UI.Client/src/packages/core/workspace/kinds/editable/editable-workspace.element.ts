@@ -17,11 +17,9 @@ export class UmbEditableWorkspaceElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<uui-form>
-			<form>
-				<umb-router-slot .routes="${this._routes}"></umb-router-slot>
-			</form>
-		</uui-form>`;
+		return html`<umb-form>
+			<umb-router-slot .routes="${this._routes}"></umb-router-slot>
+		</umb-form>`;
 	}
 }
 

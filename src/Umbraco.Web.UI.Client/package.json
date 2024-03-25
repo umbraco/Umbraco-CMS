@@ -38,6 +38,7 @@
 		"./entity-bulk-action": "./dist-cms/packages/core/entity-bulk-action/index.js",
 		"./event": "./dist-cms/packages/core/event/index.js",
 		"./extension-registry": "./dist-cms/packages/core/extension-registry/index.js",
+		"./form": "./dist-cms/packages/core/form/index.js",
 		"./icon": "./dist-cms/packages/core/icon-registry/index.js",
 		"./id": "./dist-cms/packages/core/id/index.js",
 		"./language": "./dist-cms/packages/language/index.js",
