@@ -1,4 +1,7 @@
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -6,40 +9,66 @@ namespace Umbraco.Cms.Core.Services;
 
 // not implementing ContentEditingServiceWithSortingBase - it might be for later as it has Move, Copy, etc.
 // FIXME: Refactor IContentEditingService and IContentBlueprintEditingService - they share logic
-internal sealed class ContentBlueprintEditingService : IContentBlueprintEditingService
+internal sealed class ContentBlueprintEditingService
+    : ContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>, IContentBlueprintEditingService
 {
-    private readonly IContentService _contentService;
-    private readonly ICoreScopeProvider _scopeProvider;
-    private readonly IUserIdKeyResolver _userIdKeyResolver;
-
     public ContentBlueprintEditingService(
         IContentService contentService,
+        IContentTypeService contentTypeService,
+        PropertyEditorCollection propertyEditorCollection,
+        IDataTypeService dataTypeService,
+        ILogger<ContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>> logger,
         ICoreScopeProvider scopeProvider,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IContentValidationService validationService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService)
     {
-        _contentService = contentService;
-        _scopeProvider = scopeProvider;
-        _userIdKeyResolver = userIdKeyResolver;
     }
 
     public async Task<IContent?> GetAsync(Guid key)
     {
-        IContent? blueprint = _contentService.GetBlueprintById(key);
+        IContent? blueprint = ContentService.GetBlueprintById(key);
         return await Task.FromResult(blueprint);
+    }
+
+    // NB: Some of the implementation is copied from <see cref="IContentEditingService.UpdateAsync()" />
+    public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentBlueprintUpdateModel updateModel, Guid userKey)
+    {
+        IContent? blueprint = await GetAsync(key);
+        if (blueprint == null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentUpdateResult());
+        }
+
+        if (await ValidateCulturesAsync(updateModel) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentUpdateResult { Content = blueprint });
+        }
+
+        Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<ContentUpdateResult>(blueprint, updateModel);
+        if (result.Success == false)
+        {
+            return Attempt.FailWithStatus(result.Status, result.Result);
+        }
+
+        var currentUserId = await GetUserIdAsync(userKey);
+        ContentService.SaveBlueprint(blueprint, currentUserId);
+
+        return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentUpdateResult { Content = blueprint, ValidationResult = result.Result.ValidationResult });
     }
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         IContent? blueprint = await GetAsync(key);
         if (blueprint == null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, blueprint);
         }
 
-        var performingUserId = await _userIdKeyResolver.GetAsync(userKey);
+        var performingUserId = await GetUserIdAsync(userKey);
 
-        _contentService.DeleteBlueprint(blueprint, performingUserId);
+        ContentService.DeleteBlueprint(blueprint, performingUserId);
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, blueprint);
