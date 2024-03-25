@@ -105,8 +105,8 @@ public class BackOfficeController : SecurityControllerBase
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     public async Task<IActionResult> LoginExternal([FromForm] LoginExternalRequestModel model)
     {
-        AuthenticationProperties properties = _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(model.IdentityProvider, null);
-        return await Task.FromResult(new ChallengeResult(model.IdentityProvider, properties));
+        AuthenticationProperties properties = _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(model.Provider, null);
+        return await Task.FromResult(new ChallengeResult(model.Provider, properties));
     }
 
     [AllowAnonymous]
