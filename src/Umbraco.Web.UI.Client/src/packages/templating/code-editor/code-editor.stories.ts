@@ -113,7 +113,7 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 
 	"Smartypants, double quotes" and 'single quotes'`,
 	typescript: `import { UmbTemplateRepository } from '../repository/template.repository.js';
-	import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context.js';
+	import { UmbWorkspaceContextBase } from '../../../shared/components/workspace/workspace-context/workspace-context.js';
 	import { UmbObjectState } from '@umbraco-cms/observable-api';
 	import { TemplateModel } from '@umbraco-cms/backend-api';
 	import { UmbControllerHostElement } from '@umbraco-cms/controller';

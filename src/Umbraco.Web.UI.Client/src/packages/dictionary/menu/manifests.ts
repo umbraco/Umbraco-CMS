@@ -8,9 +8,6 @@ export const manifests = [
 		type: 'menu',
 		alias: UMB_DICTIONARY_MENU_ALIAS,
 		name: 'Dictionary Menu',
-		meta: {
-			label: 'Dictionary',
-		},
 	},
 	{
 		type: 'menuItem',

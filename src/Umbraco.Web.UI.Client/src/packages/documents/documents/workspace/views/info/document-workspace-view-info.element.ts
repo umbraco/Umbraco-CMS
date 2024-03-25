@@ -2,7 +2,6 @@ import { TimeOptions } from './utils.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import {
 	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_WORKSPACE_MODAL,
@@ -10,7 +9,11 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
-import type { UmbDocumentVariantModel, UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
+import {
+	UMB_DOCUMENT_WORKSPACE_CONTEXT,
+	type UmbDocumentVariantModel,
+	type UmbDocumentWorkspaceContext,
+} from '@umbraco-cms/backoffice/document';
 import { DocumentVariantStateModel, type DocumentUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
 import {
 	type UmbDocumentTypeDetailModel,
@@ -78,8 +81,8 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				this._editDocumentTypePath = routeBuilder({});
 			});
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (nodeContext) => {
-			this.#workspaceContext = nodeContext as UmbDocumentWorkspaceContext;
+		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
 			this._documentTypeUnique = this.#workspaceContext.getContentTypeId()!;
 			this.#getData();
 			this._observeContent();
@@ -258,7 +261,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 							<uui-action-bar slot="actions">
 								<uui-button label=${this.localize.term('general_edit')} @click=${this.#openTemplatePicker}></uui-button>
 							</uui-action-bar>
-					  </uui-ref-node>`
+						</uui-ref-node>`
 					: html`<uui-button
 							label=${this.localize.term('general_edit')}
 							@click=${this.#openTemplatePicker}></uui-button>`}

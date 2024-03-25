@@ -7,7 +7,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`
-			<umb-workspace-editor headline="Extensions" alias=${UMB_EXTENSION_ROOT_WORKSPACE_ALIAS} .enforceNoFooter=${true}>
+			<umb-workspace-editor
+				headline="Extension Insights"
+				alias=${UMB_EXTENSION_ROOT_WORKSPACE_ALIAS}
+				.enforceNoFooter=${true}>
 				<umb-collection alias=${UMB_EXTENSION_COLLECTION_ALIAS}></umb-collection>
 			</umb-workspace-editor>
 		`;

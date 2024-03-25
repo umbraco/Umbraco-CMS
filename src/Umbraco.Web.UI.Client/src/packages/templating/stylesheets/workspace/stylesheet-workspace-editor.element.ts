@@ -1,7 +1,6 @@
-import type { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context.js';
+import { UMB_STYLESHEET_WORKSPACE_CONTEXT } from './stylesheet-workspace.context-token.js';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -13,13 +12,13 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _name?: string;
 
-	#workspaceContext?: UmbStylesheetWorkspaceContext;
+	#workspaceContext?: typeof UMB_STYLESHEET_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance as UmbStylesheetWorkspaceContext;
+		this.consumeContext(UMB_STYLESHEET_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
 
 			this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeStylesheetName');
 

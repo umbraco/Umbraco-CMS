@@ -2,24 +2,24 @@ import { UmbLanguageDetailRepository } from '../../repository/index.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UmbLanguageWorkspaceEditorElement } from './language-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContextInterface,
-	UmbEditableWorkspaceContextBase,
+	type UmbSaveableWorkspaceContext,
+	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
-import { ApiError } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbLanguageWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbLanguageDetailModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	extends UmbSaveableWorkspaceContextBase<UmbLanguageDetailModel>
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository: UmbLanguageDetailRepository = new UmbLanguageDetailRepository(this);
 
 	#data = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+	readonly unique = this.#data.asObservablePart((x) => x?.unique);
 
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
@@ -114,30 +114,17 @@ export class UmbLanguageWorkspaceContext
 		this.#data.update({ fallbackIsoCode: unique });
 	}
 
-	// TODO: this is a temp solution to bubble validation errors to the UI
-	setValidationErrors(errorMap: any) {
-		// TODO: I can't use the update method to set the value to undefined
-		this.#validationErrors.setValue(errorMap);
-	}
-
 	async save() {
-		const data = this.getData();
-		if (!data) return;
+		const newData = this.getData();
+		if (!newData) return;
 
 		if (this.getIsNew()) {
-			const { error } = await this.repository.create(data);
-			// TODO: this is temp solution to bubble validation errors to the UI
-			if (error) {
-				if (error instanceof ApiError && error.body.type === 'validation') {
-					this.setValidationErrors?.(error.body.errors);
-				}
-			} else {
-				this.setValidationErrors?.(undefined);
-				// TODO: do not make it the buttons responsibility to set the workspace to not new.
+			const { data } = await this.repository.create(newData);
+			if (data) {
 				this.setIsNew(false);
 			}
 		} else {
-			await this.repository.save(data);
+			await this.repository.save(newData);
 			// TODO: Show validation errors as warnings?
 		}
 	}
