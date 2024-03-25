@@ -1,84 +1,43 @@
 import { UmbCurrentUserRepository } from '../repository/index.js';
-import { html, customElement, state, when, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_CURRENT_USER_MFA_MODAL } from '../modals/current-user-mfa/current-user-mfa-modal.token.js';
+import { html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	type UmbExtensionElementInitializer,
-	UmbExtensionsElementInitializer,
-} from '@umbraco-cms/backoffice/extension-api';
-import { type ManifestMfaLoginProvider, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-mfa-providers-user-profile-app')
 export class UmbMfaProvidersUserProfileAppElement extends UmbLitElement {
-	@state()
-	_items: Array<UmbExtensionElementInitializer<ManifestMfaLoginProvider>> = [];
-
 	#currentUserRepository = new UmbCurrentUserRepository(this);
-	#extensionsInitializer?: UmbExtensionsElementInitializer<
-		ManifestMfaLoginProvider,
-		'mfaLoginProvider',
-		ManifestMfaLoginProvider
-	>;
+
+	@state()
+	_hasProviders = false;
 
 	constructor() {
 		super();
-
-		this.#extensionsInitializer = new UmbExtensionsElementInitializer<
-			ManifestMfaLoginProvider,
-			'mfaLoginProvider',
-			ManifestMfaLoginProvider
-		>(
-			this,
-			umbExtensionsRegistry,
-			'mfaLoginProvider',
-			undefined,
-			(permitted) => (this._items = permitted),
-			'_mfaLoginProviders',
-			'umb-mfa-login-provider-default',
-		);
-
-		this.#loadProviders();
+		this.#init();
 	}
 
-	async #loadProviders() {
-		const { data: providers } = await this.#currentUserRepository.requestMfaLoginProviders();
-
-		if (!providers) return;
-
-		for (const provider of providers) {
-			// Check if provider is initialized as extension
-			const extension = this._items.find((item) => item.manifest?.forProviderNames.includes(provider.providerName));
-			if (extension) {
-				extension.properties = { provider };
-			} else {
-				// Register provider as extension
-				const manifest: ManifestMfaLoginProvider = {
-					type: 'mfaLoginProvider',
-					alias: provider.providerName,
-					name: provider.providerName,
-					forProviderNames: [provider.providerName],
-					meta: {
-						label: provider.providerName,
-					},
-				};
-				umbExtensionsRegistry.register(manifest);
-			}
-		}
+	async #init() {
+		this._hasProviders = await this.#currentUserRepository.hasMfaLoginProviders();
 	}
 
 	render() {
-		return when(
-			this._items.length > 0,
-			() => html`
-				<uui-box headline=${this.localize.term('member_2fa')}>
-					${repeat(
-						this._items,
-						(item) => item.alias,
-						(item) => item.component,
-					)}
-				</uui-box>
-			`,
-		);
+		if (!this._hasProviders) {
+			return nothing;
+		}
+
+		return html`
+			<uui-box .headline=${this.localize.term('member_2fa')}>
+				<uui-button type="button" look="primary" @click=${this.#onClick}>
+					<umb-localize key="user_configureTwoFactor">Configure Two Factor</umb-localize>
+				</uui-button>
+			</uui-box>
+		`;
+	}
+
+	async #onClick() {
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		await modalManagerContext.open(this, UMB_CURRENT_USER_MFA_MODAL).onSubmit();
 	}
 
 	static styles = [UmbTextStyles];
