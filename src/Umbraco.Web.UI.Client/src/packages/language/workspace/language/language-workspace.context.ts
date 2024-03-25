@@ -19,7 +19,6 @@ export class UmbLanguageWorkspaceContext
 
 	#data = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
-	readonly unique = this.#data.asObservablePart((x) => x?.unique);
 
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
