@@ -9,7 +9,6 @@ public class RelationModelMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<RelationItemDto, RelationItemModel>((source, context) => new RelationItemModel(), Map);
-        mapper.Define<RelationItemDto, RelationItemModel>((source, context) => new RelationItemModel(), Map);
     }
 
     private void Map(RelationItemDto source, RelationItemModel target, MapperContext context)
