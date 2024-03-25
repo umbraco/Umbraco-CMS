@@ -17,8 +17,6 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique (instead of the object type)
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
 
-	abstract readonly unique: Observable<string | null | undefined>;
-
 	#isNew = new UmbBooleanState(undefined);
 	isNew = this.#isNew.asObservable();
 
@@ -66,7 +64,7 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	abstract getEntityType(): string;
 	abstract getData(): WorkspaceDataModelType | undefined;
 	abstract save(): Promise<void>;
-	abstract unique: Observable<string | undefined>;
+	abstract readonly unique: Observable<string | null | undefined>;
 }
 
 /*
