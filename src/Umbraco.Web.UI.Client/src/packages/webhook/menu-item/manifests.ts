@@ -10,7 +10,7 @@ const menuItem: ManifestMenuItem = {
 		label: 'Webhooks',
 		icon: 'icon-webhook',
 		entityType: UMB_WEBHOOK_ENTITY_TYPE,
-		menus: ['Umb.Menu.Settings'],
+		menus: ['Umb.Menu.AdvancedSettings'],
 	},
 };
 

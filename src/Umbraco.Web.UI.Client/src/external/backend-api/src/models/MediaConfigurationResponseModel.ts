@@ -7,5 +7,6 @@ export type MediaConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
     sanitizeTinyMce: boolean;
+    reservedFieldNames: Array<string>;
 };
 

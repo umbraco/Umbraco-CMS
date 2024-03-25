@@ -1,4 +1,4 @@
-import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from './relation-type-workspace.context.js';
+import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from './relation-type-workspace.context-token.js';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';

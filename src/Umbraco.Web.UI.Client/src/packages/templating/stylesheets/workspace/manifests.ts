@@ -1,17 +1,18 @@
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
-export const UMB_STYLESHEET_WORKSPACE_ALIAS = 'Umb.Workspace.StyleSheet';
+export const UMB_STYLESHEET_WORKSPACE_ALIAS = 'Umb.Workspace.Stylesheet';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: UMB_STYLESHEET_WORKSPACE_ALIAS,
 	name: 'Stylesheet Workspace',
-	js: () => import('./stylesheet-workspace.element.js'),
+	api: () => import('./stylesheet-workspace.context.js'),
 	meta: {
 		entityType: 'stylesheet',
 	},

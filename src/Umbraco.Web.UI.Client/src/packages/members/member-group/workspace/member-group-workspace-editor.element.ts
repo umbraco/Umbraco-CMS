@@ -1,4 +1,4 @@
-import { UMB_MEMBER_GROUP_WORKSPACE_CONTEXT } from './member-group-workspace.context.js';
+import { UMB_MEMBER_GROUP_WORKSPACE_CONTEXT } from './member-group-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

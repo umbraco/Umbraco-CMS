@@ -3,7 +3,10 @@ import '../../../block-type/components/input-block-type/index.js';
 import { UMB_BLOCK_LIST_TYPE } from '../../types.js';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
@@ -51,14 +54,19 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 		}
 	}
 
+	#onChange(e: CustomEvent) {
+		e.stopPropagation();
+		this.value = (e.target as UmbInputBlockTypeElement).value;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
 	render() {
 		return html`<umb-input-block-type
 			.value=${this.value}
 			.workspacePath=${this._workspacePath}
 			@create=${this.#onCreate}
-			@change=${(e: Event) => {
-				this.value = (e.target as UmbInputBlockTypeElement).value;
-			}}></umb-input-block-type>`;
+			@delete=${this.#onChange}
+			@change=${this.#onChange}></umb-input-block-type>`;
 	}
 }
 

@@ -34,6 +34,7 @@ export class UmbDocumentTreeStore extends UmbUniqueTreeStore {
 				return {
 					name: variant.name,
 					culture: variant.culture,
+					segment: variant.segment,
 					state: variant.state,
 				};
 			}),

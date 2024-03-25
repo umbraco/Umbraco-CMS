@@ -2,7 +2,12 @@ import { createExtensionElementWithApi } from '../functions/create-extension-ele
 import type { UmbApiConstructorArgumentsMethodType } from '../index.js';
 import type { UmbApi } from '../models/api.interface.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import type { ManifestElementAndApi, ManifestCondition, ManifestWithDynamicConditions } from '../types/index.js';
+import type {
+	ManifestElementAndApi,
+	ManifestCondition,
+	ManifestWithDynamicConditions,
+	ApiLoaderProperty,
+} from '../types/index.js';
 import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
 import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
@@ -25,6 +30,7 @@ export class UmbExtensionElementAndApiInitializer<
 	ExtensionApiInterface extends UmbApi = NonNullable<ExtensionInterface['API_TYPE']>,
 > extends UmbBaseExtensionInitializer<ManifestType, ControllerType> {
 	#defaultElement?: string;
+	#defaultApi?: ApiLoaderProperty<ExtensionApiInterface>;
 	#component?: ExtensionElementInterface;
 	#api?: ExtensionApiInterface;
 	#constructorArguments?: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType>;
@@ -102,10 +108,12 @@ export class UmbExtensionElementAndApiInitializer<
 		constructorArguments: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType> | undefined,
 		onPermissionChanged: (isPermitted: boolean, controller: ControllerType) => void,
 		defaultElement?: string,
+		defaultApi?: ApiLoaderProperty<ExtensionApiInterface>,
 	) {
 		super(host, extensionRegistry, 'extApiAndElement_', alias, onPermissionChanged);
 		this.#constructorArguments = constructorArguments;
 		this.#defaultElement = defaultElement;
+		this.#defaultApi = defaultApi;
 		this._init();
 	}
 
@@ -132,7 +140,7 @@ export class UmbExtensionElementAndApiInitializer<
 		const { element: newComponent, api: newApi } = await createExtensionElementWithApi<
 			ExtensionElementInterface,
 			ExtensionApiInterface
-		>(manifest, this.#defaultElement, this.#constructorArguments as any);
+		>(manifest, this.#constructorArguments as any, this.#defaultElement, this.#defaultApi);
 
 		if (!this._isConditionsPositive) {
 			newApi?.destroy?.();

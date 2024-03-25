@@ -1,15 +1,16 @@
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: 'Umb.Workspace.RelationType',
 	name: 'Relation Type Workspace',
-	js: () => import('./relation-type-workspace.element.js'),
+	api: () => import('./relation-type-workspace.context.js'),
 	meta: {
 		entityType: 'relation-type',
 	},

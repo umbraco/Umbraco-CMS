@@ -3,6 +3,9 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+
+let manifestPropertyEditorUis: Array<ManifestPropertyEditorUi> = [];
 
 /**
  * A server data source for Data Type items
@@ -19,11 +22,19 @@ export class UmbDataTypeItemServerDataSource extends UmbItemServerDataSourceBase
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbDataTypeItemServerDataSource
 	 */
+
 	constructor(host: UmbControllerHost) {
 		super(host, {
 			getItems,
 			mapper,
 		});
+
+		umbExtensionsRegistry
+			.byType('propertyEditorUi')
+			.subscribe((manifestPropertyEditorUIs) => {
+				manifestPropertyEditorUis = manifestPropertyEditorUIs;
+			})
+			.unsubscribe();
 	}
 }
 
@@ -35,5 +46,6 @@ const mapper = (item: DataTypeItemResponseModel): UmbDataTypeItemModel => {
 		unique: item.id,
 		name: item.name,
 		propertyEditorUiAlias: item.editorUiAlias || '', // TODO: why can this be undefined or null on the server?
+		icon: manifestPropertyEditorUis.find((ui) => ui.alias === item.editorUiAlias)?.meta.icon,
 	};
 };

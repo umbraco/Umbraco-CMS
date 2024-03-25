@@ -1,9 +1,8 @@
-import { UMB_MEMBER_TYPE_WORKSPACE_CONTEXT } from './member-type-workspace.context.js';
+import { UMB_MEMBER_TYPE_WORKSPACE_CONTEXT } from './member-type-workspace.context-token.js';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 
@@ -27,18 +26,12 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 
 	#workspaceContext?: typeof UMB_MEMBER_TYPE_WORKSPACE_CONTEXT.TYPE;
 
-	private _modalContext?: UmbModalManagerContext;
-
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MEMBER_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeMemberType();
-		});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
 		});
 	}
 
@@ -141,20 +134,6 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 							</div>
 						</uui-input>
 					</uui-input>
-				</div>
-
-				<div slot="footer-info">
-					<!-- TODO: Shortcuts Modal? -->
-					<uui-button label="Show keyboard shortcuts">
-						Keyboard Shortcuts
-						<uui-keyboard-shortcut>
-							<uui-key>ALT</uui-key>
-							+
-							<uui-key>shift</uui-key>
-							+
-							<uui-key>k</uui-key>
-						</uui-keyboard-shortcut>
-					</uui-button>
 				</div>
 			</umb-workspace-editor>
 		`;

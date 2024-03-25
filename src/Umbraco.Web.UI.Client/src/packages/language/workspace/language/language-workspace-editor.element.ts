@@ -1,5 +1,5 @@
 import type { UmbLanguageDetailModel } from '../../types.js';
-import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from './language-workspace.context.js';
+import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from './language-workspace.context-token.js';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -56,10 +56,6 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 							label="Language name"
 							value=${ifDefined(this._language?.name)}
 							@input="${this.#handleInput}"></uui-input>`}
-			</div>
-			<div slot="footer-info" id="footer-into">
-				<a href="section/settings/workspace/language-root">Languages</a> /
-				${this._isNew ? 'Create' : this._language?.name}
 			</div>
 		</umb-workspace-editor>`;
 	}

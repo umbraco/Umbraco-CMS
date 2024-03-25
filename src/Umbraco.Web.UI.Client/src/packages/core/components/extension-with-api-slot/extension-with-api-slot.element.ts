@@ -6,6 +6,7 @@ import {
 	type UmbExtensionElementAndApiInitializer,
 	UmbExtensionsElementAndApiInitializer,
 	type UmbApiConstructorArgumentsMethodType,
+	type ApiLoaderProperty,
 } from '@umbraco-cms/backoffice/extension-api';
 
 /**
@@ -135,6 +136,9 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	@property({ type: String, attribute: 'default-element' })
 	public defaultElement?: string;
 
+	@property({ type: String, attribute: 'default-api' })
+	public defaultApi?: ApiLoaderProperty;
+
 	@property()
 	public renderMethod?: (
 		extension: UmbExtensionElementAndApiInitializer,
@@ -160,6 +164,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 				},
 				undefined, // We can leave the alias to undefined, as we destroy this our selfs.
 				this.defaultElement,
+				this.defaultApi,
 			);
 			this.#extensionsController.apiProperties = this.#apiProps;
 			this.#extensionsController.elementProperties = this.#elProps;
@@ -172,7 +177,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 					this._permitted,
 					(ext) => ext.alias,
 					(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component),
-			  )
+				)
 			: html`<slot></slot>`;
 	}
 

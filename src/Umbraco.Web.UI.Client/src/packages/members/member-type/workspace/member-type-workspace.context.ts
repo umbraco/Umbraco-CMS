@@ -1,12 +1,14 @@
 import { UmbMemberTypeDetailRepository } from '../repository/detail/index.js';
 import type { UmbMemberTypeDetailModel } from '../types.js';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../index.js';
+import { UmbMemberTypeWorkspaceEditorElement } from './member-type-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContextInterface,
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
+	type UmbRoutableWorkspaceContext,
+	UmbWorkspaceRouteManager,
+	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import {
 	type UmbContentTypeCompositionModel,
 	UmbContentTypeStructureManager,
@@ -19,17 +21,21 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 
 type EntityType = UmbMemberTypeDetailModel;
 export class UmbMemberTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbContentTypeWorkspaceContext<EntityType>
+	extends UmbSaveableWorkspaceContextBase<EntityType>
+	implements UmbContentTypeWorkspaceContext<EntityType>, UmbRoutableWorkspaceContext
 {
 	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
 
 	public readonly repository = new UmbMemberTypeDetailRepository(this);
-	#parent?: { entityType: string; unique: string | null };
+
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
 	readonly data;
+	readonly unique;
 	readonly name;
 	readonly alias;
 	readonly description;
@@ -42,6 +48,7 @@ export class UmbMemberTypeWorkspaceContext
 	readonly allowedContentTypes;
 	readonly compositions;
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly structure = new UmbContentTypeStructureManager<EntityType>(this, this.repository);
 
 	constructor(host: UmbControllerHost) {
@@ -49,6 +56,8 @@ export class UmbMemberTypeWorkspaceContext
 
 		// General for content types:
 		this.data = this.structure.ownerContentType;
+
+		this.unique = this.structure.ownerContentTypeObservablePart((data) => data?.unique);
 		this.name = this.structure.ownerContentTypeObservablePart((data) => data?.name);
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
@@ -59,6 +68,32 @@ export class UmbMemberTypeWorkspaceContext
 		this.isElement = this.structure.ownerContentTypeObservablePart((data) => data?.isElement);
 		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique',
+				component: UmbMemberTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique });
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbMemberTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	set<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
@@ -105,7 +140,7 @@ export class UmbMemberTypeWorkspaceContext
 
 	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		const { data } = await this.structure.createScaffold();
 		if (!data) return undefined;
 
@@ -140,14 +175,15 @@ export class UmbMemberTypeWorkspaceContext
 		if (data === undefined) throw new Error('Cannot save, no data');
 
 		if (this.getIsNew()) {
-			if (!this.#parent) throw new Error('Parent is not set');
-			await this.repository.create(data, this.#parent.unique);
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
+			await this.repository.create(data, parent.unique);
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: this.#parent.entityType,
-				unique: this.#parent.unique,
+				entityType: parent.entityType,
+				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
 		} else {
@@ -174,11 +210,4 @@ export class UmbMemberTypeWorkspaceContext
 	}
 }
 
-export const UMB_MEMBER_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbMemberTypeWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbMemberTypeWorkspaceContext => context.getEntityType?.() === 'member-type',
-);
+export { UmbMemberTypeWorkspaceContext as api };

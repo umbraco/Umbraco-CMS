@@ -18,13 +18,20 @@ import {
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
+import { UmbDocumentWorkspaceEditorElement } from './document-workspace-editor.element.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbEditableWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbSaveableWorkspaceContextBase,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
+	UmbWorkspaceSplitViewManager,
+} from '@umbraco-cms/backoffice/workspace';
 import type {
-	UmbWorkspaceCollectionContextInterface,
-	UmbVariantableWorkspaceContextInterface,
-	UmbPublishableWorkspaceContextInterface,
+	UmbCollectionWorkspaceContext,
+	UmbVariantDatasetWorkspaceContext,
+	UmbPublishableWorkspaceContext,
+	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -44,16 +51,18 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
+	extends UmbSaveableWorkspaceContextBase<EntityType>
 	implements
-		UmbVariantableWorkspaceContextInterface<UmbDocumentVariantModel>,
-		UmbPublishableWorkspaceContextInterface,
-		UmbWorkspaceCollectionContextInterface<UmbDocumentTypeDetailModel>
+		UmbRoutableWorkspaceContext,
+		UmbVariantDatasetWorkspaceContext<UmbDocumentVariantModel>,
+		UmbPublishableWorkspaceContext,
+		UmbCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
 {
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 
-	#parent?: { entityType: string; unique: string | null };
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 
 	/**
 	 * The document is the current state/draft version of the document.
@@ -90,6 +99,7 @@ export class UmbDocumentWorkspaceContext
 	);
 	#varies?: boolean;
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly variantOptions = mergeObservables(
@@ -130,6 +140,33 @@ export class UmbDocumentWorkspaceContext
 		this.observe(this.varies, (varies) => (this.#varies = varies));
 
 		this.loadLanguages();
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique',
+				component: UmbDocumentWorkspaceEditorElement,
+				setup: async (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					const documentTypeUnique = info.match.params.documentTypeUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbDocumentWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	resetState() {
@@ -168,7 +205,7 @@ export class UmbDocumentWorkspaceContext
 
 	async create(parent: { entityType: string; unique: string | null }, documentTypeUnique: string) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		this.#getDataPromise = this.repository.createScaffold({
 			documentType: {
 				unique: documentTypeUnique,
@@ -246,6 +283,10 @@ export class UmbDocumentWorkspaceContext
 		*/
 		// TODO: We should move this type of logic to the act of saving [NL]
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
+	}
+
+	name(variantId?: UmbVariantId) {
+		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '');
 	}
 
 	setTemplate(templateUnique: string) {
@@ -449,9 +490,10 @@ export class UmbDocumentWorkspaceContext
 		const saveData = this.#buildSaveData(selectedVariants);
 
 		if (this.getIsNew()) {
-			if (!this.#parent) throw new Error('Parent is not set');
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
 
-			const { data: create, error } = await this.repository.create(saveData, this.#parent.unique);
+			const { data: create, error } = await this.repository.create(saveData, parent.unique);
 			if (!create || error) {
 				console.error('Error creating document', error);
 				throw new Error('Error creating document');
@@ -462,8 +504,8 @@ export class UmbDocumentWorkspaceContext
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: this.#parent.entityType,
-				unique: this.#parent.unique,
+				entityType: parent.entityType,
+				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
 		} else {

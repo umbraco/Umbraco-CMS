@@ -1,11 +1,11 @@
 import type { UmbUserDetailModel } from '../index.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import type { UmbUserWorkspaceContext } from './user-workspace.context.js';
+import { UMB_USER_WORKSPACE_CONTEXT } from './user-workspace.context-token.js';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 // import local components. Theses are not meant to be used outside of this component.
@@ -24,8 +24,8 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#workspaceContext = workspaceContext as UmbUserWorkspaceContext;
+		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
 			this.#observeUser();
 		});
 	}
