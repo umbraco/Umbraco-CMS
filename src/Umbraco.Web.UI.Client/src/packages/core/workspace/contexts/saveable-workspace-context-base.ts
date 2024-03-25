@@ -42,7 +42,7 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	constructor(host: UmbControllerHost, workspaceAlias: string) {
 		super(host, UMB_WORKSPACE_CONTEXT.toString());
 		this.workspaceAlias = workspaceAlias;
-		this.#performSaveBind = this.performSave.bind(this);
+		this.#performSaveBind = this.submit.bind(this);
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			(this.modalContext as UmbModalContext) = context;
 		});
@@ -103,7 +103,7 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	}
 
 	#performSaveBind: () => void;
-	protected abstract performSave(): void;
+	protected abstract submit(): void;
 }
 
 /*

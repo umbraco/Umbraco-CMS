@@ -147,7 +147,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		}
 	}
 
-	async performSave() {
+	async submit() {
 		if (!this.#data.value) return;
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {

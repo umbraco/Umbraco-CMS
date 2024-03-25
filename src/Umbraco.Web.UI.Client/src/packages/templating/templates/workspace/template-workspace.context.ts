@@ -185,7 +185,7 @@ ${currentContent}`;
 		await this.setMasterTemplate(this.#parent.unique);
 	}
 
-	async performSave() {
+	async submit() {
 		if (!this.#data.value) throw new Error('Data is missing');
 
 		let newData = undefined;

@@ -103,7 +103,7 @@ export class UmbRelationTypeWorkspaceContext
 		this.#data.update({ name });
 	}
 
-	async performSave() {
+	async submit() {
 		if (!this.#data.value) return;
 		if (!this.#data.value.id) return;
 

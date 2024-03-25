@@ -126,7 +126,7 @@ export class UmbStylesheetWorkspaceContext
 		}
 	}
 
-	public async performSave() {
+	public async submit() {
 		if (!this.#data.value) throw new Error('Data is missing');
 
 		let newData = undefined;

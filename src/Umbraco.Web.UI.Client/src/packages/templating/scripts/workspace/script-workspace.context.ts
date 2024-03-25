@@ -125,7 +125,7 @@ export class UmbScriptWorkspaceContext
 		}
 	}
 
-	async performSave() {
+	async submit() {
 		if (!this.#data.value) throw new Error('Data is missing');
 
 		let newData = undefined;

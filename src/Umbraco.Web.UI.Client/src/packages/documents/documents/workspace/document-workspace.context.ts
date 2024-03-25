@@ -569,7 +569,7 @@ export class UmbDocumentWorkspaceContext
 		this.workspaceComplete(data);
 	}
 
-	public async performSave() {
+	public async submit() {
 		const { options, selected } = await this.#determineVariantOptions();
 
 		let variantIds: Array<UmbVariantId> = [];

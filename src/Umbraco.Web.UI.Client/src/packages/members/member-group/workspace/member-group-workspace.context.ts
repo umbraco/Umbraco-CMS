@@ -101,7 +101,7 @@ export class UmbMemberGroupWorkspaceContext
 		return { data };
 	}
 
-	async performSave() {
+	async submit() {
 		const data = this.getData();
 		if (!data) throw new Error('No data to save');
 

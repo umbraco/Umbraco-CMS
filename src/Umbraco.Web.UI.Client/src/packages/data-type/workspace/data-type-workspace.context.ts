@@ -314,7 +314,7 @@ export class UmbDataTypeWorkspaceContext
 		}
 	}
 
-	async performSave() {
+	async submit() {
 		if (!this.#currentData.value) return;
 		if (!this.#currentData.value.unique) return;
 

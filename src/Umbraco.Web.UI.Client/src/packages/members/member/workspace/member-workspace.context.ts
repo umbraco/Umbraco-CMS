@@ -323,7 +323,7 @@ export class UmbMemberWorkspaceContext
 		}
 	}
 
-	async performSave() {
+	async submit() {
 		if (!this.#currentData.value) throw new Error('Data is missing');
 		if (!this.#currentData.value.unique) throw new Error('Unique is missing');
 
