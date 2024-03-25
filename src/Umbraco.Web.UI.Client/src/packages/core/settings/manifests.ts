@@ -21,18 +21,40 @@ export const manifests = [
 	},
 	{
 		type: 'menu',
-		alias: 'Umb.Menu.Settings',
+		alias: 'Umb.Menu.StructureSettings',
 		name: 'Settings Menu',
 	},
 	{
 		type: 'sectionSidebarApp',
 		kind: 'menu',
 		alias: 'Umb.SectionSidebarMenu.Settings',
-		name: 'Settings Section Sidebar Menu',
+		name: 'Structure Settings Sidebar Menu',
 		weight: 300,
 		meta: {
-			label: 'Settings',
-			menu: 'Umb.Menu.Settings',
+			label: 'Structure',
+			menu: 'Umb.Menu.StructureSettings',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.SectionAlias',
+				match: UMB_SETTINGS_SECTION_ALIAS,
+			},
+		],
+	},
+	{
+		type: 'menu',
+		alias: 'Umb.Menu.AdvancedSettings',
+		name: 'Advanced Settings Menu',
+	},
+	{
+		type: 'sectionSidebarApp',
+		kind: 'menu',
+		alias: 'Umb.SectionSidebarMenu.AdvancedSettings',
+		name: 'Advanced Settings Sidebar Menu',
+		weight: 100,
+		meta: {
+			label: 'Advanced',
+			menu: 'Umb.Menu.AdvancedSettings',
 		},
 		conditions: [
 			{
