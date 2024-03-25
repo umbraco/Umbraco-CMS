@@ -135,7 +135,7 @@ export class UmbExternalLoginProviderElement extends UmbLitElement {
 
   protected renderDefaultView() {
     return html`
-      <form id="defaultView" method="get" action=${this.externalLoginUrl}>
+      <form id="defaultView" method="post" action=${this.externalLoginUrl}>
         <uui-button
           type="submit"
           name="provider"
