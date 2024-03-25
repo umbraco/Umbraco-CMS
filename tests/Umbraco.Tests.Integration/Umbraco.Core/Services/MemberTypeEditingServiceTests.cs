@@ -24,52 +24,72 @@ public class MemberTypeEditingServiceTests : ContentTypeEditingServiceTestsBase
     [Test]
     public async Task Can_Create_Sensitive_Properties_With_Sensitive_Data_Access()
     {
+        // arrange
         var createModel = MemberTypeCreateModel(propertyTypes: new[] { MemberTypePropertyTypeModel(isSensitive: true) });
-        var result = await MemberTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
 
+        // act
+        var result = await MemberTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        // assert
         var memberType = await MemberTypeService.GetAsync(result.Result.Key)!;
-        Assert.IsNotEmpty(memberType.PropertyTypes);
-        Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.IsSensitiveProperty(propertyType.Alias)));
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.IsNotEmpty(memberType.PropertyTypes);
+            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.IsSensitiveProperty(propertyType.Alias)));
+        });
     }
 
     [TestCase(true)]
     [TestCase(false)]
     public async Task Can_Change_Property_Sensitivity_With_Sensitive_Data_Access(bool initialIsSensitiveValue)
     {
+        // arrange
         var createModel = MemberTypeCreateModel(propertyTypes: new[] { MemberTypePropertyTypeModel(isSensitive: initialIsSensitiveValue) });
         IMemberType memberType = (await MemberTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
         var newIsSensitiveValue = initialIsSensitiveValue is false;
         var updateModel = MemberTypeUpdateModel(propertyTypes: new[] { MemberTypePropertyTypeModel(isSensitive: newIsSensitiveValue) });
+
+        // act
         var result = await MemberTypeEditingService.UpdateAsync(memberType, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.Success, result.Status);
-
+        // assert
         memberType = await MemberTypeService.GetAsync(memberType.Key)!;
-        Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.IsSensitiveProperty(propertyType.Alias) == newIsSensitiveValue));
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.Success, result.Status);
+            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.IsSensitiveProperty(propertyType.Alias) == newIsSensitiveValue));
+        });
     }
 
     [Test]
     public async Task Cannot_Create_Sensitive_Properties_Without_Sensitive_Data_Access()
     {
+        // arrange
         // this user does NOT have access to sensitive data
         var user = UserBuilder.CreateUser();
         UserService.Save(user);
-
         var createModel = MemberTypeCreateModel(propertyTypes: new[] { MemberTypePropertyTypeModel(isSensitive: true) });
-        var result = await MemberTypeEditingService.CreateAsync(createModel, user.Key);
-        Assert.IsFalse(result.Success);
 
+        // act
+        var result = await MemberTypeEditingService.CreateAsync(createModel, user.Key);
+
+        // assert
         var memberType = await MemberTypeService.GetAsync(result.Result.Key)!;
-        Assert.IsNull(memberType);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.IsNull(memberType);
+        });
     }
 
     [TestCase(true)]
     [TestCase(false)]
     public async Task Cannot_Change_Property_Sensitivity_Without_Sensitive_Data_Access(bool initialIsSensitiveValue)
     {
+        // arrange
         // this user does NOT have access to sensitive data
         var user = UserBuilder.CreateUser();
         UserService.Save(user);
@@ -79,13 +99,19 @@ public class MemberTypeEditingServiceTests : ContentTypeEditingServiceTestsBase
 
         var newIsSensitiveValue = initialIsSensitiveValue is false;
         var updateModel = MemberTypeUpdateModel(propertyTypes: new[] { MemberTypePropertyTypeModel(isSensitive: newIsSensitiveValue) });
+
+        // act
         var result = await MemberTypeEditingService.UpdateAsync(memberType, updateModel, user.Key);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.NotAllowed, result.Status);
-
+        // assert
         memberType = await MemberTypeService.GetAsync(memberType.Key)!;
-        Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.IsSensitiveProperty(propertyType.Alias) == initialIsSensitiveValue));
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentTypeOperationStatus.NotAllowed, result.Status);
+            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.IsSensitiveProperty(propertyType.Alias) == initialIsSensitiveValue));
+        });
+
     }
 
     [TestCase(true, true)]
@@ -94,14 +120,21 @@ public class MemberTypeEditingServiceTests : ContentTypeEditingServiceTestsBase
     [TestCase(false, false)]
     public async Task Can_Define_Property_Visibility_When_Creating(bool memberCanView, bool memberCanEdit)
     {
+        // arrange
         var createModel = MemberTypeCreateModel(propertyTypes: new[] { MemberTypePropertyTypeModel(memberCanView: memberCanView, memberCanEdit: memberCanEdit) });
-        var result = await MemberTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
 
+        // act
+        var result = await MemberTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        // assert
         var memberType = await MemberTypeService.GetAsync(result.Result.Key)!;
-        Assert.IsNotEmpty(memberType.PropertyTypes);
-        Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanViewProperty(propertyType.Alias) == memberCanView));
-        Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanEditProperty(propertyType.Alias) == memberCanEdit));
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.IsNotEmpty(memberType.PropertyTypes);
+            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanViewProperty(propertyType.Alias) == memberCanView));
+            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanEditProperty(propertyType.Alias) == memberCanEdit));
+        });
     }
 
     [TestCase(true, true)]
@@ -110,16 +143,22 @@ public class MemberTypeEditingServiceTests : ContentTypeEditingServiceTestsBase
     [TestCase(false, false)]
     public async Task Can_Update_Property_Visibility(bool memberCanView, bool memberCanEdit)
     {
+        // arrange
         var createModel = MemberTypeCreateModel(propertyTypes: new[] { MemberTypePropertyTypeModel(memberCanView: memberCanView is false, memberCanEdit: memberCanEdit is false) });
         IMemberType memberType = (await MemberTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
-
         var updateModel = MemberTypeUpdateModel(propertyTypes: new[] { MemberTypePropertyTypeModel(memberCanView: memberCanView, memberCanEdit: memberCanEdit) });
+
+        // act
         var result = await MemberTypeEditingService.UpdateAsync(memberType, updateModel, Constants.Security.SuperUserKey);
 
+        // assert
         memberType = await MemberTypeService.GetAsync(result.Result.Key)!;
-        Assert.IsNotEmpty(memberType.PropertyTypes);
-        Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanViewProperty(propertyType.Alias) == memberCanView));
-        Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanEditProperty(propertyType.Alias) == memberCanEdit));
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotEmpty(memberType.PropertyTypes);
+            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanViewProperty(propertyType.Alias) == memberCanView));
+            Assert.IsTrue(memberType.PropertyTypes.All(propertyType => memberType.MemberCanEditProperty(propertyType.Alias) == memberCanEdit));
+        });
     }
 
     private MemberTypeCreateModel MemberTypeCreateModel(
