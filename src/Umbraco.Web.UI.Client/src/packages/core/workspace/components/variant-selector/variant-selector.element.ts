@@ -99,7 +99,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	async #observeActiveVariants() {
 		if (!this.#splitViewContext) return;
 
-		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
+		const workspaceContext = this.#splitViewContext.getWorkspaceContext() as UmbDocumentWorkspaceContext;
 		if (workspaceContext) {
 			this.observe(
 				workspaceContext.splitView.activeVariantsInfo,
@@ -223,9 +223,9 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 											<uui-button slot="append" compact id="variant-close" @click=${this.#closeSplitView}>
 												<uui-icon name="remove"></uui-icon>
 											</uui-button>
-									  `
+										`
 									: ''}
-						  `
+							`
 						: nothing
 				}
 			</uui-input>
@@ -264,7 +264,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 																		@click=${() => this.#openSplitView(variant)}>
 																		Split view
 																	</uui-button>
-															  `}
+																`}
 													</li>
 												`,
 											)}
@@ -272,7 +272,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 									</uui-scroll-container>
 								</div>
 							</uui-popover-container>
-					  `
+						`
 					: nothing
 			}
 		</div>

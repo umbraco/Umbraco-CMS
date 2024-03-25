@@ -24,6 +24,7 @@ export class UmbRelationTypeTreeServerDataSource extends UmbTreeServerDataSource
 		super(host, {
 			getRootItems,
 			getChildrenOf,
+			getAncestorsOf,
 			mapper,
 		});
 	}
@@ -39,6 +40,10 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	} else {
 		throw new Error('Not supported for the relation type tree');
 	}
+};
+
+const getAncestorsOf = () => {
+	throw new Error('Not supported for the relation type tree');
 };
 
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbRelationTypeTreeItemModel => {

@@ -28,6 +28,12 @@ export interface UmbracoPackage {
 	allowTelemetry?: boolean;
 
 	/**
+	 * @title Decides if the package is allowed to be accessed by the public, e.g. on the login screen
+	 * @default false
+	 */
+	allowPublicAccess?: boolean;
+
+	/**
 	 * @title An array of Umbraco package manifest types that will be installed
 	 * @required
 	 */

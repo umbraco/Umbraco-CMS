@@ -101,6 +101,7 @@
 			"@umbraco-cms/backoffice/user-permission": ["./src/packages/user/user-permission/index.ts"],
 			"@umbraco-cms/backoffice/user": ["./src/packages/user/user/index.ts"],
 			"@umbraco-cms/backoffice/utils": ["./src/packages/core/utils/index.ts"],
+			"@umbraco-cms/backoffice/validation": ["./src/packages/core/validation/index.ts"],
 			"@umbraco-cms/backoffice/variant": ["./src/packages/core/variant/index.ts"],
 			"@umbraco-cms/backoffice/webhook": ["./src/packages/webhook/index.ts"],
 			"@umbraco-cms/backoffice/workspace": ["./src/packages/core/workspace/index.ts"],
