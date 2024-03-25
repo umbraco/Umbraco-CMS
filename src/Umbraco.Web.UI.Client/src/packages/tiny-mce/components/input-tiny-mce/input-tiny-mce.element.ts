@@ -209,7 +209,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 		// set the configured toolbar if any, otherwise false
 		const toolbar = this.configuration?.getValueByAlias<string[]>('toolbar');
-		configurationOptions.toolbar = toolbar?.join(' ') ?? false;
+		if (toolbar && toolbar.length) {
+			configurationOptions.toolbar = toolbar?.join(' ');
+		} else {
+			configurationOptions.toolbar = false;
+		}
 
 		// set the configured inline mode
 		const mode = this.configuration?.getValueByAlias<Array<string>>('mode');
