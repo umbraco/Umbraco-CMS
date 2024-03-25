@@ -16,7 +16,6 @@ export default {
     requestPasswordResetConfirmation: 'Een e-mail met daarin de wachtwoord reset uitleg zal worden gestuurd als het e-mailadres in onze database voorkomt.',
     setPasswordConfirmation: 'Je wachtwoord is aangepast',
     rememberMe: 'Onthoud mij',
-    or: 'of',
     error: 'Fout',
     defaultError: 'Er is een onbekende fout opgetreden.',
     errorInPasswordFormat: 'Het wachtwoord moet minstens %0% tekens lang zijn en moet minstens %1% cijfers bevatten',

@@ -16,7 +16,6 @@ export default {
     requestPasswordResetConfirmation: 'En e-post med instruksjoner for tilbakestilling av passordet vil bli sendt til den angitte adressen hvis den samsvarer med våre opplysninger',
     setPasswordConfirmation: 'Passordet ditt er oppdatert',
     rememberMe: 'Husk meg',
-    or: 'eller',
     error: 'Feil',
     defaultError: 'Det oppstod en ukjent feil.',
     errorInPasswordFormat: 'Passordet må være minst {0} tegn langt og inneholde minst {1} spesialtegn.',

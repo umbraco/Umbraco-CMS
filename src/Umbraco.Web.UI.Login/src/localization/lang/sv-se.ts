@@ -16,7 +16,6 @@ export default {
     requestPasswordResetConfirmation: 'Ett e-postmeddelande med instruktioner för lösenordsåterställning kommer att skickas till den angivna adressen om den matchar våra uppgifter',
     setPasswordConfirmation: 'Ditt lösenord har uppdaterats',
     rememberMe: 'Kom ihåg mig',
-    or: 'eller',
     error: 'Fel',
     defaultError: 'Ett okänt fel inträffade.',
     errorInPasswordFormat: 'Lösenordet måste bestå av minst %0% tecken varav minst %1% är icke-alfanumeriska tecken (t.ex. %, #, !, @).',

@@ -16,7 +16,6 @@ export default {
     requestPasswordResetConfirmation: 'En e-mail med instruktioner for nulstilling af adgangskoden vil blive sendt til den angivne adresse, hvis det matcher vores optegnelser',
     setPasswordConfirmation: 'Din adgangskode er blevet opdateret',
     rememberMe: 'Husk mig',
-    or: 'eller',
     error: 'Fejl',
     defaultError: 'Der er opstået en ukendt fejl.',
     errorInPasswordFormat: 'Kodeordet skal være på minimum %0% tegn og indeholde mindst %1% alfanumeriske tegn.',

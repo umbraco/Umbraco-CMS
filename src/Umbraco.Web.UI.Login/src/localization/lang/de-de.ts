@@ -16,7 +16,6 @@ export default {
     requestPasswordResetConfirmation: 'Es wird eine E-Mail mit Anweisungen zum Zurücksetzen des Kennwortes an die angegebene Adresse geschickt sofern diese im Datenbestand gefunden wurde.',
     setPasswordConfirmation: 'Ihr Kennwort wurde aktualisiert',
     rememberMe: 'Angemeldet bleiben',
-    or: 'oder',
     error: 'Fehler',
     defaultError: 'Ein unbekannter Fehler ist passiert.',
     errorInPasswordFormat: 'Für das Kennwort ist eine Mindestlänge von {0} Zeichen vorgesehen, wovon mindestens {1} Sonderzeichen (nicht alphanumerisch) sein müssen',
