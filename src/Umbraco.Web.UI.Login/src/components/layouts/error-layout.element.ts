@@ -9,6 +9,9 @@ export default class UmbErrorLayoutElement extends UmbLitElement {
   @property({ type: String })
   message = '';
 
+  @property({ type: Boolean, attribute: 'no-back-link' })
+  noBackLink = false;
+
   render() {
     return html`
       <header id="header">
@@ -16,7 +19,7 @@ export default class UmbErrorLayoutElement extends UmbLitElement {
         <span>${this.message}</span>
       </header>
       <slot></slot>
-      <umb-back-to-login-button></umb-back-to-login-button>
+      ${!this.noBackLink ? html`<umb-back-to-login-button></umb-back-to-login-button>`: ''}
     `;
   }
 

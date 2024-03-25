@@ -12,7 +12,6 @@ import { UmbContextToken } from "@umbraco-cms/backoffice/context-api";
 
 export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
   readonly supportsPersistLogin = false;
-  disableLocalLogin = false;
   twoFactorView = '';
   isMfaEnabled = false;
   mfaProviders: string[] = [];
@@ -52,27 +51,27 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
     return url.toString();
   }
 
-  async login(data: LoginRequestModel): Promise<LoginResponse> {
+  login(data: LoginRequestModel): Promise<LoginResponse> {
     return this.#authRepository.login(data);
   }
 
-  async resetPassword(username: string): Promise<ResetPasswordResponse> {
+  resetPassword(username: string): Promise<ResetPasswordResponse> {
     return this.#authRepository.resetPassword(username);
   }
 
-  async validatePasswordResetCode(userId: string, resetCode: string): Promise<ValidatePasswordResetCodeResponse> {
+  validatePasswordResetCode(userId: string, resetCode: string): Promise<ValidatePasswordResetCodeResponse> {
     return this.#authRepository.validatePasswordResetCode(userId, resetCode);
   }
 
-  async newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse> {
+  newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse> {
     return this.#authRepository.newPassword(password, resetCode, userId);
   }
 
-  async newInvitedUserPassword(password: string, token: string, userId: string): Promise<NewPasswordResponse> {
+  newInvitedUserPassword(password: string, token: string, userId: string): Promise<NewPasswordResponse> {
     return this.#authRepository.newInvitedUserPassword(password, token, userId);
   }
 
-  async validateInviteCode(token: string, userId: string): Promise<ValidateInviteCodeResponse> {
+  validateInviteCode(token: string, userId: string): Promise<ValidateInviteCodeResponse> {
     return this.#authRepository.validateInviteCode(token, userId);
   }
 

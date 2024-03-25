@@ -77,12 +77,7 @@ export default class UmbAuthElement extends UmbLitElement {
    * @attr disable-local-login
    */
   @property({type: Boolean, attribute: 'disable-local-login'})
-  set disableLocalLogin(value: boolean) {
-    this.#authContext.disableLocalLogin = value;
-  }
-  get disableLocalLogin() {
-    return this.#authContext.disableLocalLogin;
-  }
+  disableLocalLogin = false;
 
   @property({attribute: 'background-image'})
   backgroundImage?: string;
@@ -219,6 +214,14 @@ export default class UmbAuthElement extends UmbLitElement {
   }
 
   private _renderFlowAndStatus() {
+    if (this.disableLocalLogin) {
+      return html`
+        <umb-error-layout header="Hi there" no-back-link>
+          <umb-localize key="auth_localLoginDisabled">Unfortunately, it is not possible to log in directly. It has been disabled by a login provider.</umb-localize>
+        </umb-error-layout>
+      `;
+    }
+
     const searchParams = new URLSearchParams(window.location.search);
     let flow = this.flow || searchParams.get('flow')?.toLowerCase();
     const status = searchParams.get('status');
@@ -267,7 +270,6 @@ export default class UmbAuthElement extends UmbLitElement {
             ?username-is-email=${this.usernameIsEmail}>
             <slot></slot>
             <slot name="subheadline" slot="subheadline"></slot>
-            <slot name="external" slot="external"></slot>
           </umb-login-page>`;
     }
   }

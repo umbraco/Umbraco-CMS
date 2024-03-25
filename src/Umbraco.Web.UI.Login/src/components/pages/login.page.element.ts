@@ -22,9 +22,6 @@ export default class UmbLoginPageElement extends UmbLitElement {
   private _loginError = '';
 
   @state()
-  disableLocalLogin = true;
-
-  @state()
   supportPersistLogin = false;
 
   #formElement?: HTMLFormElement;
@@ -36,7 +33,6 @@ export default class UmbLoginPageElement extends UmbLitElement {
 
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
       this.#authContext = authContext;
-      this.disableLocalLogin = authContext.disableLocalLogin;
       this.supportPersistLogin = authContext.supportsPersistLogin;
     });
   }
@@ -128,45 +124,38 @@ export default class UmbLoginPageElement extends UmbLitElement {
         </h1>
         <slot name="subheadline"></slot>
       </header>
-      ${this.disableLocalLogin
-        ? nothing
-        : html`
-          <slot @slotchange=${this.#onSlotChanged}></slot>
-          <div id="secondary-actions">
-            ${when(
-              this.supportPersistLogin,
-              () => html`
-                <uui-form-layout-item>
-                  <uui-checkbox
-                    name="persist"
-                    .label=${this.localize.term('auth_rememberMe')}>
-                    <umb-localize key="auth_rememberMe">Remember me</umb-localize>
-                  </uui-checkbox>
-                </uui-form-layout-item>`
-            )}
-            ${when(
-              this.allowPasswordReset,
-              () =>
-                html`
-                  <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
-                    <umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
-                  </button>`
-            )}
-          </div>
-          <uui-button
-            type="submit"
-            id="umb-login-button"
-            look="primary"
-            @click=${this.#onSubmitClick}
-            .label=${this.localize.term('auth_login')}
-            color="default"
-            .state=${this._loginState}></uui-button>
+      <slot @slotchange=${this.#onSlotChanged}></slot>
+      <div id="secondary-actions">
+        ${when(
+          this.supportPersistLogin,
+          () => html`
+            <uui-form-layout-item>
+              <uui-checkbox
+                name="persist"
+                .label=${this.localize.term('auth_rememberMe')}>
+                <umb-localize key="auth_rememberMe">Remember me</umb-localize>
+              </uui-checkbox>
+            </uui-form-layout-item>`
+        )}
+        ${when(
+          this.allowPasswordReset,
+          () =>
+            html`
+              <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
+                <umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
+              </button>`
+        )}
+      </div>
+      <uui-button
+        type="submit"
+        id="umb-login-button"
+        look="primary"
+        @click=${this.#onSubmitClick}
+        .label=${this.localize.term('auth_login')}
+        color="default"
+        .state=${this._loginState}></uui-button>
 
-          ${this.#renderErrorMessage()}
-        `}
-      <umb-external-login-providers-layout .showDivider=${!this.disableLocalLogin}>
-        <slot name="external"></slot>
-      </umb-external-login-providers-layout>
+      ${this.#renderErrorMessage()}
     `;
   }
 
