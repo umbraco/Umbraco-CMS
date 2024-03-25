@@ -55,7 +55,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbBackofficeContext(this);
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry);
+		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerAllExtensions();
 
 		// So far local packages are this simple to registerer, so no need for a manager to do that:
 		CORE_PACKAGES.forEach(async (packageImport) => {
