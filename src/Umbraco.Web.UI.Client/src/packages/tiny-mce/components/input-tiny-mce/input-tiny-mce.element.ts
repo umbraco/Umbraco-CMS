@@ -195,8 +195,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// create an object by merging the configuration onto the fallback config
 		const configurationOptions: RawEditorOptions = {
 			...defaultFallbackConfig,
-			height: dimensions?.height,
-			width: dimensions?.width,
+			height: dimensions?.height || undefined,
+			width: dimensions?.width || undefined,
 			content_css: stylesheets,
 			style_formats: styleFormats,
 		};
