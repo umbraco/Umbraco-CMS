@@ -42,17 +42,17 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	constructor(host: UmbControllerHost, workspaceAlias: string) {
 		super(host, UMB_WORKSPACE_CONTEXT.toString());
 		this.workspaceAlias = workspaceAlias;
-		this.#performSaveBind = this.submit.bind(this);
+		this.#performSubmitBind = this.submit.bind(this);
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			(this.modalContext as UmbModalContext) = context;
 		});
 		this.consumeContext(UMB_FORM_CONTEXT, (context) => {
 			if (this.#form === context) return;
 			if (this.#form) {
-				this.#form.removeEventListener('submit', this.#performSaveBind);
+				this.#form.removeEventListener('submit', this.#performSubmitBind);
 			}
 			this.#form = context;
-			this.#form.addEventListener('submit', this.#performSaveBind);
+			this.#form.addEventListener('submit', this.#performSubmitBind);
 			this._gotFormContext(context);
 		});
 	}
@@ -69,7 +69,7 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 		this.#isNew.setValue(isNew);
 	}
 
-	protected workspaceComplete(data: WorkspaceDataModelType | undefined) {
+	protected submitComplete(data: WorkspaceDataModelType | undefined) {
 		// Resolve the save promise:
 		this.#saveResolve?.();
 
@@ -102,7 +102,7 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 		return this.#savePromise;
 	}
 
-	#performSaveBind: () => void;
+	#performSubmitBind: () => void;
 	protected abstract submit(): void;
 }
 

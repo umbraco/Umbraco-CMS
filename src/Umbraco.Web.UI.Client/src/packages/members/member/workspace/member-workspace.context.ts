@@ -341,7 +341,7 @@ export class UmbMemberWorkspaceContext
 			this.#persistedData.setValue(newData);
 			this.#currentData.setValue(newData);
 			this.setIsNew(false);
-			this.workspaceComplete(newData);
+			this.submitComplete(newData);
 		}
 	}
 

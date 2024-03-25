@@ -117,7 +117,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		});
 
 		this.setIsNew(false);
-		this.workspaceComplete(this.#data.value);
+		this.submitComplete(this.#data.value);
 	}
 
 	public destroy(): void {

@@ -158,7 +158,7 @@ export class UmbDictionaryWorkspaceContext
 		if (!data) return;
 
 		this.setIsNew(false);
-		this.workspaceComplete(data);
+		this.submitComplete(data);
 	}
 
 	public destroy(): void {

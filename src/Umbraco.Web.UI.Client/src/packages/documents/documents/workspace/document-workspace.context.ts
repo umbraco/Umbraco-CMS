@@ -566,7 +566,7 @@ export class UmbDocumentWorkspaceContext
 		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 
-		this.workspaceComplete(data);
+		this.submitComplete(data);
 	}
 
 	public async submit() {
@@ -606,7 +606,7 @@ export class UmbDocumentWorkspaceContext
 		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 
-		this.workspaceComplete(data);
+		this.submitComplete(data);
 	}
 
 	public async publish() {
@@ -652,7 +652,7 @@ export class UmbDocumentWorkspaceContext
 		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 
-		this.workspaceComplete(data);
+		this.submitComplete(data);
 	}
 
 	public async unpublish() {
@@ -700,7 +700,7 @@ export class UmbDocumentWorkspaceContext
 		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 
-		this.workspaceComplete(data);
+		this.submitComplete(data);
 	}
 
 	async delete() {

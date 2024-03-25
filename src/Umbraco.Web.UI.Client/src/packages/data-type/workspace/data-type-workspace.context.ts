@@ -342,12 +342,12 @@ export class UmbDataTypeWorkspaceContext
 		}
 
 		this.setIsNew(false);
-		this.workspaceComplete(this.#currentData.value);
+		this.submitComplete(this.#currentData.value);
 	}
 
-	protected workspaceComplete(data: EntityType | undefined) {
+	protected submitComplete(data: EntityType | undefined) {
 		this.dispatchEvent(new CustomEvent('workspace-complete'));
-		super.workspaceComplete(data);
+		super.submitComplete(data);
 	}
 
 	async delete(unique: string) {

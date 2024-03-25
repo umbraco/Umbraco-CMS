@@ -159,7 +159,7 @@ export class UmbStylesheetWorkspaceContext
 		if (newData) {
 			this.#data.setValue(newData);
 			this.setIsNew(false);
-			this.workspaceComplete(newData);
+			this.submitComplete(newData);
 		}
 	}
 

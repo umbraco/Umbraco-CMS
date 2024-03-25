@@ -246,7 +246,7 @@ export class UmbDocumentTypeWorkspaceContext
 		}
 
 		this.setIsNew(false);
-		this.workspaceComplete(data);
+		this.submitComplete(data);
 	}
 
 	public destroy(): void {

@@ -112,7 +112,7 @@ export class UmbMemberGroupWorkspaceContext
 		}
 
 		this.setIsNew(false);
-		this.workspaceComplete(data);
+		this.submitComplete(data);
 	}
 
 	getData() {
