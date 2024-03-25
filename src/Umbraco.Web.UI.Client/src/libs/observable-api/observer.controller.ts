@@ -13,8 +13,8 @@ export class UmbObserverController<T = unknown> extends UmbObserver<T> implement
 	constructor(
 		host: UmbControllerHost,
 		source: Observable<T>,
-		callback: ObserverCallback<T>,
-		alias: UmbControllerAlias,
+		callback?: ObserverCallback<T>,
+		alias?: UmbControllerAlias,
 	) {
 		super(source, callback);
 		this.#host = host;

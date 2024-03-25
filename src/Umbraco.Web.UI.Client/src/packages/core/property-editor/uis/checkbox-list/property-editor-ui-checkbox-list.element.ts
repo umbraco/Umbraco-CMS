@@ -1,9 +1,11 @@
 import type { UmbInputCheckboxListElement } from './input-checkbox-list/input-checkbox-list.element.js';
-import './input-checkbox-list/input-checkbox-list.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+
+import './input-checkbox-list/input-checkbox-list.element.js';
 
 /**
  * @element umb-property-editor-ui-checkbox-list
@@ -12,48 +14,34 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	#value: Array<string> = [];
 	@property({ type: Array })
-	public get value(): Array<string> {
-		return this.#value;
-	}
 	public set value(value: Array<string>) {
 		this.#value = value ?? [];
 	}
+	public get value(): Array<string> {
+		return this.#value;
+	}
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		if (!config) return;
-		const listData: Record<number, { value: string; sortOrder: number }> | undefined = config.getValueByAlias('items');
-
-		if (!listData) return;
-
-		// formatting the items in the dictionary into an array
-		const sortedItems = [];
-		const values = Object.values<{ value: string; sortOrder: number }>(listData);
-		const keys = Object.keys(listData);
-		for (let i = 0; i < values.length; i++) {
-			sortedItems.push({ key: keys[i], sortOrder: values[i].sortOrder, value: values[i].value });
-		}
-		// ensure the items are sorted by the provided sort order
-		sortedItems.sort((a, b) => {
-			return a.sortOrder > b.sortOrder ? 1 : b.sortOrder > a.sortOrder ? -1 : 0;
-		});
-
-		this._list = sortedItems.map((x) => ({ key: x.key, checked: this.#value.includes(x.value), value: x.value }));
+		const listData: string[] | undefined = config?.getValueByAlias('items');
+		this._list = listData?.map((item) => ({ label: item, value: item, checked: this.#value.includes(item) })) ?? [];
 	}
 
 	@state()
-	private _list: Array<{ key: string; checked: boolean; value: string }> = [];
+	private _list: UmbInputCheckboxListElement['list'] = [];
 
 	#onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputCheckboxListElement).selected;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		const element = event.target as UmbInputCheckboxListElement;
+		this.value = element.selection;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<umb-input-checkbox-list
-			@change="${this.#onChange}"
-			.selectedIds="${this.#value}"
-			.list="${this._list}"></umb-input-checkbox-list>`;
+		return html`
+			<umb-input-checkbox-list
+				.list=${this._list}
+				.selection=${this.#value}
+				@change=${this.#onChange}></umb-input-checkbox-list>
+		`;
 	}
 }
 

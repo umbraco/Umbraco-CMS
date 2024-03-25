@@ -1,3 +1,4 @@
+import type { UmbDocumentVariantPublishModel } from '../../types.js';
 import { UmbDocumentPublishingServerDataSource } from './document-publishing.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
@@ -28,12 +29,12 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * @return {*}
 	 * @memberof UmbDocumentPublishingRepository
 	 */
-	async publish(unique: string, variantIds: Array<UmbVariantId>) {
+	async publish(unique: string, variants: Array<UmbDocumentVariantPublishModel>) {
 		if (!unique) throw new Error('id is missing');
-		if (!variantIds) throw new Error('variant IDs are missing');
+		if (!variants.length) throw new Error('variant IDs are missing');
 		await this.#init;
 
-		const { error } = await this.#publishingDataSource.publish(unique, variantIds);
+		const { error } = await this.#publishingDataSource.publish(unique, variants);
 
 		if (!error) {
 			const notification = { data: { message: `Document published` } };
@@ -59,6 +60,29 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 
 		if (!error) {
 			const notification = { data: { message: `Document unpublished` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Publish variants of a document including its descendants
+	 * @memberof UmbDocumentPublishingRepository
+	 */
+	async publishWithDescendants(id: string, variantIds: Array<UmbVariantId>, includeUnpublishedDescendants: boolean) {
+		if (!id) throw new Error('id is missing');
+		if (!variantIds) throw new Error('variant IDs are missing');
+		await this.#init;
+
+		const { error } = await this.#publishingDataSource.publishWithDescendants(
+			id,
+			variantIds,
+			includeUnpublishedDescendants,
+		);
+
+		if (!error) {
+			const notification = { data: { message: `Document published with descendants` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 

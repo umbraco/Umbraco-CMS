@@ -61,7 +61,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 
 		const requestBody = {
 			id: args.unique,
-			parentId: args.parentUnique,
+			parent: args.parentUnique ? { id: args.parentUnique } : null,
 			name: args.name,
 		};
 

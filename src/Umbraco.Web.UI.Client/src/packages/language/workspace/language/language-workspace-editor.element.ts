@@ -1,5 +1,5 @@
 import type { UmbLanguageDetailModel } from '../../types.js';
-import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from './language-workspace.context.js';
+import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from './language-workspace.context-token.js';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';

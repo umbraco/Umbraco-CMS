@@ -1,6 +1,6 @@
 import { extractUmbColorVariable } from '../../resources/extractUmbColorVariable.function.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -45,7 +45,16 @@ export class UmbIconElement extends UmbLitElement {
 		return html`<uui-icon name=${ifDefined(this._icon)} style=${ifDefined(this._color)}></uui-icon>`;
 	}
 
-	static styles = [UmbTextStyles];
+	static styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+		`,
+	];
 }
 
 declare global {

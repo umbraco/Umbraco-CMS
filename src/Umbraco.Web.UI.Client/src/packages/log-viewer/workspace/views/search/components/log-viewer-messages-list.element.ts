@@ -1,5 +1,5 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer.context.js';
-import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
+import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import type { UUIScrollContainerElement, UUIPaginationElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -89,12 +89,12 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 							.properties=${log.properties ?? []}
 							.exception=${log.exception ?? ''}
 							.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`,
-			  )}`
+				)}`
 			: html`
 					<span id="empty">
 						<uui-icon name="icon-search"></uui-icon>Sorry, we cannot find what you are looking for.
 					</span>
-			  `}`;
+				`}`;
 	}
 
 	render() {
@@ -124,6 +124,10 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 
 	static styles = [
 		css`
+			uui-pagination {
+				display: block;
+				margin-bottom: var(--uui-size-layout-1);
+			}
 			uui-box {
 				--uui-box-default-padding: 0;
 			}

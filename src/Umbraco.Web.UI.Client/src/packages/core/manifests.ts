@@ -1,5 +1,6 @@
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as cultureManifests } from './culture/manifests.js';
+import { manifests as contentTypeManifests } from './content-type/manifests.js';
 import { manifests as debugManifests } from './debug/manifests.js';
 import { manifests as entityActionManifests } from './entity-action/manifests.js';
 import { manifests as extensionManifests } from './extension-registry/manifests.js';
@@ -18,6 +19,7 @@ import type { ManifestTypes, UmbBackofficeManifestKind } from './extension-regis
 export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...collectionManifests,
 	...cultureManifests,
+	...contentTypeManifests,
 	...debugManifests,
 	...entityActionManifests,
 	...extensionManifests,

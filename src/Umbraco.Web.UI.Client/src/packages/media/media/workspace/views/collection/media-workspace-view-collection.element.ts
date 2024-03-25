@@ -1,4 +1,4 @@
-import { customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -58,7 +58,6 @@ export class UmbMediaWorkspaceViewCollectionElement extends UmbLitElement implem
 		const config = new UmbPropertyEditorConfigCollection(dataType.values);
 		return {
 			unique: this._mediaUnique,
-			dataTypeId: dataType.unique,
 			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
@@ -69,7 +68,7 @@ export class UmbMediaWorkspaceViewCollectionElement extends UmbLitElement implem
 	}
 
 	render() {
-		if (!this._config?.unique || !this._config?.dataTypeId) return html`<uui-loader></uui-loader>`;
+		if (!this._config?.unique) return nothing;
 		return html`<umb-collection .alias=${UMB_MEDIA_COLLECTION_ALIAS} .config=${this._config}></umb-collection>`;
 	}
 }

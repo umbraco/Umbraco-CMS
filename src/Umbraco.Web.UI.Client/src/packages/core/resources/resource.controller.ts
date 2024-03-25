@@ -62,6 +62,11 @@ export class UmbResourceController extends UmbControllerBase {
 				// Cancelled - do nothing
 				return {};
 			} else {
+				console.group('ApiError caught in UmbResourceController');
+				console.error('Request failed', error.request);
+				console.error('ProblemDetails', error.body);
+				console.error('Error', error);
+
 				// ApiError - body could hold a ProblemDetails from the server
 				if (typeof error.body !== 'undefined' && !!error.body) {
 					try {
@@ -78,7 +83,7 @@ export class UmbResourceController extends UmbControllerBase {
 						console.log('Unauthorized');
 
 						// TODO: Do not remove the token here but instead let whatever is listening to the event decide what to do
-						localStorage.removeItem('tokenResponse');
+						localStorage.removeItem('umb:userAuthTokenResponse');
 
 						// TODO: Show a modal dialog to login either by bubbling an event to UmbAppElement or by showing a modal directly
 						this.#notificationContext?.peek('warning', {
@@ -87,6 +92,32 @@ export class UmbResourceController extends UmbControllerBase {
 								message: 'Your session has expired. Please refresh the page.',
 							},
 						});
+						break;
+					case 500:
+						// Server Error
+
+						if (this.#notificationContext) {
+							let headline = error.body?.title ?? error.name ?? 'Server Error';
+							let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
+
+							// Special handling for ObjectCacheAppCache corruption errors, which we are investigating
+							if (
+								error.body?.detail?.includes('ObjectCacheAppCache') ||
+								error.body?.detail?.includes('Umbraco.Cms.Infrastructure.Scoping.Scope.DisposeLastScope()')
+							) {
+								headline = 'Please restart the server';
+								message =
+									'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
+							}
+
+							this.#notificationContext.peek('danger', {
+								data: {
+									headline,
+									message,
+								},
+								...options,
+							});
+						}
 						break;
 					default:
 						// Other errors
@@ -98,12 +129,10 @@ export class UmbResourceController extends UmbControllerBase {
 								},
 								...options,
 							});
-						} else {
-							console.group('UmbResourceController');
-							console.error(error);
-							console.groupEnd();
 						}
 				}
+
+				console.groupEnd();
 			}
 		}
 

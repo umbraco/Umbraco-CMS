@@ -3,7 +3,7 @@ import { createFileSystemTreeItem } from '../../utils.js';
 import { pagedResult } from '../paged-result.js';
 import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-export class UmbMockFileSystemTreeManager<T extends Omit<FileSystemTreeItemPresentationModel, 'type'>> {
+export class UmbMockFileSystemTreeManager<T extends FileSystemTreeItemPresentationModel> {
 	#db: UmbMockDBBase<T>;
 
 	constructor(mockDb: UmbMockDBBase<T>) {
@@ -11,7 +11,7 @@ export class UmbMockFileSystemTreeManager<T extends Omit<FileSystemTreeItemPrese
 	}
 
 	getRoot({ skip = 0, take = 100 }: { skip?: number; take?: number } = {}): {
-		items: Array<Omit<FileSystemTreeItemPresentationModel, 'type'>>;
+		items: Array<FileSystemTreeItemPresentationModel>;
 		total: number;
 	} {
 		const items = this.#db.getAll().filter((item) => item.parent === null);
@@ -19,7 +19,7 @@ export class UmbMockFileSystemTreeManager<T extends Omit<FileSystemTreeItemPrese
 	}
 
 	getChildrenOf({ parentPath, skip = 0, take = 100 }: { parentPath: string; skip?: number; take?: number }): {
-		items: Array<Omit<FileSystemTreeItemPresentationModel, 'type'>>;
+		items: Array<FileSystemTreeItemPresentationModel>;
 		total: number;
 	} {
 		const items = this.#db.getAll().filter((item) => item.parent?.path === parentPath);

@@ -1,3 +1,5 @@
+export type UmbEntityUnique = string | null;
+
 /** Tried to find a common base of our entities — used by Entity Workspace Context */
 export type UmbEntityBase = {
 	id?: string;
@@ -21,5 +23,10 @@ export interface NumberRangeValueType {
 }
 
 export interface UmbReferenceByUnique {
+	unique: string;
+}
+
+export interface UmbReferenceByUniqueAndType {
+	type: string;
 	unique: string;
 }

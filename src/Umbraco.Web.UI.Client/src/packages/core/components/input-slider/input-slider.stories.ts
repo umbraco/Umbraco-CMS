@@ -15,7 +15,7 @@ export const Overview: Story = {
 		min: 0,
 		max: 100,
 		step: 10,
-		initVal1: 20,
+		valueLow: 20,
 	},
 };
 
@@ -24,8 +24,8 @@ export const WithRange: Story = {
 		min: 0,
 		max: 100,
 		step: 10,
-		initVal1: 20,
-		initVal2: 80,
+		valueLow: 20,
+		valueHigh: 80,
 		enableRange: true,
 	},
 };
@@ -35,7 +35,7 @@ export const WithSmallStep: Story = {
 		min: 0,
 		max: 5,
 		step: 1,
-		initVal1: 4,
+		valueLow: 4,
 	},
 };
 
@@ -44,6 +44,6 @@ export const WithLargeMinMax: Story = {
 		min: 0,
 		max: 100,
 		step: 1,
-		initVal1: 86,
+		valueLow: 86,
 	},
 };

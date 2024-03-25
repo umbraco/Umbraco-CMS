@@ -1,5 +1,4 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { css, html, customElement, state, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { EXAMPLE_COUNTER_CONTEXT } from './counter-workspace-context';

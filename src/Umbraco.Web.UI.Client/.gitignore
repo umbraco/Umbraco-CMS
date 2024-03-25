@@ -41,6 +41,9 @@ playwright/.cache/
 # storybook
 storybook-static/
 
+# API Docs
+ui-api/
+
 custom-elements.json
 
 # JSON for HTML Custom Data

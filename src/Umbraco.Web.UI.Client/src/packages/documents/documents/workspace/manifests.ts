@@ -1,13 +1,11 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import { UMB_DOCUMENT_WORKSPACE_HAS_COLLECTION_CONDITION } from '../conditions/document-workspace-has-collection.condition.js';
-//import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
-//import { UmbPublishDocumentEntityAction } from '../entity-actions/publish.action.js';
+import { UmbDocumentSaveAndScheduleWorkspaceAction } from './actions/save-and-schedule.action.js';
+import { UmbDocumentUnpublishWorkspaceAction } from './actions/unpublish.action.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
-//import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
-//import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action.js';
+import { UmbDocumentPublishWithDescendantsWorkspaceAction } from './actions/publish-with-descendants.action.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceActionMenuItem,
 	ManifestWorkspaceView,
@@ -15,11 +13,11 @@ import type {
 
 export const UMB_DOCUMENT_WORKSPACE_ALIAS = 'Umb.Workspace.Document';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: UMB_DOCUMENT_WORKSPACE_ALIAS,
 	name: 'Document Workspace',
-	element: () => import('./document-workspace.element.js'),
 	api: () => import('./document-workspace.context.js'),
 	meta: {
 		entityType: UMB_DOCUMENT_ENTITY_TYPE,
@@ -40,7 +38,11 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: UMB_DOCUMENT_WORKSPACE_HAS_COLLECTION_CONDITION,
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+			{
+				alias: 'Umb.Condition.WorkspaceHasCollection',
 			},
 		],
 	},
@@ -138,22 +140,6 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			},
 		],
 	},
-	{
-		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.Document.SaveAndSchedule',
-		name: 'Save And Schedule Document Workspace Action',
-		weight: 100,
-		api: UmbSaveAndScheduleDocumentWorkspaceAction,
-		meta: {
-			label: 'Save And Schedule',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
-			},
-		],
-	},
 	*/
 ];
 
@@ -163,11 +149,11 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		kind: 'default',
 		alias: 'Umb.Document.WorkspaceActionMenuItem.Unpublish',
 		name: 'Unpublish',
-		weight: 10,
-		api: UmbDocumentSaveAndPublishWorkspaceAction,
+		weight: 0,
+		api: UmbDocumentUnpublishWorkspaceAction,
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Unpublish',
+			label: 'Unpublish...',
 			icon: 'icon-globe',
 		},
 	},
@@ -176,11 +162,11 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		kind: 'default',
 		alias: 'Umb.Document.WorkspaceActionMenuItem.PublishWithDescendants',
 		name: 'Publish with descendants',
-		weight: 20,
-		api: UmbDocumentSaveAndPublishWorkspaceAction,
+		weight: 10,
+		api: UmbDocumentPublishWithDescendantsWorkspaceAction,
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Publish with descendants (TBD)',
+			label: 'Publish with descendants...',
 			icon: 'icon-globe',
 		},
 	},
@@ -190,10 +176,10 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		alias: 'Umb.Document.WorkspaceActionMenuItem.SchedulePublishing',
 		name: 'Schedule publishing',
 		weight: 20,
-		api: UmbDocumentSaveAndPublishWorkspaceAction,
+		api: UmbDocumentSaveAndScheduleWorkspaceAction,
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Schedule publishing (TBD)',
+			label: 'Schedule...',
 			icon: 'icon-globe',
 		},
 	},

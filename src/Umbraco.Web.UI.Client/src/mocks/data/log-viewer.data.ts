@@ -14,7 +14,7 @@ class UmbLogViewerSearchesData extends UmbMockDBBase<SavedLogSearchResponseModel
 
 	// skip can be number or null
 	getSavedSearches(skip = 0, take = this.data.length): Array<SavedLogSearchResponseModel> {
-		return this.data.slice(skip, take);
+		return this.data.slice(skip, take + skip);
 	}
 
 	getByName(name: string) {
@@ -29,7 +29,7 @@ class UmbLogViewerTemplatesData extends UmbMockDBBase<LogTemplateResponseModel> 
 
 	// skip can be number or null
 	getTemplates(skip = 0, take = this.data.length): Array<LogTemplateResponseModel> {
-		return this.data.slice(skip, take);
+		return this.data.slice(skip, take + skip);
 	}
 }
 

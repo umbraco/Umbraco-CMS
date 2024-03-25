@@ -12,7 +12,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'filter',
 					label: 'Accepted types',
 					description: 'Limit to specific types',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaTypePicker',
 				},
 				{
 					alias: 'multiple',

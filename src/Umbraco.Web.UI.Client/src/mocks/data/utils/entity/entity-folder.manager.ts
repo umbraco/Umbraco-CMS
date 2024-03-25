@@ -6,7 +6,7 @@ import type {
 	UpdateFolderResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-export class UmbMockEntityFolderManager<MockItemType extends Omit<FolderTreeItemResponseModel, 'type'>> {
+export class UmbMockEntityFolderManager<MockItemType extends FolderTreeItemResponseModel> {
 	#db: UmbEntityMockDbBase<MockItemType>;
 	#createMockFolderMapper: (request: CreateFolderRequestModel) => MockItemType;
 

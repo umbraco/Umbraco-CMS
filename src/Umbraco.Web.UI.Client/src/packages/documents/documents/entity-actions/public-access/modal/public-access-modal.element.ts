@@ -32,7 +32,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	private _startPage = true;
 
 	@state()
-	private _selectedIds: Array<string> = [];
+	private _selection: Array<string> = [];
 
 	@state()
 	private _loginPageId?: string;
@@ -76,11 +76,11 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 		// Specific or Groups
 		this._specific = data.members.length > 0 ? true : false;
 
-		//SelectedIds
+		//selection
 		if (data.members.length > 0) {
-			this._selectedIds = data.members.map((m: any) => m.id);
+			this._selection = data.members.map((m: any) => m.id);
 		} else if (data.groups.length > 0) {
-			this._selectedIds = data.groups.map((g: any) => g.id);
+			this._selection = data.groups.map((g: any) => g.id);
 		}
 
 		this._loginPageId = data.loginPageId;
@@ -96,8 +96,8 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	async #handleSave() {
 		if (!this._loginPageId || !this._errorPageId || !this.#unique) return;
 
-		const groups = this._specific ? [] : this._selectedIds;
-		const members = this._specific ? this._selectedIds : [];
+		const groups = this._specific ? [] : this._selection;
+		const members = this._specific ? this._selection : [];
 
 		const requestBody: PublicAccessRequestModel = {
 			memberGroupNames: groups,
@@ -128,19 +128,19 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	// Change Events
 
 	#onChangeLoginPage(e: CustomEvent) {
-		this._loginPageId = (e.target as UmbInputDocumentElement).selectedIds[0];
+		this._loginPageId = (e.target as UmbInputDocumentElement).selection[0];
 	}
 
 	#onChangeErrorPage(e: CustomEvent) {
-		this._errorPageId = (e.target as UmbInputDocumentElement).selectedIds[0];
+		this._errorPageId = (e.target as UmbInputDocumentElement).selection[0];
 	}
 
 	#onChangeGroup(e: CustomEvent) {
-		this._selectedIds = (e.target as UmbInputMemberTypeElement).selectedIds;
+		this._selection = (e.target as UmbInputMemberTypeElement).selection;
 	}
 
 	#onChangeMember(e: CustomEvent) {
-		this._selectedIds = (e.target as UmbInputMemberElement).selectedIds;
+		this._selection = (e.target as UmbInputMemberElement).selection;
 	}
 
 	// Renders
@@ -204,13 +204,11 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 			? html`<umb-localize key="publicAccess_paSelectMembers" .args=${[this._documentName]}>
 						Select the members who have access to the page <strong>${this._documentName}</strong>
 					</umb-localize>
-					<umb-input-member .selectedIds=${this._selectedIds} @change=${this.#onChangeMember}></umb-input-member>`
+					<umb-input-member .selection=${this._selection} @change=${this.#onChangeMember}></umb-input-member>`
 			: html`<umb-localize key="publicAccess_paSelectGroups" .args=${[this._documentName]}>
 						Select the groups who have access to the page <strong>${this._documentName}</strong>
 					</umb-localize>
-					<umb-input-member-type
-						.selectedIds=${this._selectedIds}
-						@change=${this.#onChangeGroup}></umb-input-member-type>`;
+					<umb-input-member-type .selection=${this._selection} @change=${this.#onChangeGroup}></umb-input-member-type>`;
 	}
 
 	// Action buttons
@@ -223,7 +221,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 					look="primary"
 					color="positive"
 					label=${this.localize.term('buttons_save')}
-					?disabled=${!this._loginPageId || !this._errorPageId || this._selectedIds.length === 0}
+					?disabled=${!this._loginPageId || !this._errorPageId || this._selection.length === 0}
 					@click="${this.#handleSave}"></uui-button>`
 			: html`<uui-button
 					slot="actions"

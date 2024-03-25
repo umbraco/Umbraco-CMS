@@ -12,16 +12,17 @@ export class UmbEntityActionElement<
 > extends UmbLitElement {
 	#api?: ApiType;
 
+	// TODO: Do these need to be properties? [NL]
 	@property({ type: String })
 	entityType?: string | null;
 
+	// TODO: Do these need to be properties? [NL]
 	@property({ type: String })
 	public unique?: string | null;
 
 	@property({ attribute: false })
 	public manifest?: ManifestEntityAction<MetaType>;
 
-	@property({ attribute: false })
 	public set api(api: ApiType | undefined) {
 		this.#api = api;
 

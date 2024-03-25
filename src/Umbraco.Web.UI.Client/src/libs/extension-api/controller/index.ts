@@ -8,3 +8,4 @@ export * from './extension-manifest-initializer.controller.js';
 export * from './extensions-manifest-initializer.controller.js';
 export * from './extension-element-and-api-initializer.controller.js';
 export * from './extensions-element-and-api-initializer.controller.js';
+export * from './server-extension-registrator.controller.js';

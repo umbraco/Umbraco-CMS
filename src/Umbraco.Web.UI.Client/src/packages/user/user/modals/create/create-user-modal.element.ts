@@ -27,7 +27,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		const email = formData.get('email') as string;
 
 		const userGroupPicker = form.querySelector('#userGroups') as UmbUserGroupInputElement;
-		const userGroups = userGroupPicker?.selectedIds;
+		const userGroups = userGroupPicker?.selection;
 
 		const { data: userScaffold } = await this.#userDetailRepository.createScaffold();
 		if (!userScaffold) return;

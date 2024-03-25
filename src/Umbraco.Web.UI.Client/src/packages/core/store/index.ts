@@ -1,5 +1,6 @@
 export * from './store-base.js';
 export * from './store.interface.js';
+export * from './events/index.js';
 
 export { UmbDetailStoreBase } from './detail/detail-store-base.js';
 export type { UmbDetailStore } from './detail/detail-store.interface.js';

@@ -69,7 +69,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	}
 
 	protected renderSelectionActions() {
-		return html`<umb-collection-selection-actions slot="footer-info"></umb-collection-selection-actions>`;
+		return html`<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>`;
 	}
 
 	static styles = [

@@ -248,8 +248,8 @@ export class UmbExtensionRegistry<
 	}
 
 	/**
-	 * Get an observable that provides extensions matching the given alias.
-	 * @param alias {string} - The alias of the extensions to get.
+	 * Get an observable that provides an extension matching the given alias.
+	 * @param alias {string} - The alias of the extension to get.
 	 * @returns {Observable<T | undefined>} - An observable of the extension that matches the alias.
 	 */
 	byAlias<T extends ManifestBase = ManifestBase>(alias: string): Observable<T | undefined> {
@@ -265,6 +265,19 @@ export class UmbExtensionRegistry<
 
 			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
 		) as Observable<T | undefined>;
+	}
+
+	/**
+	 * Get an extension that matches the given alias, this will not return an observable, it is a one of retrieval if it exists at the given point in time.
+	 * @param alias {string} - The alias of the extension to get.
+	 * @returns {<T | undefined>} - The extension manifest that matches the alias.
+	 */
+	getByAlias<T extends ManifestBase = ManifestBase>(alias: string): T | undefined {
+		const ext = this._extensions.getValue().find((ext) => ext.alias === alias) as T | undefined;
+		if (ext?.kind) {
+			return this.#mergeExtensionWithKinds([ext, this._kinds.getValue()]);
+		}
+		return ext;
 	}
 
 	/**

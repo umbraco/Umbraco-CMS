@@ -1,6 +1,11 @@
 import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
+
+const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest: unknown) => {
+	return [{ manifest }];
+};
 
 @customElement('umb-workspace')
 export class UmbWorkspaceElement extends UmbLitElement {
@@ -9,9 +14,12 @@ export class UmbWorkspaceElement extends UmbLitElement {
 
 	render() {
 		if (!this.entityType) return nothing;
-		return html`<umb-extension-slot
+		return html`<umb-extension-with-api-slot
 			type="workspace"
-			.filter=${(manifest: ManifestWorkspace) => manifest.meta.entityType === this.entityType}></umb-extension-slot>`;
+			.defaultApi=${() => import('./contexts/default-workspace.context.js')}
+			.apiArgs=${apiArgsCreator}
+			.filter=${(manifest: ManifestWorkspace) =>
+				manifest.meta.entityType === this.entityType}></umb-extension-with-api-slot>`;
 	}
 }
 

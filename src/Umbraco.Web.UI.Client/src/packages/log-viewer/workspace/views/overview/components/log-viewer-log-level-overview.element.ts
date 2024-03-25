@@ -1,10 +1,9 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer.context.js';
-import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
+import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LoggerResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-//TODO: implement the saved searches pagination when the API total bug is fixed
 @customElement('umb-log-viewer-log-level-overview')
 export class UmbLogViewerLogLevelOverviewElement extends UmbLitElement {
 	#logViewerContext?: UmbLogViewerWorkspaceContext;

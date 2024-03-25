@@ -3,8 +3,7 @@ import type {
 	StaticFileItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-type UmbMockStaticFileModelHack = StaticFileItemResponseModel & FileSystemTreeItemPresentationModel;
-export interface UmbMockStaticFileModel extends Omit<UmbMockStaticFileModelHack, 'type'> {}
+export type UmbMockStaticFileModel = StaticFileItemResponseModel & FileSystemTreeItemPresentationModel;
 
 export const data: Array<UmbMockStaticFileModel> = [
 	{

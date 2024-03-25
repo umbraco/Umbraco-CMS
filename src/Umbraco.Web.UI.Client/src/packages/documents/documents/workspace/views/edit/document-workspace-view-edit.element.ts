@@ -38,10 +38,14 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
-		this.observe(this._tabsStructureHelper.containers, (tabs) => {
-			this._tabs = tabs;
-			this._createRoutes();
-		});
+		this.observe(
+			this._tabsStructureHelper.mergedContainers,
+			(tabs) => {
+				this._tabs = tabs;
+				this._createRoutes();
+			},
+			null,
+		);
 
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
@@ -76,11 +80,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./document-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
-						(component as UmbDocumentWorkspaceViewEditTabElement).tabName = tabName;
-						// TODO: Consider if we can link these more simple, and not parse this on.
-						// Instead have the structure manager looking at wether one of the OwnerALikecontainers is in the owner document.
-						(component as UmbDocumentWorkspaceViewEditTabElement).ownerTabId =
-							this._tabsStructureHelper.isOwnerContainer(tab.id!) ? tab.id : undefined;
+						(component as UmbDocumentWorkspaceViewEditTabElement).containerId = tab.id;
 					},
 				});
 			});
@@ -91,8 +91,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 				path: '',
 				component: () => import('./document-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
-					(component as UmbDocumentWorkspaceViewEditTabElement).noTabName = true;
-					(component as UmbDocumentWorkspaceViewEditTabElement).ownerTabId = null;
+					(component as UmbDocumentWorkspaceViewEditTabElement).containerId = null;
 				},
 			});
 		}
@@ -121,7 +120,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 											href=${this._routerPath + '/'}
 											>Content</uui-tab
 										>
-								  `
+									`
 								: ''}
 							${repeat(
 								this._tabs,
@@ -133,7 +132,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 									>`;
 								},
 							)}
-					  </uui-tab-group>`
+						</uui-tab-group>`
 					: ''}
 
 				<umb-router-slot

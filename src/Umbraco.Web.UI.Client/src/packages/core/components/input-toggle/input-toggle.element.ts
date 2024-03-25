@@ -32,10 +32,6 @@ export class UmbInputToggleElement extends FormControlMixin(UmbLitElement) {
 		return undefined;
 	}
 
-	constructor() {
-		super();
-	}
-
 	connectedCallback(): void {
 		super.connectedCallback();
 		this.#updateLabel();

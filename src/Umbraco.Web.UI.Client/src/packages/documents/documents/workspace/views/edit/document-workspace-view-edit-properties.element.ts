@@ -1,53 +1,52 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-document-workspace-view-edit-properties')
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	@property({ type: String, attribute: 'container-name', reflect: false })
-	public get containerName(): string | undefined {
-		return this._propertyStructureHelper.getContainerName();
+	@property({ type: String, attribute: 'container-id', reflect: false })
+	public get containerId(): string | null | undefined {
+		return this.#propertyStructureHelper.getContainerId();
 	}
-	public set containerName(value: string | undefined) {
-		this._propertyStructureHelper.setContainerName(value);
-	}
-
-	@property({ type: String, attribute: 'container-type', reflect: false })
-	public get containerType(): UmbPropertyContainerTypes | undefined {
-		return this._propertyStructureHelper.getContainerType();
-	}
-	public set containerType(value: UmbPropertyContainerTypes | undefined) {
-		this._propertyStructureHelper.setContainerType(value);
+	public set containerId(value: string | null | undefined) {
+		this.#propertyStructureHelper.setContainerId(value);
 	}
 
-	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<any>(this);
+	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbDocumentTypeDetailModel>(this);
 
 	@state()
-	_propertyStructure: Array<UmbPropertyTypeModel> = [];
+	_propertyStructure?: Array<UmbPropertyTypeModel>;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._propertyStructureHelper.setStructureManager(workspaceContext.structure);
+			this.#propertyStructureHelper.setStructureManager(workspaceContext.structure);
 		});
-		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
-			this._propertyStructure = propertyStructure;
-		});
+		this.observe(
+			this.#propertyStructureHelper.propertyStructure,
+			(propertyStructure) => {
+				this._propertyStructure = propertyStructure;
+			},
+			null,
+		);
 	}
 
 	render() {
-		return repeat(
-			this._propertyStructure,
-			(property) => property.alias,
-			(property) =>
-				html`<umb-property-type-based-property
-					class="property"
-					.property=${property}></umb-property-type-based-property> `,
-		);
+		return this._propertyStructure
+			? repeat(
+					this._propertyStructure,
+					(property) => property.alias,
+					(property) =>
+						html`<umb-property-type-based-property
+							class="property"
+							.property=${property}></umb-property-type-based-property> `,
+				)
+			: '';
 	}
 
 	static styles = [

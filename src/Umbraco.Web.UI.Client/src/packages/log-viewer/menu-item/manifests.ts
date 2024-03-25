@@ -3,13 +3,13 @@ import type { ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registr
 const menuItem: ManifestMenuItem = {
 	type: 'menuItem',
 	alias: 'Umb.MenuItem.LogViewer',
-	name: 'LogViewer Menu Item',
+	name: 'Log Viewer Menu Item',
 	weight: 300,
 	meta: {
 		label: 'Log Viewer',
 		icon: 'icon-box-alt',
 		entityType: 'logviewer',
-		menus: ['Umb.Menu.Settings'],
+		menus: ['Umb.Menu.AdvancedSettings'],
 	},
 };
 

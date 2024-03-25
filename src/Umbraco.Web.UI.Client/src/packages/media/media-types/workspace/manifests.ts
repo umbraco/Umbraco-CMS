@@ -1,28 +1,30 @@
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
+	ManifestWorkspaceViews,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
-const workspace: ManifestWorkspace = {
+export const UMB_MEDIA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.MediaType';
+
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
-	alias: 'Umb.Workspace.MediaType',
+	kind: 'routable',
+	alias: UMB_MEDIA_TYPE_WORKSPACE_ALIAS,
 	name: 'Media Type Workspace',
-	js: () => import('./media-type-workspace.element.js'),
+	api: () => import('./media-type-workspace.context.js'),
 	meta: {
 		entityType: 'media-type',
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [
+const workspaceViews: Array<ManifestWorkspaceViews> = [
 	{
 		type: 'workspaceView',
+		kind: 'contentTypeDesignEditor',
 		alias: 'Umb.WorkspaceView.MediaType.Design',
 		name: 'Media Type Workspace Design View',
-		js: () => import('./views/design/media-type-workspace-view-edit.element.js'),
-		weight: 1000,
 		meta: {
 			label: 'Design',
 			pathname: 'design',

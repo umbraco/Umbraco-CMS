@@ -25,36 +25,15 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	@property({ type: String })
-	public get tabName(): string | undefined {
-		return this.#groupStructureHelper.getName();
+	public get containerId(): string | null | undefined {
+		return this._containerId;
 	}
-	public set tabName(value: string | undefined) {
-		if (value === this._tabName) return;
-		const oldValue = this._tabName;
-		this._tabName = value;
-		this.#groupStructureHelper.setName(value);
-		this.requestUpdate('tabName', oldValue);
+	public set containerId(value: string | null | undefined) {
+		this._containerId = value;
+		this.#groupStructureHelper.setContainerId(value);
 	}
-	private _tabName?: string | undefined;
-
-	@property({ type: Boolean })
-	public get noTabName(): boolean {
-		return this.#groupStructureHelper.getIsRoot();
-	}
-	public set noTabName(value: boolean) {
-		this.#groupStructureHelper.setIsRoot(value);
-	}
-
-	private _ownerTabId?: string | null;
-	@property({ type: String })
-	public get ownerTabId(): string | null | undefined {
-		return this._ownerTabId;
-	}
-	public set ownerTabId(value: string | null | undefined) {
-		if (value === this._ownerTabId) return;
-		this._ownerTabId = value;
-		this.#groupStructureHelper.setOwnerId(value);
-	}
+	@state()
+	private _containerId?: string | null;
 
 	/**
 	 * If true, the group box will be hidden, if we are to only represents one group.
@@ -82,7 +61,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 		if (!this.#blockWorkspace || !this.#managerName) return;
 		this.#groupStructureHelper.setStructureManager(this.#blockWorkspace[this.#managerName].structure);
 		this.observe(
-			this.#groupStructureHelper.containers,
+			this.#groupStructureHelper.mergedContainers,
 			(groups) => {
 				this._groups = groups;
 			},
@@ -99,29 +78,24 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 
 	render() {
 		return html`
-			${this._hasProperties ? this.#renderPart(this._tabName) : ''}
-			${repeat(
-				this._groups,
-				(group) => group.name,
-				(group) => this.#renderPart(group.name, group.name),
-			)}
-		`;
-	}
-
-	#renderPart(groupName: string | null | undefined, boxName?: string | null | undefined) {
-		return this.hideSingleGroup && this._groups.length === 1
-			? html` <umb-block-workspace-view-edit-properties
-					.managerName=${this.#managerName}
-					class="properties"
-					container-type="Group"
-					container-name=${groupName || ''}></umb-block-workspace-view-edit-properties>`
-			: html` <uui-box .headline=${boxName || ''}
-					><umb-block-workspace-view-edit-properties
+			${this._hasProperties
+				? html` <umb-block-workspace-view-edit-properties
 						.managerName=${this.#managerName}
 						class="properties"
-						container-type="Group"
-						container-name=${groupName || ''}></umb-block-workspace-view-edit-properties
-			  ></uui-box>`;
+						.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>`
+				: ''}
+			${repeat(
+				this._groups,
+				(group) => group.id,
+				(group) =>
+					html` <uui-box .headline=${group.name || ''}
+						><umb-block-workspace-view-edit-properties
+							.managerName=${this.#managerName}
+							class="properties"
+							.containerId=${group.id}></umb-block-workspace-view-edit-properties
+					></uui-box>`,
+			)}
+		`;
 	}
 
 	static styles = [

@@ -13,7 +13,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbPaginationManager, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -23,6 +23,11 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 {
 	#treeRoot = new UmbObjectState<TreeItemType | undefined>(undefined);
 	treeRoot = this.#treeRoot.asObservable();
+
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	#rootItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
+	rootItems = this.#rootItems.asObservable();
 
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
@@ -52,7 +57,26 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
-		this.requestTreeRoot();
+
+		/* TODO: revisit. This is a temp solution to notify the parent it needs to reload its children
+		there might be a better way to do this through a tree item parent context.
+		It does not look like there is a way to have a "dynamic" parent context that will stop when a
+		specific parent is reached (a tree item unique that matches the parentUnique of this item) */
+		const hostElement = this.getHostElement();
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		hostElement.addEventListener('temp-reload-tree-item-parent', (event: CustomEvent) => {
+			const treeRoot = this.#treeRoot.getValue();
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			const unique = treeRoot.unique;
+			if (event.detail.unique === unique) {
+				event.stopPropagation();
+				this.loadRootItems();
+			}
+		});
+
+		this.loadTreeRoot();
 	}
 
 	// TODO: find a generic way to do this
@@ -91,35 +115,29 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		return this.#repository;
 	}
 
-	public async requestTreeRoot() {
+	public async loadTreeRoot() {
 		await this.#init;
 		const { data } = await this.#repository!.requestTreeRoot();
 
 		if (data) {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			//@ts-ignore
+			// @ts-ignore
 			this.#treeRoot.setValue(data);
 		}
 	}
 
-	public async requestRootItems() {
+	public async loadRootItems() {
 		await this.#init;
 
-		const { data, error, asObservable } = await this.#repository!.requestRootTreeItems({
+		const { data } = await this.#repository!.requestRootTreeItems({
 			skip: this.#paging.skip,
 			take: this.#paging.take,
 		});
 
 		if (data) {
+			this.#rootItems.setValue(data.items);
 			this.pagination.setTotalItems(data.total);
 		}
-
-		return { data, error, asObservable };
-	}
-
-	public async rootItems() {
-		await this.#init;
-		return this.#repository!.rootTreeItems();
 	}
 
 	#consumeContexts() {
@@ -139,7 +157,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
 		this.#paging.skip = target.getSkip();
-		this.requestRootItems();
+		this.loadRootItems();
 	};
 
 	#observeRepository(repositoryAlias?: string) {
@@ -165,7 +183,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		// @ts-ignore
 		if (event.getUnique() !== treeRoot.unique) return;
 		if (event.getEntityType() !== treeRoot.entityType) return;
-		this.requestRootItems();
+		this.loadRootItems();
 	};
 
 	destroy(): void {

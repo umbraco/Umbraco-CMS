@@ -4,11 +4,16 @@ import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
 import type { UmbMediaDetailModel, UmbMediaVariantModel, UmbMediaVariantOptionModel } from '../types.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbCollectionWorkspaceContext,
+	UmbVariantDatasetWorkspaceContext,
+} from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
-	type UmbVariantableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -22,11 +27,14 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
+import UmbMediaWorkspaceEditorElement from './media-workspace-editor.element.js';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbVariantableWorkspaceContextInterface
+	extends UmbSaveableWorkspaceContextBase<EntityType>
+	implements UmbVariantDatasetWorkspaceContext, UmbCollectionWorkspaceContext<UmbMediaTypeDetailModel>
 {
 	//
 	public readonly repository = new UmbMediaDetailRepository(this);
@@ -50,13 +58,13 @@ export class UmbMediaWorkspaceContext
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.mediaType.unique);
-	readonly contentTypeCollection = this.#currentData.asObservablePart((data) => data?.mediaType.collection);
+	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.mediaType.collection);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 
-	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbMediaTypeDetailRepository(this));
+	readonly structure = new UmbContentTypeStructureManager(this, new UmbMediaTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
 	//#variesByCulture?: boolean;
 	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
@@ -66,6 +74,7 @@ export class UmbMediaWorkspaceContext
 	);
 	#varies?: boolean;
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly variantOptions = mergeObservables(
@@ -106,6 +115,33 @@ export class UmbMediaWorkspaceContext
 		this.observe(this.varies, (varies) => (this.#varies = varies));
 
 		this.loadLanguages();
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique/:mediaTypeUnique',
+				component: UmbMediaWorkspaceEditorElement,
+				setup: async (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					const mediaTypeUnique = info.match.params.mediaTypeUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique }, mediaTypeUnique);
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbMediaWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	resetState() {
@@ -123,13 +159,23 @@ export class UmbMediaWorkspaceContext
 	async load(unique: string) {
 		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
-		const { data } = await this.#getDataPromise;
-		if (!data) return undefined;
+		type GetDataType = Awaited<ReturnType<UmbMediaDetailRepository['requestByUnique']>>;
+		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 
-		this.setIsNew(false);
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-		return data || undefined;
+		if (data) {
+			this.setIsNew(false);
+			this.#persistedData.update(data);
+			this.#currentData.update(data);
+		}
+
+		this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbMediaStoreObserver');
+	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/media');
+		}
 	}
 
 	async create(parent: { entityType: string; unique: string | null }, mediaTypeUnique: string) {
@@ -143,6 +189,10 @@ export class UmbMediaWorkspaceContext
 		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 		return data;
+	}
+
+	getCollectionAlias() {
+		return 'Umb.Collection.Media';
 	}
 
 	getData() {
@@ -339,6 +389,14 @@ export class UmbMediaWorkspaceContext
 			}
 		} else {
 			await this.repository.save(this.#currentData.value);
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 	}
 
@@ -377,4 +435,4 @@ export class UmbMediaWorkspaceContext
 	}
 }
 
-export default UmbMediaWorkspaceContext;
+export { UmbMediaWorkspaceContext as api };

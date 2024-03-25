@@ -1,10 +1,11 @@
-import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
+import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-input-tree')
@@ -50,32 +51,40 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Boolean })
 	ignoreUserStartNodes?: boolean;
 
-	@property()
-	public set value(newValue: string) {
-		super.value = newValue;
-		if (newValue) {
-			this.selectedIds = newValue.split(',');
-		} else {
-			this.selectedIds = [];
-		}
+	#entityTypeLookup = { content: 'document', media: 'media', member: 'member' };
+
+	@property({ type: Array })
+	public set items(items: Array<UmbReferenceByUniqueAndType>) {
+		this.#selection = items?.map((item) => item.unique) ?? [];
+		this.value = items?.map((item) => item.unique).join(',');
 	}
-	public get value(): string {
-		return super.value as string;
+	public get items(): Array<UmbReferenceByUniqueAndType> {
+		return this.#selection.map((id) => ({ type: this.#entityTypeLookup[this._type], unique: id }));
 	}
 
-	selectedIds: Array<string> = [];
+	#selection: Array<string> = [];
 
 	#onChange(event: CustomEvent) {
 		switch (this._type) {
 			case 'content':
-				this.value = (event.target as UmbInputDocumentElement).selectedIds.join(',');
+				{
+					const input = event.target as UmbInputDocumentElement;
+					this.#selection = input.selection;
+					this.value = input.selection.join(',');
+				}
 				break;
-			case 'media':
-				this.value = (event.target as UmbInputMediaElement).selectedIds.join(',');
+			case 'media': {
+				const input = event.target as UmbInputMediaElement;
+				this.#selection = input.selection;
+				this.value = input.selection.join(',');
 				break;
-			case 'member':
-				this.value = (event.target as UmbInputMemberElement).selectedIds.join(',');
+			}
+			case 'member': {
+				const input = event.target as UmbInputMemberElement;
+				this.#selection = input.selection;
+				this.value = input.selection.join(',');
 				break;
+			}
 			default:
 				break;
 		}
@@ -90,7 +99,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	render() {
 		switch (this._type) {
 			case 'content':
-				return this.#renderContentPicker();
+				return this.#renderDocumentPicker();
 			case 'media':
 				return this.#renderMediaPicker();
 			case 'member':
@@ -100,9 +109,9 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 		}
 	}
 
-	#renderContentPicker() {
+	#renderDocumentPicker() {
 		return html`<umb-input-document
-			.selectedIds=${this.selectedIds}
+			.selection=${this.#selection}
 			.startNodeId=${this.startNodeId}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
@@ -113,8 +122,9 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderMediaPicker() {
+		// TODO: [LK] Review the data structure of this input editor.
 		return html`<umb-input-media
-			.selectedIds=${this.selectedIds}
+			.selection=${this.#selection}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
 			.max=${this.max}
@@ -125,7 +135,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 
 	#renderMemberPicker() {
 		return html`<umb-input-member
-			.selectedIds=${this.selectedIds}
+			.selection=${this.#selection}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
 			.max=${this.max}

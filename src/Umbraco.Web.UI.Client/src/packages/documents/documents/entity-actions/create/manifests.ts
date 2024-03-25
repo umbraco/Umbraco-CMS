@@ -7,12 +7,12 @@ const entityActions: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.Document.Create',
 		name: 'Create Document Entity Action',
-		weight: 1000,
+		weight: 1200,
 		api: () => import('./create.action.js'),
 		forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create',
+			label: 'Create...',
 		},
 	},
 ];

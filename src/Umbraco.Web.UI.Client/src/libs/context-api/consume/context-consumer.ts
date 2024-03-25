@@ -13,7 +13,9 @@ import { UmbContextRequestEventImplementation } from './context-request.event.js
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
-	#skipOrigin?: boolean;
+	protected _host: Element;
+
+	#skipHost?: boolean;
 	#stopAtContextMatch = true;
 	#callback?: UmbContextCallback<ResultType>;
 	#promise?: Promise<ResultType>;
@@ -31,16 +33,17 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 
 	/**
 	 * Creates an instance of UmbContextConsumer.
-	 * @param {Element} element
+	 * @param {Element} host
 	 * @param {string} contextIdentifier
 	 * @param {UmbContextCallback} callback
 	 * @memberof UmbContextConsumer
 	 */
 	constructor(
-		protected element: Element,
+		host: Element,
 		contextIdentifier: string | UmbContextToken<BaseType, ResultType>,
 		callback?: UmbContextCallback<ResultType>,
 	) {
+		this._host = host;
 		const idSplit = contextIdentifier.toString().split('#');
 		this.#contextAlias = idSplit[0];
 		this.#apiAlias = idSplit[1] ?? 'default';
@@ -51,10 +54,11 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	/**
 	 * @public
 	 * @memberof UmbContextConsumer
-	 * @description Skip the contexts provided by the requesting element.
+	 * @description Make the consumption skip the contexts provided by the Host element.
 	 */
-	public skipOrigin(): void {
-		this.#skipOrigin = true;
+	public skipHost() {
+		this.#skipHost = true;
+		return this;
 	}
 
 	/**
@@ -63,8 +67,9 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @description Pass beyond any context aliases that matches this.
 	 * The default behavior is to stop at first Context Alias match, this is to avoid receiving unforeseen descending contexts.
 	 */
-	public passContextAliasMatches(): void {
+	public passContextAliasMatches() {
 		this.#stopAtContextMatch = false;
+		return this;
 	}
 
 	protected _onResponse = (instance: BaseType): boolean => {
@@ -119,7 +124,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 			this._onResponse,
 			this.#stopAtContextMatch,
 		);
-		(this.#skipOrigin ? this.element.parentNode : this.element)?.dispatchEvent(event);
+		(this.#skipHost ? this._host.parentNode : this._host)?.dispatchEvent(event);
 	}
 
 	public hostConnected(): void {

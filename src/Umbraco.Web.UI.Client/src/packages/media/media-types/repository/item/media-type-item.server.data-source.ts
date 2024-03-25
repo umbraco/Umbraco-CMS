@@ -34,6 +34,6 @@ const mapper = (item: MediaTypeItemResponseModel): UmbMediaTypeItemModel => {
 	return {
 		icon: item.icon || null,
 		name: item.name,
-		unique: item.name,
+		unique: item.id,
 	};
 };

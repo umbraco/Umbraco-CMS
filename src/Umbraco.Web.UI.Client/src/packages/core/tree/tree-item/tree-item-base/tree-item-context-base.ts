@@ -7,14 +7,14 @@ import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/b
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import type { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbChangeEvent, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
 	x: TreeItemType,
@@ -32,6 +32,11 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	#treeItem = new UmbDeepState<TreeItemType | undefined>(undefined);
 	treeItem = this.#treeItem.asObservable();
+
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	#childItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
+	childItems = this.#childItems.asObservable();
 
 	#hasChildren = new UmbBooleanState(false);
 	hasChildren = this.#hasChildren.asObservable();
@@ -78,6 +83,26 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
+
+		/* TODO: revisit. This is a temp solution to notify the parent it needs to reload its children
+		there might be a better way to do this through a tree item parent context.
+		It does not look like there is a way to have a "dynamic" parent context that will stop when a
+		specific parent is reached (a tree item unique that matches the parentUnique of this item) */
+		const hostElement = this.getHostElement();
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		hostElement.addEventListener('temp-reload-tree-item-parent', (event: CustomEvent) => {
+			const treeItem = this.getTreeItem();
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			const unique = treeItem?.unique;
+			if (event.detail.unique === unique) {
+				event.stopPropagation();
+				this.loadChildren();
+			}
+		});
+
+		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
 	}
 
 	/**
@@ -129,25 +154,26 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.#observeHasChildren();
 	}
 
-	public async requestChildren() {
+	public async loadChildren() {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		// TODO: wait for tree context to be ready
 		const repository = this.treeContext?.getRepository();
 		if (!repository) throw new Error('Could not request children, repository is missing');
 
 		this.#isLoading.setValue(true);
-		const { data, error, asObservable } = await repository.requestTreeItemsOf({
+
+		const { data } = await repository.requestTreeItemsOf({
 			parentUnique: this.unique,
 			skip: this.#paging.skip,
 			take: this.#paging.take,
 		});
 
 		if (data) {
+			this.#childItems.setValue(data.items);
 			this.pagination.setTotalItems(data.total);
 		}
 
 		this.#isLoading.setValue(false);
-		return { data, error, asObservable };
 	}
 
 	public toggleContextMenu() {
@@ -168,7 +194,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.treeContext?.selection.deselect(this.unique);
 	}
 
-	#consumeContexts() {
+	async #consumeContexts() {
 		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
 			this.#sectionContext = instance;
 			this.#observeSectionPath();
@@ -187,14 +213,26 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
-			this.#actionEventContext = instance;
-			this.#actionEventContext.removeEventListener(
+			this.#actionEventContext?.removeEventListener(
 				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
+
+			this.#actionEventContext?.removeEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadStructureRequest as unknown as EventListener,
+			);
+
+			this.#actionEventContext = instance;
+
 			this.#actionEventContext.addEventListener(
 				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
 				this.#onReloadRequest as EventListener,
+			);
+
+			this.#actionEventContext.addEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadStructureRequest as unknown as EventListener,
 			);
 		});
 	}
@@ -214,6 +252,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 				if (value === true) {
 					const isSelectable = this.treeContext?.selectableFilter?.(this.getTreeItem()!) ?? true;
 					this.#isSelectable.setValue(isSelectable);
+					this.#checkIsActive();
 				}
 			},
 			'observeIsSelectable',
@@ -241,6 +280,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 				if (!pathname || !this.entityType || this.unique === undefined) return;
 				const path = this.constructPath(pathname, this.entityType, this.unique);
 				this.#path.setValue(path);
+				this.#checkIsActive();
 			},
 			'observeSectionPath',
 		);
@@ -281,18 +321,54 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	}
 
 	#onReloadRequest = (event: UmbEntityActionEvent) => {
-		// Only handle children request here. Root request is handled by the tree context
+		if (event.getUnique() !== this.unique) return;
+		if (event.getEntityType() !== this.entityType) return;
+		this.loadChildren();
+	};
+
+	#onReloadStructureRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
 		if (!this.unique) return;
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
-		this.requestChildren();
+
+		/* TODO: revisit. This is a temp solution to notify the parent it needs to reload its children
+		there might be a better way to do this through a tree item parent context.
+		It does not look like there is a way to have a "dynamic" parent context that will stop when a
+		specific parent is reached (a tree item unique that matches the parentUnique of this item) */
+		const treeItem = this.getTreeItem();
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		const parentUnique = treeItem?.parentUnique;
+		const customEvent = new CustomEvent('temp-reload-tree-item-parent', {
+			detail: { unique: parentUnique },
+			bubbles: true,
+			composed: true,
+		});
+		this.getHostElement().dispatchEvent(customEvent);
 	};
 
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
 		this.#paging.skip = target.getSkip();
-		this.requestChildren();
+		this.loadChildren();
 	};
+
+	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
+
+	#checkIsActive() {
+		// don't set the active state if the item is selectable
+		const isSelectable = this.#isSelectable.getValue();
+
+		if (isSelectable) {
+			this.#isActive.setValue(false);
+			return;
+		}
+
+		const path = this.#path.getValue();
+		const location = window.location.pathname;
+		const isActive = location.includes(path);
+		this.#isActive.setValue(isActive);
+	}
 
 	// TODO: use router context
 	constructPath(pathname: string, entityType: string, unique: string | null) {
@@ -304,6 +380,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
 			this.#onReloadRequest as EventListener,
 		);
+		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
 		super.destroy();
 	}
 }

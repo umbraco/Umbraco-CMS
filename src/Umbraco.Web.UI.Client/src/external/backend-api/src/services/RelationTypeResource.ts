@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateRelationTypeRequestModel } from '../models/CreateRelationTypeRequestModel';
-import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
+import type { PagedRelationTypeTreeItemResponseModel } from '../models/PagedRelationTypeTreeItemResponseModel';
 import type { RelationTypeItemResponseModel } from '../models/RelationTypeItemResponseModel';
 import type { RelationTypeResponseModel } from '../models/RelationTypeResponseModel';
 import type { UpdateRelationTypeRequestModel } from '../models/UpdateRelationTypeRequestModel';
@@ -130,7 +130,7 @@ export class RelationTypeResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns PagedRelationTypeTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeRelationTypeRoot({
@@ -139,7 +139,7 @@ export class RelationTypeResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
+    }): CancelablePromise<PagedRelationTypeTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/relation-type/root',

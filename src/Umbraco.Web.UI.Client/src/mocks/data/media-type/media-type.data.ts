@@ -4,9 +4,9 @@ import type {
 	MediaTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-type UmbMockMediaTypeModelHack = MediaTypeResponseModel & MediaTypeTreeItemResponseModel & MediaTypeItemResponseModel;
-
-export interface UmbMockMediaTypeModel extends Omit<UmbMockMediaTypeModelHack, 'type'> {}
+export type UmbMockMediaTypeModel = MediaTypeResponseModel &
+	MediaTypeTreeItemResponseModel &
+	MediaTypeItemResponseModel;
 
 export const data: Array<UmbMockMediaTypeModel> = [
 	{
@@ -91,9 +91,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		allowedMediaTypes: [
-			{ mediaType: { id: 'media-type-1-id' }, sortOrder: 0 },
-		],
+		allowedMediaTypes: [{ mediaType: { id: 'media-type-1-id' }, sortOrder: 0 }],
 		compositions: [],
 		isFolder: false,
 		hasChildren: false,

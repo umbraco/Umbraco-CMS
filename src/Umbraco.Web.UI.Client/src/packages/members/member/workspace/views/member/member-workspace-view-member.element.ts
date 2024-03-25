@@ -1,5 +1,4 @@
-// import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
-import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context.js';
+import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-token.js';
 import type { UmbMemberDetailModel } from '../../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -38,21 +37,20 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 	#onChange(propertyName: keyof UmbMemberDetailModel, value: UmbMemberDetailModel[keyof UmbMemberDetailModel]) {
 		if (!this._workspaceContext) return;
 
-		console.log('Setting', propertyName, value);
-
 		this._workspaceContext.set(propertyName, value);
 	}
 
 	#onGroupsUpdated(event: CustomEvent) {
-		const uniques = (event.target as UmbInputMemberGroupElement).selectedIds;
+		const uniques = (event.target as UmbInputMemberGroupElement).selection;
 
 		this._workspaceContext?.set('groups', uniques);
 	}
 
 	#onPasswordUpdate = () => {
 		const newPassword = this.shadowRoot?.querySelector<HTMLInputElement>('uui-input[name="newPassword"]')?.value;
-		const confirmPassword = this.shadowRoot?.querySelector<HTMLInputElement>('uui-input[name="confirmPassword"]')
-			?.value;
+		const confirmPassword = this.shadowRoot?.querySelector<HTMLInputElement>(
+			'uui-input[name="confirmPassword"]',
+		)?.value;
 
 		if (newPassword !== confirmPassword) {
 			this._newPasswordError = 'Passwords do not match';
@@ -159,7 +157,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 					<umb-input-member-group
 						slot="editor"
 						@change=${this.#onGroupsUpdated}
-						.selectedIds=${this._workspaceContext.memberGroups}></umb-input-member-group>
+						.selection=${this._workspaceContext.memberGroups}></umb-input-member-group>
 				</umb-property-layout>
 
 				<umb-property-layout label="Approved">

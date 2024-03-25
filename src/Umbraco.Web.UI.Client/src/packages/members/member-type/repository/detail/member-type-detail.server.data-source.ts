@@ -79,7 +79,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			unique: data.id,
 			name: data.name,
 			alias: data.alias,
-			description: data.description || null,
+			description: data.description ?? '',
 			icon: data.icon,
 			allowedAtRoot: data.allowedAsRoot,
 			variesByCulture: data.variesByCulture,

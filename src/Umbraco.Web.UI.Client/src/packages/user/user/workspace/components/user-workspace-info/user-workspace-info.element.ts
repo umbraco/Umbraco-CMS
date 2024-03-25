@@ -1,6 +1,6 @@
 import type { UmbUserDisplayStatus } from '../../../utils.js';
 import { getDisplayStateFromUserStatus } from '../../../utils.js';
-import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
+import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { html, customElement, state, css, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

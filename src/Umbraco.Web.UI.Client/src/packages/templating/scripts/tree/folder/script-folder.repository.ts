@@ -1,26 +1,11 @@
-import { UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import { UMB_SCRIPT_TREE_STORE_CONTEXT } from '../script-tree.store.js';
-import type { UmbScriptTreeItemModel } from '../types.js';
 import { UmbScriptFolderServerDataSource } from './script-folder.server.data-source.js';
-import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 import { UmbFolderRepositoryBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbScriptFolderRepository extends UmbFolderRepositoryBase<UmbScriptTreeItemModel> {
+export class UmbScriptFolderRepository extends UmbFolderRepositoryBase {
 	constructor(host: UmbControllerHost) {
-		super(host, UmbScriptFolderServerDataSource, UMB_SCRIPT_TREE_STORE_CONTEXT, folderToScriptTreeItemFolder);
+		super(host, UmbScriptFolderServerDataSource);
 	}
 }
 
 export default UmbScriptFolderRepository;
-
-const folderToScriptTreeItemFolder = (folder: UmbFolderModel, parentUnique: string | null): UmbScriptTreeItemModel => {
-	return {
-		unique: folder.unique,
-		parentUnique,
-		name: folder.name,
-		entityType: UMB_SCRIPT_FOLDER_ENTITY_TYPE,
-		isFolder: true,
-		hasChildren: false,
-	};
-};

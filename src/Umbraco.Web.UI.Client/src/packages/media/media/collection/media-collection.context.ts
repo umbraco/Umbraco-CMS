@@ -9,7 +9,5 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 > {
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS);
-
-		this.selection.setSelectable(true);
 	}
 }

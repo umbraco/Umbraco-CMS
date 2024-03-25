@@ -14,7 +14,7 @@ export interface UmbContentTypeModel {
 	unique: string;
 	name: string;
 	alias: string;
-	description: string | null;
+	description: string;
 	icon: string;
 	allowedAtRoot: boolean;
 	variesByCulture: boolean;

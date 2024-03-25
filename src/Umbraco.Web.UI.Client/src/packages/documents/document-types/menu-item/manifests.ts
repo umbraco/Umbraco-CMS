@@ -10,7 +10,7 @@ const menuItem: ManifestMenuItemTreeKind = {
 	meta: {
 		treeAlias: UMB_DOCUMENT_TYPE_TREE_ALIAS,
 		label: 'Document Types',
-		menus: ['Umb.Menu.Settings'],
+		menus: ['Umb.Menu.StructureSettings'],
 	},
 };
 

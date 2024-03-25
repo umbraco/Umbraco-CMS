@@ -1,28 +1,25 @@
 import { UmbDocumentTypePickerContext } from '../../documents/document-types/components/input-document-type/input-document-type.context.js';
+import type { UmbDynamicRootQueryStepModalData } from './index.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbTreePickerDynamicRootQueryStep } from '@umbraco-cms/backoffice/components';
 import type { ManifestDynamicRootQueryStep } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-dynamic-root-query-step-picker-modal')
-export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBaseElement {
+export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBaseElement<UmbDynamicRootQueryStepModalData> {
 	@state()
 	private _querySteps: Array<ManifestDynamicRootQueryStep> = [];
 
 	#documentTypePickerContext = new UmbDocumentTypePickerContext(this);
 
-	constructor() {
-		super();
+	connectedCallback() {
+		super.connectedCallback();
 
-		this.observe(
-			umbExtensionsRegistry.byType('dynamicRootQueryStep'),
-			(querySteps: Array<ManifestDynamicRootQueryStep>) => {
-				this._querySteps = querySteps;
-			},
-		);
+		if (this.data) {
+			this._querySteps = this.data.items;
+		}
 	}
 
 	#choose(item: ManifestDynamicRootQueryStep) {
@@ -55,19 +52,22 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 
 	render() {
 		return html`
-			<umb-body-layout headline="${this.localize.term('dynamicRoot_pickDynamicRootQueryStepTitle')}">
+			<umb-body-layout headline=${this.localize.term('dynamicRoot_pickDynamicRootQueryStepTitle')}>
 				<div id="main">
 					<uui-box>
-						${repeat(
-							this._querySteps,
-							(item) => item.alias,
-							(item) => html`
-								<uui-button @click=${() => this.#choose(item)} look="placeholder" label="${ifDefined(item.meta.label)}">
-									<h3>${item.meta.label}</h3>
-									<p>${item.meta.description}</p>
-								</uui-button>
-							`,
-						)}
+						<uui-ref-list>
+							${repeat(
+								this._querySteps,
+								(item) => item.alias,
+								(item) => html`
+									<umb-ref-item
+										name=${ifDefined(item.meta.label)}
+										detail=${ifDefined(item.meta.description)}
+										icon=${ifDefined(item.meta.icon)}
+										@click=${() => this.#choose(item)}></umb-ref-item>
+								`,
+							)}
+						</uui-ref-list>
 					</uui-box>
 				</div>
 				<div slot="actions">

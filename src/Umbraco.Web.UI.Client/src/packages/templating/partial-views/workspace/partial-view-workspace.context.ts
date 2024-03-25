@@ -1,20 +1,26 @@
 import { UmbPartialViewDetailRepository } from '../repository/partial-view-detail.repository.js';
 import type { UmbPartialViewDetailModel } from '../types.js';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
+import { UmbPartialViewWorkspaceEditorElement } from './partial-view-workspace-editor.element.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import type { UmbRoutableWorkspaceContext, UmbSaveableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbSaveableWorkspaceContextBase,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
+} from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbPartialViewWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbPartialViewDetailModel>
-	implements UmbSaveableWorkspaceContextInterface
+	extends UmbSaveableWorkspaceContextBase<UmbPartialViewDetailModel>
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbPartialViewDetailRepository(this);
 
@@ -22,6 +28,7 @@ export class UmbPartialViewWorkspaceContext
 
 	#data = new UmbObjectState<UmbPartialViewDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly content = this.#data.asObservablePart((data) => data?.content);
 	readonly path = this.#data.asObservablePart((data) => data?.path);
@@ -29,10 +36,52 @@ export class UmbPartialViewWorkspaceContext
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.PartialView');
 		this.#loadCodeEditor();
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique/snippet/:snippetId',
+				component: UmbPartialViewWorkspaceEditorElement,
+				setup: async (component: PageComponent, info: IRoutingInfo) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					const snippetId = info.match.params.snippetId;
+					this.#onCreate({ entityType: parentEntityType, unique: parentUnique }, snippetId);
+				},
+			},
+			{
+				path: 'create/parent/:entityType/:parentUnique',
+				component: UmbPartialViewWorkspaceEditorElement,
+				setup: async (component: PageComponent, info: IRoutingInfo) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					this.#onCreate({ entityType: parentEntityType, unique: parentUnique });
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbPartialViewWorkspaceEditorElement,
+				setup: (component: PageComponent, info: IRoutingInfo) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
+
+	#onCreate = async (parent: { entityType: string; unique: string | null }, snippetId?: string) => {
+		await this.create(parent, snippetId);
+
+		new UmbWorkspaceIsNewRedirectController(
+			this,
+			this,
+			this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+		);
+	};
 
 	protected resetState(): void {
 		super.resetState();
@@ -119,6 +168,14 @@ export class UmbPartialViewWorkspaceContext
 		} else {
 			const { data } = await this.repository.save(this.#data.value);
 			newData = data;
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 
 		if (newData) {
@@ -143,11 +200,4 @@ export class UmbPartialViewWorkspaceContext
 	}
 }
 
-export const UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbPartialViewWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbPartialViewWorkspaceContext => context.getEntityType?.() === UMB_PARTIAL_VIEW_ENTITY_TYPE,
-);
+export { UmbPartialViewWorkspaceContext as api };

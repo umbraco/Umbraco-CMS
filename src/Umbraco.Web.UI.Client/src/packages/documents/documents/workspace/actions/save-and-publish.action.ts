@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../document-workspace.context-token.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
 
 export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceActionBase {

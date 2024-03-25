@@ -21,7 +21,6 @@ export class UmbWorkspaceActionMenuItemElement<
 	@property({ attribute: false })
 	public manifest?: ManifestWorkspaceActionMenuItemDefaultKind<MetaType>;
 
-	@property({ attribute: false })
 	public set api(api: ApiType | undefined) {
 		this.#api = api;
 

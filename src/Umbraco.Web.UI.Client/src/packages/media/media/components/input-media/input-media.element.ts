@@ -3,9 +3,9 @@ import { UmbMediaPickerContext } from './input-media.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 const SORTER_CONFIG: UmbSorterConfig<string> = {
 	getUniqueOfElement: (element) => {
@@ -24,7 +24,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	#sorter = new UmbSorterController(this, {
 		...SORTER_CONFIG,
 		onChange: ({ model }) => {
-			this.selectedIds = model;
+			this.selection = model;
 		},
 	});
 
@@ -35,11 +35,11 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	 * @default 0
 	 */
 	@property({ type: Number })
-	public get min(): number {
-		return this.#pickerContext.min;
-	}
 	public set min(value: number) {
 		this.#pickerContext.min = value;
+	}
+	public get min(): number {
+		return this.#pickerContext.min;
 	}
 
 	/**
@@ -58,11 +58,11 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	 * @default Infinity
 	 */
 	@property({ type: Number })
-	public get max(): number {
-		return this.#pickerContext.max;
-	}
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+	}
+	public get max(): number {
+		return this.#pickerContext.max;
 	}
 
 	/**
@@ -74,12 +74,12 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selectedIds(): Array<string> {
-		return this.#pickerContext.getSelection();
-	}
-	public set selectedIds(ids: Array<string>) {
+	public set selection(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
 		this.#sorter.setModel(ids);
+	}
+	public get selection(): Array<string> {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property({ type: Array })
@@ -94,7 +94,10 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIds = splitStringToArray(idsString);
+		this.selection = splitStringToArray(idsString);
+	}
+	public get value() {
+		return this.selection.join(',');
 	}
 
 	@state()

@@ -3,6 +3,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import { UMB_USER_GROUP_ENTITY_TYPE } from '../entity.js';
 
 @customElement('umb-user-group-section-view')
 export class UmbUserGroupSectionViewElement extends UmbLitElement {
@@ -17,7 +18,11 @@ export class UmbUserGroupSectionViewElement extends UmbLitElement {
 		},
 		{
 			path: 'user-group',
-			component: () => import('../workspace/user-group-workspace.element.js'),
+			component: () => {
+				const element = document.createElement('umb-workspace');
+				element.setAttribute('entityType', UMB_USER_GROUP_ENTITY_TYPE);
+				return element;
+			},
 		},
 		{
 			path: '',

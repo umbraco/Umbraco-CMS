@@ -6,9 +6,6 @@ const menu: ManifestMenu = {
 	type: 'menu',
 	alias: UMB_MEDIA_MENU_ALIAS,
 	name: 'Media Menu',
-	meta: {
-		label: 'Media',
-	},
 };
 
 export const manifests = [menu];

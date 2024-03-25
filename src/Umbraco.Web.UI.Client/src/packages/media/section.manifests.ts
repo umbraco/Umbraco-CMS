@@ -12,7 +12,12 @@ const section: ManifestSection = {
 		label: 'Media',
 		pathname: 'media',
 	},
-	conditions: [],
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionUserPermission',
+			match: sectionAlias,
+		},
+	],
 };
 
 const menuSectionSidebarApp: ManifestSectionSidebarApp = {

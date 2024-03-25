@@ -1,10 +1,9 @@
 // import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
+import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbMemberWorkspaceContext } from '../../member-workspace.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
 
@@ -17,7 +16,7 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 	@state()
 	private _memberTypeIcon = '';
 
-	private _workspaceContext?: UmbMemberWorkspaceContext;
+	private _workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
 	private _memberTypeItemRepository: UmbMemberTypeItemRepository = new UmbMemberTypeItemRepository(this);
 
 	@state()
@@ -40,8 +39,8 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 				this._editMemberTypePath = routeBuilder({});
 			});
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, async (nodeContext) => {
-			this._workspaceContext = nodeContext as UmbMemberWorkspaceContext;
+		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, async (context) => {
+			this._workspaceContext = context;
 			this.observe(this._workspaceContext.contentTypeUnique, (unique) => (this._memberTypeUnique = unique || ''));
 			this.observe(this._workspaceContext.createDate, (date) => (this._createDate = date || 'Unknown'));
 			this.observe(this._workspaceContext.updateDate, (date) => (this._updateDate = date || 'Unknown'));

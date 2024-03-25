@@ -11,7 +11,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		type: 'entityAction',
 		kind: 'reloadTreeItemChildren',
 		api: () => import('./reload-tree-item-children.action.js'),
-		weight: 100,
+		weight: 0,
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-refresh',

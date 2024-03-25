@@ -1,8 +1,12 @@
-import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
-import { html, customElement, property, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbImageCropperPropertyEditorValue, UmbInputImageCropperElement } from '../../components/index.js';
+import { html, customElement, property, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import '../../components/input-image-cropper/input-image-cropper.element.js';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-image-cropper
@@ -15,6 +19,9 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 		crops: [],
 		focalPoint: { left: 0.5, top: 0.5 },
 	};
+
+	@state()
+	crops: UmbImageCropperPropertyEditorValue['crops'] = [];
 
 	updated(changedProperties: Map<string | number | symbol, unknown>) {
 		super.updated(changedProperties);
@@ -29,31 +36,22 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 		}
 	}
 
-	// #crops = [];
-
-	// @property({ attribute: false })
-	// public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-	// 	this.#crops = config?.getValueByAlias('crops') ?? [];
-
-	// 	if (!this.value) {
-	// 		//TODO: How should we combine the crops from the value with the configuration?
-	// 		this.value = {
-	// 			crops: this.#crops,
-	// 			focalPoint: { left: 0.5, top: 0.5 },
-	// 			src: 'https://picsum.photos/seed/picsum/1920/1080',
-	// 		};
-	// 	}
-	// }
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		this.crops = config?.getValueByAlias<UmbImageCropperPropertyEditorValue['crops']>('crops') ?? [];
+	}
 
 	#onChange(e: Event) {
-		this.value = (e.target as any).value;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.value = (e.target as UmbInputImageCropperElement).value;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
 		if (!this.value) return nothing;
 
-		return html`<umb-input-image-cropper @change=${this.#onChange} .value=${this.value}></umb-input-image-cropper>`;
+		return html`<umb-input-image-cropper
+			@change=${this.#onChange}
+			.value=${this.value}
+			.crops=${this.crops}></umb-input-image-cropper>`;
 	}
 }
 

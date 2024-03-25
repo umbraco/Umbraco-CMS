@@ -255,6 +255,7 @@ export default {
 			'Publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.',
 		publishDescendantsWithVariantsHelp:
 			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
+		noVariantsToProcess: 'There are no available variants',
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
 		removeDate: 'Clear Date',
@@ -308,7 +309,7 @@ export default {
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
 		languagesToUnpublish:
-			'Select the languages to unpublish. Unpublishing a mandatory language will\n      unpublish all languages.\n    ',
+			'Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.',
 		variantsWillBeSaved: 'All new variants will be saved.',
 		variantsToPublish: 'Which variants would you like to publish?',
 		variantsToSave: 'Choose which variants to be saved.',
@@ -2172,6 +2173,10 @@ export default {
 			'This item or its descendants is being referenced. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
 		deleteDisabledWarning: 'This item or its descendants is being referenced. Therefore, deletion has been disabled.',
 		listViewDialogWarning: 'The following items you are trying to %0% are referenced by other content.',
+		labelMoreReferences: (count: number) => {
+			if (count === 1) return '...and one more item';
+			return `...and ${count} more items`;
+		},
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',

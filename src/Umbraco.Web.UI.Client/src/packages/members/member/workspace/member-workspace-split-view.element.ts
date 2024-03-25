@@ -1,4 +1,4 @@
-import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context.js';
+import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';

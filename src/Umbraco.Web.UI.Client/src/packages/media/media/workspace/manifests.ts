@@ -1,16 +1,15 @@
-import { UMB_MEDIA_WORKSPACE_HAS_COLLECTION_CONDITION } from '../conditions/media-workspace-has-collection.condition.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: 'Umb.Workspace.Media',
 	name: 'Media Workspace',
-	element: () => import('./media-workspace.element.js'),
 	api: () => import('./media-workspace.context.js'),
 	meta: {
 		entityType: 'media',
@@ -31,7 +30,11 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: UMB_MEDIA_WORKSPACE_HAS_COLLECTION_CONDITION,
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+			{
+				alias: 'Umb.Condition.WorkspaceHasCollection',
 			},
 		],
 	},

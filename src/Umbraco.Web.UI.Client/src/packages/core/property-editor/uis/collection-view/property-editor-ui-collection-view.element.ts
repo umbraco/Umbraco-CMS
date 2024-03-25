@@ -1,17 +1,14 @@
-import type {
-	UmbCollectionBulkActionPermissions,
-	UmbCollectionConfiguration,
-} from '../../../../core/collection/types.js';
 import type { UmbPropertyEditorConfigCollection } from '../../config/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/document';
-import { UMB_MEDIA_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/media';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
-import type { UmbMediaWorkspaceContext } from '@umbraco-cms/backoffice/media';
+import { UMB_COLLECTION_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbCollectionBulkActionPermissions,
+	UmbCollectionConfiguration,
+} from '@umbraco-cms/backoffice/collection';
 
 /**
  * @element umb-property-editor-ui-collection-view
@@ -27,7 +24,6 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 	@state()
 	private _config?: UmbCollectionConfiguration;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._config = this.#mapDataTypeConfigToCollectionConfig(config);
 	}
@@ -35,28 +31,17 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 	constructor() {
 		super();
 
-		// Gets the Data Type ID for the current property.
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
-			this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-				// TODO: [LK:2024-02-22] We need a solution that will allow the Collection property-editor
-				// to work in any workspace (that supports `unique` and `structure.getPropertyStructureByAlias`).
-				const entityType = workspaceContext.getEntityType();
-				const contentWorkspaceContext =
-					entityType === 'media'
-						? (workspaceContext as UmbMediaWorkspaceContext)
-						: (workspaceContext as UmbDocumentWorkspaceContext);
+		this.consumeContext(UMB_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this._collectionAlias = workspaceContext.getCollectionAlias();
 
-				this._collectionAlias = entityType === 'media' ? UMB_MEDIA_COLLECTION_ALIAS : UMB_DOCUMENT_COLLECTION_ALIAS;
-
-				this.observe(contentWorkspaceContext.unique, (unique) => {
-					if (this._config) {
-						this._config.unique = unique;
-					}
-				});
+			this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
 				this.observe(propertyContext.alias, async (propertyAlias) => {
 					if (propertyAlias) {
-						const property = await contentWorkspaceContext.structure.getPropertyStructureByAlias(propertyAlias);
-						if (property && this._config) {
+						// Gets the Data Type ID for the current property.
+						const property = await workspaceContext.structure.getPropertyStructureByAlias(propertyAlias);
+						const unique = workspaceContext.getUnique();
+						if (unique && property && this._config) {
+							this._config.unique = unique;
 							this._config.dataTypeId = property.dataType.unique;
 							this.requestUpdate('_config');
 						}

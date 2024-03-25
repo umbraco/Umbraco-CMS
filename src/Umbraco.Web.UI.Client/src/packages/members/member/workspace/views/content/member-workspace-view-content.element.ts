@@ -1,4 +1,4 @@
-import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context.js';
+import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-token.js';
 import type { UmbMemberWorkspaceViewContentTabElement } from './member-workspace-view-content-tab.element.js';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -38,7 +38,7 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
-		this.observe(this._tabsStructureHelper.containers, (tabs) => {
+		this.observe(this._tabsStructureHelper.mergedContainers, (tabs) => {
 			this._tabs = tabs;
 			this._createRoutes();
 		});
@@ -76,10 +76,7 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./member-workspace-view-content-tab.element.js'),
 					setup: (component) => {
-						(component as UmbMemberWorkspaceViewContentTabElement).tabName = tabName;
-						// TODO: Consider if we can link these more simple, and not parse this on.
-						(component as UmbMemberWorkspaceViewContentTabElement).ownerTabId =
-							this._tabsStructureHelper.isOwnerContainer(tab.id!) ? tab.id : undefined;
+						(component as UmbMemberWorkspaceViewContentTabElement).containerId = tab.id;
 					},
 				});
 			});
@@ -90,8 +87,7 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 				path: '',
 				component: () => import('./member-workspace-view-content-tab.element.js'),
 				setup: (component) => {
-					(component as UmbMemberWorkspaceViewContentTabElement).noTabName = true;
-					(component as UmbMemberWorkspaceViewContentTabElement).ownerTabId = null;
+					(component as UmbMemberWorkspaceViewContentTabElement).containerId = null;
 				},
 			});
 		}
@@ -121,7 +117,7 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 											href=${this._routerPath + '/'}
 											>Content</uui-tab
 										>
-								  `
+									`
 								: ''}
 							${repeat(
 								this._tabs,
@@ -133,7 +129,7 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 									>`;
 								},
 							)}
-					  </uui-tab-group>`
+						</uui-tab-group>`
 					: ''}
 
 				<umb-router-slot

@@ -15,9 +15,11 @@ export class UmbObserver<T> {
 	#callback!: ObserverCallback<T>;
 	#subscription!: Subscription;
 
-	constructor(source: Observable<T>, callback: ObserverCallback<T>) {
+	constructor(source: Observable<T>, callback?: ObserverCallback<T>) {
 		this.#source = source;
-		this.#subscription = source.subscribe(callback);
+		if (callback) {
+			this.#subscription = source.subscribe(callback);
+		}
 	}
 
 	/**
@@ -63,9 +65,9 @@ export class UmbObserver<T> {
 	destroy(): void {
 		if (this.#subscription) {
 			this.#subscription.unsubscribe();
-			(this.#source as any) = undefined;
 			(this.#callback as any) = undefined;
 			(this.#subscription as any) = undefined;
 		}
+		(this.#source as any) = undefined;
 	}
 }

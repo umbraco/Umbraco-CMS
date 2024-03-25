@@ -85,7 +85,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	}
 
 	#renderItemDisplay(view: ManifestCollectionView) {
-		return html`<umb-icon name=${view.meta.icon}></u-icon>`;
+		return html`<umb-icon name=${view.meta.icon}></umb-icon>`;
 	}
 
 	static styles = [

@@ -12,15 +12,16 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 		super.connectedCallback();
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
-		this.#createFolderAction = new UmbCreateFolderEntityAction(
-			this,
-			UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS,
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			// TODO: allow null for entity actions. Some actions can be executed on the root item
-			this.data.parent.unique,
-			this.data.parent.entityType,
-		);
+		// TODO: render the info from this instance in the list of actions
+		this.#createFolderAction = new UmbCreateFolderEntityAction(this, {
+			unique: this.data.parent.unique,
+			entityType: this.data.parent.entityType,
+			meta: {
+				icon: 'icon-folder',
+				label: 'New Folder...',
+				folderRepositoryAlias: UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS,
+			},
+		});
 	}
 
 	async #onCreateFolderClick(event: PointerEvent) {

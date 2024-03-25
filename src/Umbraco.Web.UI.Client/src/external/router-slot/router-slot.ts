@@ -127,7 +127,6 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 	 */
 	constructor() {
 		super();
-
 		this.addEventListener('router-slot:capture-parent', (e: any) => {
 			e.stopPropagation();
 			e.detail.parent = this;
@@ -248,9 +247,9 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 		this.listeners.push(
 			this.parent != null
 				? // Attach child router listeners
-				  addListener<Event, RouterSlotEvent>(this.parent, 'changestate', this.render)
+					addListener<Event, RouterSlotEvent>(this.parent, 'changestate', this.render)
 				: // Add global listeners.
-				  addListener<Event, GlobalRouterEvent>(GLOBAL_ROUTER_EVENTS_TARGET, 'changestate', this.render),
+					addListener<Event, GlobalRouterEvent>(GLOBAL_ROUTER_EVENTS_TARGET, 'changestate', this.render),
 		);
 	}
 

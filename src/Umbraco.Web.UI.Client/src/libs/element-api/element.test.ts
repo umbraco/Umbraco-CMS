@@ -1,12 +1,12 @@
 import { expect } from '@open-wc/testing';
 import { UmbElementMixin } from './element.mixin.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { type UmbObserverController, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('test-my-umb-element')
 class UmbTestUmbElement extends UmbElementMixin(HTMLElement) {}
 
-describe('UmbElement', () => {
+describe('UmbElementMixin', () => {
 	let hostElement: UmbTestUmbElement;
 
 	beforeEach(() => {
@@ -180,7 +180,6 @@ describe('UmbElement', () => {
 			// The controller is removed from the host, and the new one was NOT added:
 			expect(hostElement.hasController(ctrl)).to.be.false;
 			expect(ctrl2).to.be.undefined;
-			expect(hostElement.hasController(ctrl2)).to.be.false;
 		});
 
 		it('observe is removed when observer is undefined and using the same callback method', () => {
@@ -197,7 +196,115 @@ describe('UmbElement', () => {
 			// The controller is removed from the host, and the new one was NOT added:
 			expect(hostElement.hasController(ctrl)).to.be.false;
 			expect(ctrl2).to.be.undefined;
-			expect(hostElement.hasController(ctrl2)).to.be.false;
+		});
+
+		it('an undefined observer executes the callback method with undefined', () => {
+			let callbackWasCalled = false;
+			const ctrl = hostElement.observe(undefined, (value) => {
+				expect(value).to.be.undefined;
+				callbackWasCalled = true;
+			});
+			expect(callbackWasCalled).to.be.true;
+			expect(ctrl).to.be.undefined;
+		});
+	});
+	describe('Observe types', () => {
+		// Type helpers for TSC Type Checking:
+		type CheckType<T, ExpectedType> = T extends ExpectedType ? ExpectedType : never;
+		type ReverseCheckType<T, ExpectedType> = T extends ExpectedType ? never : T;
+
+		it('observes Observable of String with corresponding callback method value type', () => {
+			const myState = new UmbStringState('hello');
+			const myObservable = myState.asObservable();
+
+			const ctrl = hostElement.observe(myObservable, (value) => {
+				type A = typeof value;
+				const check: CheckType<A, string> = value;
+				const check2: ReverseCheckType<A, undefined> = value;
+				expect(check).to.be.equal('hello');
+				expect(check2).to.be.equal('hello');
+			});
+			const check: CheckType<typeof ctrl, UmbObserverController<string>> = ctrl;
+			const check2: ReverseCheckType<typeof ctrl, UmbObserverController<undefined>> = ctrl;
+
+			expect(hostElement.hasController(check)).to.be.true;
+			expect(check === check2).to.be.true; // Just to use the const for something.
+		});
+
+		it('observes Observable of String and Undefined with corresponding callback method value type', () => {
+			const myState = new UmbStringState(undefined);
+			const myObservable = myState.asObservable();
+
+			const ctrl = hostElement.observe(myObservable, (value) => {
+				type A = typeof value;
+				const check: CheckType<A, string | undefined> = value;
+				expect(check).to.be.undefined;
+			});
+			const check: CheckType<typeof ctrl, UmbObserverController<string | undefined>> = ctrl;
+			const check2: ReverseCheckType<typeof ctrl, UmbObserverController<undefined>> = ctrl;
+			const check3: ReverseCheckType<typeof ctrl, UmbObserverController<string>> = ctrl;
+
+			expect(hostElement.hasController(check)).to.be.true;
+			expect(check2 === check3).to.be.true; // Just to use the const for something.
+		});
+
+		it('observes potential undefined Observable of String with corresponding callback method value type', () => {
+			let myState: UmbStringState<string> | undefined = undefined;
+			// eslint-disable-next-line no-constant-condition
+			if (1 === 1) {
+				myState = new UmbStringState('hello');
+			}
+			const myObservable = myState?.asObservable();
+
+			const ctrl = hostElement.observe(myObservable, (value) => {
+				type A = typeof value;
+				const check: CheckType<A, string | undefined> = value;
+				const check2: CheckType<A, string> = value as string;
+				const check3: CheckType<A, undefined> = value as undefined;
+				expect(check).to.be.equal('hello');
+				expect(check2 === check3).to.be.true; // Just to use the const for something.
+			});
+			const check: CheckType<typeof ctrl, UmbObserverController<string | undefined> | undefined> = ctrl;
+			const check2: ReverseCheckType<typeof ctrl, UmbObserverController<undefined>> = ctrl;
+			const check3: ReverseCheckType<typeof ctrl, UmbObserverController<string>> = ctrl;
+
+			if (ctrl) {
+				expect(hostElement.hasController(ctrl)).to.be.true;
+			} else {
+				expect(ctrl).to.be.undefined;
+			}
+			expect(check === check3 && check2 === check3).to.be.true; // Just to use the const for something.
+		});
+
+		it('observes potential undefined Observable of String and Null with corresponding callback method value type', () => {
+			let myState: UmbStringState<null> | undefined = undefined;
+			// eslint-disable-next-line no-constant-condition
+			if (1 === 1) {
+				myState = new UmbStringState(null);
+			}
+			const myObservable = myState?.asObservable();
+
+			const ctrl = hostElement.observe(myObservable, (value) => {
+				type A = typeof value;
+				const check: CheckType<A, string | null | undefined> = value;
+				const check2: CheckType<A, string> = value as string;
+				const check3: CheckType<A, null> = value as null;
+				const check4: CheckType<A, undefined> = value as undefined;
+				expect(check).to.be.equal('hello');
+				expect(check2 === check3 && check2 === check4).to.be.true; // Just to use the const for something.
+			});
+			// Because the source is potentially undefined, the controller could be undefined and the value of the callback method could be undefined [NL]
+			const check: CheckType<typeof ctrl, UmbObserverController<string | null | undefined> | undefined> = ctrl;
+			const check2: ReverseCheckType<typeof ctrl, UmbObserverController<string>> = ctrl;
+			const check3: ReverseCheckType<typeof ctrl, UmbObserverController<null>> = ctrl;
+			const check4: ReverseCheckType<typeof ctrl, UmbObserverController<undefined>> = ctrl;
+
+			if (ctrl) {
+				expect(hostElement.hasController(ctrl)).to.be.true;
+			} else {
+				expect(ctrl).to.be.undefined;
+			}
+			expect(check === check2 && check3 === check4).to.be.true; // Just to use the const for something.
 		});
 	});
 });

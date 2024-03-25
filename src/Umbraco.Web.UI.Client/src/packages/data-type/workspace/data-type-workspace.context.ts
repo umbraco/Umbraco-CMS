@@ -1,10 +1,16 @@
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
+import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import type { UmbInvariantableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbInvariantDatasetWorkspaceContext,
+	UmbRoutableWorkspaceContext,
+} from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -22,11 +28,12 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbInvariantableWorkspaceContextInterface
+	extends UmbSaveableWorkspaceContextBase<EntityType>
+	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
@@ -71,9 +78,37 @@ export class UmbDataTypeWorkspaceContext
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DataType');
 		this.#observePropertyEditorUIAlias();
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique',
+				component: UmbDataTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique });
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbDataTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	resetState() {
@@ -177,14 +212,27 @@ export class UmbDataTypeWorkspaceContext
 
 	async load(unique: string) {
 		this.resetState();
-		const request = this.repository.requestByUnique(unique);
-		this.#getDataPromise = request;
-		const { data } = await request;
+		this.#getDataPromise = this.repository.requestByUnique(unique);
+		type GetDataType = Awaited<ReturnType<UmbDataTypeDetailRepository['requestByUnique']>>;
+		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 		if (!data) return undefined;
 
-		this.setIsNew(false);
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
+		if (data) {
+			this.setIsNew(false);
+			this.#persistedData.setValue(data);
+			this.#currentData.setValue(data);
+		}
+
+		if (asObservable) {
+			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDataTypeStoreObserver');
+		}
+	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/settings/workspace/data-type-root');
+		}
 	}
 
 	async create(parent: { entityType: string; unique: string | null }) {
@@ -283,10 +331,23 @@ export class UmbDataTypeWorkspaceContext
 			eventContext.dispatchEvent(event);
 		} else {
 			await this.repository.save(this.#currentData.value);
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 
 		this.setIsNew(false);
 		this.workspaceComplete(this.#currentData.value);
+	}
+
+	protected workspaceComplete(data: EntityType | undefined) {
+		this.dispatchEvent(new CustomEvent('workspace-complete'));
+		super.workspaceComplete(data);
 	}
 
 	async delete(unique: string) {
@@ -304,3 +365,5 @@ export class UmbDataTypeWorkspaceContext
 		super.destroy();
 	}
 }
+
+export { UmbDataTypeWorkspaceContext as api };

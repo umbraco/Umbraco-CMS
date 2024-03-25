@@ -8,9 +8,6 @@ const menu: ManifestMenu = {
 	type: 'menu',
 	alias: UMB_DICTIONARY_MENU_ALIAS,
 	name: 'Dictionary Menu',
-	meta: {
-		label: 'Dictionary',
-	},
 };
 
 const menuItem: ManifestMenuItemTreeKind = {

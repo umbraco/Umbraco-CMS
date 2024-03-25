@@ -1,4 +1,4 @@
-import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
+import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context-token.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -26,17 +26,17 @@ export class UmbUserWorkspaceAccessSettingsElement extends UmbLitElement {
 
 	#onUserGroupsChange(event: UmbChangeEvent) {
 		const target = event.target as UmbUserGroupInputElement;
-		this.#userWorkspaceContext?.updateProperty('userGroupUniques', target.selectedIds);
+		this.#userWorkspaceContext?.updateProperty('userGroupUniques', target.selection);
 	}
 
 	#onDocumentStartNodeChange(event: UmbChangeEvent) {
 		const target = event.target as UmbInputDocumentElement;
-		this.#userWorkspaceContext?.updateProperty('documentStartNodeUniques', target.selectedIds);
+		this.#userWorkspaceContext?.updateProperty('documentStartNodeUniques', target.selection);
 	}
 
 	#onMediaStartNodeChange(event: UmbChangeEvent) {
 		const target = event.target as UmbInputMediaElement;
-		this.#userWorkspaceContext?.updateProperty('mediaStartNodeUniques', target.selectedIds);
+		this.#userWorkspaceContext?.updateProperty('mediaStartNodeUniques', target.selection);
 	}
 
 	render() {
@@ -48,14 +48,14 @@ export class UmbUserWorkspaceAccessSettingsElement extends UmbLitElement {
 						description="${this.localize.term('user_groupsHelp')}">
 						<umb-user-group-input
 							slot="editor"
-							.selectedIds=${this._user?.userGroupUniques ?? []}
+							.selection=${this._user?.userGroupUniques ?? []}
 							@change=${this.#onUserGroupsChange}></umb-user-group-input>
 					</umb-property-layout>
 					<umb-property-layout
 						label=${this.localize.term('user_startnodes')}
 						description=${this.localize.term('user_startnodeshelp')}>
 						<umb-input-document
-							.selectedIds=${this._user?.documentStartNodeUniques ?? []}
+							.selection=${this._user?.documentStartNodeUniques ?? []}
 							@change=${this.#onDocumentStartNodeChange}
 							slot="editor"></umb-input-document>
 					</umb-property-layout>
@@ -63,7 +63,7 @@ export class UmbUserWorkspaceAccessSettingsElement extends UmbLitElement {
 						label=${this.localize.term('user_mediastartnodes')}
 						description=${this.localize.term('user_mediastartnodeshelp')}>
 						<umb-input-media
-							.selectedIds=${this._user?.mediaStartNodeUniques ?? []}
+							.selection=${this._user?.mediaStartNodeUniques ?? []}
 							@change=${this.#onMediaStartNodeChange}
 							slot="editor"></umb-input-media>
 					</umb-property-layout>

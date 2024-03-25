@@ -4,7 +4,7 @@ import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
-	rest.get(umbracoPath(`${UMB_SLUG}/filter`), (req, res, ctx) => {
+	rest.get(umbracoPath(`/filter${UMB_SLUG}`), (req, res, ctx) => {
 		const skip = Number(req.url.searchParams.get('skip'));
 		const take = Number(req.url.searchParams.get('take'));
 		const orderBy = req.url.searchParams.get('orderBy');

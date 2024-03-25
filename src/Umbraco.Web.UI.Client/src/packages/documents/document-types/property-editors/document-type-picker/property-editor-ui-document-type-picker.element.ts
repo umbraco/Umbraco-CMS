@@ -2,20 +2,16 @@ import type { UmbInputDocumentTypeElement } from '../../components/input-documen
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-document-type-picker')
 export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ type: Array })
-	public get value(): Array<string> | string | undefined {
-		return this._value;
-	}
-	public set value(value: Array<string> | string | undefined) {
-		this._value = value;
-	}
-	private _value?: Array<string> | string;
+	@property()
+	public value?: string;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (config) {
 			const validationLimit = config.getValueByAlias<any>('validationLimit');
@@ -26,6 +22,9 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 			this._multiPicker = config.getValueByAlias('multiPicker') ?? false;
 			this._onlyElementTypes = config.getValueByAlias('onlyPickElementTypes') ?? false;
 		}
+	}
+	public get config() {
+		return undefined;
 	}
 
 	@state()
@@ -38,9 +37,9 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 	private _onlyElementTypes?: boolean;
 
 	private _onChange(event: CustomEvent) {
-		const selectedIds = (event.target as UmbInputDocumentTypeElement).selectedIds;
-		this.value = this._multiPicker ? selectedIds : selectedIds[0];
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		const selection = (event.target as UmbInputDocumentTypeElement).selection;
+		this.value = this._multiPicker ? selection.join(',') : selection[0];
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	// TODO: Implement mandatory?
@@ -49,17 +48,13 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 			? html`
 					<umb-input-document-type
 						@change=${this._onChange}
-						.selectedIds=${this._multiPicker
-							? (this._value as Array<string>) ?? []
-							: this._value
-							? [this._value as string]
-							: []}
+						.value=${this.value ?? ''}
 						.min=${this._limitMin ?? 0}
 						.max=${this._limitMax ?? Infinity}
-						.elementTypesOnly=${this._onlyElementTypes ?? false}
-						>Add</umb-input-document-type
-					>
-			  `
+						.elementTypesOnly=${this._onlyElementTypes ?? false}>
+						<umb-localize key="general_add">Add</umb-localize>
+					</umb-input-document-type>
+				`
 			: '';
 	}
 }

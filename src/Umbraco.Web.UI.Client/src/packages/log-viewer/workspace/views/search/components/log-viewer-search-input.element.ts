@@ -1,5 +1,5 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer.context.js';
-import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
+import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import type {
 	UmbContextSaveSearchModalData,
 	UmbContextSaveSearchModalValue,
@@ -71,7 +71,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	#observeStuff() {
 		if (!this.#logViewerContext) return;
 		this.observe(this.#logViewerContext.savedSearches, (savedSearches) => {
-			this._savedSearches = savedSearches ?? [];
+			this._savedSearches = savedSearches?.items ?? [];
 			this._isQuerySaved = this._savedSearches.some((search) => search.query === this._inputQuery);
 		});
 
@@ -156,13 +156,13 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 				${this._showLoader
 					? html`<div id="loader-container" slot="append">
 							<uui-loader-circle></uui-loader-circle>
-					  </div>`
+						</div>`
 					: ''}
 				${this._inputQuery
 					? html`${!this._isQuerySaved
 								? html`<uui-button compact slot="append" label="Save search" @click=${this.#openSaveSearchDialog}
 										><uui-icon name="icon-favorite"></uui-icon
-								  ></uui-button>`
+									></uui-button>`
 								: ''}<uui-button compact slot="append" label="Clear" @click=${this.#clearQuery}
 								><uui-icon name="icon-delete"></uui-icon
 							></uui-button>`
