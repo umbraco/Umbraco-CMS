@@ -44,5 +44,7 @@ export default {
     mfaCodeInput: 'Bekreftelseskode',
     signInWith: 'Logg inn med {0}',
     returnToLogin: 'Tilbake til innlogging',
+    localLoginDisabled: 'Dessverre er direkte innlogging ikke mulig. Den er deaktivert av en leverandør.',
+    friendlyGreeting: 'Hei!',
   },
 } satisfies UmbLocalizationDictionary;

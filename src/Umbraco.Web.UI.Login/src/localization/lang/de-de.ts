@@ -44,5 +44,7 @@ export default {
     mfaCodeInput: 'Bestätigungscode',
     signInWith: 'Anmelden mit {0}',
     returnToLogin: 'Zurück zur Anmeldung',
+    localLoginDisabled: 'Leider ist eine direkte Anmeldung nicht möglich. Sie wurde von einem Anbieter deaktiviert.',
+    friendlyGreeting: 'Hallo!',
   },
 } satisfies UmbLocalizationDictionary;

@@ -44,5 +44,7 @@ export default {
     mfaCodeInput: 'Verificatiecode',
     signInWith: 'Inloggen met {0}',
     returnToLogin: 'Terug naar loginformulier',
+    localLoginDisabled: 'Helaas is direct inloggen niet mogelijk. Het is uitgeschakeld door een aanbieder.',
+    friendlyGreeting: 'Hallo!',
   },
 } satisfies UmbLocalizationDictionary;

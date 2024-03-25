@@ -44,5 +44,7 @@ export default {
     mfaCodeInput: 'Verifieringskod',
     signInWith: 'Logga in med {0}',
     returnToLogin: 'Återgå till inloggning',
+    localLoginDisabled: 'Tyvärr är direktinloggning inte möjlig. Det har inaktiverats av en leverantör.',
+    friendlyGreeting: 'Hej!',
   },
 } satisfies UmbLocalizationDictionary;

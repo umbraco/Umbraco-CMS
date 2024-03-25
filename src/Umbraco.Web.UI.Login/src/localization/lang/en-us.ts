@@ -44,5 +44,7 @@ export default {
     mfaCodeInput: 'Verification code',
     signInWith: 'Sign in with {0}',
     returnToLogin: 'Return to login',
+    localLoginDisabled: 'Unfortunately, direct login is not possible. It has been disabled by a provider.',
+    friendlyGreeting: 'Hi there',
   },
 } satisfies UmbLocalizationDictionary;
