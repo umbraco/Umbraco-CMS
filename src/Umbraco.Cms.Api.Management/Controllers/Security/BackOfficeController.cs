@@ -19,7 +19,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
@@ -59,8 +58,6 @@ public class BackOfficeController : SecurityControllerBase
         _userTwoFactorLoginService = userTwoFactorLoginService;
     }
 
-    // FIXME: this is a temporary solution to get the new backoffice auth rolling.
-    //        once the old backoffice auth is no longer necessary, clean this up and merge with 2FA handling etc.
     [HttpPost("login")]
     [MapToApiVersion("1.0")]
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
@@ -101,6 +98,15 @@ public class BackOfficeController : SecurityControllerBase
             });
         }
         return Ok();
+    }
+
+    [HttpPost("login-external")]
+    [MapToApiVersion("1.0")]
+    [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
+    public async Task<IActionResult> LoginExternal(LoginExternalRequestModel model)
+    {
+        AuthenticationProperties properties = _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(model.IdentityProvider, null);
+        return await Task.FromResult(new ChallengeResult(model.IdentityProvider, properties));
     }
 
     [AllowAnonymous]
@@ -145,13 +151,6 @@ public class BackOfficeController : SecurityControllerBase
         return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
             .WithTitle("Invalid code")
             .Build());
-    }
-
-    public class LoginRequestModel
-    {
-        public required string Username { get; init; }
-
-        public required string Password { get; init; }
     }
 
     [AllowAnonymous]
