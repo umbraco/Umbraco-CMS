@@ -217,8 +217,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		}
 
 		// set the configured inline mode
-		const mode = this.configuration?.getValueByAlias<Array<string>>('mode');
-		if (mode?.[0].toLocaleLowerCase() === 'inline') {
+		const mode = this.configuration?.getValueByAlias<string | Array<string>>('mode'); // Migration: Bellissima (PropertyEditorUi.Dropdown) saves as Array.
+		if (typeof mode === 'string' && mode.toLocaleLowerCase() === 'inline') {
+			configurationOptions.inline = true;
+		} else if (Array.isArray(mode) && mode.length && mode?.[0].toLocaleLowerCase() === 'inline') {
 			configurationOptions.inline = true;
 		}
 
