@@ -98,7 +98,7 @@ export class UmbUserGroupWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	async save() {
+	async performSave() {
 		if (!this.#data.value) return;
 
 		//TODO: Could we clean this code up?

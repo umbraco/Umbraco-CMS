@@ -111,7 +111,7 @@ export class UmbLanguageWorkspaceContext
 		this.#data.update({ fallbackIsoCode: unique });
 	}
 
-	async save() {
+	async performSave() {
 		const newData = this.getData();
 		if (!newData) return;
 

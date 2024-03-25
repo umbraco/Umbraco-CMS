@@ -400,7 +400,7 @@ export class UmbMediaWorkspaceContext
 		}
 	}
 
-	async save() {
+	async performSave() {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		await this.#createOrSave();

@@ -1,7 +1,9 @@
 import { UmbWorkspaceRouteManager } from '../controllers/workspace-route-manager.controller.js';
+//import { UmbValidationContext } from '../../validation/context/validation.context.js';
 import { UMB_WORKSPACE_CONTEXT } from './tokens/workspace.context-token.js';
 import type { UmbSaveableWorkspaceContext } from './tokens/saveable-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_FORM_CONTEXT } from '@umbraco-cms/backoffice/form';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
@@ -16,6 +18,11 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique (instead of the object type)
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
+
+	//readonly #validation = new UmbValidationContext(this);
+	#form?: typeof UMB_FORM_CONTEXT.TYPE;
+	#savePromise: Promise<void> | undefined;
+	#saveResolve: (() => void) | undefined;
 
 	abstract readonly unique: Observable<string | null | undefined>;
 
@@ -35,8 +42,18 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	constructor(host: UmbControllerHost, workspaceAlias: string) {
 		super(host, UMB_WORKSPACE_CONTEXT.toString());
 		this.workspaceAlias = workspaceAlias;
+		this.#performSaveBind = this.performSave.bind(this);
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			(this.modalContext as UmbModalContext) = context;
+		});
+		this.consumeContext(UMB_FORM_CONTEXT, (context) => {
+			if (this.#form === context) return;
+			if (this.#form) {
+				this.#form.removeEventListener('submit', this.#performSaveBind);
+			}
+			this.#form = context;
+			this.#form.addEventListener('submit', this.#performSaveBind);
+			this._gotFormContext(context);
 		});
 	}
 
@@ -53,6 +70,9 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	}
 
 	protected workspaceComplete(data: WorkspaceDataModelType | undefined) {
+		// Resolve the save promise:
+		this.#saveResolve?.();
+
 		if (this.modalContext) {
 			if (data) {
 				this.modalContext?.setValue(data);
@@ -61,11 +81,29 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 		}
 	}
 
+	protected _gotFormContext(context: typeof UMB_FORM_CONTEXT.TYPE): void {}
+
 	//abstract getIsDirty(): Promise<boolean>;
-	abstract getUnique(): string | undefined; // TODO: Consider if this should go away/be renamed? now that we have getUnique()
+	abstract getUnique(): string | undefined;
 	abstract getEntityType(): string;
 	abstract getData(): WorkspaceDataModelType | undefined;
-	abstract save(): Promise<void>;
+	save(): Promise<void> {
+		if (this.#savePromise) {
+			return this.#savePromise;
+		}
+		if (!this.#form) {
+			throw new Error('Form context not available');
+		}
+		this.#form.requestSubmit();
+
+		this.#savePromise = new Promise<void>((resolve) => {
+			this.#saveResolve = resolve;
+		});
+		return this.#savePromise;
+	}
+
+	#performSaveBind: () => void;
+	protected abstract performSave(): void;
 }
 
 /*

@@ -166,7 +166,7 @@ export class UmbMemberTypeWorkspaceContext
 		}
 	}
 
-	async save() {
+	async performSave() {
 		const data = this.getData();
 		if (data === undefined) throw new Error('Cannot save, no data');
 

@@ -122,7 +122,7 @@ export class UmbDictionaryWorkspaceContext
 		this.#data.setValue(data);
 	}
 
-	async save() {
+	async performSave() {
 		if (!this.#data.value) return;
 		if (!this.#data.value.unique) return;
 

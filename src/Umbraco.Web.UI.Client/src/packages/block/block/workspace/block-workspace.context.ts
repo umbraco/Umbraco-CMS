@@ -300,7 +300,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 	}
 
-	async save() {
+	async performSave() {
 		const layoutData = this.#layout.value;
 		const contentData = this.content.getData();
 		if (!layoutData || !this.#blockManager || !this.#blockEntries || !contentData || !this.#modalContext) return;

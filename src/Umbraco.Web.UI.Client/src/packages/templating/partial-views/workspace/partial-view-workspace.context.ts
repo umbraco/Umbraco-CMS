@@ -146,7 +146,7 @@ export class UmbPartialViewWorkspaceContext
 		}
 	}
 
-	public async save() {
+	public async performSave() {
 		if (!this.#data.value) throw new Error('Data is missing');
 
 		let newData = undefined;
