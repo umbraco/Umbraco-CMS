@@ -214,13 +214,13 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		}
 
 		// set the configured inline mode
-		const mode = this.configuration?.getValueByAlias<string>('mode');
-		if (mode?.toLocaleLowerCase() === 'inline') {
+		const mode = this.configuration?.getValueByAlias<Array<string>>('mode');
+		if (mode?.[0].toLocaleLowerCase() === 'inline') {
 			configurationOptions.inline = true;
 		}
 
 		// set the maximum image size
-		const maxImageSize = this.configuration?.getValueByAlias<number>('maxImageSize');
+		const maxImageSize = this.configuration?.getValueByAlias<string>('maxImageSize');
 		if (maxImageSize !== undefined) {
 			configurationOptions.maxImageSize = maxImageSize;
 		}
