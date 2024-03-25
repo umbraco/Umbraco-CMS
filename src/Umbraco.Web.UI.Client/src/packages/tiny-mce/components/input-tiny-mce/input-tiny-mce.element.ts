@@ -138,7 +138,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		const stylesheetResponses = await Promise.all(promises);
 
 		stylesheetResponses.forEach(({ data }) => {
-			if (!data) return;
+			if (!data?.content) return;
+
 			const rulesFromContent = this.#umbStylesheetRuleManager.extractRules(data.content);
 
 			rulesFromContent.forEach((rule) => {
