@@ -1818,6 +1818,75 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/data-type/ancestors": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "GetTreeDataTypeAncestors",
+        "parameters": [
+          {
+            "name": "descendantId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/data-type/children": {
       "get": {
         "tags": [
@@ -2967,6 +3036,129 @@
                     "oneOf": [
                       {
                         "$ref": "#/components/schemas/DictionaryItemItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/dictionary/ancestors": {
+      "get": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "GetTreeDictionaryAncestors",
+        "parameters": [
+          {
+            "name": "descendantId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -4897,6 +5089,75 @@
                     "oneOf": [
                       {
                         "$ref": "#/components/schemas/DocumentTypeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/document-type/ancestors": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "GetTreeDocumentTypeAncestors",
+        "parameters": [
+          {
+            "name": "descendantId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -8520,6 +8781,75 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/document/ancestors": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetTreeDocumentAncestors",
+        "parameters": [
+          {
+            "name": "descendantId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -12748,6 +13078,75 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/media-type/ancestors": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "GetTreeMediaTypeAncestors",
+        "parameters": [
+          {
+            "name": "descendantId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/media-type/children": {
       "get": {
         "tags": [
@@ -14917,6 +15316,75 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/media/ancestors": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetTreeMediaAncestors",
+        "parameters": [
+          {
+            "name": "descendantId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MediaTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MediaTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MediaTreeItemResponseModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -19841,6 +20309,74 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/partial-view/ancestors": {
+      "get": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "GetTreePartialViewAncestors",
+        "parameters": [
+          {
+            "name": "descendantPath",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/partial-view/children": {
       "get": {
         "tags": [
@@ -22378,6 +22914,74 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/script/ancestors": {
+      "get": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "GetTreeScriptAncestors",
+        "parameters": [
+          {
+            "name": "descendantPath",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/script/children": {
       "get": {
         "tags": [
@@ -23398,6 +24002,74 @@
                     "oneOf": [
                       {
                         "$ref": "#/components/schemas/StaticFileItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/static-file/ancestors": {
+      "get": {
+        "tags": [
+          "Static File"
+        ],
+        "operationId": "GetTreeStaticFileAncestors",
+        "parameters": [
+          {
+            "name": "descendantPath",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
                       }
                     ]
                   }
@@ -24556,6 +25228,74 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/stylesheet/ancestors": {
+      "get": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "GetTreeStylesheetAncestors",
+        "parameters": [
+          {
+            "name": "descendantPath",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/stylesheet/children": {
       "get": {
         "tags": [
@@ -25678,6 +26418,129 @@
                       "$ref": "#/components/schemas/TemplateQuerySettingsResponseModel"
                     }
                   ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/tree/template/ancestors": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "GetTreeTemplateAncestors",
+        "parameters": [
+          {
+            "name": "descendantId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -33684,7 +34547,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/PropertyTypeModelBaseModel"
+            "$ref": "#/components/schemas/MemberTypePropertyTypeModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -33926,6 +34789,7 @@
           "email",
           "fallbackPermissions",
           "hasAccessToAllLanguages",
+          "hasAccessToSensitiveData",
           "id",
           "languages",
           "mediaStartNodeIds",
@@ -33981,6 +34845,9 @@
             }
           },
           "hasAccessToAllLanguages": {
+            "type": "boolean"
+          },
+          "hasAccessToSensitiveData": {
             "type": "boolean"
           },
           "fallbackPermissions": {
@@ -36839,13 +37706,113 @@
         ],
         "additionalProperties": false
       },
+      "MemberTypePropertyTypeModelBaseModel": {
+        "required": [
+          "alias",
+          "appearance",
+          "dataType",
+          "id",
+          "isSensitive",
+          "name",
+          "sortOrder",
+          "validation",
+          "variesByCulture",
+          "variesBySegment",
+          "visibility"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "container": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "alias": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "variesByCulture": {
+            "type": "boolean"
+          },
+          "variesBySegment": {
+            "type": "boolean"
+          },
+          "validation": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PropertyTypeValidationModel"
+              }
+            ]
+          },
+          "appearance": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PropertyTypeAppearanceModel"
+              }
+            ]
+          },
+          "isSensitive": {
+            "type": "boolean"
+          },
+          "visibility": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MemberTypePropertyTypeVisibilityModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "MemberTypePropertyTypeResponseModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/PropertyTypeModelBaseModel"
+            "$ref": "#/components/schemas/MemberTypePropertyTypeModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "MemberTypePropertyTypeVisibilityModel": {
+        "required": [
+          "memberCanEdit",
+          "memberCanView"
+        ],
+        "type": "object",
+        "properties": {
+          "memberCanView": {
+            "type": "boolean"
+          },
+          "memberCanEdit": {
+            "type": "boolean"
+          }
+        },
         "additionalProperties": false
       },
       "MemberTypeReferenceResponseModel": {
@@ -38836,18 +39803,13 @@
       "RecycleBinItemResponseModelBaseModel": {
         "required": [
           "hasChildren",
-          "id",
-          "type"
+          "id"
         ],
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
-          },
-          "type": {
-            "minLength": 1,
-            "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
@@ -40664,7 +41626,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/PropertyTypeModelBaseModel"
+            "$ref": "#/components/schemas/MemberTypePropertyTypeModelBaseModel"
           }
         ],
         "additionalProperties": false
