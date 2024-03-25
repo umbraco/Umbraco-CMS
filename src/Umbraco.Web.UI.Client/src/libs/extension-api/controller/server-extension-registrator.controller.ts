@@ -1,3 +1,5 @@
+import type { ManifestBase } from '../types/index.js';
+import { isManifestBaseType } from '../type-guards/index.js';
 import {
 	PackageResource,
 	OpenAPI,
@@ -7,8 +9,6 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
-import { isManifestBaseType } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO: consider if this can be replaced by the new extension controllers
 export class UmbServerExtensionRegistrator extends UmbControllerBase {
