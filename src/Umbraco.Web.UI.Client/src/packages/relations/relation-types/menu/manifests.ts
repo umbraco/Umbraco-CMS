@@ -6,11 +6,11 @@ export const manifests = [
 		kind: 'tree',
 		alias: 'Umb.MenuItem.RelationTypes',
 		name: 'Relation Types Menu Item',
-		weight: 500,
+		weight: 800,
 		meta: {
 			treeAlias: UMB_RELATION_TYPE_TREE_ALIAS,
 			label: 'Relation Types',
-			menus: ['Umb.Menu.Settings'],
+			menus: ['Umb.Menu.AdvancedSettings'],
 		},
 	},
 	{

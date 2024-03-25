@@ -7,9 +7,6 @@ export const manifests = [
 		type: 'menu',
 		alias: UMB_MEDIA_MENU_ALIAS,
 		name: 'Media Menu',
-		meta: {
-			label: 'Media',
-		},
 	},
 	{
 		type: 'menuItem',
