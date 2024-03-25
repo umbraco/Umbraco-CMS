@@ -19,27 +19,6 @@ const workspace: ManifestWorkspaces = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Media.Collection',
-		name: 'Media Workspace Collection View',
-		element: () => import('./views/collection/media-workspace-view-collection.element.js'),
-		weight: 300,
-		meta: {
-			label: 'Collection',
-			pathname: 'collection',
-			icon: 'icon-grid',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
-			},
-			{
-				alias: 'Umb.Condition.WorkspaceHasCollection',
-			},
-		],
-	},
-	{
-		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Media.Edit',
 		name: 'Media Workspace Edit View',
 		js: () => import('./views/edit/media-workspace-view-edit.element.js'),
