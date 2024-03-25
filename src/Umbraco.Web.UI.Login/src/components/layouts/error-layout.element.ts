@@ -15,7 +15,7 @@ export default class UmbErrorLayoutElement extends UmbLitElement {
   render() {
     return html`
       <header id="header">
-        <h1>${this.header}</h1>
+        <h1>${this.header?.length ? this.header : html`<umb-localize key="auth_friendlyGreeting">Hi there</umb-localize>`}</h1>
         <span>${this.message}</span>
       </header>
       <slot></slot>

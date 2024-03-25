@@ -216,7 +216,7 @@ export default class UmbAuthElement extends UmbLitElement {
   private _renderFlowAndStatus() {
     if (this.disableLocalLogin) {
       return html`
-        <umb-error-layout header="Hi there" no-back-link>
+        <umb-error-layout no-back-link>
           <umb-localize key="auth_localLoginDisabled">Unfortunately, it is not possible to log in directly. It has been disabled by a login provider.</umb-localize>
         </umb-error-layout>
       `;
@@ -229,7 +229,6 @@ export default class UmbAuthElement extends UmbLitElement {
     if (status === 'resetCodeExpired') {
       return html`
         <umb-error-layout
-          header="Hi there"
           message=${this.localize.term('auth_resetCodeExpired')}>
         </umb-error-layout>`;
     }
@@ -237,7 +236,6 @@ export default class UmbAuthElement extends UmbLitElement {
     if (flow === 'invite-user' && status === 'false') {
       return html`
         <umb-error-layout
-          header="Hi there"
           message=${this.localize.term('auth_userInviteExpiredMessage')}>
         </umb-error-layout>`;
     }
