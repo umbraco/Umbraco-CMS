@@ -23,6 +23,7 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	#form?: typeof UMB_FORM_CONTEXT.TYPE;
 	#savePromise: Promise<void> | undefined;
 	#saveResolve: (() => void) | undefined;
+	#saveReject: (() => void) | undefined;
 
 	abstract readonly unique: Observable<string | null | undefined>;
 
@@ -46,13 +47,17 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			(this.modalContext as UmbModalContext) = context;
 		});
+		console.log('about to consume form context', UMB_FORM_CONTEXT);
 		this.consumeContext(UMB_FORM_CONTEXT, (context) => {
+			console.log('consume form context', context);
 			if (this.#form === context) return;
 			if (this.#form) {
 				this.#form.removeEventListener('submit', this.#performSubmitBind);
+				this.#form.removeEventListener('invalid', this.#invalidForm);
 			}
 			this.#form = context;
 			this.#form.addEventListener('submit', this.#performSubmitBind);
+			this.#form.addEventListener('invalid', this.#invalidForm);
 			this._gotFormContext(context);
 		});
 	}
@@ -69,9 +74,41 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 		this.#isNew.setValue(isNew);
 	}
 
+	requestSubmit(): Promise<void> {
+		if (this.#savePromise) {
+			return this.#savePromise;
+		}
+		if (!this.#form) {
+			throw new Error('Form context not available');
+		}
+		this.#savePromise = new Promise<void>((resolve, reject) => {
+			this.#saveResolve = resolve;
+			this.#saveReject = reject;
+		});
+
+		console.log('REQUEST SUBMIT', this.#form);
+		this.#form.requestSubmit();
+
+		return this.#savePromise;
+	}
+
+	#invalidForm = (event: Event) => {
+		console.log('workspace context got invalid form', event);
+		if (this.#savePromise) {
+			this.#saveReject?.();
+			this.#savePromise = undefined;
+			this.#saveResolve = undefined;
+			this.#saveReject = undefined;
+		}
+	};
+
 	protected submitComplete(data: WorkspaceDataModelType | undefined) {
 		// Resolve the save promise:
 		this.#saveResolve?.();
+		// TODO: We need a way to fail the save promise..
+		this.#savePromise = undefined;
+		this.#saveResolve = undefined;
+		this.#saveReject = undefined;
 
 		if (this.modalContext) {
 			if (data) {
@@ -87,20 +124,6 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	abstract getUnique(): string | undefined;
 	abstract getEntityType(): string;
 	abstract getData(): WorkspaceDataModelType | undefined;
-	requestSubmit(): Promise<void> {
-		if (this.#savePromise) {
-			return this.#savePromise;
-		}
-		if (!this.#form) {
-			throw new Error('Form context not available');
-		}
-		this.#form.requestSubmit();
-
-		this.#savePromise = new Promise<void>((resolve) => {
-			this.#saveResolve = resolve;
-		});
-		return this.#savePromise;
-	}
 
 	#performSubmitBind: () => void;
 	protected abstract submit(): void;

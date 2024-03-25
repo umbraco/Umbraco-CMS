@@ -1,4 +1,5 @@
 export * from './collection-workspace.context-token.js';
+export * from './editable-workspace.context-token.js';
 export * from './entity-workspace.context-token.js';
 export * from './publishable-workspace.context-token.js';
 export * from './routable-workspace.context-token.js';
@@ -6,6 +7,7 @@ export * from './saveable-workspace.context-token.js';
 export * from './variant-workspace.context-token.js';
 export * from './workspace.context-token.js';
 export type * from './collection-workspace-context.interface.js';
+export type * from './editable-workspace-context.interface.js';
 export type * from './entity-workspace-context.interface.js';
 export type * from './invariant-dataset-workspace-context.interface.js';
 export type * from './property-structure-workspace-context.interface.js';

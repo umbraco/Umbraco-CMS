@@ -1,5 +1,5 @@
 import { UmbFormContext } from '../context/form.context.js';
-import { type PropertyValueMap, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { type PropertyValueMap, customElement, html, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-form')
@@ -19,4 +19,12 @@ export class UmbFormElement extends UmbLitElement {
 			</form>
 		</uui-form>`;
 	}
+
+	static styles = [
+		css`
+			form {
+				display: contents;
+			}
+		`,
+	];
 }

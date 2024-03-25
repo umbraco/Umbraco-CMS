@@ -13,6 +13,7 @@ export class UmbFormContext extends UmbContextBase<UmbFormContext> {
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_FORM_CONTEXT);
+		console.log('providing it self as', UMB_FORM_CONTEXT, this);
 	}
 
 	/**
@@ -20,6 +21,7 @@ export class UmbFormContext extends UmbContextBase<UmbFormContext> {
 	 * @param element {HTMLFormElement | null} - The Form element to be used for this context.
 	 */
 	setFormElement(element: HTMLFormElement | null) {
+		console.log('setFormElement', element, this);
 		if (this.#formElement === element) return;
 		if (this.#formElement) {
 			this.#formElement.removeEventListener('submit', this.onSubmit);
@@ -46,25 +48,29 @@ export class UmbFormContext extends UmbContextBase<UmbFormContext> {
 	 */
 	requestSubmit() {
 		// We do not call requestSubmit here, as we want the form to submit, and then we will handle the validation as part of the submit event handling.
-		this.#formElement?.submit();
+		this.#formElement?.requestSubmit();
 	}
 
 	/**
 	 * @description Triggered by the form, when it fires a submit event
 	 */
 	onSubmit = (event: SubmitEvent) => {
+		console.log('onSubmit', event);
 		event?.preventDefault();
 		//this.dispatchEvent(new CustomEvent('submit-requested'));
 
 		// Check client validation:
 		const isClientValid = this.#formElement?.checkValidity();
 
+		console.log('isClientValid', isClientValid);
 		// ask validation managers to validate the form.
 
 		const isValid = isClientValid ?? false;
 
 		if (!isValid) {
 			// Fire invalid..
+			// TODO: consider naming it something like submit failed?
+			this.dispatchEvent(new CustomEvent('invalid'));
 			return;
 		}
 

@@ -15,6 +15,7 @@ export * from './entity-action/index.js';
 export * from './entity-bulk-action/index.js';
 export * from './extension-registry/index.js';
 export * from './id/index.js';
+export * from './form/index.js';
 export * from './menu/index.js';
 export * from './modal/index.js';
 export * from './notification/index.js';

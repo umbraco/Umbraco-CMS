@@ -60,7 +60,21 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	protected getFormElement() {
-		return this;
+		return undefined;
+	}
+
+	constructor() {
+		super();
+
+		this.addValidator(
+			'customError',
+			() => {
+				return 'The low value must be less than the high value';
+			},
+			() => {
+				return this._minValue !== undefined && this._maxValue !== undefined && this._minValue > this._maxValue;
+			},
+		);
 	}
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
