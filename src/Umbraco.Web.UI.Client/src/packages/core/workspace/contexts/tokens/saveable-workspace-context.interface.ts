@@ -5,7 +5,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 export interface UmbSaveableWorkspaceContext extends UmbEntityWorkspaceContext, UmbRoutableWorkspaceContext {
 	isNew: Observable<boolean | undefined>;
 	getIsNew(): boolean | undefined;
-	save(): Promise<void>;
+	requestSubmit(): Promise<void>;
 	destroy(): void;
 }
 /**

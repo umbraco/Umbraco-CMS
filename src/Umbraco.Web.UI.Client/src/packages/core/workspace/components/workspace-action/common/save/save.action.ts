@@ -12,6 +12,6 @@ export class UmbSaveWorkspaceAction extends UmbWorkspaceActionBase<UmbSaveableWo
 
 	async execute() {
 		const workspaceContext = await this.getContext(UMB_SAVEABLE_WORKSPACE_CONTEXT);
-		return workspaceContext.save();
+		return workspaceContext.requestSubmit();
 	}
 }

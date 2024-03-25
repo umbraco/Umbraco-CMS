@@ -87,7 +87,7 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	abstract getUnique(): string | undefined;
 	abstract getEntityType(): string;
 	abstract getData(): WorkspaceDataModelType | undefined;
-	save(): Promise<void> {
+	requestSubmit(): Promise<void> {
 		if (this.#savePromise) {
 			return this.#savePromise;
 		}
