@@ -212,6 +212,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 						? html`
 								<uui-button
 									id="variant-selector-toggle"
+									compact
 									slot="append"
 									popovertarget="variant-selector-popover"
 									title=${this._variantTitleName}>
@@ -284,7 +285,6 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		css`
 			#name-input {
 				width: 100%;
-				height: 100%; /** I really don't know why this fixes the border colliding with variant-selector-toggle, but lets this solution for now */
 			}
 
 			#variant-selector-toggle {
