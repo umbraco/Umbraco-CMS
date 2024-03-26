@@ -5,7 +5,7 @@ import type { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from '@umbraco-cms
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbMediaDetailRepository, sizeImageInEditor, uploadBlobImages } from '@umbraco-cms/backoffice/media';
+import { sizeImageInEditor, uploadBlobImages } from '@umbraco-cms/backoffice/media';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -29,8 +29,6 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#temporaryFileRepository;
-
-	#mediaDetailRepository = new UmbMediaDetailRepository(this);
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
@@ -76,8 +74,6 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			// Listen for SetContent to update images
 			this.editor.on('SetContent', async (e) => {
 				const content = e.content;
-
-				console.log('set content', content);
 
 				// Handle images that are pasted in
 				uploadBlobImages(this.editor, content);
@@ -218,7 +214,6 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		// Using settimeout to wait for a DoM-render, so we can find the new element by ID.
 		setTimeout(() => {
 			const imgElm = this.editor.dom.get('__mcenew') as HTMLImageElement;
-			console.log('timeout?', imgElm);
 			if (!imgElm) return;
 
 			this.editor.dom.setAttrib(imgElm, 'id', null);
