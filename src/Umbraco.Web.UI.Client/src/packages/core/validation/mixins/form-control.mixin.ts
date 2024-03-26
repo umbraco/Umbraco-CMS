@@ -33,6 +33,7 @@ interface Validator {
 export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> extends HTMLElement {
 	//static formAssociated: boolean;
 	getFormElement(): HTMLElement | undefined;
+	focusFirstInvalidElement(): void;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
 	formResetCallback(): void;
@@ -59,6 +60,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 
 	//static formAssociated: boolean;
 	getFormElement(): HTMLElement | undefined;
+	focusFirstInvalidElement(): void;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
 	formResetCallback(): void;
@@ -145,12 +147,29 @@ export const UmbFormControlMixin = <
 		/**
 		 * Get internal form element.
 		 * This has to be implemented to provide a FormControl Element of choice for the given context. The element is used as anchor for validation-messages.
-		 * @abstract
 		 * @method getFormElement
 		 * @returns {HTMLElement | undefined}
 		 */
 		getFormElement(): HTMLElement | undefined {
 			return this.#formCtrlElements.find((el) => el.validity.valid === false);
+		}
+
+		/**
+		 * Focus first element that is invalid.
+		 * @method focusFirstInvalidElement
+		 * @returns {HTMLElement | undefined}
+		 */
+		focusFirstInvalidElement() {
+			const firstInvalid = this.#formCtrlElements.find((el) => el.validity.valid === false);
+			if (firstInvalid) {
+				if ('focusFirstInvalidElement' in firstInvalid) {
+					firstInvalid.focusFirstInvalidElement();
+				} else {
+					firstInvalid.focus();
+				}
+			} else {
+				this.focus();
+			}
 		}
 
 		disconnectedCallback(): void {

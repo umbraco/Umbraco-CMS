@@ -15,6 +15,11 @@ export interface UmbValidator {
 	 */
 	isValid: boolean;
 
+	/**
+	 * Focus the first invalid element.
+	 */
+	focusFirstInvalidElement(): void;
+
 	//getMessage(): string;
 	getMessages(): string[]; // Should we enable bringing multiple messages?
 

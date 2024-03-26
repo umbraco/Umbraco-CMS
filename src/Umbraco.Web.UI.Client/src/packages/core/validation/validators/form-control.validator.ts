@@ -40,7 +40,7 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 	#setValid = this.#setIsValid.bind(this, true);
 
 	validate(): Promise<boolean> {
-		//this.#validate();
+		this.#isValid = this.#control.checkValidity();
 		return Promise.resolve(this.#isValid);
 	}
 
@@ -52,8 +52,8 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 		return [this.#control.validationMessage];
 	}
 
-	focus(): void {
-		this.#control.getFormElement()?.focus();
+	focusFirstInvalidElement(): void {
+		this.#control.focusFirstInvalidElement();
 	}
 
 	destroy(): void {

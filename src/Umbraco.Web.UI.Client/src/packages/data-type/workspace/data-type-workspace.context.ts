@@ -317,8 +317,6 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	async submit() {
-		console.log('SUBMIT');
-
 		if (!this.#currentData.value) return;
 		if (!this.#currentData.value.unique) return;
 
@@ -347,11 +345,6 @@ export class UmbDataTypeWorkspaceContext
 
 		this.setIsNew(false);
 		this.submitComplete(this.#currentData.value);
-	}
-
-	protected submitComplete(data: EntityType | undefined) {
-		this.dispatchEvent(new CustomEvent('workspace-complete'));
-		super.submitComplete(data);
 	}
 
 	async delete(unique: string) {

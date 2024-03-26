@@ -6,6 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 export class UmbValidationContext extends UmbContextBase<UmbValidationContext> implements UmbValidator {
 	#validators: Array<UmbValidator> = [];
 	#isValid: boolean = false;
+	#preventFail: boolean = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_VALIDATION_CONTEXT);
@@ -13,6 +14,14 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 
 	get isValid(): boolean {
 		return this.#isValid;
+	}
+
+	preventFail(): void {
+		this.#preventFail = true;
+	}
+
+	allowFail(): void {
+		this.#preventFail = false;
 	}
 
 	addValidator(validator: UmbValidator) {
@@ -29,15 +38,24 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 
 	#runValidate = this.validate.bind(this);
 
+	/**
+	 *
+	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validator succeeded, this depends on the validators and wether forceSucceed is set.
+	 */
 	async validate(): Promise<boolean> {
 		const results = await Promise.all(this.#validators.map((v) => v.validate()));
-		console.log('validators: ', this.#validators);
 		const isValid = results.every((r) => r);
 		this.#isValid = isValid;
 
-		console.log('Context says valid: ', isValid);
+		// Focus first invalid element:
+		if (!isValid) {
+			const firstInvalid = this.#validators.find((v) => !v.isValid);
+			if (firstInvalid) {
+				firstInvalid.focusFirstInvalidElement();
+			}
+		}
 
-		return isValid;
+		return this.#preventFail ? true : isValid;
 	}
 
 	getMessages(): string[] {

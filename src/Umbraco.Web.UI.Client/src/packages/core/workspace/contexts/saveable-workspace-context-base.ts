@@ -48,6 +48,13 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 		});
 	}
 
+	protected passValidation() {
+		this.#validation.preventFail();
+	}
+	protected failValidation() {
+		this.#validation.allowFail();
+	}
+
 	protected resetState() {
 		this.#isNew.setValue(undefined);
 	}
@@ -69,10 +76,9 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 			this.#submitReject = reject;
 		});
 
-		console.log('request submit');
-
-		this.#validation.validate().then((isValid) => {
-			if (isValid) {
+		this.#validation.validate().then((succeed) => {
+			console.log('#validation.validate', succeed ? 'succeed' : 'fail');
+			if (succeed) {
 				this.submit();
 			} else {
 				this.#failSubmit();
@@ -92,7 +98,7 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	}
 
 	protected submitComplete(data: WorkspaceDataModelType | undefined) {
-		// Resolve the save promise:
+		// Resolve the submit promise:
 		this.#submitResolve?.();
 		this.#submitPromise = undefined;
 		this.#submitResolve = undefined;
