@@ -11,6 +11,7 @@ const meta: Meta<UmbCurrentUserMfaDisableProviderModalElement> = {
 	args: {
 		data: {
 			providerName: 'SMS',
+			displayName: 'SMS',
 		},
 	},
 	parameters: {

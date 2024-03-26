@@ -34,6 +34,7 @@ const meta: Meta<UmbCurrentUserMfaEnableProviderModalElement> = {
 	args: {
 		data: {
 			providerName: 'SMS',
+			displayName: 'SMS',
 		},
 	},
 	parameters: {
