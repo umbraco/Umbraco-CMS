@@ -2,10 +2,6 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Relation;
 
 public sealed class RelationReferenceModel
 {
-    public RelationReferenceModel()
-        : this(Guid.Empty)
-    {
-    }
 
     public RelationReferenceModel(Guid id)
         => Id = id;

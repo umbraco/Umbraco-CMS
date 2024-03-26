@@ -5,6 +5,13 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Relation;
 
 public class RelationResponseModel
 {
+    public RelationResponseModel(ReferenceByIdModel relationType, RelationReferenceModel parent, RelationReferenceModel child)
+    {
+        RelationType = relationType;
+        Parent = parent;
+        Child = child;
+    }
+
     public Guid Id { get; set; }
 
     /// <summary>
@@ -37,11 +44,4 @@ public class RelationResponseModel
     /// </summary>
     [ReadOnly(true)]
     public string? Comment { get; set; }
-
-    public RelationResponseModel(ReferenceByIdModel relationType, RelationReferenceModel parent, RelationReferenceModel child)
-    {
-        RelationType = relationType;
-        Parent = parent;
-        Child = child;
-    }
 }

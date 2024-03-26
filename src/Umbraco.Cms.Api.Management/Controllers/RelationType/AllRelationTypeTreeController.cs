@@ -10,12 +10,12 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.RelationType;
 
 [ApiVersion("1.0")]
-public class RootRelationTypeTreeController : RelationTypeControllerBase
+public class AllRelationTypeController : RelationTypeControllerBase
 {
     private readonly IRelationService _relationService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public RootRelationTypeTreeController(
+    public AllRelationTypeController(
         IRelationService relationService,
         IUmbracoMapper umbracoMapper)
     {
