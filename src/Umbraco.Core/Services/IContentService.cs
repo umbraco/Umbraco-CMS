@@ -316,6 +316,15 @@ public interface IContentService : IContentServiceBase<IContent>
     void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    /// Attempts to move the <see cref="IContent"/> <paramref name="content"/> to under the node with id <paramref name="parentId"/>
+    /// </summary>
+    /// <param name="content">The <see cref="IContent"/> that shall be moved</param>
+    /// <param name="parentId">The id of the new parent node</param>
+    /// <param name="userId">Id of the user attempting to move <paramref name="content"/></param>
+    /// <returns>True if moving succeeded, otherwise False</returns>
+    Attempt<OperationResult?> AttemptMove(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
     ///     Copies a document.
     /// </summary>
     /// <remarks>
