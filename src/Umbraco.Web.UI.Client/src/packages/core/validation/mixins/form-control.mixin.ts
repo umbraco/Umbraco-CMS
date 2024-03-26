@@ -31,7 +31,7 @@ interface Validator {
 }
 
 export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> extends HTMLElement {
-	//formAssociated: boolean;
+	//static formAssociated: boolean;
 	getFormElement(): HTMLElement | undefined;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
@@ -57,7 +57,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 	protected addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
 	protected addFormControlElement(element: NativeFormControlElement): void;
 
-	//formAssociated: boolean;
+	//static formAssociated: boolean;
 	abstract getFormElement(): HTMLElement | undefined;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
