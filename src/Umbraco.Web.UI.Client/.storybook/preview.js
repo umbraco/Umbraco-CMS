@@ -9,7 +9,9 @@ import { setCustomElements } from '@storybook/web-components';
 
 import { startMockServiceWorker } from '../src/mocks';
 
-import { UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext } from '../src/packages/core/modal';
+import '../src/libs/controller-api/controller-host-provider.element';
+import { UmbServerExtensionRegistrator } from '../src/libs/extension-api/controller/server-extension-registrator.controller';
+import { UmbModalManagerContext } from '../src/packages/core/modal';
 import { UmbDataTypeTreeStore } from '../src/packages/data-type/tree/data-type-tree.store';
 import { UmbDocumentDetailStore } from '../src/packages/documents/documents/repository/detail/document-detail.store';
 import { UmbDocumentTreeStore } from '../src/packages/documents/documents/tree/document-tree.store';
@@ -25,6 +27,7 @@ import '../src/packages/core/components';
 
 import { manifests as documentManifests } from '../src/packages/documents';
 import { manifests as localizationManifests } from '../src/packages/core/localization/manifests';
+import { UmbNotificationContext } from '../src/packages/core';
 
 // MSW
 startMockServiceWorker({ serviceWorker: { url: (import.meta.env.VITE_BASE_PATH ?? '/') + 'mockServiceWorker.js' } });
@@ -38,9 +41,12 @@ class UmbStoryBookElement extends UmbLitElement {
 		this._registerExtensions(documentManifests);
 		new UmbModalManagerContext(this);
 		new UmbCurrentUserStore(this);
+		new UmbNotificationContext(this);
 
 		this._registerExtensions(localizationManifests);
 		umbLocalizationRegistry.loadLanguage('en-us'); // register default language
+
+		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerAllExtensions();
 	}
 
 	_registerExtensions(manifests) {
@@ -52,7 +58,8 @@ class UmbStoryBookElement extends UmbLitElement {
 
 	render() {
 		return html`<slot></slot>
-			<umb-backoffice-modal-container></umb-backoffice-modal-container> `;
+			<umb-backoffice-modal-container></umb-backoffice-modal-container>
+			<umb-backoffice-notification-container></umb-backoffice-notification-container>`;
 	}
 }
 
@@ -79,7 +86,7 @@ const documentTreeStoreProvider = (story) => html`
 `;
 
 // Provide the MSW addon decorator globally
-export const decorators = [storybookProvider, documentStoreProvider, documentTreeStoreProvider, dataTypeStoreProvider];
+export const decorators = [documentStoreProvider, documentTreeStoreProvider, dataTypeStoreProvider, storybookProvider];
 
 export const parameters = {
 	options: {
