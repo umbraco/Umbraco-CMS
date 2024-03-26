@@ -10,12 +10,12 @@ public enum RefreshMethodType
     // that enum should get merged somehow with MessageType and renamed somehow
     // but at the moment it is exposed in CacheRefresher webservice through RefreshInstruction
     // so for the time being we keep it as-is for backward compatibility reasons
-    RefreshAll,
-    RefreshByGuid,
-    RefreshById,
-    RefreshByIds,
-    RefreshByJson,
-    RemoveById,
+    RefreshAll = 0,
+    RefreshByGuid = 1,
+    RefreshById = 2,
+    RefreshByIds = 3,
+    RefreshByJson = 4,
+    RemoveById = 5,
 
     // would adding values break backward compatibility?
     // RemoveByIds
