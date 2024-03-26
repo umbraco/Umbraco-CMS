@@ -5,6 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-mfa-provider-default')
 export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMfaProviderConfigurationElementProps {
@@ -25,6 +26,9 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 
 	@state()
 	protected _qrCodeSetupImageUrl = '';
+
+	@state()
+	protected _buttonState?: UUIButtonState;
 
 	protected notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
@@ -117,7 +121,11 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 								@click=${this.close}>
 								${this.localize.term('general_close')}
 							</uui-button>
-							<uui-button type="submit" look="primary" .label=${this.localize.term('buttons_save')}>
+							<uui-button
+								.state=${this._buttonState}
+								type="submit"
+								look="primary"
+								.label=${this.localize.term('buttons_save')}>
 								${this.localize.term('general_submit')}
 							</uui-button>
 						</div>
@@ -146,6 +154,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	 */
 	protected async submit(e: SubmitEvent) {
 		e.preventDefault();
+		this._buttonState = 'waiting';
 		this.codeField?.setCustomValidity('');
 		const formData = new FormData(e.target as HTMLFormElement);
 		const code = formData.get('code') as string;
@@ -153,9 +162,11 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 
 		if (successful) {
 			this.peek('Two-factor authentication has successfully been enabled.');
+			this._buttonState = 'success';
 		} else {
 			this.codeField?.setCustomValidity(this.localize.term('user_2faInvalidCode'));
 			this.codeField?.focus();
+			this._buttonState = 'failed';
 		}
 	}
 

@@ -42,11 +42,11 @@ export const handlers = [
 			}
 
 			if (body.code === 'fail') {
-				return res(ctx.status(400));
+				return res(ctx.delay(), ctx.status(400));
 			}
 
 			const result = umbUserMockDb.enableMfaProvider(req.params.providerName.toString());
-			return res(ctx.status(result ? 200 : 404));
+			return res(ctx.delay(), ctx.status(result ? 200 : 404));
 		},
 	),
 	rest.delete<{ code: string }>(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), async (req, res, ctx) => {
@@ -56,10 +56,10 @@ export const handlers = [
 		}
 
 		if (body.code === 'fail') {
-			return res(ctx.status(400));
+			return res(ctx.delay(), ctx.status(400));
 		}
 
 		const result = umbUserMockDb.disableMfaProvider(req.params.providerName.toString());
-		return res(ctx.status(result ? 200 : 404));
+		return res(ctx.delay(), ctx.status(result ? 200 : 404));
 	}),
 ];
