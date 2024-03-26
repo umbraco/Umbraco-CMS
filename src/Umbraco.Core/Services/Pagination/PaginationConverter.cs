@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Api.Management.Services.Paging;
+namespace Umbraco.Cms.Core.Services.Pagination;
 
 internal static class PaginationConverter
 {
