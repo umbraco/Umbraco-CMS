@@ -1,4 +1,4 @@
-import { UMB_CURRENT_USER_MFA_PROVIDER_MODAL } from '../current-user-mfa-provider/current-user-mfa-provider-modal.token.js';
+import { UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL } from '../current-user-mfa-enable-provider/current-user-mfa-enable-provider-modal.token.js';
 import { UmbCurrentUserRepository } from '../../repository/index.js';
 import type { UmbCurrentUserMfaProviderModel } from '../../types.js';
 import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -100,7 +100,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 		// Open the provider modal
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		return await modalManager
-			.open(this, UMB_CURRENT_USER_MFA_PROVIDER_MODAL, {
+			.open(this, UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL, {
 				data: { providerName: item.providerName },
 			})
 			.onSubmit()

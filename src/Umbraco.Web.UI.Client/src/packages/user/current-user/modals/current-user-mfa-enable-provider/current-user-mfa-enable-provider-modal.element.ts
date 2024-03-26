@@ -1,15 +1,15 @@
 import type { UmbMfaProviderConfigurationElementProps } from '../../types.js';
 import { UmbCurrentUserRepository } from '../../repository/index.js';
-import type { UmbCurrentUserMfaProviderModalConfig } from './current-user-mfa-provider-modal.token.js';
+import type { UmbCurrentUserMfaEnableProviderModalConfig } from './current-user-mfa-enable-provider-modal.token.js';
 import type { ManifestMfaLoginProvider } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 import '../../components/mfa-provider-default.element.js';
 
-@customElement('umb-current-user-mfa-provider-modal')
-export class UmbCurrentUserMfaProviderModalElement extends UmbModalBaseElement<
-	UmbCurrentUserMfaProviderModalConfig,
+@customElement('umb-current-user-mfa-enable-provider-modal')
+export class UmbCurrentUserMfaEnableProviderModalElement extends UmbModalBaseElement<
+	UmbCurrentUserMfaEnableProviderModalConfig,
 	never
 > {
 	#currentUserRepository = new UmbCurrentUserRepository(this);
@@ -48,10 +48,10 @@ export class UmbCurrentUserMfaProviderModalElement extends UmbModalBaseElement<
 	};
 }
 
-export default UmbCurrentUserMfaProviderModalElement;
+export default UmbCurrentUserMfaEnableProviderModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-current-user-mfa-provider-modal': UmbCurrentUserMfaProviderModalElement;
+		'umb-current-user-mfa-enable-provider-modal': UmbCurrentUserMfaEnableProviderModalElement;
 	}
 }

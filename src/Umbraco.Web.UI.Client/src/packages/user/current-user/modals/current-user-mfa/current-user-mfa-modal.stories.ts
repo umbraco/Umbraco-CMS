@@ -5,8 +5,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './current-user-mfa-modal.element.js';
 
 const meta: Meta<UmbCurrentUserMfaModalElement> = {
-	id: 'umb-current-user-mfa-modal',
-	title: 'Current User/Modals/MFA Modal',
+	title: 'Current User/MFA/Configure MFA Providers',
 	component: 'umb-current-user-mfa-modal',
 	decorators: [(Story) => html`<div style="width: 500px; height: 500px;">${Story()}</div>`],
 	parameters: {

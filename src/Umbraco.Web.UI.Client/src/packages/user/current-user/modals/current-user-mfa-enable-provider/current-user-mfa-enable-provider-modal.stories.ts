@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
-import type { UmbCurrentUserMfaProviderModalElement } from './current-user-mfa-provider-modal.element.js';
+import type { UmbCurrentUserMfaEnableProviderModalElement } from './current-user-mfa-enable-provider-modal.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import './current-user-mfa-provider-modal.element.js';
+import './current-user-mfa-enable-provider-modal.element.js';
 
 class UmbServerExtensionsHostElement extends UmbLitElement {
 	constructor() {
@@ -22,10 +22,9 @@ if (window.customElements.get('umb-server-extensions-host') === undefined) {
 	customElements.define('umb-server-extensions-host', UmbServerExtensionsHostElement);
 }
 
-const meta: Meta<UmbCurrentUserMfaProviderModalElement> = {
-	id: 'umb-current-user-mfa-provider-modal',
-	title: 'Current User/Modals/MFA Provider Modal',
-	component: 'umb-current-user-mfa-provider-modal',
+const meta: Meta<UmbCurrentUserMfaEnableProviderModalElement> = {
+	title: 'Current User/MFA/Enable MFA Provider',
+	component: 'umb-current-user-mfa-enable-provider-modal',
 	decorators: [
 		(Story) =>
 			html`<umb-server-extensions-host style="width: 500px; height: 500px;">${Story()}</umb-server-extensions-host>`,
@@ -45,6 +44,6 @@ const meta: Meta<UmbCurrentUserMfaProviderModalElement> = {
 
 export default meta;
 
-type Story = StoryObj<UmbCurrentUserMfaProviderModalElement>;
+type Story = StoryObj<UmbCurrentUserMfaEnableProviderModalElement>;
 
 export const Overview: Story = {};
