@@ -225,17 +225,25 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                     throw new InstallException("Didn't retrieve updated connection string within 10 seconds, try manual configuration instead.");
                 }
 
-                Configure(_globalSettings.CurrentValue.InstallMissingDatabase || providerMeta.ForceCreateDatabase);
+                Configure(_globalSettings.CurrentValue.InstallMissingDatabase, providerMeta.ForceCreateDatabase);
             }
 
             return true;
         }
 
-        private void Configure(bool installMissingDatabase)
+        private void Configure(bool? installMissingDatabase, bool forceCreateDatabase)
         {
             _databaseFactory.Configure(_connectionStrings.CurrentValue);
 
-            if (installMissingDatabase)
+            if (installMissingDatabase == false)
+            {
+                return;
+            }
+            else if (installMissingDatabase == null && forceCreateDatabase == true)
+            {
+                CreateDatabase();
+            }
+            else if (installMissingDatabase == true)
             {
                 CreateDatabase();
             }

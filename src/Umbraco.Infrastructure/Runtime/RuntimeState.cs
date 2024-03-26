@@ -215,13 +215,27 @@ public class RuntimeState : IRuntimeState
                         _logger.LogDebug("Could not connect to database.");
                     }
 
-                    if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
+                    if (_globalSettings.Value.InstallMissingDatabase == false)
+                    {
+                        // If InstallMissingDatabase is false, prevent the database from being created
+                        // regardless of whether the database provider can force create the database.
+                        _logger.LogDebug("InstallMissingDatabase is false. Not creating new database...");
+                    }
+                    else if (_globalSettings.Value.InstallMissingDatabase == null && _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory) == true)
                     {
                         // ok to install on a configured but missing database
                         Level = RuntimeLevel.BootFailed;
                         Reason = RuntimeLevelReason.InstallMissingDatabase;
                         return;
                     }
+                    else if (_globalSettings.Value.InstallMissingDatabase == true)
+                    {
+                        // ok to install on a configured but missing database
+                        Level = RuntimeLevel.BootFailed;
+                        Reason = RuntimeLevelReason.InstallMissingDatabase;
+                        return;
+                    }
+                 
 
                     // else it is bad enough that we want to throw
                     Reason = RuntimeLevelReason.BootFailedCannotConnectToDatabase;
@@ -378,7 +392,16 @@ public class RuntimeState : IRuntimeState
         // anything other than install wants a database - see if we can connect
         // (since this is an already existing database, assume localdb is ready)
         bool canConnect;
-        var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
+        int tries;
+        switch (_globalSettings.Value.InstallMissingDatabase)
+        {
+            case false: case null:
+                tries = 5;
+                break;
+            case true:
+                tries = 2;
+                break;
+        }
         for (var i = 0; ;)
         {
             canConnect = databaseFactory.CanConnect;
