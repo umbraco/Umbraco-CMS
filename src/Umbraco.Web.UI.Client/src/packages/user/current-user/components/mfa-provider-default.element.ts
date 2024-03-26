@@ -10,7 +10,6 @@ import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 /**
  * A default MFA provider configuration element.
  * @element umb-mfa-provider-default
- * @slot description - The description of the action that is about to be taken.
  */
 @customElement('umb-mfa-provider-default')
 export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMfaProviderConfigurationElementProps {
@@ -22,12 +21,6 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 
 	@property({ attribute: false })
 	close = () => {};
-
-	@property({ attribute: 'success-message' })
-	successMessage = 'This two-factor provider is enabled';
-
-	@property({ attribute: 'success-message' })
-	successMessageKey = 'user_2faProviderIsEnabled';
 
 	@state()
 	protected _loading = true;
@@ -96,7 +89,11 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 						<div id="main">
 							<uui-box .headline=${this.localize.term('member_2fa')}>
 								<div class="text-center">
-									<slot name="description"></slot>
+									<p>
+										<umb-localize key="user_2faQrCodeDescription">
+											Scan this QR code with your authenticator app to enable two-factor authentication
+										</umb-localize>
+									</p>
 									<img
 										.src=${this._qrCodeSetupImageUrl}
 										alt=${this.localize.term('user_2faQrCodeAlt')}
@@ -175,8 +172,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		const successful = await this.callback(this.providerName, code, this._secret);
 
 		if (successful) {
-			const message = this.localize.term(this.successMessageKey) || this.successMessage;
-			this.peek(message);
+			this.peek(this.localize.term('user_2faProviderIsEnabled'));
 			this._buttonState = 'success';
 			this.close();
 		} else {
