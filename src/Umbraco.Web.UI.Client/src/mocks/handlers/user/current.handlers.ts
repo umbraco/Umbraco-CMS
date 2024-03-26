@@ -28,7 +28,7 @@ export const handlers = [
 			ctx.status(200),
 			ctx.json({
 				$type: 'TwoFactorAuthInfo',
-				qrCodeSetupImageUrl: 'https://placekitten.com/200/200',
+				qrCodeSetupImageUrl: 'https://placehold.co/200x200',
 				secret: '8b713fc7-8f17-4f5d-b2ac-b53879c75953',
 			}),
 		);
@@ -41,12 +41,21 @@ export const handlers = [
 				return res(ctx.status(400));
 			}
 
+			if (body.code === 'fail') {
+				return res(ctx.status(400));
+			}
+
 			const result = umbUserMockDb.enableMfaProvider(req.params.providerName.toString());
 			return res(ctx.status(result ? 200 : 404));
 		},
 	),
-	rest.delete<{ code: string }>(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), (req, res, ctx) => {
-		if (!req.params.providerName) {
+	rest.delete<{ code: string }>(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), async (req, res, ctx) => {
+		const body = await req.json();
+		if (!req.params.providerName || !body.code) {
+			return res(ctx.status(400));
+		}
+
+		if (body.code === 'fail') {
 			return res(ctx.status(400));
 		}
 
