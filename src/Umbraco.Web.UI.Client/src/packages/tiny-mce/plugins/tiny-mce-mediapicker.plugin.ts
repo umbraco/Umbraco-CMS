@@ -171,7 +171,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			altText: mediaData?.altText,
 			caption: mediaData?.caption,
 			url: mediaData?.url,
-			udi: mediaUnique,
+			udi: 'umb://media/' + mediaUnique?.replace(/-/g, ''),
 		};
 
 		this.#insertInEditor(media);
