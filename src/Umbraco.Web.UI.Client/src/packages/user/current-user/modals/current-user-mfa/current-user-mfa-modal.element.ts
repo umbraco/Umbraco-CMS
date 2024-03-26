@@ -6,6 +6,12 @@ import { css, customElement, html, property, repeat, state, when } from '@umbrac
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+
+type UmbMfaLoginProviderOption = UmbCurrentUserMfaProviderModel & {
+	displayName: string;
+};
 
 @customElement('umb-current-user-mfa-modal')
 export class UmbCurrentUserMfaModalElement extends UmbLitElement {
@@ -13,7 +19,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	modalContext?: UmbModalContext;
 
 	@state()
-	_items: Array<UmbCurrentUserMfaProviderModel> = [];
+	_items: Array<UmbMfaLoginProviderOption> = [];
 
 	#currentUserRepository = new UmbCurrentUserRepository(this);
 
@@ -23,12 +29,33 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	}
 
 	async #loadProviders() {
+		const serverLoginProviders$ = await this.#currentUserRepository.requestMfaLoginProviders();
+		const manifestLoginProviders$ = umbExtensionsRegistry.byType('mfaLoginProvider');
+
+		// Merge the server and manifest providers to get the final list of providers
+		const mfaLoginProviders$ = mergeObservables(
+			[serverLoginProviders$, manifestLoginProviders$],
+			([serverLoginProviders, manifestLoginProviders]) => {
+				return manifestLoginProviders.map((manifestLoginProvider) => {
+					const serverLoginProvider = serverLoginProviders.find(
+						(serverLoginProvider) => serverLoginProvider.providerName === manifestLoginProvider.forProviderName,
+					);
+					return {
+						isEnabledOnUser: serverLoginProvider?.isEnabledOnUser ?? false,
+						providerName: serverLoginProvider?.providerName ?? manifestLoginProvider.forProviderName,
+						displayName:
+							manifestLoginProvider.meta?.label ?? serverLoginProvider?.providerName ?? manifestLoginProvider.name,
+					} satisfies UmbMfaLoginProviderOption;
+				});
+			},
+		);
+
 		this.observe(
-			await this.#currentUserRepository.requestMfaLoginProviders(),
+			mfaLoginProviders$,
 			(providers) => {
 				this._items = providers;
 			},
-			'_mfaProviders',
+			'_mfaLoginProviders',
 		);
 	}
 
@@ -63,9 +90,9 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	/**
 	 * Render a provider with a toggle to enable/disable it
 	 */
-	#renderProvider(item: UmbCurrentUserMfaProviderModel) {
+	#renderProvider(item: UmbMfaLoginProviderOption) {
 		return html`
-			<uui-box headline=${item.providerName}>
+			<uui-box headline=${item.displayName}>
 				${when(
 					item.isEnabledOnUser,
 					() => html`
@@ -97,7 +124,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * This will show the QR code and/or other means of validation for the given provider and return the activation code.
 	 * The activation code is then used to either enable the provider.
 	 */
-	async #onProviderEnable(item: UmbCurrentUserMfaProviderModel) {
+	async #onProviderEnable(item: UmbMfaLoginProviderOption) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		await modalManager
 			.open(this, UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL, {
@@ -112,7 +139,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * This will show the QR code and/or other means of validation for the given provider and return the activation code.
 	 * The activation code is then used to disable the provider.
 	 */
-	async #onProviderDisable(item: UmbCurrentUserMfaProviderModel) {
+	async #onProviderDisable(item: UmbMfaLoginProviderOption) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		await modalManager
 			.open(this, UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL, {

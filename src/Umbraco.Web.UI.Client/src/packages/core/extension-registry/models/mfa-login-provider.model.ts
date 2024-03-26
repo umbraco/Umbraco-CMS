@@ -5,8 +5,9 @@ export interface ManifestMfaLoginProvider extends ManifestElement {
 
 	/**
 	 * The provider names that this provider is for.
+	 * @examples 'Umbraco.GoogleAuthenticator'
 	 */
-	forProviderNames?: Array<string>;
+	forProviderName: string;
 
 	meta?: MetaMfaLoginProvider;
 }

@@ -43,8 +43,7 @@ export class UmbCurrentUserMfaEnableProviderModalElement extends UmbModalBaseEle
 
 	#extensionSlotFilter = (manifest: ManifestMfaLoginProvider): boolean => {
 		if (!this.data) return false;
-		const providerName = this.data.providerName.toLowerCase();
-		return !manifest.forProviderNames || manifest.forProviderNames.includes(providerName);
+		return manifest.forProviderName.toLowerCase() === this.data.providerName.toLowerCase();
 	};
 }
 
