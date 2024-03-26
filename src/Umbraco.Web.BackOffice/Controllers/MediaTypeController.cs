@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Editors;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -380,6 +382,23 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
         IEnumerable<IMediaType> types;
         if (contentId == Constants.System.Root)
         {
+            IUser? currentUser = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+
+            if (currentUser == null)
+            {
+                return Enumerable.Empty<ContentTypeBasic>();
+            }
+
+            var currentUserMediaStartIds = currentUser.StartMediaIds;
+            bool hasAccessToRoot = currentUserMediaStartIds.IsNullOrEmpty() || (currentUserMediaStartIds != null && currentUserMediaStartIds.Any(id => id == Constants.System.Root));
+            bool groupsHaveAccessToRoot = currentUser.Groups.Any(g => g.StartMediaId == Constants.System.Root);
+
+            // Return root types only if the current user or their groups have the Media Root set as start
+            if (!hasAccessToRoot || !groupsHaveAccessToRoot)
+            {
+                return Enumerable.Empty<ContentTypeBasic>();
+            }
+
             types = _mediaTypeService.GetAll().ToList();
 
             //if no allowed root types are set, just return everything
