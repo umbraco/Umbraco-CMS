@@ -35,7 +35,7 @@ export class UmbCurrentUserMfaDisableProviderModalElement extends UmbModalBaseEl
 		return html`
 			<uui-form>
 				<form id="authForm" name="authForm" @submit=${this.#onSubmit} novalidate>
-					<umb-body-layout headline=${this.data.providerName}>
+					<umb-body-layout headline=${this.data.displayName}>
 						<div id="main">
 							<p>
 								<umb-localize key="user_2faDisableText">
