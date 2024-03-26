@@ -55,6 +55,6 @@ internal class LogDto
     /// </summary>
     [Column("parameters")]
     [NullSetting(NullSetting = NullSettings.Null)]
-    [Length(500)]
+    [Length(4000)]
     public string? Parameters { get; set; }
 }
