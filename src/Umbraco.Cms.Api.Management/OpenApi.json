@@ -7494,6 +7494,140 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document/{id}/referenced-by": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByIdReferencedBy",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedIReferenceResponseModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedIReferenceResponseModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedIReferenceResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document/{id}/referenced-descendants": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByIdReferencedDescendants",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document/{id}/unpublish": {
       "put": {
         "tags": [
@@ -7793,6 +7927,76 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document/are-referenced": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentAreReferenced",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
           }
         },
         "security": [
@@ -14256,6 +14460,140 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/media/{id}/referenced-by": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetMediaByIdReferencedBy",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedIReferenceResponseModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedIReferenceResponseModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedIReferenceResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media/{id}/referenced-descendants": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetMediaByIdReferencedDescendants",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/media/{id}/validate": {
       "put": {
         "tags": [
@@ -14401,6 +14739,76 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media/are-referenced": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetMediaAreReferenced",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedReferenceByIdModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
           }
         },
         "security": [
@@ -26701,234 +27109,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/tracked-reference/{id}": {
-      "get": {
-        "tags": [
-          "Tracked Reference"
-        ],
-        "operationId": "GetTrackedReferenceById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          },
-          {
-            "name": "filterMustBeIsDependency",
-            "in": "query",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItemResponseModel"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItemResponseModel"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItemResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/tracked-reference/descendants/{parentId}": {
-      "get": {
-        "tags": [
-          "Tracked Reference"
-        ],
-        "operationId": "GetTrackedReferenceDescendantsByParentId",
-        "parameters": [
-          {
-            "name": "parentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          },
-          {
-            "name": "filterMustBeIsDependency",
-            "in": "query",
-            "schema": {
-              "type": "boolean",
-              "default": true
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItemResponseModel"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItemResponseModel"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItemResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/tracked-reference/item": {
-      "get": {
-        "tags": [
-          "Tracked Reference"
-        ],
-        "operationId": "GetTrackedReferenceItem",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "schema": {
-              "uniqueItems": true,
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          },
-          {
-            "name": "filterMustBeIsDependency",
-            "in": "query",
-            "schema": {
-              "type": "boolean",
-              "default": true
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItemResponseModel"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItemResponseModel"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRelationItemResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/upgrade/authorize": {
       "post": {
         "tags": [
@@ -34697,6 +34877,31 @@
         },
         "additionalProperties": false
       },
+      "DefaultReferenceResponseModel": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DeleteUserGroupsRequestModel": {
         "required": [
           "userGroupIds"
@@ -35065,6 +35270,35 @@
                 }
               ]
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentReferenceResponseModel": {
+        "required": [
+          "documentType",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "published": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TrackedReferenceDocumentTypeModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -36731,6 +36965,31 @@
         },
         "additionalProperties": false
       },
+      "MediaReferenceResponseModel": {
+        "required": [
+          "id",
+          "mediaType"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TrackedReferenceMediaTypeModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "MediaResponseModel": {
         "required": [
           "isTrashed",
@@ -38184,6 +38443,36 @@
         },
         "additionalProperties": false
       },
+      "PagedIReferenceResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DefaultReferenceResponseModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentReferenceResponseModel"
+                },
+                {
+                  "$ref": "#/components/schemas/MediaReferenceResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedIndexResponseModel": {
         "required": [
           "items",
@@ -38633,7 +38922,7 @@
         },
         "additionalProperties": false
       },
-      "PagedRelationItemResponseModel": {
+      "PagedReferenceByIdModel": {
         "required": [
           "items",
           "total"
@@ -38649,7 +38938,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/RelationItemResponseModel"
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
                 }
               ]
             }
@@ -39403,55 +39692,6 @@
           "id": {
             "type": "string",
             "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
-      "RelationItemResponseModel": {
-        "required": [
-          "nodeId",
-          "relationTypeIsBidirectional",
-          "relationTypeIsDependency"
-        ],
-        "type": "object",
-        "properties": {
-          "nodeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "nodeName": {
-            "type": "string",
-            "nullable": true
-          },
-          "nodeType": {
-            "type": "string",
-            "nullable": true
-          },
-          "nodePublished": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "contentTypeIcon": {
-            "type": "string",
-            "nullable": true
-          },
-          "contentTypeAlias": {
-            "type": "string",
-            "nullable": true
-          },
-          "contentTypeName": {
-            "type": "string",
-            "nullable": true
-          },
-          "relationTypeName": {
-            "type": "string",
-            "nullable": true
-          },
-          "relationTypeIsBidirectional": {
-            "type": "boolean"
-          },
-          "relationTypeIsDependency": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -40476,6 +40716,42 @@
             "type": "boolean"
           }
         },
+        "additionalProperties": false
+      },
+      "TrackedReferenceContentTypeModel": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TrackedReferenceDocumentTypeModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TrackedReferenceContentTypeModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "TrackedReferenceMediaTypeModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TrackedReferenceContentTypeModel"
+          }
+        ],
         "additionalProperties": false
       },
       "TreeItemPresentationModel": {

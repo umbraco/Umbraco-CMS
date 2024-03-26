@@ -14,6 +14,7 @@ internal static class RelationTypesBuilderExtensions
             .Add<RelationTypeViewModelsMapDefinition>();
 
         builder.Services.AddTransient<IObjectTypePresentationFactory, ObjectTypePresentationFactory>();
+        builder.Services.AddTransient<IRelationTypePresentationFactory, RelationTypePresentationFactory>();
         return builder;
     }
 }
