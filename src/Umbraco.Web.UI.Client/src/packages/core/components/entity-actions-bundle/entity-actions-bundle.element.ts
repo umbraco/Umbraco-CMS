@@ -53,7 +53,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 					this._numberOfActions > 0 ? (actions[0] as ManifestEntityActionDefaultKind) : undefined;
 				if (!this._firstActionManifest) return;
 				this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
-					{ unique: this.unique, entityType: this.entityType, meta: this._firstActionManifest.meta }
+					{ unique: this.unique, entityType: this.entityType, meta: this._firstActionManifest.meta },
 				]);
 			},
 			'umbEntityActionsObserver',
