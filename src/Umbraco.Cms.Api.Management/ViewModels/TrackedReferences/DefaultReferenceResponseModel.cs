@@ -1,10 +1,12 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 
-public class MediaReferenceResponseModel : IReferenceResponseModel
+public class DefaultReferenceResponseModel : IReferenceResponseModel
 {
     public Guid Id { get; set; }
 
     public string? Name { get; set; }
 
-    public TrackedReferenceMediaType MediaType { get; set; } = new();
+    public string? Type { get; set; }
+
+    public string? Icon { get; set; }
 }

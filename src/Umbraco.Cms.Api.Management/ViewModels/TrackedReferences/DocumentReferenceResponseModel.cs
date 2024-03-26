@@ -1,18 +1,12 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 
-public class DocumentReferenceResponseModel
+public class DocumentReferenceResponseModel : IReferenceResponseModel
 {
-    public Guid NodeId { get; set; }
+    public Guid Id { get; set; }
 
-    public string? NodeName { get; set; }
+    public string? Name { get; set; }
 
-    public string? NodeType { get; set; }
+    public bool? Published { get; set; }
 
-    public bool? NodePublished { get; set; }
-
-    public string? ContentTypeIcon { get; set; }
-
-    public string? ContentTypeAlias { get; set; }
-
-    public string? ContentTypeName { get; set; }
+    public TrackedReferenceDocumentType DocumentType { get; set; } = new();
 }

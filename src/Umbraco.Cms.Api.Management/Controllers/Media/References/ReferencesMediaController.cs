@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -13,12 +13,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.References;
 public class ReferencesMediaController : MediaControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
 
-    public ReferencesMediaController(ITrackedReferencesService trackedReferencesService, IUmbracoMapper umbracoMapper)
+    public ReferencesMediaController(ITrackedReferencesService trackedReferencesService, IRelationTypePresentationFactory relationTypePresentationFactory)
     {
         _trackedReferencesService = trackedReferencesService;
-        _umbracoMapper = umbracoMapper;
+        _relationTypePresentationFactory = relationTypePresentationFactory;
     }
 
     /// <summary>
@@ -30,18 +30,18 @@ public class ReferencesMediaController : MediaControllerBase
     /// </remarks>
     [HttpGet("{id:guid}/references")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<MediaReferenceResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<MediaReferenceResponseModel>>> Get(
+    [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<IReferenceResponseModel>>> Get(
         Guid id,
         int skip = 0,
         int take = 20)
     {
         PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, false);
 
-        var pagedViewModel = new PagedViewModel<MediaReferenceResponseModel>
+        var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
         {
             Total = relationItems.Total,
-            Items = _umbracoMapper.MapEnumerable<RelationItemModel, MediaReferenceResponseModel>(relationItems.Items),
+            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
         };
 
         return await Task.FromResult(pagedViewModel);

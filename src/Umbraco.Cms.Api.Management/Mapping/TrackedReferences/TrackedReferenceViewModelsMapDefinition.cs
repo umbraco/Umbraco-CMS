@@ -11,30 +11,44 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
     {
         mapper.Define<RelationItemModel, DocumentReferenceResponseModel>((source, context) => new DocumentReferenceResponseModel(), Map);
         mapper.Define<RelationItemModel, MediaReferenceResponseModel>((source, context) => new MediaReferenceResponseModel(), Map);
+        mapper.Define<RelationItemModel, DefaultReferenceResponseModel>((source, context) => new DefaultReferenceResponseModel(), Map);
         mapper.Define<RelationItemModel, ReferenceByIdModel>((source, context) => new ReferenceByIdModel(), Map);
     }
 
     // Umbraco.Code.MapAll
     private void Map(RelationItemModel source, DocumentReferenceResponseModel target, MapperContext context)
     {
-        target.ContentTypeAlias = source.ContentTypeAlias;
-        target.ContentTypeIcon = source.ContentTypeIcon;
-        target.ContentTypeName = source.ContentTypeName;
-        target.NodeId = source.NodeKey;
-        target.NodeName = source.NodeName;
-        target.NodeType = source.NodeType;
-        target.NodePublished = source.NodePublished;
+        target.Id = source.NodeKey;
+        target.Name = source.NodeName;
+        target.Published = source.NodePublished;
+        target.DocumentType = new TrackedReferenceDocumentType
+        {
+            Alias = source.ContentTypeAlias,
+            Icon = source.ContentTypeIcon,
+            Name = source.ContentTypeName,
+        };
     }
 
+    // Umbraco.Code.MapAll
     private void Map(RelationItemModel source, MediaReferenceResponseModel target, MapperContext context)
     {
-        target.ContentTypeAlias = source.ContentTypeAlias;
-        target.ContentTypeIcon = source.ContentTypeIcon;
-        target.ContentTypeName = source.ContentTypeName;
-        target.NodeId = source.NodeKey;
-        target.NodeName = source.NodeName;
-        target.NodeType = source.NodeType;
-        target.NodePublished = source.NodePublished;
+        target.Id = source.NodeKey;
+        target.Name = source.NodeName;
+        target.MediaType = new TrackedReferenceMediaType
+        {
+            Alias = source.ContentTypeAlias,
+            Icon = source.ContentTypeIcon,
+            Name = source.ContentTypeName,
+        };
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(RelationItemModel source, DefaultReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.NodeKey;
+        target.Name = source.NodeName;
+        target.Type = source.NodeType;
+        target.Icon = source.ContentTypeIcon;
     }
 
     // Umbraco.Code.MapAll
