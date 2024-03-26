@@ -1,4 +1,4 @@
-import type { UmbMfaProviderConfigurationElementProps } from '../types.js';
+import type { UmbMfaProviderConfigurationElementProps } from '../../types.js';
 import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
