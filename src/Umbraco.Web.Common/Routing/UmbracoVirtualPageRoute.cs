@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Extensions;
 
@@ -156,7 +157,8 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
         IPublishedRequestBuilder requestBuilder = await _publishedRouter.CreateRequestAsync(cleanedUrl);
         requestBuilder.SetPublishedContent(publishedContent);
 
-        return requestBuilder.Build();
+        // Ensure the culture and domain is set correctly for the published request
+        return await _publishedRouter.RouteRequestAsync(requestBuilder, new RouteRequestOptions(Core.Routing.RouteDirection.Inbound));
     }
 
     /// <summary>
@@ -169,6 +171,14 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     public async Task SetRouteValues(HttpContext httpContext, IPublishedContent publishedContent, ControllerActionDescriptor controllerActionDescriptor)
     {
         IPublishedRequest publishedRequest = await CreatePublishedRequest(httpContext, publishedContent);
+
+        IUmbracoContextAccessor umbracoContextAccessor = httpContext.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
+
+        // Ensure the published request is set to the UmbracoContext
+        if (umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
+        {
+            umbracoContext.PublishedRequest = publishedRequest;
+        }
 
         var umbracoRouteValues = new UmbracoRouteValues(
             publishedRequest,
