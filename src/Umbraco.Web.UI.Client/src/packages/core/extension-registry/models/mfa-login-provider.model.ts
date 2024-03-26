@@ -6,11 +6,11 @@ export interface ManifestMfaLoginProvider extends ManifestElement {
 	/**
 	 * The provider names that this provider is for.
 	 */
-	forProviderNames: Array<string>;
+	forProviderNames?: Array<string>;
 
-	meta: MetaMfaLoginProvider;
+	meta?: MetaMfaLoginProvider;
 }
 
 export interface MetaMfaLoginProvider {
-	label: string;
+	label?: string;
 }
