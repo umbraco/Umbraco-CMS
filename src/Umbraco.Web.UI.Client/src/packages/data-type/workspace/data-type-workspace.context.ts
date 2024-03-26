@@ -15,12 +15,12 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
+	mergeObservables,
 	UmbArrayState,
 	UmbObjectState,
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	PropertyEditorSettingsDefaultData,
 	PropertyEditorSettingsProperty,
@@ -281,17 +281,18 @@ export class UmbDataTypeWorkspaceContext
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		await this.#getDataPromise;
 
-		return combineLatest([
-			this.#currentData.asObservablePart(
-				(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
-			),
-			this.#defaults.asObservablePart(
-				(defaults) => defaults?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
-			),
-		]).pipe(
-			map(([value, defaultValue]) => {
+		return mergeObservables(
+			[
+				this.#currentData.asObservablePart(
+					(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
+				),
+				this.#defaults.asObservablePart(
+					(defaults) => defaults?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
+				),
+			],
+			([value, defaultValue]) => {
 				return value ?? defaultValue;
-			}),
+			},
 		);
 	}
 

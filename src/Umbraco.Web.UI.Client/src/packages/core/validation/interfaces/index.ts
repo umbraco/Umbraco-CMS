@@ -1,1 +1,1 @@
-export type * from './validation-manager.interface.js';
+export type * from './validator.interface.js';
