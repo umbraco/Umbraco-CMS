@@ -77,6 +77,26 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 		return mfaLoginProviders;
 	}
 
+	enableMfaProvider(providerName: string) {
+		const provider = mfaLoginProviders.find((x) => x.providerName === providerName);
+		if (provider) {
+			provider.isEnabledOnUser = true;
+			return true;
+		}
+
+		return false;
+	}
+
+	disableMfaProvider(providerName: string) {
+		const provider = mfaLoginProviders.find((x) => x.providerName === providerName);
+		if (provider) {
+			provider.isEnabledOnUser = false;
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Disable users
 	 * @param {Array<string>} ids
