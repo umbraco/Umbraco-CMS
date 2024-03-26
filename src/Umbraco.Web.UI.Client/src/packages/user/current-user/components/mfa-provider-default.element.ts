@@ -23,6 +23,12 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	@property({ attribute: false })
 	close = () => {};
 
+	@property({ attribute: 'success-message' })
+	successMessage = 'This two-factor provider is enabled';
+
+	@property({ attribute: 'success-message' })
+	successMessageKey = 'user_2faProviderIsEnabled';
+
 	@state()
 	protected _loading = true;
 
@@ -169,7 +175,8 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		const successful = await this.callback(this.providerName, code, this._secret);
 
 		if (successful) {
-			this.peek('Two-factor authentication has successfully been enabled.');
+			const message = this.localize.term(this.successMessageKey) || this.successMessage;
+			this.peek(message);
 			this._buttonState = 'success';
 		} else {
 			this.codeField?.setCustomValidity(this.localize.term('user_2faInvalidCode'));

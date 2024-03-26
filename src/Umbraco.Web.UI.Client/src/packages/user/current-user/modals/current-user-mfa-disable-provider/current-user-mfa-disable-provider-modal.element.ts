@@ -21,7 +21,9 @@ export class UmbCurrentUserMfaDisableProviderModalElement extends UmbModalBaseEl
 			<umb-mfa-provider-default
 				.providerName=${this.data.providerName}
 				.callback=${this.#disableProvider}
-				.close=${this.modalContext?.submit()}>
+				.close=${this.modalContext?.submit()}
+				success-message="This two-factor provider is now disabled"
+				success-message-key="user_2faProviderIsDisabledMsg">
 				<p slot="description">
 					<umb-localize key="user_2faDisableText">
 						If you wish to disable this two-factor provider, then you must enter the code shown on your authentication
