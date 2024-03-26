@@ -21,3 +21,10 @@ export interface UmbCurrentUserModel {
 }
 
 export type UmbCurrentUserMfaProviderModel = UserTwoFactorProviderModel;
+
+export interface UmbMfaProviderConfigurationElementProps {
+	providerName: string;
+	isEnabled: boolean;
+	onSubmit: (value: { code: string; secret?: string }) => void;
+	onClose: () => void;
+}
