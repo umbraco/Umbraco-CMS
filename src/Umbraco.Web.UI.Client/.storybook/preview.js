@@ -13,6 +13,7 @@ import { UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext } from '../src/packag
 import { UmbDataTypeTreeStore } from '../src/packages/data-type/tree/data-type-tree.store';
 import { UmbDocumentDetailStore } from '../src/packages/documents/documents/repository/detail/document-detail.store';
 import { UmbDocumentTreeStore } from '../src/packages/documents/documents/tree/document-tree.store';
+import { UmbCurrentUserStore } from '../src/packages/user/current-user/repository/current-user.store';
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
 import { UmbIconRegistry } from '../src/packages/core/icon-registry/icon.registry';
 import { UmbLitElement } from '../src/packages/core/lit-element';
@@ -35,7 +36,8 @@ class UmbStoryBookElement extends UmbLitElement {
 		super();
 		this._umbIconRegistry.attach(this);
 		this._registerExtensions(documentManifests);
-		this.provideContext(UMB_MODAL_MANAGER_CONTEXT, new UmbModalManagerContext(this));
+		new UmbModalManagerContext(this);
+		new UmbCurrentUserStore(this);
 
 		this._registerExtensions(localizationManifests);
 		umbLocalizationRegistry.loadLanguage('en-us'); // register default language
