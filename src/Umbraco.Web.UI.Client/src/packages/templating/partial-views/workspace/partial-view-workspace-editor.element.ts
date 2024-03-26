@@ -17,9 +17,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	private _content?: string | null = '';
 
 	@state()
-	private _path?: string | null = '';
-
-	@state()
 	private _ready: boolean = false;
 
 	@state()
@@ -41,10 +38,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 
 			this.observe(this.#workspaceContext.content, (content) => {
 				this._content = content;
-			});
-
-			this.observe(this.#workspaceContext.path, (path) => {
-				this._path = path;
 			});
 
 			this.observe(this.#workspaceContext.isCodeEditorReady, (isReady) => {
@@ -104,7 +97,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 					@input=${this.#onNameInput}
 					label="Partial view name"
 					?readonly=${this._isNew === false}></uui-input>
-				<small>Views/Partials${this._path}</small>
 			</div>
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">

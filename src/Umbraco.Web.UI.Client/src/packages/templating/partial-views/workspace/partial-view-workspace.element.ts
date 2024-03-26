@@ -6,6 +6,8 @@ import type { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoff
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 import '../../components/templating-item-menu/templating-item-menu.element.js';
+import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-partial-view-workspace')
 export class UmbPartialViewWorkspaceElement extends UmbLitElement {
@@ -43,6 +45,12 @@ export class UmbPartialViewWorkspaceElement extends UmbLitElement {
 			},
 		},
 	];
+
+	constructor() {
+		super();
+		// TODO: We need to recreate when ID changed?
+		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this, this.#workspaceContext]);
+	}
 
 	#onCreate = async (parent: { entityType: string; unique: string | null }, snippetId?: string) => {
 		await this.#workspaceContext.create(parent, snippetId);

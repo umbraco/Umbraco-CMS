@@ -1,14 +1,13 @@
 // import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
-import type { UmbMemberGroupWorkspaceContext } from '../../member-group-workspace.context.js';
+import { UMB_MEMBER_GROUP_WORKSPACE_CONTEXT } from '../../member-group-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-member-type-workspace-view-member-info')
 export class UmbMemberTypeWorkspaceViewMemberInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	private _workspaceContext?: UmbMemberGroupWorkspaceContext;
+	private _workspaceContext?: typeof UMB_MEMBER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _unique = '';
@@ -16,8 +15,8 @@ export class UmbMemberTypeWorkspaceViewMemberInfoElement extends UmbLitElement i
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, async (context) => {
-			this._workspaceContext = context as UmbMemberGroupWorkspaceContext;
+		this.consumeContext(UMB_MEMBER_GROUP_WORKSPACE_CONTEXT, async (context) => {
+			this._workspaceContext = context;
 			this._unique = this._workspaceContext.getUnique() ?? '';
 		});
 	}

@@ -1,14 +1,13 @@
-import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-type-workspace-view-settings')
 export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
+	#workspaceContext?: typeof UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _variesByCulture?: boolean;
@@ -21,8 +20,8 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		super();
 
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (documentTypeContext) => {
-			this.#workspaceContext = documentTypeContext as UmbDocumentTypeWorkspaceContext;
+		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (documentTypeContext) => {
+			this.#workspaceContext = documentTypeContext;
 			this._observeDocumentType();
 		});
 	}
@@ -47,7 +46,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					<div slot="description">Allow editors to create content of different languages.</div>
 					<div slot="editor">
 						<uui-toggle
-							.checked=${this._variesByCulture}
+							?checked=${this._variesByCulture}
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setVariesByCulture((e.target as UUIToggleElement).checked);
 							}}
@@ -58,7 +57,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					<div slot="description">Allow editors to segment their content.</div>
 					<div slot="editor">
 						<uui-toggle
-							.checked=${this._variesBySegment}
+							?checked=${this._variesBySegment}
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setVariesBySegment((e.target as UUIToggleElement).checked);
 							}}
@@ -71,7 +70,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					</div>
 					<div slot="editor">
 						<uui-toggle
-							.checked=${this._isElement}
+							?checked=${this._isElement}
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setIsElement((e.target as UUIToggleElement).checked);
 							}}

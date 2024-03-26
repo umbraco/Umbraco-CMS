@@ -1,12 +1,11 @@
 import { TimeOptions } from './utils.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import './media-workspace-view-info-history.element.js';
 import './media-workspace-view-info-reference.element.js';
-import type { UmbMediaWorkspaceContext } from '@umbraco-cms/backoffice/media';
+import { UMB_MEDIA_WORKSPACE_CONTEXT, type UmbMediaWorkspaceContext } from '@umbraco-cms/backoffice/media';
 import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-media-workspace-view-info')
@@ -20,7 +19,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
 	private _mediaUnique = '';
 
-	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
+	private _workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _editMediaTypePath = '';
@@ -43,8 +42,8 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				this._editMediaTypePath = routeBuilder({});
 			});
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (nodeContext) => {
-			this._workspaceContext = nodeContext;
+		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
+			this._workspaceContext = context;
 			this._observeContent();
 		});
 	}

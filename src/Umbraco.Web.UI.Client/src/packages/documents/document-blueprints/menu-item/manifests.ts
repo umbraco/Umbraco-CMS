@@ -9,7 +9,7 @@ const menuItem: ManifestMenuItem = {
 		label: 'Document Blueprints',
 		icon: 'icon-blueprint',
 		entityType: 'document-blueprint-root',
-		menus: ['Umb.Menu.Settings'],
+		menus: ['Umb.Menu.StructureSettings'],
 	},
 };
 

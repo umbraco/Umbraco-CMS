@@ -13,20 +13,20 @@ export class UmbLocalizeDateElement extends UmbLitElement {
 	 * @attr
 	 * @example date="Sep 22 2023"
 	 */
-	@property()
-	date!: string | Date;
+	@property({ type: String })
+	date?: string | Date;
 
 	/**
 	 * Formatting options
 	 * @attr
 	 * @example options={ dateStyle: 'full', timeStyle: 'long', timeZone: 'Australia/Sydney' }
 	 */
-	@property()
+	@property({ type: Object })
 	options?: Intl.DateTimeFormatOptions;
 
 	@state()
 	protected get text(): string {
-		return this.localize.date(this.date, this.options);
+		return this.localize.date(this.date!, this.options);
 	}
 
 	protected render() {

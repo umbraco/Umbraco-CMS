@@ -4,12 +4,9 @@ import { UmbTemplateDetailRepository, UmbTemplateItemRepository } from '../repos
 import { UMB_TEMPLATE_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbTemplateWorkspaceEditorElement } from './template-workspace-editor.element.js';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import type {
-	UmbRoutableWorkspaceContext,
-	UmbSaveableWorkspaceContextInterface,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbRoutableWorkspaceContext, UmbSaveableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
@@ -21,13 +18,14 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbTemplateWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbTemplateDetailModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	extends UmbSaveableWorkspaceContextBase<UmbTemplateDetailModel>
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly detailRepository = new UmbTemplateDetailRepository(this);
 	public readonly itemRepository = new UmbTemplateItemRepository(this);
 
-	#parent?: { entityType: string; unique: string | null };
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 
 	#data = new UmbObjectState<UmbTemplateDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -36,7 +34,7 @@ export class UmbTemplateWorkspaceContext
 	name = this.#data.asObservablePart((data) => data?.name);
 	alias = this.#data.asObservablePart((data) => data?.alias);
 	content = this.#data.asObservablePart((data) => data?.content);
-	unique = this.#data.asObservablePart((data) => data?.unique);
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	masterTemplateUnique = this.#data.asObservablePart((data) => data?.masterTemplate?.unique);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
@@ -178,14 +176,14 @@ ${currentContent}`;
 
 	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		const { data } = await this.detailRepository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.setValue(data);
 
-		if (!this.#parent) return;
-		await this.setMasterTemplate(this.#parent.unique);
+		if (!parent) return;
+		await this.setMasterTemplate(parent.unique);
 	}
 
 	async save() {
@@ -194,15 +192,16 @@ ${currentContent}`;
 		let newData = undefined;
 
 		if (this.getIsNew()) {
-			if (!this.#parent) throw new Error('Parent is not set');
-			const { data } = await this.detailRepository.create(this.#data.value, this.#parent.unique);
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
+			const { data } = await this.detailRepository.create(this.#data.value, parent.unique);
 			newData = data;
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: this.#parent.entityType,
-				unique: this.#parent.unique,
+				entityType: parent.entityType,
+				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
 		} else {

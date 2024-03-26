@@ -1,8 +1,8 @@
 import { UmbRelationTypeRepository } from '../repository/relation-type.repository.js';
 import { UmbRelationTypeWorkspaceEditorElement } from './relation-type-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContextInterface,
-	UmbEditableWorkspaceContextBase,
+	type UmbSaveableWorkspaceContext,
+	UmbSaveableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
@@ -12,16 +12,18 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbRelationTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<RelationTypeResponseModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	extends UmbSaveableWorkspaceContextBase<RelationTypeResponseModel>
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly repository: UmbRelationTypeRepository = new UmbRelationTypeRepository(this);
 
-	#parent?: { entityType: string; unique: string | null };
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 
 	#data = new UmbObjectState<RelationTypeResponseModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+	readonly unique = this.#data.asObservablePart((data) => data?.id);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly id = this.#data.asObservablePart((data) => data?.id);
 
@@ -74,7 +76,7 @@ export class UmbRelationTypeWorkspaceContext
 
 	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		const { data } = await this.repository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
