@@ -1,17 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
-import type { UmbMfaProviderDefaultElement } from '../../components/mfa-provider-default.element.js';
+import type { UmbCurrentUserMfaProviderModalElement } from './current-user-mfa-provider-modal.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import '../../components/mfa-provider-default.element.js';
+import './current-user-mfa-provider-modal.element.js';
 
-const meta: Meta<UmbMfaProviderDefaultElement> = {
+const meta: Meta<UmbCurrentUserMfaProviderModalElement> = {
 	id: 'umb-current-user-mfa-provider-modal',
 	title: 'Current User/Modals/MFA Provider Modal',
-	component: 'umb-mfa-provider-default',
+	component: 'umb-current-user-mfa-provider-modal',
 	decorators: [(Story) => html`<div style="width: 500px; height: 500px;">${Story()}</div>`],
 	args: {
-		providerName: 'SMS',
-		enableProvider: async (_provider, code) => (code === 'fail' ? false : true),
+		data: {
+			providerName: 'SMS',
+		},
 	},
 	parameters: {
 		layout: 'centered',
@@ -23,6 +24,6 @@ const meta: Meta<UmbMfaProviderDefaultElement> = {
 
 export default meta;
 
-type Story = StoryObj<UmbMfaProviderDefaultElement>;
+type Story = StoryObj<UmbCurrentUserMfaProviderModalElement>;
 
 export const Overview: Story = {};
