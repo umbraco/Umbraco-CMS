@@ -3,7 +3,7 @@ import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { css, customElement, html, property, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-mfa-provider-default')
@@ -46,7 +46,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 
 	async #load() {
 		if (!this.providerName) {
-			this.peek('Provider name is required');
+			this.peek('Provider name is required', 'danger');
 			throw new Error('Provider name is required');
 		}
 		const { data } = await tryExecuteAndNotify(
@@ -55,13 +55,13 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		);
 
 		if (!data) {
-			this.peek('No data returned');
+			this.peek('No data returned', 'danger');
 			throw new Error('No data returned');
 		}
 
 		// Verify that there is a secret
 		if (!data.secret) {
-			this.peek('The provider did not return a secret.');
+			this.peek('The provider did not return a secret.', 'danger');
 			throw new Error('No secret returned');
 		}
 
@@ -131,8 +131,8 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	 * Show a peek notification with a message.
 	 * @param message The message to show.
 	 */
-	protected peek(message: string) {
-		this.notificationContext?.peek('danger', {
+	protected peek(message: string, color?: UmbNotificationColor) {
+		this.notificationContext?.peek(color ?? 'positive', {
 			data: {
 				headline: this.localize.term('member_2fa'),
 				message,
@@ -150,7 +150,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		const formData = new FormData(e.target as HTMLFormElement);
 		const code = formData.get('code') as string;
 		const successful = await this.enableProvider(this.providerName, code, this._secret);
-		debugger;
+
 		if (successful) {
 			this.peek('Two-factor authentication has successfully been enabled.');
 		} else {
