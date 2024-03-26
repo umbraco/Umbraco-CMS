@@ -98,14 +98,13 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * The activation code is then used to either enable the provider.
 	 */
 	async #onProviderEnable(item: UmbCurrentUserMfaProviderModel) {
-		// Open the provider modal
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		return await modalManager
 			.open(this, UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL, {
 				data: { providerName: item.providerName },
 			})
 			.onSubmit()
-			.catch(() => ({}));
+			.catch(() => undefined);
 	}
 
 	/**
@@ -114,14 +113,13 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * The activation code is then used to disable the provider.
 	 */
 	async #onProviderDisable(item: UmbCurrentUserMfaProviderModel) {
-		// Open the provider modal
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		return await modalManager
 			.open(this, UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL, {
 				data: { providerName: item.providerName },
 			})
 			.onSubmit()
-			.catch(() => ({}));
+			.catch(() => undefined);
 	}
 
 	static styles = [
