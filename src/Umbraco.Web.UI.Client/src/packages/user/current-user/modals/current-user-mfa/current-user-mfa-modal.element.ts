@@ -85,12 +85,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 		// If already enabled, disable it
 		if (item.isEnabledOnUser) {
 			// Disable provider
-			const result = await this.#currentUserRepository.disableMfaProvider(item.providerName, code);
-			if (result) {
-				item.isEnabledOnUser = false;
-				this.#currentUserRepository;
-			}
-			return result;
+			return this.#currentUserRepository.disableMfaProvider(item.providerName, code);
 		}
 
 		// Enable provider
@@ -99,11 +94,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 			return;
 		}
 
-		const result = await this.#currentUserRepository.enableMfaProvider(item.providerName, code, secret);
-		if (result) {
-			item.isEnabledOnUser = true;
-		}
-		return result;
+		return this.#currentUserRepository.enableMfaProvider(item.providerName, code, secret);
 	}
 
 	/**
