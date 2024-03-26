@@ -27,7 +27,10 @@ public class ItemDocumentBlueprintController : DocumentBlueprintItemControllerBa
     [ProducesResponseType(typeof(IEnumerable<DocumentBlueprintItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
-        IEnumerable<IDocumentEntitySlim> documents = _entityService.GetAll(UmbracoObjectTypes.Document, ids.ToArray()).Select(x => x as IDocumentEntitySlim).WhereNotNull();
+        IEnumerable<IDocumentEntitySlim> documents = _entityService
+            .GetAll(UmbracoObjectTypes.DocumentBlueprint, ids.ToArray())
+            .Select(x => x as IDocumentEntitySlim)
+            .WhereNotNull();
         IEnumerable<DocumentBlueprintItemResponseModel> responseModels = documents.Select(x => _documentPresentationFactory.CreateBlueprintItemResponseModel(x));
         return await Task.FromResult(Ok(responseModels));
     }

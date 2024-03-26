@@ -76,13 +76,16 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 
     public DocumentBlueprintItemResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity)
     {
-        var responseModel = new DocumentBlueprintItemResponseModel()
+        var responseModel = new DocumentBlueprintItemResponseModel
         {
             Id = entity.Key,
+            Name = entity.Name ?? string.Empty,
         };
 
-        IContentType? contentType = _contentTypeService.Get(entity.ContentTypeAlias);
-        responseModel.Name = contentType?.Name ?? entity.Name ?? string.Empty;
+        //responseModel.DocumentType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
+
+        //IContentType? contentType = _contentTypeService.Get(entity.ContentTypeAlias);
+        //responseModel.Name = contentType?.Name ?? entity.Name ?? string.Empty;
         return responseModel;
     }
 
