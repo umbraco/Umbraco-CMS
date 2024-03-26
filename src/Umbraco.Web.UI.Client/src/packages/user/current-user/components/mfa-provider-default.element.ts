@@ -98,9 +98,11 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 										</umb-localize>
 									</p>
 									<img
+										id="qrCode"
 										.src=${this._qrCodeSetupImageUrl}
 										alt=${this.localize.term('user_2faQrCodeAlt')}
-										title=${this.localize.term('user_2faQrCodeTitle')} />
+										title=${this.localize.term('user_2faQrCodeTitle')}
+										loading="eager" />
 								</div>
 								<uui-form-layout-item class="text-center">
 									<uui-label for="code" slot="label" required>
@@ -190,6 +192,11 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		css`
 			#authForm {
 				height: 100%;
+			}
+
+			#qrCode {
+				width: 100%;
+				aspect-ratio: 1;
 			}
 
 			#code {
