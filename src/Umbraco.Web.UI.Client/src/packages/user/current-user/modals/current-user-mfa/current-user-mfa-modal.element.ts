@@ -1,5 +1,6 @@
 import { UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL } from '../current-user-mfa-enable-provider/current-user-mfa-enable-provider-modal.token.js';
 import { UmbCurrentUserRepository } from '../../repository/index.js';
+import { UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL } from '../current-user-mfa-disable-provider/current-user-mfa-disable-provider-modal.token.js';
 import type { UmbCurrentUserMfaProviderModel } from '../../types.js';
 import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -94,7 +95,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	/**
 	 * Open the provider modal.
 	 * This will show the QR code and/or other means of validation for the given provider and return the activation code.
-	 * The activation code is then used to either enable or disable the provider.
+	 * The activation code is then used to either enable the provider.
 	 */
 	async #onProviderEnable(item: UmbCurrentUserMfaProviderModel) {
 		// Open the provider modal
@@ -107,8 +108,20 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 			.catch(() => ({}));
 	}
 
+	/**
+	 * Open the provider modal.
+	 * This will show the QR code and/or other means of validation for the given provider and return the activation code.
+	 * The activation code is then used to disable the provider.
+	 */
 	async #onProviderDisable(item: UmbCurrentUserMfaProviderModel) {
-		alert('TODO: Disable provider: ' + item.providerName);
+		// Open the provider modal
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		return await modalManager
+			.open(this, UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL, {
+				data: { providerName: item.providerName },
+			})
+			.onSubmit()
+			.catch(() => ({}));
 	}
 
 	static styles = [
