@@ -99,7 +99,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 */
 	async #onProviderEnable(item: UmbCurrentUserMfaProviderModel) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		return await modalManager
+		await modalManager
 			.open(this, UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL, {
 				data: { providerName: item.providerName },
 			})
@@ -114,7 +114,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 */
 	async #onProviderDisable(item: UmbCurrentUserMfaProviderModel) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		return await modalManager
+		await modalManager
 			.open(this, UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL, {
 				data: { providerName: item.providerName },
 			})
@@ -125,10 +125,6 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
-			:host {
-				display: block;
-			}
-
 			uui-box {
 				margin-bottom: var(--uui-size-space-3);
 			}
