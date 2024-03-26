@@ -1,4 +1,4 @@
-import type { UmbMfaProviderConfigurationElementProps } from '../../types.js';
+import type { UmbMfaProviderConfigurationElementProps } from '../types.js';
 import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -21,21 +21,21 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	onClose = () => {};
 
 	@state()
-	_loading = true;
+	protected _loading = true;
 
 	@state()
-	_secret = '';
+	protected _secret = '';
 
 	@state()
-	_qrCodeSetupImageUrl = '';
+	protected _qrCodeSetupImageUrl = '';
 
-	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+	protected notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
-			this.#notificationContext = context;
+			this.notificationContext = context;
 		});
 	}
 
@@ -46,7 +46,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 
 	async #load() {
 		if (!this.providerName) {
-			this.#peek('Provider name is required');
+			this.peek('Provider name is required');
 			throw new Error('Provider name is required');
 		}
 		const { data } = await tryExecuteAndNotify(
@@ -55,13 +55,13 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		);
 
 		if (!data) {
-			this.#peek('No data returned');
+			this.peek('No data returned');
 			throw new Error('No data returned');
 		}
 
 		// Verify that there is a secret
 		if (!data.secret) {
-			this.#peek('The provider did not return a secret.');
+			this.peek('The provider did not return a secret.');
 			throw new Error('No secret returned');
 		}
 
@@ -75,7 +75,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		}
 
 		return html`
-			<form id="authForm" name="authForm" @submit=${this.#onSubmit}>
+			<form id="authForm" name="authForm" @submit=${this.submit}>
 				<umb-body-layout headline=${this.providerName}>
 					<div id="main"></div>
 					<div slot="actions">
@@ -95,8 +95,12 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		`;
 	}
 
-	#peek(message: string) {
-		this.#notificationContext?.peek('danger', {
+	/**
+	 * Show a peek notification with a message.
+	 * @param message The message to show.
+	 */
+	protected peek(message: string) {
+		this.notificationContext?.peek('danger', {
 			data: {
 				headline: this.localize.term('member_2fa'),
 				message,
@@ -104,7 +108,11 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		});
 	}
 
-	#onSubmit(e: SubmitEvent) {
+	/**
+	 * Submit the form with the code and secret back to the opener.
+	 * @param e The submit event
+	 */
+	protected submit(e: SubmitEvent) {
 		e.preventDefault();
 		this.onSubmit({ code: '123456', secret: '123' });
 	}

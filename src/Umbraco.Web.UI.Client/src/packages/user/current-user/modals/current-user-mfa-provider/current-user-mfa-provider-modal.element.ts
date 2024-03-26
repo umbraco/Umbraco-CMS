@@ -7,7 +7,7 @@ import type { ManifestMfaLoginProvider } from '@umbraco-cms/backoffice/extension
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-import './mfa-provider-default.element.js';
+import '../../components/mfa-provider-default.element.js';
 
 @customElement('umb-current-user-mfa-provider-modal')
 export class UmbCurrentUserMfaProviderModalElement extends UmbModalBaseElement<
