@@ -24,8 +24,13 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	}
 
 	async #loadProviders() {
-		const providers = await this.#currentUserRepository.requestMfaLoginProviders();
-		this._items = providers;
+		this.observe(
+			await this.#currentUserRepository.requestMfaLoginProviders(),
+			(providers) => {
+				this._items = providers;
+			},
+			'_mfaProviders',
+		);
 	}
 
 	#close() {

@@ -11,9 +11,10 @@ export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 	readonly data = this.#data.asObservable();
 
 	#mfaProviders = new UmbArrayState<UmbCurrentUserMfaProviderModel>([], (e) => e.providerName);
+	readonly mfaProviders = this.#mfaProviders.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_CURRENT_USER_STORE_CONTEXT.toString());
+		super(host, UMB_CURRENT_USER_STORE_CONTEXT);
 
 		this.consumeContext(UMB_USER_DETAIL_STORE_CONTEXT, (instance) => {
 			this.observe(instance?.all(), (users) => this.#onUserDetailStoreUpdate(users));
@@ -75,10 +76,6 @@ export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 
 		this.update(mappedCurrentUser);
 	};
-
-	getMfaProviders() {
-		return this.#mfaProviders.getValue();
-	}
 
 	setMfaProviders(data: Array<UmbCurrentUserMfaProviderModel>) {
 		this.#mfaProviders.setValue(data);

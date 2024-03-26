@@ -5,6 +5,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { firstValueFrom, type Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * A repository for the current user
@@ -16,6 +17,8 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	#currentUserSource: UmbCurrentUserServerDataSource;
 	#currentUserStore?: typeof UMB_CURRENT_USER_STORE_CONTEXT.TYPE;
 	#init: Promise<unknown>;
+
+	#mfaProviders$?: Observable<Array<UmbCurrentUserMfaProviderModel>>;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -49,21 +52,16 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	 * Request the current user's available MFA login providers
 	 * @memberof UmbCurrentUserRepository
 	 */
-	async requestMfaLoginProviders(): Promise<Array<UmbCurrentUserMfaProviderModel>> {
+	async requestMfaLoginProviders(): Promise<Observable<Array<UmbCurrentUserMfaProviderModel>>> {
 		await this.#init;
-		const existingValue = this.#currentUserStore?.getMfaProviders();
-		if (existingValue?.length) {
-			return existingValue;
-		}
 
-		const { data } = await this.#currentUserSource.getMfaLoginProviders();
+		return (this.#mfaProviders$ ??= await this.#currentUserSource.getMfaLoginProviders().then(({ data }) => {
+			if (data) {
+				this.#currentUserStore?.setMfaProviders(data);
+			}
 
-		if (data) {
-			this.#currentUserStore?.setMfaProviders(data);
-			return data;
-		}
-
-		return [];
+			return this.#currentUserStore!.mfaProviders;
+		}));
 	}
 
 	/**
@@ -71,7 +69,8 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	 * @memberof UmbCurrentUserRepository
 	 */
 	async hasMfaLoginProviders(): Promise<boolean> {
-		const data = await this.requestMfaLoginProviders();
+		const providers$ = await this.requestMfaLoginProviders();
+		const data = firstValueFrom(providers$);
 		return !!data;
 	}
 
