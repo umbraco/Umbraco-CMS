@@ -27,25 +27,51 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
 
     protected IDictionaryItemService DictionaryItemService { get; }
 
-    protected async Task<IEnumerable<NamedEntityTreeItemResponseModel>> MapTreeItemViewModels(Guid? parentKey, IEnumerable<IDictionaryItem> dictionaryItems)
+    protected async Task<IEnumerable<NamedEntityTreeItemResponseModel>> MapTreeItemViewModels(IEnumerable<IDictionaryItem> dictionaryItems)
+        => await Task.WhenAll(dictionaryItems.Select(CreateEntityTreeItemViewModelAsync));
+
+    protected override async Task<ActionResult<IEnumerable<NamedEntityTreeItemResponseModel>>> GetAncestors(Guid descendantKey, bool includeSelf = true)
     {
-        async Task<NamedEntityTreeItemResponseModel> CreateEntityTreeItemViewModelAsync(IDictionaryItem dictionaryItem)
+        IDictionaryItem? dictionaryItem = await DictionaryItemService.GetAsync(descendantKey);
+        if (dictionaryItem is null)
         {
-            var hasChildren = await DictionaryItemService.CountChildrenAsync(dictionaryItem.Key) > 0;
-            return new NamedEntityTreeItemResponseModel
-            {
-                Name = dictionaryItem.ItemKey,
-                Id = dictionaryItem.Key,
-                HasChildren = hasChildren,
-                Parent = parentKey.HasValue
-                    ? new ReferenceByIdModel
-                    {
-                        Id = parentKey.Value
-                    }
-                    : null
-            };
+            // this looks weird - but we actually mimic how the rest of the ancestor (and children) endpoints actually work
+            return Ok(Enumerable.Empty<NamedEntityTreeItemResponseModel>());
         }
 
-        return await Task.WhenAll(dictionaryItems.Select(CreateEntityTreeItemViewModelAsync));
+        var ancestors = new List<IDictionaryItem>();
+        if (includeSelf)
+        {
+            ancestors.Add(dictionaryItem);
+        }
+
+        while (dictionaryItem?.ParentId is not null)
+        {
+            dictionaryItem = await DictionaryItemService.GetAsync(dictionaryItem.ParentId.Value);
+            if (dictionaryItem is not null)
+            {
+                ancestors.Add(dictionaryItem);
+            }
+        }
+
+        NamedEntityTreeItemResponseModel[] viewModels = await Task.WhenAll(ancestors.Select(CreateEntityTreeItemViewModelAsync));
+        return Ok(viewModels.Reverse());
+    }
+
+    private async Task<NamedEntityTreeItemResponseModel> CreateEntityTreeItemViewModelAsync(IDictionaryItem dictionaryItem)
+    {
+        var hasChildren = await DictionaryItemService.CountChildrenAsync(dictionaryItem.Key) > 0;
+        return new NamedEntityTreeItemResponseModel
+        {
+            Name = dictionaryItem.ItemKey,
+            Id = dictionaryItem.Key,
+            HasChildren = hasChildren,
+            Parent = dictionaryItem.ParentId.HasValue
+                ? new ReferenceByIdModel
+                {
+                    Id = dictionaryItem.ParentId.Value
+                }
+                : null
+        };
     }
 }

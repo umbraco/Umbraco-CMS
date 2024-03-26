@@ -73,6 +73,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                         .WithTitle("Duplicate property type alias")
                         .WithDetail("One or more property type aliases are already in use, all property type aliases must be unique.")
                         .Build()),
+                ContentTypeOperationStatus.NotAllowed => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Operation not permitted")
+                    .WithDetail("The attempted operation was not permitted, likely due to a permission/configuration mismatch with the operation.")
+                    .Build()),
                 _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
             });
 

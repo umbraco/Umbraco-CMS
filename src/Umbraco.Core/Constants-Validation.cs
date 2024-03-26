@@ -8,11 +8,11 @@ public static partial class Constants
         {
             public static class Properties
             {
-                public const string Missing = "#validation.property.missing";
+                public const string Missing = "#validation.invalidNull";
 
-                public const string Empty = "#validation.property.empty";
+                public const string Empty = "#validation.invalidEmpty";
 
-                public const string PatternMismatch = "#validation.property.pattern";
+                public const string PatternMismatch = "#validation.invalidPattern";
             }
         }
     }
