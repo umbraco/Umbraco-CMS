@@ -6,3 +6,4 @@ export * from './enable/index.js';
 export * from './item/index.js';
 export * from './unlock/index.js';
 export * from './user.repository.js';
+export * from './new-password/index.js';

@@ -27,11 +27,11 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 
 	/**
 	 * Creates a new Member scaffold
-	 * @param {(string | null)} parentUnique
+	 * @param {Partial<UmbMemberDetailModel>} [preset]
 	 * @return { CreateMemberRequestModel }
 	 * @memberof UmbMemberServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null, preset: Partial<UmbMemberDetailModel> = {}) {
+	async createScaffold(preset: Partial<UmbMemberDetailModel> = {}) {
 		const data: UmbMemberDetailModel = {
 			entityType: UMB_MEMBER_ENTITY_TYPE,
 			unique: UmbId.new(),
@@ -49,7 +49,15 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			lastPasswordChangeDate: null,
 			groups: [],
 			values: [],
-			variants: [],
+			variants: [
+				{
+					name: '',
+					culture: null,
+					segment: null,
+					createDate: new Date().toISOString(),
+					updateDate: new Date().toISOString(),
+				},
+			],
 			...preset,
 		};
 
@@ -124,7 +132,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			id: model.unique,
 			email: model.email,
 			username: model.username,
-			password: '', // TODO: figure out what to get password from
+			password: model.newPassword || '',
 			memberType: { id: model.memberType.unique },
 			groups: model.groups,
 			isApproved: model.isApproved,

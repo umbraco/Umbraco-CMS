@@ -1,6 +1,8 @@
+import type { UmbDocumentVariantPublishModel } from '../../types.js';
 import type {
 	CultureAndScheduleRequestModel,
 	PublishDocumentRequestModel,
+	PublishDocumentWithDescendantsRequestModel,
 	UnpublishDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
@@ -31,17 +33,16 @@ export class UmbDocumentPublishingServerDataSource {
 	 * @param {string} unique
 	 * @param {Array<UmbVariantId>} variantIds
 	 * @return {*}
-	 * @memberof UmbDocumentServerDataSource
+	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
-	async publish(unique: string, variantIds: Array<UmbVariantId>) {
+	async publish(unique: string, variants: Array<UmbDocumentVariantPublishModel>) {
 		if (!unique) throw new Error('Id is missing');
 
-		const publishSchedules: CultureAndScheduleRequestModel[] = variantIds.map<CultureAndScheduleRequestModel>(
+		const publishSchedules: CultureAndScheduleRequestModel[] = variants.map<CultureAndScheduleRequestModel>(
 			(variant) => {
 				return {
-					culture: variant.isCultureInvariant() ? null : variant.toCultureString(),
-					// TODO: NO, this does not belong as part of the UmbVariantID, we need another way to parse that around:
-					//schedule: variant.schedule,
+					culture: variant.variantId.isCultureInvariant() ? null : variant.variantId.toCultureString(),
+					schedule: variant.schedule,
 				};
 			},
 		);
@@ -59,16 +60,50 @@ export class UmbDocumentPublishingServerDataSource {
 	 * @param {string} unique
 	 * @param {Array<UmbVariantId>} variantIds
 	 * @return {*}
-	 * @memberof UmbDocumentServerDataSource
+	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async unpublish(unique: string, variantIds: Array<UmbVariantId>) {
 		if (!unique) throw new Error('Id is missing');
 
 		// TODO: THIS DOES NOT TAKE SEGMENTS INTO ACCOUNT!!!!!!
+
+		// If variants are culture invariant, we need to pass null to the API
+		const hasInvariant = variantIds.some((variant) => variant.isCultureInvariant());
+
+		if (hasInvariant) {
+			const requestBody: UnpublishDocumentRequestModel = {
+				cultures: null,
+			};
+
+			return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdUnpublish({ id: unique, requestBody }));
+		}
+
 		const requestBody: UnpublishDocumentRequestModel = {
-			culture: variantIds.map((variant) => (variant.isCultureInvariant() ? null : variant.toCultureString()))[0],
+			cultures: variantIds.map((variant) => variant.toCultureString()),
 		};
 
 		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdUnpublish({ id: unique, requestBody }));
+	}
+
+	/**
+	 * Publish variants of a document and all its descendants
+	 * @memberof UmbDocumentPublishingServerDataSource
+	 */
+	async publishWithDescendants(
+		unique: string,
+		variantIds: Array<UmbVariantId>,
+		includeUnpublishedDescendants: boolean,
+	) {
+		if (!unique) throw new Error('Id is missing');
+
+		const requestBody: PublishDocumentWithDescendantsRequestModel = {
+			cultures: variantIds.map((variant) => variant.toCultureString()),
+			includeUnpublishedDescendants,
+		};
+
+		return tryExecuteAndNotify(
+			this.#host,
+			DocumentResource.putDocumentByIdPublishWithDescendants({ id: unique, requestBody }),
+		);
 	}
 }

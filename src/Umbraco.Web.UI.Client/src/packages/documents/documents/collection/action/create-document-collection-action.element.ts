@@ -111,7 +111,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		const label = this.manifest?.meta.label ?? this.localize.term('general_create');
 
 		return html`
-			<uui-button popovertarget="collection-action-menu-popover" label=${label}>
+			<uui-button popovertarget="collection-action-menu-popover" label=${label} color="default" look="outline">
 				${label}
 				<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
 			</uui-button>
@@ -125,7 +125,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 							this._allowedDocumentTypes,
 							(item) => html`
 								<uui-menu-item label=${item.name} href=${this.#getCreateUrl(item)}>
-									<uui-icon slot="icon" name=${item.icon ?? 'icon-document'}></uui-icon>
+									<umb-icon slot="icon" name=${item.icon ?? 'icon-document'}></umb-icon>
 								</uui-menu-item>
 							`,
 						)}

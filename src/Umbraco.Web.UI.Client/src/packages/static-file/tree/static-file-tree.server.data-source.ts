@@ -1,6 +1,11 @@
 import { UMB_STATIC_FILE_ENTITY_TYPE, UMB_STATIC_FILE_FOLDER_ENTITY_TYPE } from '../entity.js';
 import type { UmbStaticFileTreeItemModel } from './types.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import {
 	StaticFileResource,
@@ -27,19 +32,21 @@ export class UmbStaticFileTreeServerDataSource extends UmbTreeServerDataSourceBa
 		super(host, {
 			getRootItems,
 			getChildrenOf,
+			getAncestorsOf,
 			mapper,
 		});
 	}
 }
 
-// eslint-disable-next-line local-rules/no-direct-api-import
-const getRootItems = () => StaticFileResource.getTreeStaticFileRoot({});
+const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	StaticFileResource.getTreeStaticFileRoot({ skip: args.skip, take: args.take });
 
-const getChildrenOf = (parentUnique: string | null) => {
-	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
+const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
+	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parentUnique);
 
 	if (parentPath === null) {
-		return getRootItems();
+		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return StaticFileResource.getTreeStaticFileChildren({
@@ -47,6 +54,12 @@ const getChildrenOf = (parentUnique: string | null) => {
 		});
 	}
 };
+
+const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	StaticFileResource.getTreeStaticFileAncestors({
+		descendantPath: args.descendantUnique,
+	});
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbStaticFileTreeItemModel => {
 	const serializer = new UmbServerFilePathUniqueSerializer();

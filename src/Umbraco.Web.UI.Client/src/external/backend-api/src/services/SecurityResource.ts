@@ -28,21 +28,23 @@ export class SecurityResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postSecurityForgotPassword({
         requestBody,
     }: {
         requestBody?: ResetPasswordRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/security/forgot-password',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -85,7 +87,6 @@ export class SecurityResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });

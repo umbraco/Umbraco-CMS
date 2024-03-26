@@ -1,3 +1,4 @@
+import { UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -9,7 +10,7 @@ export const createManifest: ManifestCollectionAction = {
 	weight: 200,
 	meta: {
 		label: 'Create',
-		href: 'section/dictionary/workspace/dictionary/create/null',
+		href: `section/dictionary/workspace/dictionary/create/parent/${UMB_DICTIONARY_ROOT_ENTITY_TYPE}/null`,
 	},
 	conditions: [
 		{

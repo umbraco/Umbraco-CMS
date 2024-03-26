@@ -1,7 +1,7 @@
 import type { UmbContextToken } from '../context-api/index.js';
 import type { UmbControllerHost } from '../controller-api/index.js';
 import type { UmbContext } from './context.interface.js';
-import { UmbBaseController } from './controller-base.class.js';
+import { UmbControllerBase } from './controller-base.class.js';
 
 /**
  * This base provides the necessary for a class to become a context-api controller.
@@ -11,7 +11,7 @@ export abstract class UmbContextBase<
 		ContextType,
 		GivenContextToken extends UmbContextToken<ContextType, ContextType> = UmbContextToken<ContextType, ContextType>,
 	>
-	extends UmbBaseController
+	extends UmbControllerBase
 	implements UmbContext
 {
 	constructor(host: UmbControllerHost, contextToken: GivenContextToken | string) {

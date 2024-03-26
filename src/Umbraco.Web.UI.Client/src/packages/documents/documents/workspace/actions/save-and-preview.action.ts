@@ -1,18 +1,13 @@
-import type { UmbDocumentWorkspaceContext } from '../document-workspace.context.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../document-workspace.context-token.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceActionBase<UmbDocumentWorkspaceContext> {
-	constructor(host: UmbControllerHostElement) {
-		super(host);
-	}
-
+export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceActionBase {
 	async execute() {
-		if (!this.workspaceContext) return;
-		// TODO: it doesn't get the updated value
-		const document = this.workspaceContext.getData();
+		const workspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT);
+		//const document = workspaceContext.getData();
 		// TODO: handle errors
-		if (!document) return;
+		//if (!document) return;
 		//this.workspaceContext.repository?.saveAndPreview();
+		//Remember to return a promise.
 	}
 }

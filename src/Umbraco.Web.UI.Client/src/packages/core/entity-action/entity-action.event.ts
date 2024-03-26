@@ -1,7 +1,7 @@
 import { UmbControllerEvent } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbEntityActionEventArgs {
-	unique: string;
+	unique: string | null;
 	entityType: string;
 }
 
@@ -17,7 +17,7 @@ export class UmbEntityActionEvent extends UmbControllerEvent {
 		return this.#args.entityType;
 	}
 
-	getUnique(): string {
+	getUnique(): string | null {
 		return this.#args.unique;
 	}
 }

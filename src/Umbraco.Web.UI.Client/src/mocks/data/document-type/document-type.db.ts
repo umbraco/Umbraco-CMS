@@ -89,7 +89,7 @@ const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): 
 		isElement: request.isElement,
 		allowedDocumentTypes: request.allowedDocumentTypes,
 		compositions: request.compositions,
-		parent: request.folder,
+		parent: request.parent,
 		isFolder: false,
 		hasChildren: false,
 		allowedTemplates: [],
@@ -122,9 +122,7 @@ const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeR
 	};
 };
 
-const documentTypeTreeItemMapper = (
-	item: UmbMockDocumentTypeModel,
-): Omit<DocumentTypeTreeItemResponseModel, 'type'> => {
+const documentTypeTreeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTypeTreeItemResponseModel => {
 	return {
 		name: item.name,
 		hasChildren: item.hasChildren,

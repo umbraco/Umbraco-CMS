@@ -8,7 +8,7 @@ import type {
 	PagedSavedLogSearchResponseModel,
 	SavedLogSearchResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface LogSearchDataSource {
 	getAllSavedSearches({
@@ -17,10 +17,10 @@ export interface LogSearchDataSource {
 	}: {
 		skip?: number;
 		take?: number;
-	}): Promise<DataSourceResponse<PagedSavedLogSearchResponseModel>>;
-	getSavedSearchByName({ name }: { name: string }): Promise<DataSourceResponse<SavedLogSearchResponseModel>>;
-	deleteSavedSearchByName({ name }: { name: string }): Promise<DataSourceResponse<unknown>>;
-	postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel): Promise<DataSourceResponse<unknown>>;
+	}): Promise<UmbDataSourceResponse<PagedSavedLogSearchResponseModel>>;
+	getSavedSearchByName({ name }: { name: string }): Promise<UmbDataSourceResponse<SavedLogSearchResponseModel>>;
+	deleteSavedSearchByName({ name }: { name: string }): Promise<UmbDataSourceResponse<unknown>>;
+	postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel): Promise<UmbDataSourceResponse<unknown>>;
 }
 
 export interface LogMessagesDataSource {
@@ -30,14 +30,14 @@ export interface LogMessagesDataSource {
 	}: {
 		skip?: number;
 		take?: number;
-	}): Promise<DataSourceResponse<PagedLoggerResponseModel>>;
+	}): Promise<UmbDataSourceResponse<PagedLoggerResponseModel>>;
 	getLogViewerLevelCount({
 		startDate,
 		endDate,
 	}: {
 		startDate?: string;
 		endDate?: string;
-	}): Promise<DataSourceResponse<LogLevelCountsReponseModel>>;
+	}): Promise<UmbDataSourceResponse<LogLevelCountsReponseModel>>;
 	getLogViewerLogs({
 		skip,
 		take,
@@ -54,7 +54,7 @@ export interface LogMessagesDataSource {
 		logLevel?: Array<LogLevelModel>;
 		startDate?: string;
 		endDate?: string;
-	}): Promise<DataSourceResponse<PagedLogMessageResponseModel>>;
+	}): Promise<UmbDataSourceResponse<PagedLogMessageResponseModel>>;
 	getLogViewerMessageTemplate({
 		skip,
 		take,
@@ -65,5 +65,5 @@ export interface LogMessagesDataSource {
 		take?: number;
 		startDate?: string;
 		endDate?: string;
-	}): Promise<DataSourceResponse<PagedLogTemplateResponseModel>>;
+	}): Promise<UmbDataSourceResponse<PagedLogTemplateResponseModel>>;
 }

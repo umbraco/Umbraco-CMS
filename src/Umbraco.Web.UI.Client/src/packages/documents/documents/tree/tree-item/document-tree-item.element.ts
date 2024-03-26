@@ -1,49 +1,73 @@
-import type { UmbDocumentTreeItemModel } from '../types.js';
-import { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
-import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbDocumentTreeItemModel, UmbDocumentTreeItemVariantModel } from '../types.js';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbTreeItemElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-document-tree-item')
-export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTreeItemElement {
-	private _item?: UmbDocumentTreeItemModel;
-	@property({ type: Object, attribute: false })
-	public get item() {
-		return this._item;
-	}
-	public set item(value: UmbDocumentTreeItemModel | undefined) {
-		this._item = value;
-		this.#context.setTreeItem(value);
+export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocumentTreeItemModel> {
+	#appLanguageContext?: UmbAppLanguageContext;
+
+	@state()
+	_currentCulture?: string;
+
+	@state()
+	_defaultCulture?: string;
+
+	@state()
+	_variant?: UmbDocumentTreeItemVariantModel;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
+			this.#appLanguageContext = instance;
+			this.#observeAppCulture();
+			this.#observeDefaultCulture();
+		});
 	}
 
-	#context = new UmbDocumentTreeItemContext(this);
+	#observeAppCulture() {
+		this.observe(this.#appLanguageContext!.appLanguageCulture, (value) => {
+			this._currentCulture = value;
+			this._variant = this.#getVariant(value);
+		});
+	}
 
-	render() {
-		if (!this.item) return nothing;
-		return html`
-			<umb-tree-item-base> ${this.#renderIconWithStatusSymbol()} ${this.#renderLabel()} </umb-tree-item-base>
-		`;
+	#observeDefaultCulture() {
+		this.observe(this.#appLanguageContext!.appDefaultLanguage, (value) => {
+			this._defaultCulture = value?.unique;
+		});
+	}
+
+	#getVariant(culture: string | undefined) {
+		return this.item?.variants.find((x) => x.culture === culture);
+	}
+
+	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
+	#getLabel() {
+		const fallbackName = this.#getVariant(this._defaultCulture)?.name ?? this._item?.variants[0].name ?? 'Unknown';
+		return this._variant?.name ?? `(${fallbackName})`;
 	}
 
 	// TODO: implement correct status symbol
-	#renderIconWithStatusSymbol() {
+	renderIconContainer() {
 		return html`
 			<span id="icon-container" slot="icon">
 				${this.item?.documentType.icon
 					? html`
-							<uui-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></uui-icon>
+							<umb-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></umb-icon>
 							<span id="status-symbol"></span>
-					  `
+						`
 					: nothing}
 			</span>
 		`;
 	}
 
 	// TODO: lower opacity if item is not published
-	// TODO: get correct variant name
-	#renderLabel() {
-		return html` <span id="label" slot="label">${this.item?.variants[0].name}</span> `;
+	renderLabel() {
+		return html`<span id="label" slot="label">${this.#getLabel()}</span> `;
 	}
 
 	static styles = [

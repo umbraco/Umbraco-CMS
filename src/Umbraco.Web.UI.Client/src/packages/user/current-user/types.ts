@@ -14,6 +14,7 @@ export interface UmbCurrentUserModel {
 	avatarUrls: Array<string>;
 	languages: Array<string>;
 	hasAccessToAllLanguages: boolean;
+	allowedSections: Array<string>;
 	fallbackPermissions: Array<string>;
 	permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 }

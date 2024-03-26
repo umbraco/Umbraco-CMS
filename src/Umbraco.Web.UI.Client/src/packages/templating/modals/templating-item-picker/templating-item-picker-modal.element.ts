@@ -8,11 +8,8 @@ import type {
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_DICTIONARY_ITEM_PICKER_MODAL,
-	UmbModalBaseElement,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UMB_DICTIONARY_PICKER_MODAL } from '@umbraco-cms/backoffice/dictionary';
 
 @customElement('umb-templating-item-picker-modal')
 export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
@@ -23,58 +20,63 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	private _itemModalContext?: UmbModalManagerContext;
+	#modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._itemModalContext = instance;
+			this.#modalContext = instance;
 		});
 	}
 
 	async #openTemplatingPageFieldModal() {
-		const pageFieldBuilderContext = this._itemModalContext?.open(UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
-		await pageFieldBuilderContext?.onSubmit();
+		const pageFieldBuilderContext = this.#modalContext?.open(this, UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
+		const result = await pageFieldBuilderContext?.onSubmit().catch(() => undefined);
 
-		const output = pageFieldBuilderContext?.getValue().output;
+		if (result === undefined) return;
 
-		if (output) {
-			this.value = { value: output, type: CodeSnippetType.pageField };
-			this.modalContext?.submit();
-		}
+		const value = pageFieldBuilderContext?.getValue().output;
+
+		if (!value) return;
+
+		this.value = { value, type: CodeSnippetType.pageField };
+		this.modalContext?.submit();
 	}
 
 	async #openPartialViewPickerModal() {
-		const partialViewPickerContext = this._itemModalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
-		await partialViewPickerContext?.onSubmit();
+		const partialViewPickerContext = this.#modalContext?.open(this, UMB_PARTIAL_VIEW_PICKER_MODAL);
+		const result = await partialViewPickerContext?.onSubmit().catch(() => undefined);
 
-		const path = partialViewPickerContext?.getValue().selection[0];
+		if (result === undefined) return;
 
-		if (path) {
-			const regex = /^%2F|%25dot%25cshtml$/g;
-			const prettyPath = path.replace(regex, '').replace(/%2F/g, '/');
-			this.value = {
-				value: prettyPath,
-				type: CodeSnippetType.partialView,
-			};
-			this.modalContext?.submit();
-		}
+		const value = partialViewPickerContext?.getValue().selection[0];
+
+		if (!value) return;
+
+		const regex = /^%2F|%25dot%25cshtml$/g;
+		const prettyPath = value.replace(regex, '').replace(/%2F/g, '/');
+		this.value = {
+			value: prettyPath,
+			type: CodeSnippetType.partialView,
+		};
+		this.modalContext?.submit();
 	}
 
 	async #openDictionaryItemPickerModal() {
-		const dictionaryItemPickerModal = this._itemModalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
+		const dictionaryItemPickerModal = this.#modalContext?.open(this, UMB_DICTIONARY_PICKER_MODAL, {
 			data: {
 				pickableFilter: (item) => item.unique !== null,
 			},
 		});
-		await dictionaryItemPickerModal?.onSubmit();
+		const result = await dictionaryItemPickerModal?.onSubmit().catch(() => undefined);
+		if (result === undefined) return;
 
 		const dictionaryItem = dictionaryItemPickerModal?.getValue().selection[0];
 
-		if (dictionaryItem) {
-			this.value = { value: dictionaryItem, type: CodeSnippetType.dictionaryItem };
-			this.modalContext?.submit();
-		}
+		if (!dictionaryItem) return;
+
+		this.value = { value: dictionaryItem, type: CodeSnippetType.dictionaryItem };
+		this.modalContext?.submit();
 	}
 
 	render() {

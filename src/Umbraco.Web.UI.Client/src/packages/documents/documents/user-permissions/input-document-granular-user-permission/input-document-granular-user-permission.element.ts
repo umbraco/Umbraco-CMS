@@ -1,13 +1,10 @@
 import type { UmbDocumentUserPermissionModel } from '../types.js';
 import { UmbDocumentItemRepository, type UmbDocumentItemModel } from '../../repository/index.js';
+import { UMB_DOCUMENT_PICKER_MODAL } from '../../modals/index.js';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_DOCUMENT_PICKER_MODAL,
-	UMB_ENTITY_USER_PERMISSION_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_ENTITY_USER_PERMISSION_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
@@ -70,7 +67,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends FormControlMi
 	}
 
 	#addGranularPermission() {
-		this.#documentPickerModalContext = this.#modalManagerContext?.open(UMB_DOCUMENT_PICKER_MODAL, {
+		this.#documentPickerModalContext = this.#modalManagerContext?.open(this, UMB_DOCUMENT_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				// prevent already selected items to be picked again
@@ -115,7 +112,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends FormControlMi
 		const name = item.variants[0]?.name;
 		const headline = name ? `Permissions for ${name}` : 'Permissions';
 
-		this.#entityUserPermissionModalContext = this.#modalManagerContext?.open(UMB_ENTITY_USER_PERMISSION_MODAL, {
+		this.#entityUserPermissionModalContext = this.#modalManagerContext?.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
 			data: {
 				unique: item.unique,
 				entityType: item.entityType,

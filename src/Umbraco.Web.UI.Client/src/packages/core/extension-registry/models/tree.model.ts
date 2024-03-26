@@ -1,6 +1,6 @@
-import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestTree extends ManifestBase {
+export interface ManifestTree extends ManifestElementAndApi {
 	type: 'tree';
 	meta: MetaTree;
 }

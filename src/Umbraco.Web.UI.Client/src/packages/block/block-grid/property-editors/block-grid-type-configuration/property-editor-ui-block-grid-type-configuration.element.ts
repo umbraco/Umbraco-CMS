@@ -35,6 +35,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+	#moveData?: Array<UmbBlockTypeWithGroupKey>;
 	#sorter = new UmbSorterController<MappedGroupWithBlockTypes, HTMLElement>(this, {
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-group-key'),
 		getUniqueOfModel: (modelEntry) => modelEntry.key!,
@@ -45,6 +46,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			this._groupsWithBlockTypes = model;
 		},
 		onEnd: () => {
+			// TODO: make one method for updating the blockGroupsDataSetValue:
 			this.#datasetContext?.setPropertyValue(
 				'blockGroups',
 				this._groupsWithBlockTypes.map((group) => ({ key: group.key, name: group.name })),
@@ -127,11 +129,38 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		this.#sorter.setModel(this._groupsWithBlockTypes);
 	}
 
-	#onChange(e: CustomEvent, groupKey?: string) {
+	#onDelete(e: CustomEvent, groupKey?: string) {
 		const updatedValues = (e.target as UmbInputBlockTypeElement).value.map((value) => ({ ...value, groupKey }));
 		const filteredValues = this.value.filter((value) => value.groupKey !== groupKey);
 		this.value = [...filteredValues, ...updatedValues];
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
+	async #onChange(e: CustomEvent) {
+		e.stopPropagation();
+		const element = e.target as UmbInputBlockTypeElement;
+		const value = element.value;
+
+		if (!e.detail?.moveComplete) {
+			// Container change, store data of the new group...
+			const newGroupKey = element.getAttribute('data-umb-group-key');
+			const movedItem = e.detail?.item as UmbBlockTypeWithGroupKey;
+			// Check if item moved back to original group...
+			movedItem.groupKey === newGroupKey
+				? (this.#moveData = undefined)
+				: (this.#moveData = value.map((block) => ({ ...block, groupKey: newGroupKey })));
+		} else if (e.detail?.moveComplete) {
+			// Move complete, get the blocks that were in an untouched group
+			const blocks = this.value
+				.filter((block) => !value.find((value) => value.contentElementTypeKey === block.contentElementTypeKey))
+				.filter(
+					(block) => !this.#moveData?.find((value) => value.contentElementTypeKey === block.contentElementTypeKey),
+				);
+
+			this.value = this.#moveData ? [...blocks, ...value, ...this.#moveData] : [...blocks, ...value];
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+			this.#moveData = undefined;
+		}
 	}
 
 	#onCreate(e: CustomEvent, groupKey?: string) {
@@ -143,6 +172,8 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	// TODO: Implement confirm dialog
 	#deleteGroup(groupKey: string) {
+		// TODO: make one method for updating the blockGroupsDataSetValue:
+		// This one that deletes might require the ability to parse what to send as an argument to the method, then a filtering can occur before.
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
 			this._blockGroups.filter((group) => group.key !== groupKey),
@@ -154,6 +185,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#changeGroupName(e: UUIInputEvent, groupKey: string) {
 		const groupName = e.target.value as string;
+		// TODO: make one method for updating the blockGroupsDataSetValue:
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
 			this._blockGroups.map((group) => (group.key === groupKey ? { ...group, name: groupName } : group)),
@@ -166,8 +198,9 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 				? html`<umb-input-block-type
 						.value=${this._notGroupedBlockTypes}
 						.workspacePath=${this._workspacePath}
+						@change=${this.#onChange}
 						@create=${(e: CustomEvent) => this.#onCreate(e, undefined)}
-						@change=${(e: CustomEvent) => this.#onChange(e, undefined)}></umb-input-block-type>`
+						@delete=${(e: CustomEvent) => this.#onDelete(e, undefined)}></umb-input-block-type>`
 				: ''}
 			${repeat(
 				this._groupsWithBlockTypes,
@@ -176,10 +209,12 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 					html`<div class="group" data-umb-group-key=${ifDefined(group.key)}>
 						${group.key ? this.#renderGroupInput(group.key, group.name) : nothing}
 						<umb-input-block-type
+							data-umb-group-key=${group.key}
 							.value=${group.blocks}
 							.workspacePath=${this._workspacePath}
+							@change=${this.#onChange}
 							@create=${(e: CustomEvent) => this.#onCreate(e, group.key)}
-							@change=${(e: CustomEvent) => this.#onChange(e, group.key)}></umb-input-block-type>
+							@delete=${(e: CustomEvent) => this.#onDelete(e, group.key)}></umb-input-block-type>
 					</div>`,
 			)}
 		</div>`;

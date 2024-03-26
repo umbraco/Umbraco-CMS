@@ -3,12 +3,19 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateDictionaryItemRequestModel } from '../models/CreateDictionaryItemRequestModel';
+import type { DataTypeTreeItemResponseModel } from '../models/DataTypeTreeItemResponseModel';
 import type { DictionaryItemItemResponseModel } from '../models/DictionaryItemItemResponseModel';
 import type { DictionaryItemResponseModel } from '../models/DictionaryItemResponseModel';
+import type { DocumentBlueprintTreeItemResponseModel } from '../models/DocumentBlueprintTreeItemResponseModel';
+import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
+import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
 import type { ImportDictionaryRequestModel } from '../models/ImportDictionaryRequestModel';
+import type { MediaTypeTreeItemResponseModel } from '../models/MediaTypeTreeItemResponseModel';
 import type { MoveDictionaryRequestModel } from '../models/MoveDictionaryRequestModel';
+import type { NamedEntityTreeItemResponseModel } from '../models/NamedEntityTreeItemResponseModel';
 import type { PagedDictionaryOverviewResponseModel } from '../models/PagedDictionaryOverviewResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
+import type { RelationTypeTreeItemResponseModel } from '../models/RelationTypeTreeItemResponseModel';
 import type { UpdateDictionaryItemRequestModel } from '../models/UpdateDictionaryItemRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -22,9 +29,11 @@ export class DictionaryResource {
      * @throws ApiError
      */
     public static getDictionary({
+        filter,
         skip,
         take = 100,
     }: {
+        filter?: string,
         skip?: number,
         take?: number,
     }): CancelablePromise<PagedDictionaryOverviewResponseModel> {
@@ -32,6 +41,7 @@ export class DictionaryResource {
             method: 'GET',
             url: '/umbraco/management/api/v1/dictionary',
             query: {
+                'filter': filter,
                 'skip': skip,
                 'take': take,
             },
@@ -89,20 +99,21 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteDictionaryById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/dictionary/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -112,7 +123,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDictionaryById({
@@ -121,7 +132,7 @@ export class DictionaryResource {
     }: {
         id: string,
         requestBody?: UpdateDictionaryItemRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/dictionary/{id}',
@@ -130,6 +141,7 @@ export class DictionaryResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -167,7 +179,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDictionaryByIdMove({
@@ -176,7 +188,7 @@ export class DictionaryResource {
     }: {
         id: string,
         requestBody?: MoveDictionaryRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/dictionary/{id}/move',
@@ -185,6 +197,7 @@ export class DictionaryResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -230,6 +243,27 @@ export class DictionaryResource {
             url: '/umbraco/management/api/v1/item/dictionary',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreeDictionaryAncestors({
+        descendantId,
+    }: {
+        descendantId?: string,
+    }): CancelablePromise<Array<(NamedEntityTreeItemResponseModel | DataTypeTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel | MediaTypeTreeItemResponseModel | RelationTypeTreeItemResponseModel)>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/dictionary/ancestors',
+            query: {
+                'descendantId': descendantId,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,

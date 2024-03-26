@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 	name: 'Multi Node Tree Picker',
 	alias: 'Umbraco.MultiNodeTreePicker',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MultiNodeTreePicker',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
 		settings: {
 			properties: [
 				{
@@ -25,6 +25,12 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Ignore user start nodes',
 					description: 'Selecting this option allows a user to choose nodes that they normally dont have access to.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+				},
+				{
+					alias: 'startNode',
+					label: 'Node type',
+					description: '',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.SourcePicker',
 				},
 			],
 			defaultData: [

@@ -3,7 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateTemplateRequestModel } from '../models/CreateTemplateRequestModel';
+import type { DataTypeTreeItemResponseModel } from '../models/DataTypeTreeItemResponseModel';
+import type { DocumentBlueprintTreeItemResponseModel } from '../models/DocumentBlueprintTreeItemResponseModel';
+import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
+import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
+import type { MediaTypeTreeItemResponseModel } from '../models/MediaTypeTreeItemResponseModel';
+import type { NamedEntityTreeItemResponseModel } from '../models/NamedEntityTreeItemResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
+import type { RelationTypeTreeItemResponseModel } from '../models/RelationTypeTreeItemResponseModel';
 import type { TemplateConfigurationResponseModel } from '../models/TemplateConfigurationResponseModel';
 import type { TemplateItemResponseModel } from '../models/TemplateItemResponseModel';
 import type { TemplateQueryExecuteModel } from '../models/TemplateQueryExecuteModel';
@@ -85,20 +92,21 @@ export class TemplateResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteTemplateById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/template/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -108,7 +116,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putTemplateById({
@@ -117,7 +125,7 @@ export class TemplateResource {
     }: {
         id: string,
         requestBody?: UpdateTemplateRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/template/{id}',
@@ -126,6 +134,7 @@ export class TemplateResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -176,6 +185,27 @@ export class TemplateResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/template/query/settings',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreeTemplateAncestors({
+        descendantId,
+    }: {
+        descendantId?: string,
+    }): CancelablePromise<Array<(NamedEntityTreeItemResponseModel | DataTypeTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel | MediaTypeTreeItemResponseModel | RelationTypeTreeItemResponseModel)>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/template/ancestors',
+            query: {
+                'descendantId': descendantId,
+            },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
             },

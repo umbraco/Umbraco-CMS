@@ -7,7 +7,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	element: () => import('./property-editor-ui-collection-view-order-by.element.js'),
 	meta: {
 		label: 'Collection View Order By',
-		propertyEditorSchemaAlias: '',
 		icon: 'icon-autofill',
 		group: 'lists',
 	},

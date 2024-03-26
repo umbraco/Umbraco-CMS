@@ -15,5 +15,6 @@ export const UMB_STYLESHEET_PICKER_MODAL = new UmbModalToken<
 	},
 	data: {
 		treeAlias: 'Umb.Tree.Stylesheet',
+		hideTreeRoot: true,
 	},
 });

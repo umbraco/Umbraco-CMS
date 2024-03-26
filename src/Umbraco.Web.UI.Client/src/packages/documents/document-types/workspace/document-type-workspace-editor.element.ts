@@ -3,7 +3,6 @@ import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 @customElement('umb-document-type-workspace-editor')
@@ -20,13 +19,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _icon?: string;
 
-	@state()
-	private _iconColorAlias?: string;
-	// TODO: Color should be using an alias, and look up in some dictionary/key/value) of project-colors.
-
 	#workspaceContext?: typeof UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT.TYPE;
-
-	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
@@ -34,10 +27,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeDocumentType();
-		});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
 		});
 	}
 
@@ -98,16 +87,21 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private async _handleIconClick() {
-		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
+		const [alias, color] = this._icon?.replace('color-', '')?.split(' ') ?? [];
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_ICON_PICKER_MODAL, {
 			value: {
-				icon: this._icon,
-				color: this._iconColorAlias,
+				icon: alias,
+				color: color,
 			},
 		});
 
 		modalContext?.onSubmit().then((saved) => {
-			if (saved.icon) this.#workspaceContext?.setIcon(saved.icon);
-			// TODO: save color ALIAS as well
+			if (saved.icon && saved.color) {
+				this.#workspaceContext?.setIcon(`${saved.icon} color-${saved.color}`);
+			} else if (saved.icon) {
+				this.#workspaceContext?.setIcon(saved.icon);
+			}
 		});
 	}
 
@@ -116,7 +110,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			<umb-workspace-editor alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
 					<uui-button id="icon" @click=${this._handleIconClick} label="icon" compact>
-						<uui-icon name="${ifDefined(this._icon)}" style="color: ${this._iconColorAlias}"></uui-icon>
+						<umb-icon name=${ifDefined(this._icon)}></umb-icon>
 					</uui-button>
 
 					<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}" label="name">
@@ -135,20 +129,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 							</div>
 						</uui-input>
 					</uui-input>
-				</div>
-
-				<div slot="footer-info">
-					<!-- TODO: Shortcuts Modal? -->
-					<uui-button label="Show keyboard shortcuts">
-						Keyboard Shortcuts
-						<uui-keyboard-shortcut>
-							<uui-key>ALT</uui-key>
-							+
-							<uui-key>shift</uui-key>
-							+
-							<uui-key>k</uui-key>
-						</uui-keyboard-shortcut>
-					</uui-button>
 				</div>
 			</umb-workspace-editor>
 		`;

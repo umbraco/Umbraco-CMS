@@ -81,11 +81,11 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			(options) => {
 				this._variants = options.map<UmbDocumentVariantOption>((option) => {
 					const name = option.variant?.name ?? option.language.name;
-					const segment = option.variant?.segment ?? null;
+					const segment = option.segment;
 					return {
 						// Notice the option object has a unique property, but it's not used here. (Its equivalent to a UmbVariantId string) [NL]
-						culture: option.language.unique,
-						segment: segment,
+						culture: option.culture,
+						segment: segment ?? null,
 						title: name + (segment ? ` — ${segment}` : ''),
 						displayName: name + (segment ? ` — ${segment}` : ''),
 						state: option.variant?.state ?? DocumentVariantStateModel.NOT_CREATED,
@@ -99,7 +99,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	async #observeActiveVariants() {
 		if (!this.#splitViewContext) return;
 
-		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
+		const workspaceContext = this.#splitViewContext.getWorkspaceContext() as UmbDocumentWorkspaceContext;
 		if (workspaceContext) {
 			this.observe(
 				workspaceContext.splitView.activeVariantsInfo,
@@ -143,7 +143,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				const languageName = option?.language.name;
 				this._variantDisplayName = (languageName ? languageName : '') + (segment ? ` — ${segment}` : '');
 				this._variantTitleName =
-					(languageName ? `${languageName} (${culture})` : '') + (segment ? ` — ${segment}` : '');
+					(languageName ? `${languageName} ${culture ? `(${culture})` : ''}` : '') + (segment ? ` — ${segment}` : '');
 			},
 			'_currentLanguage',
 		);
@@ -201,12 +201,18 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-input id="name-input" .value=${this._name ?? ''} @input="${this.#handleInput}">
+			<uui-input
+				id="name-input"
+				label="Document name (TODO: Localize)"
+				.value=${this._name ?? ''}
+				@input=${this.#handleInput}
+			>
 				${
 					this._variants?.length
 						? html`
 								<uui-button
 									id="variant-selector-toggle"
+									compact
 									slot="append"
 									popovertarget="variant-selector-popover"
 									title=${this._variantTitleName}>
@@ -218,9 +224,9 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 											<uui-button slot="append" compact id="variant-close" @click=${this.#closeSplitView}>
 												<uui-icon name="remove"></uui-icon>
 											</uui-button>
-									  `
+										`
 									: ''}
-						  `
+							`
 						: nothing
 				}
 			</uui-input>
@@ -246,8 +252,8 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 																? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
 																: nothing}
 															<div>
-																${variant.title}
-																<i>(${variant.culture})</i> ${variant.segment}
+																${variant.title} ${variant.culture ? html` <i>(${variant.culture})</i>` : ''}
+																${variant.segment}
 																<div class="variant-selector-state">${variant.state}</div>
 															</div>
 														</button>
@@ -259,7 +265,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 																		@click=${() => this.#openSplitView(variant)}>
 																		Split view
 																	</uui-button>
-															  `}
+																`}
 													</li>
 												`,
 											)}
@@ -267,7 +273,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 									</uui-scroll-container>
 								</div>
 							</uui-popover-container>
-					  `
+						`
 					: nothing
 			}
 		</div>
@@ -279,7 +285,6 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		css`
 			#name-input {
 				width: 100%;
-				height: 100%; /** I really don't know why this fixes the border colliding with variant-selector-toggle, but lets this solution for now */
 			}
 
 			#variant-selector-toggle {

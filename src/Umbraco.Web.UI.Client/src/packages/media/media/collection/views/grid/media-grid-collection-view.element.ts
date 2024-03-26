@@ -40,7 +40,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 
 	#onOpen(item: UmbMediaCollectionItemModel) {
 		//TODO: Fix when we have dynamic routing
-		history.pushState(null, '', 'section/media-management/workspace/media/edit/' + item.unique);
+		history.pushState(null, '', 'section/media/workspace/media/edit/' + item.unique);
 	}
 
 	#onSelect(item: UmbMediaCollectionItemModel) {

@@ -8,12 +8,10 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { EditorEvent, Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -57,8 +55,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	#renderEditor?: typeof import('@umbraco-cms/backoffice/external/tinymce').renderEditor;
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 	#editorRef?: Editor | null = null;
-	#stylesheetRepository: UmbStylesheetDetailRepository;
-	#serverUrl?: string;
+	#stylesheetRepository = new UmbStylesheetDetailRepository(this);
 	#umbStylesheetRuleManager = new UmbStylesheetRuleManager();
 
 	protected getFormElement() {
@@ -81,19 +78,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	@query('#editor', true)
 	private _editorElement?: HTMLElement;
 
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this.#serverUrl = instance.getServerUrl();
-		});
-
-		this.#stylesheetRepository = new UmbStylesheetDetailRepository(this);
-	}
-
-	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
-		super.firstUpdated(_changedProperties);
-
+	protected async firstUpdated(): Promise<void> {
 		// Here we want to start the loading of everything at first, not one at a time, which is why this code is not using await.
 		const loadEditor = import('@umbraco-cms/backoffice/external/tinymce').then((tinyMce) => {
 			this.#renderEditor = tinyMce.renderEditor;
@@ -153,7 +138,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		const stylesheetResponses = await Promise.all(promises);
 
 		stylesheetResponses.forEach(({ data }) => {
-			if (!data) return;
+			if (!data?.content) return;
+
 			const rulesFromContent = this.#umbStylesheetRuleManager.extractRules(data.content);
 
 			rulesFromContent.forEach((rule) => {
@@ -202,17 +188,15 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 		// Map the stylesheets with server url
 		const stylesheets =
-			stylesheetPaths?.map(
-				(stylesheetPath: string) => `${this.#serverUrl}/css/${stylesheetPath.replace(/\\/g, '/')}`,
-			) ?? [];
+			stylesheetPaths?.map((stylesheetPath: string) => `/css${stylesheetPath.replace(/\\/g, '/')}`) ?? [];
 
 		stylesheets.push('/umbraco/backoffice/css/rte-content.css');
 
 		// create an object by merging the configuration onto the fallback config
 		const configurationOptions: RawEditorOptions = {
 			...defaultFallbackConfig,
-			height: dimensions?.height,
-			width: dimensions?.width,
+			height: dimensions?.height || undefined,
+			width: dimensions?.width || undefined,
 			content_css: stylesheets,
 			style_formats: styleFormats,
 		};
@@ -224,10 +208,12 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			}
 		}
 
-		// set the configured toolbar if any
+		// set the configured toolbar if any, otherwise false
 		const toolbar = this.configuration?.getValueByAlias<string[]>('toolbar');
-		if (toolbar) {
-			configurationOptions.toolbar = toolbar.join(' ');
+		if (toolbar && toolbar.length) {
+			configurationOptions.toolbar = toolbar?.join(' ');
+		} else {
+			configurationOptions.toolbar = false;
 		}
 
 		// set the configured inline mode
@@ -238,7 +224,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 		// set the maximum image size
 		const maxImageSize = this.configuration?.getValueByAlias<number>('maxImageSize');
-		if (maxImageSize !== undefined) {
+		if (maxImageSize) {
 			configurationOptions.maxImageSize = maxImageSize;
 		}
 
@@ -349,7 +335,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				}
 			});
 		});
-
 		editor.on('init', () => editor.setContent(this.value?.toString() ?? ''));
 	}
 

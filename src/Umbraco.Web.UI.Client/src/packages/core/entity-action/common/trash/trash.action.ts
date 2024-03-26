@@ -1,11 +1,16 @@
-import { UmbEntityActionBase } from '../../entity-action.js';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbEntityActionBase } from '../../entity-action-base.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+//import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
-export class UmbTrashEntityAction<
-	T extends UmbItemRepository<any> & { trash(unique: string): Promise<void> },
-> extends UmbEntityActionBase<T> {
+export class UmbTrashEntityAction extends UmbEntityActionBase<any> {
+	constructor(host: UmbControllerHost, args: any) {
+		super(host, args);
+	}
+
 	async execute() {
+		console.log(`execute trash for: ${this.args.unique}`);
+		/*
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository) return;
 
 		const { data } = await this.repository.requestItems([this.unique]);
@@ -22,5 +27,8 @@ export class UmbTrashEntityAction<
 
 			this.repository?.trash(this.unique);
 		}
+		*/
 	}
 }
+
+export default UmbTrashEntityAction;

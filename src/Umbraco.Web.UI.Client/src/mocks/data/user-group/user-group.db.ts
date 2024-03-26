@@ -38,6 +38,16 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 		const uniqueArray = Array.from(new Set(permissions.map((e) => JSON.stringify(e)))).map((e) => JSON.parse(e));
 		return uniqueArray;
 	}
+
+	getAllowedSections(userGroupIds: string[]): string[] {
+		const sections = this.data
+			.filter((userGroup) => userGroupIds.includes(userGroup.id))
+			.map((userGroup) => (userGroup.sections?.length ? userGroup.sections : []))
+			.flat();
+
+		// Remove duplicates
+		return Array.from(new Set(sections));
+	}
 }
 
 const itemMapper = (item: UmbMockUserGroupModel): UserGroupItemResponseModel => {

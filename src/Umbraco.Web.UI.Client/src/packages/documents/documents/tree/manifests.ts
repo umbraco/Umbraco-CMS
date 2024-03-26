@@ -1,5 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
+import { UmbDocumentTreeItemContext } from './tree-item/document-tree-item.context.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -27,6 +28,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_DOCUMENT_TREE_ALIAS,
 	name: 'Document Tree',
 	meta: {
@@ -38,10 +40,9 @@ const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
 	alias: 'Umb.TreeItem.Document',
 	name: 'Document Tree Item',
-	js: () => import('./tree-item/document-tree-item.element.js'),
-	meta: {
-		entityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
-	},
+	element: () => import('./tree-item/document-tree-item.element.js'),
+	api: UmbDocumentTreeItemContext,
+	forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem, ...reloadTreeItemChildrenManifests];
+export const manifests = [...reloadTreeItemChildrenManifests, tree, treeItem, treeRepository, treeStore];

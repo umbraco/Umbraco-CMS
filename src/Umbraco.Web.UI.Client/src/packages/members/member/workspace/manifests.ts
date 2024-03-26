@@ -1,22 +1,28 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type { ManifestWorkspace, ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	ManifestWorkspaces,
+	ManifestWorkspaceActions,
+	ManifestWorkspaceView,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_MEMBER_WORKSPACE_ALIAS = 'Umb.Workspace.Member';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: UMB_MEMBER_WORKSPACE_ALIAS,
 	name: 'Member Workspace',
-	js: () => import('./member-workspace.element.js'),
+	api: () => import('./member-workspace.context.js'),
 	meta: {
 		entityType: UMB_MEMBER_ENTITY_TYPE,
 	},
 };
 
-const workspaceActions: Array<ManifestWorkspaceAction> = [
+const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
+		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Member.Save',
 		name: 'Save Member Workspace Action',
 		api: UmbSaveWorkspaceAction,
@@ -34,4 +40,43 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceActions];
+export const workspaceViews: Array<ManifestWorkspaceView> = [
+	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Member.Content',
+		name: 'Member Workspace Content View',
+		js: () => import('./views/content/member-workspace-view-content.element.js'),
+		weight: 100,
+		meta: {
+			label: 'Content',
+			pathname: 'content',
+			icon: 'icon-document',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: UMB_MEMBER_WORKSPACE_ALIAS,
+			},
+		],
+	},
+	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Member.Member',
+		name: 'Member Workspace Member View',
+		js: () => import('./views/member/member-workspace-view-member.element.js'),
+		weight: 200,
+		meta: {
+			label: 'Member',
+			pathname: 'member',
+			icon: 'icon-user',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: UMB_MEMBER_WORKSPACE_ALIAS,
+			},
+		],
+	},
+];
+
+export const manifests = [workspace, ...workspaceActions, ...workspaceViews];

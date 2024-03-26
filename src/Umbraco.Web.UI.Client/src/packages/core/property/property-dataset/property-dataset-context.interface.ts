@@ -1,6 +1,7 @@
 import type { UmbVariantId } from '../../variant/variant-id.class.js';
 import type { UmbContext } from '@umbraco-cms/backoffice/class-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/models';
 
 /**
  * A property dataset context, represents the data of a set of properties.
@@ -18,7 +19,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
  */
 export interface UmbPropertyDatasetContext extends UmbContext {
 	getEntityType(): string;
-	getUnique(): string | undefined;
+	getUnique(): UmbEntityUnique | undefined;
 	getVariantId: () => UmbVariantId;
 
 	getName(): string | undefined;
@@ -29,6 +30,9 @@ export interface UmbPropertyDatasetContext extends UmbContext {
 
 	// Property methods:
 	propertyVariantId?: (propertyAlias: string) => Promise<Observable<UmbVariantId | undefined>>;
-	propertyValueByAlias<ReturnType = unknown>(propertyAlias: string): Promise<Observable<ReturnType | undefined>>;
+	propertyValueByAlias<ReturnType = unknown>(
+		propertyAlias: string,
+	): Promise<Observable<ReturnType | undefined> | undefined>;
+	// TODO: Append the andCulture method as well..
 	setPropertyValue(propertyAlias: string, value: unknown): void;
 }

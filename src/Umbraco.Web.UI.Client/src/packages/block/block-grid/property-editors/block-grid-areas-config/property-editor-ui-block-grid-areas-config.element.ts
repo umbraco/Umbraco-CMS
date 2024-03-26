@@ -24,19 +24,17 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	#defaultAreaGridColumns: number = 12;
 	#valueOfAreaGridColumns?: number | null;
 
-	#workspaceModal: UmbModalRouteRegistrationController;
-
 	@property({ type: Array })
-	public get value(): Array<UmbBlockGridTypeAreaType> {
-		return this._value;
-	}
 	public set value(value: Array<UmbBlockGridTypeAreaType>) {
 		this._value = value ?? [];
 	}
+	public get value(): Array<UmbBlockGridTypeAreaType> {
+		return this._value;
+	}
+
 	@state()
 	private _value: Array<UmbBlockGridTypeAreaType> = [];
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const defaultAreaGridColumns = config?.getValueByAlias('defaultAreaGridColumns');
 		if (typeof defaultAreaGridColumns === 'number' && defaultAreaGridColumns > 0) {
@@ -59,7 +57,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	constructor() {
 		super();
 
-		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL)
 			.addAdditionalPath('block-grid-area-type')
 			.onSetup(() => {
 				return { data: { entityType: 'block-grid-area-type', preset: {} }, modal: { size: 'large' } };

@@ -21,10 +21,9 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		this.#host = host;
 	}
 
-	async createScaffold(parentUnique: string | null, preset?: Partial<UmbPartialViewDetailModel>) {
+	async createScaffold(preset: Partial<UmbPartialViewDetailModel> = {}) {
 		const data: UmbPartialViewDetailModel = {
 			entityType: UMB_PARTIAL_VIEW_ENTITY_TYPE,
-			parentUnique,
 			unique: '',
 			path: '',
 			name: '',
@@ -35,12 +34,11 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		return { data };
 	}
 
-	async create(model: UmbPartialViewDetailModel) {
+	async create(model: UmbPartialViewDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Data is missing');
-		if (!model.parentUnique === undefined) throw new Error('Parent Unique is missing');
 		if (!model.name) throw new Error('Name is missing');
 
-		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(model.parentUnique);
+		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(parentUnique);
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreatePartialViewRequestModel = {
@@ -83,7 +81,6 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		const partialView: UmbPartialViewDetailModel = {
 			entityType: UMB_PARTIAL_VIEW_ENTITY_TYPE,
 			unique: this.#serverFilePathUniqueSerializer.toUnique(data.path),
-			parentUnique: data.parent ? this.#serverFilePathUniqueSerializer.toUnique(data.parent.path) : null,
 			path: data.path,
 			name: data.name,
 			content: data.content,

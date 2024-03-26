@@ -1,7 +1,7 @@
 import { createExtensionApi } from '../functions/index.js';
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	UmbConditionConfigBase,
 	ManifestCondition,
@@ -21,7 +21,7 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 export abstract class UmbBaseExtensionInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
 	SubClassType = never,
-> extends UmbBaseController {
+> extends UmbControllerBase {
 	//
 	#promiseResolvers: Array<() => void> = [];
 	#manifestObserver!: UmbObserverController<ManifestType | undefined>;
@@ -205,9 +205,8 @@ export abstract class UmbBaseExtensionInitializer<
 		// Check if we already have a controller for this config:
 		const existing = this.#conditionControllers.find((controller) => controller.config === conditionConfig);
 		if (!existing) {
-			const conditionController = await createExtensionApi(conditionManifest, [
+			const conditionController = await createExtensionApi(this, conditionManifest, [
 				{
-					host: this,
 					manifest: conditionManifest,
 					config: conditionConfig,
 					onChange: this.#onConditionsChangedCallback,
@@ -235,7 +234,7 @@ export abstract class UmbBaseExtensionInitializer<
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
 		const isPositive =
 			this.#conditionsAreInitialized() &&
-			this.#conditionControllers.find((condition) => condition.permitted === false) === undefined;
+			this.#conditionControllers.some((condition) => condition.permitted === false) === false;
 
 		this._isConditionsPositive = isPositive;
 
@@ -244,9 +243,8 @@ export abstract class UmbBaseExtensionInitializer<
 				const newPermission = await this._conditionsAreGood();
 				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time.
 				if (newPermission === false || this._isConditionsPositive === false) {
-					console.warn(
-						'If this happens then please inform Niels Lyngsø on CMS Team. We are still investigating wether this is a situation we should handle. Ref. No.: 1.',
-					);
+					// Then we need to revert the above work:
+					this._conditionsAreBad();
 					return;
 				}
 				// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time.
@@ -259,9 +257,6 @@ export abstract class UmbBaseExtensionInitializer<
 
 			// Only continue if we are still negative, otherwise it means that something changed in the mean time.
 			if (this._isConditionsPositive === true) {
-				console.warn(
-					'If this happens then please inform Niels Lyngsø on CMS Team. We are still investigating wether this is a situation we should handle. Ref. No.: 2.',
-				);
 				return;
 			}
 			// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time.
@@ -322,6 +317,5 @@ export abstract class UmbBaseExtensionInitializer<
 		this.#onPermissionChanged = undefined;
 		(this.#extensionRegistry as any) = undefined;
 		super.destroy();
-		// Destroy the conditions controllers, they are begin destroyed cause they are controllers...
 	}
 }

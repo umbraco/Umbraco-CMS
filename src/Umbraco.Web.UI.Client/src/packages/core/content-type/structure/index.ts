@@ -1,4 +1,3 @@
-export * from './content-type-structure-repository-base.js';
-export * from './content-type-structure-repository.interface.js';
-export * from './content-type-structure-server-data-source-base.js';
-export * from './content-type-structure-data-source.interface.js';
+export * from './content-type-container-structure-helper.class.js';
+export * from './content-type-property-structure-helper.class.js';
+export * from './content-type-structure-manager.class.js';

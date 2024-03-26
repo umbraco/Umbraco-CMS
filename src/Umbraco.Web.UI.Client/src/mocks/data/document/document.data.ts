@@ -5,11 +5,47 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-type UmbMockDocumentTypeModelHack = DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel;
-
-export interface UmbMockDocumentModel extends Omit<UmbMockDocumentTypeModelHack, 'type'> {}
+export type UmbMockDocumentModel = DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel;
 
 export const data: Array<UmbMockDocumentModel> = [
+	{
+		urls: [
+			{
+				culture: 'en-US',
+				url: '/',
+			},
+		],
+		template: null,
+		id: 'the-simplest-document-id',
+		parent: null,
+		documentType: {
+			id: 'the-simplest-document-type-id',
+			icon: 'icon-document',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: DocumentVariantStateModel.DRAFT,
+				publishDate: '2023-02-06T15:32:24.957009',
+				culture: 'en-us',
+				segment: null,
+				name: 'The Simplest Document',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
+			},
+		],
+		values: [
+			{
+				alias: 'prop1',
+				culture: null,
+				segment: null,
+				value: 'default value here',
+			},
+		],
+	},
 	{
 		urls: [
 			{
@@ -102,7 +138,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			},
 			{
 				alias: 'multiUrlPicker',
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				value: [
 					{
@@ -501,7 +537,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				name: 'All properties',
 				createDate: '2023-02-06T15:31:46.876902',
@@ -556,13 +592,13 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: 'My first blog post',
 			},
 			{
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'in the master tab',
 			},
 			{
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'which is under another group in the tab',
@@ -602,7 +638,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				name: 'Article in english',
 				createDate: '2023-02-06T15:31:46.876902',
@@ -679,13 +715,13 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: 'My first blog post B',
 			},
 			{
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'in the master tab B',
 			},
 			{
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'which is under another group in the tab B',
@@ -713,7 +749,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				state: DocumentVariantStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				name: 'Blog post B',
 				createDate: '2023-02-06T15:32:05.350038',
@@ -734,7 +770,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: 'simple-document-type-id',
 			icon: 'icon-document',
-			collection: { id: 'dt-collectionView'},
+			collection: { id: 'dt-collectionView' },
 		},
 		hasChildren: false,
 		noAccess: false,
@@ -744,7 +780,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				state: DocumentVariantStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				name: 'Simple Document',
 				createDate: '2023-02-06T15:32:05.350038',

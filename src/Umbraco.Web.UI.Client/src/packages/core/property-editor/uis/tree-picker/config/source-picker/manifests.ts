@@ -9,6 +9,5 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Tree Picker Source Picker',
 		icon: 'icon-page-add',
 		group: 'pickers',
-		propertyEditorSchemaAlias: '',
 	},
 };

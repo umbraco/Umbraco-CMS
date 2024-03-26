@@ -1,12 +1,11 @@
 import type { UmbTemplatingInsertMenuElement } from '../../components/index.js';
 import { getQuerySnippet } from '../../utils/index.js';
-import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context.js';
+import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.context-token.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '@umbraco-cms/backoffice/template';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-partial-view-workspace-editor')
@@ -18,9 +17,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	private _content?: string | null = '';
 
 	@state()
-	private _path?: string | null = '';
-
-	@state()
 	private _ready: boolean = false;
 
 	@state()
@@ -30,14 +26,9 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	private _codeEditor?: UmbCodeEditorElement;
 
 	#workspaceContext?: typeof UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT.TYPE;
-	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
-		});
 
 		this.consumeContext(UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
@@ -47,10 +38,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 
 			this.observe(this.#workspaceContext.content, (content) => {
 				this._content = content;
-			});
-
-			this.observe(this.#workspaceContext.path, (path) => {
-				this._path = path;
 			});
 
 			this.observe(this.#workspaceContext.isCodeEditorReady, (isReady) => {
@@ -81,12 +68,16 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 		this._codeEditor?.insert(value);
 	}
 
-	#openQueryBuilder() {
-		const queryBuilderModal = this._modalContext?.open(UMB_TEMPLATE_QUERY_BUILDER_MODAL);
+	async #openQueryBuilder() {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const queryBuilderModal = modalManager.open(this, UMB_TEMPLATE_QUERY_BUILDER_MODAL);
 
-		queryBuilderModal?.onSubmit().then((queryBuilderModalValue) => {
-			if (queryBuilderModalValue.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
-		});
+		queryBuilderModal
+			?.onSubmit()
+			.then((queryBuilderModalValue) => {
+				if (queryBuilderModalValue.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
+			})
+			.catch(() => undefined);
 	}
 
 	#renderCodeEditor() {
@@ -106,7 +97,6 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 					@input=${this.#onNameInput}
 					label="Partial view name"
 					?readonly=${this._isNew === false}></uui-input>
-				<small>Views/Partials${this._path}</small>
 			</div>
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">
@@ -119,7 +109,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 					? this.#renderCodeEditor()
 					: html`<div id="loader-container">
 							<uui-loader></uui-loader>
-					  </div>`}
+						</div>`}
 			</uui-box>
 		</umb-workspace-editor>`;
 	}

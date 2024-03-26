@@ -78,7 +78,7 @@ export class UmbRelationTypeServerDataSource {
 			isBidirectional: false,
 			isDependency: false,
 			path: '',
-			isSystemRelationType: false,
+			isDeletable: false,
 		};
 
 		return { data };

@@ -1,5 +1,5 @@
 import type { UmbMemberEntityType } from './entity.js';
-import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 export interface UmbMemberDetailModel {
 	email: string;
@@ -21,9 +21,13 @@ export interface UmbMemberDetailModel {
 	variants: Array<UmbVariantModel>;
 }
 
+export interface UmbMemberVariantModel extends UmbVariantModel {}
+
 export interface UmbMemberValueModel<ValueType = unknown> {
 	culture: string | null;
 	segment: string | null;
 	alias: string;
 	value: ValueType;
 }
+
+export interface UmbMemberVariantOptionModel extends UmbVariantOptionModel<UmbMemberVariantModel> {}

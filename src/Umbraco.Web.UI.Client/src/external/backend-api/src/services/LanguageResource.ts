@@ -105,20 +105,21 @@ export class LanguageResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteLanguageByIsoCode({
         isoCode,
     }: {
         isoCode: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/language/{isoCode}',
             path: {
                 'isoCode': isoCode,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -128,7 +129,7 @@ export class LanguageResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putLanguageByIsoCode({
@@ -137,7 +138,7 @@ export class LanguageResource {
     }: {
         isoCode: string,
         requestBody?: UpdateLanguageRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/language/{isoCode}',
@@ -146,6 +147,7 @@ export class LanguageResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

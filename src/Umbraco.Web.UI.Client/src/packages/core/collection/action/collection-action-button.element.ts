@@ -43,7 +43,7 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 	async #createApi() {
 		if (!this._manifest) throw new Error('No manifest defined');
 		if (!this._manifest.api) return;
-		this.#api = (await createExtensionApi(this._manifest, [this])) as unknown as UmbCollectionAction;
+		this.#api = (await createExtensionApi(this, this._manifest)) as unknown as UmbCollectionAction;
 	}
 
 	#api?: UmbCollectionAction;

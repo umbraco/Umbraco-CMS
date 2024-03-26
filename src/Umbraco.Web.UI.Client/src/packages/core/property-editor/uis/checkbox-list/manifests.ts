@@ -2,12 +2,12 @@ import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
-	alias: 'Umb.PropertyEditorUi.CheckboxList',
+	alias: 'Umb.PropertyEditorUi.CheckBoxList',
 	name: 'Checkbox List Property Editor UI',
 	element: () => import('./property-editor-ui-checkbox-list.element.js'),
 	meta: {
 		label: 'Checkbox List',
-		propertyEditorSchemaAlias: 'Umbraco.CheckboxList',
+		propertyEditorSchemaAlias: 'Umbraco.CheckBoxList',
 		icon: 'icon-bulleted-list',
 		group: 'lists',
 		settings: {

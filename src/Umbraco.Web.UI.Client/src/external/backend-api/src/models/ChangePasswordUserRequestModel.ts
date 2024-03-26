@@ -5,6 +5,5 @@
 
 export type ChangePasswordUserRequestModel = {
     newPassword: string;
-    oldPassword?: string | null;
 };
 

@@ -3,7 +3,6 @@ import type { UmbStylesheetEntityType, UmbStylesheetFolderEntityType } from './e
 export interface UmbStylesheetDetailModel {
 	entityType: UmbStylesheetEntityType;
 	unique: string;
-	parentUnique: string | null;
 	path: string;
 	name: string;
 	content: string;
@@ -12,7 +11,6 @@ export interface UmbStylesheetDetailModel {
 export interface UmbStylesheetItemModel {
 	entityType: UmbStylesheetEntityType | UmbStylesheetFolderEntityType;
 	unique: string;
-	parentUnique: string | null;
 	name: string;
 	isFolder: boolean;
 }

@@ -29,8 +29,8 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box>
-				<div slot="headline" class="flex">
-					Health Check
+				<div id="header" slot="header">
+					<h2>Health Check</h2>
 					<uui-button
 						label="Perform all checks"
 						color="positive"
@@ -60,10 +60,16 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 				margin-top: var(--uui-size-space-5);
 			}
 
-			.flex {
+			#header {
+				width: 100%;
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
+			}
+
+			#header h2 {
+				font-size: var(--uui-type-h5-size);
+				margin: 0;
 			}
 
 			.grid {

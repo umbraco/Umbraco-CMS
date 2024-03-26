@@ -87,7 +87,9 @@ export class UmbInputDocumentRootPickerElement extends FormControlMixin(UmbLitEl
 	});
 
 	#openDynamicRootOriginPicker() {
-		this.#openModal = this.#modalContext?.open(UMB_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL, {});
+		this.#openModal = this.#modalContext?.open(this, UMB_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL, {
+			data: { items: this._originManifests },
+		});
 		this.#openModal?.onSubmit().then((data: UmbTreePickerDynamicRoot) => {
 			const existingData = { ...this.data };
 			existingData.originKey = undefined;
@@ -98,7 +100,9 @@ export class UmbInputDocumentRootPickerElement extends FormControlMixin(UmbLitEl
 	}
 
 	#openDynamicRootQueryStepPicker() {
-		this.#openModal = this.#modalContext?.open(UMB_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL, {});
+		this.#openModal = this.#modalContext?.open(this, UMB_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL, {
+			data: { items: this._queryStepManifests },
+		});
 		this.#openModal?.onSubmit().then((step) => {
 			if (this.data) {
 				const querySteps = [...(this.data.querySteps ?? []), step];
@@ -190,11 +194,10 @@ export class UmbInputDocumentRootPickerElement extends FormControlMixin(UmbLitEl
 		if (!this.#dynamicRootOrigin) return;
 		return html`
 			<uui-ref-node
-				border
 				standalone
 				name=${this.#dynamicRootOrigin.label}
 				detail=${ifDefined(this.#dynamicRootOrigin.description)}>
-				<uui-icon slot="icon" name=${ifDefined(this.#dynamicRootOrigin.icon)}></uui-icon>
+				<umb-icon slot="icon" name=${ifDefined(this.#dynamicRootOrigin.icon)}></umb-icon>
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${this.#openDynamicRootOriginPicker}
@@ -225,7 +228,7 @@ export class UmbInputDocumentRootPickerElement extends FormControlMixin(UmbLitEl
 		const step = this.#getQueryStepMeta(item);
 		return html`
 			<uui-ref-node standalone id=${step.unique} name=${step.label} detail="${ifDefined(step.description)}">
-				<uui-icon slot="icon" name=${step.icon}></uui-icon>
+				<umb-icon slot="icon" name=${step.icon}></umb-icon>
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#removeDynamicRootQueryStep(item)}

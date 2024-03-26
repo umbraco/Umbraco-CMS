@@ -22,10 +22,16 @@ export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 	public set alias(value: string | undefined) {
 		this.myModalRegistration.setUniquePathValue('propertyAlias', value);
 	}
+	public get alias(): string | undefined {
+		return this.myModalRegistration.getUniquePathValue('propertyAlias');
+	}
 
 	@property()
 	public set variantId(value: string | UmbVariantId | undefined) {
 		this.myModalRegistration.setUniquePathValue('variantId', value?.toString());
+	}
+	public get variantId(): string | undefined {
+		return this.myModalRegistration.getUniquePathValue('variantId');
 	}
 
 	/**
@@ -91,8 +97,7 @@ export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 		this._urls = [...data]; // Unfreeze data coming from State, so we can manipulate it.
 		super.value = this._urls.map((x) => x.url).join(',');
 	}
-
-	get urls() {
+	get urls(): Array<UmbLinkPickerLink> {
 		return this._urls;
 	}
 
@@ -207,7 +212,7 @@ export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 			.name="${link.name || ''}"
 			.detail="${(link.url || '') + (link.queryString || '')}"
 			@open="${() => this._temporary_onClick_editItem(index)}">
-			<uui-icon slot="icon" name="${link.icon || 'icon-link'}"></uui-icon>
+			<umb-icon slot="icon" name="${link.icon || 'icon-link'}"></umb-icon>
 			<uui-action-bar slot="actions">
 				<uui-button .href=${this._modalRoute?.({ index })} label="Edit link">Edit</uui-button>
 				<uui-button @click="${() => this._removeItem(index)}" label="Remove link">Remove</uui-button>

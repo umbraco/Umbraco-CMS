@@ -1,22 +1,19 @@
 import type { UmbBlockGridTypeAreaType } from '../../../types.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type {
-	UmbInvariantableWorkspaceContextInterface,
-	UmbWorkspaceContextInterface,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbInvariantDatasetWorkspaceContext, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBlockGridAreaTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbBlockGridTypeAreaType>
-	implements UmbInvariantableWorkspaceContextInterface
+	extends UmbSaveableWorkspaceContextBase<UmbBlockGridTypeAreaType>
+	implements UmbInvariantDatasetWorkspaceContext
 {
 	// Just for context token safety:
 	public readonly IS_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT = true;
@@ -29,10 +26,10 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 	readonly name = this.#data.asObservablePart((data) => data?.alias);
 	readonly unique = this.#data.asObservablePart((data) => data?.key);
 
-	#properties = new UmbArrayState<PropertyEditorConfigProperty>([], (x) => x.alias);
+	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
 
-	constructor(host: UmbControllerHostElement, workspaceArgs: { manifest: ManifestWorkspace }) {
+	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 	}
@@ -119,7 +116,8 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 			context.setValue(appendToFrozenArray(context.getValue() ?? [], this.#data.getValue(), (x) => x?.key));
 		});
 
-		this.saveComplete(this.#data.value);
+		this.setIsNew(false);
+		this.workspaceComplete(this.#data.value);
 	}
 
 	public destroy(): void {
@@ -131,7 +129,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 export default UmbBlockGridAreaTypeWorkspaceContext;
 
 export const UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbWorkspaceContextInterface,
+	UmbWorkspaceContext,
 	UmbBlockGridAreaTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',

@@ -139,6 +139,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			const server = formData.get('server') as string;
 			const name = formData.get('name') as string;
 			const useIntegratedAuthentication = formData.has('useIntegratedAuthentication');
+			const trustServerCertificate = formData.has('trustServerCertificate');
 			const connectionString = formData.get('connectionString') as string;
 
 			// Validate connection
@@ -157,10 +158,10 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 					password,
 					server,
 					useIntegratedAuthentication,
+					trustServerCertificate,
 					name,
 					connectionString,
 					providerName: selectedDatabase.providerName,
-					trustServerCertificate: false,
 				};
 
 				const { error } = await tryExecute(
@@ -184,6 +185,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				server,
 				name,
 				useIntegratedAuthentication,
+				trustServerCertificate,
 				connectionString,
 				providerName: selectedDatabase.providerName,
 			};
@@ -289,39 +291,47 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				name="useIntegratedAuthentication"
 				label="Use integrated authentication"
 				@change=${this._handleChange}
-				.checked=${this.databaseFormData.useIntegratedAuthentication || false}>
-				Use integrated authentication
-			</uui-checkbox>
+				.checked=${this.databaseFormData.useIntegratedAuthentication || false}></uui-checkbox>
+		</uui-form-layout-item>
+		<uui-form-layout-item>
+			<uui-checkbox
+				name="trustServerCertificate"
+				label="Trust the database certificate"
+				@change=${this._handleChange}
+				.checked=${this.databaseFormData.trustServerCertificate || false}></uui-checkbox>
 		</uui-form-layout-item>
 
-		${!this.databaseFormData.useIntegratedAuthentication
-			? html` <uui-form-layout-item>
-						<uui-label for="username" slot="label" required>Username</uui-label>
-						<uui-input
-							type="text"
-							.value=${this.databaseFormData.username ?? ''}
-							id="username"
-							name="username"
-							label="Username"
-							@input=${this._handleChange}
-							required
-							required-message="Username is required"></uui-input>
-					</uui-form-layout-item>
+			${
+				!this.databaseFormData.useIntegratedAuthentication
+					? html` <uui-form-layout-item>
+								<uui-label for="username" slot="label" required>Username</uui-label>
+								<uui-input
+									type="text"
+									.value=${this.databaseFormData.username ?? ''}
+									id="username"
+									name="username"
+									label="Username"
+									@input=${this._handleChange}
+									required
+									required-message="Username is required"></uui-input>
+							</uui-form-layout-item>
 
-					<uui-form-layout-item>
-						<uui-label for="password" slot="label" required>Password</uui-label>
-						<uui-input
-							type="text"
-							.value=${this.databaseFormData.password ?? ''}
-							id="password"
-							name="password"
-							label="Password"
-							@input=${this._handleChange}
-							autocomplete="new-password"
-							required
-							required-message="Password is required"></uui-input>
-					</uui-form-layout-item>`
-			: ''}
+							<uui-form-layout-item>
+								<uui-label for="password" slot="label" required>Password</uui-label>
+								<uui-input
+									type="text"
+									.value=${this.databaseFormData.password ?? ''}
+									id="password"
+									name="password"
+									label="Password"
+									@input=${this._handleChange}
+									autocomplete="new-password"
+									required
+									required-message="Password is required"></uui-input>
+							</uui-form-layout-item>`
+					: ''
+			}
+		</uui-form-layout-item>
 	`;
 
 	private _renderCustom = () => html`

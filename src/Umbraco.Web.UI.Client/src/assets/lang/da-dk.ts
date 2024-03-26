@@ -308,7 +308,7 @@ export default {
 		languagesToSendForApproval: 'Hvilke sprog vil du gerne sende til godkendelse?',
 		languagesToSchedule: 'Hvilke sprog vil du gerne planlægge?',
 		languagesToUnpublish:
-			'Vælg sproget du vil afpublicere. Afpublicering af et obligatorisk sprog vil\n      afpublicere alle sprog.\n    ',
+			'Vælg sproget du vil afpublicere. Afpublicering af et obligatorisk sprog vil afpublicere alle sprog.',
 		resetFocalPoint: 'Nulstil fokuspunkt',
 		variantsWillBeSaved: 'Alle nye varianter vil blive gemt.',
 		publishRequiresVariants: 'De følgende varianter er krævet for at en udgivelse kan finde sted:',
@@ -1565,8 +1565,8 @@ export default {
 			'Konfigurér indholdet til at blive vist i en sortérbar og søgbar liste;\n      undersider vil ikke blive vist i træet\n    ',
 		allowedTemplatesHeading: 'Tilladte skabeloner',
 		allowedTemplatesDescription: 'Vælg hvilke skabeloner, der er tilladt at bruge på dette indhold.',
-		allowAsRootHeading: 'Tillad på rodniveau',
-		allowAsRootDescription:
+		allowAtRootHeading: 'Tillad på rodniveau',
+		allowAtRootDescription:
 			'Kun dokumenttyper med denne indstilling aktiveret kan oprettes i rodniveau under\n      indhold og mediearkiv.\n    ',
 		childNodesHeading: 'Tilladte typer',
 		childNodesDescription: 'Tillad at oprette indhold af en specifik type under denne.',
@@ -1655,6 +1655,11 @@ export default {
 			'<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
+		collections: 'Samlinger',
+		collectionsDescription:
+			'Konfigurerer indholdselementet til at vise listen over dets underordnede elementer, underordnede elementer vil ikke blive vist i træet.',
+		structure: 'Struktur',
+		presentation: 'Præsentation',
 	},
 	languages: {
 		addLanguage: 'Tilføj sprog',
@@ -1785,6 +1790,7 @@ export default {
 		settingsGroup: 'Indstillinger',
 		templatingGroup: 'Design og layout',
 		thirdPartyGroup: 'Tredjepart',
+		webhooks: 'Webhooks',
 	},
 	update: {
 		updateAvailable: 'Ny opdatering er klar',
@@ -2118,6 +2124,10 @@ export default {
 			'This item or its descendants is being referenced. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
 		deleteDisabledWarning: 'This item or its descendants is being referenced. Therefore, deletion has been disabled.',
 		listViewDialogWarning: 'The following items you are trying to %0% are referenced by other content.',
+		labelMoreReferences: (count: number) => {
+			if (count === 1) return '...og en mere';
+			return `...og ${count} andre`;
+		},
 	},
 	logViewer: {
 		deleteSavedSearch: 'Slet gemte søgning',

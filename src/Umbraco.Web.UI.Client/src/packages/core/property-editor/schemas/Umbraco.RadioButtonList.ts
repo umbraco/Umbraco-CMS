@@ -6,5 +6,15 @@ export const manifest: ManifestPropertyEditorSchema = {
 	alias: 'Umbraco.RadioButtonList',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.RadioButtonList',
+		settings: {
+			properties: [
+				{
+					alias: 'items',
+					label: 'Add option',
+					description: 'Add, remove or sort options for the list.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
+				},
+			],
+		},
 	},
 };

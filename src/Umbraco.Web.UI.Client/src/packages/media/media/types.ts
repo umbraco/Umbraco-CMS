@@ -1,6 +1,5 @@
 import type { UmbMediaEntityType } from './entity.js';
 import type { UmbVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
-import type { MediaUrlInfoModel, MediaValueModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbMediaDetailModel {
@@ -11,10 +10,23 @@ export interface UmbMediaDetailModel {
 	entityType: UmbMediaEntityType;
 	isTrashed: boolean;
 	unique: string;
-	parentUnique: string | null;
-	urls: Array<MediaUrlInfoModel>;
-	values: Array<MediaValueModel>;
+	urls: Array<UmbMediaUrlInfoModel>;
+	values: Array<UmbMediaValueModel>;
 	variants: Array<UmbVariantModel>;
+}
+
+export interface UmbMediaUrlInfoModel {
+	culture: string | null;
+	url: string;
+}
+
+export interface UmbMediaVariantModel extends UmbVariantModel {}
+
+export interface UmbMediaValueModel<ValueType = unknown> {
+	culture: string | null;
+	segment: string | null;
+	alias: string;
+	value: ValueType;
 }
 
 export interface UmbMediaVariantOptionModel extends UmbVariantOptionModel<UmbVariantModel> {}

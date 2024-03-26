@@ -24,7 +24,7 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 
 		//TODO: How should we handle pickers forms?
 		const userGroupPicker = form.querySelector('#userGroups') as UmbUserGroupInputElement;
-		const userGroupUniques = userGroupPicker?.selectedIds;
+		const userGroupUniques = userGroupPicker?.selection;
 
 		const message = formData.get('message') as string;
 

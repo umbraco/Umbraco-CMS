@@ -48,6 +48,14 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 
 		this.#tabsStructureHelper.setIsRoot(true);
 		this.#tabsStructureHelper.setContainerChildType('Tab');
+		this.observe(
+			this.#tabsStructureHelper.mergedContainers,
+			(tabs) => {
+				this._tabs = tabs;
+				this._createRoutes();
+			},
+			null,
+		);
 
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
@@ -73,14 +81,6 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			},
 			'observeGroups',
 		);
-		this.observe(
-			this.#tabsStructureHelper.containers,
-			(tabs) => {
-				this._tabs = tabs;
-				this._createRoutes();
-			},
-			'observeTabs',
-		);
 	}
 
 	private _createRoutes() {
@@ -95,14 +95,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 					component: () => import('./block-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
 						(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
-						(component as UmbBlockWorkspaceViewEditTabElement).tabName = tabName;
-						// TODO: Consider if we can link these more simple, and not parse this on.
-						// Instead have the structure manager looking at wether one of the OwnerALikecontainers is in the owner document.
-						(component as UmbBlockWorkspaceViewEditTabElement).ownerTabId = this.#tabsStructureHelper.isOwnerContainer(
-							tab.id!,
-						)
-							? tab.id
-							: undefined;
+						(component as UmbBlockWorkspaceViewEditTabElement).containerId = tab.id;
 					},
 				});
 			});
@@ -114,8 +107,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 				component: () => import('./block-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
 					(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
-					(component as UmbBlockWorkspaceViewEditTabElement).noTabName = true;
-					(component as UmbBlockWorkspaceViewEditTabElement).ownerTabId = null;
+					(component as UmbBlockWorkspaceViewEditTabElement).containerId = null;
 				},
 			});
 		}
@@ -144,7 +136,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 											href=${this._routerPath + '/'}
 											>Content</uui-tab
 										>
-								  `
+									`
 								: ''}
 							${repeat(
 								this._tabs,
@@ -156,7 +148,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 									>`;
 								},
 							)}
-					  </uui-tab-group>`
+						</uui-tab-group>`
 					: ''}
 
 				<umb-router-slot

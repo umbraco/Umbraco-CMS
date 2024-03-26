@@ -1,6 +1,7 @@
-import type { UmbHealthCheckContext } from './health-check.context.js';
+import { UmbHealthCheckContext } from './health-check.context.js';
 import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbHealthCheckDashboardContext {
 	#manifests: ManifestHealthCheck[] = [];
@@ -27,9 +28,12 @@ export class UmbHealthCheckDashboardContext {
 
 	#registerApis() {
 		this.apis.clear();
-		this.#manifests.forEach((manifest) => {
-			// the group name (label) is the unique key for a health check group
-			this.apis.set(manifest.meta.label, new manifest.meta.api(this.host));
+		this.#manifests.forEach(async (manifest) => {
+			if (!manifest.api) return;
+			const api = await loadManifestApi(manifest.api);
+			if (!api) return;
+			const apiInstance = new api(this.host);
+			if (api && UmbHealthCheckContext.isInstanceLike(apiInstance)) this.apis.set(manifest.meta.label, apiInstance);
 		});
 	}
 }

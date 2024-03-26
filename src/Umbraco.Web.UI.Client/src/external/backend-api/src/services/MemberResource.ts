@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { CreateMemberRequestModel } from '../models/CreateMemberRequestModel';
 import type { DirectionModel } from '../models/DirectionModel';
+import type { MemberConfigurationResponseModel } from '../models/MemberConfigurationResponseModel';
 import type { MemberItemResponseModel } from '../models/MemberItemResponseModel';
 import type { MemberResponseModel } from '../models/MemberResponseModel';
 import type { PagedMemberResponseModel } from '../models/PagedMemberResponseModel';
@@ -21,6 +22,9 @@ export class MemberResource {
      */
     public static getFilterMember({
         memberTypeId,
+        memberGroupName,
+        isApproved,
+        isLockedOut,
         orderBy = 'username',
         orderDirection,
         filter,
@@ -28,6 +32,9 @@ export class MemberResource {
         take = 100,
     }: {
         memberTypeId?: string,
+        memberGroupName?: string,
+        isApproved?: boolean,
+        isLockedOut?: boolean,
         orderBy?: string,
         orderDirection?: DirectionModel,
         filter?: string,
@@ -39,6 +46,9 @@ export class MemberResource {
             url: '/umbraco/management/api/v1/filter/member',
             query: {
                 'memberTypeId': memberTypeId,
+                'memberGroupName': memberGroupName,
+                'isApproved': isApproved,
+                'isLockedOut': isLockedOut,
                 'orderBy': orderBy,
                 'orderDirection': orderDirection,
                 'filter': filter,
@@ -119,20 +129,21 @@ export class MemberResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteMemberById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/member/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -142,7 +153,7 @@ export class MemberResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putMemberById({
@@ -151,7 +162,7 @@ export class MemberResource {
     }: {
         id: string,
         requestBody?: UpdateMemberRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/member/{id}',
@@ -160,6 +171,7 @@ export class MemberResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -169,7 +181,7 @@ export class MemberResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putMemberByIdValidate({
@@ -178,7 +190,7 @@ export class MemberResource {
     }: {
         id: string,
         requestBody?: UpdateMemberRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/member/{id}/validate',
@@ -187,6 +199,7 @@ export class MemberResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -199,16 +212,31 @@ export class MemberResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static getMemberConfiguration(): CancelablePromise<MemberConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/member/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns string Success
+     * @throws ApiError
+     */
     public static postMemberValidate({
         requestBody,
     }: {
         requestBody?: CreateMemberRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/member/validate',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

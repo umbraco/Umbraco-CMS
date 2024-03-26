@@ -23,5 +23,6 @@ export interface UmbDocumentTreeRootModel extends UmbUniqueTreeRootModel {
 export interface UmbDocumentTreeItemVariantModel {
 	name: string;
 	culture: string | null;
-	state: DocumentVariantStateModel; // TODO: make our own enum for this. We might have states for "unsaved changes" etc.
+	segment: string | null;
+	state: DocumentVariantStateModel | null; // TODO: make our own enum for this. We might have states for "unsaved changes" etc.
 }

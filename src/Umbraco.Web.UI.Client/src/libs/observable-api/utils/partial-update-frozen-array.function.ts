@@ -7,8 +7,8 @@
  * @description - Creates a RxJS Observable from RxJS Subject.
  * @example <caption>Example append new entry for a ArrayState or a part of UmbDeepState/UmbObjectState it which is an array. Where the key is unique and the item will be updated if matched with existing.</caption>
  * const partialEntry = {value: 'myValue'};
- * const newDataSet = partialUpdateFrozenArray(mySubject.getValue(), partialEntry, x => x.key === 'myKey');
- * mySubject.next(newDataSet);
+ * const newDataSet = partialUpdateFrozenArray(myState.getValue(), partialEntry, x => x.key === 'myKey');
+ * myState.setValue(newDataSet);
  */
 export function partialUpdateFrozenArray<T>(
 	data: T[],

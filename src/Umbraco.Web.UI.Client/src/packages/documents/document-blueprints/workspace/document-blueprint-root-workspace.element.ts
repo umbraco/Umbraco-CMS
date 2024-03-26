@@ -1,13 +1,14 @@
-import { html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-document-blueprint-root-workspace')
-export class UmbDocumentBlueprintRootWorkspaceElement extends LitElement {
+export class UmbDocumentBlueprintRootWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`<div>Document Blueprint Root Workspace</div> `;
 	}
 }
 
-export default UmbDocumentBlueprintRootWorkspaceElement;
+export { UmbDocumentBlueprintRootWorkspaceElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

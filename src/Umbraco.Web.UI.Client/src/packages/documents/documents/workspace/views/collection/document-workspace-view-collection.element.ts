@@ -2,7 +2,7 @@ import type {
 	UmbCollectionBulkActionPermissions,
 	UmbCollectionConfiguration,
 } from '../../../../../core/collection/types.js';
-import { customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -31,7 +31,7 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 				this._documentUnique = unique;
 			});
 			this.observe(
-				workspaceContext.structure.ownerContentType(),
+				workspaceContext.structure.ownerContentType,
 				async (documentType) => {
 					if (!documentType || !documentType.collection) return;
 
@@ -58,7 +58,6 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 		const config = new UmbPropertyEditorConfigCollection(dataType.values);
 		return {
 			unique: this._documentUnique,
-			dataTypeId: dataType.unique,
 			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
@@ -69,7 +68,7 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 	}
 
 	render() {
-		if (!this._config?.unique || !this._config?.dataTypeId) return html`<uui-loader></uui-loader>`;
+		if (!this._config?.unique) return nothing;
 		return html`<umb-collection alias="Umb.Collection.Document" .config=${this._config}></umb-collection>`;
 	}
 }

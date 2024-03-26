@@ -1,9 +1,9 @@
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspace.context-token.js';
 import type { UmbInputTemplateElement } from '@umbraco-cms/backoffice/template';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 import '@umbraco-cms/backoffice/template'; // TODO: This is needed to register the <umb-input-template> element, but it should be done in a better way without importing the whole module.
@@ -20,7 +20,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (documentTypeContext) => {
+		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (documentTypeContext) => {
 			this.#workspaceContext = documentTypeContext as UmbDocumentTypeWorkspaceContext;
 			this._observeDocumentType();
 		});
@@ -52,7 +52,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 		// save new allowed ids
 		const input = e.target as UmbInputTemplateElement;
 		const idsWithoutRoot =
-			input.selectedIds
+			input.selection
 				?.filter((id) => id !== null)
 				.map((id) => {
 					return { id };
@@ -68,7 +68,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 				<div id="templates" slot="editor">
 					<umb-input-template
 						.defaultUnique=${this._defaultTemplateId ?? ''}
-						.selectedIds=${this._allowedTemplateIds}
+						.selection=${this._allowedTemplateIds}
 						@change=${this.#templateInputChange}></umb-input-template>
 				</div>
 			</umb-property-layout>

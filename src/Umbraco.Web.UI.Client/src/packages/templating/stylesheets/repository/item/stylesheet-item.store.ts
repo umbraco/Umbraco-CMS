@@ -1,6 +1,6 @@
 import type { UmbStylesheetItemModel } from '../../types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
@@ -13,10 +13,10 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 export class UmbStylesheetItemStore extends UmbItemStoreBase<UmbStylesheetItemModel> {
 	/**
 	 * Creates an instance of UmbStylesheetItemStore.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbStylesheetItemStore
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_STYLESHEET_ITEM_STORE_CONTEXT.toString());
 	}
 }

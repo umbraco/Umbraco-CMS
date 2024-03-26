@@ -1,7 +1,7 @@
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../workspace/data-type-workspace.context-token.js';
 import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
+import type { PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -15,7 +15,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	private _properties: Array<PropertyEditorConfigProperty> = [];
+	private _properties: Array<PropertyEditorSettingsProperty> = [];
 
 	constructor() {
 		super();
@@ -32,7 +32,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		this.observe(
 			this.#workspaceContext.properties,
 			(properties) => {
-				this._properties = properties as Array<PropertyEditorConfigProperty>;
+				this._properties = properties as Array<PropertyEditorSettingsProperty>;
 			},
 			'observeProperties',
 		);

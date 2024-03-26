@@ -1,4 +1,5 @@
 import { createExtensionApi } from '../functions/create-extension-api.function.js';
+import type { UmbApiConstructorArgumentsMethodType } from '../functions/types.js';
 import type { UmbApi } from '../models/api.interface.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { ManifestApi, ManifestCondition } from '../types/index.js';
@@ -24,7 +25,7 @@ export class UmbExtensionApiInitializer<
 		: UmbApi,
 > extends UmbBaseExtensionInitializer<ManifestType, ControllerType> {
 	#api?: ExtensionApiInterface;
-	#constructorArguments?: Array<unknown>;
+	#constructorArguments?: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType>;
 
 	/**
 	 * The api that is created for this extension.
@@ -65,7 +66,7 @@ export class UmbExtensionApiInitializer<
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
-		constructorArguments: Array<unknown> | undefined,
+		constructorArguments: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType> | undefined,
 		onPermissionChanged?: (isPermitted: boolean, controller: ControllerType) => void,
 	) {
 		super(host, extensionRegistry, 'extApi_', alias, onPermissionChanged);
@@ -88,8 +89,9 @@ export class UmbExtensionApiInitializer<
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
 		const newApi = await createExtensionApi<ExtensionApiInterface>(
+			this._host,
 			manifest as unknown as ManifestApi<ExtensionApiInterface>,
-			this.#constructorArguments,
+			this.#constructorArguments as any,
 		);
 		if (!this._isConditionsPositive) {
 			// We are not positive anymore, so we will back out of this creation.
@@ -98,6 +100,7 @@ export class UmbExtensionApiInitializer<
 		this.#api = newApi;
 
 		if (this.#api) {
+			(this.#api as any).manifest = manifest;
 			//this.#assignProperties();
 			return true; // we will confirm we have a component and are still good to go.
 		}

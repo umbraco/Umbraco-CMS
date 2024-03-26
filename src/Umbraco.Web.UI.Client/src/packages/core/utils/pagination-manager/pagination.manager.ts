@@ -8,7 +8,7 @@ export class UmbPaginationManager extends EventTarget {
 	#totalItems = new UmbNumberState(0);
 	public readonly totalItems = this.#totalItems.asObservable();
 
-	#totalPages = new UmbNumberState(0);
+	#totalPages = new UmbNumberState(1);
 	public readonly totalPages = this.#totalPages.asObservable();
 
 	#currentPage = new UmbNumberState(1);
@@ -106,7 +106,8 @@ export class UmbPaginationManager extends EventTarget {
 	 * @memberof UmbPaginationManager
 	 */
 	#calculateTotalPages() {
-		const totalPages = Math.ceil(this.#totalItems.getValue() / this.#pageSize.getValue());
+		let totalPages = Math.ceil(this.#totalItems.getValue() / this.#pageSize.getValue());
+		totalPages = totalPages === 0 ? 1 : totalPages;
 		this.#totalPages.setValue(totalPages);
 
 		/* If we currently are on a page higher than the total pages. We need to reset the current page to the last page.
@@ -117,7 +118,7 @@ export class UmbPaginationManager extends EventTarget {
 	}
 
 	#calculateSkip() {
-		const skip = (this.#currentPage.getValue() - 1) * this.#pageSize.getValue();
+		const skip = Math.max(0, (this.#currentPage.getValue() - 1) * this.#pageSize.getValue());
 		this.#skip.setValue(skip);
 	}
 }

@@ -86,8 +86,8 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 							(item) => item.nodeId,
 							(item) =>
 								html`<uui-table-row>
-									<uui-table-cell>
-										<uui-icon style=" vertical-align: middle;" name="icon-media"></uui-icon>
+									<uui-table-cell style="text-align:center;">
+										<umb-icon name=${item.contentTypeIcon ?? 'icon-media'}></umb-icon>
 									</uui-table-cell>
 									<uui-table-cell class="link-cell">
 										<uui-button

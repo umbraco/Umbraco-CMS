@@ -3,11 +3,11 @@ import { UMB_BLOCK_ELEMENT_PROPERTY_DATASET_CONTEXT } from './block-element-prop
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
-export class UmbBlockElementPropertyDatasetContext extends UmbBaseController implements UmbPropertyDatasetContext {
+export class UmbBlockElementPropertyDatasetContext extends UmbControllerBase implements UmbPropertyDatasetContext {
 	#elementManager: UmbBlockElementManager;
 
 	// default data:

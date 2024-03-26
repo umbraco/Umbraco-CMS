@@ -14,7 +14,7 @@ import { manifest as integer } from './Umbraco.Integer.js';
 import { manifest as label } from './Umbraco.Label.js';
 import { manifest as listView } from './Umbraco.ListView.js';
 import { manifest as markdownEditor } from './Umbraco.MarkdownEditor.js';
-import { manifest as mediaPicker } from './Umbraco.MediaPicker3.js';
+import { manifest as mediaPicker } from './Umbraco.MediaPicker.js';
 import { manifest as memberGroupPicker } from './Umbraco.MemberGroupPicker.js';
 import { manifest as memberPicker } from './Umbraco.MemberPicker.js';
 import { manifest as multiNodeTreePicker } from './Umbraco.MultiNodeTreePicker.js';

@@ -1,4 +1,4 @@
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDeselectedEvent, UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -8,8 +8,8 @@ import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observab
  * @export
  * @class UmbSelectionManager
  */
-export class UmbSelectionManager<ValueType extends string | null = string | null> extends UmbBaseController {
-	#selectable = new UmbBooleanState(false);
+export class UmbSelectionManager<ValueType extends string | null = string | null> extends UmbControllerBase {
+	#selectable = new UmbBooleanState(true);
 	public readonly selectable = this.#selectable.asObservable();
 
 	#selection = new UmbArrayState(<Array<ValueType>>[], (x) => x);
@@ -81,7 +81,9 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 		/* If multiple is set to false, and the current selection is more than one,
 		then we need to set the selection to the first item. */
 		if (value === false && this.getSelection().length > 1) {
-			this.setSelection([this.getSelection()[0]]);
+			const first = this.getSelection()[0];
+			this.clearSelection();
+			this.select(first);
 		}
 	}
 

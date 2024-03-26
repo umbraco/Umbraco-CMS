@@ -1,5 +1,5 @@
 import type { UmbDocumentEntityType } from './entity.js';
-import type { UmbVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantModel, UmbVariantOptionModel, UmbVariantPublishModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { DocumentVariantStateModel as UmbDocumentVariantState } from '@umbraco-cms/backoffice/external/backend-api';
 export { UmbDocumentVariantState };
@@ -13,7 +13,6 @@ export interface UmbDocumentDetailModel {
 	isTrashed: boolean;
 	template: { unique: string } | null;
 	unique: string;
-	parentUnique: string | null;
 	urls: Array<UmbDocumentUrlInfoModel>;
 	values: Array<UmbDocumentValueModel>;
 	variants: Array<UmbDocumentVariantModel>;
@@ -37,3 +36,5 @@ export interface UmbDocumentValueModel<ValueType = unknown> {
 }
 
 export interface UmbDocumentVariantOptionModel extends UmbVariantOptionModel<UmbDocumentVariantModel> {}
+
+export interface UmbDocumentVariantPublishModel extends UmbVariantPublishModel {}

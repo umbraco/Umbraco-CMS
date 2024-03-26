@@ -8,17 +8,12 @@ import type {
 } from './query-builder-modal.token.js';
 import type { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import {
-	UmbModalBaseElement,
-	UMB_DOCUMENT_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type {
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
+import { UmbDocumentItemRepository, UMB_DOCUMENT_PICKER_MODAL } from '@umbraco-cms/backoffice/document';
 import './query-builder-filter.element.js';
 
 enum SortOrder {
@@ -53,7 +48,6 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 	private _defaultSortDirection: SortOrder = SortOrder.Ascending;
 
 	#documentItemRepository: UmbDocumentItemRepository;
-	#modalManagerContext?: UmbModalManagerContext;
 	#templateQueryRepository: UmbTemplateQueryRepository;
 
 	constructor() {
@@ -61,9 +55,6 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 		this.#templateQueryRepository = new UmbTemplateQueryRepository(this);
 		this.#documentItemRepository = new UmbDocumentItemRepository(this);
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalManagerContext = instance;
-		});
 		this.#init();
 	}
 
@@ -98,9 +89,10 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 		}
 	};
 
-	#openDocumentPicker = () => {
-		this.#modalManagerContext
-			?.open(UMB_DOCUMENT_PICKER_MODAL, { data: { hideTreeRoot: true } })
+	async #openDocumentPicker() {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		modalManager
+			.open(this, UMB_DOCUMENT_PICKER_MODAL, { data: { hideTreeRoot: true } })
 			.onSubmit()
 			.then((result) => {
 				const selection = result.selection[0];
@@ -116,7 +108,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 					return;
 				}
 			});
-	};
+	}
 
 	async #getDocumentItem(ids: string[]) {
 		const { data } = await this.#documentItemRepository.requestItems(ids);
@@ -252,7 +244,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 								${this._templateQuery?.executionTime ?? 0} ms
 							</span>
 							${this._templateQuery?.sampleResults.map(
-								(sample) => html`<span><uui-icon name=${sample.icon}></uui-icon>${sample.name}</span>`,
+								(sample) => html`<span><umb-icon name=${sample.icon}></umb-icon>${sample.name}</span>`,
 							) ?? ''}
 						</div>
 						<umb-code-block language="C#" copy>${this._templateQuery?.queryExpression ?? ''}</umb-code-block>

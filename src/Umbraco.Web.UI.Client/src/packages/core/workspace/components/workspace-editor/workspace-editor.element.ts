@@ -95,7 +95,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 								<slot name="footer-info"></slot>
 								<slot name="actions" slot="actions"></slot>
 							</umb-workspace-footer>
-					  `}
+						`}
 			</umb-body-layout>
 		`;
 	}
@@ -113,13 +113,13 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 										.label="${view.meta.label || view.name}"
 										href="${this._routerPath}/view/${view.meta.pathname}"
 										?active="${'view/' + view.meta.pathname === this._activePath}">
-										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
+										<umb-icon slot="icon" name="${view.meta.icon}"></umb-icon>
 										${view.meta.label || view.name}
 									</uui-tab>
 								`,
 							)}
 						</uui-tab-group>
-				  `
+					`
 				: nothing}
 		`;
 	}
@@ -137,7 +137,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 							@change=${(event: UmbRouterSlotChangeEvent) => {
 								this._activePath = event.target.localActiveViewPath;
 							}}></umb-router-slot>
-				  `
+					`
 				: nothing}
 		`;
 	}

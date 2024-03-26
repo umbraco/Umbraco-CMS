@@ -8,8 +8,8 @@
  * @description - Inserts or replaces an entry in a frozen array and returns a new array.
  * @example <caption>Example append new entry for a UmbArrayState or a part of UmbObjectState/UmbDeepState which is an array. Where the key is unique and the item will be updated if matched with existing.</caption>
  * const entry = {id: 'myKey', value: 'myValue'};
- * const newDataSet = appendToFrozenArray(mySubject.getValue(), entry, x => x.id === id);
- * mySubject.next(newDataSet);
+ * const newDataSet = appendToFrozenArray(myState.getValue(), entry, x => x.id === id);
+ * myState.setValue(newDataSet);
  */
 export function appendToFrozenArray<T>(data: T[], entry: T, getUniqueMethod?: (entry: T) => unknown): T[] {
 	const unFrozenDataSet = [...data];

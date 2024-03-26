@@ -1,10 +1,10 @@
 import type { UmbInputTinyMceElement } from './input-tiny-mce.element.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-export class UmbTinyMcePluginBase extends UmbBaseController implements UmbApi {
+export class UmbTinyMcePluginBase extends UmbControllerBase implements UmbApi {
 	editor: Editor;
 	configuration?: UmbPropertyEditorConfigCollection;
 

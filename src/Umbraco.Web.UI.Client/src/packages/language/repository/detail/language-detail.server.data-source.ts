@@ -27,11 +27,11 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Creates a new Language scaffold
-	 * @param {(string | null)} parentUnique
+	 * @param {Partial<UmbLanguageDetailModel>} [preset]
 	 * @return { CreateLanguageRequestModel }
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(preset: Partial<UmbLanguageDetailModel> = {}) {
 		const data: UmbLanguageDetailModel = {
 			entityType: UMB_LANGUAGE_ENTITY_TYPE,
 			fallbackIsoCode: null,
@@ -39,6 +39,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 			isMandatory: false,
 			name: '',
 			unique: UmbId.new(), // Creating a temporary unique until the culture is selected
+			...preset,
 		};
 
 		return { data };

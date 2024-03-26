@@ -6,6 +6,8 @@ export function getPropertyValueByAlias(sortOrder: number, item: UmbDocumentColl
 	switch (alias) {
 		case 'createDate':
 			return item.createDate.toLocaleString();
+		case 'creator':
+			return item.creator;
 		case 'entityName':
 			return item.name;
 		case 'entityState':

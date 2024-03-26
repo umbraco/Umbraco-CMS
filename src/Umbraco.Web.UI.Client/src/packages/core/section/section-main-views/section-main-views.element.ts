@@ -134,7 +134,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 									href="${this._routerPath}/${viewPath}"
 									label="${viewName}"
 									?active="${this._activePath === viewPath}">
-									<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
+									<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>
 									${viewName}
 								</uui-tab>
 							`;

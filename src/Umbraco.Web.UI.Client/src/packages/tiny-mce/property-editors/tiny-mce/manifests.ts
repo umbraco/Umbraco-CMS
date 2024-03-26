@@ -212,7 +212,7 @@ export const manifest: ManifestPropertyEditorUi = {
 					alias: 'mode',
 					label: 'Mode',
 					description: 'Select the mode for the editor',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.RadioButtonList',
 					config: [
 						{
 							alias: 'items',
@@ -231,11 +231,11 @@ export const manifest: ManifestPropertyEditorUi = {
 					label: 'Hide Label',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
+			],
+			defaultData: [
 				{
-					alias: 'blocks',
-					label: 'Available Blocks',
-					description: 'Define the available blocks.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockRteTypeConfiguration',
+					alias: 'mode',
+					value: 'Classic',
 				},
 			],
 		},

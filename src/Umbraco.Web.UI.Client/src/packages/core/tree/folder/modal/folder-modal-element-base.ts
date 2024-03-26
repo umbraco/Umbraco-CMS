@@ -29,7 +29,9 @@ export abstract class UmbFolderModalElementBase<
 			[this],
 			(permitted, ctrl) => {
 				this.folderRepository = permitted ? (ctrl.api as UmbFolderRepository) : undefined;
-				this.init();
+				if (this.folderRepository) {
+					this.init();
+				}
 			},
 		);
 	}

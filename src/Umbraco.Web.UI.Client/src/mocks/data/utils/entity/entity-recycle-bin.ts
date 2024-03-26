@@ -2,9 +2,7 @@ import { UmbEntityMockDbBase } from './entity-base.js';
 import { UmbMockEntityTreeManager } from './entity-tree.manager.js';
 import type { ContentTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-export class UmbEntityRecycleBin<
-	MockType extends Omit<ContentTreeItemResponseModel, 'type'>,
-> extends UmbEntityMockDbBase<MockType> {
+export class UmbEntityRecycleBin<MockType extends ContentTreeItemResponseModel> extends UmbEntityMockDbBase<MockType> {
 	tree;
 
 	constructor(data: Array<MockType>, treeItemMapper: (model: MockType) => any) {

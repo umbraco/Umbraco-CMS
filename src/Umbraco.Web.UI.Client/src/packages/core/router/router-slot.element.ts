@@ -70,6 +70,10 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		return this.#router.constructAbsolutePath('') || '';
 	}
 
+	protected _constructLocalRouterPath() {
+		return this.#router.match?.fragments.consumed ?? '';
+	}
+
 	connectedCallback() {
 		super.connectedCallback();
 		// Currently we have to set this every time as RouteSlot looks for its parent every-time it is connected. Aka it has not way to explicitly set the parent.
@@ -101,7 +105,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 			this.#routeContext._internal_routerGotBasePath(this._routerPath);
 			this.dispatchEvent(new UmbRouterSlotInitEvent());
 
-			const newActiveLocalPath = this.#router.match?.route.path;
+			const newActiveLocalPath = this._constructLocalRouterPath();
 			if (this._activeLocalPath !== newActiveLocalPath) {
 				this._activeLocalPath = newActiveLocalPath;
 				this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
@@ -112,11 +116,14 @@ export class UmbRouterSlotElement extends UmbLitElement {
 
 	private _onNavigationChanged = (event?: any) => {
 		if (event.detail.slot === this.#router) {
-			this._activeLocalPath = event.detail.match.route.path;
-			this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
-			this.dispatchEvent(new UmbRouterSlotChangeEvent());
+			const newActiveLocalPath = this._constructLocalRouterPath();
+			if (this._activeLocalPath !== newActiveLocalPath) {
+				this._activeLocalPath = newActiveLocalPath;
+				this.#routeContext._internal_routerGotActiveLocalPath(newActiveLocalPath);
+				this.dispatchEvent(new UmbRouterSlotChangeEvent());
+			}
 		} else if (event.detail.slot === this.#modalRouter) {
-			const newActiveModalLocalPath = event.detail.match.route.path;
+			const newActiveModalLocalPath = this.#modalRouter.match?.fragments.consumed ?? '';
 			this.#routeContext._internal_modalRouterChanged(newActiveModalLocalPath);
 		}
 	};

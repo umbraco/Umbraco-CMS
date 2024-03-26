@@ -10,9 +10,14 @@ const section: ManifestSection = {
 	weight: 500,
 	meta: {
 		label: 'Media',
-		pathname: 'media-management',
+		pathname: 'media',
 	},
-	conditions: [],
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionUserPermission',
+			match: sectionAlias,
+		},
+	],
 };
 
 const menuSectionSidebarApp: ManifestSectionSidebarApp = {

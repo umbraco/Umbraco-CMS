@@ -18,7 +18,13 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'storageType',
 					label: 'Storage Type',
 					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tags.StorageType',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+					config: [
+						{
+							alias: 'items',
+							value: ['Csv', 'Json'],
+						},
+					],
 				},
 			],
 			defaultData: [

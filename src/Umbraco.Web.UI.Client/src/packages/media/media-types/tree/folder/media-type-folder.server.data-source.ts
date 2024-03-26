@@ -41,7 +41,6 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 			const mappedData = {
 				unique: data.id,
 				name: data.name,
-				parentUnique: data.parent ? data.parent.id : null,
 			};
 
 			return { data: mappedData };
@@ -62,7 +61,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 
 		const requestBody = {
 			id: args.unique,
-			parentId: args.parentUnique,
+			parent: args.parentUnique ? { id: args.parentUnique } : null,
 			name: args.name,
 		};
 

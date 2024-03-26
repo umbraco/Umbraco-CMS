@@ -6,11 +6,11 @@ import {
 	type UmbTemplatingItemPickerModalValue,
 } from '../../modals/templating-item-picker/templating-item-picker-modal.token.js';
 import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils/index.js';
-import { UmbDictionaryDetailRepository } from '@umbraco-cms/backoffice/dictionary';
+import { UmbDictionaryDetailRepository, UMB_DICTIONARY_PICKER_MODAL } from '@umbraco-cms/backoffice/dictionary';
 import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_DICTIONARY_ITEM_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-templating-insert-menu')
@@ -18,14 +18,14 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	@property()
 	value = '';
 
-	private _modalContext?: UmbModalManagerContext;
+	#modalContext?: UmbModalManagerContext;
 
 	#dictionaryDetailRepository = new UmbDictionaryDetailRepository(this);
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
+			this.#modalContext = instance;
 		});
 	}
 
@@ -58,44 +58,56 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	async #openTemplatingItemPickerModal() {
-		const itemPickerContext = this._modalContext?.open(UMB_TEMPLATING_ITEM_PICKER_MODAL);
-		await itemPickerContext?.onSubmit();
+		const itemPickerContext = this.#modalContext?.open(this, UMB_TEMPLATING_ITEM_PICKER_MODAL);
+		const result = await itemPickerContext?.onSubmit().catch(() => undefined);
+
+		if (result === undefined) return;
 
 		const value = itemPickerContext?.getValue();
+
 		if (!value) return;
 
 		this.determineInsertValue(value);
 	}
 
 	async #openPartialViewPickerModal() {
-		const partialViewPickerContext = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
-		await partialViewPickerContext?.onSubmit();
+		const partialViewPickerContext = this.#modalContext?.open(this, UMB_PARTIAL_VIEW_PICKER_MODAL);
+		const result = await partialViewPickerContext?.onSubmit().catch(() => undefined);
 
-		const path = partialViewPickerContext?.getValue().selection[0];
-		if (!path) return;
+		if (result === undefined) return;
 
-		this.determineInsertValue({ type: CodeSnippetType.partialView, value: path });
+		const value = partialViewPickerContext?.getValue().selection[0];
+
+		if (!value) return;
+
+		this.determineInsertValue({ type: CodeSnippetType.partialView, value });
 	}
 
 	async #openDictionaryItemPickerModal() {
-		const dictionaryItemPickerContext = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL);
-		await dictionaryItemPickerContext?.onSubmit();
+		const dictionaryItemPickerContext = this.#modalContext?.open(this, UMB_DICTIONARY_PICKER_MODAL);
+		const result = await dictionaryItemPickerContext?.onSubmit().catch(() => undefined);
 
-		const item = dictionaryItemPickerContext?.getValue().selection[0];
-		if (!item) return;
+		if (result === undefined) return;
 
-		this.determineInsertValue({ type: CodeSnippetType.dictionaryItem, value: item });
+		const value = dictionaryItemPickerContext?.getValue().selection[0];
+
+		if (!value) return;
+
+		this.determineInsertValue({ type: CodeSnippetType.dictionaryItem, value });
 	}
 
 	async #openPageFieldBuilderModal() {
-		const pageFieldBuilderContext = this._modalContext?.open(UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
-		await pageFieldBuilderContext?.onSubmit();
+		const pageFieldBuilderContext = this.#modalContext?.open(this, UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
+		const result = await pageFieldBuilderContext?.onSubmit().catch(() => undefined);
 
-		const output = pageFieldBuilderContext?.getValue().output;
-		if (!output) return;
+		if (result === undefined) return;
+
+		const value = pageFieldBuilderContext?.getValue().output;
+
+		if (!value) return;
 
 		// The output is already built due to the preview in the modal. Can insert it directly now.
-		this.value = output;
+		this.value = value;
 		this.#dispatchInsertEvent();
 	}
 

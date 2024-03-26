@@ -1,10 +1,5 @@
-import {
-	UMB_DISABLE_USER_REPOSITORY_ALIAS,
-	UMB_ENABLE_USER_REPOSITORY_ALIAS,
-	UMB_UNLOCK_USER_REPOSITORY_ALIAS,
-	UMB_USER_DETAIL_REPOSITORY_ALIAS,
-} from '../repository/index.js';
 import { UMB_USER_COLLECTION_ALIAS } from '../collection/manifests.js';
+import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbEnableUserEntityBulkAction } from './enable/enable.action.js';
 import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action.js';
 import { UmbUnlockUserEntityBulkAction } from './unlock/unlock.action.js';
@@ -19,9 +14,9 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		name: 'SetGroup User Entity Bulk Action',
 		weight: 400,
 		api: UmbSetGroupUserEntityBulkAction,
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			label: 'SetGroup',
-			repositoryAlias: UMB_USER_DETAIL_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
@@ -36,9 +31,9 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		name: 'Enable User Entity Bulk Action',
 		weight: 300,
 		api: UmbEnableUserEntityBulkAction,
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			label: 'Enable',
-			repositoryAlias: UMB_ENABLE_USER_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
@@ -53,9 +48,9 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		name: 'Unlock User Entity Bulk Action',
 		weight: 200,
 		api: UmbUnlockUserEntityBulkAction,
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			label: 'Unlock',
-			repositoryAlias: UMB_UNLOCK_USER_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
@@ -70,9 +65,9 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		name: 'Disable User Entity Bulk Action',
 		weight: 100,
 		api: UmbDisableUserEntityBulkAction,
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			label: 'Disable',
-			repositoryAlias: UMB_DISABLE_USER_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{

@@ -27,6 +27,7 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 		});
 	}
 
+	// TODO: make this a utility function, please check that we do not already have on for this: [NL]
 	// credit: https://stackoverflow.com/a/7225450/12787 [LK]
 	#camelCaseToWords(input: string) {
 		const result = input.replace(/([A-Z])/g, ' $1');
@@ -35,7 +36,6 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 
 	#onChange(event: UUISelectEvent) {
 		const extensionType = event.target.value;
-		console.log('onChange', extensionType);
 		this.#collectionContext?.setFilter({ type: extensionType });
 	}
 

@@ -20,6 +20,6 @@ export type CreateContentTypeForDocumentTypeRequestModel = {
     properties: Array<CreateDocumentTypePropertyTypeRequestModel>;
     containers: Array<CreateDocumentTypePropertyTypeContainerRequestModel>;
     id?: string | null;
-    folder?: ReferenceByIdModel | null;
+    parent?: ReferenceByIdModel | null;
 };
 

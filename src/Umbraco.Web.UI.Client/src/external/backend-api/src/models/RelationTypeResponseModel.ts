@@ -9,7 +9,7 @@ export type RelationTypeResponseModel = (RelationTypeBaseModel & {
     id: string;
     alias?: string | null;
     path: string;
-    isSystemRelationType: boolean;
+    isDeletable: boolean;
     parentObjectTypeName?: string | null;
     childObjectTypeName?: string | null;
 });

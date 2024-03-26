@@ -2,7 +2,7 @@ import type { TagResponseModel } from '@umbraco-cms/backoffice/external/backend-
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export const UMB_TAG_STORE_CONTEXT = new UmbContextToken<UmbTagStore>('UmbTagStore');
 /**
@@ -16,10 +16,10 @@ export class UmbTagStore extends UmbStoreBase {
 
 	/**
 	 * Creates an instance of UmbTagStore.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbTagStore
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_TAG_STORE_CONTEXT.toString(), new UmbArrayState<TagResponseModel>([], (x) => x.id));
 	}
 

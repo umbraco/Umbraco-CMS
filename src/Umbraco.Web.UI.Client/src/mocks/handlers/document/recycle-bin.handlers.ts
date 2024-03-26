@@ -5,14 +5,18 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const recycleBinHandlers = [
 	rest.get(umbracoPath(`/recycle-bin${UMB_SLUG}/root`), (req, res, ctx) => {
-		const response = umbDocumentMockDb.recycleBin.tree.getRoot();
+		const skip = Number(req.url.searchParams.get('skip'));
+		const take = Number(req.url.searchParams.get('take'));
+		const response = umbDocumentMockDb.recycleBin.tree.getRoot({ skip, take });
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.get(umbracoPath(`/recycle-bin${UMB_SLUG}/children`), (req, res, ctx) => {
 		const parentId = req.url.searchParams.get('parentId');
 		if (!parentId) return;
-		const response = umbDocumentMockDb.recycleBin.tree.getChildrenOf(parentId);
+		const skip = Number(req.url.searchParams.get('skip'));
+		const take = Number(req.url.searchParams.get('take'));
+		const response = umbDocumentMockDb.recycleBin.tree.getChildrenOf({ parentId, skip, take });
 		return res(ctx.status(200), ctx.json(response));
 	}),
 

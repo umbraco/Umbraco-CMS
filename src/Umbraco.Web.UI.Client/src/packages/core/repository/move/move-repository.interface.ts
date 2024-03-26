@@ -1,5 +1,5 @@
-import type { UmbDataSourceErrorResponse } from '../data-source-response.interface.js';
+import type { UmbRepositoryErrorResponse } from '../types.js';
 
 export interface UmbMoveRepository {
-	move(unique: string, targetUnique: string): Promise<UmbDataSourceErrorResponse>;
+	move(unique: string, targetUnique: string): Promise<UmbRepositoryErrorResponse>;
 }

@@ -1,4 +1,4 @@
-import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from '../dictionary-workspace.context.js';
+import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from '../dictionary-workspace.context-token.js';
 import type { UmbDictionaryDetailModel } from '../../types.js';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';

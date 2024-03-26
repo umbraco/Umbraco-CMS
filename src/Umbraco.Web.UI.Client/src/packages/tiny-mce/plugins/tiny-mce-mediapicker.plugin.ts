@@ -1,5 +1,5 @@
+import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL } from '../modals/media-caption-alt-text/media-caption-alt-text-modal.token.js';
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MEDIA_TREE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
@@ -26,8 +26,8 @@ interface MediaPickerResultData {
 
 export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	#currentUser?: UmbCurrentUserModel;
-	#modalContext?: UmbModalManagerContext;
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
+	#modalManager?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#temporaryFileRepository;
 
 	constructor(args: TinyMcePluginArguments) {
@@ -35,8 +35,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(args.host);
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalContext) => {
-			this.#modalContext = modalContext;
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
+			this.#modalManager = instance;
 		});
 
 		// TODO => this breaks tests. disabling for now
@@ -136,9 +136,12 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		*/
 
 		// TODO => startNodeId and startNodeIsVirtual do not exist on ContentTreeItemResponseModel
-		const modalHandler = this.#modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {
+
+		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_TREE_PICKER_MODAL, {
 			data: {
 				multiple: false,
+				hideTreeRoot: true,
+
 				//startNodeId,
 				//startNodeIsVirtual,
 			},
@@ -149,31 +152,48 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 		if (!modalHandler) return;
 
-		const { selection } = await modalHandler.onSubmit();
-		if (!selection.length) return;
+		const { selection } = await modalHandler.onSubmit().catch(() => ({ selection: undefined }));
+		if (!selection || !selection.length) return;
 
-		this.#insertInEditor(selection[0]);
+		this.#showMediaCaptionAltText(selection[0]);
 		this.editor.dispatch('Change');
 	}
 
-	// TODO => mediaPicker returns a UDI, so need to fetch it. Wait for backend CLI before implementing
-	async #insertInEditor(img: any) {
-		if (!img) return;
+	async #showMediaCaptionAltText(mediaUnique: string | null) {
+		if (!mediaUnique) return;
+
+		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, { data: { mediaUnique } });
+
+		await modalHandler?.onSubmit().catch(() => undefined);
+		const mediaData = modalHandler?.getValue();
+
+		const media: MediaPickerTargetData = {
+			altText: mediaData?.altText,
+			caption: mediaData?.caption,
+			url: mediaData?.url,
+			udi: 'umb://media/' + mediaUnique?.replace(/-/g, ''),
+		};
+
+		this.#insertInEditor(media);
+	}
+
+	async #insertInEditor(media: MediaPickerTargetData) {
+		if (!media) return;
 
 		// We need to create a NEW DOM <img> element to insert
 		// setting an attribute of ID to __mcenew, so we can gather a reference to the node, to be able to update its size accordingly to the size of the image.
-		const data: MediaPickerResultData = {
-			alt: img.altText || '',
-			src: img.url ? img.url : 'nothing.jpg',
+		const img: MediaPickerResultData = {
+			alt: media.altText,
+			src: media.url ? media.url : 'nothing.jpg',
 			id: '__mcenew',
-			'data-udi': img.udi,
-			'data-caption': img.caption,
+			'data-udi': media.udi,
+			'data-caption': media.caption,
 		};
-		const newImage = this.editor.dom.createHTML('img', data as Record<string, string | null>);
+		const newImage = this.editor.dom.createHTML('img', img as Record<string, string | null>);
 		const parentElement = this.editor.selection.getNode().parentElement;
 
-		if (img.caption && parentElement) {
-			const figCaption = this.editor.dom.createHTML('figcaption', {}, img.caption);
+		if (img['data-caption'] && parentElement) {
+			const figCaption = this.editor.dom.createHTML('figcaption', {}, img['data-caption']);
 			const combined = newImage + figCaption;
 
 			if (parentElement.nodeName !== 'FIGURE') {
@@ -200,7 +220,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 			// When image is loaded we are ready to call sizeImageInEditor.
 			const onImageLoaded = () => {
-				sizeImageInEditor(this.editor, imgElm, img.url);
+				sizeImageInEditor(this.editor, imgElm, img.src);
 				this.editor.dispatch('Change');
 			};
 

@@ -47,7 +47,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	async #getReferences() {
 		const { data } = await this.#trackedReferenceRepository.requestTrackedReference(
 			this.documentUnique,
-			this._currentPage - 1 * this.#itemsPerPage,
+			(this._currentPage - 1) * this.#itemsPerPage,
 			this.#itemsPerPage,
 		);
 		if (!data) return;
@@ -65,10 +65,9 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 
 	render() {
 		if (this._items && this._items.length > 0) {
-			return html`<strong>
-					<umb-localize key="references_labelUsedByItems">Referenced by the following items</umb-localize>
-				</strong>
-				<uui-box style="--uui-box-default-padding:0">
+			return html` <uui-box
+					headline=${this.localize.term('references_labelUsedByItems')}
+					style="--uui-box-default-padding:0">
 					<uui-table>
 						<uui-table-head>
 							<uui-table-head-cell></uui-table-head-cell>
@@ -86,8 +85,8 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 							(item) => item.nodeId,
 							(item) =>
 								html`<uui-table-row>
-									<uui-table-cell>
-										<uui-icon style=" vertical-align: middle;" name="icon-document"></uui-icon>
+									<uui-table-cell style="text-align:center;">
+										<umb-icon name=${item.contentTypeIcon ?? 'icon-document'}></umb-icon>
 									</uui-table-cell>
 									<uui-table-cell class="link-cell">
 										<uui-button label="Edit" href=${`${this._editDocumentPath}edit/${item.nodeId}`}>

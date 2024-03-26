@@ -1,14 +1,7 @@
-import type { UmbDocumentDetailRepository } from '../../repository/index.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbDocumentMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbDocumentDetailRepository> {
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
-		super(host, repositoryAlias, selection);
-	}
-
+export class UmbMoveDocumentEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
-		console.log(`execute move for: ${this.selection}`);
-		//await this.repository?.move();
+		console.log(`execute bulk move`);
 	}
 }

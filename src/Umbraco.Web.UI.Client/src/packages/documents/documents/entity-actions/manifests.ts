@@ -1,111 +1,130 @@
 import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
-import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbPublishDocumentEntityAction } from './publish.action.js';
-import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action.js';
-import { UmbUnpublishDocumentEntityAction } from './unpublish.action.js';
-import { UmbRollbackDocumentEntityAction } from './rollback.action.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_PICKER_MODAL } from '../modals/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
-import {
-	UmbCopyEntityAction,
-	UmbMoveEntityAction,
-	UmbSortChildrenOfEntityAction,
-} from '@umbraco-cms/backoffice/entity-action';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
-	...createManifests,
-	...publicAccessManifests,
-	...cultureAndHostnamesManifests,
+const entityActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
+		kind: 'delete',
+		alias: 'Umb.EntityAction.Document.Delete',
+		name: 'Delete Document Entity Action',
+		weight: 1100,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		meta: {
+			deleteRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
+			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
+			pickerModalAlias: UMB_DOCUMENT_PICKER_MODAL,
+		},
+	},
+	{
+		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Document.CreateBlueprint',
 		name: 'Create Document Blueprint Entity Action',
-		weight: 800,
-		api: UmbCreateDocumentBlueprintEntityAction,
+		weight: 1000,
+		api: () => import('./create-blueprint.action.js'),
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-blueprint',
 			label: 'Create Document Blueprint (TBD)',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.Move',
 		name: 'Move Document Entity Action ',
-		weight: 700,
-		api: UmbMoveEntityAction,
+		kind: 'move',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		weight: 900,
 		meta: {
-			icon: 'icon-enter',
-			label: 'Move (TBD)',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+			moveRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
+			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
+			pickerModelAlias: UMB_DOCUMENT_PICKER_MODAL,
 		},
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Copy',
-		name: 'Copy Document Entity Action',
-		weight: 600,
-		api: UmbCopyEntityAction,
+		kind: 'duplicate',
+		alias: 'Umb.EntityAction.Document.Duplicate',
+		name: 'Duplicate Document Entity Action',
+		weight: 800,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			icon: 'icon-documents',
-			label: 'Copy (TBD)',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+			duplicateRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
+			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
+			pickerModal: UMB_DOCUMENT_PICKER_MODAL,
 		},
 	},
 	{
 		type: 'entityAction',
+		kind: 'sort',
 		alias: 'Umb.EntityAction.Document.Sort',
 		name: 'Sort Document Entity Action',
-		weight: 500,
-		api: UmbSortChildrenOfEntityAction,
-		meta: {
-			icon: 'icon-navigation-vertical',
-			label: 'Sort (TBD)',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
-		},
+		weight: 700,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		meta: {},
 	},
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Document.Publish',
 		name: 'Publish Document Entity Action',
-		api: UmbPublishDocumentEntityAction,
+		weight: 600,
+		api: () => import('./publish.action.js'),
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-globe',
 			label: 'Publish',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Document.Unpublish',
 		name: 'Unpublish Document Entity Action',
-		api: UmbUnpublishDocumentEntityAction,
+		weight: 500,
+		api: () => import('./unpublish.action.js'),
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-globe',
-			label: 'Unpublish',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+			label: 'Unpublish...',
 		},
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Rollback',
-		name: 'Rollback Document Entity Action',
-		api: UmbRollbackDocumentEntityAction,
+		kind: 'default',
+		alias: 'Umb.EntityAction.Document.Permissions',
+		name: 'Permissions Document Entity Action',
+		weight: 300,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		api: () => import('./permissions.action.js'),
 		meta: {
-			icon: 'icon-undo',
-			label: 'Rollback (TBD)',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+			icon: 'icon-name-badge',
+			label: 'Permissions...',
+		},
+	},
+	{
+		type: 'entityAction',
+		kind: 'default',
+		alias: 'Umb.EntityAction.Document.Notifications',
+		name: 'Notifications Document Entity Action',
+		weight: 100,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		api: () => import('./permissions.action.js'),
+		meta: {
+			icon: 'icon-megaphone',
+			label: 'Notifications...',
 		},
 	},
 ];
 
-export const manifests = [...entityActions];
+export const manifests = [
+	...createManifests,
+	...publicAccessManifests,
+	...cultureAndHostnamesManifests,
+	...entityActions,
+];

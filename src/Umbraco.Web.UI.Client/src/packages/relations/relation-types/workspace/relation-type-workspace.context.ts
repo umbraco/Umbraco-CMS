@@ -1,27 +1,62 @@
 import { UmbRelationTypeRepository } from '../repository/relation-type.repository.js';
+import { UmbRelationTypeWorkspaceEditorElement } from './relation-type-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContextInterface,
-	UmbEditableWorkspaceContextBase,
+	type UmbSaveableWorkspaceContext,
+	UmbSaveableWorkspaceContextBase,
+	type UmbRoutableWorkspaceContext,
+	UmbWorkspaceRouteManager,
+	UmbWorkspaceIsNewRedirectController,
 } from '@umbraco-cms/backoffice/workspace';
 import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbRelationTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<RelationTypeResponseModel>
-	implements UmbSaveableWorkspaceContextInterface
+	extends UmbSaveableWorkspaceContextBase<RelationTypeResponseModel>
+	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly repository: UmbRelationTypeRepository = new UmbRelationTypeRepository(this);
 
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+
 	#data = new UmbObjectState<RelationTypeResponseModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+	readonly unique = this.#data.asObservablePart((data) => data?.id);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly id = this.#data.asObservablePart((data) => data?.id);
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.RelationType');
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique',
+				component: UmbRelationTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique });
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbRelationTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	protected resetState(): void {
@@ -39,9 +74,10 @@ export class UmbRelationTypeWorkspaceContext
 		}
 	}
 
-	async create(parentId: string | null) {
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		const { data } = await this.repository.createScaffold(parentId);
+		this.#parent.setValue(parent);
+		const { data } = await this.repository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.setValue(data);
@@ -100,11 +136,4 @@ export class UmbRelationTypeWorkspaceContext
 	}
 }
 
-export const UMB_RELATION_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbRelationTypeWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbRelationTypeWorkspaceContext => context.getEntityType?.() === 'relation-type',
-);
+export { UmbRelationTypeWorkspaceContext as api };

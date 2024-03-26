@@ -21,6 +21,9 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	public set splitViewIndex(index: number) {
 		this.splitViewContext.setSplitViewIndex(index);
 	}
+	public get splitViewIndex(): number {
+		return this.splitViewContext.getSplitViewIndex()!;
+	}
 
 	splitViewContext = new UmbWorkspaceSplitViewContext(this);
 

@@ -1,47 +1,43 @@
-import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	HealthCheckGroupPresentationModel,
 	HealthCheckGroupWithResultResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbHealthCheckContext {
-	private _checks = new BehaviorSubject<HealthCheckGroupPresentationModel | undefined>(undefined);
-	public readonly checks = this._checks.asObservable();
+export class UmbHealthCheckContext extends UmbControllerBase implements UmbApi {
+	#checks = new UmbBasicState<HealthCheckGroupPresentationModel | undefined>(undefined);
+	public readonly checks = this.#checks.asObservable();
 
-	private _results = new BehaviorSubject<HealthCheckGroupWithResultResponseModel | undefined>(undefined);
-	public readonly results = this._results.asObservable();
-
-	public host: UmbControllerHostElement;
-
-	constructor(host: UmbControllerHostElement) {
-		this.host = host;
-	}
+	#results = new UmbBasicState<HealthCheckGroupWithResultResponseModel | undefined>(undefined);
+	public readonly results = this.#results.asObservable();
 
 	async getGroupChecks(name: string) {
-		const { data } = await tryExecuteAndNotify(this.host, HealthCheckResource.getHealthCheckGroupByName({ name }));
+		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.getHealthCheckGroupByName({ name }));
 
 		if (data) {
-			this._checks.next(data);
+			this.#checks.setValue(data);
 		} else {
-			this._checks.next(undefined);
+			this.#checks.setValue(undefined);
 		}
 	}
 
 	async checkGroup(name: string) {
-		const { data } = await tryExecuteAndNotify(
-			this.host,
-			HealthCheckResource.postHealthCheckGroupByNameCheck({ name }),
-		);
+		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.postHealthCheckGroupByNameCheck({ name }));
 
 		if (data) {
-			this._results.next(data);
+			this.#results.setValue(data);
 		} else {
-			this._results.next(undefined);
+			this.#results.setValue(undefined);
 		}
+	}
+
+	static isInstanceLike(instance: unknown): instance is UmbHealthCheckContext {
+		return typeof instance === 'object' && (instance as UmbHealthCheckContext).results !== undefined;
 	}
 }
 

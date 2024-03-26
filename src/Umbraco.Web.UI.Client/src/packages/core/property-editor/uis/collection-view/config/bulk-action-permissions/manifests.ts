@@ -7,7 +7,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	element: () => import('./property-editor-ui-collection-view-bulk-action-permissions.element.js'),
 	meta: {
 		label: 'Collection View Bulk Action Permissions',
-		propertyEditorSchemaAlias: '',
 		icon: 'icon-autofill',
 		group: 'lists',
 	},

@@ -21,25 +21,24 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		this.#host = host;
 	}
 
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(preset: Partial<UmbStylesheetDetailModel> = {}) {
 		const data: UmbStylesheetDetailModel = {
 			entityType: UMB_STYLESHEET_ENTITY_TYPE,
-			parentUnique,
 			unique: '',
 			path: '',
 			name: '',
 			content: '',
+			...preset,
 		};
 
 		return { data };
 	}
 
-	async create(model: UmbStylesheetDetailModel) {
+	async create(model: UmbStylesheetDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Data is missing');
-		if (!model.parentUnique === undefined) throw new Error('Parent Unique is missing');
 		if (!model.name) throw new Error('Name is missing');
 
-		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(model.parentUnique);
+		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(parentUnique);
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateStylesheetRequestModel = {
@@ -82,7 +81,6 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const stylesheet: UmbStylesheetDetailModel = {
 			entityType: UMB_STYLESHEET_ENTITY_TYPE,
 			unique: this.#serverFilePathUniqueSerializer.toUnique(data.path),
-			parentUnique: data.parent ? this.#serverFilePathUniqueSerializer.toUnique(data.parent.path) : null,
 			path: data.path,
 			name: data.name,
 			content: data.content,

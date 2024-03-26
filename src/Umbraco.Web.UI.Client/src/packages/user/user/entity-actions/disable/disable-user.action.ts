@@ -1,22 +1,20 @@
-import type { UmbDisableUserRepository } from '../../repository/disable/disable-user.repository.js';
 import { UmbUserItemRepository } from '../../repository/item/user-item.repository.js';
+import { UmbDisableUserRepository } from '../../repository/index.js';
+import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
-export class UmbDisableUserEntityAction extends UmbEntityActionBase<UmbDisableUserRepository> {
-	#itemRepository: UmbUserItemRepository;
-
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias, unique, entityType);
-
-		this.#itemRepository = new UmbUserItemRepository(this);
+export class UmbDisableUserEntityAction extends UmbEntityActionBase<never> {
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
+		super(host, args);
 	}
 
 	async execute() {
-		if (!this.repository) return;
+		if (!this.args.unique) throw new Error('Unique is not available');
 
-		const { data } = await this.#itemRepository.requestItems([this.unique]);
+		const itemRepository = new UmbUserItemRepository(this);
+		const { data } = await itemRepository.requestItems([this.args.unique]);
 
 		if (data) {
 			const item = data[0];
@@ -28,7 +26,8 @@ export class UmbDisableUserEntityAction extends UmbEntityActionBase<UmbDisableUs
 				confirmLabel: 'Disable',
 			});
 
-			await this.repository?.disable([this.unique]);
+			const disableUserRepository = new UmbDisableUserRepository(this);
+			await disableUserRepository.disable([this.args.unique]);
 		}
 	}
 }

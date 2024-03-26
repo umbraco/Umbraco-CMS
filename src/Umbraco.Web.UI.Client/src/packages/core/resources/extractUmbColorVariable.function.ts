@@ -1,4 +1,4 @@
-const umbracoColors = [
+export const umbracoColors = [
 	{ alias: 'text', varName: '--uui-color-text' },
 	{ alias: 'yellow', varName: '--uui-palette-sunglow' },
 	{ alias: 'pink', varName: '--uui-palette-spanish-pink' },

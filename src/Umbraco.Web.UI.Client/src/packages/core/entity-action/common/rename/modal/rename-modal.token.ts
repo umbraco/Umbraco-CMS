@@ -3,6 +3,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbRenameModalData {
 	renameRepositoryAlias: string;
+	itemRepositoryAlias: string;
 	unique: string;
 }
 

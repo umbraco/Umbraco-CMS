@@ -1,12 +1,15 @@
 import type { UmbMediaCollectionFilterModel } from '../types.js';
 import { UmbMediaCollectionServerDataSource } from './media-collection.server.data-source.js';
+import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbMediaCollectionRepository implements UmbCollectionRepository {
+export class UmbMediaCollectionRepository extends UmbRepositoryBase implements UmbCollectionRepository {
 	#collectionSource: UmbMediaCollectionServerDataSource;
 
 	constructor(host: UmbControllerHost) {
+		super(host);
+
 		this.#collectionSource = new UmbMediaCollectionServerDataSource(host);
 	}
 

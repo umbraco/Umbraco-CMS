@@ -2,16 +2,17 @@ import { expect } from '@open-wc/testing';
 import type { ManifestElement, ManifestElementAndApi } from '../types/index.js';
 import { createExtensionElement } from './create-extension-element.function.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-extension-api-true-test-element')
-class UmbExtensionApiTrueTestElement extends HTMLElement {
+class UmbExtensionApiTrueTestElement extends UmbLitElement {
 	isValidClassInstance() {
 		return true;
 	}
 }
 
 @customElement('umb-extension-api-false-test-element')
-class UmbExtensionApiFalseTestElement extends HTMLElement {
+class UmbExtensionApiFalseTestElement extends UmbLitElement {
 	isValidClassInstance() {
 		return false;
 	}
@@ -30,7 +31,7 @@ const jsModuleWithDefaultAndElementExport = {
 	element: UmbExtensionApiTrueTestElement,
 };
 
-describe('Extension-Api: Create Extension Element', () => {
+describe('Create Extension Element Method', () => {
 	it('Returns `undefined` when manifest does not have any correct properties', async () => {
 		const manifest: ManifestElement = {
 			type: 'my-test-type',

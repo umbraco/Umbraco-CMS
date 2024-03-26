@@ -1,13 +1,13 @@
 import type { UmbBlockDataType } from '../types.js';
 import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
-import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 
-export class UmbBlockElementManager extends UmbBaseController {
+export class UmbBlockElementManager extends UmbControllerBase {
 	//
 	#data = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
 	readonly data = this.#data.asObservable();
@@ -19,7 +19,7 @@ export class UmbBlockElementManager extends UmbBaseController {
 	readonly unique = this.#data.asObservablePart((data) => data?.udi);
 	readonly contentTypeId = this.#data.asObservablePart((data) => data?.contentTypeKey);
 
-	readonly structure = new UmbContentTypePropertyStructureManager<UmbContentTypeModel>(
+	readonly structure = new UmbContentTypeStructureManager<UmbContentTypeModel>(
 		this,
 		new UmbDocumentTypeDetailRepository(this),
 	);

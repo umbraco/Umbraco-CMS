@@ -3,13 +3,13 @@ import type { ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registr
 const menuItem: ManifestMenuItem = {
 	type: 'menuItem',
 	alias: 'Umb.MenuItem.Extensions',
-	name: 'Extensions Menu Item',
-	weight: 0,
+	name: 'Extension Insights Menu Item',
+	weight: 200,
 	meta: {
-		label: 'Extensions',
+		label: 'Extension Insights',
 		icon: 'icon-wand',
 		entityType: 'extension-root',
-		menus: ['Umb.Menu.Settings'],
+		menus: ['Umb.Menu.AdvancedSettings'],
 	},
 };
 

@@ -6,16 +6,20 @@ export type ObserverCallbackStack<T> = {
 	complete?: () => void;
 };
 
-export type ObserverCallback<T> = ((_value: T) => void) | ObserverCallbackStack<T>;
+export type ObserverCallback<T> = (_value: T) => void;
+// We do not use the ObserverCallbackStack type, and it was making things more complicated than they need to be so I have taken it out..
+//export type ObserverCallback<T> = ((_value: T) => void) | ObserverCallbackStack<T>;
 
 export class UmbObserver<T> {
 	#source!: Observable<T>;
 	#callback!: ObserverCallback<T>;
 	#subscription!: Subscription;
 
-	constructor(source: Observable<T>, callback: ObserverCallback<T>) {
+	constructor(source: Observable<T>, callback?: ObserverCallback<T>) {
 		this.#source = source;
-		this.#subscription = source.subscribe(callback);
+		if (callback) {
+			this.#subscription = source.subscribe(callback);
+		}
 	}
 
 	/**
@@ -61,9 +65,9 @@ export class UmbObserver<T> {
 	destroy(): void {
 		if (this.#subscription) {
 			this.#subscription.unsubscribe();
-			(this.#source as any) = undefined;
 			(this.#callback as any) = undefined;
 			(this.#subscription as any) = undefined;
 		}
+		(this.#source as any) = undefined;
 	}
 }

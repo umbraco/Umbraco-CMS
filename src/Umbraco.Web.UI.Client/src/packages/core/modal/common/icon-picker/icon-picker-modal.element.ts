@@ -6,6 +6,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import type { UmbIconPickerModalData, UmbIconPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { extractUmbColorVariable, umbracoColors } from '@umbraco-cms/backoffice/resources';
 
 // TODO: Make use of UmbPickerLayoutBase
 // TODO: to prevent element extension we need to move the Picker logic into a separate class we can reuse across all pickers
@@ -17,25 +18,15 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	private _iconListFiltered: Array<(typeof icons)[0]> = [];
 
 	@state()
-	private _colorList = [
-		{ alias: 'text', varName: '--uui-color-text' },
-		{ alias: 'yellow', varName: '--uui-palette-sunglow' },
-		{ alias: 'pink', varName: '--uui-palette-spanish-pink' },
-		{ alias: 'dark', varName: '--uui-palette-gunmetal' },
-		{ alias: 'darkblue', varName: '--uui-palette-space-cadet' },
-		{ alias: 'blue', varName: '--uui-palette-violet-blue' },
-		{ alias: 'red', varName: '--uui-palette-maroon-flush' },
-		{ alias: 'green', varName: '--uui-palette-jungle-green' },
-		{ alias: 'brown', varName: '--uui-palette-chamoisee' },
-	];
+	private _colorList = umbracoColors;
 
 	@state()
-	_modalValue?: UmbIconPickerModalValue;
+	private _modalValue?: UmbIconPickerModalValue;
 
 	@state()
-	_currentColorVarName = '--uui-color-text';
+	private _currentAlias = 'text';
 
-	#changeIcon(e: { target: HTMLInputElement; type: any; key: unknown }) {
+	#changeIcon(e: { target: HTMLInputElement; type: string; key: unknown }) {
 		if (e.type == 'click' || (e.type == 'keyup' && e.key == 'Enter')) {
 			this.modalContext?.updateValue({ icon: e.target.id });
 		}
@@ -43,7 +34,9 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	#filterIcons(e: { target: HTMLInputElement }) {
 		if (e.target.value) {
-			this._iconListFiltered = this._iconList.filter((icon) => icon.name.includes(e.target.value));
+			this._iconListFiltered = this._iconList.filter((icon) =>
+				icon.name.toLowerCase().includes(e.target.value.toLowerCase()),
+			);
 		} else {
 			this._iconListFiltered = this._iconList;
 		}
@@ -51,6 +44,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	#onColorChange(e: UUIColorSwatchesEvent) {
 		this.modalContext?.updateValue({ color: e.target.value });
+		this._currentAlias = e.target.value;
 	}
 
 	connectedCallback() {
@@ -62,8 +56,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				this.modalContext?.value,
 				(newValue) => {
 					this._modalValue = newValue;
-					this._currentColorVarName =
-						this._colorList.find((x) => x.alias === newValue?.color)?.alias ?? this._colorList[0].varName;
+					this._currentAlias = newValue?.color ?? 'text';
 				},
 				'_observeModalContextValue',
 			);
@@ -96,10 +89,16 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					<hr />
 					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
 				</div>
-				<uui-button slot="actions" label="close" @click="${this._rejectModal}">Close</uui-button>
-				<uui-button slot="actions" color="positive" look="primary" @click="${this._submitModal}" label="Submit">
-					Submit
-				</uui-button>
+				<uui-button
+					slot="actions"
+					label=${this.localize.term('general_close')}
+					@click="${this._rejectModal}"></uui-button>
+				<uui-button
+					slot="actions"
+					color="positive"
+					look="primary"
+					@click="${this._submitModal}"
+					label=${this.localize.term('general_submit')}></uui-button>
 			</umb-body-layout>
 		`;
 	}
@@ -107,8 +106,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	renderSearchbar() {
 		return html` <uui-input
 			type="search"
-			placeholder="Type to filter..."
-			label="Type to filter icons"
+			placeholder=${this.localize.term('placeholders_filter')}
+			label=${this.localize.term('placeholders_filter')}
 			id="searchbar"
 			@keyup="${this.#filterIcons}">
 			<uui-icon name="search" slot="prepend" id="searchbar_icon"></uui-icon>
@@ -122,7 +121,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 			(icon) => html`
 				<uui-icon
 					tabindex="0"
-					style="color: var(${this._currentColorVarName})"
+					style="--uui-icon-color: var(${extractUmbColorVariable(this._currentAlias)})"
 					class="icon ${icon.name === this._modalValue?.icon ? 'selected' : ''}"
 					title="${icon.name}"
 					name="${icon.name}"
@@ -161,6 +160,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 			#searchbar {
 				width: 100%;
+				align-items: center;
 			}
 			#searchbar_icon {
 				padding-left: var(--uui-size-space-2);

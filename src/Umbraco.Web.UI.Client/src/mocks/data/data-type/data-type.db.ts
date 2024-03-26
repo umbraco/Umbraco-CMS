@@ -57,7 +57,6 @@ const createDetailMockMapper = (request: CreateDataTypeRequestModel): UmbMockDat
 const detailResponseMapper = (item: UmbMockDataTypeModel): DataTypeResponseModel => {
 	return {
 		id: item.id,
-		parent: item.parent,
 		name: item.name,
 		editorAlias: item.editorAlias,
 		editorUiAlias: item.editorUiAlias,

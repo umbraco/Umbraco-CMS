@@ -1,7 +1,12 @@
-import { expect } from '@open-wc/testing';
+import { expect, fixture } from '@open-wc/testing';
 import type { ManifestApi } from '../types/index.js';
 import type { UmbApi } from '../models/api.interface.js';
 import { createExtensionApi } from './create-extension-api.function.js';
+import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+
+@customElement('umb-test-controller-host')
+class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 class UmbExtensionApiTrueTestClass implements UmbApi {
 	isValidClassInstance() {
@@ -30,7 +35,13 @@ const jsModuleWithDefaultAndApiExport = {
 	api: UmbExtensionApiTrueTestClass,
 };
 
-describe('Extension-Api: Create Extension Api', () => {
+describe('Create Extension Api Method', () => {
+	let hostElement: UmbTestControllerHostElement;
+
+	beforeEach(async () => {
+		hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
+	});
+
 	it('Returns `undefined` when manifest does not have any correct properties', async () => {
 		const manifest: ManifestApi = {
 			type: 'my-test-type',
@@ -38,7 +49,7 @@ describe('Extension-Api: Create Extension Api', () => {
 			name: 'pretty name',
 		};
 
-		const api = await createExtensionApi(manifest, []);
+		const api = await createExtensionApi(hostElement, manifest, []);
 		expect(api).to.be.undefined;
 	});
 
@@ -50,7 +61,7 @@ describe('Extension-Api: Create Extension Api', () => {
 			api: UmbExtensionApiTrueTestClass,
 		};
 
-		const api = await createExtensionApi(manifest, []);
+		const api = await createExtensionApi(hostElement, manifest, []);
 		expect(api).to.not.be.undefined;
 		if (api) {
 			expect(api.isValidClassInstance()).to.be.true;
@@ -65,7 +76,7 @@ describe('Extension-Api: Create Extension Api', () => {
 			js: () => Promise.resolve(jsModuleWithDefaultExport),
 		};
 
-		const api = await createExtensionApi(manifest, []);
+		const api = await createExtensionApi(hostElement, manifest, []);
 		expect(api).to.not.be.undefined;
 		if (api) {
 			expect(api.isValidClassInstance()).to.be.true;
@@ -80,7 +91,7 @@ describe('Extension-Api: Create Extension Api', () => {
 			js: () => Promise.resolve(jsModuleWithApiExport),
 		};
 
-		const api = await createExtensionApi(manifest, []);
+		const api = await createExtensionApi(hostElement, manifest, []);
 		expect(api).to.not.be.undefined;
 		if (api) {
 			expect(api.isValidClassInstance()).to.be.true;
@@ -95,7 +106,7 @@ describe('Extension-Api: Create Extension Api', () => {
 			js: () => Promise.resolve(jsModuleWithDefaultAndApiExport),
 		};
 
-		const api = await createExtensionApi(manifest, []);
+		const api = await createExtensionApi(hostElement, manifest, []);
 		expect(api).to.not.be.undefined;
 		if (api) {
 			expect(api.isValidClassInstance()).to.be.true;

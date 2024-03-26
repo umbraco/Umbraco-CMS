@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
@@ -11,10 +11,10 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 export class UmbStaticFileTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbStaticFileTreeStore.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbStaticFileTreeStore
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_STATIC_FILE_TREE_STORE_CONTEXT.toString());
 	}
 }

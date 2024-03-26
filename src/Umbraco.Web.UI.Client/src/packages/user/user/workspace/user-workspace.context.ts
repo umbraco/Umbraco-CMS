@@ -3,30 +3,42 @@ import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbUserDetailRepository } from '../repository/index.js';
 import { UmbUserAvatarRepository } from '../repository/avatar/index.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './manifests.js';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
+import type { UmbSaveableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextBase, UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 type EntityType = UmbUserDetailModel;
 
 export class UmbUserWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbSaveableWorkspaceContextInterface
+	extends UmbSaveableWorkspaceContextBase<EntityType>
+	implements UmbSaveableWorkspaceContext
 {
 	public readonly detailRepository: UmbUserDetailRepository = new UmbUserDetailRepository(this);
 	public readonly avatarRepository: UmbUserAvatarRepository = new UmbUserAvatarRepository(this);
-
-	constructor(host: UmbControllerHost) {
-		super(host, UMB_USER_WORKSPACE_ALIAS);
-	}
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
 	readonly data = this.#currentData.asObservable();
 	readonly state = this.#currentData.asObservablePart((x) => x?.state);
 	readonly unique = this.#currentData.asObservablePart((x) => x?.unique);
+
+	readonly routes = new UmbWorkspaceRouteManager(this);
+
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_USER_WORKSPACE_ALIAS);
+		this.routes.setRoutes([
+			{
+				path: ':id',
+				component: UmbUserWorkspaceEditorElement,
+				setup: (component, info) => {
+					const id = info.match.params.id;
+					this.load(id);
+				},
+			},
+		]);
+	}
 
 	async load(unique: string) {
 		const { data, asObservable } = await this.detailRepository.requestByUnique(unique);
@@ -45,7 +57,11 @@ export class UmbUserWorkspaceContext
 		There might be a less manual way to do this.
 	*/
 	onUserStoreChanges(user: EntityType | undefined) {
-		if (!user) return;
+		if (!user) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/user-management');
+			return;
+		}
 		this.#currentData.update({ state: user.state, avatarUrls: user.avatarUrls });
 	}
 
@@ -85,7 +101,8 @@ export class UmbUserWorkspaceContext
 		if (newData) {
 			this.#persistedData.setValue(newData);
 			this.#currentData.setValue(newData);
-			this.saveComplete(newData);
+			this.setIsNew(false);
+			this.workspaceComplete(newData);
 		}
 	}
 
@@ -111,11 +128,4 @@ export class UmbUserWorkspaceContext
 	}
 }
 
-export const UMB_USER_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbUserWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbUserWorkspaceContext => context.getEntityType?.() === UMB_USER_ENTITY_TYPE,
-);
+export { UmbUserWorkspaceContext as api };

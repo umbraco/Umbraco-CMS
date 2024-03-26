@@ -1,32 +1,21 @@
 import type { UmbMultipleColorPickerItemInputElement } from './multiple-color-picker-item-input.element.js';
-import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 import {
 	css,
+	customElement,
 	html,
+	ifDefined,
 	nothing,
 	repeat,
-	customElement,
 	property,
 	state,
-	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { type UmbInputEvent, UmbChangeEvent, type UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-
-const SORTER_CONFIG: UmbSorterConfig<UmbSwatchDetails, UmbMultipleColorPickerItemInputElement> = {
-	getUniqueOfElement: (element) => {
-		return element.value.toString();
-	},
-	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.value;
-	},
-	identifier: 'Umb.SorterIdentifier.ColorEditor',
-	itemSelector: 'umb-multiple-color-picker-item-input',
-	containerSelector: '#sorter-wrapper',
-};
+import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 
 /**
  * @element umb-multiple-color-picker-input
@@ -34,7 +23,15 @@ const SORTER_CONFIG: UmbSorterConfig<UmbSwatchDetails, UmbMultipleColorPickerIte
 @customElement('umb-multiple-color-picker-input')
 export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitElement) {
 	#sorter = new UmbSorterController(this, {
-		...SORTER_CONFIG,
+		getUniqueOfElement: (element: UmbMultipleColorPickerItemInputElement) => {
+			return element.value.toString();
+		},
+		getUniqueOfModel: (modelEntry: UmbSwatchDetails) => {
+			return modelEntry.value;
+		},
+		identifier: 'Umb.SorterIdentifier.ColorEditor',
+		itemSelector: 'umb-multiple-color-picker-item-input',
+		containerSelector: '#sorter-wrapper',
 		onChange: ({ model }) => {
 			const oldValue = this._items;
 			this._items = model;
@@ -194,7 +191,6 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 						?showLabels=${this.showLabels}
 						value=${item.value}
 						label=${ifDefined(item.label)}
-						name="item-${index}"
 						@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}
 						@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
 						?disabled=${this.disabled}

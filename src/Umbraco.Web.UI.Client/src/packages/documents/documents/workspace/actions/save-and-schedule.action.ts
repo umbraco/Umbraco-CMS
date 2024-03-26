@@ -1,18 +1,9 @@
-import type { UmbDocumentWorkspaceContext } from '../document-workspace.context.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../document-workspace.context-token.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbSaveAndScheduleDocumentWorkspaceAction extends UmbWorkspaceActionBase<UmbDocumentWorkspaceContext> {
-	constructor(host: UmbControllerHost) {
-		super(host);
-	}
-
+export class UmbDocumentSaveAndScheduleWorkspaceAction extends UmbWorkspaceActionBase {
 	async execute() {
-		if (!this.workspaceContext) return;
-		// TODO: it doesn't get the updated value
-		const document = this.workspaceContext.getData();
-		// TODO: handle errors
-		if (!document) return;
-		//this.workspaceContext.repository.saveAndSchedule();
+		const workspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT);
+		return workspaceContext.schedule();
 	}
 }

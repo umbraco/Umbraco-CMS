@@ -1,27 +1,21 @@
+import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
+import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
 	isWithinRect,
 } from '@umbraco-cms/backoffice/utils';
-import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
-import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import { html, customElement, state, repeat, css, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../block-grid-entry/index.js';
-import {
-	UmbSorterController,
-	type UmbSorterConfig,
-	type resolveVerticalDirectionArgs,
-} from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController, type UmbSorterConfig, type resolvePlacementArgs } from '@umbraco-cms/backoffice/sorter';
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
  */
-function resolveVerticalDirectionAsGrid(
-	args: resolveVerticalDirectionArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>,
-) {
+function resolvePlacementAsGrid(args: resolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>) {
 	// If this has areas, we do not want to move, unless we are at the edge
 	if (args.relatedModel.areas.length > 0 && isWithinRect(args.pointerX, args.pointerY, args.relatedRect, -10)) {
 		return null;
@@ -94,7 +88,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
 	getUniqueOfModel: (modelEntry) => {
 		return modelEntry.contentUdi;
 	},
-	resolveVerticalDirection: resolveVerticalDirectionAsGrid,
+	resolvePlacement: resolvePlacementAsGrid,
 	identifier: 'block-grid-editor',
 	itemSelector: 'umb-block-grid-entry',
 	containerSelector: '.umb-block-grid__layout-container',

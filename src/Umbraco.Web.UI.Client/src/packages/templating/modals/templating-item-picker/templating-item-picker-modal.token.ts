@@ -1,6 +1,5 @@
 import type { CodeSnippetType } from '../../types.js';
-import type { UmbPartialViewPickerModalValue, UmbTemplatingPageFieldBuilderModalValue } from '../index.js';
-import { type UmbDictionaryItemPickerModalValue, UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbTemplatingItemPickerModalData {
 	hidePartialViews?: boolean;

@@ -9,6 +9,12 @@ const section: ManifestSection = {
 		label: 'Members',
 		pathname: 'member-management',
 	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionUserPermission',
+			match: 'Umb.Section.Members',
+		},
+	],
 };
 
 export const manifests = [section];

@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { CreatePartialViewFolderRequestModel } from '../models/CreatePartialViewFolderRequestModel';
 import type { CreatePartialViewRequestModel } from '../models/CreatePartialViewRequestModel';
+import type { FileSystemTreeItemPresentationModel } from '../models/FileSystemTreeItemPresentationModel';
 import type { PagedFileSystemTreeItemPresentationModel } from '../models/PagedFileSystemTreeItemPresentationModel';
 import type { PagedPartialViewSnippetItemResponseModel } from '../models/PagedPartialViewSnippetItemResponseModel';
 import type { PartialViewFolderResponseModel } from '../models/PartialViewFolderResponseModel';
@@ -86,20 +87,21 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deletePartialViewByPath({
         path,
     }: {
         path: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/partial-view/{path}',
             path: {
                 'path': path,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -109,7 +111,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putPartialViewByPath({
@@ -118,7 +120,7 @@ export class PartialViewResource {
     }: {
         path: string,
         requestBody?: UpdatePartialViewRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/partial-view/{path}',
@@ -127,6 +129,7 @@ export class PartialViewResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -209,20 +212,21 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deletePartialViewFolderByPath({
         path,
     }: {
         path: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/partial-view/folder/{path}',
             path: {
                 'path': path,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -273,6 +277,27 @@ export class PartialViewResource {
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreePartialViewAncestors({
+        descendantPath,
+    }: {
+        descendantPath?: string,
+    }): CancelablePromise<Array<FileSystemTreeItemPresentationModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/partial-view/ancestors',
+            query: {
+                'descendantPath': descendantPath,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

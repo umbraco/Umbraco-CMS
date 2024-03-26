@@ -1,10 +1,10 @@
 import { UmbBackofficeContext } from './backoffice.context.js';
-import { UmbServerExtensionRegistrator } from './server-extension-registrator.controller.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbBundleExtensionInitializer,
 	UmbEntryPointExtensionInitializer,
+	UmbServerExtensionRegistrator,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -22,6 +22,7 @@ const CORE_PACKAGES = [
 	import('../../packages/health-check/umbraco-package.js'),
 	import('../../packages/language/umbraco-package.js'),
 	import('../../packages/log-viewer/umbraco-package.js'),
+	import('../../packages/markdown-editor/umbraco-package.js'),
 	import('../../packages/media/umbraco-package.js'),
 	import('../../packages/members/umbraco-package.js'),
 	import('../../packages/models-builder/umbraco-package.js'),
@@ -36,6 +37,7 @@ const CORE_PACKAGES = [
 	import('../../packages/tiny-mce/umbraco-package.js'),
 	import('../../packages/umbraco-news/umbraco-package.js'),
 	import('../../packages/user/umbraco-package.js'),
+	import('../../packages/webhook/umbraco-package.js'),
 ];
 
 @customElement('umb-backoffice')
@@ -53,7 +55,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbBackofficeContext(this);
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry);
+		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerAllExtensions();
 
 		// So far local packages are this simple to registerer, so no need for a manager to do that:
 		CORE_PACKAGES.forEach(async (packageImport) => {

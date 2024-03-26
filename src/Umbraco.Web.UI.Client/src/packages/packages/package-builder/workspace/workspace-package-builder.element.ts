@@ -125,7 +125,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			${this._package?.id
 				? html`<uui-button @click="${this.#download}" color="" look="secondary" label="Download package">
 						Download
-				  </uui-button>`
+					</uui-button>`
 				: nothing}
 			<uui-button
 				@click="${this._package.id ? this.#update : this.#save}"
@@ -176,7 +176,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 					.value=${this._package.contentNodeId ?? ''}
 					max="1"
 					@change="${(e: CustomEvent) =>
-						(this._package.contentNodeId = (e.target as UmbInputDocumentElement).selectedIds[0])}">
+						(this._package.contentNodeId = (e.target as UmbInputDocumentElement).selection[0])}">
 				</umb-input-document>
 				<uui-checkbox
 					label="Include child nodes"
@@ -192,9 +192,9 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		return html`
 			<div slot="editor">
 				<umb-input-media
-					.selectedIds=${this._package.mediaIds ?? []}
+					.selection=${this._package.mediaIds ?? []}
 					@change="${(e: CustomEvent) =>
-						(this._package.mediaIds = (e.target as UmbInputMediaElement).selectedIds)}"></umb-input-media>
+						(this._package.mediaIds = (e.target as UmbInputMediaElement).selection)}"></umb-input-media>
 				<uui-checkbox
 					label="Include child nodes"
 					.checked="${this._package.mediaLoadChildNodes ?? false}"
@@ -222,7 +222,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-input-language
 				.value="${this._package.languages?.join(',') ?? ''}"
 				@change="${(e: CustomEvent) => {
-					this._package.languages = (e.target as UmbInputLanguageElement).selectedUniques;
+					this._package.languages = (e.target as UmbInputLanguageElement).selection;
 				}}"></umb-input-language>
 		</div>`;
 	}
@@ -288,7 +288,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	];
 }
 
-export default UmbWorkspacePackageBuilderElement;
+export { UmbWorkspacePackageBuilderElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

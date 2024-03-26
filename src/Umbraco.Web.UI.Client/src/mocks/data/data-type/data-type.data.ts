@@ -4,9 +4,7 @@ import type {
 	DataTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-type UmbMockDataTypeModelHack = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
-
-export interface UmbMockDataTypeModel extends Omit<UmbMockDataTypeModelHack, 'type'> {}
+export type UmbMockDataTypeModel = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
 
 export const data: Array<UmbMockDataTypeModel> = [
 	{
@@ -367,7 +365,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		name: 'Multiple Text String',
 		id: 'dt-multipleTextString',
 		parent: null,
-		editorAlias: 'Umbraco.MultipleTextString',
+		editorAlias: 'Umbraco.MultipleTextstring',
 		editorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 		hasChildren: false,
 		isFolder: false,
@@ -401,11 +399,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{
 				alias: 'items',
-				value: {
-					0: { sortOrder: 1, value: 'First Option' },
-					1: { sortOrder: 2, value: 'Second Option' },
-					2: { sortOrder: 3, value: 'I Am the third Option' },
-				},
+				value: ['First Option', 'Second Option', 'I Am the third Option'],
 			},
 		],
 	},
@@ -544,11 +538,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: {
-					0: { sortOrder: 1, value: 'First Option' },
-					1: { sortOrder: 2, value: 'Second Option' },
-					2: { sortOrder: 3, value: 'I Am the third Option' },
-				},
+				value: ['First Option', 'Second Option', 'I Am the third Option'],
 			},
 		],
 	},
@@ -556,8 +546,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		name: 'Checkbox List',
 		id: 'dt-checkboxList',
 		parent: null,
-		editorAlias: 'Umbraco.CheckboxList',
-		editorUiAlias: 'Umb.PropertyEditorUi.CheckboxList',
+		editorAlias: 'Umbraco.CheckBoxList',
+		editorUiAlias: 'Umb.PropertyEditorUi.CheckBoxList',
 		hasChildren: false,
 		isFolder: false,
 		isDeletable: true,
@@ -565,11 +555,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: {
-					0: { sortOrder: 1, value: 'First Option' },
-					1: { sortOrder: 2, value: 'Second Option' },
-					2: { sortOrder: 3, value: 'I Am the third Option' },
-				},
+				value: ['First Option', 'Second Option', 'I Am the third Option'],
 			},
 		],
 	},
@@ -642,7 +628,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		name: 'Media Picker',
 		id: 'dt-mediaPicker',
 		parent: null,
-		editorAlias: 'Umbraco.MediaPicker3',
+		editorAlias: 'Umbraco.MediaPicker',
 		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
 		hasChildren: false,
 		isFolder: false,

@@ -15,16 +15,10 @@ const manifest: ManifestPropertyEditorUi = {
 		settings: {
 			properties: [
 				{
-					alias: 'startNode',
-					label: 'Node type',
-					description: '',
-					propertyEditorUiAlias: sourcePicker.alias,
-				},
-				{
 					alias: 'filter',
 					label: 'Allow items of type',
 					description: 'Select the applicable types',
-					propertyEditorUiAlias: sourceTypePicker.alias,
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.SourceTypePicker',
 				},
 				{
 					alias: 'showOpenButton',

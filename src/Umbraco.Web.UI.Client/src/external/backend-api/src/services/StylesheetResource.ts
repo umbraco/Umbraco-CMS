@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { CreateStylesheetFolderRequestModel } from '../models/CreateStylesheetFolderRequestModel';
 import type { CreateStylesheetRequestModel } from '../models/CreateStylesheetRequestModel';
+import type { FileSystemTreeItemPresentationModel } from '../models/FileSystemTreeItemPresentationModel';
 import type { PagedFileSystemTreeItemPresentationModel } from '../models/PagedFileSystemTreeItemPresentationModel';
 import type { RenameStylesheetRequestModel } from '../models/RenameStylesheetRequestModel';
 import type { StylesheetFolderResponseModel } from '../models/StylesheetFolderResponseModel';
@@ -84,20 +85,21 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteStylesheetByPath({
         path,
     }: {
         path: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/stylesheet/{path}',
             path: {
                 'path': path,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -107,7 +109,7 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putStylesheetByPath({
@@ -116,7 +118,7 @@ export class StylesheetResource {
     }: {
         path: string,
         requestBody?: UpdateStylesheetRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/stylesheet/{path}',
@@ -125,6 +127,7 @@ export class StylesheetResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -207,24 +210,46 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteStylesheetFolderByPath({
         path,
     }: {
         path: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/stylesheet/folder/{path}',
             path: {
                 'path': path,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreeStylesheetAncestors({
+        descendantPath,
+    }: {
+        descendantPath?: string,
+    }): CancelablePromise<Array<FileSystemTreeItemPresentationModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/stylesheet/ancestors',
+            query: {
+                'descendantPath': descendantPath,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

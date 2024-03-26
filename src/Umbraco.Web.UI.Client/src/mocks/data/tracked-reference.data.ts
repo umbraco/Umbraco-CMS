@@ -13,4 +13,16 @@ export const items: Array<RelationItemResponseModel> = [
 		relationTypeIsDependency: true,
 		relationTypeName: 'Related Document',
 	},
+	{
+		nodeId: '1234',
+		nodeName: 'Image Block',
+		nodeType: 'element',
+		nodePublished: true,
+		contentTypeIcon: 'icon-settings',
+		contentTypeName: 'Image Block',
+		contentTypeAlias: 'imageBlock',
+		relationTypeIsBidirectional: false,
+		relationTypeIsDependency: true,
+		relationTypeName: 'Related Document',
+	},
 ];

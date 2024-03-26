@@ -12,7 +12,6 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		js: () => import('./toolbar/property-editor-ui-tiny-mce-toolbar-configuration.element.js'),
 		meta: {
 			label: 'TinyMCE Toolbar Configuration',
-			propertyEditorSchemaAlias: 'Umbraco.RichText.Configuration',
 			icon: 'icon-autofill',
 			group: 'common',
 		},
@@ -24,7 +23,6 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		js: () => import('./stylesheets/property-editor-ui-tiny-mce-stylesheets-configuration.element.js'),
 		meta: {
 			label: 'TinyMCE Stylesheets Configuration',
-			propertyEditorSchemaAlias: 'Umbraco.RichText.Configuration',
 			icon: 'icon-autofill',
 			group: 'common',
 		},
@@ -36,7 +34,6 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		js: () => import('./dimensions/property-editor-ui-tiny-mce-dimensions-configuration.element.js'),
 		meta: {
 			label: 'TinyMCE Dimensions Configuration',
-			propertyEditorSchemaAlias: 'Umbraco.RichText.Configuration',
 			icon: 'icon-autofill',
 			group: 'common',
 		},
@@ -48,7 +45,6 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		js: () => import('./max-image-size/property-editor-ui-tiny-mce-maximagesize-configuration.element.js'),
 		meta: {
 			label: 'TinyMCE Max Image Size Configuration',
-			propertyEditorSchemaAlias: 'Umbraco.RichText.Configuration',
 			icon: 'icon-autofill',
 			group: 'common',
 		},

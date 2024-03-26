@@ -1,15 +1,15 @@
 import { UmbPackageRepository } from './package.repository.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbExtensionInitializer extends UmbBaseController {
+export class UmbExtensionInitializer extends UmbControllerBase {
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
 	#repository: UmbPackageRepository;
 	#localPackages: Array<Promise<any>>;
 
 	constructor(
-		host: UmbControllerHostElement,
+		host: UmbControllerHost,
 		extensionRegistry: UmbBackofficeExtensionRegistry,
 		localPackages: Array<Promise<any>>,
 	) {

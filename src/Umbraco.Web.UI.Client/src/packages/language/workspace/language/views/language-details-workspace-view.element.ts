@@ -1,4 +1,4 @@
-import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../language-workspace.context.js';
+import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../language-workspace.context-token.js';
 import type { UmbInputLanguageElement } from '../../../components/input-language/input-language.element.js';
 import type { UmbLanguageDetailModel } from '../../../types.js';
 import type { UmbLanguageItemModel } from '../../../repository/index.js';
@@ -21,9 +21,6 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 
 	@state()
 	_isNew?: boolean;
-
-	@state()
-	_validationErrors?: { [key: string]: Array<any> };
 
 	#languageWorkspaceContext?: typeof UMB_LANGUAGE_WORKSPACE_CONTEXT.TYPE;
 
@@ -51,11 +48,6 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 
 			this.observe(this.#languageWorkspaceContext.isNew, (isNew) => {
 				this._isNew = isNew;
-			});
-
-			this.observe(this.#languageWorkspaceContext.validationErrors, (value) => {
-				this._validationErrors = value;
-				this.requestUpdate('_validationErrors');
 			});
 		});
 	}
@@ -108,7 +100,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 	#handleFallbackChange(event: UmbChangeEvent) {
 		if (event instanceof UmbChangeEvent) {
 			const target = event.target as UmbInputLanguageElement;
-			const selectedLanguageUnique = target.selectedUniques?.[0];
+			const selectedLanguageUnique = target.selection?.[0];
 			this.#languageWorkspaceContext?.setFallbackCulture(selectedLanguageUnique);
 		}
 	}
@@ -123,9 +115,6 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 							value=${ifDefined(this._language?.unique)}
 							@change=${this.#handleCultureChange}
 							?readonly=${this._isNew === false}></umb-input-culture-select>
-
-						<!-- TEMP VALIDATION ERROR -->
-						${this._validationErrors?.isoCode.map((error) => html`<div class="validation-message">${error}</div>`)}
 					</div>
 				</umb-property-layout>
 
@@ -149,7 +138,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 						${this._language?.isDefault && this._language?.isDefault !== this._isDefaultLanguage
 							? html`<div id="default-language-warning">
 									Switching default language may result in default content missing.
-							  </div>`
+								</div>`
 							: nothing}
 
 						<hr />

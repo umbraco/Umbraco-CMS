@@ -11,7 +11,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	}
 }
 
-export default UmbLanguageRootWorkspaceElement;
+export { UmbLanguageRootWorkspaceElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

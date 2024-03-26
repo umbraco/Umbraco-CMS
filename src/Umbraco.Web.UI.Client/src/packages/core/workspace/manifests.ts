@@ -1,5 +1,6 @@
-import { manifests as workspaceModals } from './workspace-modal/manifests.js';
-import { manifest as workspaceAliasCondition } from './workspace-alias.condition.js';
-import { manifest as workspaceEntityTypeCondition } from './workspace-entity-type.condition.js';
+import { manifests as componentManifests } from './components/manifests.js';
+import { manifests as workspaceKinds } from './kinds/manifests.js';
+import { manifests as workspaceModals } from './modals/manifests.js';
+import { manifests as workspaceConditions } from './conditions/manifests.js';
 
-export const manifests = [...workspaceModals, workspaceAliasCondition, workspaceEntityTypeCondition];
+export const manifests = [...workspaceConditions, ...workspaceKinds, ...componentManifests, ...workspaceModals];

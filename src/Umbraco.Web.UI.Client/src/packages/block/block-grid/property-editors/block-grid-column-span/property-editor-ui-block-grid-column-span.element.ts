@@ -13,7 +13,6 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 	@state()
 	private _columnsArray = Array.from(Array(12).keys());
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const maxColumns = config?.getValueByAlias('maxColumns');
 		if (typeof maxColumns === 'number') {

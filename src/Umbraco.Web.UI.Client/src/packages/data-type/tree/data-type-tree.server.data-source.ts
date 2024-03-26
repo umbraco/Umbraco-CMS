@@ -1,8 +1,16 @@
 import type { UmbDataTypeTreeItemModel } from './types.js';
+import type {
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+	UmbTreeAncestorsOfRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { DataTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+
+let manifestPropertyEditorUis: Array<ManifestPropertyEditorUi> = [];
 
 /**
  * A data source for a data type tree that fetches data from the server
@@ -23,29 +31,45 @@ export class UmbDataTypeTreeServerDataSource extends UmbTreeServerDataSourceBase
 		super(host, {
 			getRootItems,
 			getChildrenOf,
+			getAncestorsOf,
 			mapper,
 		});
+		umbExtensionsRegistry
+			.byType('propertyEditorUi')
+			.subscribe((manifestPropertyEditorUIs) => {
+				manifestPropertyEditorUis = manifestPropertyEditorUIs;
+			})
+			.unsubscribe();
 	}
 }
 
-// eslint-disable-next-line local-rules/no-direct-api-import
-const getRootItems = () => DataTypeResource.getTreeDataTypeRoot({});
+const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	return DataTypeResource.getTreeDataTypeRoot({ skip: args.skip, take: args.take });
+};
 
-const getChildrenOf = (parentUnique: string | null) => {
-	if (parentUnique === null) {
-		return getRootItems();
+const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
+	if (args.parentUnique === null) {
+		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DataTypeResource.getTreeDataTypeChildren({
-			parentId: parentUnique,
+			parentId: args.parentUnique,
 		});
 	}
 };
+
+const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	DataTypeResource.getTreeDataTypeAncestors({
+		descendantId: args.descendantUnique,
+	});
 
 const mapper = (item: DataTypeTreeItemResponseModel): UmbDataTypeTreeItemModel => {
 	return {
 		unique: item.id,
 		parentUnique: item.parent?.id || null,
+		icon: manifestPropertyEditorUis.find((ui) => ui.alias === item.editorUiAlias)?.meta.icon,
 		name: item.name,
 		entityType: item.isFolder ? 'data-type-folder' : 'data-type',
 		isFolder: item.isFolder,

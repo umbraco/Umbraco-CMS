@@ -50,7 +50,7 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 		const target = e.target as HTMLInputElement;
 
 		const value: { [key: string]: string } = {};
-		value[target.name] = this._telemetryLevels[parseInt(target.value) - 1].level ?? TelemetryLevelModel.BASIC;
+		value[target.name] = this._telemetryLevels[parseInt(target.value) - 1].level ?? TelemetryLevelModel.DETAILED;
 		this._installerContext?.appendData(value);
 	}
 
@@ -83,7 +83,6 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 				min="1"
 				max=${this._telemetryLevels.length}></uui-slider>
 			<h2>${this._selectedTelemetry.level}</h2>
-			<!-- TODO: Is this safe to do? -->
 			<p>${unsafeHTML(this._selectedTelemetry.description)}</p>
 		`;
 	}

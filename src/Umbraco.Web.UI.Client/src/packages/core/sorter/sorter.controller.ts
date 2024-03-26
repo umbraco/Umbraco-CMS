@@ -1,5 +1,5 @@
 import { isWithinRect } from '@umbraco-cms/backoffice/utils';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 const autoScrollSensitivity = 50;
@@ -57,7 +57,7 @@ function destroyPreventEvent(element: Element) {
 	//element.removeAttribute('draggable');
 }
 
-export type resolveVerticalDirectionArgs<T, ElementType extends HTMLElement> = {
+export type resolvePlacementArgs<T, ElementType extends HTMLElement> = {
 	containerElement: Element;
 	containerRect: DOMRect;
 	item: T;
@@ -73,8 +73,11 @@ export type resolveVerticalDirectionArgs<T, ElementType extends HTMLElement> = {
 };
 
 type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
-	getUniqueOfElement: (element: ElementType) => string | null | symbol | number;
-	getUniqueOfModel: (modeEntry: T) => string | null | symbol | number;
+	/**
+	 * Define how to retrive the unique identifier of an element. If this method returns undefined, the move will be cancelled.
+	 */
+	getUniqueOfElement: (element: ElementType) => string | null | symbol | number | undefined;
+	getUniqueOfModel: (modeEntry: T) => string | null | symbol | number | undefined;
 	/**
 	 * Optionally define a unique identifier for each sorter experience, all Sorters that uses the same identifier to connect with other sorters.
 	 */
@@ -134,9 +137,21 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	onRequestMove?: (argument: { item: T }) => boolean;
 	/**
 	 * This callback is executed when an item is hovered within this container.
-	 * The callback should return true if the item should be placed after based on a vertical logic. Other wise false for horizontal. True is default.
+	 * The callback should return true if the item should be placed after the hovered item, or false if it should be placed before the hovered item.
+	 * In this way the callback can control the placement of the item.
+	 * If it returns null the placement will be prevented.
+	 * @example
+	 * This is equivalent to the default behavior:
+	 * ```ts
+	 * resolvePlacement: (argument) => {
+	 * 	if(argument.pointerY > argument.relatedRect.top + argument.relatedRect.height * 0.5) {
+	 * 		return true; // Place after
+	 * 	} else {
+	 * 		return false; // Place before
+	 * 	}
+	 * }
 	 */
-	resolveVerticalDirection?: (argument: resolveVerticalDirectionArgs<T, ElementType>) => boolean | null;
+	resolvePlacement?: (argument: resolvePlacementArgs<T, ElementType>) => boolean | null;
 	/**
 	 * This callback is executed when an item is moved within this container.
 	 */
@@ -164,7 +179,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
  */
-export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> extends UmbBaseController {
+export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> extends UmbControllerBase {
 	//
 	// The sorter who last indicated that it was okay or not okay to drop here:
 	static lastIndicationSorter?: UmbSorterController<unknown>;
@@ -186,6 +201,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	static activeDragElement?: Element;
 
 	#host;
+	#isConnected = false;
 	#config: INTERNAL_UmbSorterConfig<T, ElementType>;
 	#observer;
 
@@ -239,35 +255,44 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	enable(): void {
 		if (this.#enabled) return;
 		this.#enabled = true;
-		this.#initialize();
+		if (this.#isConnected) {
+			this.#initialize();
+		}
 	}
 	disable(): void {
 		if (!this.#enabled) return;
 		this.#enabled = false;
-		this.#uninitialize();
+		if (this.#isConnected) {
+			this.#uninitialize();
+		}
 	}
 
 	setModel(model: Array<T>): void {
 		if (this.#model) {
-			// TODO: Some updates might need to be done, as the modal is about to changed? Do make the changes after setting the model?..
+			// TODO: Some updates might need to be done, as the model is about to change? Do make the changes after setting the model?.. [NL]
+			this.#model = model;
 		}
-		this.#model = model;
 	}
 
 	hasItem(unique: string) {
 		return this.#model.find((x) => this.#config.getUniqueOfModel(x) === unique) !== undefined;
 	}
 
+	/*
 	getItem(unique: string) {
+		if (!unique) return undefined;
 		return this.#model.find((x) => this.#config.getUniqueOfModel(x) === unique);
 	}
+	*/
 
 	hostConnected() {
+		this.#isConnected = true;
 		if (this.#enabled) {
 			requestAnimationFrame(this.#initialize);
 		}
 	}
 	hostDisconnected() {
+		this.#isConnected = false;
 		if (this.#enabled) {
 			this.#uninitialize();
 		}
@@ -362,12 +387,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		// If we have a currentItem and the element matches, we should set the currentElement to this element.
-		if (
-			UmbSorterController.activeItem &&
-			this.#config.getUniqueOfElement(element) === this.#config.getUniqueOfModel(UmbSorterController.activeItem)
-		) {
-			if (UmbSorterController.activeElement !== element) {
-				this.#setCurrentElement(element);
+		if (UmbSorterController.activeItem) {
+			const elUnique = this.#config.getUniqueOfElement(element);
+			const modelUnique = this.#config.getUniqueOfModel(UmbSorterController.activeItem);
+			if (elUnique === modelUnique && elUnique !== undefined) {
+				if (UmbSorterController.activeElement !== element) {
+					this.#setCurrentElement(element);
+				}
 			}
 		}
 	}
@@ -629,8 +655,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				return;
 			}
 
-			const verticalDirection: boolean | null = this.#config.resolveVerticalDirection
-				? this.#config.resolveVerticalDirection({
+			const verticalDirection: boolean | null = this.#config.resolvePlacement
+				? this.#config.resolvePlacement({
 						containerElement: this.#containerElement,
 						containerRect: currentContainerRect,
 						item: UmbSorterController.activeItem,
@@ -643,11 +669,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 						horizontalPlaceAfter: placeAfter,
 						pointerX: this.#dragX,
 						pointerY: this.#dragY,
-				  })
+					})
 				: true;
 
 			if (verticalDirection === null) {
-				// The resolveVerticalDirection has chosen to back out of this move.
+				// The resolvePlacement has chosen to back out of this move.
 				return;
 			}
 
@@ -726,8 +752,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			throw new Error('Element was not defined');
 		}
 		const elementUnique = this.#config.getUniqueOfElement(element);
-		if (!elementUnique) {
-			throw new Error('Could not find unique of element');
+		if (elementUnique === undefined) {
+			console.error('Could not find unique of element', element);
+			return undefined;
 		}
 		return this.#model.find((entry: T) => elementUnique === this.#config.getUniqueOfModel(entry));
 	}
@@ -909,15 +936,15 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				Math.abs(scrollRect.right - clientX) <= autoScrollSensitivity && scrollPosX + scrollRect.width < scrollWidth
 					? 1
 					: Math.abs(scrollRect.left - clientX) <= autoScrollSensitivity && !!scrollPosX
-					? -1
-					: 0;
+						? -1
+						: 0;
 
 			this.autoScrollY =
 				Math.abs(scrollRect.bottom - clientY) <= autoScrollSensitivity && scrollPosY + scrollRect.height < scrollHeight
 					? 1
 					: Math.abs(scrollRect.top - clientY) <= autoScrollSensitivity && !!scrollPosY
-					? -1
-					: 0;
+						? -1
+						: 0;
 
 			this.#autoScrollRAF = requestAnimationFrame(this.#performAutoScroll);
 		}

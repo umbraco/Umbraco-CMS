@@ -76,13 +76,13 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	 * @return {*}
 	 * @memberof UmbDictionaryServerDataSource
 	 */
-	async create(model: UmbDictionaryDetailModel) {
+	async create(model: UmbDictionaryDetailModel, parentUnique: string | null) {
 		if (!model) throw new Error('Dictionary is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDictionaryItemRequestModel = {
 			id: model.unique,
-			parent: null,
+			parent: parentUnique ? { id: parentUnique } : null,
 			name: model.name,
 			translations: model.translations,
 		};

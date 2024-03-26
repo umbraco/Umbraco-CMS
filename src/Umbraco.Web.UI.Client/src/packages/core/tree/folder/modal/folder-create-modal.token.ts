@@ -3,7 +3,10 @@ import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbFolderCreateModalData {
 	folderRepositoryAlias: string;
-	parentUnique: string | null;
+	parent: {
+		unique: string | null;
+		entityType: string;
+	};
 }
 
 export interface UmbFolderCreateModalValue {

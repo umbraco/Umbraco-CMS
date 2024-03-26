@@ -1,3 +1,4 @@
+import { manifests as itemManifests } from './item/manifests.js';
 import type { ManifestRepository, ManifestStore } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.Script.Detail';
@@ -17,4 +18,4 @@ const store: ManifestStore = {
 	api: () => import('./script-detail.store.js'),
 };
 
-export const manifests = [repository, store];
+export const manifests = [repository, store, ...itemManifests];

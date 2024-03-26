@@ -1,15 +1,16 @@
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
-	ManifestWorkspace,
-	ManifestWorkspaceAction,
+	ManifestWorkspaces,
+	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: 'Umb.Workspace.Language',
 	name: 'Language Workspace',
-	js: () => import('./language-workspace.element.js'),
+	api: () => import('./language-workspace.context.js'),
 	meta: {
 		entityType: 'language',
 	},
@@ -36,9 +37,10 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
-const workspaceActions: Array<ManifestWorkspaceAction> = [
+const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
+		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Language.Save',
 		name: 'Save Language Workspace Action',
 		api: UmbSaveWorkspaceAction,

@@ -15,6 +15,12 @@ const section: ManifestSection = {
 		label: 'Content',
 		pathname: 'content',
 	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionUserPermission',
+			match: sectionAlias,
+		},
+	],
 };
 
 const menuSectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind = {

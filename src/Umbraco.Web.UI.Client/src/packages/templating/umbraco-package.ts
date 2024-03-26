@@ -1,3 +1,5 @@
+import './index.js';
+
 export const name = 'Umbraco.Core.Templating';
 export const extensions = [
 	{

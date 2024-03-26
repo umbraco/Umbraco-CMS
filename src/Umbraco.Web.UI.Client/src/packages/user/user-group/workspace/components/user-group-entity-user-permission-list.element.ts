@@ -1,5 +1,5 @@
+import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -36,7 +36,7 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry.byType('entityUserPermission'),
 			(manifests) => {
-				this._entityTypes = [...new Set(manifests.map((manifest) => manifest.meta.entityType))];
+				this._entityTypes = [...new Set(manifests.flatMap((manifest) => manifest.forEntityTypes))];
 			},
 			'umbUserPermissionsObserver',
 		);

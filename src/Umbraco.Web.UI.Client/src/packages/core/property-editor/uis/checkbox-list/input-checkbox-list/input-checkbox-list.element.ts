@@ -1,64 +1,64 @@
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, nothing, repeat, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-checkbox-list')
 export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement) {
-	/**
-	 * List of items.
-	 */
-	// TODO: Could this use a type that we export to ensure TS failure,  or hook this up with a type coming from backend?
+	// TODO: Could this use a type that we export to ensure TS failure, or hook this up with a type coming from backend?
 	@property({ attribute: false })
-	public list: Array<{ key: string; checked: boolean; value: string }> = [];
+	public list: Array<{ label: string; value: string; checked: boolean }> = [];
 
-	#selected: Array<string> = [];
-	public get selected(): Array<string> {
-		return this.#selected;
+	#selection: Array<string> = [];
+	@property({ type: Array })
+	public set selection(values: Array<string>) {
+		this.#selection = values;
+		super.value = values.join(',');
 	}
-	public set selected(keys: Array<string>) {
-		this.#selected = keys;
-		super.value = keys.join(',');
+	public get selection(): Array<string> {
+		return this.#selection;
 	}
 
 	@property()
-	public set value(keysString: string) {
-		if (keysString !== this._value) {
-			this.selected = keysString.split(/[ ,]+/);
-		}
+	public set value(value: string) {
+		this.selection = value.split(',');
 	}
 
 	protected getFormElement() {
 		return undefined;
 	}
 
-	#setSelection(e: UUIBooleanInputEvent) {
+	#onChange(e: UUIBooleanInputEvent) {
 		e.stopPropagation();
-		if (e.target.checked) this.selected = [...this.selected, e.target.value];
-		else this.#removeFromSelection(this.selected.findIndex((key) => e.target.value === key));
+		if (e.target.checked) this.selection = [...this.selection, e.target.value];
+		else this.#removeFromSelection(this.selection.findIndex((value) => e.target.value === value));
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#removeFromSelection(index: number) {
 		if (index == -1) return;
-		const keys = [...this.selected];
-		keys.splice(index, 1);
-		this.selected = keys;
+		const values = [...this.selection];
+		values.splice(index, 1);
+		this.selection = values;
 	}
 
 	render() {
 		if (!this.list) return nothing;
 		return html`<form>
-			<uui-form @change="${this.#setSelection}">
-				${repeat(this.list, (item) => item.key, this.renderCheckbox)}
+			<uui-form @change="${this.#onChange}">
+				${repeat(
+					this.list,
+					(item) => item.value,
+					(item) => this.#renderCheckbox(item),
+				)}
 			</uui-form>
 		</form>`;
 	}
 
-	renderCheckbox(item: { key: string; checked: boolean; value: string }) {
-		return html`<uui-checkbox value="${item.value}" label="${item.value}" ?checked="${item.checked}"></uui-checkbox>`;
+	#renderCheckbox(item: (typeof this.list)[0]) {
+		return html`<uui-checkbox ?checked=${item.checked} label=${item.label} value=${item.value}></uui-checkbox>`;
 	}
 
 	static styles = [

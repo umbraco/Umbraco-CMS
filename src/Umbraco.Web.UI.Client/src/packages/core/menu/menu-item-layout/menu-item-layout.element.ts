@@ -1,5 +1,6 @@
-import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @element umb-menu-item-layout
@@ -36,19 +37,48 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 	@property({ type: String })
 	public href?: string;
 
+	@state()
+	private _isActive = false;
+
+	connectedCallback() {
+		super.connectedCallback();
+		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
+	}
+
+	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
+
+	#checkIsActive() {
+		if (!this.href) {
+			this._isActive = false;
+			return;
+		}
+
+		const location = window.location.pathname;
+		this._isActive = location.includes(this.href);
+	}
+
 	render() {
-		return html`<uui-menu-item href="${ifDefined(this.href)}" label=${this.label} ?has-children=${this.hasChildren}>
-			<uui-icon slot="icon" name=${this.iconName}></uui-icon>
+		return html`<uui-menu-item
+			href="${ifDefined(this.href)}"
+			label=${this.label}
+			?active=${this._isActive}
+			?has-children=${this.hasChildren}>
+			<umb-icon slot="icon" name=${this.iconName}></umb-icon>
 			${this.entityType
 				? html`<umb-entity-actions-bundle
 						slot="actions"
 						.entityType=${this.entityType}
 						.unique=${null}
 						.label=${this.label}>
-				  </umb-entity-actions-bundle>`
+					</umb-entity-actions-bundle>`
 				: ''}
 			<slot></slot>
 		</uui-menu-item>`;
+	}
+
+	disconnectedCallback() {
+		super.disconnectedCallback();
+		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
 	}
 }
 

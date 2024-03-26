@@ -33,6 +33,7 @@ const getItems = (uniques: Array<string>) => MemberResource.getItemMember({ id: 
 const mapper = (item: MemberItemResponseModel): UmbMemberItemModel => {
 	return {
 		unique: item.id,
+		name: item.variants[0].name || '',
 		memberType: {
 			unique: item.memberType.id,
 			icon: item.memberType.icon,

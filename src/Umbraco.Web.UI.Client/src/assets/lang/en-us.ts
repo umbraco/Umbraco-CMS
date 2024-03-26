@@ -255,6 +255,7 @@ export default {
 			'Publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.',
 		publishDescendantsWithVariantsHelp:
 			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
+		noVariantsToProcess: 'There are no available variants',
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
 		removeDate: 'Clear Date',
@@ -308,7 +309,7 @@ export default {
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
 		languagesToUnpublish:
-			'Select the languages to unpublish. Unpublishing a mandatory language will\n      unpublish all languages.\n    ',
+			'Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.',
 		variantsWillBeSaved: 'All new variants will be saved.',
 		variantsToPublish: 'Which variants would you like to publish?',
 		variantsToSave: 'Choose which variants to be saved.',
@@ -1563,11 +1564,10 @@ export default {
 			'Configures the content item to show a sortable and searchable list of its\n      children, the children will not be shown in the tree\n    ',
 		allowedTemplatesHeading: 'Allowed Templates',
 		allowedTemplatesDescription: 'Choose which templates editors are allowed to use on content of this type',
-		allowAsRootHeading: 'Allow as root',
-		allowAsRootDescription: 'Allow editors to create content of this type in the root of the content tree.\n    ',
+		allowAtRootHeading: 'Allow at root',
+		allowAtRootDescription: 'Allow editors to create content of this type in the root of the content tree.\n    ',
 		childNodesHeading: 'Allowed child node types',
-		childNodesDescription:
-			'Allow content of the specified types to be created underneath content of this\n      type.\n    ',
+		childNodesDescription: 'Allow content of the specified types to be created underneath content of this type.',
 		chooseChildNode: 'Choose child node',
 		compositionsDescription:
 			'Inherit tabs and properties from an existing Document Type. New tabs will be\n      added to the current Document Type or merged if a tab with an identical name exists.\n    ',
@@ -1652,6 +1652,11 @@ export default {
 			'<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
+		collections: 'Collections',
+		collectionsDescription:
+			'Configures the content item to show list of its children, the children will not be shown in the tree.',
+		structure: 'Structure',
+		presentation: 'Presentation',
 	},
 	languages: {
 		addLanguage: 'Add language',
@@ -1778,6 +1783,7 @@ export default {
 		settingsGroup: 'Settings',
 		templatingGroup: 'Templating',
 		thirdPartyGroup: 'Third Party',
+		webhooks: 'Webhooks',
 	},
 	update: {
 		updateAvailable: 'New update ready',
@@ -2167,6 +2173,10 @@ export default {
 			'This item or its descendants is being referenced. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
 		deleteDisabledWarning: 'This item or its descendants is being referenced. Therefore, deletion has been disabled.',
 		listViewDialogWarning: 'The following items you are trying to %0% are referenced by other content.',
+		labelMoreReferences: (count: number) => {
+			if (count === 1) return '...and one more item';
+			return `...and ${count} more items`;
+		},
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',

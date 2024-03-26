@@ -98,9 +98,9 @@ export class UmbSearchModalElement extends LitElement {
 									this._groups,
 									(group) => group.name,
 									(group) => this.#renderGroup(group.name, group.items),
-							  )
+								)
 							: html`<div id="no-results">Only mock data for now <strong>Search for blog</strong></div>`}
-				  </div>`
+					</div>`
 				: nothing}
 		`;
 	}
@@ -118,7 +118,7 @@ export class UmbSearchModalElement extends LitElement {
 		return html`
 			<a href="${item.href}" class="item">
 				<span class="item-icon">
-					${item.icon ? html`<uui-icon name="${item.icon}"></uui-icon>` : this.#renderHashTag()}
+					${item.icon ? html`<umb-icon name="${item.icon}"></umb-icon>` : this.#renderHashTag()}
 				</span>
 				<span class="item-name">
 					${item.name} ${item.url ? html`<span class="item-url">${item.url}</span>` : nothing}
@@ -190,8 +190,7 @@ export class UmbSearchModalElement extends LitElement {
 			:host {
 				display: flex;
 				flex-direction: column;
-				height: 100%;
-				width: 100%;
+				width: min(500px, 100vw);
 				height: 100%;
 				background-color: var(--uui-color-background);
 				box-sizing: border-box;

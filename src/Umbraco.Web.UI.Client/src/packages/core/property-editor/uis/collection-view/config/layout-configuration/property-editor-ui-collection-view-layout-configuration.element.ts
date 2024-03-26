@@ -2,7 +2,6 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import { html, customElement, property, repeat, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -26,62 +25,55 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ type: Array })
-	value: Array<LayoutConfig> = [];
+	value?: Array<LayoutConfig>;
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	private _modalContext?: UmbModalManagerContext;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
-		});
-	}
-
 	#onAdd() {
-		this.value = [...this.value, { isSystem: false, icon: 'icon-stop', selected: true }];
+		this.value = [...(this.value ?? []), { isSystem: false, icon: 'icon-stop', selected: true }];
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onRemove(unique: number) {
-		const values = [...this.value];
+		const values = [...(this.value ?? [])];
 		values.splice(unique, 1);
 		this.value = values;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onChangePath(e: UUIInputEvent, index: number) {
-		const values = [...this.value];
+		const values = [...(this.value ?? [])];
 		values[index] = { ...values[index], path: e.target.value as string };
 		this.value = values;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onChangeName(e: UUIInputEvent, index: number) {
-		const values = [...this.value];
+		const values = [...(this.value ?? [])];
 		values[index] = { ...values[index], name: e.target.value as string };
 		this.value = values;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onChangeSelected(e: UUIBooleanInputEvent, index: number) {
-		const values = [...this.value];
+		const values = [...(this.value ?? [])];
 		values[index] = { ...values[index], selected: e.target.checked };
 		this.value = values;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	async #onIconChange(index: number) {
-		const icon = this.#iconReader(this.value[index].icon ?? '');
+		// This is not begin used? [NL]
+		//const icon = this.#iconReader((this.value ? this.value[index].icon : undefined) ?? '');
 
 		// TODO: send icon data to modal
-		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL);
-		const picked = await modalContext?.onSubmit();
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modal = modalManager.open(this, UMB_ICON_PICKER_MODAL);
+		const picked = await modal?.onSubmit();
 		if (!picked) return;
 
-		const values = [...this.value];
+		const values = [...(this.value ?? [])];
 		values[index] = { ...values[index], icon: `${picked.icon} color-${picked.color}` };
 		this.value = values;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
@@ -89,16 +81,18 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 
 	render() {
 		return html`<div id="layout-wrapper">
-				${repeat(
-					this.value,
-					(layout, index) => '' + layout.name + layout.icon,
-					(layout, index) =>
-						html` <div class="layout-item">
-							<uui-icon name="icon-navigation"></uui-icon> ${layout.isSystem
-								? this.renderSystemFieldRow(layout, index)
-								: this.renderCustomFieldRow(layout, index)}
-						</div>`,
-				)}
+				${this.value
+					? repeat(
+							this.value,
+							(layout, index) => '' + layout.name + layout.icon,
+							(layout, index) =>
+								html` <div class="layout-item">
+									<uui-icon name="icon-navigation"></uui-icon> ${layout.isSystem
+										? this.renderSystemFieldRow(layout, index)
+										: this.renderCustomFieldRow(layout, index)}
+								</div>`,
+					  )
+					: ''}
 			</div>
 			<uui-button
 				id="add"

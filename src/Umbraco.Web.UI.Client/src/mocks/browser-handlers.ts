@@ -11,6 +11,7 @@ import { handlers as healthCheckHandlers } from './handlers/health-check.handler
 import { handlers as installHandlers } from './handlers/install.handlers.js';
 import { handlers as languageHandlers } from './handlers/language/index.js';
 import { handlers as logViewerHandlers } from './handlers/log-viewer.handlers.js';
+import { handlers as webhookHandlers } from './handlers/webhook.handlers.js';
 import { handlers as mediaHandlers } from './handlers/media/index.js';
 import { handlers as mediaTypeHandlers } from './handlers/media-type/index.js';
 import { handlers as memberGroupHandlers } from './handlers/member-group/index.js';
@@ -52,6 +53,7 @@ const handlers = [
 	...installHandlers,
 	...languageHandlers,
 	...logViewerHandlers,
+	...webhookHandlers,
 	...mediaHandlers,
 	...mediaTypeHandlers,
 	...memberGroupHandlers,

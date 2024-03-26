@@ -13,6 +13,18 @@ export const manifest: ManifestPropertyEditorUi = {
 		settings: {
 			properties: [
 				{
+					alias: 'startNodeId',
+					label: 'Start node',
+					description: '',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker',
+					config: [
+						{
+							alias: 'validationLimit',
+							value: { min: 0, max: 1 },
+						},
+					],
+				},
+				{
 					alias: 'showOpenButton',
 					label: 'Show open button',
 					description: 'Opens the node in a dialog',

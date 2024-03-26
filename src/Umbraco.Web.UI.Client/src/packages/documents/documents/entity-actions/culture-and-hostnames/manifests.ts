@@ -1,25 +1,24 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action.js';
-import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestEntityAction> = [
+const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Document.CultureAndHostnames',
 		name: 'Culture And Hostnames Document Entity Action',
 		weight: 400,
 		api: UmbDocumentCultureAndHostnamesEntityAction,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-home',
-			label: 'Culture and Hostnames',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+			label: 'Culture and Hostnames...',
 		},
 	},
 ];
 
-const manifestModals: Array<ManifestModal> = [
+const manifestModals: Array<ManifestTypes> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.CultureAndHostnames',

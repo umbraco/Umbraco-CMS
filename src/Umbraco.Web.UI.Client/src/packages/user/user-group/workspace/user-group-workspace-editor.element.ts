@@ -1,13 +1,13 @@
 import type { UmbUserGroupDetailModel } from '../index.js';
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
-import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context.js';
+import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context-token.js';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
-import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
+import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/section';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 
@@ -33,19 +33,19 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#onSectionsChange(event: UmbChangeEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputSectionElement;
-		this.#workspaceContext?.updateProperty('sections', target.value);
+		this.#workspaceContext?.updateProperty('sections', target.selection);
 	}
 
 	#onDocumentStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputDocumentElement;
-		this.#workspaceContext?.updateProperty('documentStartNode', { unique: target.selectedIds[0] });
+		this.#workspaceContext?.updateProperty('documentStartNode', { unique: target.selection[0] });
 	}
 
 	#onMediaStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputMediaElement;
-		this.#workspaceContext?.updateProperty('mediaStartNode', { unique: target.selectedIds[0] });
+		this.#workspaceContext?.updateProperty('mediaStartNode', { unique: target.selection[0] });
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -98,7 +98,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					description=${this.localize.term('user_sectionsHelp')}>
 					<umb-input-section
 						slot="editor"
-						.value=${this._userGroup.sections ?? []}
+						.selection=${this._userGroup.sections ?? []}
 						@change=${this.#onSectionsChange}></umb-input-section>
 				</umb-property-layout>
 				<umb-property-layout
@@ -107,7 +107,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					<umb-input-document
 						slot="editor"
 						max="1"
-						.selectedIds=${this._userGroup.documentStartNode?.unique ? [this._userGroup.documentStartNode.unique] : []}
+						.selection=${this._userGroup.documentStartNode?.unique ? [this._userGroup.documentStartNode.unique] : []}
 						@change=${this.#onDocumentStartNodeChange}></umb-input-document>
 				</umb-property-layout>
 				<umb-property-layout
@@ -116,7 +116,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					<umb-input-media
 						slot="editor"
 						max="1"
-						.selectedIds=${this._userGroup.mediaStartNode?.unique ? [this._userGroup.mediaStartNode.unique] : []}
+						.selection=${this._userGroup.mediaStartNode?.unique ? [this._userGroup.mediaStartNode.unique] : []}
 						@change=${this.#onMediaStartNodeChange}></umb-input-media>
 				</umb-property-layout>
 			</uui-box>

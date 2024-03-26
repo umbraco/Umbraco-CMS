@@ -1,4 +1,4 @@
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ServertimeOffset } from '@umbraco-cms/backoffice/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -6,7 +6,7 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 export class UmbConfigRepository {
 	#host;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 

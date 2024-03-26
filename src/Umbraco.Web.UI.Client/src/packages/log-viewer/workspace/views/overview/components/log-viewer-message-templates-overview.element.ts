@@ -1,25 +1,31 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer.context.js';
-import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
+import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
-	PagedLogTemplateResponseModel,
+	LogTemplateResponseModel,
 	SavedLogSearchResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
-//TODO: fix pagination bug when API is fixed
 @customElement('umb-log-viewer-message-templates-overview')
 export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
+	#itemsPerPage = 10;
+	#currentPage = 1;
+
 	@state()
-	private _messageTemplates: PagedLogTemplateResponseModel | null = null;
+	private _total = 0;
+
+	@state()
+	private _messageTemplates: Array<LogTemplateResponseModel> = [];
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
 		super();
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
-			this.#logViewerContext?.getMessageTemplates(0, 10);
+			this.#logViewerContext?.getMessageTemplates(0, this.#itemsPerPage);
 			this.#observeStuff();
 		});
 	}
@@ -27,13 +33,19 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	#observeStuff() {
 		if (!this.#logViewerContext) return;
 		this.observe(this.#logViewerContext.messageTemplates, (templates) => {
-			this._messageTemplates = templates ?? null;
+			this._messageTemplates = templates?.items ?? [];
+			this._total = templates?.total ?? 0;
 		});
 	}
 
 	#getMessageTemplates() {
-		const take = this._messageTemplates?.items?.length ?? 0;
-		this.#logViewerContext?.getMessageTemplates(0, take + 10);
+		const skip = this.#currentPage * this.#itemsPerPage - this.#itemsPerPage;
+		this.#logViewerContext?.getMessageTemplates(skip, this.#itemsPerPage);
+	}
+
+	#onChangePage(event: UUIPaginationEvent) {
+		this.#currentPage = event.target.current;
+		this.#getMessageTemplates();
 	}
 
 	#renderSearchItem = (searchListItem: SavedLogSearchResponseModel) => {
@@ -54,11 +66,11 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box headline="Common Log Messages" id="saved-searches">
-				<p style="font-style: italic;">Total Unique Message types: ${this._messageTemplates?.total}</p>
+				<p style="font-style: italic;">Total Unique Message types: ${this._total}</p>
 
 				<uui-table>
 					${this._messageTemplates
-						? this._messageTemplates.items.map(
+						? this._messageTemplates.map(
 								(template) =>
 									html`<uui-table-row>
 										<uui-table-cell>
@@ -70,17 +82,15 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 											</a>
 										</uui-table-cell>
 									</uui-table-row>`,
-						  )
+							)
 						: ''}
 				</uui-table>
-
-				<uui-button
-					id="show-more-templates-btn"
-					look="primary"
-					@click=${this.#getMessageTemplates}
-					label="Show more templates">
-					Show more
-				</uui-button>
+				${this._total > this.#itemsPerPage
+					? html`<uui-pagination
+							.current=${this.#currentPage}
+							.total=${Math.ceil(this._total / this.#itemsPerPage)}
+							@change=${this.#onChangePage}></uui-pagination>`
+					: nothing}
 			</uui-box>
 		`;
 	}
@@ -88,6 +98,10 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
+			uui-pagination {
+				margin-top: var(--uui-size-layout-1);
+			}
+
 			#show-more-templates-btn {
 				margin-top: var(--uui-size-space-5);
 			}

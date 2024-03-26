@@ -21,18 +21,6 @@ const modals: Array<ManifestModal> = [
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.PropertySettings',
-		name: 'Property Settings Modal',
-		js: () => import('./property-settings/property-settings-modal.element.js'),
-	},
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.SectionPicker',
-		name: 'Section Picker Modal',
-		js: () => import('./section-picker/section-picker-modal.element.js'),
-	},
-	{
-		type: 'modal',
 		alias: 'Umb.Modal.CodeEditor',
 		name: 'Code Editor Modal',
 		js: () => import('./code-editor/code-editor-modal.element.js'),
@@ -45,9 +33,9 @@ const modals: Array<ManifestModal> = [
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.TreePicker',
-		name: 'Tree Picker Modal',
-		js: () => import('./tree-picker/tree-picker-modal.element.js'),
+		alias: 'Umb.Modal.ItemPicker',
+		name: 'Item Picker Modal',
+		element: () => import('./item-picker/item-picker-modal.element.js'),
 	},
 ];
 

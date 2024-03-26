@@ -7,7 +7,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	element: () => import('./property-editor-ui-number-range.element.js'),
 	meta: {
 		label: 'Number Range',
-		propertyEditorSchemaAlias: '',
 		icon: 'icon-autofill',
 		group: 'common',
 	},

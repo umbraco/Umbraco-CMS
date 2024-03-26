@@ -3,7 +3,7 @@ import type { UmbNameablePropertyDatasetContext, UmbPropertyDatasetContext } fro
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import { type Observable, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -83,21 +83,24 @@ export class UmbDocumentPropertyDataContext
 
 	/**
 	 * TODO: Write proper JSDocs here.
-	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
+	 * Ideally do not use this method, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
 	 */
-	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
+	async propertyValueByAlias<ReturnType = unknown>(
+		propertyAlias: string,
+	): Promise<Observable<ReturnType | undefined> | undefined> {
 		await this.#workspace.isLoaded();
-		return (await this.#workspace.structure.propertyStructureByAlias(propertyAlias)).pipe(
-			map((property) =>
-				property?.alias
-					? this.#workspace.getPropertyValue<ReturnType>(property.alias, this.#createPropertyVariantId(property))
-					: undefined,
-			),
-		);
+		const structure = await this.#workspace.structure.getPropertyStructureByAlias(propertyAlias);
+		if (structure) {
+			return this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias, this.#createPropertyVariantId(structure));
+		}
+		return;
 	}
 
 	// TODO: Refactor: Not used currently, but should investigate if we can implement this, to spare some energy.
-	async propertyValueByAliasAndCulture<ReturnType = unknown>(propertyAlias: string, propertyVariantId: UmbVariantId) {
+	async propertyValueByAliasAndCulture<ReturnType = unknown>(
+		propertyAlias: string,
+		propertyVariantId: UmbVariantId,
+	): Promise<Observable<ReturnType | undefined> | undefined> {
 		return this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias, propertyVariantId);
 	}
 

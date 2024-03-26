@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-collection-pagination')
 export class UmbCollectionPaginationElement extends UmbLitElement {
 	@state()
-	_totalPages = 0;
+	_totalPages = 1;
 
 	@state()
 	_currentPage = 1;

@@ -7,7 +7,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	js: () => import('./property-editor-ui-block-type-group-configuration.element.js'),
 	meta: {
 		label: 'Block Grid Group Configuration',
-		propertyEditorSchemaAlias: 'Umbraco.BlockGrid.GroupConfiguration',
 		icon: 'icon-autofill',
 		group: 'blocks',
 	},

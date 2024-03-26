@@ -1,8 +1,8 @@
 import type { UmbUserDetailModel } from '../../types.js';
-import type { DataSourceResponse, UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse, UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbInviteUserDataSource {
-	invite(requestModel: UmbInviteUserRequestModel): Promise<DataSourceResponse<UmbUserDetailModel>>;
+	invite(requestModel: UmbInviteUserRequestModel): Promise<UmbDataSourceResponse<UmbUserDetailModel>>;
 	resendInvite(requestModel: UmbResendUserInviteRequestModel): Promise<UmbDataSourceErrorResponse>;
 }
 

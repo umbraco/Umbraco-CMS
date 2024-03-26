@@ -1,32 +1,23 @@
 import { UMB_RENAME_MODAL } from './modal/rename-modal.token.js';
-import type { UmbRenameRepository } from './types.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { MetaEntityActionRenameKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbRenameEntityAction extends UmbEntityActionBase<UmbRenameRepository<{ unique: string }>> {
-	#modalManagerContext?: UmbModalManagerContext;
-
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias, unique, entityType);
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalManagerContext = instance;
-		});
-	}
-
+export class UmbRenameEntityAction extends UmbEntityActionBase<MetaEntityActionRenameKind> {
 	async execute() {
-		if (!this.#modalManagerContext) throw new Error('Modal manager context is not available');
-		if (!this.repository) throw new Error('Repository is not available');
+		if (!this.args.unique) throw new Error('Unique is required to rename a folder');
 
-		const modalContext = this.#modalManagerContext?.open(UMB_RENAME_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_RENAME_MODAL, {
 			data: {
-				unique: this.unique,
-				renameRepositoryAlias: this.repositoryAlias,
+				unique: this.args.unique,
+				renameRepositoryAlias: this.args.meta.renameRepositoryAlias,
+				itemRepositoryAlias: this.args.meta.itemRepositoryAlias,
 			},
 		});
 
 		await modalContext.onSubmit();
 	}
 }
+
+export default UmbRenameEntityAction;

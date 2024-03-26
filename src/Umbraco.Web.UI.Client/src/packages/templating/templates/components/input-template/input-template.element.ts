@@ -2,11 +2,10 @@ import type { UmbTemplateCardElement } from '../template-card/template-card.elem
 import '../template-card/template-card.element.js';
 import type { UmbTemplateItemModel } from '../../repository/item/index.js';
 import { UmbTemplateItemRepository } from '../../repository/item/index.js';
+import { UMB_TEMPLATE_PICKER_MODAL } from '../../modals/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import {
-	UMB_TEMPLATE_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_WORKSPACE_MODAL,
 	UmbModalRouteRegistrationController,
@@ -52,27 +51,26 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	_selectedIds: Array<string> = [];
 	@property({ type: Array })
-	public get selectedIds() {
-		return this._selectedIds;
-	}
-	public set selectedIds(newKeys: Array<string> | undefined) {
-		this._selectedIds = newKeys ?? [];
+	public set selection(newKeys: Array<string> | undefined) {
+		this._selection = newKeys ?? [];
 		this.#observePickedTemplates();
 	}
+	public get selection() {
+		return this._selection;
+	}
+	_selection: Array<string> = [];
 
 	_defaultUnique = '';
 	@property({ type: String })
-	public get defaultUnique(): string {
-		return this._defaultUnique;
-	}
 	public set defaultUnique(newId: string) {
 		this._defaultUnique = newId;
 		super.value = newId;
 	}
+	public get defaultUnique(): string {
+		return this._defaultUnique;
+	}
 
-	private _modalContext?: UmbModalManagerContext;
 	private _templateItemRepository = new UmbTemplateItemRepository(this);
 
 	@state()
@@ -82,10 +80,6 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
-		});
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('template')
@@ -99,7 +93,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 
 	async #observePickedTemplates() {
 		this.observe(
-			(await this._templateItemRepository.requestItems(this._selectedIds)).asObservable(),
+			(await this._templateItemRepository.requestItems(this._selection)).asObservable(),
 			(data) => {
 				const oldValue = this._pickedTemplates;
 				this._pickedTemplates = data;
@@ -114,11 +108,11 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#appendTemplates(unique: string[]) {
-		this.selectedIds = [...(this.selectedIds ?? []), ...unique];
+		this.selection = [...(this.selection ?? []), ...unique];
 
 		// If there is no default, set the first picked template as default.
-		if (!this.defaultUnique && this.selectedIds.length) {
-			this.defaultUnique = this.selectedIds[0];
+		if (!this.defaultUnique && this.selection.length) {
+			this.defaultUnique = this.selection[0];
 		}
 
 		this.dispatchEvent(new UmbChangeEvent());
@@ -132,11 +126,12 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	async #openPicker() {
-		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				multiple: true,
-				pickableFilter: (template) => template.unique !== null && !this._selectedIds.includes(template.unique),
+				pickableFilter: (template) => template.unique !== null && !this._selection.includes(template.unique),
 			},
 		});
 
@@ -144,12 +139,12 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 
 		if (!value?.selection) return;
 
-		const selectedIds = value.selection.filter((x) => x !== null) as Array<string>;
+		const selection = value.selection.filter((x) => x !== null) as Array<string>;
 
-		if (!selectedIds.length) return;
+		if (!selection.length) return;
 
 		// Add templates to row of picked templates and dispatch change event
-		this.#appendTemplates(selectedIds);
+		this.#appendTemplates(selection);
 	}
 
 	#removeTemplate(unique: string) {
@@ -162,12 +157,12 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		In current backoffice we just prevent deleting a default when there are other templates. But if its the only one its okay. This is a weird experience, so we should make something that makes more sense.
 		BTW. its weird cause the damage of removing the default template is equally bad when there is one or more templates.
 		*/
-		this.selectedIds = this._selectedIds.filter((x) => x !== unique);
+		this.selection = this._selection.filter((x) => x !== unique);
 
 		// If the default template is removed, set the first picked template as default or reset defaultUnique.
 		if (unique === this.defaultUnique) {
-			if (this.selectedIds.length) {
-				this.defaultUnique = this.selectedIds[0];
+			if (this.selection.length) {
+				this.defaultUnique = this.selection[0];
 			} else {
 				this.defaultUnique = '';
 			}

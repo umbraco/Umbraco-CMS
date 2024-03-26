@@ -21,7 +21,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		itemSelector: 'uui-ref-node',
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
-			this.selectedIds = model;
+			this.selection = model;
 		},
 	});
 
@@ -32,11 +32,11 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	 * @default 0
 	 */
 	@property({ type: Number })
-	public get min(): number {
-		return this.#pickerContext.min;
-	}
 	public set min(value: number) {
 		this.#pickerContext.min = value;
+	}
+	public get min(): number {
+		return this.#pickerContext.min;
 	}
 
 	/**
@@ -55,11 +55,11 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	 * @default Infinity
 	 */
 	@property({ type: Number })
-	public get max(): number {
-		return this.#pickerContext.max;
-	}
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+	}
+	public get max(): number {
+		return this.#pickerContext.max;
 	}
 
 	/**
@@ -71,10 +71,10 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selectedIds(): Array<string> {
+	public get selection(): Array<string> {
 		return this.#pickerContext.getSelection();
 	}
-	public set selectedIds(ids: Array<string>) {
+	public set selection(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
 		this.#sorter.setModel(ids);
 	}
@@ -94,7 +94,10 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIds = splitStringToArray(idsString);
+		this.selection = splitStringToArray(idsString);
+	}
+	public get value() {
+		return this.selection.join(',');
 	}
 
 	@state()
@@ -163,7 +166,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this._items?.length) return;
 		return html`<uui-ref-list>
 			${repeat(
 				this._items,
@@ -174,7 +177,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderAddButton() {
-		if (this.max > 0 && this.selectedIds.length >= this.max) return;
+		if (this.max === 1 && this.selection.length >= this.max) return;
 		return html`<uui-button
 			id="add-button"
 			look="placeholder"
@@ -202,7 +205,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	#renderIcon(item: UmbDocumentItemModel) {
 		if (!item.documentType.icon) return;
-		return html`<uui-icon slot="icon" name=${item.documentType.icon}></uui-icon>`;
+		return html`<umb-icon slot="icon" name=${item.documentType.icon}></umb-icon>`;
 	}
 
 	#renderIsTrashed(item: UmbDocumentItemModel) {

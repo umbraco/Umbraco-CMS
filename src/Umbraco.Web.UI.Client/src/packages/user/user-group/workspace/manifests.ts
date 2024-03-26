@@ -1,24 +1,26 @@
 import type {
-	ManifestWorkspace,
-	ManifestWorkspaceAction,
+	ManifestWorkspaces,
+	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: 'Umb.Workspace.UserGroup',
 	name: 'User Group Workspace',
-	js: () => import('./user-group-workspace.element.js'),
+	api: () => import('./user-group-workspace.context.js'),
 	meta: {
 		entityType: 'user-group',
 	},
 };
 
 const workspaceViews: Array<ManifestWorkspaceView> = [];
-const workspaceActions: Array<ManifestWorkspaceAction> = [
+const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
+		kind: 'default',
 		alias: 'Umb.WorkspaceAction.UserGroup.Save',
 		name: 'Save User Group Workspace Action',
 		api: UmbSaveWorkspaceAction,

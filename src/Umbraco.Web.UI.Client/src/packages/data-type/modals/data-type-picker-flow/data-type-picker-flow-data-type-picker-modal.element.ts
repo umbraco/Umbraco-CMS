@@ -1,13 +1,12 @@
-import { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
-import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.js';
-import type { UmbDataTypeDetailModel } from '../../types.js';
-import { css, html, customElement, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbDataTypeCollectionRepository } from '../../collection/index.js';
 import type {
 	UmbDataTypePickerFlowDataTypePickerModalData,
 	UmbDataTypePickerFlowDataTypePickerModalValue,
-} from '@umbraco-cms/backoffice/modal';
+} from './data-type-picker-flow-data-type-picker-modal.token.js';
+import { css, html, customElement, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-data-type-picker-flow-data-type-picker-modal')
 export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBaseElement<
@@ -15,7 +14,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 	UmbDataTypePickerFlowDataTypePickerModalValue
 > {
 	@state()
-	private _dataTypes?: Array<UmbDataTypeDetailModel>;
+	private _dataTypes?: Array<UmbDataTypeItemModel>;
 
 	private _propertyEditorUiAlias!: string;
 
@@ -32,33 +31,20 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 	private async _observeDataTypesOf(propertyEditorUiAlias: string) {
 		if (!this.data) return;
 
-		const dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
-		const dataTypeTreeRepository = new UmbDataTypeTreeRepository(this);
+		const dataTypeCollectionRepository = new UmbDataTypeCollectionRepository(this);
 
-		// TODO: This is a hack to get the data types of a property editor ui alias.
-		// TODO: Make sure filtering works data-type that does not have a property editor ui, but should be using the default property editor UI for those.
-		// TODO: make an end-point just retrieving the data types using a given property editor ui alias.
-		const { data } = await dataTypeTreeRepository.requestRootTreeItems();
+		const collection = await dataTypeCollectionRepository.requestCollection({
+			skip: 0,
+			take: 100,
+			editorUiAlias: propertyEditorUiAlias,
+		});
 
-		if (!data) return;
-
-		await Promise.all(
-			data.items.map((item) => {
-				if (item.unique) {
-					return dataTypeDetailRepository.requestByUnique(item.unique);
-				}
-				return Promise.resolve();
-			}),
-		);
-
-		// TODO: Use the asObservable from above onces end-point has been made.
-		const source = await dataTypeDetailRepository.byPropertyEditorUiAlias(propertyEditorUiAlias);
-		this.observe(source, (dataTypes) => {
+		this.observe(collection.asObservable(), (dataTypes) => {
 			this._dataTypes = dataTypes;
 		});
 	}
 
-	private _handleClick(dataType: UmbDataTypeDetailModel) {
+	private _handleClick(dataType: UmbDataTypeItemModel) {
 		if (dataType.unique) {
 			this.value = { dataTypeId: dataType.unique };
 			this.modalContext?.submit();
@@ -79,7 +65,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 			<umb-body-layout headline="Select a configuration">
 				<uui-box> ${this._renderDataTypes()} ${this._renderCreate()}</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this._close}></uui-button>
+					<uui-button label=${this.localize.term('general_close')} @click=${this._close}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
@@ -100,11 +86,11 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 								? html` <li class="item">
 										<uui-button label="dataType.name" type="button" @click="${() => this._handleClick(dataType)}">
 											<div class="item-content">
-												<uui-icon name="${'icon-bug'}" class="icon"></uui-icon>
+												<umb-icon name=${dataType.icon ?? 'icon-circle-dotted'} class="icon"></umb-icon>
 												${dataType.name}
 											</div>
 										</uui-button>
-								  </li>`
+									</li>`
 								: '',
 					)}
 				</ul>`,
@@ -112,7 +98,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 	}
 	private _renderCreate() {
 		return html`
-			<uui-button id="create-button" type="button" look="placeholder" @click="${() => this._handleCreate()}">
+			<uui-button id="create-button" type="button" look="placeholder" @click="${this._handleCreate}">
 				<div class="content">
 					<uui-icon name="icon-add" class="icon"></uui-icon>
 					Create new

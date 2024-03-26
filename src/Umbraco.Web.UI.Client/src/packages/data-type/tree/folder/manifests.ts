@@ -1,7 +1,6 @@
 import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UmbDataTypeFolderRepository } from './data-type-folder.repository.js';
-import { UmbDeleteFolderEntityAction, UmbFolderUpdateEntityAction } from '@umbraco-cms/backoffice/tree';
-import type { ManifestEntityAction, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.DataType.Folder';
 
@@ -12,31 +11,25 @@ const folderRepository: ManifestRepository = {
 	api: UmbDataTypeFolderRepository,
 };
 
-const entityActions: Array<ManifestEntityAction> = [
+const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.DataType.RenameFolder',
+		kind: 'folderUpdate',
+		alias: 'Umb.EntityAction.DataType.Folder.Rename',
 		name: 'Rename Data Type Folder Entity Action',
-		weight: 800,
-		api: UmbFolderUpdateEntityAction,
+		forEntityTypes: [UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		meta: {
-			icon: 'icon-edit',
-			label: 'Rename Folder...',
-			repositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
+			folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
 		},
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.DataType.DeleteFolder',
+		kind: 'folderDelete',
+		alias: 'Umb.EntityAction.DataType.Folder.Delete',
 		name: 'Delete Data Type Folder Entity Action',
-		weight: 700,
-		api: UmbDeleteFolderEntityAction,
+		forEntityTypes: [UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		meta: {
-			icon: 'icon-trash',
-			label: 'Delete Folder...',
-			repositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
+			folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
 		},
 	},
 ];

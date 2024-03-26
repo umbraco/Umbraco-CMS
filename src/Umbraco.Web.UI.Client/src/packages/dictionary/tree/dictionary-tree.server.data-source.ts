@@ -1,5 +1,10 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import type { UmbDictionaryTreeItemModel } from './types.js';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -24,24 +29,32 @@ export class UmbDictionaryTreeServerDataSource extends UmbTreeServerDataSourceBa
 		super(host, {
 			getRootItems,
 			getChildrenOf,
+			getAncestorsOf,
 			mapper,
 		});
 	}
 }
 
-// eslint-disable-next-line local-rules/no-direct-api-import
-const getRootItems = () => DictionaryResource.getTreeDictionaryRoot({});
+const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	DictionaryResource.getTreeDictionaryRoot({ skip: args.skip, take: args.take });
 
-const getChildrenOf = (parentUnique: string | null) => {
-	if (parentUnique === null) {
-		return getRootItems();
+const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
+	if (args.parentUnique === null) {
+		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DictionaryResource.getTreeDictionaryChildren({
-			parentId: parentUnique,
+			parentId: args.parentUnique,
 		});
 	}
 };
+
+const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	DictionaryResource.getTreeDictionaryAncestors({
+		descendantId: args.descendantUnique,
+	});
 
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbDictionaryTreeItemModel => {
 	return {

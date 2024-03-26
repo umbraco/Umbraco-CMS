@@ -1,7 +1,7 @@
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @export
@@ -12,10 +12,10 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 export class UmbLanguageDetailStore extends UmbDetailStoreBase<UmbLanguageDetailModel> {
 	/**
 	 * Creates an instance of UmbLanguageDetailStore.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbLanguageDetailStore
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_LANGUAGE_DETAIL_STORE_CONTEXT.toString());
 	}
 }
