@@ -10,7 +10,6 @@ import { setCustomElements } from '@storybook/web-components';
 import { startMockServiceWorker } from '../src/mocks';
 
 import '../src/libs/controller-api/controller-host-provider.element';
-import { UmbServerExtensionRegistrator } from '../src/libs/extension-api/controller/server-extension-registrator.controller';
 import { UmbModalManagerContext } from '../src/packages/core/modal';
 import { UmbDataTypeTreeStore } from '../src/packages/data-type/tree/data-type-tree.store';
 import { UmbDocumentDetailStore } from '../src/packages/documents/documents/repository/detail/document-detail.store';
@@ -45,8 +44,6 @@ class UmbStoryBookElement extends UmbLitElement {
 
 		this._registerExtensions(localizationManifests);
 		umbLocalizationRegistry.loadLanguage('en-us'); // register default language
-
-		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerAllExtensions();
 	}
 
 	_registerExtensions(manifests) {
