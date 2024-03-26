@@ -29,13 +29,13 @@ export interface UmbMfaProviderConfigurationElementProps {
 	providerName: string;
 
 	/**
-	 * Enable the provider with the given code and secret.
+	 * Call this function to execute the action for the given provider, e.g. to enable or disable it.
 	 * @param providerName The name of the provider to enable.
 	 * @param code The authentication code from the authentication method.
 	 * @param secret The secret from the authentication backend.
-	 * @returns True if the provider was enabled successfully.
+	 * @returns True if the provider action was executed successfully.
 	 */
-	enableProvider: (providerName: string, code: string, secret: string) => Promise<boolean>;
+	callback: (providerName: string, code: string, secret: string) => Promise<boolean>;
 
 	/**
 	 * Call this function to close the modal.

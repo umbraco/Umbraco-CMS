@@ -13,7 +13,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	providerName = '';
 
 	@property({ attribute: false })
-	enableProvider: (providerName: string, code: string, secret: string) => Promise<boolean> = async () => false;
+	callback: (providerName: string, code: string, secret: string) => Promise<boolean> = async () => false;
 
 	@property({ attribute: false })
 	close = () => {};
@@ -84,19 +84,12 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 					<umb-body-layout headline=${this.providerName}>
 						<div id="main">
 							<uui-box .headline=${this.localize.term('member_2fa')}>
-								${this._qrCodeSetupImageUrl
-									? html` <div class="text-center">
-											<p>
-												<umb-localize key="user_2faQrCodeDescription">
-													Scan this QR code with your authenticator app to enable two-factor authentication
-												</umb-localize>
-											</p>
-											<img
-												.src=${this._qrCodeSetupImageUrl}
-												alt=${this.localize.term('user_2faQrCodeAlt')}
-												title=${this.localize.term('user_2faQrCodeTitle')} />
-										</div>`
-									: ''}
+								<div class="text-center">
+									<img
+										.src=${this._qrCodeSetupImageUrl}
+										alt=${this.localize.term('user_2faQrCodeAlt')}
+										title=${this.localize.term('user_2faQrCodeTitle')} />
+								</div>
 								<uui-form-layout-item class="text-center">
 									<uui-label for="code" slot="label" required>
 										<umb-localize key="user_2faCodeInput"></umb-localize>
@@ -109,6 +102,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 										autocomplete="one-time-code"
 										required
 										required-message=${this.localize.term('general_required')}
+										label=${this.localize.term('user_2faCodeInputHelp')}
 										placeholder=${this.localize.term('user_2faCodeInputHelp')}></uui-input>
 								</uui-form-layout-item>
 							</uui-box>
@@ -154,11 +148,19 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	 */
 	protected async submit(e: SubmitEvent) {
 		e.preventDefault();
-		this._buttonState = 'waiting';
 		this.codeField?.setCustomValidity('');
-		const formData = new FormData(e.target as HTMLFormElement);
+
+		const form = e.target as HTMLFormElement;
+
+		if (!form.checkValidity()) return;
+
+		const formData = new FormData(form);
 		const code = formData.get('code') as string;
-		const successful = await this.enableProvider(this.providerName, code, this._secret);
+
+		if (!code) return;
+
+		this._buttonState = 'waiting';
+		const successful = await this.callback(this.providerName, code, this._secret);
 
 		if (successful) {
 			this.peek('Two-factor authentication has successfully been enabled.');
