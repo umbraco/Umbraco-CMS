@@ -32,16 +32,12 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         int? parentId,
         IEnumerable<string>? includeItemTypes,
         IEnumerable<string>? excludeItemTypes)
-        : base(includeItemTypes, excludeItemTypes, null, null)
+        : this(publishedValuesOnly, supportProtectedContent, publicAccessService, scopeProvider, parentId, includeItemTypes, excludeItemTypes, null, null)
     {
-        PublishedValuesOnly = publishedValuesOnly;
-        SupportProtectedContent = supportProtectedContent;
-        ParentId = parentId;
-        _publicAccessService = publicAccessService;
-        _scopeProvider = scopeProvider;
+
     }
 
-    [Obsolete("This constructor is obsolete, the IScopeProvider will change to Infrastructure.Scoping.ScopeProvider instead, this will be removed in Umbraco 14.")]
+    [Obsolete("This constructor is obsolete, the IScopeProvider will change to Infrastructure.Scoping.IScopeProvider instead, this will be removed in Umbraco 14.")]
     public ContentValueSetValidator(
         bool publishedValuesOnly,
         bool supportProtectedContent,
