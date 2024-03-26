@@ -10,7 +10,7 @@ dotenv.config();
 const config: PlaywrightTestConfig = {
   testDir: './tests/',
   /* Maximum time one test can run for. */
-  timeout: 40 * 1000,
+  timeout: 20 * 1000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -21,7 +21,7 @@ const config: PlaywrightTestConfig = {
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 5 : 2,
+  retries: process.env.CI ? 3 : 2,
   // We don't want to run parallel, as tests might differ in state
   workers:  1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
