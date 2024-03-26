@@ -128,10 +128,13 @@ internal sealed class ContentBlueprintEditingService
         return Attempt.SucceedWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, blueprint);
     }
 
-    // NB: Some methods from ContentEditingServiceBase are needed so we need to inherit from it and have some of these as unimplemented as they don't apply in the case of blueprints
     protected override IContent New(string? name, int parentId, IContentType contentType)
         => new Content(name, parentId, contentType);
 
+    /// <summary>
+    ///     NB: Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
+    ///     but there are others that are not required to be implemented in the case of blueprints, therefore they throw NotImplementedException as default.
+    /// </summary>
     protected override OperationResult? Move(IContent content, int newParentId, int userId) => throw new NotImplementedException();
 
     protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId) => throw new NotImplementedException();
