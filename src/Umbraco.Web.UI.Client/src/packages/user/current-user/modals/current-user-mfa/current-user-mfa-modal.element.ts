@@ -1,8 +1,12 @@
+import {
+	UMB_CURRENT_USER_MFA_PROVIDER_MODAL,
+	type UmbCurrentUserMfaProviderModalValue,
+} from '../current-user-mfa-provider/current-user-mfa-provider-modal.token.js';
 import { UmbCurrentUserRepository } from '../../repository/index.js';
 import type { UmbCurrentUserMfaProviderModel } from '../../types.js';
 import { customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-current-user-mfa-modal')
 export class UmbCurrentUserMfaModalElement extends UmbLitElement {
@@ -61,20 +65,61 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 				<uui-toggle
 					label=${item.providerName}
 					?checked=${item.isEnabledOnUser}
-					@change=${() => this.#onProviderToggleChange(item)}></uui-toggle>
+					@change=${(e: Event) => this.#onProviderToggleChange(e, item)}></uui-toggle>
 			</div>
 		`;
 	}
 
-	#onProviderToggleChange = (item: UmbCurrentUserMfaProviderModel) => {
-		// If already enabled, disable it
-		if (item.isEnabledOnUser) {
-			// Disable provider
+	async #onProviderToggleChange(event: Event, item: UmbCurrentUserMfaProviderModel) {
+		// Prevent the toggle from changing
+		event.preventDefault();
+		event.stopPropagation();
+
+		const { code, secret } = await this.#openProviderModal(item);
+
+		// If no code, do nothing
+		if (!code) {
 			return;
 		}
 
+		// If already enabled, disable it
+		if (item.isEnabledOnUser) {
+			// Disable provider
+			const result = await this.#currentUserRepository.disableMfaProvider(item.providerName, code);
+			if (result) {
+				item.isEnabledOnUser = false;
+				this.#currentUserRepository;
+			}
+			return result;
+		}
+
 		// Enable provider
-	};
+		// If no secret, do nothing
+		if (!secret) {
+			return;
+		}
+
+		const result = await this.#currentUserRepository.enableMfaProvider(item.providerName, code, secret);
+		if (result) {
+			item.isEnabledOnUser = true;
+		}
+		return result;
+	}
+
+	/**
+	 * Open the provider modal.
+	 * This will show the QR code and/or other means of validation for the given provider and return the activation code.
+	 * The activation code is then used to either enable or disable the provider.
+	 */
+	async #openProviderModal(item: UmbCurrentUserMfaProviderModel): Promise<UmbCurrentUserMfaProviderModalValue> {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		return modalManager
+			.open(this, UMB_CURRENT_USER_MFA_PROVIDER_MODAL, {
+				data: { providerName: item.providerName, isEnabled: item.isEnabledOnUser },
+			})
+			.onSubmit()
+			.catch(() => ({}));
+	}
 }
 
 export default UmbCurrentUserMfaModalElement;
