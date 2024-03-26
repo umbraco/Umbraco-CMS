@@ -52,14 +52,18 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	async requestMfaLoginProviders(): Promise<Array<UmbCurrentUserMfaProviderModel>> {
 		await this.#init;
 		const existingValue = this.#currentUserStore?.getMfaProviders();
-		if (existingValue) {
+		if (existingValue?.length) {
 			return existingValue;
 		}
 
 		const { data } = await this.#currentUserSource.getMfaLoginProviders();
-		this.#currentUserStore?.setMfaProviders(data);
 
-		return data ?? [];
+		if (data) {
+			this.#currentUserStore?.setMfaProviders(data);
+			return data;
+		}
+
+		return [];
 	}
 
 	/**
@@ -77,15 +81,17 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	 * @param code The activation code of the provider to enable
 	 * @memberof UmbCurrentUserRepository
 	 */
-	async enableMfaProvider(provider: string, code: string): Promise<boolean> {
+	async enableMfaProvider(providerName: string, code: string, secret: string): Promise<boolean> {
 		const { error } = await tryExecuteAndNotify(
 			this._host,
-			UserResource.postUserCurrent2FaByProviderName({ providerName: provider, requestBody: { code, secret: code } }),
+			UserResource.postUserCurrent2FaByProviderName({ providerName, requestBody: { code, secret } }),
 		);
 
 		if (error) {
 			return false;
 		}
+
+		this.#currentUserStore?.updateMfaProvider({ providerName, isEnabledOnUser: true });
 
 		return true;
 	}
@@ -96,15 +102,17 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	 * @param code The activation code of the provider to disable
 	 * @memberof UmbCurrentUserRepository
 	 */
-	async disableMfaProvider(provider: string, code: string): Promise<boolean> {
+	async disableMfaProvider(providerName: string, code: string): Promise<boolean> {
 		const { error } = await tryExecuteAndNotify(
 			this._host,
-			UserResource.deleteUserCurrent2FaByProviderName({ providerName: provider, code }),
+			UserResource.deleteUserCurrent2FaByProviderName({ providerName, code }),
 		);
 
 		if (error) {
 			return false;
 		}
+
+		this.#currentUserStore?.updateMfaProvider({ providerName, isEnabledOnUser: false });
 
 		return true;
 	}

@@ -4,13 +4,13 @@ import { UMB_USER_DETAIL_STORE_CONTEXT } from '@umbraco-cms/backoffice/user';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 	#data = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
-	#mfaProviders = new UmbObjectState<Array<UmbCurrentUserMfaProviderModel> | undefined>(undefined);
+	#mfaProviders = new UmbArrayState<UmbCurrentUserMfaProviderModel>([], (e) => e.providerName);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CURRENT_USER_STORE_CONTEXT.toString());
@@ -80,8 +80,12 @@ export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 		return this.#mfaProviders.getValue();
 	}
 
-	setMfaProviders(data: Array<UmbCurrentUserMfaProviderModel> | undefined) {
+	setMfaProviders(data: Array<UmbCurrentUserMfaProviderModel>) {
 		this.#mfaProviders.setValue(data);
+	}
+
+	updateMfaProvider(data: Partial<UmbCurrentUserMfaProviderModel>) {
+		this.#mfaProviders.updateOne(data.providerName, data);
 	}
 }
 
