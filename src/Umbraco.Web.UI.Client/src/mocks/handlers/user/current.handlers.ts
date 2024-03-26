@@ -12,6 +12,27 @@ export const handlers = [
 		const mfaLoginProviders = umbUserMockDb.getMfaLoginProviders();
 		return res(ctx.status(200), ctx.json(mfaLoginProviders));
 	}),
+	rest.get(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), (req, res, ctx) => {
+		if (!req.params.providerName) {
+			return res(ctx.status(400));
+		}
+
+		const mfaProviders = umbUserMockDb.getMfaLoginProviders();
+		const mfaProvider = mfaProviders.find((p) => p.providerName === req.params.providerName.toString());
+
+		if (!mfaProvider) {
+			return res(ctx.status(404));
+		}
+
+		return res(
+			ctx.status(200),
+			ctx.json({
+				$type: 'TwoFactorAuthInfo',
+				qrCodeSetupImageUrl: 'https://placekitten.com/200/200',
+				secret: '8b713fc7-8f17-4f5d-b2ac-b53879c75953',
+			}),
+		);
+	}),
 	rest.post<{ code: string; secret: string }>(
 		umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`),
 		async (req, res, ctx) => {
