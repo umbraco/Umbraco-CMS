@@ -15,4 +15,5 @@ public enum ContentTypeOperationStatus
     MissingContainer,
     DuplicateContainer,
     NotFound,
+    NotAllowed
 }

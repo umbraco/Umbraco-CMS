@@ -131,7 +131,7 @@ public abstract class ContentTypeEditingServiceTestsBase : UmbracoIntegrationTes
         Guid? key = null)
         => CreateContainer<MediaTypePropertyContainerModel>(name, type, key);
 
-    private TModel CreateContentEditingModel<TModel, TPropertyType, TPropertyTypeContainer>(
+    protected TModel CreateContentEditingModel<TModel, TPropertyType, TPropertyTypeContainer>(
         string name,
         string? alias = null,
         bool isElement = false,
@@ -151,7 +151,7 @@ public abstract class ContentTypeEditingServiceTestsBase : UmbracoIntegrationTes
             IsElement = isElement
         };
 
-    private TModel CreatePropertyType<TModel>(
+    protected TModel CreatePropertyType<TModel>(
         string name,
         string? alias = null,
         Guid? key = null,
@@ -169,7 +169,7 @@ public abstract class ContentTypeEditingServiceTestsBase : UmbracoIntegrationTes
             Appearance = new PropertyTypeAppearance(),
         };
 
-    private TModel CreateContainer<TModel>(
+    protected TModel CreateContainer<TModel>(
         string name,
         string type = TabContainerType,
         Guid? key = null)
