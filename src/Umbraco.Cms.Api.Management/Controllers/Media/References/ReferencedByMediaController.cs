@@ -7,15 +7,15 @@ using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Document.References;
+namespace Umbraco.Cms.Api.Management.Controllers.Media.References;
 
 [ApiVersion("1.0")]
-public class ReferencesDocumentController : DocumentControllerBase
+public class ReferencedByMediaController : MediaControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
 
-    public ReferencesDocumentController(ITrackedReferencesService trackedReferencesService, IRelationTypePresentationFactory relationTypePresentationFactory)
+    public ReferencedByMediaController(ITrackedReferencesService trackedReferencesService, IRelationTypePresentationFactory relationTypePresentationFactory)
     {
         _trackedReferencesService = trackedReferencesService;
         _relationTypePresentationFactory = relationTypePresentationFactory;
@@ -28,10 +28,10 @@ public class ReferencesDocumentController : DocumentControllerBase
     ///     Used by info tabs on content, media etc. and for the delete and unpublish of single items.
     ///     This is basically finding parents of relations.
     /// </remarks>
-    [HttpGet("{id:guid}/references")]
+    [HttpGet("{id:guid}/referenced-by")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<IReferenceResponseModel>>> Get(
+    public async Task<ActionResult<PagedViewModel<IReferenceResponseModel>>> ReferencedBy(
         Guid id,
         int skip = 0,
         int take = 20)
