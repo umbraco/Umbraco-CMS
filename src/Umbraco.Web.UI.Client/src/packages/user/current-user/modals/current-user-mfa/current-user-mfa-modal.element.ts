@@ -1,7 +1,7 @@
 import { UmbCurrentUserRepository } from '../../repository/index.js';
+import type { UmbCurrentUserMfaProviderModel } from '../../types.js';
 import { customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UserTwoFactorProviderModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-current-user-mfa-modal')
@@ -10,7 +10,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	modalContext?: UmbModalContext;
 
 	@state()
-	_items: Array<UserTwoFactorProviderModel> = [];
+	_items: Array<UmbCurrentUserMfaProviderModel> = [];
 
 	#currentUserRepository = new UmbCurrentUserRepository(this);
 
@@ -20,10 +20,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	}
 
 	async #loadProviders() {
-		const { data: providers } = await this.#currentUserRepository.requestMfaLoginProviders();
-
-		if (!providers) return;
-
+		const providers = await this.#currentUserRepository.requestMfaLoginProviders();
 		this._items = providers;
 	}
 
@@ -58,7 +55,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	/**
 	 * Render a provider with a toggle to enable/disable it
 	 */
-	#renderProvider(item: UserTwoFactorProviderModel) {
+	#renderProvider(item: UmbCurrentUserMfaProviderModel) {
 		return html`
 			<div>
 				<uui-toggle
@@ -69,7 +66,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 		`;
 	}
 
-	#onProviderToggleChange = (item: UserTwoFactorProviderModel) => {
+	#onProviderToggleChange = (item: UmbCurrentUserMfaProviderModel) => {
 		// If already enabled, disable it
 		if (item.isEnabledOnUser) {
 			// Disable provider

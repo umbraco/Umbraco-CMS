@@ -1,3 +1,4 @@
+import type { UmbCurrentUserMfaProviderModel } from '../types.js';
 import { UmbCurrentUserServerDataSource } from './current-user.server.data-source.js';
 import { UMB_CURRENT_USER_STORE_CONTEXT } from './current-user.store.js';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -48,13 +49,25 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	 * Request the current user's available MFA login providers
 	 * @memberof UmbCurrentUserRepository
 	 */
-	requestMfaLoginProviders() {
-		return this.#currentUserSource.getMfaLoginProviders();
+	async requestMfaLoginProviders(): Promise<Array<UmbCurrentUserMfaProviderModel>> {
+		await this.#init;
+		const existingValue = this.#currentUserStore?.getMfaProviders();
+		if (existingValue) {
+			return existingValue;
+		}
+
+		const { data } = await this.#currentUserSource.getMfaLoginProviders();
+		this.#currentUserStore?.setMfaProviders(data);
+
+		return data ?? [];
 	}
 
+	/**
+	 * Check if the current user has MFA login providers
+	 * @memberof UmbCurrentUserRepository
+	 */
 	async hasMfaLoginProviders(): Promise<boolean> {
-		const { data } = await this.requestMfaLoginProviders();
-
+		const data = await this.requestMfaLoginProviders();
 		return !!data;
 	}
 
@@ -62,6 +75,7 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	 * Enable an MFA provider
 	 * @param provider The provider to enable
 	 * @param code The activation code of the provider to enable
+	 * @memberof UmbCurrentUserRepository
 	 */
 	async enableMfaProvider(provider: string, code: string): Promise<boolean> {
 		const { error } = await tryExecuteAndNotify(
@@ -80,6 +94,7 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	 * Disable an MFA provider
 	 * @param provider The provider to disable
 	 * @param code The activation code of the provider to disable
+	 * @memberof UmbCurrentUserRepository
 	 */
 	async disableMfaProvider(provider: string, code: string): Promise<boolean> {
 		const { error } = await tryExecuteAndNotify(

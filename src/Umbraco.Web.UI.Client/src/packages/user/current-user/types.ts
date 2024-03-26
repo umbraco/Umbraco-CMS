@@ -1,6 +1,7 @@
 import type {
 	DocumentPermissionPresentationModel,
 	UnknownTypePermissionPresentationModel,
+	UserTwoFactorProviderModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbCurrentUserModel {
@@ -18,3 +19,5 @@ export interface UmbCurrentUserModel {
 	fallbackPermissions: Array<string>;
 	permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 }
+
+export type UmbCurrentUserMfaProviderModel = UserTwoFactorProviderModel;
