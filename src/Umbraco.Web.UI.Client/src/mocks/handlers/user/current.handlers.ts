@@ -49,13 +49,13 @@ export const handlers = [
 			return res(ctx.delay(), ctx.status(result ? 200 : 404));
 		},
 	),
-	rest.delete<{ code: string }>(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), async (req, res, ctx) => {
-		const body = await req.json();
-		if (!req.params.providerName || !body.code) {
+	rest.delete<{ code: string }>(umbracoPath(`${UMB_SLUG}/current/2fa/:providerName`), (req, res, ctx) => {
+		const code = req.url.searchParams.get('code');
+		if (!req.params.providerName || !code) {
 			return res(ctx.status(400));
 		}
 
-		if (body.code === 'fail') {
+		if (code === 'fail') {
 			return res(ctx.delay(), ctx.status(400));
 		}
 
