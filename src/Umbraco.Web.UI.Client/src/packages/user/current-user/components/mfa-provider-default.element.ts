@@ -7,6 +7,11 @@ import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationColor } from '@umbraco-cm
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
+/**
+ * A default MFA provider configuration element.
+ * @element umb-mfa-provider-default
+ * @slot description - The description of the action that is about to be taken.
+ */
 @customElement('umb-mfa-provider-default')
 export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMfaProviderConfigurationElementProps {
 	@property({ attribute: false })
@@ -43,7 +48,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		});
 	}
 
-	async firstUpdated() {
+	protected async firstUpdated() {
 		await this.#load();
 		this._loading = false;
 	}
@@ -85,6 +90,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 						<div id="main">
 							<uui-box .headline=${this.localize.term('member_2fa')}>
 								<div class="text-center">
+									<slot name="description"></slot>
 									<img
 										.src=${this._qrCodeSetupImageUrl}
 										alt=${this.localize.term('user_2faQrCodeAlt')}
