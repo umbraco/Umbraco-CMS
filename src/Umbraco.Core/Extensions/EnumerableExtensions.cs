@@ -11,7 +11,25 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class EnumerableExtensions
 {
-    public static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T>? list) => list == null || list.Count == 0;
+    /// <summary>
+    /// Determines whether the specified IReadOnlyCollection is null or empty.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the collection.</typeparam>
+    /// <param name="collection">The IReadOnlyCollection to check.</param>
+    /// <returns>
+    ///   <c>true</c> if the specified collection is null or empty; otherwise, <c>false</c>.
+    /// </returns>
+    public static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T>? collection) => collection == null || collection.Count == 0;
+
+    /// <summary>
+    /// Determines whether the specified IEnumerable is null or has no elements.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the enumerable.</typeparam>
+    /// <param name="enumerable">The IEnumerable to check.</param>
+    /// <returns>
+    ///   <c>true</c> if the specified enumerable is null or has no elements; otherwise, <c>false</c>.
+    /// </returns>
+    public static bool IsEnumerableEmpty<T>(this IEnumerable<T>? enumerable) => enumerable == null || !enumerable.Any();
 
     /// <summary>
     ///     Wraps this object instance into an IEnumerable{T} consisting of a single item.
