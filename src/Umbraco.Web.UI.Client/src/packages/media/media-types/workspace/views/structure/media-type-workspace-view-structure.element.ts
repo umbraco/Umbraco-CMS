@@ -1,9 +1,9 @@
 import type { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
 import type { UmbInputMediaTypeElement } from '../../../components/input-media-type/input-media-type.element.js';
+import { UMB_MEDIA_TYPE_WORKSPACE_CONTEXT } from '../../media-type-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbInputCollectionConfigurationElement } from '@umbraco-cms/backoffice/components';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -26,8 +26,8 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 		super();
 
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (mediaTypeContext) => {
-			this.#workspaceContext = mediaTypeContext as UmbMediaTypeWorkspaceContext;
+		this.consumeContext(UMB_MEDIA_TYPE_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
 			this._observeMediaType();
 		});
 	}

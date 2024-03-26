@@ -22,9 +22,6 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 	@state()
 	_isNew?: boolean;
 
-	@state()
-	_validationErrors?: { [key: string]: Array<any> };
-
 	#languageWorkspaceContext?: typeof UMB_LANGUAGE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -51,11 +48,6 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 
 			this.observe(this.#languageWorkspaceContext.isNew, (isNew) => {
 				this._isNew = isNew;
-			});
-
-			this.observe(this.#languageWorkspaceContext.validationErrors, (value) => {
-				this._validationErrors = value;
-				this.requestUpdate('_validationErrors');
 			});
 		});
 	}
@@ -123,9 +115,6 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 							value=${ifDefined(this._language?.unique)}
 							@change=${this.#handleCultureChange}
 							?readonly=${this._isNew === false}></umb-input-culture-select>
-
-						<!-- TEMP VALIDATION ERROR -->
-						${this._validationErrors?.isoCode.map((error) => html`<div class="validation-message">${error}</div>`)}
 					</div>
 				</umb-property-layout>
 

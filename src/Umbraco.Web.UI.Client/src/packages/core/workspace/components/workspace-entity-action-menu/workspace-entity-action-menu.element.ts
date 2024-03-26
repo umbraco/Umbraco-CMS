@@ -2,14 +2,14 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, nothing, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ENTITY_WORKSPACE_CONTEXT, type UmbWorkspaceUniqueType } from '@umbraco-cms/backoffice/workspace';
 import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 @customElement('umb-workspace-entity-action-menu')
 export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
-	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
+	private _workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	private _unique?: string;
+	private _unique?: UmbWorkspaceUniqueType;
 
 	@state()
 	private _entityType?: string;
@@ -23,7 +23,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
 			this._observeInfo();
 		});

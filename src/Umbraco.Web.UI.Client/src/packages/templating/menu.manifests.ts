@@ -6,9 +6,6 @@ const menu: ManifestMenu = {
 	type: 'menu',
 	alias: 'Umb.Menu.Templating',
 	name: 'Templating Menu',
-	meta: {
-		label: 'Templating',
-	},
 };
 
 const menuSectionSidebarApp: ManifestTypes = {
@@ -16,7 +13,7 @@ const menuSectionSidebarApp: ManifestTypes = {
 	kind: 'menu',
 	alias: 'Umb.SectionSidebarMenu.Templating',
 	name: 'Templating Section Sidebar Menu',
-	weight: 100,
+	weight: 200,
 	meta: {
 		label: 'Templating',
 		menu: 'Umb.Menu.Templating',

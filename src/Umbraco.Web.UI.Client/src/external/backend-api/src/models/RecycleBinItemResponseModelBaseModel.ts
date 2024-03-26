@@ -7,7 +7,6 @@ import type { ItemReferenceByIdResponseModel } from './ItemReferenceByIdResponse
 
 export type RecycleBinItemResponseModelBaseModel = {
     id: string;
-    type: string;
     hasChildren: boolean;
     parent?: ItemReferenceByIdResponseModel | null;
 };
