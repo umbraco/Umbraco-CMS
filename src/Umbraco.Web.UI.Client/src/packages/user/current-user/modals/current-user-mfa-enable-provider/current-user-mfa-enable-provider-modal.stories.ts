@@ -27,7 +27,9 @@ const meta: Meta<UmbCurrentUserMfaEnableProviderModalElement> = {
 	component: 'umb-current-user-mfa-enable-provider-modal',
 	decorators: [
 		(Story) =>
-			html`<umb-server-extensions-host style="width: 500px; height: 500px;">${Story()}</umb-server-extensions-host>`,
+			html`<umb-server-extensions-host style="display: block; width: 500px; height: 500px;">
+				${Story()}
+			</umb-server-extensions-host>`,
 	],
 	args: {
 		data: {
