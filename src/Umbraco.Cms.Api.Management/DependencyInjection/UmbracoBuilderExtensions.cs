@@ -10,7 +10,6 @@ using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Extensions;
@@ -33,6 +32,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddSearchManagement()
                 .AddTrees()
                 .AddAuditLogs()
+                .AddConfigurationFactories()
                 .AddDocuments()
                 .AddDocumentTypes()
                 .AddMedia()

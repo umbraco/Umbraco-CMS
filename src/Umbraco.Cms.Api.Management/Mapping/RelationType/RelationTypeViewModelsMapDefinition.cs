@@ -29,7 +29,7 @@ public class RelationTypeViewModelsMapDefinition : IMapDefinition
         target.ParentObjectType = source.ParentObjectType;
         target.Path = "-1," + source.Id;
 
-        target.IsSystemRelationType = source.IsSystemRelationType();
+        target.IsDeletable = source.IsDeletableRelationType();
 
         // Set the "friendly" and entity names for the parent and child object types
         if (source.ParentObjectType.HasValue)

@@ -3,6 +3,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
@@ -47,6 +49,29 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         return viewModel;
     }
 
+    protected override async Task<IEntitySlim[]> GetAncestorEntitiesAsync(Guid descendantKey, bool includeSelf = true)
+    {
+        IEntitySlim? entity = EntityService.Get(descendantKey, ItemObjectType)
+                              ?? EntityService.Get(descendantKey, FolderObjectType);
+        if (entity is null)
+        {
+            // not much else we can do here but return nothing
+            return await Task.FromResult(Array.Empty<IEntitySlim>());
+        }
+
+        var ancestorIds = entity.AncestorIds();
+        // annoyingly we can't use EntityService.GetAll() with container object types, so we have to get them one by one
+        IEntitySlim[] containers = ancestorIds.Select(id => EntityService.Get(id, FolderObjectType)).WhereNotNull().ToArray();
+        IEnumerable<IEntitySlim> ancestors = ancestorIds.Any()
+            ? EntityService
+                .GetAll(ItemObjectType, ancestorIds)
+                .Union(containers)
+            : Array.Empty<IEntitySlim>();
+        ancestors = ancestors.Union(includeSelf ? new[] { entity } : Array.Empty<IEntitySlim>());
+
+        return ancestors.OrderBy(item => item.Level).ToArray();
+    }
+
     private IEntitySlim[] GetEntities(Guid? parentKey, int skip, int take, out long totalItems)
     {
         totalItems = 0;
@@ -69,6 +94,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             ? Array.Empty<IEntitySlim>()
             : EntityService.GetPagedChildren(
                     parentKey,
+                    new [] { FolderObjectType, ItemObjectType },
                     ItemObjectType,
                     skip,
                     take,

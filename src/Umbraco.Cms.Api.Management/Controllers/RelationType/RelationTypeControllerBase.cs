@@ -7,7 +7,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
-namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Query;
+namespace Umbraco.Cms.Api.Management.Controllers.RelationType;
 
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.RelationType}")]
 [ApiExplorerSettings(GroupName = "Relation Type")]

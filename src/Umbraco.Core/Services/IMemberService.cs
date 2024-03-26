@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Services;
@@ -90,6 +91,13 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
         bool orderBySystemField,
         string? memberTypeAlias,
         string filter);
+
+    public Task<PagedModel<IMember>> FilterAsync(
+        MemberFilter memberFilter,
+        string orderBy = "username",
+        Direction orderDirection = Direction.Ascending,
+        int skip = 0,
+        int take = 100);
 
     /// <summary>
     ///     Creates an <see cref="IMember" /> object without persisting it

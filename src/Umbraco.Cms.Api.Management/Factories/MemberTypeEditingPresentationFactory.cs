@@ -25,6 +25,8 @@ internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingP
         createModel.Key = requestModel.Id;
         createModel.Compositions = MapCompositions(requestModel.Compositions);
 
+        MapPropertyTypeSensitivityAndVisibility(createModel.Properties, requestModel.Properties);
+
         return createModel;
     }
 
@@ -40,6 +42,8 @@ internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingP
 
         updateModel.Compositions = MapCompositions(requestModel.Compositions);
 
+        MapPropertyTypeSensitivityAndVisibility(updateModel.Properties, requestModel.Properties);
+
         return updateModel;
     }
 
@@ -50,4 +54,23 @@ internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingP
         => MapCompositions(documentTypeCompositions
             .DistinctBy(c => c.MemberType.Id)
             .ToDictionary(c => c.MemberType.Id, c => c.CompositionType));
+
+    private void MapPropertyTypeSensitivityAndVisibility<TRequestPropertyTypeModel>(
+        IEnumerable<MemberTypePropertyTypeModel> propertyTypes,
+        IEnumerable<TRequestPropertyTypeModel> requestPropertyTypes)
+        where TRequestPropertyTypeModel : MemberTypePropertyTypeModelBase
+    {
+        var requestModelPropertiesByAlias = requestPropertyTypes.ToDictionary(p => p.Alias);
+        foreach (MemberTypePropertyTypeModel propertyType in propertyTypes)
+        {
+            if (requestModelPropertiesByAlias.TryGetValue(propertyType.Alias, out TRequestPropertyTypeModel? requestPropertyType) is false)
+            {
+                throw new InvalidOperationException($"Could not find the property type model {propertyType.Alias} in the request");
+            }
+
+            propertyType.IsSensitive = requestPropertyType.IsSensitive;
+            propertyType.MemberCanView = requestPropertyType.Visibility.MemberCanView;
+            propertyType.MemberCanEdit = requestPropertyType.Visibility.MemberCanEdit;
+        }
+    }
 }

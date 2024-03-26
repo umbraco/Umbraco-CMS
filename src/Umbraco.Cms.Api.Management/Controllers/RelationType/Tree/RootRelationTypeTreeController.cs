@@ -19,12 +19,12 @@ public class RootRelationTypeTreeController : RelationTypeTreeControllerBase
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<NamedEntityTreeItemResponseModel>>> Root(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<RelationTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<RelationTypeTreeItemResponseModel>>> Root(int skip = 0, int take = 100)
     {
         PagedModel<IRelationType> pagedRelationTypes = await _relationService.GetPagedRelationTypesAsync(skip, take);
 
-        PagedViewModel<NamedEntityTreeItemResponseModel> pagedResult = PagedViewModel(
+        PagedViewModel<RelationTypeTreeItemResponseModel> pagedResult = PagedViewModel(
             MapTreeItemViewModels(null, pagedRelationTypes.Items),
             pagedRelationTypes.Total);
 

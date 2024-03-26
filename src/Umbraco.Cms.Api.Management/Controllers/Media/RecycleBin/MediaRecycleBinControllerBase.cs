@@ -27,7 +27,7 @@ public class MediaRecycleBinControllerBase : RecycleBinControllerBase<MediaRecyc
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Media;
 
-    protected override Guid RecycleBindRootKey => Constants.System.RecycleBinMediaKey;
+    protected override Guid RecycleBinRootKey => Constants.System.RecycleBinMediaKey;
 
     protected override MediaRecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
     {
