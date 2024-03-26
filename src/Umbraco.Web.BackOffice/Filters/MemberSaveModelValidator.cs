@@ -2,13 +2,18 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Filters;
@@ -23,6 +28,24 @@ internal class
     private readonly IMemberService _memberService;
     private readonly IMemberTypeService _memberTypeService;
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly SecuritySettings _securitySettings;
+
+    public MemberSaveModelValidator(
+        ILogger<MemberSaveModelValidator> logger,
+        IBackOfficeSecurity? backofficeSecurity,
+        IMemberTypeService memberTypeService,
+        IMemberService memberService,
+        IShortStringHelper shortStringHelper,
+        IPropertyValidationService propertyValidationService,
+        SecuritySettings securitySettings)
+        : base(logger, propertyValidationService)
+    {
+        _backofficeSecurity = backofficeSecurity;
+        _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
+        _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
+        _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+        _securitySettings = securitySettings;
+    }
 
     public MemberSaveModelValidator(
         ILogger<MemberSaveModelValidator> logger,
@@ -37,6 +60,7 @@ internal class
         _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
         _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+        _securitySettings = StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>().Value;
     }
 
     public override bool ValidatePropertiesData(
@@ -64,8 +88,7 @@ internal class
                 $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
         }
 
-        var validEmail = ValidateUniqueEmail(model);
-        if (validEmail == false)
+        if (_securitySettings.MemberRequireUniqueEmail && ValidateUniqueEmail(model) == false)
         {
             modelState.AddPropertyError(
                 new ValidationResult("Email address is already in use", new[] { "value" }),

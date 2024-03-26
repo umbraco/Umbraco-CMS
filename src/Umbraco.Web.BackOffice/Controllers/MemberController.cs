@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
@@ -55,6 +56,7 @@ public class MemberController : ContentControllerBase
     private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly SecuritySettings? _securitySettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberController" /> class.
@@ -461,7 +463,7 @@ public class MemberController : ContentControllerBase
         }
 
         // now re-look up the member, which will now exist
-        IMember? member = _memberService.GetByEmail(contentItem.Email);
+        IMember? member = _memberService.GetByUsername(contentItem.Username);
 
         if (member is null)
         {
@@ -700,7 +702,7 @@ public class MemberController : ContentControllerBase
         }
 
         IMember? byEmail = _memberService.GetByEmail(contentItem.Email);
-        if (byEmail != null && byEmail.Key != contentItem.Key)
+        if (_securitySettings != null && _securitySettings.MemberRequireUniqueEmail && byEmail != null && byEmail.Key != contentItem.Key)
         {
             ModelState.AddPropertyError(
                 new ValidationResult("Email address is already in use", new[] { "value" }),
