@@ -11,8 +11,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Versions;
 
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Document}-version")]
-[ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocuments)]
+[ApiExplorerSettings(GroupName = $"{Constants.UdiEntityType.Document} Version")]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public class DocumentVersionControllerBase : ManagementApiControllerBase
 {
     protected readonly IContentVersionService ContentVersionService;

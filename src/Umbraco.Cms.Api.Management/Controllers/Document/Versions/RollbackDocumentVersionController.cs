@@ -22,7 +22,7 @@ public class RollbackDocumentVersionController : DocumentVersionControllerBase
     }
 
     [MapToApiVersion("1.0")]
-    [HttpPost("/{id:guid}/rollback")]
+    [HttpPost("{id:guid}/rollback")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
