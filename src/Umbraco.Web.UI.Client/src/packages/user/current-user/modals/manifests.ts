@@ -19,6 +19,12 @@ const modals: Array<ManifestModal> = [
 		name: 'Current User MFA Enable Provider Modal',
 		js: () => import('./current-user-mfa-enable-provider/current-user-mfa-enable-provider-modal.element.js'),
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.CurrentUserMfaDisableProvider',
+		name: 'Current User MFA Disable Provider Modal',
+		js: () => import('./current-user-mfa-disable-provider/current-user-mfa-disable-provider-modal.element.js'),
+	},
 ];
 
 export const manifests = [...modals];
