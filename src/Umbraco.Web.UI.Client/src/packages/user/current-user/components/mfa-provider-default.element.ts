@@ -178,6 +178,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 			const message = this.localize.term(this.successMessageKey) || this.successMessage;
 			this.peek(message);
 			this._buttonState = 'success';
+			this.close();
 		} else {
 			this.codeField?.setCustomValidity(this.localize.term('user_2faInvalidCode'));
 			this.codeField?.focus();
