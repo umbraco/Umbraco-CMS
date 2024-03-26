@@ -96,7 +96,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		return await modalManager
 			.open(this, UMB_CURRENT_USER_MFA_PROVIDER_MODAL, {
-				data: { providerName: item.providerName, repository: this.#currentUserRepository },
+				data: { providerName: item.providerName },
 			})
 			.onSubmit()
 			.catch(() => ({}));
