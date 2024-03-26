@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
@@ -47,7 +48,8 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IdentityErrorDescriber>(),
                 factory.GetRequiredService<IPublishedSnapshotAccessor>(),
                 factory.GetRequiredService<IExternalLoginWithKeyService>(),
-                factory.GetRequiredService<ITwoFactorLoginService>()))
+                factory.GetRequiredService<ITwoFactorLoginService>(),
+                factory.GetRequiredService<IEventMessagesFactory>()))
             .AddRoleStore<MemberRoleStore>()
             .AddRoleManager<IMemberRoleManager, MemberRoleManager>()
             .AddMemberManager<IMemberManager, MemberManager>()

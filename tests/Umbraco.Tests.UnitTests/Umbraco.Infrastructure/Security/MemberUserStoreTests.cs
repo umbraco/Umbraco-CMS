@@ -37,7 +37,8 @@ public class MemberUserStoreTests
             new IdentityErrorDescriber(),
             Mock.Of<IPublishedSnapshotAccessor>(),
             Mock.Of<IExternalLoginWithKeyService>(),
-            Mock.Of<ITwoFactorLoginService>());
+            Mock.Of<ITwoFactorLoginService>(),
+            Mock.Of<IEventMessagesFactory>());
     }
 
     [Test]
