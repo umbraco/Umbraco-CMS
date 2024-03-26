@@ -21,6 +21,7 @@ export class UmbCurrentUserMfaEnableProviderModalElement extends UmbModalBaseEle
 	get #extensionSlotProps(): UmbMfaProviderConfigurationElementProps {
 		return {
 			providerName: this.data!.providerName,
+			displayName: this.data!.displayName,
 			callback: (providerName, code, secret) =>
 				this.#currentUserRepository.enableMfaProvider(providerName, code, secret),
 			close: this.#close,

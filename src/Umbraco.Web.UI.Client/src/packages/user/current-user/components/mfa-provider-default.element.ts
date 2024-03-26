@@ -17,6 +17,9 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	providerName = '';
 
 	@property({ attribute: false })
+	displayName = '';
+
+	@property({ attribute: false })
 	callback: (providerName: string, code: string, secret: string) => Promise<boolean> = async () => false;
 
 	@property({ attribute: false })
@@ -85,7 +88,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		return html`
 			<uui-form>
 				<form id="authForm" name="authForm" @submit=${this.submit} novalidate>
-					<umb-body-layout headline=${this.providerName}>
+					<umb-body-layout headline=${this.displayName}>
 						<div id="main">
 							<uui-box .headline=${this.localize.term('member_2fa')}>
 								<div class="text-center">

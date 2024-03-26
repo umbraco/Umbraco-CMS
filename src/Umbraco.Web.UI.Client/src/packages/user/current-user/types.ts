@@ -29,6 +29,11 @@ export interface UmbMfaProviderConfigurationElementProps {
 	providerName: string;
 
 	/**
+	 * The display name of the provider. If this is not set, the provider name will be used.
+	 */
+	displayName: string;
+
+	/**
 	 * Call this function to execute the action for the given provider, e.g. to enable or disable it.
 	 * @param providerName The name of the provider to enable.
 	 * @param code The authentication code from the authentication method.

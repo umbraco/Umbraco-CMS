@@ -128,7 +128,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		await modalManager
 			.open(this, UMB_CURRENT_USER_MFA_ENABLE_PROVIDER_MODAL, {
-				data: { providerName: item.providerName },
+				data: { providerName: item.providerName, displayName: item.displayName },
 			})
 			.onSubmit()
 			.catch(() => undefined);
@@ -143,7 +143,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		await modalManager
 			.open(this, UMB_CURRENT_USER_MFA_DISABLE_PROVIDER_MODAL, {
-				data: { providerName: item.providerName },
+				data: { providerName: item.providerName, displayName: item.displayName },
 			})
 			.onSubmit()
 			.catch(() => undefined);
