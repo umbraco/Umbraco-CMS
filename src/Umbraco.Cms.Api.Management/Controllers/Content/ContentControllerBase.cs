@@ -68,6 +68,10 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid Id")
                 .WithDetail("The supplied id is already in use.")
                 .Build()),
+            ContentEditingOperationStatus.DuplicateName => BadRequest(problemDetailsBuilder
+                .WithTitle("Duplicate name")
+                .WithDetail("The supplied name is already in use for the same content type.")
+                .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,
                 problemDetailsBuilder
