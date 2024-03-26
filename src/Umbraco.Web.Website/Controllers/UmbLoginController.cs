@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
@@ -109,12 +109,12 @@ public class UmbLoginController : SurfaceController
     }
 
     /// <summary>
-    ///     We pass in values via encrypted route values so they cannot be tampered with and merge them into the model for use
+    ///     We pass in values via encrypted route values so they cannot be tampered with and merge them into the model for use.
     /// </summary>
     /// <param name="model"></param>
-    private void MergeRouteValuesToModel(LoginModel model)
+    private void MergeRouteValuesToModel(PostRedirectModel model)
     {
-        if (RouteData.Values.TryGetValue(nameof(LoginModel.RedirectUrl), out var redirectUrl) && redirectUrl != null)
+        if (RouteData.Values.TryGetValue(nameof(PostRedirectModel.RedirectUrl), out var redirectUrl) && redirectUrl != null)
         {
             model.RedirectUrl = redirectUrl.ToString();
         }

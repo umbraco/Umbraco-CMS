@@ -48,7 +48,7 @@ public class RegisterModel : PostRedirectModel
 
     [DataType(DataType.Password)]
     [Display(Name = "Confirm password")]
-    [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+    [Compare(nameof(Password), ErrorMessage = "The password and confirmation password do not match.")]
     public string ConfirmPassword { get; set; } = null!;
 
     /// <summary>
