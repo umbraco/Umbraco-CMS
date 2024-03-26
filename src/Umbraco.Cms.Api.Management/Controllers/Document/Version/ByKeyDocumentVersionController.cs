@@ -8,14 +8,14 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Document.Versions;
+namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
 
 [ApiVersion("1.0")]
-public class GetByKeyDocumentVersionController : DocumentVersionControllerBase
+public class ByKeyDocumentVersionController : DocumentVersionControllerBase
 {
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public GetByKeyDocumentVersionController(
+    public ByKeyDocumentVersionController(
         IContentVersionService contentVersionService,
         IUmbracoMapper umbracoMapper)
         : base(contentVersionService)
@@ -28,7 +28,7 @@ public class GetByKeyDocumentVersionController : DocumentVersionControllerBase
     [ProducesResponseType(typeof(DocumentVersionResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Get(Guid id)
+    public async Task<IActionResult> ByKey(Guid id)
     {
         Attempt<IContent?, ContentVersionOperationStatus> attempt =
             await ContentVersionService.GetAsync(id);

@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Document.Versions;
+namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
 
 [ApiVersion("1.0")]
 public class GetDocumentVersionsController : DocumentVersionControllerBase

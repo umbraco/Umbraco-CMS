@@ -6,14 +6,14 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Document.Versions;
+namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
 
 [ApiVersion("1.0")]
-public class RollbackDocumentVersionController : DocumentVersionControllerBase
+public class UpdatePreventCleanupDocumentVersionController : DocumentVersionControllerBase
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public RollbackDocumentVersionController(
+    public UpdatePreventCleanupDocumentVersionController(
         IContentVersionService contentVersionService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         : base(contentVersionService)
@@ -22,14 +22,14 @@ public class RollbackDocumentVersionController : DocumentVersionControllerBase
     }
 
     [MapToApiVersion("1.0")]
-    [HttpPost("{id:guid}/rollback")]
+    [HttpPut("{id:guid}/preventCleanup")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Rollback(Guid id, string? culture)
+    public async Task<IActionResult> Set(Guid id, bool preventCleanup)
     {
         Attempt<ContentVersionOperationStatus> attempt =
-            await ContentVersionService.RollBackAsync(id, culture, CurrentUserKey(_backOfficeSecurityAccessor));
+            await ContentVersionService.SetPreventCleanupAsync(id, preventCleanup, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return attempt.Success is true
             ? Ok()

@@ -7,13 +7,12 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Document.Versions;
+namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Document}-version")]
-[ApiExplorerSettings(GroupName = $"{Constants.UdiEntityType.Document} Version")]
+[ApiExplorerSettings(GroupName = $"{nameof(Constants.UdiEntityType.Document)} Version")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
-public class DocumentVersionControllerBase : ManagementApiControllerBase
+public abstract class DocumentVersionControllerBase : ManagementApiControllerBase
 {
     protected readonly IContentVersionService ContentVersionService;
 
