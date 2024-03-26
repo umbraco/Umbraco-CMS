@@ -34,5 +34,6 @@ internal class DomainDto
     public string IsoCode { get; set; } = null!;
 
     [Column("sortOrder")]
+    [Index(IndexTypes.NonClustered,Name = "IX_" + TableName + "_sortOrder_id", ForColumns ="sortOrder,id", IncludeColumns = "domainDefaultLanguage,domainRootStructureID,domainName")]
     public int SortOrder { get; set; }
 }

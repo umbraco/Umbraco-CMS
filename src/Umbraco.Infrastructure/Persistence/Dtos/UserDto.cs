@@ -32,6 +32,7 @@ public class UserDto
     public bool NoConsole { get; set; }
 
     [Column("userName")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_userName", ForColumns ="userName")]
     public string UserName { get; set; } = null!;
 
     [Column("userLogin")]

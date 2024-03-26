@@ -31,7 +31,7 @@ public class NodeDto
 
     // NOTE: This index is primarily for the nucache data lookup, see https://github.com/umbraco/Umbraco-CMS/pull/8365#issuecomment-673404177
     [Column("level")]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Level", ForColumns = "level,parentId,sortOrder,nodeObjectType,trashed", IncludeColumns = "nodeUser,path,uniqueId,createDate")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Level", ForColumns = "level,parentId,sortOrder,nodeObjectType,trashed", IncludeColumns = "nodeUser,path,uniqueId,createDate,text")]
     public short Level { get; set; }
 
     [Column("path")]
@@ -60,6 +60,7 @@ public class NodeDto
     [Column("nodeObjectType")] // TODO: db rename to 'objectType'
     [NullSetting(NullSetting = NullSettings.Null)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType", ForColumns = "nodeObjectType,trashed", IncludeColumns = "uniqueId,parentId,level,path,sortOrder,nodeUser,text,createDate")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_nodeObjectType_level_sortOrder", ForColumns = "nodeObjectType,level,sortOrder")]
     public Guid? NodeObjectType { get; set; }
 
     [Column("createDate")]

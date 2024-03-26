@@ -16,7 +16,7 @@ internal class TwoFactorLoginDto
     public int Id { get; set; }
 
     [Column("userOrMemberKey")]
-    [Index(IndexTypes.NonClustered)]
+    [Index(IndexTypes.NonClustered, IncludeColumns ="id,providerName,secret")]
     public Guid UserOrMemberKey { get; set; }
 
     [Column("providerName")]

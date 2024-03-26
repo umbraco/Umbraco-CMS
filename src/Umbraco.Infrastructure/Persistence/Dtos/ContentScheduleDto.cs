@@ -28,5 +28,6 @@ internal class ContentScheduleDto
     public DateTime Date { get; set; }
 
     [Column("action")]
+    [Index(IndexTypes.NonClustered,Name = "IX_"+ TableName + "_action_date", ForColumns = "action,date")]
     public string? Action { get; set; }
 }
