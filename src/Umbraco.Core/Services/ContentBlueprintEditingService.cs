@@ -31,13 +31,67 @@ internal sealed class ContentBlueprintEditingService
         return await Task.FromResult(blueprint);
     }
 
+    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentBlueprintCreateModel createModel, Guid userKey)
+    {
+        if (await ValidateCulturesAsync(createModel) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentCreateResult());
+        }
+
+        Attempt<ContentCreateResult, ContentEditingOperationStatus> result = await MapCreate<ContentCreateResult>(createModel);
+        if (result.Success is false)
+        {
+            return result;
+        }
+
+        IContent blueprint = result.Result.Content!;
+
+        if (ValidateUniqueName(createModel.InvariantName ?? string.Empty, blueprint) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentCreateResult());
+        }
+
+        // Save blueprint
+        await SaveAsync(blueprint, userKey);
+
+        return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentCreateResult { Content = blueprint, ValidationResult = result.Result.ValidationResult });
+    }
+
+    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateFromContentAsync(Guid contentKey, string name, Guid userKey)
+    {
+        IContent? content = ContentService.GetById(contentKey);
+        if (content is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentCreateResult());
+        }
+
+        if (ValidateUniqueName(name, content) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentCreateResult());
+        }
+
+        // Create Blueprint
+        var currentUserId = await GetUserIdAsync(userKey);
+        IContent blueprint = ContentService.CreateContentFromBlueprint(content, name, currentUserId);
+
+        // Save blueprint
+        await SaveAsync(blueprint, userKey);
+
+        return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentCreateResult { Content = blueprint });
+    }
+
     // NB: Some of the implementation is copied from <see cref="IContentEditingService.UpdateAsync()" />
     public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentBlueprintUpdateModel updateModel, Guid userKey)
     {
         IContent? blueprint = await GetAsync(key);
-        if (blueprint == null)
+        if (blueprint is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentUpdateResult());
+        }
+
+        if (ValidateUniqueName(updateModel.InvariantName ?? string.Empty, blueprint) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentUpdateResult());
         }
 
         if (await ValidateCulturesAsync(updateModel) is false)
@@ -46,13 +100,13 @@ internal sealed class ContentBlueprintEditingService
         }
 
         Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<ContentUpdateResult>(blueprint, updateModel);
-        if (result.Success == false)
+        if (result.Success is false)
         {
             return Attempt.FailWithStatus(result.Status, result.Result);
         }
 
-        var currentUserId = await GetUserIdAsync(userKey);
-        ContentService.SaveBlueprint(blueprint, currentUserId);
+        // Save blueprint
+        await SaveAsync(blueprint, userKey);
 
         return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentUpdateResult { Content = blueprint, ValidationResult = result.Result.ValidationResult });
     }
@@ -61,13 +115,13 @@ internal sealed class ContentBlueprintEditingService
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         IContent? blueprint = await GetAsync(key);
-        if (blueprint == null)
+        if (blueprint is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, blueprint);
         }
 
+        // Delete blueprint
         var performingUserId = await GetUserIdAsync(userKey);
-
         ContentService.DeleteBlueprint(blueprint, performingUserId);
 
         scope.Complete();
@@ -85,4 +139,16 @@ internal sealed class ContentBlueprintEditingService
     protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => throw new NotImplementedException();
 
     protected override OperationResult? Delete(IContent content, int userId) => throw new NotImplementedException();
+
+    private async Task SaveAsync(IContent blueprint, Guid userKey)
+    {
+        var currentUserId = await GetUserIdAsync(userKey);
+        ContentService.SaveBlueprint(blueprint, currentUserId);
+    }
+
+    private bool ValidateUniqueName(string name, IContent content)
+    {
+        IEnumerable<IContent> existing = ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
+        return existing.Any(c => c.Name == name && c.Id != content.Id) is false;
+    }
 }
