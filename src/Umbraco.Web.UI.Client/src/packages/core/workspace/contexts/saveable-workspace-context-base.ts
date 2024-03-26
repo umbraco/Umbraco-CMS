@@ -77,7 +77,6 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 		});
 
 		this.#validation.validate().then((succeed) => {
-			console.log('#validation.validate', succeed ? 'succeed' : 'fail');
 			if (succeed) {
 				this.submit();
 			} else {
