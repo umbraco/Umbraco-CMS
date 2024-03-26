@@ -11,10 +11,13 @@ const meta: Meta<UmbMfaProviderDefaultElement> = {
 	decorators: [(Story) => html`<div style="width: 500px; height: 500px;">${Story()}</div>`],
 	args: {
 		providerName: 'SMS',
-		isEnabled: true,
+		enableProvider: async (_provider, code) => (code === 'fail' ? false : true),
 	},
 	parameters: {
 		layout: 'centered',
+		actions: {
+			disabled: true,
+		},
 	},
 };
 

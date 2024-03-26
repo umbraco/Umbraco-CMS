@@ -11,6 +11,9 @@ const meta: Meta<UmbCurrentUserMfaModalElement> = {
 	decorators: [(Story) => html`<div style="width: 500px; height: 500px;">${Story()}</div>`],
 	parameters: {
 		layout: 'centered',
+		actions: {
+			disabled: true,
+		},
 	},
 };
 

@@ -23,8 +23,22 @@ export interface UmbCurrentUserModel {
 export type UmbCurrentUserMfaProviderModel = UserTwoFactorProviderModel;
 
 export interface UmbMfaProviderConfigurationElementProps {
+	/**
+	 * The name of the provider reflecting the provider name in the backend.
+	 */
 	providerName: string;
-	isEnabled: boolean;
-	onSubmit: (value: { code: string; secret?: string }) => void;
-	onClose: () => void;
+
+	/**
+	 * Enable the provider with the given code and secret.
+	 * @param providerName The name of the provider to enable.
+	 * @param code The authentication code from the authentication method.
+	 * @param secret The secret from the authentication backend.
+	 * @returns True if the provider was enabled successfully.
+	 */
+	enableProvider: (providerName: string, code: string, secret: string) => Promise<boolean>;
+
+	/**
+	 * Call this function to close the modal.
+	 */
+	close: () => void;
 }

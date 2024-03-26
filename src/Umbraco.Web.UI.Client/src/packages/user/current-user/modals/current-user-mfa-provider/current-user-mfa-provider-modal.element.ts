@@ -1,8 +1,5 @@
 import type { UmbMfaProviderConfigurationElementProps } from '../../types.js';
-import type {
-	UmbCurrentUserMfaProviderModalConfig,
-	UmbCurrentUserMfaProviderModalValue,
-} from './current-user-mfa-provider-modal.token.js';
+import type { UmbCurrentUserMfaProviderModalConfig } from './current-user-mfa-provider-modal.token.js';
 import type { ManifestMfaLoginProvider } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -12,13 +9,8 @@ import '../../components/mfa-provider-default.element.js';
 @customElement('umb-current-user-mfa-provider-modal')
 export class UmbCurrentUserMfaProviderModalElement extends UmbModalBaseElement<
 	UmbCurrentUserMfaProviderModalConfig,
-	UmbCurrentUserMfaProviderModalValue
+	never
 > {
-	#submit = (value: UmbCurrentUserMfaProviderModalValue) => {
-		this.value = value;
-		this._submitModal();
-	};
-
 	#close = () => {
 		this._rejectModal();
 	};
@@ -26,9 +18,8 @@ export class UmbCurrentUserMfaProviderModalElement extends UmbModalBaseElement<
 	get #extensionSlotProps(): UmbMfaProviderConfigurationElementProps {
 		return {
 			providerName: this.data!.providerName,
-			isEnabled: this.data!.isEnabled,
-			onSubmit: this.#submit,
-			onClose: this.#close,
+			enableProvider: this.data!.repository.enableMfaProvider,
+			close: this.#close,
 		};
 	}
 

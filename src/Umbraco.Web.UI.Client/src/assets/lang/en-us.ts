@@ -1935,6 +1935,12 @@ export default {
 		'2faProviderIsDisabledMsg': 'This two-factor provider is now disabled',
 		'2faProviderIsNotDisabledMsg': 'Something went wrong with trying to disable this two-factor provider',
 		'2faDisableForUser': 'Do you want to disable this two-factor provider for this user?',
+		'2faQrCodeAlt': 'QR code for two-factor authentication with {0}',
+		'2faQrCodeTitle': 'QR code for two-factor authentication with {0}',
+		'2faQrCodeDescription': 'Scan this QR code with your authenticator app to enable two-factor authentication',
+		'2faCodeInput': 'Verification code',
+		'2faCodeInputHelp': 'Please enter the verification code',
+		'2faInvalidCode': 'Invalid code entered',
 	},
 	validation: {
 		validation: 'Validation',

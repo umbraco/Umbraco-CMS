@@ -1,7 +1,4 @@
-import {
-	UMB_CURRENT_USER_MFA_PROVIDER_MODAL,
-	type UmbCurrentUserMfaProviderModalValue,
-} from '../current-user-mfa-provider/current-user-mfa-provider-modal.token.js';
+import { UMB_CURRENT_USER_MFA_PROVIDER_MODAL } from '../current-user-mfa-provider/current-user-mfa-provider-modal.token.js';
 import { UmbCurrentUserRepository } from '../../repository/index.js';
 import type { UmbCurrentUserMfaProviderModel } from '../../types.js';
 import { customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -80,26 +77,14 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 		event.preventDefault();
 		event.stopPropagation();
 
-		const { code, secret } = await this.#openProviderModal(item);
-
-		// If no code, do nothing
-		if (!code) {
-			return;
-		}
-
 		// If already enabled, disable it
 		if (item.isEnabledOnUser) {
 			// Disable provider
-			return this.#currentUserRepository.disableMfaProvider(item.providerName, code);
+			alert('TODO: Implement disabling provider');
 		}
 
 		// Enable provider
-		// If no secret, do nothing
-		if (!secret) {
-			return;
-		}
-
-		return this.#currentUserRepository.enableMfaProvider(item.providerName, code, secret);
+		await this.#openProviderModal(item);
 	}
 
 	/**
@@ -107,11 +92,11 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * This will show the QR code and/or other means of validation for the given provider and return the activation code.
 	 * The activation code is then used to either enable or disable the provider.
 	 */
-	async #openProviderModal(item: UmbCurrentUserMfaProviderModel): Promise<UmbCurrentUserMfaProviderModalValue> {
+	async #openProviderModal(item: UmbCurrentUserMfaProviderModel) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		return modalManager
+		return await modalManager
 			.open(this, UMB_CURRENT_USER_MFA_PROVIDER_MODAL, {
-				data: { providerName: item.providerName, isEnabled: item.isEnabledOnUser },
+				data: { providerName: item.providerName, repository: this.#currentUserRepository },
 			})
 			.onSubmit()
 			.catch(() => ({}));

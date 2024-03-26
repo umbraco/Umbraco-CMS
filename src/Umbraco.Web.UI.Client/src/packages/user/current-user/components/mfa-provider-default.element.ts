@@ -1,6 +1,6 @@
 import type { UmbMfaProviderConfigurationElementProps } from '../types.js';
 import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
@@ -11,14 +11,11 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	@property({ attribute: false })
 	providerName = '';
 
-	@property({ type: Boolean, attribute: false })
-	isEnabled = false;
+	@property({ attribute: false })
+	enableProvider: (providerName: string, code: string, secret: string) => Promise<boolean> = async () => false;
 
 	@property({ attribute: false })
-	onSubmit: (value: { code: string; secret?: string | undefined }) => void = () => {};
-
-	@property({ attribute: false })
-	onClose = () => {};
+	close = () => {};
 
 	@state()
 	protected _loading = true;
@@ -30,6 +27,9 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	protected _qrCodeSetupImageUrl = '';
 
 	protected notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+
+	@query('#code')
+	protected codeField?: HTMLInputElement;
 
 	constructor() {
 		super();
@@ -75,23 +75,55 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		}
 
 		return html`
-			<form id="authForm" name="authForm" @submit=${this.submit}>
-				<umb-body-layout headline=${this.providerName}>
-					<div id="main"></div>
-					<div slot="actions">
-						<uui-button
-							type="button"
-							look="secondary"
-							.label=${this.localize.term('general_close')}
-							@click=${this.onClose}>
-							${this.localize.term('general_close')}
-						</uui-button>
-						<uui-button type="submit" look="primary" .label=${this.localize.term('buttons_save')}>
-							${this.localize.term('general_submit')}
-						</uui-button>
-					</div>
-				</umb-body-layout>
-			</form>
+			<uui-form>
+				<form id="authForm" name="authForm" @submit=${this.submit} novalidate>
+					<umb-body-layout headline=${this.providerName}>
+						<div id="main">
+							<uui-box .headline=${this.localize.term('member_2fa')}>
+								${this._qrCodeSetupImageUrl
+									? html` <div class="text-center">
+											<p>
+												<umb-localize key="user_2faQrCodeDescription">
+													Scan this QR code with your authenticator app to enable two-factor authentication
+												</umb-localize>
+											</p>
+											<img
+												.src=${this._qrCodeSetupImageUrl}
+												alt=${this.localize.term('user_2faQrCodeAlt')}
+												title=${this.localize.term('user_2faQrCodeTitle')} />
+										</div>`
+									: ''}
+								<uui-form-layout-item class="text-center">
+									<uui-label for="code" slot="label" required>
+										<umb-localize key="user_2faCodeInput"></umb-localize>
+									</uui-label>
+									<uui-input
+										id="code"
+										name="code"
+										type="text"
+										inputmode="numeric"
+										autocomplete="one-time-code"
+										required
+										required-message=${this.localize.term('general_required')}
+										placeholder=${this.localize.term('user_2faCodeInputHelp')}></uui-input>
+								</uui-form-layout-item>
+							</uui-box>
+						</div>
+						<div slot="actions">
+							<uui-button
+								type="button"
+								look="secondary"
+								.label=${this.localize.term('general_close')}
+								@click=${this.close}>
+								${this.localize.term('general_close')}
+							</uui-button>
+							<uui-button type="submit" look="primary" .label=${this.localize.term('buttons_save')}>
+								${this.localize.term('general_submit')}
+							</uui-button>
+						</div>
+					</umb-body-layout>
+				</form>
+			</uui-form>
 		`;
 	}
 
@@ -112,9 +144,19 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	 * Submit the form with the code and secret back to the opener.
 	 * @param e The submit event
 	 */
-	protected submit(e: SubmitEvent) {
+	protected async submit(e: SubmitEvent) {
 		e.preventDefault();
-		this.onSubmit({ code: '123456', secret: '123' });
+		this.codeField?.setCustomValidity('');
+		const formData = new FormData(e.target as HTMLFormElement);
+		const code = formData.get('code') as string;
+		const successful = await this.enableProvider(this.providerName, code, this._secret);
+		debugger;
+		if (successful) {
+			this.peek('Two-factor authentication has successfully been enabled.');
+		} else {
+			this.codeField?.setCustomValidity(this.localize.term('user_2faInvalidCode'));
+			this.codeField?.focus();
+		}
 	}
 
 	static styles = [
@@ -122,6 +164,15 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		css`
 			#authForm {
 				height: 100%;
+			}
+
+			#code {
+				width: 100%;
+				max-width: 300px;
+			}
+
+			.text-center {
+				text-align: center;
 			}
 		`,
 	];
