@@ -116,6 +116,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         {
             // whatever happens, clear the cache
             var cacheKey = GetEntityCacheKey(entity.Id);
+
             Cache.Clear(cacheKey);
 
             // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
@@ -127,6 +128,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     public override TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
     {
         var cacheKey = GetEntityCacheKey(id);
+
         TEntity? fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
 
         // if found in cache then return else fetch and cache
@@ -137,7 +139,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
 
         TEntity? entity = performGet(id);
 
-        if (entity != null && entity.HasIdentity)
+        if ((entity != null && entity.HasIdentity) || _options.CacheNullValues)
         {
             InsertEntity(cacheKey, entity);
         }
