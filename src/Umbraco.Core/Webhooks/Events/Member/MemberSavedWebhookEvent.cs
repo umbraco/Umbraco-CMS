@@ -20,7 +20,7 @@ public class MemberSavedWebhookEvent : WebhookEventBase<MemberSavedNotification>
 
     public override string Alias => Constants.WebhookEvents.Aliases.MemberSaved;
 
-    public override object? ConvertNotificationToRequestPayload(MemberSavedNotification notification)
+    public override object ConvertNotificationToRequestPayload(MemberSavedNotification notification)
     {
         // TODO: Map more stuff here
         var result = notification.SavedEntities.Select(entity => new

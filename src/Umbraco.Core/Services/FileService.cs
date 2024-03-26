@@ -618,7 +618,7 @@ public class FileService : RepositoryService, IFileService
         }
     }
 
-    private string? GetViewContent(string? fileName)
+    private string GetViewContent(string? fileName)
     {
         if (fileName.IsNullOrWhiteSpace())
         {

@@ -8,7 +8,7 @@ namespace Umbraco.Extensions;
 public static class MethodInfoApiCommonExtensions
 {
 
-    public static string? GetMapToApiVersionAttributeValue(this MethodInfo methodInfo)
+    public static string GetMapToApiVersionAttributeValue(this MethodInfo methodInfo)
     {
         MapToApiVersionAttribute[] mapToApis = methodInfo.GetCustomAttributes(typeof(MapToApiVersionAttribute), inherit: true).Cast<MapToApiVersionAttribute>().ToArray();
 

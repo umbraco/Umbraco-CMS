@@ -138,7 +138,7 @@ public sealed class ServerRegistrationService : RepositoryService, IServerRegist
     ///     <paramref name="refresh" /> parameter to force a cache refresh and reload active servers
     ///     from the database.
     /// </remarks>
-    public IEnumerable<IServerRegistration>? GetActiveServers(bool refresh = false) =>
+    public IEnumerable<IServerRegistration> GetActiveServers(bool refresh = false) =>
         GetServers(refresh).Where(x => x.IsActive);
 
     /// <summary>

@@ -20,6 +20,6 @@ public class DataTypeMovedWebhookEvent : WebhookEventBase<DataTypeMovedNotificat
 
     public override string Alias => Constants.WebhookEvents.Aliases.DataTypeMoved;
 
-    public override object? ConvertNotificationToRequestPayload(DataTypeMovedNotification notification)
+    public override object ConvertNotificationToRequestPayload(DataTypeMovedNotification notification)
         => notification.MoveInfoCollection;
 }

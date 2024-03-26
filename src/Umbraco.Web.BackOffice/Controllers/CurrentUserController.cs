@@ -205,7 +205,7 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
     ///     Returns the user's tours
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<UserTourStatus>? GetUserTours()
+    public IEnumerable<UserTourStatus> GetUserTours()
     {
         if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.TourData.IsNullOrWhiteSpace() ?? true)
         {

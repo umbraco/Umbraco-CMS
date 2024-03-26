@@ -20,6 +20,6 @@ public class MemberGroupSavedWebhookEvent : WebhookEventBase<MemberGroupSavedNot
 
     public override string Alias => Constants.WebhookEvents.Aliases.MemberGroupSaved;
 
-    public override object? ConvertNotificationToRequestPayload(MemberGroupSavedNotification notification)
+    public override object ConvertNotificationToRequestPayload(MemberGroupSavedNotification notification)
         => notification.SavedEntities;
 }
