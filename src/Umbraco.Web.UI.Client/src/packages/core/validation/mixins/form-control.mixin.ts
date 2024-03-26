@@ -58,7 +58,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 	protected addFormControlElement(element: NativeFormControlElement): void;
 
 	//static formAssociated: boolean;
-	abstract getFormElement(): HTMLElement | undefined;
+	getFormElement(): HTMLElement | undefined;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
 	formResetCallback(): void;
