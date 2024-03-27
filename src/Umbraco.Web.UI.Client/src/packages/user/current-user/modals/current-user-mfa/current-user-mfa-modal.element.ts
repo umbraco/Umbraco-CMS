@@ -29,7 +29,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	}
 
 	async #loadProviders() {
-		const serverLoginProviders$ = await this.#currentUserRepository.requestMfaLoginProviders();
+		const serverLoginProviders$ = (await this.#currentUserRepository.requestMfaLoginProviders()).asObservable();
 		const manifestLoginProviders$ = umbExtensionsRegistry.byType('mfaLoginProvider');
 
 		// Merge the server and manifest providers to get the final list of providers
