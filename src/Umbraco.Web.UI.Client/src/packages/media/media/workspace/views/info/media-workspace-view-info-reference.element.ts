@@ -113,10 +113,9 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 
 	render() {
 		if (this._items && this._items.length > 0) {
-			return html`<strong>
-					<umb-localize key="references_labelUsedByItems">Referenced by the following items</umb-localize>
-				</strong>
-				<uui-box style="--uui-box-default-padding:0">
+			return html` <uui-box
+					headline=${this.localize.term('references_labelUsedByItems')}
+					style="--uui-box-default-padding:0">
 					<uui-table>
 						<uui-table-head>
 							<uui-table-head-cell></uui-table-head-cell>
@@ -177,10 +176,6 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
-			.link-cell {
-				font-weight: bold;
-			}
-
 			uui-table-cell:not(.link-cell) {
 				color: var(--uui-color-text-alt);
 			}
