@@ -96,7 +96,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				.value=${this._minValue}
 				@input=${this._onMinInput}
 				label=${this.minLabel}></uui-input>
-			–
+			<b>–</b>
 			<uui-input
 				type="number"
 				.value=${this._maxValue}
@@ -106,6 +106,9 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	static styles = css`
+		:host(:invalid) {
+			color: var(--uui-color-danger);
+		}
 		:host(:invalid) uui-input {
 			border-color: var(--uui-color-danger);
 		}
