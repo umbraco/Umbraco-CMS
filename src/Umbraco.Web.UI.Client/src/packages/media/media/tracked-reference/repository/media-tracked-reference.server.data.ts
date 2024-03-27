@@ -1,5 +1,5 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { TrackedReferenceResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -25,11 +25,8 @@ export class UmbMediaTrackedReferenceServerDataSource {
 	 * @return {*}
 	 * @memberof UmbDataTypeItemServerDataSource
 	 */
-	async getTrackedReferenceById(id: string, skip = 0, take = 20, filterMustBeIsDependency = false) {
-		return await tryExecuteAndNotify(
-			this.#host,
-			TrackedReferenceResource.getTrackedReferenceById({ id, skip, take, filterMustBeIsDependency }),
-		);
+	async getTrackedReferenceById(id: string, skip = 0, take = 20) {
+		return await tryExecuteAndNotify(this.#host, MediaResource.getMediaByIdReferencedBy({ id, skip, take }));
 	}
 
 	/**
@@ -38,19 +35,13 @@ export class UmbMediaTrackedReferenceServerDataSource {
 	 * @return {*}
 	 * @memberof UmbMediaTrackedReferenceServerDataSource
 	 */
-	async getTrackedReferenceDescendantsByParentId(
-		parentId: string,
-		skip = 0,
-		take = 20,
-		filterMustBeIsDependency = false,
-	) {
+	async getTrackedReferenceDescendantsByParentId(parentId: string, skip = 0, take = 20) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			TrackedReferenceResource.getTrackedReferenceDescendantsByParentId({
-				parentId,
+			MediaResource.getMediaByIdReferencedDescendants({
+				id: parentId,
 				skip,
 				take,
-				filterMustBeIsDependency,
 			}),
 		);
 	}
@@ -61,14 +52,13 @@ export class UmbMediaTrackedReferenceServerDataSource {
 	 * @return {*}
 	 * @memberof UmbMediaTrackedReferenceServerDataSource
 	 */
-	async getTrackedReferenceItem(id: string[], skip = 0, take = 20, filterMustBeIsDependency = true) {
+	async getTrackedReferenceItem(id: string[], skip = 0, take = 20) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			TrackedReferenceResource.getTrackedReferenceItem({
+			MediaResource.getMediaAreReferenced({
 				id,
 				skip,
 				take,
-				filterMustBeIsDependency,
 			}),
 		);
 	}

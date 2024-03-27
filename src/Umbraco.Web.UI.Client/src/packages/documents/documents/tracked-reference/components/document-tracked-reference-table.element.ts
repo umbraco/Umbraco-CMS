@@ -1,14 +1,13 @@
 import { UmbDocumentTrackedReferenceRepository } from '../repository/index.js';
-import type {
-	DefaultReferenceResponseModel,
-	DocumentReferenceResponseModel,
-	MediaReferenceResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-
-type UmbReferenceModel = DefaultReferenceResponseModel | DocumentReferenceResponseModel | MediaReferenceResponseModel;
+import {
+	type UmbReferenceModel,
+	isDocumentReference,
+	isMediaReference,
+	isDefaultReference,
+} from '@umbraco-cms/backoffice/relations';
 
 @customElement('umb-document-tracked-reference-table')
 export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
@@ -58,39 +57,27 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 		return html` ${this.#renderErrorMessage()} ${this.#renderTable()} `;
 	}
 
-	#isDocumentReference(item: UmbReferenceModel): item is DocumentReferenceResponseModel {
-		return typeof (item as DocumentReferenceResponseModel).documentType !== 'undefined';
-	}
-
-	#isMediaReference(item: UmbReferenceModel): item is MediaReferenceResponseModel {
-		return typeof (item as MediaReferenceResponseModel).mediaType !== 'undefined';
-	}
-
-	#isDefaultReference(item: UmbReferenceModel): item is DefaultReferenceResponseModel {
-		return typeof (item as DefaultReferenceResponseModel).type !== 'undefined';
-	}
-
 	#getIcon(item: UmbReferenceModel) {
-		if (this.#isDocumentReference(item)) {
+		if (isDocumentReference(item)) {
 			return item.documentType.icon ?? 'icon-document';
 		}
-		if (this.#isMediaReference(item)) {
+		if (isMediaReference(item)) {
 			return item.mediaType.icon ?? 'icon-media';
 		}
-		if (this.#isDefaultReference(item)) {
+		if (isDefaultReference(item)) {
 			return item.icon ?? 'icon-document';
 		}
 		return 'icon-document';
 	}
 
 	#getContentTypeName(item: UmbReferenceModel) {
-		if (this.#isDocumentReference(item)) {
+		if (isDocumentReference(item)) {
 			return item.documentType.name;
 		}
-		if (this.#isMediaReference(item)) {
+		if (isMediaReference(item)) {
 			return item.mediaType.name;
 		}
-		if (this.#isDefaultReference(item)) {
+		if (isDefaultReference(item)) {
 			return item.type;
 		}
 		return '';

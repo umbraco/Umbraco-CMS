@@ -1,10 +1,15 @@
+import { UmbDocumentTrackedReferenceRepository } from '../../../tracked-reference/index.js';
 import { css, html, customElement, state, nothing, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { RelationItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbDocumentTrackedReferenceRepository } from '@umbraco-cms/backoffice/document';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import {
+	isDefaultReference,
+	isDocumentReference,
+	isMediaReference,
+	type UmbReferenceModel,
+} from '@umbraco-cms/backoffice/relations';
 
 @customElement('umb-document-workspace-view-info-reference')
 export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement {
@@ -24,7 +29,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	private _total = 0;
 
 	@state()
-	private _items?: Array<RelationItemResponseModel> = [];
+	private _items?: Array<UmbReferenceModel> = [];
 
 	constructor() {
 		super();
@@ -63,6 +68,49 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 		this.#getReferences();
 	}
 
+	#getIcon(item: UmbReferenceModel) {
+		if (isDocumentReference(item)) {
+			return item.documentType.icon ?? 'icon-document';
+		}
+		if (isMediaReference(item)) {
+			return item.mediaType.icon ?? 'icon-media';
+		}
+		if (isDefaultReference(item)) {
+			return item.icon ?? 'icon-document';
+		}
+		return 'icon-document';
+	}
+
+	#getPublishedStatus(item: UmbReferenceModel) {
+		return isDocumentReference(item) ? item.published : true;
+	}
+
+	#getContentTypeName(item: UmbReferenceModel) {
+		if (isDocumentReference(item)) {
+			return item.documentType.name;
+		}
+		if (isMediaReference(item)) {
+			return item.mediaType.name;
+		}
+		if (isDefaultReference(item)) {
+			return item.type;
+		}
+		return '';
+	}
+
+	#getContentType(item: UmbReferenceModel) {
+		if (isDocumentReference(item)) {
+			return item.documentType.alias;
+		}
+		if (isMediaReference(item)) {
+			return item.mediaType.alias;
+		}
+		if (isDefaultReference(item)) {
+			return item.type;
+		}
+		return '';
+	}
+
 	render() {
 		if (this._items && this._items.length > 0) {
 			return html` <uui-box
@@ -75,32 +123,30 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 							<uui-table-head-cell><umb-localize key="general_status">Status</umb-localize></uui-table-head-cell>
 							<uui-table-head-cell><umb-localize key="general_typeName">Type Name</umb-localize></uui-table-head-cell>
 							<uui-table-head-cell><umb-localize key="general_type">Type</umb-localize></uui-table-head-cell>
-							<uui-table-head-cell>
-								<umb-localize key="relationType_relation">Relation</umb-localize>
-							</uui-table-head-cell>
 						</uui-table-head>
 
 						${repeat(
 							this._items,
-							(item) => item.nodeId,
+							(item) => item.id,
 							(item) =>
 								html`<uui-table-row>
 									<uui-table-cell style="text-align:center;">
-										<umb-icon name=${item.contentTypeIcon ?? 'icon-document'}></umb-icon>
+										<umb-icon name=${this.#getIcon(item)}></umb-icon>
 									</uui-table-cell>
 									<uui-table-cell class="link-cell">
-										<uui-button label="Edit" href=${`${this._editDocumentPath}edit/${item.nodeId}`}>
-											${item.nodeName}
-										</uui-button>
+										${isDocumentReference(item)
+											? html` <uui-button label="Edit" href=${`${this._editDocumentPath}edit/${item.id}`}>
+													${item.name}
+												</uui-button>`
+											: item.name}
 									</uui-table-cell>
 									<uui-table-cell>
-										${item.nodePublished
+										${this.#getPublishedStatus(item)
 											? this.localize.term('content_published')
 											: this.localize.term('content_unpublished')}
 									</uui-table-cell>
-									<uui-table-cell>${item.contentTypeName}</uui-table-cell>
-									<uui-table-cell>${item.nodeType}</uui-table-cell>
-									<uui-table-cell>${item.relationTypeName}</uui-table-cell>
+									<uui-table-cell>${this.#getContentTypeName(item)}</uui-table-cell>
+									<uui-table-cell>${this.#getContentType(item)}</uui-table-cell>
 								</uui-table-row>`,
 						)}
 					</uui-table>
@@ -126,10 +172,6 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	static styles = [
 		UmbTextStyles,
 		css`
-			.link-cell {
-				font-weight: bold;
-			}
-
 			uui-table-cell:not(.link-cell) {
 				color: var(--uui-color-text-alt);
 			}
