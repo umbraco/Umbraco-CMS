@@ -9,9 +9,11 @@ import type { MediaItemResponseModel } from '../models/MediaItemResponseModel';
 import type { MediaResponseModel } from '../models/MediaResponseModel';
 import type { MediaTreeItemResponseModel } from '../models/MediaTreeItemResponseModel';
 import type { MoveMediaRequestModel } from '../models/MoveMediaRequestModel';
+import type { PagedIReferenceResponseModel } from '../models/PagedIReferenceResponseModel';
 import type { PagedMediaCollectionResponseModel } from '../models/PagedMediaCollectionResponseModel';
 import type { PagedMediaRecycleBinItemResponseModel } from '../models/PagedMediaRecycleBinItemResponseModel';
 import type { PagedMediaTreeItemResponseModel } from '../models/PagedMediaTreeItemResponseModel';
+import type { PagedReferenceByIdModel } from '../models/PagedReferenceByIdModel';
 import type { ReferenceByIdModel } from '../models/ReferenceByIdModel';
 import type { SortingRequestModel } from '../models/SortingRequestModel';
 import type { UpdateMediaRequestModel } from '../models/UpdateMediaRequestModel';
@@ -239,6 +241,64 @@ export class MediaResource {
     }
 
     /**
+     * @returns PagedIReferenceResponseModel Success
+     * @throws ApiError
+     */
+    public static getMediaByIdReferencedBy({
+        id,
+        skip,
+        take = 20,
+    }: {
+        id: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedIReferenceResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/media/{id}/referenced-by',
+            path: {
+                'id': id,
+            },
+            query: {
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedReferenceByIdModel Success
+     * @throws ApiError
+     */
+    public static getMediaByIdReferencedDescendants({
+        id,
+        skip,
+        take = 20,
+    }: {
+        id: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedReferenceByIdModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/media/{id}/referenced-descendants',
+            path: {
+                'id': id,
+            },
+            query: {
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
      * @returns string Success
      * @throws ApiError
      */
@@ -263,6 +323,33 @@ export class MediaResource {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedReferenceByIdModel Success
+     * @throws ApiError
+     */
+    public static getMediaAreReferenced({
+        id,
+        skip,
+        take = 20,
+    }: {
+        id?: Array<string>,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedReferenceByIdModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/media/are-referenced',
+            query: {
+                'id': id,
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

@@ -3,14 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ObjectTypeResponseModel } from './ObjectTypeResponseModel';
 import type { RelationTypeBaseModel } from './RelationTypeBaseModel';
 
 export type RelationTypeResponseModel = (RelationTypeBaseModel & {
     id: string;
     alias?: string | null;
-    path: string;
-    isDeletable: boolean;
-    parentObjectTypeName?: string | null;
-    childObjectTypeName?: string | null;
+    parentObject?: ObjectTypeResponseModel | null;
+    childObject?: ObjectTypeResponseModel | null;
 });
 
