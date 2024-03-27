@@ -36,10 +36,18 @@ public class BackOfficeSecurity : IBackOfficeSecurity
                     // Check again
                     if (_currentUser == null)
                     {
-                        Attempt<int> id = GetUserId();
-                        if (id.Success)
+                        Attempt<Guid> keyAttempt = GetUserKey();
+                        if (keyAttempt.Success)
                         {
-                            _currentUser = id.Success ? _userService.GetUserById(id.Result) : null;
+                            _currentUser = keyAttempt.Success ? _userService.GetAsync(keyAttempt.Result).GetAwaiter().GetResult() : null;
+                        }
+
+                        // The key attempt can fail in certain scenarios (especially our integration tests) so we can fall back on using the non-cached user by id
+                        // This also aligns with behavior in our IAuthorizationHelper
+                        else
+                        {
+                            Attempt<int> idAttempt = GetUserId();
+                            _currentUser = idAttempt.Success ? _userService.GetUserById(idAttempt.Result) : null;
                         }
                     }
                 }
@@ -47,6 +55,14 @@ public class BackOfficeSecurity : IBackOfficeSecurity
 
             return _currentUser;
         }
+    }
+
+    private Attempt<Guid> GetUserKey()
+    {
+        ClaimsIdentity? identity = _httpContextAccessor.HttpContext?.GetCurrentIdentity();
+
+        Guid? id = identity?.GetUserKey();
+        return id.HasValue is false ? Attempt.Fail<Guid>() : Attempt.Succeed(id.Value);
     }
 
     /// <inheritdoc />

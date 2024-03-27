@@ -31,7 +31,7 @@ public class SetTelemetryController : TelemetryControllerBase
             return BadRequest(invalidModelProblem);
         }
 
-        _metricsConsentService.SetConsentLevel(telemetryRepresentationBase.TelemetryLevel);
+        await _metricsConsentService.SetConsentLevelAsync(telemetryRepresentationBase.TelemetryLevel);
         return await Task.FromResult(Ok());
     }
 }

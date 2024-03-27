@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
-public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
+public interface IUserRepository : IReadWriteQueryRepository<Guid, IUser>
 {
     /// <summary>
     ///     Gets the count of items based on a complex query
@@ -141,6 +141,4 @@ public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
     int ClearLoginSessions(TimeSpan timespan);
 
     void ClearLoginSession(Guid sessionId);
-
-    IEnumerable<IUser> GetNextUsers(int id, int count);
 }

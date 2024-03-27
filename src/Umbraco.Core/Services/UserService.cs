@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -50,7 +51,9 @@ internal class UserService : RepositoryService, IUserService
     private readonly IIsoCodeValidator _isoCodeValidator;
     private readonly IUserRepository _userRepository;
     private readonly ContentSettings _contentSettings;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
+    [Obsolete("Use the constructor that takes an IUserIdKeyResolver instead. Scheduled for removal in V15.")]
     public UserService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -70,6 +73,49 @@ internal class UserService : RepositoryService, IUserService
         IOptions<ContentSettings> contentSettings,
         IIsoCodeValidator isoCodeValidator,
         IUserForgotPasswordSender forgotPasswordSender)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            userRepository,
+            userGroupRepository,
+            globalSettings,
+            securitySettings,
+            userEditorAuthorizationHelper,
+            serviceScopeFactory,
+            entityService,
+            localLoginSettingProvider,
+            inviteSender,
+            mediaFileManager,
+            temporaryFileService,
+            shortStringHelper,
+            contentSettings,
+            isoCodeValidator,
+            forgotPasswordSender,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    {
+    }
+
+    public UserService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IUserRepository userRepository,
+        IUserGroupRepository userGroupRepository,
+        IOptions<GlobalSettings> globalSettings,
+        IOptions<SecuritySettings> securitySettings,
+        UserEditorAuthorizationHelper userEditorAuthorizationHelper,
+        IServiceScopeFactory serviceScopeFactory,
+        IEntityService entityService,
+        ILocalLoginSettingProvider localLoginSettingProvider,
+        IUserInviteSender inviteSender,
+        MediaFileManager mediaFileManager,
+        ITemporaryFileService temporaryFileService,
+        IShortStringHelper shortStringHelper,
+        IOptions<ContentSettings> contentSettings,
+        IIsoCodeValidator isoCodeValidator,
+        IUserForgotPasswordSender forgotPasswordSender,
+        IUserIdKeyResolver userIdKeyResolver)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -84,6 +130,7 @@ internal class UserService : RepositoryService, IUserService
         _shortStringHelper = shortStringHelper;
         _isoCodeValidator = isoCodeValidator;
         _forgotPasswordSender = forgotPasswordSender;
+        _userIdKeyResolver = userIdKeyResolver;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
@@ -187,11 +234,13 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
+    [Obsolete("Please use GetAsync instead. Scheduled for removal in V15.")]
     public IUser? GetById(int id)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _userRepository.Get(id);
+            Guid userKey = _userIdKeyResolver.GetAsync(id).GetAwaiter().GetResult();
+            return _userRepository.Get(userKey);
         }
     }
 
@@ -1669,14 +1718,6 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
-    public IEnumerable<IUser> GetNextUsers(int id, int count)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _userRepository.GetNextUsers(id, count);
-        }
-    }
-
     /// <summary>
     ///     Gets a list of <see cref="IUser" /> objects associated with a given group
     /// </summary>
@@ -1969,10 +2010,17 @@ internal class UserService : RepositoryService, IUserService
                     userGroup.HasIdentity ? _userRepository.GetAllInGroup(userGroup.Id).ToArray() : empty;
                 var xGroupUsers = groupUsers.ToDictionary(x => x.Id, x => x);
                 var groupIds = groupUsers.Select(x => x.Id).ToArray();
+                var addedUserKeys = new List<Guid>();
+                foreach (var userId in userIds.Except(groupIds))
+                {
+                    Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+                    addedUserKeys.Add(userKey);
+                }
+
                 IEnumerable<int> addedUserIds = userIds.Except(groupIds);
 
                 addedUsers = addedUserIds.Count() > 0
-                    ? _userRepository.GetMany(addedUserIds.ToArray()).Where(x => x.Id != 0).ToArray()
+                    ? _userRepository.GetMany(addedUserKeys.ToArray()).Where(x => x.Id != 0).ToArray()
                     : new IUser[] { };
                 removedUsers = groupIds.Except(userIds).Select(x => xGroupUsers[x]).Where(x => x.Id != 0).ToArray();
             }

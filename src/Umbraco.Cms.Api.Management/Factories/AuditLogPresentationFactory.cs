@@ -17,14 +17,16 @@ public class AuditLogPresentationFactory : IAuditLogPresentationFactory
     private readonly MediaFileManager _mediaFileManager;
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly IEntityService _entityService;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
-    public AuditLogPresentationFactory(IUserService userService, AppCaches appCaches, MediaFileManager mediaFileManager, IImageUrlGenerator imageUrlGenerator, IEntityService entityService)
+    public AuditLogPresentationFactory(IUserService userService, AppCaches appCaches, MediaFileManager mediaFileManager, IImageUrlGenerator imageUrlGenerator, IEntityService entityService, IUserIdKeyResolver userIdKeyResolver)
     {
         _userService = userService;
         _appCaches = appCaches;
         _mediaFileManager = mediaFileManager;
         _imageUrlGenerator = imageUrlGenerator;
         _entityService = entityService;
+        _userIdKeyResolver = userIdKeyResolver;
     }
 
     public IEnumerable<AuditLogResponseModel> CreateAuditLogViewModel(IEnumerable<IAuditItem> auditItems) => auditItems.Select(CreateAuditLogViewModel);
@@ -46,7 +48,8 @@ public class AuditLogPresentationFactory : IAuditLogPresentationFactory
     private T CreateResponseModel<T>(IAuditItem auditItem, out IUser user)
         where T : AuditLogBaseModel, new()
     {
-        user = _userService.GetUserById(auditItem.UserId)
+        Guid userKey = _userIdKeyResolver.GetAsync(auditItem.UserId).GetAwaiter().GetResult();
+        user = _userService.GetAsync(userKey).GetAwaiter().GetResult()
                ?? throw new ArgumentException($"Could not find user with id {auditItem.UserId}");
 
         IEntitySlim? entitySlim = _entityService.Get(auditItem.Id);
