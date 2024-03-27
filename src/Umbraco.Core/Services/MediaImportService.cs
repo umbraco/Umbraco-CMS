@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -46,8 +47,7 @@ internal sealed class MediaImportService : IMediaImportService
             throw new InvalidOperationException("Could not read from file stream, please ensure it is open and readable");
         }
 
-        IUser user = await _userService.GetAsync(userKey)
-                     ?? throw new ArgumentException($"Could not find a user with the specified user key ({userKey})", nameof(userKey));
+        IUser user = await _userService.GetRequiredUserAsync(userKey);
 
         var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
         var mediaItemName = safeFileName.ToFriendlyName();

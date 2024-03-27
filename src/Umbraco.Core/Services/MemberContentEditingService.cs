@@ -39,8 +39,7 @@ internal sealed class MemberContentEditingService
         IMemberType memberType = await ContentTypeService.GetAsync(member.ContentType.Key)
                                  ?? throw new InvalidOperationException($"The member type {member.ContentType.Alias} could not be found.");
 
-        IUser user = await _userService.GetAsync(userKey)
-                     ?? throw new InvalidOperationException("The supplied user key did not match any existing user");
+        IUser user = await _userService.GetRequiredUserAsync(userKey);
 
         if (ValidateAccessToSensitiveProperties(member, memberType, updateModel, user) is false)
         {
