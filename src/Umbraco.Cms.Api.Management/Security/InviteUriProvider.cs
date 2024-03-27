@@ -1,9 +1,6 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -13,21 +10,19 @@ namespace Umbraco.Cms.Api.Management.Security;
 
 public class InviteUriProvider : IInviteUriProvider
 {
-    private readonly LinkGenerator _linkGenerator;
     private readonly ICoreBackOfficeUserManager _userManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly WebRoutingSettings _webRoutingSettings;
+    private readonly IHostingEnvironment _hostingEnvironment;
 
     public InviteUriProvider(
-        LinkGenerator linkGenerator,
         ICoreBackOfficeUserManager userManager,
         IHttpContextAccessor httpContextAccessor,
-        IOptions<WebRoutingSettings> webRoutingSettings)
+        IHostingEnvironment hostingEnvironment)
     {
-        _linkGenerator = linkGenerator;
+
         _userManager = userManager;
         _httpContextAccessor = httpContextAccessor;
-        _webRoutingSettings = webRoutingSettings.Value;
+        _hostingEnvironment = hostingEnvironment;
     }
 
     public async Task<Attempt<Uri, UserOperationStatus>> CreateInviteUriAsync(IUser invitee)
@@ -39,21 +34,21 @@ public class InviteUriProvider : IInviteUriProvider
             return Attempt.FailWithStatus(tokenAttempt.Status, new Uri(string.Empty));
         }
 
-        string inviteToken = $"{invitee.Key}{WebUtility.UrlEncode("|")}{tokenAttempt.Result.ToUrlBase64()}";
+        HttpRequest? request = _httpContextAccessor.HttpContext?.Request;
+        if (request is null)
+        {
+            throw new NotSupportedException("Needs a HttpContext");
+        }
 
-        // FIXME: This will need to change.
-        // string? action = _linkGenerator.GetPathByAction(
-        //     nameof(BackOfficeController.VerifyInvite),
-        //     ControllerExtensions.GetControllerName<BackOfficeController>(),
-        //     new { area = Constants.Web.Mvc.BackOfficeArea, invite = inviteToken });
-        string action = string.Empty;
+        var uriBuilder = new UriBuilder(_hostingEnvironment.ApplicationMainUrl);
+        uriBuilder.Path = BackOfficeLoginController.LoginPath;
+        uriBuilder.Query = QueryString.Create(new KeyValuePair<string, string?>[]
+        {
+            new ("flow", "invite-user"),
+            new ("userId", invitee.Key.ToString()),
+            new ("inviteCode", tokenAttempt.Result.ToUrlBase64()),
+        }).ToUriComponent();
 
-        Uri applicationUri = _httpContextAccessor
-            .GetRequiredHttpContext()
-            .Request
-            .GetApplicationUri(_webRoutingSettings);
-
-        var inviteUri = new Uri(applicationUri, action);
-        return Attempt.SucceedWithStatus(UserOperationStatus.Success, inviteUri);
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, uriBuilder.Uri);
     }
 }

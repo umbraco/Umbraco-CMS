@@ -1,5 +1,5 @@
-import { UUIInputElement } from '@umbraco-ui/uui';
-import { customElement } from 'lit/decorators.js';
+import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * This is a custom element based on UUIInputElement that is used in the login page.

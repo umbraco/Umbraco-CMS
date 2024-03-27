@@ -68,7 +68,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
         // If old password is not specified we either have to change another user's password, or provide a reset password token
         if (changingPasswordModel.OldPassword.IsNullOrWhiteSpace())
         {
-            if (changingPasswordModel.Id == currentUser?.Id && changingPasswordModel.ResetPasswordToken is null)
+            if (changingPasswordModel.Id == currentUser?.Id && changingPasswordModel.ResetPasswordToken is null && currentUser.UserState != UserState.Invited)
             {
                 return Attempt.Fail(new PasswordChangedModel
                 {

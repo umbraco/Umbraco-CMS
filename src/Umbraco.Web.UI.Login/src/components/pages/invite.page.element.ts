@@ -1,13 +1,13 @@
-import type { UUIButtonState } from '@umbraco-ui/uui';
-import { LitElement, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { until } from 'lit/directives/until.js';
-
-import { umbAuthContext } from '../../context/auth.context.js';
-import { umbLocalizationContext } from '../../external/localization/localization-context.js';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_AUTH_CONTEXT } from "../../contexts";
 
 @customElement('umb-invite-page')
-export default class UmbInvitePageElement extends LitElement {
+export default class UmbInvitePageElement extends UmbLitElement {
+  #token = '';
+  #userId = '';
+
   @state()
   state: UUIButtonState = undefined;
 
@@ -15,20 +15,51 @@ export default class UmbInvitePageElement extends LitElement {
   error = '';
 
   @state()
-  invitedUser?: any;
+  loading = true;
 
-  protected async firstUpdated(_changedProperties: any) {
-    super.firstUpdated(_changedProperties);
+  #authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
-    const response = await umbAuthContext.getInvitedUser();
+  constructor() {
+    super();
 
-    if (!response.user?.id) {
-      // The login page should already have redirected the user to an error page. They should never get here.
-      this.error = 'No invited user found';
+    this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+      this.#authContext = authContext;
+      this.#init();
+    });
+  }
+
+  async #init() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('inviteCode');
+    const userId = urlParams.get('userId');
+
+    if (!token || !userId) {
+      this.error = 'The invite has expired or is invalid';
+      this.loading = false;
       return;
     }
 
-    this.invitedUser = response.user;
+    if (!this.#authContext) return;
+
+    this.#token = token;
+    this.#userId = userId;
+
+    const response = await this.#authContext.validateInviteCode(this.#token, this.#userId);
+
+    if (response.error) {
+      this.error = response.error;
+      this.loading = false;
+      return;
+    }
+
+    if (!response.passwordConfiguration) {
+      this.error = 'There is no password configuration for the invite code. Please contact the administrator.';
+      this.loading = false;
+      return;
+    }
+
+    this.#authContext.passwordConfiguration = response.passwordConfiguration;
+    this.loading = false;
   }
 
   async #onSubmit(event: CustomEvent) {
@@ -37,8 +68,10 @@ export default class UmbInvitePageElement extends LitElement {
 
     if (!password) return;
 
+    if (!this.#authContext) return;
+
     this.state = 'waiting';
-    const response = await umbAuthContext.newInvitedUserPassword(password);
+    const response = await this.#authContext.newInvitedUserPassword(password, this.#token, this.#userId);
 
     if (response.error) {
       this.error = response.error;
@@ -47,30 +80,25 @@ export default class UmbInvitePageElement extends LitElement {
     }
 
     this.state = 'success';
-    window.location.href = umbAuthContext.returnPath;
+    window.location.href = this.#authContext.returnPath;
   }
 
   render() {
-    return this.invitedUser
-      ? html`
-        <umb-new-password-layout
-          @submit=${this.#onSubmit}
-          .userId=${this.invitedUser.id}
-          .userName=${this.invitedUser.name}
-          .state=${this.state}
-          .error=${this.error}></umb-new-password-layout>`
-      : this.error
+    return this.loading ? html`<uui-loader-bar></uui-loader-bar>` : (
+      this.error
         ? html`
           <umb-error-layout
-            .header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))}
-            .message=${this.error}></umb-error-layout>`
-        : html`
-          <umb-error-layout
-            header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))}
-            message=${until(
-              umbLocalizationContext.localize('errors_defaultError', undefined, 'An unknown failure has occured')
-            )}>
-          </umb-error-layout>`;
+            header=${this.localize.term('auth_error')}
+            message=${this.error ?? this.localize.term('auth_defaultError')}>
+          </umb-error-layout>`
+      : html`
+        <umb-new-password-layout
+          @submit=${this.#onSubmit}
+          is-invite
+          .userId=${this.#userId}
+          .state=${this.state}
+          .error=${this.error}></umb-new-password-layout>`
+    );
   }
 }
 

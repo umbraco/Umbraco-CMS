@@ -1,6 +1,5 @@
-import { css, CSSResultGroup, html, LitElement, nothing, PropertyValueMap } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { when } from 'lit/directives/when.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, CSSResultGroup, html, nothing, PropertyValueMap, customElement, property, when } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * The auth layout component.
@@ -27,7 +26,7 @@ import { when } from 'lit/directives/when.js';
  * @cssprop --umb-login-curves-display - The display of the curves (default: inline)
  */
 @customElement('umb-auth-layout')
-export class UmbAuthLayoutElement extends LitElement {
+export class UmbAuthLayoutElement extends UmbLitElement {
   @property({ attribute: 'background-image' })
   backgroundImage?: string;
 
