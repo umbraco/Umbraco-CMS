@@ -51,10 +51,7 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 
 		// Focus first invalid element:
 		if (!isValid) {
-			const firstInvalid = this.#validators.find((v) => !v.isValid);
-			if (firstInvalid) {
-				firstInvalid.focusFirstInvalidElement();
-			}
+			this.focusFirstInvalidElement();
 		}
 
 		return this.#preventFail ? true : isValid;
