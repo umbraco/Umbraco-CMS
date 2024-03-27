@@ -72,7 +72,7 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 	#onGoToProfile = (event: Event) => {
 		event.stopPropagation();
 		this._submitModal();
-		history.pushState(null, '', 'section/user-management/view/users/user/' + this.data?.user.unique); //TODO: URL Should be dynamic
+		history.pushState(null, '', 'section/user-management/view/users/user/edit/' + this.data?.user.unique); //TODO: URL Should be dynamic
 	};
 
 	render() {
