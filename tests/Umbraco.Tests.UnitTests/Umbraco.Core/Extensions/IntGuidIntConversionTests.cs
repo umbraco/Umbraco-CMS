@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.Extensions;
-using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;

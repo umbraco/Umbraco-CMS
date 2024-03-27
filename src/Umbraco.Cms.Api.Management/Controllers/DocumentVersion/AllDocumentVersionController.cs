@@ -36,12 +36,14 @@ public class AllDocumentVersionController : DocumentVersionControllerBase
         Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus> attempt =
             await _contentVersionService.GetPagedContentVersionsAsync(documentId, culture, skip, take);
 
+        var pagedViewModel = new PagedViewModel<DocumentVersionItemResponseModel>
+        {
+            Total = attempt.Result!.Total,
+            Items = await _documentVersionPresentationFactory.CreateMultipleAsync(attempt.Result!.Items),
+        };
+
         return attempt.Success
-            ? Ok(new PagedViewModel<DocumentVersionItemResponseModel>
-            {
-                Total = attempt.Result!.Total,
-                Items = await _documentVersionPresentationFactory.CreateMultipleAsync(attempt.Result!.Items),
-            })
+            ? Ok(pagedViewModel)
             : MapFailure(attempt.Status);
     }
 }
