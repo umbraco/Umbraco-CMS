@@ -310,6 +310,8 @@ export const UmbFormControlMixin = <
 		}
 
 		public checkValidity() {
+			this.pristine = false;
+
 			for (const key in this.#formCtrlElements) {
 				if (this.#formCtrlElements[key].checkValidity() === false) {
 					return false;
