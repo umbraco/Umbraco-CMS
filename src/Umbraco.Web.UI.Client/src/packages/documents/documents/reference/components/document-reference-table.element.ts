@@ -1,4 +1,4 @@
-import { UmbDocumentTrackedReferenceRepository } from '../repository/index.js';
+import { UmbDocumentReferenceRepository } from '../repository/index.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -9,9 +9,9 @@ import {
 	isDefaultReference,
 } from '@umbraco-cms/backoffice/relations';
 
-@customElement('umb-document-tracked-reference-table')
-export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
-	#documentTrackedReferenceRepository = new UmbDocumentTrackedReferenceRepository(this);
+@customElement('umb-document-reference-table')
+export class UmbDocumentReferenceTableElement extends UmbLitElement {
+	#documentReferenceRepository = new UmbDocumentReferenceRepository(this);
 	#pageSize = 10;
 
 	@property()
@@ -31,16 +31,12 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 	_errorMessage = '';
 
 	firstUpdated() {
-		this.#getTrackedReferences();
+		this.#getReferences();
 	}
 
-	async #getTrackedReferences() {
-		// Get the first 10 tracked references for the document:
-		const { data, error } = await this.#documentTrackedReferenceRepository.requestTrackedReference(
-			this.unique,
-			0,
-			this.#pageSize,
-		);
+	async #getReferences() {
+		// Get the first 10 references for the document:
+		const { data, error } = await this.#documentReferenceRepository.requestReference(this.unique, 0, this.#pageSize);
 
 		if (error) {
 			this._errorMessage = error.message;
@@ -142,6 +138,6 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-tracked-reference-table': UmbDocumentTrackedReferenceTableElement;
+		'umb-document-reference-table': UmbDocumentReferenceTableElement;
 	}
 }

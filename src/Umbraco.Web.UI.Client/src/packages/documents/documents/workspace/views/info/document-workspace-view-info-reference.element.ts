@@ -1,4 +1,4 @@
-import { UmbDocumentTrackedReferenceRepository } from '../../../tracked-reference/index.js';
+import { UmbDocumentReferenceRepository } from '../../../reference/index.js';
 import { css, html, customElement, state, nothing, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -14,7 +14,7 @@ import {
 @customElement('umb-document-workspace-view-info-reference')
 export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	#itemsPerPage = 10;
-	#trackedReferenceRepository;
+	#referenceRepository;
 
 	@property()
 	documentUnique = '';
@@ -33,7 +33,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 
 	constructor() {
 		super();
-		this.#trackedReferenceRepository = new UmbDocumentTrackedReferenceRepository(this);
+		this.#referenceRepository = new UmbDocumentReferenceRepository(this);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('document')
@@ -50,7 +50,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	}
 
 	async #getReferences() {
-		const { data } = await this.#trackedReferenceRepository.requestTrackedReference(
+		const { data } = await this.#referenceRepository.requestReference(
 			this.documentUnique,
 			(this._currentPage - 1) * this.#itemsPerPage,
 			this.#itemsPerPage,

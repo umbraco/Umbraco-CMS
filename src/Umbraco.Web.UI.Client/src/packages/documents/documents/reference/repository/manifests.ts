@@ -6,7 +6,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DOCUMENT_TRACKED_REFERENCE_REPOSITORY_ALIAS,
 	name: 'Document Tracked Reference Repository',
-	api: () => import('./document-tracked-reference.repository.js'),
+	api: () => import('./document-reference.repository.js'),
 };
 
 export const manifests = [repository];
