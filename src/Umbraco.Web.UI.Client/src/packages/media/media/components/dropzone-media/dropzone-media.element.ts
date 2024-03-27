@@ -1,16 +1,18 @@
 import { UmbMediaDetailRepository } from '../../repository/index.js';
-import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMediaDetailModel } from '../../types.js';
-import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	type UmbAllowedMediaTypeModel,
 	UmbMediaTypeStructureRepository,
 	getMediaTypeByFileMimeType,
 } from '@umbraco-cms/backoffice/media-type';
-import { UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import {
+	UmbTemporaryFileManager,
+	type UmbTemporaryFileQueueModel,
+	type UmbTemporaryFileModel,
+} from '@umbraco-cms/backoffice/temporary-file';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-dropzone-media')
@@ -20,14 +22,18 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 	#allowedMediaTypes: Array<UmbAllowedMediaTypeModel> = [];
 	#mediaDetailRepository = new UmbMediaDetailRepository(this);
 
-	@property()
-	collectionUnique: string | null = null;
-
-	@property()
-	parentUnique: string | null = null;
+	@state()
+	private queue: Array<UmbTemporaryFileModel> = [];
 
 	constructor() {
 		super();
+
+		this.observe(this.#fileManager.queue, (queue) => {
+			this.queue = queue;
+			/** TODO: Show uploading badge while waiting... */
+			console.log(queue);
+		});
+
 		this.#getAllowedMediaTypes();
 		document.addEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.addEventListener('dragleave', this.#handleDragLeave.bind(this));
@@ -65,35 +71,30 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 		return this.#allowedMediaTypes.find((type) => type.name === mediaTypeName)!;
 	}
 
-	async #uploadHandler(file: File) {
-		const unique = UmbId.new();
-		const uploaded = await this.#fileManager.uploadOne({ file, unique });
-		if (uploaded[0].status === 'error') {
-			throw new Error('Error uploading file');
-		}
-		return uploaded[0];
+	async #uploadHandler(files: Array<File>) {
+		const queue = files.map((file): UmbTemporaryFileQueueModel => ({ file }));
+		const uploaded = await this.#fileManager.upload(queue);
+		return uploaded;
 	}
 
 	async #onFileUpload(event: UUIFileDropzoneEvent) {
 		const files: Array<File> = event.detail.files;
 		if (!files.length) return;
+		const uploads = await this.#uploadHandler(files);
 
-		for (const file of files) {
-			const mediaType = this.#getMediaTypeFromMime(file.type);
-
-			const uploaded = await this.#uploadHandler(file);
-			/** TODO: Show uploading badge while waiting... */
+		for (const upload of uploads) {
+			const mediaType = this.#getMediaTypeFromMime(upload.file.type);
 
 			const preset: Partial<UmbMediaDetailModel> = {
 				mediaType: {
 					unique: mediaType.unique,
-					collection: this.collectionUnique ? { unique: this.collectionUnique } : null,
+					collection: null,
 				},
 				variants: [
 					{
 						culture: null,
 						segment: null,
-						name: file.name,
+						name: upload.file.name,
 						createDate: null,
 						updateDate: null,
 					},
@@ -101,7 +102,7 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 				values: [
 					{
 						alias: 'umbracoFile',
-						value: { src: uploaded.unique },
+						value: { src: upload.unique },
 						culture: null,
 						segment: null,
 					},

@@ -22,15 +22,13 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 	#queue = new UmbArrayState<UmbTemporaryFileModel>([], (item) => item.unique);
 	public readonly queue = this.#queue.asObservable();
 
-	#completed = new UmbArrayState<UmbTemporaryFileModel>([], (item) => item.unique);
-	public readonly completed = this.#completed.asObservable();
-
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(host);
 	}
 
 	async uploadOne(queueItem: UmbTemporaryFileQueueModel): Promise<Array<UmbTemporaryFileModel>> {
+		this.#queue.setValue([]);
 		const item: UmbTemporaryFileModel = {
 			file: queueItem.file,
 			unique: queueItem.unique ?? UmbId.new(),
@@ -41,6 +39,7 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 	}
 
 	async upload(queueItems: Array<UmbTemporaryFileQueueModel>): Promise<Array<UmbTemporaryFileModel>> {
+		this.#queue.setValue([]);
 		const items = queueItems.map(
 			(item): UmbTemporaryFileModel => ({
 				file: item.file,
@@ -72,15 +71,16 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 			const { error } = await this.#temporaryFileRepository.upload(item.unique, item.file);
 			await new Promise((resolve) => setTimeout(resolve, (Math.random() + 0.5) * 1000)); // simulate small delay so that the upload badge is properly shown
 
+			let status: TemporaryFileStatus;
 			if (error) {
-				this.#queue.updateOne(item.unique, { ...item, status: 'error' });
+				status = 'error';
+				this.#queue.updateOne(item.unique, { ...item, status });
 			} else {
-				this.#queue.updateOne(item.unique, { ...item, status: 'success' });
+				status = 'success';
+				this.#queue.updateOne(item.unique, { ...item, status });
 			}
-			filesCompleted.push(item);
 
-			this.#completed.appendOne(item);
-			this.#queue.removeOne(item.unique);
+			filesCompleted.push({ ...item, status });
 		}
 
 		return filesCompleted;
