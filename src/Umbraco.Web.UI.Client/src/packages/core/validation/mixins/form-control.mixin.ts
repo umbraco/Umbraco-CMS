@@ -3,7 +3,7 @@ import { UmbValidationValidEvent } from '../events/validation-valid.event.js';
 import { property, type LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 
-type NativeFormControlElement = Pick<HTMLInputElement, 'validity' | 'checkValidity' | 'validationMessage'> &
+type UmbNativeFormControlElement = Pick<HTMLInputElement, 'validity' | 'checkValidity' | 'validationMessage'> &
 	HTMLElement; // Eventually use a specific interface or list multiple options like appending these types: ... | HTMLTextAreaElement | HTMLSelectElement
 
 /* FlagTypes type options originate from:
@@ -56,7 +56,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 	protected _internals: ElementInternals;
 	protected _runValidators(): void;
 	protected addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
-	protected addFormControlElement(element: NativeFormControlElement): void;
+	protected addFormControlElement(element: UmbNativeFormControlElement): void;
 
 	//static formAssociated: boolean;
 	getFormElement(): HTMLElement | undefined;
@@ -132,7 +132,7 @@ export const UmbFormControlMixin = <
 		protected _internals: ElementInternals;
 		#form: HTMLFormElement | null = null;
 		#validators: Validator[] = [];
-		#formCtrlElements: NativeFormControlElement[] = [];
+		#formCtrlElements: UmbNativeFormControlElement[] = [];
 
 		constructor(...args: any[]) {
 			super(...args);
@@ -217,9 +217,9 @@ export const UmbFormControlMixin = <
 		/**
 		 * @method addFormControlElement
 		 * @description Important notice if adding a native form control then ensure that its value and thereby validity is updated when value is changed from the outside.
-		 * @param element {NativeFormControlElement} - element to validate and include as part of this form association.
+		 * @param element {UmbNativeFormControlElement} - element to validate and include as part of this form association.
 		 */
-		protected addFormControlElement(element: NativeFormControlElement) {
+		protected addFormControlElement(element: UmbNativeFormControlElement) {
 			this.#formCtrlElements.push(element);
 			element.addEventListener(UmbValidationInvalidEvent.TYPE, () => {
 				this._runValidators();
