@@ -20,7 +20,6 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IDocumentUrlFactory _documentUrlFactory;
     private readonly IFileService _fileService;
-    private readonly IContentTypeService _contentTypeService;
     private readonly IPublicAccessService _publicAccessService;
     private readonly TimeProvider _timeProvider;
 
@@ -28,14 +27,12 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         IUmbracoMapper umbracoMapper,
         IDocumentUrlFactory documentUrlFactory,
         IFileService fileService,
-        IContentTypeService contentTypeService,
         IPublicAccessService publicAccessService,
         TimeProvider timeProvider)
     {
         _umbracoMapper = umbracoMapper;
         _documentUrlFactory = documentUrlFactory;
         _fileService = fileService;
-        _contentTypeService = contentTypeService;
         _publicAccessService = publicAccessService;
         _timeProvider = timeProvider;
     }
@@ -74,15 +71,16 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
         return responseModel;
     }
 
-    public DocumentBlueprintResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity)
+    public DocumentBlueprintItemResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity)
     {
-        var responseModel = new DocumentBlueprintResponseModel()
+        var responseModel = new DocumentBlueprintItemResponseModel
         {
             Id = entity.Key,
+            Name = entity.Name ?? string.Empty,
         };
 
-        IContentType? contentType = _contentTypeService.Get(entity.ContentTypeAlias);
-        responseModel.Name = contentType?.Name ?? entity.Name ?? string.Empty;
+        responseModel.DocumentType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
+
         return responseModel;
     }
 

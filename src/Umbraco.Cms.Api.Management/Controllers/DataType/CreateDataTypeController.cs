@@ -43,10 +43,5 @@ public class CreateDataTypeController : DataTypeControllerBase
         return result.Success
             ? CreatedAtId<ByKeyDataTypeController>(controller => nameof(controller.ByKey), result.Result.Key)
             : DataTypeOperationStatusResult(result.Status);
-
-
-
-
-
     }
 }

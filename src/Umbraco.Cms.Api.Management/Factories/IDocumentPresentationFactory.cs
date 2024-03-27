@@ -1,5 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
-using Umbraco.Cms.Api.Management.ViewModels.Document;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
@@ -17,11 +16,11 @@ public interface IDocumentPresentationFactory
 
     DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity);
 
-    DocumentBlueprintResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity);
+    DocumentBlueprintItemResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity);
 
     IEnumerable<DocumentVariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity);
 
     DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity);
 
-    Attempt<CultureAndScheduleModel,ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel);
+    Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel);
 }

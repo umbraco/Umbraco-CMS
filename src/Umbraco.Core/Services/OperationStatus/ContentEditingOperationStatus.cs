@@ -19,5 +19,6 @@ public enum ContentEditingOperationStatus
     PropertyValidationError,
     InvalidCulture,
     DuplicateKey,
+    DuplicateName,
     Unknown,
 }
