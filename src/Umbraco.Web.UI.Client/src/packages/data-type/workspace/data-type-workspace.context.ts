@@ -347,7 +347,7 @@ export class UmbDataTypeWorkspaceContext
 		}
 
 		this.setIsNew(false);
-		this.submitComplete(this.#currentData.value);
+		return true;
 	}
 
 	async delete(unique: string) {

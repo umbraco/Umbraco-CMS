@@ -333,7 +333,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 
 		this.setIsNew(false);
-		this.submitComplete(layoutData);
+		return true;
 	}
 
 	#modalRejected = () => {

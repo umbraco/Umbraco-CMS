@@ -183,8 +183,8 @@ export class UmbPartialViewWorkspaceContext
 		if (newData) {
 			this.#data.setValue(newData);
 			this.setIsNew(false);
-			this.submitComplete(newData);
 		}
+		return true;
 	}
 
 	public destroy(): void {

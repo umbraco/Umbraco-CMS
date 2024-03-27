@@ -250,7 +250,7 @@ export class UmbDocumentTypeWorkspaceContext
 		}
 
 		this.setIsNew(false);
-		this.submitComplete(data);
+		return true;
 	}
 
 	public destroy(): void {

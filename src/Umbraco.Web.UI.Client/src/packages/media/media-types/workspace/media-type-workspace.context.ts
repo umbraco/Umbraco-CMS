@@ -228,7 +228,7 @@ export class UmbMediaTypeWorkspaceContext
 		}
 
 		this.setIsNew(false);
-		this.submitComplete(data);
+		return true;
 	}
 
 	public destroy(): void {

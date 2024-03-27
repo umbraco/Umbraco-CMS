@@ -48,12 +48,14 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 		});
 	}
 
+	/*
 	protected passValidation() {
 		this.#validation.preventFail();
 	}
 	protected failValidation() {
 		this.#validation.allowFail();
 	}
+	*/
 
 	protected resetState() {
 		this.#isNew.setValue(undefined);
@@ -68,6 +70,10 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	}
 
 	async requestSubmit(): Promise<void> {
+		return this.validateAndSubmit((valid) => (valid ? this.submit() : this.invalidSubmit()));
+	}
+
+	protected async validateAndSubmit(callback: (valid: boolean) => Promise<boolean | undefined>): Promise<void> {
 		if (this.#submitPromise) {
 			return this.#submitPromise;
 		}
@@ -75,19 +81,18 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 			this.#submitResolve = resolve;
 			this.#submitReject = reject;
 		});
-
-		this.#validation.validate().then((succeed) => {
-			if (succeed) {
-				this.submit();
+		this.#validation.validate().then(async (valid: boolean) => {
+			if ((await callback(valid)) === true) {
+				this.#submitComplete();
 			} else {
-				this.#failSubmit();
+				this.#submitFailed();
 			}
 		});
 
 		return this.#submitPromise;
 	}
 
-	#failSubmit() {
+	#submitFailed() {
 		if (this.#submitPromise) {
 			this.#submitReject?.();
 			this.#submitPromise = undefined;
@@ -96,17 +101,18 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 		}
 	}
 
-	protected submitComplete(data: WorkspaceDataModelType | undefined) {
+	#submitComplete() {
 		// Resolve the submit promise:
 		this.#submitResolve?.();
 		this.#submitPromise = undefined;
 		this.#submitResolve = undefined;
 		this.#submitReject = undefined;
 
+		// Calling reset on the validation context here. [NL]
+		this.#validation.reset();
+
 		if (this.modalContext) {
-			if (data) {
-				this.modalContext?.setValue(data);
-			}
+			this.modalContext?.setValue(this.getData());
 			this.modalContext?.submit();
 		}
 	}
@@ -115,7 +121,10 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	abstract getUnique(): string | undefined;
 	abstract getEntityType(): string;
 	abstract getData(): WorkspaceDataModelType | undefined;
-	protected abstract submit(): void;
+	protected abstract submit(): Promise<boolean | undefined>;
+	protected invalidSubmit(): Promise<boolean | undefined> {
+		return false;
+	}
 }
 
 /*

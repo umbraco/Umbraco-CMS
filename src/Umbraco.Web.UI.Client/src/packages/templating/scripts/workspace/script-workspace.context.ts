@@ -162,8 +162,8 @@ export class UmbScriptWorkspaceContext
 			this.#data.setValue(newData);
 
 			this.setIsNew(false);
-			this.submitComplete(newData);
 		}
+		return true;
 	}
 
 	destroy(): void {

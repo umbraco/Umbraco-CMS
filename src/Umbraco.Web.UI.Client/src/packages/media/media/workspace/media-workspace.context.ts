@@ -409,7 +409,7 @@ export class UmbMediaWorkspaceContext
 		if (!data) throw new Error('Data is missing');
 		await this.#createOrSave();
 		this.setIsNew(false);
-		this.submitComplete(data);
+		return true;
 	}
 
 	async delete() {

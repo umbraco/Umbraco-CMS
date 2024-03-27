@@ -102,8 +102,8 @@ export class UmbUserWorkspaceContext
 			this.#persistedData.setValue(newData);
 			this.#currentData.setValue(newData);
 			this.setIsNew(false);
-			this.submitComplete(newData);
 		}
+		return true;
 	}
 
 	// TODO: implement upload progress

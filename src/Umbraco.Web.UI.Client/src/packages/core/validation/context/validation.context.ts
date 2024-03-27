@@ -7,7 +7,7 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	#validators: Array<UmbValidator> = [];
 	#validationMode: boolean = false;
 	#isValid: boolean = false;
-	#preventFail: boolean = false;
+	//#preventFail: boolean = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_VALIDATION_CONTEXT);
@@ -17,6 +17,7 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 		return this.#isValid;
 	}
 
+	/*
 	preventFail(): void {
 		this.#preventFail = true;
 	}
@@ -24,16 +25,23 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	allowFail(): void {
 		this.#preventFail = false;
 	}
+	*/
 
 	addValidator(validator: UmbValidator) {
 		this.#validators.push(validator);
 		//validator.addEventListener('change', this.#runValidate);
+		if (this.#validationMode) {
+			this.validate();
+		}
 	}
 	removeValidator(validator: UmbValidator) {
 		const index = this.#validators.indexOf(validator);
 		if (index !== -1) {
 			this.#validators.splice(index, 1);
 			//validator.removeEventListener('change', this.#runValidate);
+			if (this.#validationMode) {
+				this.validate();
+			}
 		}
 	}
 
@@ -54,7 +62,8 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 			this.focusFirstInvalidElement();
 		}
 
-		return this.#preventFail ? true : isValid;
+		//return this.#preventFail ? true : isValid;
+		return isValid;
 	}
 
 	focusFirstInvalidElement(): void {
