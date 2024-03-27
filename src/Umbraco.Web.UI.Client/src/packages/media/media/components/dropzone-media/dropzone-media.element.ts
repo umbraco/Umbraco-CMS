@@ -79,20 +79,25 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 		if (!files.length) return;
 
 		for (const file of files) {
-			const mediaTypeDetailUnique = UmbId.new();
-
 			const mediaType = this.#getMediaTypeFromMime(file.type);
-			const uploaded = await this.#uploadHandler(file);
 
-			const model: UmbMediaDetailModel = {
-				unique: mediaTypeDetailUnique,
+			const uploaded = await this.#uploadHandler(file);
+			/** TODO: Show uploading badge while waiting... */
+
+			const preset: Partial<UmbMediaDetailModel> = {
 				mediaType: {
 					unique: mediaType.unique,
 					collection: this.collectionUnique ? { unique: this.collectionUnique } : null,
 				},
-				entityType: UMB_MEDIA_ENTITY_TYPE,
-				isTrashed: false,
-				urls: [],
+				variants: [
+					{
+						culture: null,
+						segment: null,
+						name: file.name,
+						createDate: null,
+						updateDate: null,
+					},
+				],
 				values: [
 					{
 						alias: 'umbracoFile',
@@ -101,17 +106,12 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 						segment: null,
 					},
 				],
-				variants: [
-					{
-						culture: null,
-						segment: null,
-						name: file.name,
-						createDate: '',
-						updateDate: '',
-					},
-				],
 			};
-			await this.#mediaDetailRepository.create(model, null);
+
+			const { data } = await this.#mediaDetailRepository.createScaffold(preset);
+			if (!data) return;
+			await this.#mediaDetailRepository.create(data, null);
+
 			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}
