@@ -1,16 +1,34 @@
+import type { UmbMediaDetailModel } from '../types.js';
+import { type UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT } from '../tree/media-tree.store.js';
+import type { UmbMediaCollectionContext } from './media-collection.context.js';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
-import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
+import { UMB_DEFAULT_COLLECTION_CONTEXT, UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import './media-collection-toolbar.element.js';
 import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbTemporaryFileManager, type UmbTemporaryFileQueueModel } from '@umbraco-cms/backoffice/temporary-file';
+import { UMB_MEDIA_ENTITY_TYPE, UmbMediaDetailRepository } from '@umbraco-cms/backoffice/media';
+import { UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+
+import { getMediaTypeByFileMimeType, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 
 @customElement('umb-media-collection')
 export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	#fileManager = new UmbTemporaryFileManager(this);
+	#mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
+	#mediaDetailRepository = new UmbMediaDetailRepository(this);
+
+	#mediaCollection?: UmbMediaCollectionContext;
+	#mediaTreeStore?: UmbMediaTreeStore;
 
 	constructor() {
 		super();
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
+			this.#mediaCollection = instance as UmbMediaCollectionContext;
+		});
+		this.consumeContext(UMB_MEDIA_TREE_STORE_CONTEXT, (instance) => {
+			this.#mediaTreeStore = instance;
+			console.log('instance is here', instance);
+		});
 		document.addEventListener('dragenter', this.#handleDragEnter.bind(this));
 		document.addEventListener('dragleave', this.#handleDragLeave.bind(this));
 		document.addEventListener('drop', this.#handleDrop.bind(this));
@@ -38,26 +56,66 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	}
 
 	async #onFileUpload(event: UUIFileDropzoneEvent) {
-		const files: Array<UmbTemporaryFileQueueModel> = event.detail.files.map((file) => ({ file, unique: UmbId.new() }));
+		/** TODO: Move dropzone and logic into its own component, so that we can reuse it in more places... */
+		const files: Array<File> = event.detail.files;
 		if (!files.length) return;
 
-		const items = await this.#fileManager.upload(files);
-		if (!items.length) return;
+		const { data } = await this.#mediaTypeStructure.requestAllowedChildrenOf(null);
+		if (!data) return;
 
-		console.log('uploadComplete', items);
+		for (const file of files) {
+			const mediaTypeDetailUnique = UmbId.new();
+
+			const mediaTypeName = getMediaTypeByFileMimeType(file.type);
+			const mediaType = data.items.find((type) => type.name === mediaTypeName)!;
+
+			const mediaTempFileUnique = UmbId.new();
+
+			const uploaded = await this.#fileManager.uploadOne({ file, unique: mediaTempFileUnique });
+			if (uploaded.find((item) => item.status === 'error')) return;
+
+			const model: UmbMediaDetailModel = {
+				unique: mediaTypeDetailUnique,
+				mediaType: {
+					unique: mediaType.unique,
+					collection: null,
+				},
+				entityType: UMB_MEDIA_ENTITY_TYPE,
+				isTrashed: false,
+				urls: [],
+				values: [
+					{
+						alias: 'umbracoFile',
+						value: { src: mediaTempFileUnique },
+						culture: null,
+						segment: null,
+					},
+				],
+				variants: [
+					{
+						culture: null,
+						segment: null,
+						name: file.name,
+						createDate: '',
+						updateDate: '',
+					},
+				],
+			};
+
+			await this.#mediaDetailRepository.create(model, null);
+
+			this.#mediaCollection?.requestCollection();
+		}
 	}
 
 	protected renderToolbar() {
-		return html`
-			<umb-media-collection-toolbar slot="header"></umb-media-collection-toolbar>
-			<!-- TODO: Add the Media Upload dropzone component in here. [LK] -->
+		return html` <umb-media-collection-toolbar slot="header"></umb-media-collection-toolbar>
 			<uui-file-dropzone
 				id="dropzone"
 				multiple
 				@change=${this.#onFileUpload}
 				label="${this.localize.term('media_dragAndDropYourFilesIntoTheArea')}"
-				accept=""></uui-file-dropzone>
-		`;
+				accept=""></uui-file-dropzone>`;
 	}
 
 	static styles = [
