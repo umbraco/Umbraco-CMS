@@ -14,13 +14,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public abstract class DocumentVersionControllerBase : ManagementApiControllerBase
 {
-    protected readonly IContentVersionService ContentVersionService;
-
-    public DocumentVersionControllerBase(IContentVersionService contentVersionService)
-    {
-        ContentVersionService = contentVersionService;
-    }
-
     protected IActionResult MapFailure(ContentVersionOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {

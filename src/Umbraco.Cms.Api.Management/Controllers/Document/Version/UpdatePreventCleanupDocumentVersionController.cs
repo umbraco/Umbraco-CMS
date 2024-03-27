@@ -11,13 +11,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
 [ApiVersion("1.0")]
 public class UpdatePreventCleanupDocumentVersionController : DocumentVersionControllerBase
 {
+    private readonly IContentVersionService _contentVersionService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public UpdatePreventCleanupDocumentVersionController(
         IContentVersionService contentVersionService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : base(contentVersionService)
     {
+        _contentVersionService = contentVersionService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -29,7 +30,7 @@ public class UpdatePreventCleanupDocumentVersionController : DocumentVersionCont
     public async Task<IActionResult> Set(Guid id, bool preventCleanup)
     {
         Attempt<ContentVersionOperationStatus> attempt =
-            await ContentVersionService.SetPreventCleanupAsync(id, preventCleanup, CurrentUserKey(_backOfficeSecurityAccessor));
+            await _contentVersionService.SetPreventCleanupAsync(id, preventCleanup, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return attempt.Success is true
             ? Ok()

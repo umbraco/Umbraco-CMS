@@ -13,13 +13,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
 [ApiVersion("1.0")]
 public class ByKeyDocumentVersionController : DocumentVersionControllerBase
 {
+    private readonly IContentVersionService _contentVersionService;
     private readonly IUmbracoMapper _umbracoMapper;
 
     public ByKeyDocumentVersionController(
         IContentVersionService contentVersionService,
         IUmbracoMapper umbracoMapper)
-        : base(contentVersionService)
     {
+        _contentVersionService = contentVersionService;
         _umbracoMapper = umbracoMapper;
     }
 
@@ -31,7 +32,7 @@ public class ByKeyDocumentVersionController : DocumentVersionControllerBase
     public async Task<IActionResult> ByKey(Guid id)
     {
         Attempt<IContent?, ContentVersionOperationStatus> attempt =
-            await ContentVersionService.GetAsync(id);
+            await _contentVersionService.GetAsync(id);
 
         return attempt.Success is true
             ? Ok(_umbracoMapper.Map<DocumentVersionResponseModel>(attempt.Result))

@@ -14,13 +14,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
 [ApiVersion("1.0")]
 public class GetDocumentVersionsController : DocumentVersionControllerBase
 {
+    private readonly IContentVersionService _contentVersionService;
     private readonly IDocumentVersionPresentationFactory _documentVersionPresentationFactory;
 
     public GetDocumentVersionsController(
         IContentVersionService contentVersionService,
         IDocumentVersionPresentationFactory documentVersionPresentationFactory)
-        : base(contentVersionService)
     {
+        _contentVersionService = contentVersionService;
         _documentVersionPresentationFactory = documentVersionPresentationFactory;
     }
 
@@ -35,7 +36,7 @@ public class GetDocumentVersionsController : DocumentVersionControllerBase
         // old ContentController.GetRollbackVersions()
         // get all versions for a given document
         Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus> attempt =
-            await ContentVersionService.GetContentVersionsAsync(documentId, culture, skip, take);
+            await _contentVersionService.GetContentVersionsAsync(documentId, culture, skip, take);
 
         return attempt.Success is true
             ? Ok(await _documentVersionPresentationFactory.CreatedPagedResponseModelAsync(attempt.Result!))

@@ -11,13 +11,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
 [ApiVersion("1.0")]
 public class RollbackDocumentVersionController : DocumentVersionControllerBase
 {
+    private readonly IContentVersionService _contentVersionService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public RollbackDocumentVersionController(
         IContentVersionService contentVersionService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : base(contentVersionService)
     {
+        _contentVersionService = contentVersionService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -29,7 +30,7 @@ public class RollbackDocumentVersionController : DocumentVersionControllerBase
     public async Task<IActionResult> Rollback(Guid id, string? culture)
     {
         Attempt<ContentVersionOperationStatus> attempt =
-            await ContentVersionService.RollBackAsync(id, culture, CurrentUserKey(_backOfficeSecurityAccessor));
+            await _contentVersionService.RollBackAsync(id, culture, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return attempt.Success is true
             ? Ok()
