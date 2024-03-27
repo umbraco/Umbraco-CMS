@@ -4,6 +4,8 @@ import { html, customElement, state, nothing } from '@umbraco-cms/backoffice/ext
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-mfa-providers-user-profile-app')
 export class UmbMfaProvidersUserProfileAppElement extends UmbLitElement {
@@ -18,7 +20,7 @@ export class UmbMfaProvidersUserProfileAppElement extends UmbLitElement {
 	}
 
 	async #init() {
-		this._hasProviders = await this.#currentUserRepository.hasMfaLoginProviders();
+		this._hasProviders = (await firstValueFrom(umbExtensionsRegistry.byType('mfaLoginProvider'))).length > 0;
 	}
 
 	render() {

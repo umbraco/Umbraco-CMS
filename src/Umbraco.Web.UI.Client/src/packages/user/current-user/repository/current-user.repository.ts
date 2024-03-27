@@ -65,16 +65,6 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	}
 
 	/**
-	 * Check if the current user has MFA login providers
-	 * @memberof UmbCurrentUserRepository
-	 */
-	async hasMfaLoginProviders(): Promise<boolean> {
-		const providers$ = await this.requestMfaLoginProviders();
-		const data = firstValueFrom(providers$);
-		return !!data;
-	}
-
-	/**
 	 * Enable an MFA provider
 	 * @param provider The provider to enable
 	 * @param code The activation code of the provider to enable
