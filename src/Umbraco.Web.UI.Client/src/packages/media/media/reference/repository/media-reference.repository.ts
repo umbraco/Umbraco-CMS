@@ -12,7 +12,7 @@ export class UmbMediaReferenceRepository extends UmbControllerBase {
 
 	async requestReference(unique: string, skip = 0, take = 20) {
 		if (!unique) throw new Error(`unique is required`);
-		return this.#referenceSource.getReferenceById(unique, skip, take);
+		return this.#referenceSource.getReference(unique, skip, take);
 	}
 }
 

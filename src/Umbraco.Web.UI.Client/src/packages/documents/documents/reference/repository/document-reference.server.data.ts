@@ -20,12 +20,12 @@ export class UmbDocumentReferenceServerDataSource {
 	}
 
 	/**
-	 * Fetches the item for the given id from the server
-	 * @param {Array<string>} ids
+	 * Fetches the item for the given unique from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDocumentReferenceServerDataSource
 	 */
-	async getReferenceById(id: string, skip = 0, take = 20) {
+	async getReference(id: string, skip = 0, take = 20) {
 		return await tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdReferencedBy({ id, skip, take }));
 	}
 }
