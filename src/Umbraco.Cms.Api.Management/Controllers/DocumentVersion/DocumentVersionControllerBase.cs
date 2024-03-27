@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
+namespace Umbraco.Cms.Api.Management.Controllers.DocumentVersion;
 
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Document}-version")]
 [ApiExplorerSettings(GroupName = $"{nameof(Constants.UdiEntityType.Document)} Version")]

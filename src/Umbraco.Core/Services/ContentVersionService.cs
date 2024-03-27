@@ -52,7 +52,7 @@ internal class ContentVersionService : IContentVersionService
         _userIdKeyResolver = userIdKeyResolver;
     }
 
-    [Obsolete]
+    [Obsolete("Use the non obsolete constructor instead. Scheduled to be removed in v15")]
     public ContentVersionService(
         ILogger<ContentVersionService> logger,
         IDocumentVersionRepository documentVersionRepository,
@@ -112,7 +112,7 @@ internal class ContentVersionService : IContentVersionService
     public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = Constants.Security.SuperUserId)
         => HandleSetPreventCleanup(versionId, preventCleanup, userId);
 
-    public async Task<Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>> GetContentVersionsAsync(Guid contentId, string? culture, int skip, int take)
+    public async Task<Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>> GetPagedContentVersionsAsync(Guid contentId, string? culture, int skip, int take)
     {
         IEntitySlim? document = await Task.FromResult(_entityService.Get(contentId, UmbracoObjectTypes.Document));
         if (document is null)

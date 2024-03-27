@@ -1,11 +1,9 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
-using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 
@@ -13,12 +11,9 @@ namespace Umbraco.Cms.Api.Management.Mapping.Document;
 
 public class DocumentVersionMapDefinition : ContentMapDefinition<IContent, DocumentValueModel, DocumentVariantResponseModel>, IMapDefinition
 {
-    private readonly CommonMapper _commonMapper;
-
-    public DocumentVersionMapDefinition(PropertyEditorCollection propertyEditorCollection, CommonMapper commonMapper)
+    public DocumentVersionMapDefinition(PropertyEditorCollection propertyEditorCollection)
         : base(propertyEditorCollection)
     {
-        _commonMapper = commonMapper;
     }
 
     public void DefineMaps(IUmbracoMapper mapper)

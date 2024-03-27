@@ -5326,6 +5326,7 @@
           {
             "name": "documentId",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -5530,7 +5531,7 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/document-version/{id}/preventCleanup": {
+    "/umbraco/management/api/v1/document-version/{id}/prevent-cleanup": {
       "put": {
         "tags": [
           "Document Version"

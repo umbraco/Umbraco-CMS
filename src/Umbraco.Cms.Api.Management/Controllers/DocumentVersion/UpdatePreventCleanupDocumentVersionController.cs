@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
+namespace Umbraco.Cms.Api.Management.Controllers.DocumentVersion;
 
 [ApiVersion("1.0")]
 public class UpdatePreventCleanupDocumentVersionController : DocumentVersionControllerBase
@@ -23,7 +23,7 @@ public class UpdatePreventCleanupDocumentVersionController : DocumentVersionCont
     }
 
     [MapToApiVersion("1.0")]
-    [HttpPut("{id:guid}/preventCleanup")]
+    [HttpPut("{id:guid}/prevent-cleanup")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -32,7 +32,7 @@ public class UpdatePreventCleanupDocumentVersionController : DocumentVersionCont
         Attempt<ContentVersionOperationStatus> attempt =
             await _contentVersionService.SetPreventCleanupAsync(id, preventCleanup, CurrentUserKey(_backOfficeSecurityAccessor));
 
-        return attempt.Success is true
+        return attempt.Success
             ? Ok()
             : MapFailure(attempt.Result);
     }

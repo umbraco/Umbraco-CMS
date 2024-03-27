@@ -6,8 +6,8 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IDocumentVersionPresentationFactory
 {
-    Task<DocumentVersionItemResponseModel> CreateResponseModelAsync(ContentVersionMeta contentVersion);
+    Task<DocumentVersionItemResponseModel> CreateAsync(ContentVersionMeta contentVersion);
 
-    Task<PagedViewModel<DocumentVersionItemResponseModel>> CreatedPagedResponseModelAsync(
-        PagedModel<ContentVersionMeta> pagedContentVersionMeta);
+    Task<IEnumerable<DocumentVersionItemResponseModel>> CreateMultipleAsync(
+        IEnumerable<ContentVersionMeta> contentVersions);
 }

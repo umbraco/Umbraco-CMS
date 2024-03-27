@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,15 +10,15 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
+namespace Umbraco.Cms.Api.Management.Controllers.DocumentVersion;
 
 [ApiVersion("1.0")]
-public class GetDocumentVersionsController : DocumentVersionControllerBase
+public class AllDocumentVersionController : DocumentVersionControllerBase
 {
     private readonly IContentVersionService _contentVersionService;
     private readonly IDocumentVersionPresentationFactory _documentVersionPresentationFactory;
 
-    public GetDocumentVersionsController(
+    public AllDocumentVersionController(
         IContentVersionService contentVersionService,
         IDocumentVersionPresentationFactory documentVersionPresentationFactory)
     {
@@ -25,21 +26,22 @@ public class GetDocumentVersionsController : DocumentVersionControllerBase
         _documentVersionPresentationFactory = documentVersionPresentationFactory;
     }
 
-    // move to item?
     [MapToApiVersion("1.0")]
     [HttpGet]
     [ProducesResponseType(typeof(PagedViewModel<DocumentVersionItemResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Get(Guid documentId, string? culture, int skip = 0, int take = 100)
+    public async Task<IActionResult> All([Required] Guid documentId, string? culture, int skip = 0, int take = 100)
     {
-        // old ContentController.GetRollbackVersions()
-        // get all versions for a given document
         Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus> attempt =
-            await _contentVersionService.GetContentVersionsAsync(documentId, culture, skip, take);
+            await _contentVersionService.GetPagedContentVersionsAsync(documentId, culture, skip, take);
 
-        return attempt.Success is true
-            ? Ok(await _documentVersionPresentationFactory.CreatedPagedResponseModelAsync(attempt.Result!))
+        return attempt.Success
+            ? Ok(new PagedViewModel<DocumentVersionItemResponseModel>
+            {
+                Total = attempt.Result!.Total,
+                Items = await _documentVersionPresentationFactory.CreateMultipleAsync(attempt.Result!.Items),
+            })
             : MapFailure(attempt.Status);
     }
 }

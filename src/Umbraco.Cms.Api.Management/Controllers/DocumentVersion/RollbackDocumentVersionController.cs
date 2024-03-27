@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
+namespace Umbraco.Cms.Api.Management.Controllers.DocumentVersion;
 
 [ApiVersion("1.0")]
 public class RollbackDocumentVersionController : DocumentVersionControllerBase
@@ -32,7 +32,7 @@ public class RollbackDocumentVersionController : DocumentVersionControllerBase
         Attempt<ContentVersionOperationStatus> attempt =
             await _contentVersionService.RollBackAsync(id, culture, CurrentUserKey(_backOfficeSecurityAccessor));
 
-        return attempt.Success is true
+        return attempt.Success
             ? Ok()
             : MapFailure(attempt.Result);
     }

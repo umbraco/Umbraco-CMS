@@ -24,7 +24,7 @@ public interface IContentVersionService
     void SetPreventCleanup(int versionId, bool preventCleanup, int userId = -1);
 
     ContentVersionMeta? Get(int versionId);
-    Task<Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>> GetContentVersionsAsync(Guid contentId, string? culture, int skip, int take);
+    Task<Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>> GetPagedContentVersionsAsync(Guid contentId, string? culture, int skip, int take);
     Task<Attempt<IContent?, ContentVersionOperationStatus>> GetAsync(Guid versionId);
 
     Task<Attempt<ContentVersionOperationStatus>> SetPreventCleanupAsync(Guid versionId, bool preventCleanup, Guid userKey);

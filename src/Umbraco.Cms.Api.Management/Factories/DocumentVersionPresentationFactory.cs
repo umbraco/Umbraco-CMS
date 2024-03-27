@@ -20,7 +20,7 @@ internal sealed class DocumentVersionPresentationFactory : IDocumentVersionPrese
         _userIdKeyResolver = userIdKeyResolver;
     }
 
-    public async Task<DocumentVersionItemResponseModel> CreateResponseModelAsync(ContentVersionMeta contentVersion) =>
+    public async Task<DocumentVersionItemResponseModel> CreateAsync(ContentVersionMeta contentVersion) =>
         new(
             new ReferenceByIdModel(contentVersion.VersionId.ToGuid()), // this is a magic guid since versions do not have keys in the DB
             new ReferenceByIdModel(_entityService.GetKey(contentVersion.ContentId, UmbracoObjectTypes.Document).Result),
@@ -32,11 +32,7 @@ internal sealed class DocumentVersionPresentationFactory : IDocumentVersionPrese
             contentVersion.CurrentDraftVersion,
             contentVersion.PreventCleanup);
 
-    public async Task<PagedViewModel<DocumentVersionItemResponseModel>> CreatedPagedResponseModelAsync(
-        PagedModel<ContentVersionMeta> pagedContentVersionMeta) =>
-        new()
-        {
-            Total = pagedContentVersionMeta.Total,
-            Items = await Task.WhenAll(pagedContentVersionMeta.Items.Select(CreateResponseModelAsync)),
-        };
+    public async Task<IEnumerable<DocumentVersionItemResponseModel>> CreateMultipleAsync(
+        IEnumerable<ContentVersionMeta> contentVersions) =>
+        await Task.WhenAll(contentVersions.Select(CreateAsync));
 }

@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Document.Version;
+namespace Umbraco.Cms.Api.Management.Controllers.DocumentVersion;
 
 [ApiVersion("1.0")]
 public class ByKeyDocumentVersionController : DocumentVersionControllerBase
@@ -34,7 +34,7 @@ public class ByKeyDocumentVersionController : DocumentVersionControllerBase
         Attempt<IContent?, ContentVersionOperationStatus> attempt =
             await _contentVersionService.GetAsync(id);
 
-        return attempt.Success is true
+        return attempt.Success
             ? Ok(_umbracoMapper.Map<DocumentVersionResponseModel>(attempt.Result))
             : MapFailure(attempt.Status);
     }
