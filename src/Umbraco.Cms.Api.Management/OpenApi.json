@@ -5319,7 +5319,7 @@
     "/umbraco/management/api/v1/document-version": {
       "get": {
         "tags": [
-          "document Version"
+          "Document Version"
         ],
         "operationId": "GetDocumentVersion",
         "parameters": [
@@ -5432,7 +5432,7 @@
     "/umbraco/management/api/v1/document-version/{id}": {
       "get": {
         "tags": [
-          "document Version"
+          "Document Version"
         ],
         "operationId": "GetDocumentVersionById",
         "parameters": [
@@ -5533,7 +5533,7 @@
     "/umbraco/management/api/v1/document-version/{id}/preventCleanup": {
       "put": {
         "tags": [
-          "document Version"
+          "Document Version"
         ],
         "operationId": "PutDocumentVersionByIdPreventCleanup",
         "parameters": [
@@ -5648,7 +5648,7 @@
     "/umbraco/management/api/v1/document-version/{id}/rollback": {
       "post": {
         "tags": [
-          "document Version"
+          "Document Version"
         ],
         "operationId": "PostDocumentVersionByIdRollback",
         "parameters": [
