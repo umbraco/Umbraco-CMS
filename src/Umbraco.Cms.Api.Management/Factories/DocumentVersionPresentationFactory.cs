@@ -21,7 +21,7 @@ internal sealed class DocumentVersionPresentationFactory : IDocumentVersionPrese
 
     public async Task<DocumentVersionItemResponseModel> CreateAsync(ContentVersionMeta contentVersion) =>
         new(
-            new ReferenceByIdModel(contentVersion.VersionId.ToGuid()), // this is a magic guid since versions do not have keys in the DB
+            contentVersion.VersionId.ToGuid(), // this is a magic guid since versions do not have keys in the DB
             new ReferenceByIdModel(_entityService.GetKey(contentVersion.ContentId, UmbracoObjectTypes.Document).Result),
             new ReferenceByIdModel(_entityService.GetKey(contentVersion.ContentTypeId, UmbracoObjectTypes.DocumentType)
                 .Result),

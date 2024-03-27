@@ -3,39 +3,39 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 public class DocumentVersionItemResponseModel
 {
     public DocumentVersionItemResponseModel(
-        ReferenceByIdModel version,
-        ReferenceByIdModel content,
-        ReferenceByIdModel contentType,
+        Guid id,
+        ReferenceByIdModel document,
+        ReferenceByIdModel documentType,
         ReferenceByIdModel user,
         DateTimeOffset versionDate,
-        bool currentPublishedVersion,
-        bool currentDraftVersion,
+        bool isCurrentPublishedVersion,
+        bool isCurrentDraftVersion,
         bool preventCleanup)
     {
-        Version = version;
-        Content = content;
-        ContentType = contentType;
+        Id = id;
+        Document = document;
+        DocumentType = documentType;
 
         User = user;
         VersionDate = versionDate;
-        CurrentPublishedVersion = currentPublishedVersion;
-        CurrentDraftVersion = currentDraftVersion;
+        IsCurrentPublishedVersion = isCurrentPublishedVersion;
+        IsCurrentDraftVersion = isCurrentDraftVersion;
         PreventCleanup = preventCleanup;
     }
 
-    public ReferenceByIdModel Content { get; }
+    public Guid Id { get; }
 
-    public ReferenceByIdModel ContentType { get; }
+    public ReferenceByIdModel Document { get; }
 
-    public ReferenceByIdModel Version { get; }
+    public ReferenceByIdModel DocumentType { get; }
 
     public ReferenceByIdModel User { get; }
 
     public DateTimeOffset VersionDate { get; }
 
-    public bool CurrentPublishedVersion { get; }
+    public bool IsCurrentPublishedVersion { get; }
 
-    public bool CurrentDraftVersion { get; }
+    public bool IsCurrentDraftVersion { get; }
 
     public bool PreventCleanup { get; }
 }
