@@ -1,19 +1,22 @@
-import type {
-	UmbCollectionBulkActionPermissions,
-	UmbCollectionConfiguration,
-} from '../../../../../core/collection/types.js';
+import type { UmbCollectionBulkActionPermissions, UmbCollectionConfiguration } from '../../../collection/types.js';
 import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
+import { UMB_COLLECTION_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('umb-document-workspace-view-collection')
-export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement implements UmbWorkspaceViewElement {
+@customElement('umb-workspace-view-collection')
+export class UmbWorkspaceViewCollectionElement extends UmbLitElement implements UmbWorkspaceViewElement {
+	@state()
+	private _loading = true;
+
 	@state()
 	private _config?: UmbCollectionConfiguration;
+
+	@state()
+	private _collectionAlias?: string;
 
 	@state()
 	private _documentUnique?: string;
@@ -26,16 +29,16 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 	}
 
 	async #observeConfig() {
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.observe(workspaceContext.unique, (unique) => {
-				this._documentUnique = unique;
-			});
+		this.consumeContext(UMB_COLLECTION_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this._collectionAlias = workspaceContext.getCollectionAlias();
+			this._documentUnique = workspaceContext.getUnique() ?? '';
+
 			this.observe(
 				workspaceContext.structure.ownerContentType,
-				async (documentType) => {
-					if (!documentType || !documentType.collection) return;
+				async (contentType) => {
+					if (!contentType || !contentType.collection) return;
 
-					const dataTypeUnique = documentType.collection.unique;
+					const dataTypeUnique = contentType.collection.unique;
 
 					if (dataTypeUnique) {
 						await this.#dataTypeDetailRepository.requestByUnique(dataTypeUnique);
@@ -44,12 +47,13 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 							(dataType) => {
 								if (!dataType) return;
 								this._config = this.#mapDataTypeConfigToCollectionConfig(dataType);
+								this._loading = false;
 							},
 							'_observeConfigDataType',
 						);
 					}
 				},
-				'_observeConfigDocumentType',
+				'_observeConfigContentType',
 			);
 		});
 	}
@@ -59,6 +63,7 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 		return {
 			unique: this._documentUnique,
 			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
+			layouts: config?.getValueByAlias('layouts'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
 			pageSize: Number(config?.getValueByAlias('pageSize')) ?? 50,
@@ -68,15 +73,15 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 	}
 
 	render() {
-		if (!this._config?.unique) return nothing;
-		return html`<umb-collection alias="Umb.Collection.Document" .config=${this._config}></umb-collection>`;
+		if (this._loading) return nothing;
+		return html`<umb-collection .alias=${this._collectionAlias} .config=${this._config}></umb-collection>`;
 	}
 }
 
-export default UmbDocumentWorkspaceViewCollectionElement;
+export default UmbWorkspaceViewCollectionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-workspace-view-collection': UmbDocumentWorkspaceViewCollectionElement;
+		'umb-workspace-view-collection': UmbWorkspaceViewCollectionElement;
 	}
 }
