@@ -36349,32 +36349,29 @@
       },
       "DocumentVersionItemResponseModel": {
         "required": [
-          "content",
-          "contentType",
-          "currentDraftVersion",
-          "currentPublishedVersion",
+          "document",
+          "documentType",
+          "id",
+          "isCurrentDraftVersion",
+          "isCurrentPublishedVersion",
           "preventCleanup",
           "user",
-          "version",
           "versionDate"
         ],
         "type": "object",
         "properties": {
-          "content": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "document": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ]
           },
-          "contentType": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
-              }
-            ]
-          },
-          "version": {
+          "documentType": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ReferenceByIdModel"
@@ -36392,10 +36389,10 @@
             "type": "string",
             "format": "date-time"
           },
-          "currentPublishedVersion": {
+          "isCurrentPublishedVersion": {
             "type": "boolean"
           },
-          "currentDraftVersion": {
+          "isCurrentDraftVersion": {
             "type": "boolean"
           },
           "preventCleanup": {
