@@ -7,7 +7,7 @@ const tableCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
 	alias: UMB_COLLECTION_VIEW_USER_TABLE,
 	name: 'User Table Collection View',
-	js: () => import('./table/user-table-collection-view.element.js'),
+	element: () => import('./table/user-table-collection-view.element.js'),
 	meta: {
 		label: 'Table',
 		icon: 'icon-list',
@@ -26,8 +26,8 @@ export const UMB_COLLECTION_VIEW_USER_GRID = 'Umb.CollectionView.User.Grid';
 const gridCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
 	alias: UMB_COLLECTION_VIEW_USER_GRID,
-	name: 'User Table Collection View',
-	js: () => import('./grid/user-grid-collection-view.element.js'),
+	name: 'User Grid Collection View',
+	element: () => import('./grid/user-grid-collection-view.element.js'),
 	weight: 200,
 	meta: {
 		label: 'Grid',
