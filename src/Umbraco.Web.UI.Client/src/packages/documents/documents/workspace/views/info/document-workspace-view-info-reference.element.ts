@@ -73,7 +73,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 			return item.documentType.icon ?? 'icon-document';
 		}
 		if (isMediaReference(item)) {
-			return item.mediaType.icon ?? 'icon-media';
+			return item.mediaType.icon ?? 'icon-picture';
 		}
 		if (isDefaultReference(item)) {
 			return item.icon ?? 'icon-document';
@@ -135,7 +135,9 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 									</uui-table-cell>
 									<uui-table-cell class="link-cell">
 										${isDocumentReference(item)
-											? html` <uui-button label="Edit" href=${`${this._editDocumentPath}edit/${item.id}`}>
+											? html` <uui-button
+													label="${this.localize.term('general_edit')} ${item.name}"
+													href=${`${this._editDocumentPath}edit/${item.id}`}>
 													${item.name}
 												</uui-button>`
 											: item.name}

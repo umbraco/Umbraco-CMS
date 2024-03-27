@@ -62,7 +62,7 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 			return item.documentType.icon ?? 'icon-document';
 		}
 		if (isMediaReference(item)) {
-			return item.mediaType.icon ?? 'icon-media';
+			return item.mediaType.icon ?? 'icon-picture';
 		}
 		if (isDefaultReference(item)) {
 			return item.icon ?? 'icon-document';
