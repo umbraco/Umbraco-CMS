@@ -163,7 +163,7 @@ export const UmbFormControlMixin = <
 			const firstInvalid = this.#formCtrlElements.find((el) => el.validity.valid === false);
 			if (firstInvalid) {
 				if ('focusFirstInvalidElement' in firstInvalid) {
-					firstInvalid.focusFirstInvalidElement();
+					(firstInvalid as any).focusFirstInvalidElement();
 				} else {
 					firstInvalid.focus();
 				}
@@ -227,6 +227,11 @@ export const UmbFormControlMixin = <
 			element.addEventListener(UmbValidationValidEvent.TYPE, () => {
 				this._runValidators();
 			});
+			// If we are in validationMode/'touched'/not-pristine then we need to validate this newly added control. [NL]
+			if (this.pristine === false) {
+				// I thin we could just execute validators for the new control, but now lets just run al of it again. [NL]
+				this._runValidators();
+			}
 		}
 
 		/**
@@ -240,7 +245,7 @@ export const UmbFormControlMixin = <
 			//this._validityState = new UmbValidityState();
 			this.#validity = {};
 
-			// Loop through inner native form controls to adapt their validityState.
+			// Loop through inner native form controls to adapt their validityState. [NL]
 			this.#formCtrlElements.forEach((formCtrlEl) => {
 				let key: keyof ValidityState;
 				for (key in formCtrlEl.validity) {

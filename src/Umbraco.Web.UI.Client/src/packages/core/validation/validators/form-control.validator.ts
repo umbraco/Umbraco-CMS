@@ -11,6 +11,7 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 	#control: UmbFormControlMixinInterface<unknown, unknown>;
 	readonly controllerAlias: UmbControllerAlias;
 
+	#validationMode = false;
 	#isValid = false;
 
 	constructor(host: UmbControllerHost, formControl: UmbFormControlMixinInterface<unknown, unknown>) {
@@ -40,12 +41,18 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 	#setValid = this.#setIsValid.bind(this, true);
 
 	validate(): Promise<boolean> {
+		this.#validationMode = true;
 		this.#isValid = this.#control.checkValidity();
 		return Promise.resolve(this.#isValid);
 	}
 
+	/**
+	 * Resets the validation state of this validator.
+	 */
 	reset(): void {
+		this.#validationMode = false;
 		this.#isValid = false;
+		this.#control.pristine = true; // Make sure the control goes back into not-validation-mode/'untouched'/pristine state.
 	}
 
 	getMessages(): string[] {

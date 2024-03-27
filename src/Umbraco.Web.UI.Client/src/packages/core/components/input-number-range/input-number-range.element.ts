@@ -59,10 +59,6 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		return this.minValue || this.maxValue ? (this.minValue || '') + ',' + (this.maxValue || '') : '';
 	}
 
-	protected getFormElement() {
-		return undefined;
-	}
-
 	constructor() {
 		super();
 

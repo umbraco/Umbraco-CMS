@@ -5,6 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbValidationContext extends UmbContextBase<UmbValidationContext> implements UmbValidator {
 	#validators: Array<UmbValidator> = [];
+	#validationMode: boolean = false;
 	#isValid: boolean = false;
 	#preventFail: boolean = false;
 
@@ -43,6 +44,7 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validator succeeded, this depends on the validators and wether forceSucceed is set.
 	 */
 	async validate(): Promise<boolean> {
+		this.#validationMode = true;
 		const results = await Promise.all(this.#validators.map((v) => v.validate()));
 		const isValid = results.every((r) => r);
 		this.#isValid = isValid;
@@ -63,6 +65,7 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	}
 
 	reset(): void {
+		this.#validationMode = false;
 		this.#validators.forEach((v) => v.reset());
 	}
 
