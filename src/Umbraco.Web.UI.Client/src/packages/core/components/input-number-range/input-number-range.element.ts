@@ -1,5 +1,5 @@
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { html, customElement, property, state, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, type PropertyValueMap, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 function getNumberOrUndefined(value: string) {
@@ -93,7 +93,6 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	render() {
 		return html`<uui-input
 				type="number"
-				required
 				.value=${this._minValue}
 				@input=${this._onMinInput}
 				label=${this.minLabel}></uui-input>
@@ -105,6 +104,12 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				label=${this.maxLabel}
 				placeholder="&infin;"></uui-input>`;
 	}
+
+	static styles = css`
+		:host(:invalid) uui-input {
+			border-color: var(--uui-color-danger);
+		}
+	`;
 }
 
 export default UmbInputNumberRangeElement;
