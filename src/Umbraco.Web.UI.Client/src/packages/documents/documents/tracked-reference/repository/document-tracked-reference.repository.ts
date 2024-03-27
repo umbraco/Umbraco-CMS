@@ -10,29 +10,19 @@ export class UmbDocumentTrackedReferenceRepository extends UmbControllerBase {
 		this.#trackedReferenceSource = new UmbDocumentTrackedReferenceServerDataSource(this);
 	}
 
-	async requestTrackedReference(unique: string, skip = 0, take = 20, filterMustBeIsDependency = false) {
+	async requestTrackedReference(unique: string, skip = 0, take = 20) {
 		if (!unique) throw new Error(`unique is required`);
-		return this.#trackedReferenceSource.getTrackedReferenceById(unique, skip, take, filterMustBeIsDependency);
+		return this.#trackedReferenceSource.getTrackedReferenceById(unique, skip, take);
 	}
 
-	async requestTrackedReferenceDescendantsFromParentUnique(
-		parentUnique: string,
-		skip = 0,
-		take = 20,
-		filterMustBeIsDependency = false,
-	) {
+	async requestTrackedReferenceDescendantsFromParentUnique(parentUnique: string, skip = 0, take = 20) {
 		if (!parentUnique) throw new Error(`unique is required`);
-		return this.#trackedReferenceSource.getTrackedReferenceDescendantsByParentId(
-			parentUnique,
-			skip,
-			take,
-			filterMustBeIsDependency,
-		);
+		return this.#trackedReferenceSource.getTrackedReferenceDescendantsByParentId(parentUnique, skip, take);
 	}
 
-	async requestTrackedReferenceItems(uniques: string[], skip = 0, take = 20, filterMustBeIsDependency = true) {
+	async requestTrackedReferenceItems(uniques: string[], skip = 0, take = 20) {
 		if (!uniques) throw new Error(`unique is required`);
-		return this.#trackedReferenceSource.getTrackedReferenceItem(uniques, skip, take, filterMustBeIsDependency);
+		return this.#trackedReferenceSource.getTrackedReferenceItem(uniques, skip, take);
 	}
 }
 

@@ -1,8 +1,14 @@
 import { UmbDocumentTrackedReferenceRepository } from '../repository/index.js';
-import type { RelationItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	DefaultReferenceResponseModel,
+	DocumentReferenceResponseModel,
+	MediaReferenceResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+
+type UmbReferenceModel = DefaultReferenceResponseModel | DocumentReferenceResponseModel | MediaReferenceResponseModel;
 
 @customElement('umb-document-tracked-reference-table')
 export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
@@ -13,7 +19,7 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 	unique = '';
 
 	@state()
-	_items: Array<RelationItemResponseModel> = [];
+	_items: Array<UmbReferenceModel> = [];
 
 	/**
 	 * Indicates if there are more references to load, i.e. if the server has more references to return.
@@ -52,6 +58,44 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 		return html` ${this.#renderErrorMessage()} ${this.#renderTable()} `;
 	}
 
+	#isDocumentReference(item: UmbReferenceModel): item is DocumentReferenceResponseModel {
+		return typeof (item as DocumentReferenceResponseModel).documentType !== 'undefined';
+	}
+
+	#isMediaReference(item: UmbReferenceModel): item is MediaReferenceResponseModel {
+		return typeof (item as MediaReferenceResponseModel).mediaType !== 'undefined';
+	}
+
+	#isDefaultReference(item: UmbReferenceModel): item is DefaultReferenceResponseModel {
+		return typeof (item as DefaultReferenceResponseModel).type !== 'undefined';
+	}
+
+	#getIcon(item: UmbReferenceModel) {
+		if (this.#isDocumentReference(item)) {
+			return item.documentType.icon ?? 'icon-document';
+		}
+		if (this.#isMediaReference(item)) {
+			return item.mediaType.icon ?? 'icon-media';
+		}
+		if (this.#isDefaultReference(item)) {
+			return item.icon ?? 'icon-document';
+		}
+		return 'icon-document';
+	}
+
+	#getContentTypeName(item: UmbReferenceModel) {
+		if (this.#isDocumentReference(item)) {
+			return item.documentType.name;
+		}
+		if (this.#isMediaReference(item)) {
+			return item.mediaType.name;
+		}
+		if (this.#isDefaultReference(item)) {
+			return item.type;
+		}
+		return '';
+	}
+
 	#renderTable() {
 		if (this._items?.length === 0) return nothing;
 		return html`
@@ -65,14 +109,14 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 
 					${repeat(
 						this._items,
-						(item) => item.nodeId,
+						(item) => item.id,
 						(item) =>
 							html`<uui-table-row>
-								<uui-table-cell style="text-align:center; vertical-align:revert;">
-									<umb-icon name=${item.contentTypeIcon ?? 'icon-document'}></umb-icon>
+								<uui-table-cell style="text-align:center;">
+									<umb-icon name=${this.#getIcon(item)}></umb-icon>
 								</uui-table-cell>
-								<uui-table-cell class="link-cell"> ${item.nodeName} </uui-table-cell>
-								<uui-table-cell>${item.contentTypeName}</uui-table-cell>
+								<uui-table-cell class="link-cell"> ${item.name} </uui-table-cell>
+								<uui-table-cell>${this.#getContentTypeName(item)}</uui-table-cell>
 							</uui-table-row>`,
 					)}
 					${this._hasMoreReferences

@@ -1,4 +1,4 @@
-import { TrackedReferenceResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -25,11 +25,8 @@ export class UmbDocumentTrackedReferenceServerDataSource {
 	 * @return {*}
 	 * @memberof UmbDataTypeItemServerDataSource
 	 */
-	async getTrackedReferenceById(id: string, skip = 0, take = 20, filterMustBeIsDependency = false) {
-		return await tryExecuteAndNotify(
-			this.#host,
-			TrackedReferenceResource.getTrackedReferenceById({ id, skip, take, filterMustBeIsDependency }),
-		);
+	async getTrackedReferenceById(id: string, skip = 0, take = 20) {
+		return await tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdReferencedBy({ id, skip, take }));
 	}
 
 	/**
@@ -38,19 +35,13 @@ export class UmbDocumentTrackedReferenceServerDataSource {
 	 * @return {*}
 	 * @memberof UmbDocumentTrackedReferenceServerDataSource
 	 */
-	async getTrackedReferenceDescendantsByParentId(
-		parentId: string,
-		skip = 0,
-		take = 20,
-		filterMustBeIsDependency = false,
-	) {
+	async getTrackedReferenceDescendantsByParentId(parentId: string, skip = 0, take = 20) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			TrackedReferenceResource.getTrackedReferenceDescendantsByParentId({
-				parentId,
+			DocumentResource.getDocumentByIdReferencedDescendants({
+				id: parentId,
 				skip,
 				take,
-				filterMustBeIsDependency,
 			}),
 		);
 	}
@@ -61,14 +52,13 @@ export class UmbDocumentTrackedReferenceServerDataSource {
 	 * @return {*}
 	 * @memberof UmbDocumentTrackedReferenceServerDataSource
 	 */
-	async getTrackedReferenceItem(id: string[], skip = 0, take = 20, filterMustBeIsDependency = true) {
+	async getTrackedReferenceItem(id: string[], skip = 0, take = 20) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			TrackedReferenceResource.getTrackedReferenceItem({
+			DocumentResource.getDocumentAreReferenced({
 				id,
 				skip,
 				take,
-				filterMustBeIsDependency,
 			}),
 		);
 	}
