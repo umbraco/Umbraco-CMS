@@ -32,13 +32,13 @@ export const items: Array<
 		name: 'Simple Media',
 		mediaType: {
 			alias: 'image',
-			icon: 'icon-media',
+			icon: 'icon-picture',
 			name: 'Image',
 		},
 	} satisfies MediaReferenceResponseModel,
 	{
 		id: 'default-id',
-		name: 'Default Reference',
+		name: 'Some other reference',
 		type: 'Default',
 		icon: 'icon-bug',
 	} satisfies DefaultReferenceResponseModel,

@@ -29,6 +29,18 @@ export const detailHandlers = [
 		return res(ctx.status(200), ctx.json(umbDocumentMockDb.getConfiguration()));
 	}),
 
+	rest.get(umbracoPath(`${UMB_SLUG}/:id/referenced-by`), (_req, res, ctx) => {
+		const id = _req.params.id as string;
+		if (!id) return;
+
+		const PagedTrackedReference = {
+			total: referenceData.length,
+			items: referenceData,
+		};
+
+		return res(ctx.status(200), ctx.json<PagedIReferenceResponseModel>(PagedTrackedReference));
+	}),
+
 	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
@@ -50,17 +62,5 @@ export const detailHandlers = [
 		if (!id) return res(ctx.status(400));
 		umbDocumentMockDb.detail.delete(id);
 		return res(ctx.status(200));
-	}),
-
-	rest.get(umbracoPath(`${UMB_SLUG}/:id/referenced-by`), (_req, res, ctx) => {
-		const id = _req.params.id as string;
-		if (!id) return;
-
-		const PagedTrackedReference = {
-			total: referenceData.length,
-			items: referenceData,
-		};
-
-		return res(ctx.status(200), ctx.json<PagedIReferenceResponseModel>(PagedTrackedReference));
 	}),
 ];
