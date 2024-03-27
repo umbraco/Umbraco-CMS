@@ -31,6 +31,7 @@ internal sealed class ContentBlueprintEditingService
         return await Task.FromResult(blueprint);
     }
 
+    // NB: Some of the implementation is copied from <see cref="IContentEditingService.CreateAsync()" />
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentBlueprintCreateModel createModel, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)
@@ -57,7 +58,8 @@ internal sealed class ContentBlueprintEditingService
         return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentCreateResult { Content = blueprint, ValidationResult = result.Result.ValidationResult });
     }
 
-    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateFromContentAsync(Guid contentKey, string name, Guid userKey)
+    // NB: Some of the implementation is copied from <see cref="IContentEditingService.CreateAsync()" />
+    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateFromContentAsync(Guid contentKey, string name, Guid? key, Guid userKey)
     {
         IContent? content = ContentService.GetById(contentKey);
         if (content is null)
