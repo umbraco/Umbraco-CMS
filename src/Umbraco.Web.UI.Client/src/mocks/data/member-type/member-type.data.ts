@@ -24,6 +24,8 @@ export const data: Array<UmbMockMemberTypeModel> = [
 				alias: 'prop1',
 				name: 'Prop 1',
 				description: null,
+				isSensitive: false,
+				visibility: { memberCanEdit: true, memberCanView: true },
 				dataType: { id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae' },
 				variesByCulture: false,
 				variesBySegment: false,
