@@ -52,7 +52,11 @@ public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintCo
         }
 
         Attempt<ContentCreateResult, ContentEditingOperationStatus> result =
-            await _contentBlueprintEditingService.CreateFromContentAsync(fromDocumentRequestModel.Document.Id, fromDocumentRequestModel.Name, CurrentUserKey(_backOfficeSecurityAccessor));
+            await _contentBlueprintEditingService.CreateFromContentAsync(
+                fromDocumentRequestModel.Document.Id,
+                fromDocumentRequestModel.Name,
+                fromDocumentRequestModel.Id,
+                CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? CreatedAtId<ByKeyDocumentBlueprintController>(controller => nameof(controller.ByKey), result.Result.Content!.Key)
