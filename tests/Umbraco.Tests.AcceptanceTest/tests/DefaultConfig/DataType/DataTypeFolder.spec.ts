@@ -19,10 +19,7 @@ test.describe('Data Types Folder tests', () => {
   test('can create a data type folder', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.dataType.clickActionsMenuAtRoot();
-    await umbracoUi.dataType.clickCreateThreeDotsButton();
-    await umbracoUi.dataType.clickNewDataTypeFolderButton();
-    await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
-    await umbracoUi.dataType.clickCreateFolderButton();
+    await umbracoUi.dataType.createFolder(dataTypeFolderName);
 
     // Assert
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
@@ -90,10 +87,7 @@ test.describe('Data Types Folder tests', () => {
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
-    await umbracoUi.dataType.clickCreateThreeDotsButton();
-    await umbracoUi.dataType.clickNewDataTypeFolderButton();
-    await umbracoUi.dataType.enterFolderName(childFolderName);
-    await umbracoUi.dataType.clickCreateFolderButton();
+    await umbracoUi.dataType.createFolder(childFolderName);
 
     // Assert
     expect(await umbracoApi.dataType.doesNameExist(childFolderName)).toBeTruthy();
