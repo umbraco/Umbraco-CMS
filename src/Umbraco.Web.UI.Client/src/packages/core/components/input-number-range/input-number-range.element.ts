@@ -1,6 +1,7 @@
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { html, customElement, property, state, type PropertyValueMap, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 function getNumberOrUndefined(value: string) {
 	const num = parseInt(value, 10);
@@ -68,25 +69,30 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				return 'The low value must be less than the high value';
 			},
 			() => {
-				return this._minValue !== undefined && this._maxValue !== undefined && this._minValue > this._maxValue;
+				console.log(this._minValue, this._maxValue);
+				return this._minValue !== undefined && this._maxValue !== undefined ? this._minValue > this._maxValue : false;
 			},
 		);
 	}
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
-		this.shadowRoot
-			?.querySelectorAll('uui-input')
-			.forEach((x) => this.addFormControlElement(x as unknown as HTMLInputElement));
+		this.shadowRoot?.querySelectorAll<UUIInputElement>('uui-input').forEach((x) => this.addFormControlElement(x));
+	}
+
+	focus() {
+		return this.shadowRoot?.querySelector<UUIInputElement>('uui-input')?.focus();
 	}
 
 	private _onMinInput(e: InputEvent) {
-		this.minValue = Number((e.target as HTMLInputElement).value);
+		const value = Number((e.target as HTMLInputElement).value);
+		this.minValue = value ? Number(value) : undefined;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
 	}
 
 	private _onMaxInput(e: InputEvent) {
-		this.maxValue = Number((e.target as HTMLInputElement).value);
+		const value = (e.target as HTMLInputElement).value;
+		this.maxValue = value ? Number(value) : undefined;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
 	}
 

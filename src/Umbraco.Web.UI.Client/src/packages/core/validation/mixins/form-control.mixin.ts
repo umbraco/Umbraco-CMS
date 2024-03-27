@@ -32,7 +32,7 @@ interface Validator {
 
 export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> extends HTMLElement {
 	//static formAssociated: boolean;
-	getFormElement(): HTMLElement | undefined;
+	getFormElement(): HTMLElement | undefined | null; // allows for null as it makes it simpler to just implement a querySelector as that might return null. [NL]
 	focusFirstInvalidElement(): void;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
@@ -59,7 +59,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 	protected addFormControlElement(element: UmbNativeFormControlElement): void;
 
 	//static formAssociated: boolean;
-	getFormElement(): HTMLElement | undefined;
+	getFormElement(): HTMLElement | undefined | null;
 	focusFirstInvalidElement(): void;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
@@ -148,9 +148,9 @@ export const UmbFormControlMixin = <
 		 * Get internal form element.
 		 * This has to be implemented to provide a FormControl Element of choice for the given context. The element is used as anchor for validation-messages.
 		 * @method getFormElement
-		 * @returns {HTMLElement | undefined}
+		 * @returns {HTMLElement | undefined | null}
 		 */
-		getFormElement(): HTMLElement | undefined {
+		getFormElement(): HTMLElement | undefined | null {
 			return this.#formCtrlElements.find((el) => el.validity.valid === false);
 		}
 
@@ -260,7 +260,7 @@ export const UmbFormControlMixin = <
 			this.#validators.forEach((validator) => {
 				if (validator.checkMethod()) {
 					this.#validity[validator.flagKey] = true;
-					this._internals.setValidity(this.#validity, validator.getMessageMethod(), this.getFormElement());
+					this._internals.setValidity(this.#validity, validator.getMessageMethod(), this.getFormElement() ?? undefined);
 				}
 			});
 
