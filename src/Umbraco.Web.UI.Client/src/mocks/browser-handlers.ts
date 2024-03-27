@@ -35,7 +35,6 @@ import { handlers as trackedReferenceHandlers } from './handlers/tracked-referen
 import { handlers as upgradeHandlers } from './handlers/upgrade.handlers.js';
 import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as userHandlers } from './handlers/user/index.js';
-import { relationHandlers, relationTypeHandlers } from './handlers/relations/index.js';
 import * as manifestsHandlers from './handlers/manifests.handlers.js';
 import * as serverHandlers from './handlers/server.handlers.js';
 
@@ -66,8 +65,6 @@ const handlers = [
 	...profilingHandlers,
 	...publishedStatusHandlers,
 	...redirectManagementHandlers,
-	...relationHandlers,
-	...relationTypeHandlers,
 	...rteEmbedHandlers,
 	...scriptHandlers,
 	...staticFileHandlers,

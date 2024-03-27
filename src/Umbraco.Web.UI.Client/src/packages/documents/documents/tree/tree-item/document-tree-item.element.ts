@@ -45,6 +45,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		return this.item?.variants.find((x) => x.culture === culture);
 	}
 
+	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
 	#getLabel() {
 		const fallbackName = this.#getVariant(this._defaultCulture)?.name ?? this._item?.variants[0].name ?? 'Unknown';
 		return this._variant?.name ?? `(${fallbackName})`;

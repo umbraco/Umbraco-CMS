@@ -1,1 +1,1 @@
-export * from './relation-type.repository.js';
+export * from './detail/index.js';

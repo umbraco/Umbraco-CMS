@@ -61,7 +61,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 
 		const requestBody = {
 			id: args.unique,
-			parentId: args.parentUnique ? { id: args.parentUnique } : null,
+			parent: args.parentUnique ? { id: args.parentUnique } : null,
 			name: args.name,
 		};
 

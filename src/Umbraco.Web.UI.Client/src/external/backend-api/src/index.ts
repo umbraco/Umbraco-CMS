@@ -69,7 +69,6 @@ export type { CreateMemberTypeRequestModel } from './models/CreateMemberTypeRequ
 export type { CreatePackageRequestModel } from './models/CreatePackageRequestModel';
 export type { CreatePartialViewFolderRequestModel } from './models/CreatePartialViewFolderRequestModel';
 export type { CreatePartialViewRequestModel } from './models/CreatePartialViewRequestModel';
-export type { CreateRelationTypeRequestModel } from './models/CreateRelationTypeRequestModel';
 export type { CreateScriptFolderRequestModel } from './models/CreateScriptFolderRequestModel';
 export type { CreateScriptRequestModel } from './models/CreateScriptRequestModel';
 export type { CreateStylesheetFolderRequestModel } from './models/CreateStylesheetFolderRequestModel';
@@ -285,7 +284,7 @@ export type { PagedProblemDetailsModel } from './models/PagedProblemDetailsModel
 export type { PagedRedirectUrlResponseModel } from './models/PagedRedirectUrlResponseModel';
 export type { PagedRelationItemResponseModel } from './models/PagedRelationItemResponseModel';
 export type { PagedRelationResponseModel } from './models/PagedRelationResponseModel';
-export type { PagedRelationTypeTreeItemResponseModel } from './models/PagedRelationTypeTreeItemResponseModel';
+export type { PagedRelationTypeResponseModel } from './models/PagedRelationTypeResponseModel';
 export type { PagedSavedLogSearchResponseModel } from './models/PagedSavedLogSearchResponseModel';
 export type { PagedSearcherResponseModel } from './models/PagedSearcherResponseModel';
 export type { PagedSearchResultResponseModel } from './models/PagedSearchResultResponseModel';
@@ -319,6 +318,7 @@ export type { RedirectUrlResponseModel } from './models/RedirectUrlResponseModel
 export type { RedirectUrlStatusResponseModel } from './models/RedirectUrlStatusResponseModel';
 export type { ReferenceByIdModel } from './models/ReferenceByIdModel';
 export type { RelationItemResponseModel } from './models/RelationItemResponseModel';
+export type { RelationReferenceModel } from './models/RelationReferenceModel';
 export type { RelationResponseModel } from './models/RelationResponseModel';
 export type { RelationTypeBaseModel } from './models/RelationTypeBaseModel';
 export type { RelationTypeItemResponseModel } from './models/RelationTypeItemResponseModel';
@@ -409,7 +409,6 @@ export type { UpdateMemberTypePropertyTypeRequestModel } from './models/UpdateMe
 export type { UpdateMemberTypeRequestModel } from './models/UpdateMemberTypeRequestModel';
 export type { UpdatePackageRequestModel } from './models/UpdatePackageRequestModel';
 export type { UpdatePartialViewRequestModel } from './models/UpdatePartialViewRequestModel';
-export type { UpdateRelationTypeRequestModel } from './models/UpdateRelationTypeRequestModel';
 export type { UpdateScriptRequestModel } from './models/UpdateScriptRequestModel';
 export type { UpdateStylesheetRequestModel } from './models/UpdateStylesheetRequestModel';
 export type { UpdateTemplateRequestModel } from './models/UpdateTemplateRequestModel';

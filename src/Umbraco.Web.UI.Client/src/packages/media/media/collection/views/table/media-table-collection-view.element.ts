@@ -218,11 +218,6 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				padding: var(--uui-size-space-3) var(--uui-size-space-6);
 			}
 
-			/* TODO: Should we have embedded padding in the table component? */
-			umb-table {
-				padding: 0; /* To fix the embedded padding in the table component. */
-			}
-
 			.container {
 				display: flex;
 				justify-content: center;

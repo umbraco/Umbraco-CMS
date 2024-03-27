@@ -11,6 +11,7 @@ import type { DocumentTypeCompositionResponseModel } from '../models/DocumentTyp
 import type { DocumentTypeConfigurationResponseModel } from '../models/DocumentTypeConfigurationResponseModel';
 import type { DocumentTypeItemResponseModel } from '../models/DocumentTypeItemResponseModel';
 import type { DocumentTypeResponseModel } from '../models/DocumentTypeResponseModel';
+import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
 import type { FolderResponseModel } from '../models/FolderResponseModel';
 import type { MoveDocumentTypeRequestModel } from '../models/MoveDocumentTypeRequestModel';
 import type { PagedAllowedDocumentTypeModel } from '../models/PagedAllowedDocumentTypeModel';
@@ -398,6 +399,27 @@ export class DocumentTypeResource {
             url: '/umbraco/management/api/v1/item/document-type',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreeDocumentTypeAncestors({
+        descendantId,
+    }: {
+        descendantId?: string,
+    }): CancelablePromise<Array<DocumentTypeTreeItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/document-type/ancestors',
+            query: {
+                'descendantId': descendantId,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,

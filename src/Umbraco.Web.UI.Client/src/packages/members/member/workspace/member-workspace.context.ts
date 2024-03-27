@@ -46,7 +46,6 @@ export class UmbMemberWorkspaceContext
 
 	readonly data = this.#currentData.asObservable();
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
-	readonly name = this.#currentData.asObservablePart((data) => data?.variants[0].name);
 	readonly createDate = this.#currentData.asObservablePart((data) => data?.variants[0].createDate);
 	readonly updateDate = this.#currentData.asObservablePart((data) => data?.variants[0].updateDate);
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.memberType.unique);
@@ -228,6 +227,10 @@ export class UmbMemberWorkspaceContext
 		*/
 		// TODO: We should move this type of logic to the act of saving [NL]
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
+	}
+
+	name(variantId?: UmbVariantId) {
+		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '');
 	}
 
 	async propertyStructureById(propertyId: string) {

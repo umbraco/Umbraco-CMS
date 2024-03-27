@@ -29,6 +29,8 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	#isNew = new UmbBooleanState(undefined);
 	isNew = this.#isNew.asObservable();
 
+	abstract readonly unique: Observable<string | null | undefined>;
+
 	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	/*

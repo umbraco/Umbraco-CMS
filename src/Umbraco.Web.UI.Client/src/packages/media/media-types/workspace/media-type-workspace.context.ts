@@ -31,7 +31,9 @@ export class UmbMediaTypeWorkspaceContext
 	public readonly repository: UmbMediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 	// Draft is located in structure manager
 
-	#parent?: { entityType: string; unique: string | null };
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
@@ -160,7 +162,7 @@ export class UmbMediaTypeWorkspaceContext
 
 	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		const { data } = await this.structure.createScaffold();
 		if (!data) return undefined;
 
@@ -201,13 +203,14 @@ export class UmbMediaTypeWorkspaceContext
 		}
 
 		if (this.getIsNew()) {
-			if (!this.#parent) throw new Error('Parent is not set');
-			if ((await this.structure.create(this.#parent.unique)) === true) {
-				if (!this.#parent) throw new Error('Parent is not set');
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
+			if ((await this.structure.create(parent.unique)) === true) {
+				if (!parent) throw new Error('Parent is not set');
 				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-					entityType: this.#parent.entityType,
-					unique: this.#parent.unique,
+					entityType: parent.entityType,
+					unique: parent.unique,
 				});
 				eventContext.dispatchEvent(event);
 				this.setIsNew(false);

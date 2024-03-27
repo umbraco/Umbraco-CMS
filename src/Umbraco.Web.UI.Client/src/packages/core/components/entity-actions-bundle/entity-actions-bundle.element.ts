@@ -46,15 +46,14 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	#observeEntityActions() {
 		this.observe(
-			umbExtensionsRegistry.byType('entityAction'),
-			async (manifests) => {
-				const actions = manifests.filter((manifest) => manifest.forEntityTypes.includes(this.entityType!));
+			umbExtensionsRegistry.byTypeAndFilter('entityAction', (ext) => ext.forEntityTypes.includes(this.entityType!)),
+			async (actions) => {
 				this._numberOfActions = actions.length;
 				this._firstActionManifest =
 					this._numberOfActions > 0 ? (actions[0] as ManifestEntityActionDefaultKind) : undefined;
 				if (!this._firstActionManifest) return;
 				this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
-					{ unique: this.unique, entityType: this.entityType },
+					{ unique: this.unique, entityType: this.entityType, meta: this._firstActionManifest.meta },
 				]);
 			},
 			'umbEntityActionsObserver',
