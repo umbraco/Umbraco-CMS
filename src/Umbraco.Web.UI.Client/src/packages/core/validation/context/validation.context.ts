@@ -60,6 +60,13 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 		return this.#preventFail ? true : isValid;
 	}
 
+	focusFirstInvalidElement(): void {
+		const firstInvalid = this.#validators.find((v) => !v.isValid);
+		if (firstInvalid) {
+			firstInvalid.focusFirstInvalidElement();
+		}
+	}
+
 	getMessages(): string[] {
 		return this.#validators.reduce((acc, v) => acc.concat(v.getMessages()), [] as string[]);
 	}
