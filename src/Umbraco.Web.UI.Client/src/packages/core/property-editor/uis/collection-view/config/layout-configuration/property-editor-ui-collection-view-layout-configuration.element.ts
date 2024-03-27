@@ -1,18 +1,28 @@
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, repeat, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import {
+	html,
+	customElement,
+	property,
+	repeat,
+	css,
+	ifDefined,
+	nothing,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
-import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbInputManifestElement } from '@umbraco-cms/backoffice/components';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
-interface LayoutConfig {
+interface UmbCollectionLayoutConfig {
 	icon?: string;
-	isSystem?: boolean;
 	name?: string;
-	path?: string;
+	collectionView?: string;
+	isSystem?: boolean;
 	selected?: boolean;
 }
 
@@ -24,14 +34,41 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+	// TODO: [LK] Add sorting.
+
 	@property({ type: Array })
-	value?: Array<LayoutConfig>;
+	value?: Array<UmbCollectionLayoutConfig>;
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	#onAdd() {
-		this.value = [...(this.value ?? []), { isSystem: false, icon: 'icon-stop', selected: true }];
+	async #focusNewItem() {
+		await this.updateComplete;
+		const input = this.shadowRoot?.querySelector('.layout-item:last-of-type > uui-input') as UUIInputElement;
+		input.focus();
+	}
+
+	#onAdd(event: { target: UmbInputManifestElement }) {
+		const manifest = event.target.value;
+
+		this.value = [
+			...(this.value ?? []),
+			{
+				icon: manifest?.icon,
+				name: manifest?.label,
+				collectionView: manifest?.value,
+			},
+		];
+
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+
+		this.#focusNewItem();
+	}
+
+	#onChangeLabel(e: UUIInputEvent, index: number) {
+		const values = [...(this.value ?? [])];
+		values[index] = { ...values[index], name: e.target.value as string };
+		this.value = values;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -42,34 +79,9 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	#onChangePath(e: UUIInputEvent, index: number) {
-		const values = [...(this.value ?? [])];
-		values[index] = { ...values[index], path: e.target.value as string };
-		this.value = values;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	}
-
-	#onChangeName(e: UUIInputEvent, index: number) {
-		const values = [...(this.value ?? [])];
-		values[index] = { ...values[index], name: e.target.value as string };
-		this.value = values;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	}
-
-	#onChangeSelected(e: UUIBooleanInputEvent, index: number) {
-		const values = [...(this.value ?? [])];
-		values[index] = { ...values[index], selected: e.target.checked };
-		this.value = values;
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-	}
-
-	async #onIconChange(index: number) {
-		// This is not begin used? [NL]
-		//const icon = this.#iconReader((this.value ? this.value[index].icon : undefined) ?? '');
-
-		// TODO: send icon data to modal
+	async #onIconChange(icon: typeof UMB_ICON_PICKER_MODAL.VALUE, index: number) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this, UMB_ICON_PICKER_MODAL);
+		const modal = modalManager.open(this, UMB_ICON_PICKER_MODAL, { value: icon });
 		const picked = await modal?.onSubmit();
 		if (!picked) return;
 
@@ -79,81 +91,59 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
+	#parseIcon(iconString: string | undefined): typeof UMB_ICON_PICKER_MODAL.VALUE {
+		const [icon, color] = iconString?.split(' ') ?? [];
+		return { icon, color: color?.replace('color-', '') };
+	}
+
 	render() {
-		return html`<div id="layout-wrapper">
-				${this.value
-					? repeat(
-							this.value,
-							(layout, index) => '' + layout.name + layout.icon,
-							(layout, index) =>
-								html` <div class="layout-item">
-									<uui-icon name="icon-navigation"></uui-icon> ${layout.isSystem
-										? this.renderSystemFieldRow(layout, index)
-										: this.renderCustomFieldRow(layout, index)}
-								</div>`,
-					  )
-					: ''}
+		if (!this.value) return nothing;
+		return html`
+			<div id="layout-wrapper">
+				${repeat(
+					this.value,
+					(layout, index) => '' + index + layout.name + layout.icon,
+					(layout, index) => this.#renderLayout(layout, index),
+				)}
 			</div>
-			<uui-button
-				id="add"
-				label=${this.localize.term('general_add')}
-				look="placeholder"
-				@click=${this.#onAdd}></uui-button>`;
+			<umb-input-manifest extension-type="collectionView" @change=${this.#onAdd}></umb-input-manifest>
+		`;
 	}
 
-	#iconReader(iconString: string): { icon: string; color?: string } {
-		if (!iconString) return { icon: '' };
+	#renderLayout(layout: UmbCollectionLayoutConfig, index: number) {
+		const icon = this.#parseIcon(layout.icon);
+		const varName = icon.color ? extractUmbColorVariable(icon.color) : undefined;
 
-		const parts = iconString.split(' ');
+		return html`
+			<div class="layout-item">
+				<uui-icon name="icon-navigation"></uui-icon>
 
-		if (parts.length === 2) {
-			const [icon, color] = parts;
-			const varName = extractUmbColorVariable(color.replace('color-', ''));
-			return { icon, color: varName };
-		} else {
-			const [icon] = parts;
-			return { icon };
-		}
-	}
+				<uui-button compact look="outline" label="pick icon" @click=${() => this.#onIconChange(icon, index)}>
+					${when(
+						icon.color,
+						() => html`<uui-icon name=${ifDefined(icon.icon)} style="color:var(${varName})"></uui-icon>`,
+						() => html`<uui-icon name=${ifDefined(icon.icon)}></uui-icon>`,
+					)}
+				</uui-button>
 
-	renderSystemFieldRow(layout: LayoutConfig, index: number) {
-		const icon = this.#iconReader(layout.icon ?? '');
+				<uui-input
+					label="name"
+					value=${ifDefined(layout.name)}
+					placeholder="Enter a label..."
+					@change=${(e: UUIInputEvent) => this.#onChangeLabel(e, index)}></uui-input>
 
-		return html` <uui-button compact disabled label="Icon" look="outline">
-				<uui-icon name=${ifDefined(icon.icon)}></uui-icon>
-			</uui-button>
-			${index}
-			<span><strong>${ifDefined(layout.name)}</strong> <small>(system field)</small></span>
-			<uui-checkbox
-				?checked=${layout.selected}
-				label="Show"
-				@change=${(e: UUIBooleanInputEvent) => this.#onChangeSelected(e, index)}>
-			</uui-checkbox>`;
-	}
+				<div class="alias">
+					<code>${layout.collectionView}</code>
+				</div>
 
-	renderCustomFieldRow(layout: LayoutConfig, index: number) {
-		const icon = this.#iconReader(layout.icon ?? '');
-
-		return html`<uui-button compact look="outline" label="pick icon" @click=${() => this.#onIconChange(index)}>
-				${icon.color
-					? html`<uui-icon name=${icon.icon} style="color:var(${icon.color})"></uui-icon>`
-					: html`<uui-icon name=${icon.icon}></uui-icon>`}
-			</uui-button>
-			${index}
-			<uui-input
-				label="name"
-				value=${ifDefined(layout.name)}
-				placeholder="Name..."
-				@change=${(e: UUIInputEvent) => this.#onChangeName(e, index)}></uui-input>
-			<uui-input
-				label="path"
-				value=${ifDefined(layout.path)}
-				placeholder="Layout path..."
-				@change=${(e: UUIInputEvent) => this.#onChangePath(e, index)}></uui-input>
-			<uui-button
-				label=${this.localize.term('actions_remove')}
-				look="secondary"
-				@click=${() => this.#onRemove(index)}></uui-button>`;
+				<div class="actions">
+					<uui-button
+						label=${this.localize.term('general_remove')}
+						look="secondary"
+						@click=${() => this.#onRemove(index)}></uui-button>
+				</div>
+			</div>
+		`;
 	}
 
 	static styles = [
@@ -163,7 +153,7 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 				display: flex;
 				flex-direction: column;
 				gap: 1px;
-				margin-bottom: var(--uui-size-3);
+				margin-bottom: var(--uui-size-1);
 			}
 
 			.layout-item {
@@ -174,12 +164,23 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 				padding: var(--uui-size-3) var(--uui-size-6);
 			}
 
-			.layout-item > :last-child {
-				margin-left: auto;
+			.layout-item > uui-icon {
+				flex: 0 0 var(--uui-size-6);
 			}
 
-			#add {
-				width: 100%;
+			.layout-item > uui-button {
+				flex: 0 0 var(--uui-size-10);
+			}
+
+			.layout-item > uui-input,
+			.layout-item > .alias {
+				flex: 1;
+			}
+
+			.layout-item > .actions {
+				flex: 0 0 auto;
+				display: flex;
+				justify-content: flex-end;
 			}
 		`,
 	];

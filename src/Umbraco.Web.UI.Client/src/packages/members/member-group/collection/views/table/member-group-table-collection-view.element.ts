@@ -70,10 +70,6 @@ export class UmbMemberGroupTableCollectionViewElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 			}
-
-			umb-table {
-				padding: 0;
-			}
 		`,
 	];
 }

@@ -3,11 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+import type { RelationReferenceModel } from './RelationReferenceModel';
+
 export type RelationResponseModel = {
-    parentId: string;
-    parentName?: string | null;
-    childId: string;
-    childName?: string | null;
+    id: string;
+    relationType: ReferenceByIdModel;
+    parent: RelationReferenceModel;
+    child: RelationReferenceModel;
     createDate: string;
     comment?: string | null;
 };
