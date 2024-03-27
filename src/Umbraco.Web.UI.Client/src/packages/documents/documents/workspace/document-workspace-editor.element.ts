@@ -98,8 +98,14 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			routes.push({
 				path: '',
 				resolve: () => {
-					// Retrieve the current app language variant id from the context and redirect to the correct route.
-					history.pushState({}, '', `${this.#workspaceRoute}/${this.#appCulture}/${this.#variants![0].unique}`);
+					const route = routes.find((route) => route.path === this.#appCulture);
+
+					if (!route) {
+						history.pushState({}, '', `${this.#workspaceRoute}/${routes[routes.length - 2].path}`);
+						return;
+					}
+
+					history.pushState({}, '', `${this.#workspaceRoute}/${route?.path}`);
 				},
 			});
 		}
