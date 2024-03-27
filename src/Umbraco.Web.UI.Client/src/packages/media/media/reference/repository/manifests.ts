@@ -6,7 +6,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_MEDIA_TRACKED_REFERENCE_REPOSITORY_ALIAS,
 	name: 'Media Tracked Reference Repository',
-	api: () => import('./media-tracked-reference.repository.js'),
+	api: () => import('./media-reference.repository.js'),
 };
 
 export const manifests = [repository];

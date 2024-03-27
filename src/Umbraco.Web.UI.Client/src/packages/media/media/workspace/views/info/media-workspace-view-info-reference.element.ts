@@ -2,7 +2,7 @@ import { css, html, customElement, state, nothing, repeat, property } from '@umb
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbMediaTrackedReferenceRepository } from '@umbraco-cms/backoffice/media';
+import { UmbMediaReferenceRepository } from '@umbraco-cms/backoffice/media';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import {
 	isDefaultReference,
@@ -33,7 +33,7 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.#trackedReferenceRepository = new UmbMediaTrackedReferenceRepository(this);
+		this.#trackedReferenceRepository = new UmbMediaReferenceRepository(this);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('media')
@@ -50,7 +50,7 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	}
 
 	async #getReferences() {
-		const { data } = await this.#trackedReferenceRepository.requestTrackedReference(
+		const { data } = await this.#trackedReferenceRepository.requestReference(
 			this.mediaUnique,
 			this._currentPage - 1 * this.#itemsPerPage,
 			this.#itemsPerPage,
