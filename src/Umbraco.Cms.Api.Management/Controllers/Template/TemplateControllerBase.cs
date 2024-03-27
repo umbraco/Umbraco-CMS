@@ -30,6 +30,10 @@ public class TemplateControllerBase : ManagementApiControllerBase
                 .WithTitle("Duplicate alias")
                 .WithDetail("A template with that alias already exists.")
                 .Build()),
+            TemplateOperationStatus.CircularMasterTemplateReference => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid master template")
+                .WithDetail("The master template referenced in the template leads to a circular reference.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown template operation status.")
                 .Build()),
