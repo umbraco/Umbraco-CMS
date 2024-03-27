@@ -28,7 +28,7 @@ export const handlers = [
 			ctx.status(200),
 			ctx.json({
 				$type: 'TwoFactorAuthInfo',
-				qrCodeSetupImageUrl: 'https://placehold.co/200x200',
+				qrCodeSetupImageUrl: 'https://placehold.co/200x200?text=QR+Code+here',
 				secret: '8b713fc7-8f17-4f5d-b2ac-b53879c75953',
 			}),
 		);

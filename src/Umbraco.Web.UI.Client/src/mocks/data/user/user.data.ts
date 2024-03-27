@@ -107,7 +107,7 @@ export const mfaLoginProviders: Array<UserTwoFactorProviderModel> = [
 	},
 	{
 		isEnabledOnUser: false,
-		providerName: 'SMS',
+		providerName: 'sms',
 	},
 	{
 		isEnabledOnUser: true,

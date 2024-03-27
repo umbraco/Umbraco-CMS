@@ -83,7 +83,10 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifes
 						type: 'mfaLoginProvider',
 						alias: 'My.MfaLoginProvider.Custom',
 						name: 'My Custom MFA Provider',
-						forProviderNames: ['email', 'sms'],
+						forProviderName: 'sms',
+						meta: {
+							label: 'Setup SMS Verification',
+						},
 					},
 				],
 			},
