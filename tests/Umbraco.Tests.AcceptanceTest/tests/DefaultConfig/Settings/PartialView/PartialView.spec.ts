@@ -142,8 +142,6 @@ test.describe('Partial View tests', () => {
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    // Wait for the partial view to open
-    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.partialView.addQueryBuilderWithOrderByStatement(propertyAliasValue, isAscending);
     // Verify that the code is shown
     await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);
@@ -184,8 +182,6 @@ test.describe('Partial View tests', () => {
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    // Wait for the partial view to open
-    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.partialView.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
     // Verify that the code is shown
     await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);
@@ -209,8 +205,6 @@ test.describe('Partial View tests', () => {
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    // Wait for the partial view to open
-    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.partialView.insertDictionaryByName(dictionaryName);
     await umbracoUi.partialView.clickSaveButton();
 
