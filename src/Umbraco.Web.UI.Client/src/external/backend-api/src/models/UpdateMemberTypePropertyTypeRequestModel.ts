@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { PropertyTypeModelBaseModel } from './PropertyTypeModelBaseModel';
+import type { MemberTypePropertyTypeModelBaseModel } from './MemberTypePropertyTypeModelBaseModel';
 
-export type UpdateMemberTypePropertyTypeRequestModel = PropertyTypeModelBaseModel;
+export type UpdateMemberTypePropertyTypeRequestModel = MemberTypePropertyTypeModelBaseModel;
 
