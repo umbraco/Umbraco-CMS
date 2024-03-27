@@ -14,7 +14,7 @@ import {
 @customElement('umb-media-workspace-view-info-reference')
 export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	#itemsPerPage = 10;
-	#trackedReferenceRepository;
+	#referenceRepository;
 
 	@property()
 	mediaUnique = '';
@@ -33,7 +33,7 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.#trackedReferenceRepository = new UmbMediaReferenceRepository(this);
+		this.#referenceRepository = new UmbMediaReferenceRepository(this);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('media')
@@ -50,7 +50,7 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	}
 
 	async #getReferences() {
-		const { data } = await this.#trackedReferenceRepository.requestReference(
+		const { data } = await this.#referenceRepository.requestReferencedBy(
 			this.mediaUnique,
 			this._currentPage - 1 * this.#itemsPerPage,
 			this.#itemsPerPage,

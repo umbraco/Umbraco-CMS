@@ -59,7 +59,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	async #getReferences() {
 		if (!this.data?.documentUnique) return;
 
-		const { data, error } = await this.#referencesRepository.requestReference(this.data?.documentUnique, 0, 1);
+		const { data, error } = await this.#referencesRepository.requestReferencedBy(this.data?.documentUnique, 0, 1);
 
 		if (error) {
 			console.error(error);

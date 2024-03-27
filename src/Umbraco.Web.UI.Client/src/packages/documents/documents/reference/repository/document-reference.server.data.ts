@@ -25,7 +25,7 @@ export class UmbDocumentReferenceServerDataSource {
 	 * @return {*}
 	 * @memberof UmbDocumentReferenceServerDataSource
 	 */
-	async getReference(id: string, skip = 0, take = 20) {
+	async getReferencedBy(id: string, skip = 0, take = 20) {
 		return await tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdReferencedBy({ id, skip, take }));
 	}
 }

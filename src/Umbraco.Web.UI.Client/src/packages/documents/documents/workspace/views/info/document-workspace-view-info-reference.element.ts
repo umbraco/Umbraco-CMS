@@ -50,7 +50,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	}
 
 	async #getReferences() {
-		const { data } = await this.#referenceRepository.requestReference(
+		const { data } = await this.#referenceRepository.requestReferencedBy(
 			this.documentUnique,
 			(this._currentPage - 1) * this.#itemsPerPage,
 			this.#itemsPerPage,

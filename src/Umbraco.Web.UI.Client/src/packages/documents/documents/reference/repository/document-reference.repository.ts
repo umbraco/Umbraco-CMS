@@ -10,9 +10,9 @@ export class UmbDocumentReferenceRepository extends UmbControllerBase {
 		this.#referenceSource = new UmbDocumentReferenceServerDataSource(this);
 	}
 
-	async requestReference(unique: string, skip = 0, take = 20) {
+	async requestReferencedBy(unique: string, skip = 0, take = 20) {
 		if (!unique) throw new Error(`unique is required`);
-		return this.#referenceSource.getReference(unique, skip, take);
+		return this.#referenceSource.getReferencedBy(unique, skip, take);
 	}
 }
 

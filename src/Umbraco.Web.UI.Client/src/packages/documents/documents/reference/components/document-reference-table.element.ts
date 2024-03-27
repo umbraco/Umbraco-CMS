@@ -36,7 +36,7 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 
 	async #getReferences() {
 		// Get the first 10 references for the document:
-		const { data, error } = await this.#documentReferenceRepository.requestReference(this.unique, 0, this.#pageSize);
+		const { data, error } = await this.#documentReferenceRepository.requestReferencedBy(this.unique, 0, this.#pageSize);
 
 		if (error) {
 			this._errorMessage = error.message;
