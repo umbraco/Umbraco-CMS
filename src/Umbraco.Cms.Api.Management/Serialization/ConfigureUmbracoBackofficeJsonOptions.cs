@@ -32,7 +32,6 @@ public class ConfigureUmbracoBackofficeJsonOptions : IConfigureNamedOptions<Json
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         options.JsonSerializerOptions.Converters.Add(new JsonUdiConverter());
-        options.JsonSerializerOptions.Converters.Add(new JsonGuidUdiConverter());
         options.JsonSerializerOptions.Converters.Add(new JsonObjectConverter());
 
         options.JsonSerializerOptions.TypeInfoResolver = _umbracoJsonTypeInfoResolver;

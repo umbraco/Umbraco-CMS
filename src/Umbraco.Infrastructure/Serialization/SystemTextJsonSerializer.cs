@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Serialization;
 
@@ -13,7 +13,6 @@ public class SystemTextJsonSerializer : IJsonSerializer
         _jsonSerializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
         _jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         _jsonSerializerOptions.Converters.Add(new JsonUdiConverter());
-        _jsonSerializerOptions.Converters.Add(new JsonGuidUdiConverter());
         // we may need to add JsonObjectConverter at some point, but for the time being things work fine without
         // _jsonSerializerOptions.Converters.Add(new JsonObjectConverter());
     }
