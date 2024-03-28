@@ -20,11 +20,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
     await umbracoUi.stylesheet.clickCreateThreeDotsButton();
     await umbracoUi.stylesheet.clickNewStylesheetButton();
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
@@ -41,12 +37,8 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
     await umbracoUi.stylesheet.clickCreateThreeDotsButton();
     await umbracoUi.stylesheet.clickNewStylesheetButton();
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
     await umbracoUi.stylesheet.enterStylesheetContent(stylesheetContent);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
@@ -63,12 +55,8 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
     await umbracoUi.stylesheet.clickCreateThreeDotsButton();
     await umbracoUi.stylesheet.clickNewRichTextEditorStylesheetButton();
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
     await umbracoUi.stylesheet.addNewRule(ruleName, 'h1', 'color:red');
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
@@ -86,8 +74,6 @@ test.describe('Stylesheets tests', () => {
     //Act
     await umbracoUi.stylesheet.openStylesheetByNameAtRoot(stylesheetName);
     await umbracoUi.stylesheet.addNewRule(ruleName, 'h1', 'color:red');
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert

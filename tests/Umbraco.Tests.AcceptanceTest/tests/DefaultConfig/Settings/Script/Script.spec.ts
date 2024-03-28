@@ -20,11 +20,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.clickActionsMenuAtRoot();
     await umbracoUi.script.clickCreateThreeDotsButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.enterScriptName(scriptName);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.clickSaveButton();
 
     // Assert
@@ -40,12 +36,8 @@ test.describe('Script tests', () => {
     await umbracoUi.script.clickActionsMenuAtRoot();
     await umbracoUi.script.clickCreateThreeDotsButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.enterScriptName(scriptName);
     await umbracoUi.script.enterScriptContent(scriptContent);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.clickSaveButton();
 
     // Assert
@@ -62,11 +54,7 @@ test.describe('Script tests', () => {
 
     // Act
     await umbracoUi.script.openScriptAtRoot(scriptName);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.enterScriptContent(updatedScriptContent);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.clickSaveButton();
 
     // Assert

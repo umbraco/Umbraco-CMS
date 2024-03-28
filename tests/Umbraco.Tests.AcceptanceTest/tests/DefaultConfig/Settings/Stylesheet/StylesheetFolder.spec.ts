@@ -90,12 +90,8 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
     await umbracoUi.stylesheet.clickCreateThreeDotsButton();
     await umbracoUi.stylesheet.clickNewStylesheetButton();
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
     await umbracoUi.stylesheet.enterStylesheetContent(stylesheetContent);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
@@ -122,12 +118,8 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.clickActionsMenuForStylesheet(childFolderName);
     await umbracoUi.stylesheet.clickCreateThreeDotsButton();
     await umbracoUi.stylesheet.clickNewStylesheetButton();
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
     await umbracoUi.stylesheet.enterStylesheetContent(stylesheetContent);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert

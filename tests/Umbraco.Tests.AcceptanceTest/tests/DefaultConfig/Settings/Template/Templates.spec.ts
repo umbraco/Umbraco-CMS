@@ -19,8 +19,6 @@ test.describe('Template tests', () => {
     await umbracoUi.template.clickActionsMenuAtRoot();
     await umbracoUi.template.clickNewTemplateButton();
     await umbracoUi.template.enterTemplateName(templateName);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.clickSaveButton();
 
     // Assert
