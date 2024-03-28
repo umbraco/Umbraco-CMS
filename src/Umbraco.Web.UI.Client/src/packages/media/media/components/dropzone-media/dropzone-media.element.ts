@@ -13,7 +13,7 @@ import {
 	type UmbTemporaryFileQueueModel,
 	type UmbTemporaryFileModel,
 } from '@umbraco-cms/backoffice/temporary-file';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent, UmbProgressEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-dropzone-media')
 export class UmbDropzoneMediaElement extends UmbLitElement {
@@ -30,8 +30,9 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 
 		this.observe(this.#fileManager.queue, (queue) => {
 			this.queue = queue;
-			/** TODO: Show uploading badge while waiting... */
-			console.log(queue);
+			const completed = queue.filter((item) => item.status !== 'waiting');
+			const progress = Math.round((completed.length / queue.length) * 100);
+			this.dispatchEvent(new UmbProgressEvent(progress));
 		});
 
 		this.#getAllowedMediaTypes();
@@ -111,6 +112,7 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 
 			const { data } = await this.#mediaDetailRepository.createScaffold(preset);
 			if (!data) return;
+
 			await this.#mediaDetailRepository.create(data, null);
 
 			this.dispatchEvent(new UmbChangeEvent());
