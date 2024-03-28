@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -6,7 +6,7 @@ using Umbraco.Cms.Infrastructure.Serialization;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Serialization;
 
 [TestFixture]
-public class AutoInterningStringConverterTests
+public class JsonStringInternConverterTests
 {
     [Test]
     public void Intern_Property_String()
@@ -45,10 +45,10 @@ public class AutoInterningStringConverterTests
 
     public class Test
     {
-        [JsonConverter(typeof(AutoInterningStringConverter))]
+        [JsonConverter(typeof(JsonStringInternConverter))]
         public string Name { get; set; }
 
-        [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<int>))]
+        [JsonConverter(typeof(JsonDictionaryIgnoreCaseStringInternConverter<int>))]
         public Dictionary<string, int> Values { get; set; } = new();
     }
 }
