@@ -31,7 +31,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
         builder.AddNotificationHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>();
         // FIXME: These test NEED the System.Text.Json serializer.
         //        When the ContextualJsonSerializer is removed, this can be removed too.
-        builder.Services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
+        builder.Services.AddSingleton<IJsonSerializer, DefaultJsonSerializer>();
     }
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();

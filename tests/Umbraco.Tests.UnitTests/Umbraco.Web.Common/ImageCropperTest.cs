@@ -428,7 +428,7 @@ public class ImageCropperTest
     private void SetupJsonSerializerServiceProvider()
     {
         var serviceProvider = new Mock<IServiceProvider>();
-        serviceProvider.Setup(s => s.GetService(typeof(IJsonSerializer))).Returns(new SystemTextJsonSerializer());
+        serviceProvider.Setup(s => s.GetService(typeof(IJsonSerializer))).Returns(new DefaultJsonSerializer());
         StaticServiceProvider.Instance = serviceProvider.Object;
     }
 

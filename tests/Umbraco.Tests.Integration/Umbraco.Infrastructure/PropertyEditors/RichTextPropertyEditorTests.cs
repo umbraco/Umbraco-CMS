@@ -20,7 +20,7 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
     // FIXME: This test NEEDS the System.Text.Json serializer.
     //        When the ContextualJsonSerializer is removed, this can be removed too.
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.Services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
+        => builder.Services.AddSingleton<IJsonSerializer, DefaultJsonSerializer>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 

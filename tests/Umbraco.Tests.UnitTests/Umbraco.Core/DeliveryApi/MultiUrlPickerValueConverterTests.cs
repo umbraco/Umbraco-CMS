@@ -306,5 +306,5 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
             routeBuilder);
     }
 
-    private IJsonSerializer Serializer() => new SystemTextJsonSerializer();
+    private IJsonSerializer Serializer() => new DefaultJsonSerializer();
 }
