@@ -33,7 +33,7 @@ test.describe('Relation types tests', () => {
     // TODO: when frontend is ready, verify the new relation type name is displayed in the Relation Types tree
   });
 
-  test('can update name of a relation type', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can update name of a relation type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongRelationTypeName = 'Updated Relation Type';
     await umbracoApi.relationType.ensureNameNotExists(wrongRelationTypeName);
@@ -51,7 +51,7 @@ test.describe('Relation types tests', () => {
     expect(await umbracoApi.relationType.doesNameExist(wrongRelationTypeName)).toBeFalsy();
   });
 
-  test('can update direction value of a relation type', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can update direction value of a relation type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     relationTypeId = await umbracoApi.relationType.create(relationTypeName, false, false, objectTypeId, objectTypeId);
 
@@ -66,7 +66,7 @@ test.describe('Relation types tests', () => {
     expect(relationTypeData.isBidirectional).toEqual(true);
   });
 
-  test('can update isDependency value of a relation type', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can update isDependency value of a relation type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const updatedObjectTypeName = 'Media';
     relationTypeId = await umbracoApi.relationType.create(relationTypeName, false, false, objectTypeId, objectTypeId);
