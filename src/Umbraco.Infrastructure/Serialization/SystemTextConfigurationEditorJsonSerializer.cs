@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Serialization;
 
@@ -26,7 +26,6 @@ public class SystemTextConfigurationEditorJsonSerializer : IConfigurationEditorJ
         _jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         _jsonSerializerOptions.Converters.Add(new JsonObjectConverter());
         _jsonSerializerOptions.Converters.Add(new JsonUdiConverter());
-        _jsonSerializerOptions.Converters.Add(new JsonGuidUdiConverter());
         _jsonSerializerOptions.Converters.Add(new JsonBoolConverter());
     }
 
