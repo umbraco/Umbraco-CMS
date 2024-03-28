@@ -25,6 +25,7 @@ public class DefaultConfigurationEditorJsonSerializer : IConfigurationEditorJson
                 new JsonStringEnumConverter(),
                 new JsonObjectConverter(),
                 new JsonUdiConverter(),
+                new JsonUdiRangeConverter(),
                 new JsonFuzzyBooleanConverter()
             }
         };
