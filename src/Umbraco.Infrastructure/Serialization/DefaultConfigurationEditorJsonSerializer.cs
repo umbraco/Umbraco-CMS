@@ -25,6 +25,7 @@ public sealed class DefaultConfigurationEditorJsonSerializer : IConfigurationEdi
                 new JsonStringEnumConverter(),
                 new JsonObjectConverter(),
                 new JsonUdiConverter(),
+                new JsonUdiRangeConverter(),
                 new JsonFuzzyBooleanConverter()
             }
         };
