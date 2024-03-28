@@ -11,6 +11,7 @@ public static class UmbracoBuilderApiExtensions
 {
     public static IUmbracoBuilder AddUmbracoApiOpenApiUI(this IUmbracoBuilder builder)
     {
+        builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.ConfigureOptions<ConfigureUmbracoSwaggerGenOptions>();
         builder.Services.AddSingleton<IUmbracoJsonTypeInfoResolver, UmbracoJsonTypeInfoResolver>();
