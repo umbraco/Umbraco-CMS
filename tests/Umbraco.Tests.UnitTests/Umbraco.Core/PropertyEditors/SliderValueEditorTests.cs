@@ -123,7 +123,7 @@ public class SliderValueEditorTests
     {
         var valueEditor = new SliderPropertyEditor.SliderPropertyValueEditor(
             Mock.Of<IShortStringHelper>(),
-            new SystemTextJsonSerializer(),
+            new DefaultJsonSerializer(),
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute("alias"));
         return valueEditor;

@@ -137,7 +137,7 @@ public abstract class TestHelperBase
         }
     }
 
-    public IJsonSerializer JsonSerializer { get; } = new SystemTextJsonSerializer();
+    public IJsonSerializer JsonSerializer { get; } = new DefaultJsonSerializer();
 
     public IVariationContextAccessor VariationContextAccessor { get; } = new TestVariationContextAccessor();
 

@@ -39,7 +39,7 @@ public class PropertyValidationServiceTests
             .Returns(new CustomTextOnlyValueEditor(
                 new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox),
                 Mock.Of<IShortStringHelper>(),
-                new SystemTextJsonSerializer(),
+                new DefaultJsonSerializer(),
                 Mock.Of<IIOHelper>()));
 
         var propEditors = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
