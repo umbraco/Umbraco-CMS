@@ -6,9 +6,5 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IRelationTypePresentationFactory
 {
-    IRelationType CreateRelationType(CreateRelationTypeRequestModel createRelationTypeRequestModel);
-
-    void MapUpdateModelToRelationType(UpdateRelationTypeRequestModel updateRelationTypeRequestModel, IRelationType target);
-
     Task<IEnumerable<IReferenceResponseModel>> CreateReferenceResponseModelsAsync(IEnumerable<RelationItemModel> relationItemModels);
 }
