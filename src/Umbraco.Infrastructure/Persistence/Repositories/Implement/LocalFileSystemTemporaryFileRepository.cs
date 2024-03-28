@@ -39,24 +39,13 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
 
     public async Task<TemporaryFileModel?> GetAsync(Guid key)
     {
-
-        DirectoryInfo rootDirectory = GetRootDirectory();
-
-        DirectoryInfo? fileDirectory = rootDirectory.GetDirectories(key.ToString()).FirstOrDefault();
-        if (fileDirectory is null)
+        FileInfo[]? files = GetFileInfos(key);
+        if (files is null)
         {
             return null;
         }
 
-        FileInfo[] files = fileDirectory.GetFiles();
-
-        if (files.Length != 2)
-        {
-            _logger.LogError("Unexpected number of files in folder {FolderPath}",  fileDirectory.FullName);
-            return null;
-        }
-
-        var (actualFile, metadataFile) = GetFilesByType(files);
+        (IFileInfo actualFile, IFileInfo metadataFile) = GetFilesByType(files);
 
         FileMetaData metaData = await GetMetaDataAsync(metadataFile);
 
@@ -68,6 +57,8 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
             AvailableUntil = metaData.AvailableUntil
         };
     }
+
+    public bool Exists(Guid key) => GetFileInfos(key) is not null;
 
     public async Task SaveAsync(TemporaryFileModel model)
     {
@@ -167,4 +158,25 @@ internal sealed class LocalFileSystemTemporaryFileRepository : ITemporaryFileRep
         files[0].Name == MetaDataFileName
             ? (new PhysicalFileInfo(files[1]), new PhysicalFileInfo(files[0]))
             : (new PhysicalFileInfo(files[0]), new PhysicalFileInfo(files[1]));
+
+    private FileInfo[]? GetFileInfos(Guid key)
+    {
+        DirectoryInfo rootDirectory = GetRootDirectory();
+
+        DirectoryInfo? fileDirectory = rootDirectory.GetDirectories(key.ToString()).FirstOrDefault();
+        if (fileDirectory is null)
+        {
+            return null;
+        }
+
+        FileInfo[] files = fileDirectory.GetFiles();
+
+        if (files.Length == 2)
+        {
+            return files;
+        }
+
+        _logger.LogError("Unexpected number of files in folder {FolderPath}",  fileDirectory.FullName);
+        return null;
+    }
 }
