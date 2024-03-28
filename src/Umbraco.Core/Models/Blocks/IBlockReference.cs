@@ -40,7 +40,6 @@ public interface IBlockReference<TSettings> : IBlockReference
     TSettings Settings { get; }
 }
 
-
 /// <summary>
 ///     Represents a data item reference with content and settings for a Block editor implementation.
 /// </summary>
