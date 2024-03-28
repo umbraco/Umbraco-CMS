@@ -29,7 +29,7 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
     {
         // block list requires System.Text.Json as serializer - currently we still perform fallback to Json.NET in tests
         services.AddSingleton<IJsonSerializer, DefaultJsonSerializer>();
-        services.AddSingleton<IConfigurationEditorJsonSerializer, SystemTextConfigurationEditorJsonSerializer>();
+        services.AddSingleton<IConfigurationEditorJsonSerializer, DefaultConfigurationEditorJsonSerializer>();
     }
 
     [Test]
