@@ -135,7 +135,7 @@ public class DataTypeBuilder
         var creatorId = _creatorId ?? 1;
         var databaseType = _databaseType ?? ValueStorageType.Ntext;
         var sortOrder = _sortOrder ?? 0;
-        var serializer = new SystemTextConfigurationEditorJsonSerializer();
+        var serializer = new DefaultConfigurationEditorJsonSerializer();
 
         return new DataType(editor, serializer, parentId)
         {

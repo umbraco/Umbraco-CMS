@@ -159,7 +159,7 @@ public class PublishedSnapshotServiceTestBase
 
     protected static DataType[] GetDefaultDataTypes()
     {
-        var serializer = new SystemTextConfigurationEditorJsonSerializer();
+        var serializer = new DefaultConfigurationEditorJsonSerializer();
 
         // create data types, property types and content types
         var dataType =

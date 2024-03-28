@@ -61,7 +61,7 @@ public class ConvertersTests
         var converters =
             registerFactory.GetRequiredService<PropertyValueConverterCollection>();
 
-        var serializer = new SystemTextConfigurationEditorJsonSerializer();
+        var serializer = new DefaultConfigurationEditorJsonSerializer();
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType1 = new DataType(
             new VoidEditor(
