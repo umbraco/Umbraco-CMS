@@ -26,7 +26,7 @@ public class SystemTextConfigurationEditorJsonSerializer : IConfigurationEditorJ
         _jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         _jsonSerializerOptions.Converters.Add(new JsonObjectConverter());
         _jsonSerializerOptions.Converters.Add(new JsonUdiConverter());
-        _jsonSerializerOptions.Converters.Add(new JsonBoolConverter());
+        _jsonSerializerOptions.Converters.Add(new JsonFuzzyBooleanConverter());
     }
 
     public string Serialize(object? input) => JsonSerializer.Serialize(input, _jsonSerializerOptions);
