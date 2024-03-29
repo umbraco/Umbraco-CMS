@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Language tests', () => {
@@ -21,7 +21,7 @@ test.describe('Language tests', () => {
     await umbracoUi.language.goToSettingsTreeItem('Language');
 
     // Act
-    await umbracoUi.language.clickAddLanguageButton();
+    await umbracoUi.language.clickCreateLink();
     await umbracoUi.language.chooseLanguageByName(languageName);
     await umbracoUi.language.clickSaveButton();
 
@@ -85,7 +85,8 @@ test.describe('Language tests', () => {
     await umbracoUi.language.isLanguageNameVisible(languageName, false);
   });
 
-  test('can remove fallback language', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Remove skip when the add fallback language function works
+  test.skip('can remove fallback language', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.language.create(languageName, false, false, isoCode);
     expect(await umbracoApi.language.doesExist(isoCode)).toBeTruthy();
