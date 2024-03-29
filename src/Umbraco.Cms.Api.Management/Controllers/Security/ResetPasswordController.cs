@@ -7,19 +7,22 @@ using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
 [ApiVersion("1.0")]
+// FIXME: Add requiring password reset token policy when its implemented
+[Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
 public class ResetPasswordController : SecurityControllerBase
 {
     private readonly IUserService _userService;
 
     public ResetPasswordController(IUserService userService) => _userService = userService;
 
+
     [HttpPost("forgot-password")]
     [MapToApiVersion("1.0")]
-    [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [UserPasswordEnsureMinimumResponseTime]

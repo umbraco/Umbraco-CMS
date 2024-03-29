@@ -1,8 +1,8 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.TextFiles;
+﻿using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Stylesheet;
 
-public class CreateStylesheetRequestModel : CreateTextFileViewModelBase
+public class CreateStylesheetRequestModel : FileSystemFileCreateRequestModelBase
 {
 
 }

@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 
@@ -18,9 +19,8 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
 
     protected delegate void VariantViewModelMapping(string? culture, string? segment, TVariantViewModel variantViewModel);
 
-    protected IEnumerable<TValueViewModel> MapValueViewModels(TContent source, ValueViewModelMapping? additionalPropertyMapping = null) =>
-        source
-            .Properties
+    protected IEnumerable<TValueViewModel> MapValueViewModels(IEnumerable<IProperty> properties, ValueViewModelMapping? additionalPropertyMapping = null) =>
+        properties
             .SelectMany(property => property
                 .Values
                 .Select(propertyValue =>

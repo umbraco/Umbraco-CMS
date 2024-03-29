@@ -1,39 +1,26 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
-/// <summary>
-///     When applied to a string or string collection field will ensure the deserialized strings are interned
-/// </summary>
-/// <remarks>
-///     Borrowed from https://stackoverflow.com/a/34906004/694494
-///     On the same page an interesting approach of using a local intern pool https://stackoverflow.com/a/39605620/694494
-///     which re-uses .NET System.Xml.NameTable
-/// </remarks>
-public class AutoInterningStringConverter : JsonConverter
+public class AutoInterningStringConverter : JsonConverter<string>
 {
-    public override bool CanWrite => false;
+    // This is a hacky workaround to creating a "read only converter", since System.Text.Json doesn't support it.
+    // Taken from https://github.com/dotnet/runtime/issues/46372#issuecomment-1660515178
+    private readonly JsonConverter<string> _fallbackConverter = (JsonConverter<string>)JsonSerializerOptions.Default.GetConverter(typeof(string));
 
-    public override bool CanConvert(Type objectType) => throw
-
-        // CanConvert is not called when a converter is applied directly to a property.
-        new NotImplementedException($"{nameof(AutoInterningStringConverter)} should not be used globally");
-
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
-    {
-        if (reader.TokenType == JsonToken.Null)
+    public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
+        reader.TokenType switch
         {
-            return null;
-        }
+            JsonTokenType.Null => null,
+            JsonTokenType.String =>
+                // It's safe to ignore nullability here, because according to the docs:
+                // Returns null when TokenType is JsonTokenType.Null
+                // https://learn.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader.getstring?view=net-8.0#remarks
+                string.Intern(reader.GetString()!),
+            _ => throw new InvalidOperationException($"{nameof(AutoInterningStringConverter)} only supports strings."),
+        };
 
-        // Check is in case the value is a non-string literal such as an integer.
-        var s = reader.TokenType == JsonToken.String
-            ? string.Intern((string)reader.Value!)
-            : string.Intern((string)JToken.Load(reader)!);
-        return s;
-    }
-
-    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) =>
-        throw new NotImplementedException();
+    public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
+        => _fallbackConverter.Write(writer, value, options);
 }

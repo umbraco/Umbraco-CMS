@@ -2,15 +2,12 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -20,37 +17,19 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.MultipleTextstring,
-    "Repeatable textstrings",
-    "multipletextbox",
     ValueType = ValueTypes.Text,
-    Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-ordered-list",
     ValueEditorIsReusable = true)]
 public class MultipleTextStringPropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
-
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public MultipleTextStringPropertyEditor(
-        IIOHelper ioHelper,
-        IDataValueEditorFactory dataValueEditorFactory)
-        : this(ioHelper, dataValueEditorFactory, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MultipleTextStringPropertyEditor" /> class.
     /// </summary>
-    public MultipleTextStringPropertyEditor(
-        IIOHelper ioHelper,
-        IDataValueEditorFactory dataValueEditorFactory,
-        IEditorConfigurationParser editorConfigurationParser)
+    public MultipleTextStringPropertyEditor(IIOHelper ioHelper, IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _editorConfigurationParser = editorConfigurationParser;
         SupportsReadOnly = true;
     }
 
@@ -60,7 +39,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new MultipleTextStringConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        new MultipleTextStringConfigurationEditor(_ioHelper);
 
     /// <summary>
     ///     Custom value editor so we can format the value for the editor and the database
@@ -70,23 +49,20 @@ public class MultipleTextStringPropertyEditor : DataEditor
         private static readonly string NewLine = "\n";
         private static readonly string[] NewLineDelimiters = { "\r\n", "\r", "\n" };
 
-        private readonly ILocalizedTextService _localizedTextService;
-
         public MultipleTextStringPropertyValueEditor(
-            ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute) =>
-            _localizedTextService = localizedTextService;
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
+        {
+        }
 
         /// <summary>
         ///     A custom FormatValidator is used as for multiple text strings, each string should individually be checked
         ///     against the configured regular expression, rather than the JSON representing all the strings as a whole.
         /// </summary>
-        public override IValueFormatValidator FormatValidator =>
-            new MultipleTextStringFormatValidator(_localizedTextService);
+        public override IValueFormatValidator FormatValidator => new MultipleTextStringFormatValidator();
 
         /// <summary>
         ///     The value passed in from the editor will be an array of simple objects so we'll need to parse them to get the
@@ -136,11 +112,6 @@ public class MultipleTextStringPropertyEditor : DataEditor
 
     internal class MultipleTextStringFormatValidator : IValueFormatValidator
     {
-        private readonly ILocalizedTextService _localizedTextService;
-
-        public MultipleTextStringFormatValidator(ILocalizedTextService localizedTextService) =>
-            _localizedTextService = localizedTextService;
-
         public IEnumerable<ValidationResult> ValidateFormat(object? value, string valueType, string format)
         {
             if (value is not IEnumerable<string> textStrings)
@@ -148,7 +119,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
                 return Enumerable.Empty<ValidationResult>();
             }
 
-            var textStringValidator = new RegexValidator(_localizedTextService);
+            var textStringValidator = new RegexValidator();
             foreach (var textString in textStrings)
             {
                 var validationResults = textStringValidator.ValidateFormat(textString, valueType, format).ToList();

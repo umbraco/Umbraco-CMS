@@ -22,9 +22,9 @@ public class DomainsController : DocumentControllerBase
 
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}/domains")]
-     [ProducesResponseType(typeof(DomainsResponseModel), StatusCodes.Status200OK)]
-     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DomainsAsync(Guid id)
+    [ProducesResponseType(typeof(DomainsResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Domains(Guid id)
     {
         IDomain[] assignedDomains = (await _domainService.GetAssignedDomainsAsync(id, true))
             .OrderBy(d => d.SortOrder)

@@ -1,8 +1,10 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Umbraco.Cms.Core.Models.ContentEditing;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.Content;
 
 public abstract class VariantResponseModelBase : VariantModelBase
 {
-    public DateTime CreateDate { get; set; }
+    public DateTimeOffset CreateDate { get; set; }
 
-    public DateTime UpdateDate { get; set; }
+    public DateTimeOffset UpdateDate { get; set; }
 }

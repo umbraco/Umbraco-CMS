@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 using Examine.Search;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -27,6 +27,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
     public ApiContentQueryProvider(
         IExamineManager examineManager,
         ContentIndexHandlerCollection indexHandlers,
+        IApiContentQueryFactory apiContentQueryFactory,
         IOptions<DeliveryApiSettings> deliveryApiSettings,
         ILogger<ApiContentQueryProvider> logger)
     {
@@ -41,7 +42,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
 
         // for the time being we're going to keep these as internal implementation details.
         // perhaps later on it will make sense to expose them through the DI.
-        _selectorBuilder = new ApiContentQuerySelectorBuilder(deliveryApiSettings.Value);
+        _selectorBuilder = new ApiContentQuerySelectorBuilder(deliveryApiSettings.Value, apiContentQueryFactory);
         _filterBuilder = new ApiContentQueryFilterBuilder(fieldTypes, _logger);
         _sortBuilder = new ApiContentQuerySortBuilder(fieldTypes, _logger);
 

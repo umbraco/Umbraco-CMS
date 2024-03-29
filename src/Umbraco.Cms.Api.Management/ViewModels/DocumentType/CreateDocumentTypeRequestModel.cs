@@ -5,11 +5,15 @@ namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 
 [ShortGenericSchemaName<CreateDocumentTypePropertyTypeRequestModel, CreateDocumentTypePropertyTypeContainerRequestModel>("CreateContentTypeForDocumentTypeRequestModel")]
 public class CreateDocumentTypeRequestModel
-    : CreateContentTypeRequestModelBase<CreateDocumentTypePropertyTypeRequestModel, CreateDocumentTypePropertyTypeContainerRequestModel>
+    : CreateContentTypeWithParentRequestModelBase<CreateDocumentTypePropertyTypeRequestModel, CreateDocumentTypePropertyTypeContainerRequestModel>
 {
-    public IEnumerable<Guid> AllowedTemplateIds { get; set; } = Enumerable.Empty<Guid>();
+    public IEnumerable<ReferenceByIdModel> AllowedTemplates { get; set; } = Enumerable.Empty<ReferenceByIdModel>();
 
-    public Guid? DefaultTemplateId { get; set; }
+    public ReferenceByIdModel? DefaultTemplate { get; set; }
 
-    public ContentTypeCleanup Cleanup { get; set; } = new();
+    public DocumentTypeCleanup Cleanup { get; set; } = new();
+
+    public IEnumerable<DocumentTypeSort> AllowedDocumentTypes { get; set; } = Enumerable.Empty<DocumentTypeSort>();
+
+    public IEnumerable<DocumentTypeComposition> Compositions { get; set; } = Enumerable.Empty<DocumentTypeComposition>();
 }

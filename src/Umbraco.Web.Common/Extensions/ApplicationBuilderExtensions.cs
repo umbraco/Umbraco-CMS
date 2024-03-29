@@ -186,17 +186,17 @@ public static class ApplicationBuilderExtensions
     }
 
     /// <summary>
-    ///     Configure a virtual path with IApplicationBuilder.UseRewriter for backoffice assets to allow cache-busting using the url
+    ///     Configure a virtual path with IApplicationBuilder.UseRewriter for BackOffice assets to allow cache-busting using the url
     ///     /umbraco/backoffice/!cache-busting-id!/assets/index.js => /umbraco/backoffice/assets/index.js.
     /// </summary>
     public static IApplicationBuilder UseUmbracoBackOfficeRewrites(this IApplicationBuilder builder)
     {
-        IStaticFilePathGenerator staticFilePathGenerator = builder.ApplicationServices.GetRequiredService<IStaticFilePathGenerator>();
-        var backofficeAssetsPath = staticFilePathGenerator.BackofficeAssetsPath.TrimStart("/").EnsureEndsWith("/");
+        IBackOfficePathGenerator backOfficePathGenerator = builder.ApplicationServices.GetRequiredService<IBackOfficePathGenerator>();
+        var backOfficeAssetsPath = backOfficePathGenerator.BackOfficeAssetsPath.TrimStart("/").EnsureEndsWith("/");
 
         builder.UseRewriter(new RewriteOptions()
             // The destination needs to be hardcoded to "/umbraco/backoffice" because this is where they are located in the Umbraco.Cms.StaticAssets RCL
-            .AddRewrite(@"^" + backofficeAssetsPath + "(.+)",  "/umbraco/backoffice/$1", true));
+            .AddRewrite(@"^" + backOfficeAssetsPath + "(.+)",  "/umbraco/backoffice/$1", true));
 
         return builder;
     }

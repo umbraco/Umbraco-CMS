@@ -9,9 +9,9 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
     {
         ContentCreateModel model = MapContentEditingModel<ContentCreateModel>(requestModel);
         model.Key = requestModel.Id;
-        model.ContentTypeKey = requestModel.ContentTypeId;
-        model.TemplateKey = requestModel.TemplateId;
-        model.ParentKey = requestModel.ParentId;
+        model.ContentTypeKey = requestModel.DocumentType.Id;
+        model.TemplateKey = requestModel.Template?.Id;
+        model.ParentKey = requestModel.Parent?.Id;
 
         return model;
     }
@@ -19,7 +19,7 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
     public ContentUpdateModel MapUpdateModel(UpdateDocumentRequestModel requestModel)
     {
         ContentUpdateModel model = MapContentEditingModel<ContentUpdateModel>(requestModel);
-        model.TemplateKey = requestModel.TemplateId;
+        model.TemplateKey = requestModel.Template?.Id;
 
         return model;
     }

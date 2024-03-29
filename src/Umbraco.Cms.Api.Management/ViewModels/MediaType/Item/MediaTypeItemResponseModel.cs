@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
 
-public class MediaTypeItemResponseModel : ItemResponseModelBase
+public class MediaTypeItemResponseModel : NamedItemResponseModelBase
 {
     public string? Icon { get; set; }
 }

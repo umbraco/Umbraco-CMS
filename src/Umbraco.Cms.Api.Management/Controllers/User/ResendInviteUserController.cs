@@ -30,6 +30,7 @@ public class ResendInviteUserController : UserControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ResendInvite(ResendInviteUserRequestModel model)
     {
         UserResendInviteModel resendInviteModel = await _userPresentationFactory.CreateResendInviteModelAsync(model);

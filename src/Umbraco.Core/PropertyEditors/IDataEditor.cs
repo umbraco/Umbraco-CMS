@@ -17,31 +17,6 @@ public interface IDataEditor : IDiscoverable
     bool SupportsReadOnly => false;
 
     /// <summary>
-    ///     Gets the type of the editor.
-    /// </summary>
-    /// <remarks>An editor can be a property value editor, or a parameter editor.</remarks>
-    EditorType Type { get; }
-
-    /// <summary>
-    ///     Gets the name of the editor.
-    /// </summary>
-    string Name { get; }
-
-    /// <summary>
-    ///     Gets the icon of the editor.
-    /// </summary>
-    /// <remarks>Can be used to display editors when presenting them.</remarks>
-    // FIXME: remove this when we are rid of the old backoffice - the server should not know about data editor icons
-    string Icon { get; }
-
-    /// <summary>
-    ///     Gets the group of the editor.
-    /// </summary>
-    /// <remarks>Can be used to organize editors when presenting them.</remarks>
-    // FIXME: remove this when we are rid of the old backoffice - the server should not know about data editor groups
-    string Group { get; }
-
-    /// <summary>
     ///     Gets a value indicating whether the editor is deprecated.
     /// </summary>
     /// <remarks>Deprecated editors are supported but not proposed in the UI.</remarks>

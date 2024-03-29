@@ -22,7 +22,7 @@ public class MoveDictionaryController : DictionaryControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPost("{id:guid}/move")]
+    [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -32,12 +32,12 @@ public class MoveDictionaryController : DictionaryControllerBase
         IDictionaryItem? source = await _dictionaryItemService.GetAsync(id);
         if (source == null)
         {
-            return DictionaryNotFound();
+            return DictionaryItemNotFound();
         }
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result = await _dictionaryItemService.MoveAsync(
             source,
-            moveDictionaryRequestModel.TargetId,
+            moveDictionaryRequestModel.Target?.Id,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success

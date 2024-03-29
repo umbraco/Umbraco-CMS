@@ -8,6 +8,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -40,7 +41,7 @@ public class MoveDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionMove.ActionLetter, new[] { moveDocumentRequestModel.TargetId, id }),
+            ContentPermissionResource.WithKeys(ActionMove.ActionLetter, new[] { moveDocumentRequestModel.Target?.Id, id }),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -50,7 +51,7 @@ public class MoveDocumentController : DocumentControllerBase
 
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.MoveAsync(
             id,
-            moveDocumentRequestModel.TargetId,
+            moveDocumentRequestModel.Target?.Id,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success

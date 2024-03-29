@@ -43,27 +43,6 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
     private IFileService FileService => GetRequiredService<IFileService>();
 
     [Test]
-    public void Can_Export_Macro()
-    {
-        // Arrange
-        var macroService = GetRequiredService<IMacroService>();
-        var macro = new MacroBuilder()
-            .WithAlias("test1")
-            .WithName("Test")
-            .Build();
-        macroService.Save(macro);
-
-        // Act
-        var element = Serializer.Serialize(macro);
-
-        // Assert
-        Assert.That(element, Is.Not.Null);
-        Assert.That(element.Element("name").Value, Is.EqualTo("Test"));
-        Assert.That(element.Element("alias").Value, Is.EqualTo("test1"));
-        Debug.Print(element.ToString());
-    }
-
-    [Test]
     public async Task Can_Export_DictionaryItems()
     {
         // Arrange
@@ -176,14 +155,12 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
             scheme,
             loggerFactory.CreateLogger<MediaFileManager>(),
             ShortStringHelper,
-            Services,
-            Options.Create(new ContentSettings()));
+            Services);
 
         var ignored = new FileUploadPropertyEditor(
             DataValueEditorFactory,
             mediaFileManager,
             Mock.Of<IOptionsMonitor<ContentSettings>>(x => x.CurrentValue == contentSettings),
-            TextService,
             Services.GetRequiredService<UploadAutoFillProperties>(),
             ContentService,
             IOHelper);

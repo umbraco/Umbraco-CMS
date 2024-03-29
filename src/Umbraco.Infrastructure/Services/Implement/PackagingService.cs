@@ -28,7 +28,6 @@ public class PackagingService : IPackagingService
     private readonly ICreatedPackagesRepository _createdPackages;
     private readonly IEventAggregator _eventAggregator;
     private readonly IKeyValueService _keyValueService;
-    private readonly ILegacyManifestParser _legacyManifestParser;
     private readonly IPackageInstallation _packageInstallation;
     private readonly PackageMigrationPlanCollection _packageMigrationPlans;
     private readonly ICoreScopeProvider _coreScopeProvider;
@@ -40,7 +39,6 @@ public class PackagingService : IPackagingService
         ICreatedPackagesRepository createdPackages,
         IPackageInstallation packageInstallation,
         IEventAggregator eventAggregator,
-        ILegacyManifestParser legacyManifestParser,
         IKeyValueService keyValueService,
         ICoreScopeProvider coreScopeProvider,
         PackageMigrationPlanCollection packageMigrationPlans,
@@ -51,7 +49,6 @@ public class PackagingService : IPackagingService
         _createdPackages = createdPackages;
         _packageInstallation = packageInstallation;
         _eventAggregator = eventAggregator;
-        _legacyManifestParser = legacyManifestParser;
         _keyValueService = keyValueService;
         _packageMigrationPlans = packageMigrationPlans;
         _coreScopeProvider = coreScopeProvider;
@@ -277,50 +274,6 @@ public class PackagingService : IPackagingService
             });
 
             installedPackage.PackageMigrationPlans = currentPlans;
-        }
-
-        // Collect and merge the packages from the manifests
-        foreach (LegacyPackageManifest package in _legacyManifestParser.GetManifests())
-        {
-            if (package.PackageId is null && package.PackageName is null)
-            {
-                continue;
-            }
-
-            InstalledPackage installedPackage;
-            if (package.PackageId is not null && installedPackages.FirstOrDefault(x => x.PackageId == package.PackageId) is InstalledPackage installedPackageById)
-            {
-                installedPackage = installedPackageById;
-
-                // Always use package name from manifest
-                installedPackage.PackageName = package.PackageName;
-            }
-            else if (installedPackages.FirstOrDefault(x => x.PackageName == package.PackageName) is InstalledPackage installedPackageByName)
-            {
-                installedPackage = installedPackageByName;
-
-                // Ensure package ID is set
-                installedPackage.PackageId ??= package.PackageId;
-            }
-            else
-            {
-                installedPackage = new InstalledPackage
-                {
-                    PackageId = package.PackageId,
-                    PackageName = package.PackageName,
-                };
-
-                installedPackages.Add(installedPackage);
-            }
-
-            // Set additional values
-            installedPackage.AllowPackageTelemetry = package.AllowPackageTelemetry;
-            installedPackage.PackageView = package.PackageView;
-
-            if (!string.IsNullOrEmpty(package.Version))
-            {
-                installedPackage.Version = package.Version;
-            }
         }
 
         // Return all packages with an ID or name in the package.manifest or package migrations

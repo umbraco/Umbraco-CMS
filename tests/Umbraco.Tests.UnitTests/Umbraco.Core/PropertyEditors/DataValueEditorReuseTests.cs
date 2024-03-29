@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -16,6 +16,7 @@ public class DataValueEditorReuseTests
 {
     private Mock<IDataValueEditorFactory> _dataValueEditorFactoryMock;
     private PropertyEditorCollection _propertyEditorCollection;
+    private DataValueReferenceFactoryCollection _dataValueReferenceFactories;
 
     [SetUp]
     public void SetUp()
@@ -25,22 +26,23 @@ public class DataValueEditorReuseTests
         _dataValueEditorFactoryMock
             .Setup(m => m.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()))
             .Returns(() => new TextOnlyValueEditor(
-                new DataEditorAttribute("a", "b", "c"),
-                Mock.Of<ILocalizedTextService>(),
+                new DataEditorAttribute("a"),
                 Mock.Of<IShortStringHelper>(),
                 Mock.Of<IJsonSerializer>(),
                 Mock.Of<IIOHelper>()));
 
         _propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>));
+        _dataValueReferenceFactories = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>);
 
         _dataValueEditorFactoryMock
             .Setup(m =>
                 m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()))
             .Returns(() => new BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor(
-                new DataEditorAttribute("a", "b", "c"),
+                new DataEditorAttribute("a"),
                 new BlockListEditorDataConverter(Mock.Of<IJsonSerializer>()),
                 _propertyEditorCollection,
-                Mock.Of<IDataTypeService>(),
+                _dataValueReferenceFactories,
+                Mock.Of<IDataTypeConfigurationCache>(),
                 Mock.Of<IContentTypeService>(),
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<ILogger<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>>(),
@@ -55,8 +57,7 @@ public class DataValueEditorReuseTests
     {
         var textboxPropertyEditor = new TextboxPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            Mock.Of<IIOHelper>(),
-            Mock.Of<IEditorConfigurationParser>());
+            Mock.Of<IIOHelper>());
 
         // textbox is set to reuse its data value editor when created *without* configuration
         var dataValueEditor1 = textboxPropertyEditor.GetValueEditor();
@@ -74,8 +75,7 @@ public class DataValueEditorReuseTests
     {
         var textboxPropertyEditor = new TextboxPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            Mock.Of<IIOHelper>(),
-            Mock.Of<IEditorConfigurationParser>());
+            Mock.Of<IIOHelper>());
 
         // no matter what, a property editor should never reuse its data value editor when created *with* configuration
         var dataValueEditor1 = textboxPropertyEditor.GetValueEditor("config");
@@ -95,9 +95,8 @@ public class DataValueEditorReuseTests
     {
         var blockListPropertyEditor = new BlockListPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>)),
+            _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
-            Mock.Of<IEditorConfigurationParser>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>(),
             Mock.Of<IJsonSerializer>());
 
@@ -117,9 +116,8 @@ public class DataValueEditorReuseTests
     {
         var blockListPropertyEditor = new BlockListPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>)),
+            _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
-            Mock.Of<IEditorConfigurationParser>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>(),
             Mock.Of<IJsonSerializer>());
 

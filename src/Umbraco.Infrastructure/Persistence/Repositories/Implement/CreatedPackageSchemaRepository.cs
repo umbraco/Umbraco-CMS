@@ -33,7 +33,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private readonly FileSystems _fileSystems;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILocalizationService _localizationService;
-    private readonly IMacroService _macroService;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IMediaService _mediaService;
     private readonly IMediaTypeService _mediaTypeService;
@@ -57,7 +56,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         IMediaTypeService mediaTypeService,
         IContentService contentService,
         MediaFileManager mediaFileManager,
-        IMacroService macroService,
         IContentTypeService contentTypeService,
         IScopeAccessor scopeAccessor,
         string? mediaFolderPath = null,
@@ -73,7 +71,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         _mediaTypeService = mediaTypeService;
         _contentService = contentService;
         _mediaFileManager = mediaFileManager;
-        _macroService = macroService;
         _contentTypeService = contentTypeService;
         _scopeAccessor = scopeAccessor;
         _xmlParser = new PackageDefinitionXmlParser();
@@ -95,7 +92,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         IMediaTypeService mediaTypeService,
         IContentService contentService,
         MediaFileManager mediaFileManager,
-        IMacroService macroService,
         IContentTypeService contentTypeService,
         string? mediaFolderPath = null,
         string? tempFolderPath = null)
@@ -112,7 +108,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         mediaTypeService,
         contentService,
         mediaFileManager,
-        macroService,
         contentTypeService,
         StaticServiceProvider.Instance.GetRequiredService<IScopeAccessor>(),
         mediaFolderPath,
@@ -294,7 +289,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             PackageStylesheets(definition, root);
             PackageStaticFiles(definition.Scripts, root, "Scripts", "Script", _fileSystems.ScriptsFileSystem!);
             PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View", _fileSystems.PartialViewsFileSystem!);
-            PackageMacros(definition, root);
             PackageDictionaryItems(definition, root);
             PackageLanguages(definition, root);
             PackageDataTypes(definition, root);
@@ -529,37 +523,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         }
     }
 
-    private void PackageMacros(PackageDefinition definition, XContainer root)
-    {
-        var packagedMacros = new List<IMacro>();
-        var macros = new XElement("Macros");
-        foreach (var macroId in definition.Macros)
-        {
-            if (!int.TryParse(macroId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
-            {
-                continue;
-            }
-
-            XElement? macroXml = GetMacroXml(outInt, out IMacro? macro);
-            if (macroXml is null)
-            {
-                continue;
-            }
-
-            macros.Add(macroXml);
-            packagedMacros.Add(macro!);
-        }
-
-        root.Add(macros);
-
-        // Get the partial views for macros and package those (exclude views outside of the default directory, e.g. App_Plugins\*\Views)
-        IEnumerable<string> views = packagedMacros
-            .Where(x => x.MacroSource.StartsWith(Constants.SystemDirectories.MacroPartials))
-            .Select(x =>
-                x.MacroSource[Constants.SystemDirectories.MacroPartials.Length..].Replace('/', '\\'));
-        PackageStaticFiles(views, root, "MacroPartialViews", "View", _fileSystems.MacroPartialsFileSystem!);
-    }
-
     private void PackageStylesheets(PackageDefinition definition, XContainer root)
     {
         var stylesheetsXml = new XElement("Stylesheets");
@@ -763,21 +726,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         root.Add(mediaXml);
 
         return mediaStreams;
-    }
-
-    /// <summary>
-    ///     Gets a macros xml node
-    /// </summary>
-    private XElement? GetMacroXml(int macroId, out IMacro? macro)
-    {
-        macro = _macroService.GetById(macroId);
-        if (macro == null)
-        {
-            return null;
-        }
-
-        XElement xml = _serializer.Serialize(macro);
-        return xml;
     }
 
     /// <summary>

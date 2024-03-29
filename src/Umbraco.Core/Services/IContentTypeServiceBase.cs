@@ -124,11 +124,31 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
 
     Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);
 
+    [Obsolete("Please use MoveAsync. Will be removed in V16.")]
     Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId);
 
+    [Obsolete("Please use CopyAsync. Will be removed in V16.")]
     Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId);
 
+    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
     TItem Copy(TItem original, string alias, string name, int parentId = -1);
 
+    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
     TItem Copy(TItem original, string alias, string name, TItem parent);
+
+    Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> CopyAsync(Guid key, Guid? containerKey);
+
+    Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> MoveAsync(Guid key, Guid? containerKey);
+
+    /// <summary>
+    /// Returns all the content type allowed as root.
+    /// </summary>
+    /// <returns></returns>
+    Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take);
+
+    /// <summary>
+    /// Returns all content types allowed as children for a given content type key.
+    /// </summary>
+    /// <returns></returns>
+    Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take);
 }

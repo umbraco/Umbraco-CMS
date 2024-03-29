@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
@@ -43,6 +44,7 @@ public class MemberManagerTests
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IEntityService>(),
                 new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()),
+                new TestOptionsSnapshot<SecuritySettings>(new SecuritySettings()),
                 AppCaches.Disabled,
                 Mock.Of<ITwoFactorLoginService>())
         };
@@ -264,6 +266,6 @@ public class MemberManagerTests
         _mockMemberService
             .Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(fakeMember);
-        _mockMemberService.Setup(x => x.Save(fakeMember));
+        _mockMemberService.Setup(x => x.Save(fakeMember, Constants.Security.SuperUserId));
     }
 }

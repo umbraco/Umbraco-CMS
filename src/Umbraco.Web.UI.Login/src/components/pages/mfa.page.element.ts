@@ -25,8 +25,8 @@ export default class UmbMfaPageElement extends LitElement {
   @state()
   private error: string | null = null;
 
-  constructor() {
-    super();
+  connectedCallback() {
+    super.connectedCallback();
     this.#loadProviders();
   }
 
@@ -145,10 +145,7 @@ export default class UmbMfaPageElement extends LitElement {
                 <uui-label id="providerLabel" for="provider" slot="label" required>
                   <umb-localize key="login_2faMultipleText">Please choose a 2-factor provider</umb-localize>
                 </uui-label>
-                <div class="uui-input-wrapper">
-                  <uui-select id="provider" name="provider" .options=${this.providers} aria-required="true" required>
-                  </uui-select>
-                </div>
+                <uui-select id="provider" name="provider" .options=${this.providers} aria-required="true" required></uui-select>
               </uui-form-layout-item>
             `
             : nothing}
@@ -246,8 +243,8 @@ export default class UmbMfaPageElement extends LitElement {
         gap: var(--uui-size-layout-2);
       }
 
-      .uui-input-wrapper {
-        background-color: var(--uui-color-surface);
+      #provider {
+        width: 100%;
       }
 
       uui-form-layout-item {

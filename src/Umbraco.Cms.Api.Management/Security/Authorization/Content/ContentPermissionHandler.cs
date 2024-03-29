@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Security.Authorization.Content;
 
@@ -8,13 +11,18 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.Content;
 public class ContentPermissionHandler : MustSatisfyRequirementAuthorizationHandler<ContentPermissionRequirement, ContentPermissionResource>
 {
     private readonly IContentPermissionAuthorizer _contentPermissionAuthorizer;
+    private readonly IAuthorizationHelper _authorizationHelper;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentPermissionHandler" /> class.
     /// </summary>
     /// <param name="contentPermissionAuthorizer">Authorizer for content access.</param>
-    public ContentPermissionHandler(IContentPermissionAuthorizer contentPermissionAuthorizer)
-        => _contentPermissionAuthorizer = contentPermissionAuthorizer;
+    /// <param name="authorizationHelper">The authorization helper.</param>
+    public ContentPermissionHandler(IContentPermissionAuthorizer contentPermissionAuthorizer, IAuthorizationHelper authorizationHelper)
+    {
+        _contentPermissionAuthorizer = contentPermissionAuthorizer;
+        _authorizationHelper = authorizationHelper;
+    }
 
     /// <inheritdoc />
     protected override async Task<bool> IsAuthorized(
@@ -24,24 +32,30 @@ public class ContentPermissionHandler : MustSatisfyRequirementAuthorizationHandl
     {
         var result = true;
 
+        IUser user = _authorizationHelper.GetUmbracoUser(context.User);
         if (resource.CheckRoot)
         {
-            result &= await _contentPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User, resource.PermissionsToCheck);
+            result &= await _contentPermissionAuthorizer.IsDeniedAtRootLevelAsync(user, resource.PermissionsToCheck) is false;
         }
 
         if (resource.CheckRecycleBin)
         {
-            result &= await _contentPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User, resource.PermissionsToCheck);
+            result &= await _contentPermissionAuthorizer.IsDeniedAtRecycleBinLevelAsync(user, resource.PermissionsToCheck) is false;
         }
 
         if (resource.ParentKeyForBranch is not null)
         {
-            result &= await _contentPermissionAuthorizer.IsAuthorizedWithDescendantsAsync(context.User, resource.ParentKeyForBranch.Value, resource.PermissionsToCheck);
+            result &= await _contentPermissionAuthorizer.IsDeniedWithDescendantsAsync(user, resource.ParentKeyForBranch.Value, resource.PermissionsToCheck) is false;
         }
 
         if (resource.ContentKeys.Any())
         {
-            result &= await _contentPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.ContentKeys, resource.PermissionsToCheck);
+            result &= await _contentPermissionAuthorizer.IsDeniedAsync(user, resource.ContentKeys, resource.PermissionsToCheck) is false;
+        }
+
+        if (resource.CulturesToCheck is not null)
+        {
+            result &= await _contentPermissionAuthorizer.IsDeniedForCultures(user, resource.CulturesToCheck) is false;
         }
 
         return result;

@@ -6,10 +6,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language.Item;
 
-[ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Language}")]
-[ApiExplorerSettings(GroupName = "Language")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessLanguages)]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.Language}")]
+[ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Language))]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
 public class LanguageEntityControllerBase : ManagementApiControllerBase
 {
 }

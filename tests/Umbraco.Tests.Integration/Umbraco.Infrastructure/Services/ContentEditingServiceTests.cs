@@ -127,7 +127,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        return result.Result!;
+        return result.Result.Content!;
     }
 
     private async Task<IContent> CreateVariantContent()
@@ -167,7 +167,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        return result.Result!;
+        return result.Result.Content!;
     }
 
     private async Task<IContentType> CreateTextPageContentTypeAsync()
@@ -191,7 +191,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
             InvariantName = rootName
         };
 
-        var root = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        var root = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result.Content!;
 
         contentType.AllowedContentTypes = new List<ContentTypeSort>
         {
@@ -202,7 +202,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
         createModel.ParentKey = root.Key;
         createModel.InvariantName = childName;
 
-        var child = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        var child = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result.Content!;
         Assert.AreEqual(root.Id, child.ParentId);
 
         return (root, child);

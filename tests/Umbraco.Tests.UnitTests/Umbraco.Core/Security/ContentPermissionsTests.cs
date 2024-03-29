@@ -62,7 +62,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(1234, user, out IContent _, new[] { 'F' });
+        var result = contentPermissions.CheckPermissions(1234, user, out IContent _, new[] { "F" }.ToHashSet());
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.NotFound, result);
@@ -91,7 +91,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(1234, user, out IContent _, new[] { 'F' });
+        var result = contentPermissions.CheckPermissions(1234, user, out IContent _, new[] { "F" }.ToHashSet());
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
@@ -109,7 +109,7 @@ public class ContentPermissionsTests
         contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
         var contentService = contentServiceMock.Object;
         var userServiceMock = new Mock<IUserService>();
-        var permissions = new EntityPermissionCollection { new(9876, 1234, new[] { "A", "B", "C" }) };
+        var permissions = new EntityPermissionCollection { new(9876, 1234, new[] { "A", "B", "C" }.ToHashSet()) };
         var permissionSet = new EntityPermissionSet(1234, permissions);
         userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1,1234,5678")).Returns(permissionSet);
         var userService = userServiceMock.Object;
@@ -118,7 +118,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(1234, user, out IContent _, new[] { 'F' });
+        var result = contentPermissions.CheckPermissions(1234, user, out IContent _, new[] { "F" }.ToHashSet());
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
@@ -135,7 +135,7 @@ public class ContentPermissionsTests
         var contentServiceMock = new Mock<IContentService>();
         contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
         var contentService = contentServiceMock.Object;
-        var permissions = new EntityPermissionCollection { new(9876, 1234, new[] { "A", "F", "C" }) };
+        var permissions = new EntityPermissionCollection { new(9876, 1234, new[] { "A", "F", "C" }.ToHashSet()) };
         var permissionSet = new EntityPermissionSet(1234, permissions);
         var userServiceMock = new Mock<IUserService>();
         userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1,1234,5678")).Returns(permissionSet);
@@ -145,7 +145,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(1234, user, out IContent _, new[] { 'F' });
+        var result = contentPermissions.CheckPermissions(1234, user, out IContent _, new[] { "F" }.ToHashSet());
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
@@ -243,7 +243,7 @@ public class ContentPermissionsTests
         var user = CreateUser();
 
         var userServiceMock = new Mock<IUserService>();
-        var permissions = new EntityPermissionCollection { new(9876, 1234, new[] { "A" }) };
+        var permissions = new EntityPermissionCollection { new(9876, 1234, new[] { "A" }.ToHashSet()) };
         var permissionSet = new EntityPermissionSet(1234, permissions);
         userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1")).Returns(permissionSet);
         var contentServiceMock = new Mock<IContentService>();
@@ -254,7 +254,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(-1, user, out IContent _, new[] { 'A' });
+        var result = contentPermissions.CheckPermissions(-1, user, out IContent _, new[] { "A" }.ToHashSet());
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
@@ -267,7 +267,7 @@ public class ContentPermissionsTests
         var user = CreateUser(withUserGroup: false);
 
         var userServiceMock = new Mock<IUserService>();
-        var permissions = new EntityPermissionCollection { new(9876, 1234, new[] { "A" }) };
+        var permissions = new EntityPermissionCollection { new(9876, 1234, new[] { "A" }.ToHashSet()) };
         var permissionSet = new EntityPermissionSet(1234, permissions);
         userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-1")).Returns(permissionSet);
         var userService = userServiceMock.Object;
@@ -278,7 +278,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(-1, user, out IContent _, new[] { 'B' });
+        var result = contentPermissions.CheckPermissions(-1, user, out IContent _, new[] { "B" }.ToHashSet());
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
@@ -291,7 +291,7 @@ public class ContentPermissionsTests
         var user = CreateUser();
 
         var userServiceMock = new Mock<IUserService>();
-        var permissions = new EntityPermissionCollection { new(9876, 1234, new[] { "A" }) };
+        var permissions = new EntityPermissionCollection { new(9876, 1234, new[] { "A" }.ToHashSet()) };
         var permissionSet = new EntityPermissionSet(-20, permissions);
 
         userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-20")).Returns(permissionSet);
@@ -303,7 +303,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(-20, user, out IContent _, new[] { 'A' });
+        var result = contentPermissions.CheckPermissions(-20, user, out IContent _, new[] { "A" }.ToHashSet());
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
@@ -316,7 +316,7 @@ public class ContentPermissionsTests
         var user = CreateUser(withUserGroup: false);
 
         var userServiceMock = new Mock<IUserService>();
-        var permissions = new EntityPermissionCollection { new(9876, 1234, new[] { "A" }) };
+        var permissions = new EntityPermissionCollection { new(9876, 1234, new[] { "A" }.ToHashSet()) };
         var permissionSet = new EntityPermissionSet(1234, permissions);
         userServiceMock.Setup(x => x.GetPermissionsForPath(user, "-20")).Returns(permissionSet);
         var userService = userServiceMock.Object;
@@ -327,7 +327,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(-20, user, out IContent _, new[] { 'B' });
+        var result = contentPermissions.CheckPermissions(-20, user, out IContent _, new[] { "B" }.ToHashSet());
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);

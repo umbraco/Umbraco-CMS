@@ -59,7 +59,7 @@ public class UmbExternalLoginController : SurfaceController
     }
 
     /// <summary>
-    ///     Endpoint used to redirect to a specific login provider. This endpoint is used from the Login Macro snippet.
+    ///     Endpoint used to redirect to a specific login provider. This endpoint is used from the Login snippet.
     /// </summary>
     [HttpPost]
     [AllowAnonymous]

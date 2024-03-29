@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -624,24 +625,20 @@ public class VariationTests
     {
         var ioHelper = Mock.Of<IIOHelper>();
         var dataTypeService = Mock.Of<IDataTypeService>();
-        var localizedTextService = Mock.Of<ILocalizedTextService>();
-        var editorConfigurationParser = Mock.Of<IEditorConfigurationParser>();
 
-        var attribute = new DataEditorAttribute("a", "a", "a");
+        var attribute = new DataEditorAttribute("a");
         var dataValueEditorFactory = Mock.Of<IDataValueEditorFactory>(x
             => x.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()) == new TextOnlyValueEditor(
                 attribute,
-                localizedTextService,
                 Mock.Of<IShortStringHelper>(),
-                new JsonNetSerializer(),
+                new SystemTextJsonSerializer(),
                 Mock.Of<IIOHelper>()));
 
         var textBoxEditor = new TextboxPropertyEditor(
             dataValueEditorFactory,
-            ioHelper,
-            editorConfigurationParser);
+            ioHelper);
 
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
 
         var mockDataTypeService = new Mock<IDataTypeService>();
         Mock.Get(dataTypeService).Setup(x => x.GetDataType(It.Is<int>(y => y == Constants.DataTypes.Textbox)))
@@ -652,7 +649,8 @@ public class VariationTests
         return new PropertyValidationService(
             propertyEditorCollection,
             dataTypeService,
-            localizedTextService,
-            new ValueEditorCache());
+            Mock.Of<ILocalizedTextService>(),
+            new ValueEditorCache(),
+            Mock.Of<ICultureDictionary>());
     }
 }

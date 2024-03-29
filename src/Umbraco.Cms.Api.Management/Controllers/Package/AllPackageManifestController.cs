@@ -1,13 +1,16 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Package;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package;
 
 [ApiVersion("1.0")]
+[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
 public class AllPackageManifestController : PackageControllerBase
 {
     private readonly IPackageManifestService _packageManifestService;
@@ -25,7 +28,7 @@ public class AllPackageManifestController : PackageControllerBase
     [ProducesResponseType(typeof(IEnumerable<PackageManifestResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> AllPackageManifests()
     {
-        PackageManifest[] packageManifests = (await _packageManifestService.GetPackageManifestsAsync()).ToArray();
+        PackageManifest[] packageManifests = (await _packageManifestService.GetAllPackageManifestsAsync()).ToArray();
         return Ok(_umbracoMapper.MapEnumerable<PackageManifest, PackageManifestResponseModel>(packageManifests));
     }
 }

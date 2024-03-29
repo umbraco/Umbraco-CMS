@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -57,7 +58,8 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             DataEditorAttribute attribute,
             BlockEditorDataConverter<BlockListValue, BlockListLayoutItem> blockEditorDataConverter,
             PropertyEditorCollection propertyEditors,
-            IDataTypeService dataTypeService,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeConfigurationCache dataTypeConfigurationCache,
             IContentTypeService contentTypeService,
             ILocalizedTextService textService,
             ILogger<BlockListEditorPropertyValueEditor> logger,
@@ -65,7 +67,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             IPropertyValidationService propertyValidationService) :
-            base(attribute, propertyEditors, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
+            base(attribute, propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
         {
             BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(blockEditorDataConverter, contentTypeService, logger);
             Validators.Add(new BlockEditorValidator<BlockListValue, BlockListLayoutItem>(propertyValidationService, BlockEditorValues, contentTypeService));

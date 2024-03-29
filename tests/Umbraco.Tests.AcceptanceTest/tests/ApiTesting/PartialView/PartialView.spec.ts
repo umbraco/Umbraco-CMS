@@ -2,7 +2,7 @@ import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Partial View tests', () => {
-  let partialViewPath = "";
+  let partialViewPath = '';
   const partialViewName = 'partialViewName.cshtml';
 
   test.beforeEach(async ({umbracoApi}) => {
@@ -25,15 +25,26 @@ test.describe('Partial View tests', () => {
     // Arrange
     const newContent = 'Howdy';
     partialViewPath = await umbracoApi.partialView.create(partialViewName, 'test');
-    const partialView = await umbracoApi.partialView.get(partialViewPath);
-    partialView.content = newContent;
 
     // Act
-    await umbracoApi.partialView.update(partialView);
+    await umbracoApi.partialView.updateContent(partialViewPath, newContent);
 
     // Assert
     const updatedPartialView = await umbracoApi.partialView.get(partialViewPath);
     expect(updatedPartialView.content).toEqual(newContent);
+  });
+
+  test('can rename a partial view', async ({umbracoApi}) => {
+    // Arrange
+    const wrongPartialViewName = 'wrongPartialViewName.cshtml';
+    const wrongPartialViewPath = await umbracoApi.partialView.create(wrongPartialViewName, 'test');
+
+    // Act
+    const updatedPartialViewPath = await umbracoApi.partialView.updateName(wrongPartialViewPath, partialViewName);
+
+    // Assert
+    const updatedPartialView = await umbracoApi.partialView.get(updatedPartialViewPath);
+    expect(updatedPartialView.name).toEqual(partialViewName);
   });
 
   test('can delete a partial view', async ({umbracoApi}) => {

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
 
@@ -14,12 +14,12 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IRuntimeState _runtimeState;
     private readonly Uri? _backOfficeHost;
-    private readonly string? _authorizeCallbackPathName;
+    private readonly string _authorizeCallbackPathName;
 
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
         IWebHostEnvironment webHostEnvironment,
-        IOptions<NewBackOfficeSettings> securitySettings,
+        IOptions<SecuritySettings> securitySettings,
         IRuntimeState runtimeState)
         : base(applicationManager)
     {
@@ -31,7 +31,9 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
 
     public async Task EnsureBackOfficeApplicationAsync(Uri backOfficeUrl, CancellationToken cancellationToken = default)
     {
-        if (_runtimeState.Level < RuntimeLevel.Run)
+        // Install is okay without this, because we do not need a token to install,
+        // but upgrades do, so we need to execute for everything higher then or equal to upgrade.
+        if (_runtimeState.Level < RuntimeLevel.Upgrade)
         {
             return;
         }
@@ -101,18 +103,26 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
             ClientId = Constants.OAuthClientIds.BackOffice,
             RedirectUris =
             {
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName ?? "/umbraco")
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName)
             },
             Type = OpenIddictConstants.ClientTypes.Public,
+            PostLogoutRedirectUris =
+            {
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName + "/login"),
+                // FIXME: remove when we no longer use Umbraco.Web.UI project
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName)
+            },
             Permissions =
             {
                 OpenIddictConstants.Permissions.Endpoints.Authorization,
                 OpenIddictConstants.Permissions.Endpoints.Token,
+                OpenIddictConstants.Permissions.Endpoints.Logout,
+                OpenIddictConstants.Permissions.Endpoints.Revocation,
                 OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                 OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
                 OpenIddictConstants.Permissions.ResponseTypes.Code
             }
         };
 
-    private static Uri CallbackUrlFor(Uri url, string relativePath) => new Uri( $"{url.GetLeftPart(UriPartial.Authority)}/{relativePath.TrimStart(Constants.CharArrays.ForwardSlash)}");
+    private static Uri CallbackUrlFor(Uri url, string relativePath) => new Uri($"{url.GetLeftPart(UriPartial.Authority)}/{relativePath.TrimStart(Constants.CharArrays.ForwardSlash)}");
 }

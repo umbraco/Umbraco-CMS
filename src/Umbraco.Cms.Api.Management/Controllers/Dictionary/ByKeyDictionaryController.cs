@@ -29,7 +29,7 @@ public class ByKeyDictionaryController : DictionaryControllerBase
         IDictionaryItem? dictionary = await _dictionaryItemService.GetAsync(id);
         if (dictionary == null)
         {
-            return DictionaryNotFound();
+            return DictionaryItemNotFound();
         }
 
         return Ok(await _dictionaryPresentationFactory.CreateDictionaryItemViewModelAsync(dictionary));

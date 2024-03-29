@@ -7,6 +7,7 @@ using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;

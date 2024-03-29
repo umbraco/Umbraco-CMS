@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
@@ -172,7 +171,7 @@ public class LogViewerRepository : ILogViewerRepository
         {
             return reader.TryRead(out evt);
         }
-        catch (JsonReaderException ex)
+        catch (Exception ex)
         {
             // As we are reading/streaming one line at a time in the JSON file
             // Thus we can not report the line number, as it will always be 1

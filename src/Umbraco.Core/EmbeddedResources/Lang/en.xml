@@ -336,6 +336,7 @@
     <key alias="variantSendForApprovalNotAllowed">Send for approval is not allowed</key>
     <key alias="variantScheduleNotAllowed">Schedule is not allowed</key>
     <key alias="variantUnpublishNotAllowed">Unpublish is not allowed</key>
+    <key alias="selectAllVariants">Select all variants</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Create a new Content Template from <em>%0%</em>]]></key>
@@ -1504,6 +1505,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="queryStepTypes">That matches types: </key>
     <key alias="noValidStartNodeTitle">No matching content</key>
     <key alias="noValidStartNodeDesc">The configuration of this property does not match any content. Create the missing content or contact your administrator to adjust the Dynamic Root settings for this property.</key>
+    <key alias="cancelAndClearQuery">Cancel and clear query</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Deleted item</key>
@@ -2011,6 +2013,14 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="types">Types</key>
     <key alias="webhookKey">Webhook key</key>
     <key alias="retryCount">Retry count</key>
+    <key alias="urlDescription">The url to call when the webhook is triggered.</key>
+    <key alias="eventDescription">The events for which the webhook should be triggered.</key>
+    <key alias="contentTypeDescription">Only trigger the webhook for a specific content type.</key>
+    <key alias="enabledDescription">Is the webhook enabled?</key>
+    <key alias="headersDescription">Custom headers to include in the webhook request.</key>
+    <key alias="contentType">Content Type</key>
+    <key alias="headers">Headers</key>
+    <key alias="selectEventFirst">Please select an event first.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

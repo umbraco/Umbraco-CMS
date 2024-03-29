@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Models.Installer;
 
 namespace Umbraco.Cms.Core.Installer.Steps;
 
-public class TelemetryIdentifierStep : IInstallStep, IUpgradeStep
+public class TelemetryIdentifierStep : StepBase, IInstallStep, IUpgradeStep
 {
     private readonly IOptions<GlobalSettings> _globalSettings;
     private readonly ISiteIdentifierService _siteIdentifierService;
@@ -19,14 +18,14 @@ public class TelemetryIdentifierStep : IInstallStep, IUpgradeStep
         _siteIdentifierService = siteIdentifierService;
     }
 
-    public Task ExecuteAsync(InstallData _) => Execute();
+    public Task<Attempt<InstallationResult>> ExecuteAsync(InstallData _) => Execute();
 
-    public Task ExecuteAsync() => Execute();
+    public Task<Attempt<InstallationResult>> ExecuteAsync() => Execute();
 
-    private Task Execute()
+    private Task<Attempt<InstallationResult>> Execute()
     {
         _siteIdentifierService.TryCreateSiteIdentifier(out _);
-        return Task.CompletedTask;
+        return Task.FromResult(Success());
     }
 
     public Task<bool> RequiresExecutionAsync(InstallData _) => ShouldExecute();

@@ -65,11 +65,11 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
 
     private async Task<Attempt<int, DataTypeOperationStatus>> GetParentId(CreateDataTypeRequestModel requestModel)
     {
-        if (requestModel.ParentId.HasValue)
+        if (requestModel.Parent is not null)
         {
             try
             {
-                var parent = await _dataTypeContainerService.GetAsync(requestModel.ParentId.Value);
+                var parent = await _dataTypeContainerService.GetAsync(requestModel.Parent.Id);
 
                 return parent is null
                     ? Attempt.FailWithStatus(DataTypeOperationStatus.ParentNotFound, 0)

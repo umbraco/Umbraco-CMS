@@ -754,6 +754,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Copy
 
+    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
     public TItem Copy(TItem original, string alias, string name, int parentId = -1)
     {
         TItem? parent = null;
@@ -768,6 +769,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return Copy(original, alias, name, parent);
     }
 
+    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
     public TItem Copy(TItem original, string alias, string name, TItem? parent)
     {
         if (original == null)
@@ -822,6 +824,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return clone;
     }
 
+    [Obsolete("Please use CopyAsync. Will be removed in V16.")]
     public Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -894,10 +897,53 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages, copy);
     }
 
+    public async Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> CopyAsync(Guid key, Guid? containerKey)
+    {
+        TItem? toCopy = await GetAsync(key);
+        if (toCopy is null)
+        {
+            return Attempt.FailWithStatus(ContentTypeStructureOperationStatus.NotFound, toCopy);
+        }
+
+        var containerId = GetContainerOrRootId(containerKey);
+
+        if (containerId is null)
+        {
+            return Attempt.FailWithStatus<TItem?, ContentTypeStructureOperationStatus>(ContentTypeStructureOperationStatus.ContainerNotFound, toCopy);
+        }
+
+        // using obsolete method for version control while it still exists
+        Attempt<OperationResult<MoveOperationStatusType, TItem>?> result = Copy(toCopy, containerId.Value);
+
+        return MapStatusTypeToAttempt(result.Result?.Entity, result.Result?.Result);
+    }
+
+    private int? GetContainerOrRootId(Guid? containerKey)
+    {
+        if (containerKey is null)
+        {
+            return Constants.System.Root;
+        }
+
+        EntityContainer? container = GetContainer(containerKey.Value);
+        return container?.Id;
+    }
+
+    private Attempt<TItem?, ContentTypeStructureOperationStatus> MapStatusTypeToAttempt(TItem? item, MoveOperationStatusType? resultStatus) =>
+        resultStatus switch
+        {
+            MoveOperationStatusType.Success => Attempt.SucceedWithStatus(ContentTypeStructureOperationStatus.Success, item),
+            MoveOperationStatusType.FailedParentNotFound => Attempt.FailWithStatus(ContentTypeStructureOperationStatus.ContainerNotFound, item),
+            MoveOperationStatusType.FailedCancelledByEvent => Attempt.FailWithStatus(ContentTypeStructureOperationStatus.CancelledByNotification, item),
+            MoveOperationStatusType.FailedNotAllowedByPath => Attempt.FailWithStatus(ContentTypeStructureOperationStatus.NotAllowedByPath, item),
+            _ => throw new NotImplementedException($"{nameof(ContentTypeStructureOperationStatus)} does not map to a corresponding {nameof(MoveOperationStatusType)}")
+        };
+
     #endregion
 
     #region Move
 
+    [Obsolete("Please use MoveAsync. Will be removed in V16.")]
     public Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -948,6 +994,85 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
 
         return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages);
+    }
+
+    public async Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> MoveAsync(Guid key, Guid? containerKey)
+    {
+        TItem? toMove = await GetAsync(key);
+        if (toMove is null)
+        {
+            return Attempt.FailWithStatus(ContentTypeStructureOperationStatus.NotFound, toMove);
+        }
+
+        var containerId = GetContainerOrRootId(containerKey);
+
+        if (containerId is null)
+        {
+            return Attempt.FailWithStatus<TItem?, ContentTypeStructureOperationStatus>(ContentTypeStructureOperationStatus.ContainerNotFound, toMove);
+        }
+
+        // using obsolete method for version control while it still exists
+        Attempt<OperationResult<MoveOperationStatusType>?> result = Move(toMove, containerId.Value);
+
+        return MapStatusTypeToAttempt(toMove, result.Result?.Result);
+    }
+
+    #endregion
+
+    #region Allowed types
+
+    /// <inheritdoc />
+    public Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        // that one is special because it works across content, media and member types
+        scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+
+        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
+        IEnumerable<TItem> contentTypes = Repository.Get(query).ToArray();
+
+        var pagedModel = new PagedModel<TItem>
+        {
+            Total = contentTypes.Count(),
+            Items = contentTypes.Skip(skip).Take(take)
+        };
+
+        return Task.FromResult(pagedModel);
+    }
+
+    /// <inheritdoc />
+    public Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        TItem? parent = Get(key);
+
+        if (parent?.AllowedContentTypes is null)
+        {
+            return Task.FromResult(Attempt.FailWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, null));
+        }
+
+        PagedModel<TItem> result;
+        if (parent.AllowedContentTypes.Any() is false)
+        {
+            // no content types allowed under parent
+            result = new PagedModel<TItem>
+            {
+                Items = Array.Empty<TItem>(),
+                Total = 0,
+            };
+        }
+        else
+        {
+            TItem[] allowedChildren = GetAll(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
+            result = new PagedModel<TItem>
+            {
+                Items = allowedChildren.Take(take).Skip(skip),
+                Total = allowedChildren.Length,
+            };
+        }
+
+        return Task.FromResult(Attempt.SucceedWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result));
     }
 
     #endregion
@@ -1181,6 +1306,4 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     }
 
     #endregion
-
-
 }

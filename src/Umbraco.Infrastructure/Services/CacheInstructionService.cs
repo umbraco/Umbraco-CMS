@@ -1,7 +1,7 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -189,11 +189,10 @@ namespace Umbraco.Cms
                 => new(
                     0,
                     DateTime.UtcNow,
-                    JsonConvert.SerializeObject(instructions, new JsonSerializerSettings()
+                    JsonSerializer.Serialize(instructions, new JsonSerializerOptions
                     {
-                        Formatting = Formatting.None,
-                        DefaultValueHandling = DefaultValueHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Ignore,
+                        WriteIndented = false,
+                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
                     }),
                     localIdentity,
                     instructions.Sum(x => x.JsonIdCount));
@@ -252,13 +251,13 @@ namespace Umbraco.Cms
                     }
 
                     // Deserialize remote instructions & skip if it fails.
-                    if (!TryDeserializeInstructions(instruction, out JArray? jsonInstructions))
+                    if (TryDeserializeInstructions(instruction, out JsonDocument? jsonInstructions) is false && jsonInstructions is null)
                     {
                         lastId = instruction.Id; // skip
                         continue;
                     }
 
-                    List<RefreshInstruction> instructionBatch = GetAllInstructions(jsonInstructions);
+                    List<RefreshInstruction> instructionBatch = GetAllInstructions(jsonInstructions?.RootElement);
 
                     // Process as per-normal.
                     var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, ref lastId);
@@ -280,7 +279,7 @@ namespace Umbraco.Cms
             /// <summary>
             ///     Attempts to deserialize the instructions to a JArray.
             /// </summary>
-            private bool TryDeserializeInstructions(CacheInstruction instruction, out JArray? jsonInstructions)
+            private bool TryDeserializeInstructions(CacheInstruction instruction, out JsonDocument? jsonInstructions)
             {
                 if (instruction.Instructions is null)
                 {
@@ -291,10 +290,10 @@ namespace Umbraco.Cms
 
                 try
                 {
-                    jsonInstructions = JsonConvert.DeserializeObject<JArray>(instruction.Instructions);
+                    jsonInstructions = JsonDocument.Parse(instruction.Instructions);
                     return true;
                 }
-                catch (JsonException ex)
+                catch (System.Text.Json.JsonException ex)
                 {
                     _logger.LogError(ex, "Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').", instruction.Id, instruction.Instructions);
                     jsonInstructions = null;
@@ -305,7 +304,7 @@ namespace Umbraco.Cms
             /// <summary>
             ///     Parses out the individual instructions to be processed.
             /// </summary>
-            private static List<RefreshInstruction> GetAllInstructions(IEnumerable<JToken>? jsonInstructions)
+            private static List<RefreshInstruction> GetAllInstructions(JsonElement? jsonInstructions)
             {
                 var result = new List<RefreshInstruction>();
                 if (jsonInstructions is null)
@@ -313,13 +312,13 @@ namespace Umbraco.Cms
                     return result;
                 }
 
-                foreach (JToken jsonItem in jsonInstructions)
+                foreach (JsonElement jsonItem in jsonInstructions.Value.EnumerateArray())
                 {
                     // Could be a JObject in which case we can convert to a RefreshInstruction.
                     // Otherwise it could be another JArray - in which case we'll iterate that.
-                    if (jsonItem is JObject jsonObj)
+                    if (jsonItem.ValueKind is JsonValueKind.Object)
                     {
-                        RefreshInstruction? instruction = jsonObj.ToObject<RefreshInstruction>();
+                        RefreshInstruction? instruction = jsonItem.Deserialize<RefreshInstruction>();
                         if (instruction is not null)
                         {
                             result.Add(instruction);
@@ -327,8 +326,7 @@ namespace Umbraco.Cms
                     }
                     else
                     {
-                        var jsonInnerArray = (JArray)jsonItem;
-                        result.AddRange(GetAllInstructions(jsonInnerArray)); // recurse
+                        result.AddRange(GetAllInstructions(jsonItem)); // recurse
                     }
                 }
 
@@ -465,7 +463,7 @@ namespace Umbraco.Cms
                     return;
                 }
 
-                var ids = JsonConvert.DeserializeObject<int[]>(jsonIds);
+                var ids = JsonSerializer.Deserialize<int[]>(jsonIds);
                 if (ids is not null)
                 {
                     foreach (var id in ids)

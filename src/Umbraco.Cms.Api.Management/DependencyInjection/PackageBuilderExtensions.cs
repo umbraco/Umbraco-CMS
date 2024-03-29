@@ -10,7 +10,7 @@ internal static class PackageBuilderExtensions
 {
     internal static IUmbracoBuilder AddPackages(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IPackageDefinitionFactory, PackageDefinitionFactory>();
+        builder.Services.AddTransient<IPackagePresentationFactory, PackagePresentationFactory>();
 
         builder
             .WithCollectionBuilder<MapDefinitionCollectionBuilder>()

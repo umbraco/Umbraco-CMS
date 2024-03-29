@@ -2,6 +2,7 @@ import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Partial View Folder tests', () => {
+  let partialViewFolderPath = '';
   const partialViewFolderName = 'partialViewFolder';
 
   test.beforeEach(async ({umbracoApi}) => {
@@ -14,22 +15,22 @@ test.describe('Partial View Folder tests', () => {
 
   test('can create a partial view folder', async ({umbracoApi}) => {
     // Act
-    await umbracoApi.partialView.createFolder(partialViewFolderName);
+    partialViewFolderPath = await umbracoApi.partialView.createFolder(partialViewFolderName);
 
     // Assert
-    expect(await umbracoApi.partialView.doesFolderExist(partialViewFolderName)).toBeTruthy();
+    expect(await umbracoApi.partialView.doesFolderExist(partialViewFolderPath)).toBeTruthy();
   });
 
   test('can delete a partial view folder', async ({umbracoApi}) => {
     // Arrange
-    await umbracoApi.partialView.createFolder(partialViewFolderName);
-    expect(await umbracoApi.partialView.doesFolderExist(partialViewFolderName)).toBeTruthy();
+    partialViewFolderPath = await umbracoApi.partialView.createFolder(partialViewFolderName);
+    expect(await umbracoApi.partialView.doesFolderExist(partialViewFolderPath)).toBeTruthy();
 
     // Act
-    await umbracoApi.partialView.deleteFolder(partialViewFolderName);
+    await umbracoApi.partialView.deleteFolder(partialViewFolderPath);
 
     // Assert
-    expect(await umbracoApi.partialView.doesFolderExist(partialViewFolderName)).toBeFalsy();
+    expect(await umbracoApi.partialView.doesFolderExist(partialViewFolderPath)).toBeFalsy();
   });
 
   test('can add a partial view folder in another', async ({umbracoApi}) => {
@@ -38,11 +39,11 @@ test.describe('Partial View Folder tests', () => {
     await umbracoApi.partialView.createFolder(partialViewFolderName);
 
     // Act
-    await umbracoApi.partialView.createFolder(childFolderName, partialViewFolderName);
-    const children = await umbracoApi.partialView.getChildren(partialViewFolderName);
+    await umbracoApi.partialView.createFolder(childFolderName, partialViewFolderPath);
 
     // Assert
-    expect(children[0].name).toEqual(childFolderName);
+    const childrenData = await umbracoApi.partialView.getChildren(partialViewFolderPath);
+    expect(childrenData[0].name).toEqual(childFolderName);
   });
 
   test('can add a partial view folder in a folder in another folder', async ({umbracoApi}) => {
@@ -55,7 +56,7 @@ test.describe('Partial View Folder tests', () => {
     await umbracoApi.partialView.createFolder(partialViewFolderName);
 
     // Creates child folder in parent folder
-    await umbracoApi.partialView.createFolder(childFolderName, partialViewFolderName);
+    const childFolderPath = await umbracoApi.partialView.createFolder(childFolderName, partialViewFolderPath);
 
     // Act
     // Creates childOfChild folder in child folder
@@ -63,9 +64,9 @@ test.describe('Partial View Folder tests', () => {
 
     // Assert
     // Checks if the partial views folder are in the correct folders
-    const childOfParent = await umbracoApi.partialView.getChildren(partialViewFolderName);
-    const childOfChild = await umbracoApi.partialView.getChildren(childFolderPath);
-    expect(childOfParent[0].name).toEqual(childFolderName);
-    expect(childOfChild[0].name).toEqual(childOfChildFolderName);
+    const childOfParentData = await umbracoApi.partialView.getChildren(partialViewFolderPath);
+    expect(childOfParentData[0].name).toEqual(childFolderName);
+    const childOfChildData = await umbracoApi.partialView.getChildren(childFolderPath);   
+    expect(childOfChildData[0].name).toEqual(childOfChildFolderName);
   });
 });

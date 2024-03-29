@@ -122,11 +122,10 @@ public class SliderValueEditorTests
     private static SliderPropertyEditor.SliderPropertyValueEditor CreateValueEditor()
     {
         var valueEditor = new SliderPropertyEditor.SliderPropertyValueEditor(
-            Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
             new SystemTextJsonSerializer(),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias", "name", "view"));
+            new DataEditorAttribute("alias"));
         return valueEditor;
     }
 }

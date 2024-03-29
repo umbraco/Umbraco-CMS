@@ -127,7 +127,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                         continue;
                     }
 
-                    _logger.LogInformation($"PostMigration: {migrationContextPostMigration.FullName}.");
+                    _logger.LogInformation("PostMigration: {migrationContextFullName}.", migrationContextPostMigration.FullName);
                     MigrationBase postMigration = _migrationBuilder.Build(migrationContextPostMigration, executedMigrationContext);
                     postMigration.Run();
 

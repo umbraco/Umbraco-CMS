@@ -34,7 +34,7 @@ public class ArtifactDependency
     /// <value>
     ///   <c>true</c> if the dependency is included when building a dependency tree and gets deployed in the correct order; otherwise, <c>false</c>.
     /// </value>
-    public bool Ordering { get; }
+    public bool Ordering { get; internal set; }
 
     /// <summary>
     /// Gets the dependency mode.
@@ -42,7 +42,7 @@ public class ArtifactDependency
     /// <value>
     /// The dependency mode.
     /// </value>
-    public ArtifactDependencyMode Mode { get; }
+    public ArtifactDependencyMode Mode { get; internal set; }
 
     /// <summary>
     /// Gets or sets the checksum.

@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -14,24 +15,27 @@ internal sealed class ContentPermissionService : IContentPermissionService
     private readonly IEntityService _entityService;
     private readonly IUserService _userService;
     private readonly AppCaches _appCaches;
+    private readonly ILanguageService _languageService;
 
     public ContentPermissionService(
         IContentService contentService,
         IEntityService entityService,
         IUserService userService,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        ILanguageService languageService)
     {
         _contentService = contentService;
         _entityService = entityService;
         _userService = userService;
         _appCaches = appCaches;
+        _languageService = languageService;
     }
 
     /// <inheritdoc/>
     public async Task<ContentAuthorizationStatus> AuthorizeAccessAsync(
         IUser user,
         IEnumerable<Guid> contentKeys,
-        ISet<char> permissionsToCheck)
+        ISet<string> permissionsToCheck)
     {
         var contentItems = _contentService.GetByIds(contentKeys).ToArray();
 
@@ -47,14 +51,14 @@ internal sealed class ContentPermissionService : IContentPermissionService
 
         return HasPermissionAccess(user, contentItems.Select(c => c.Path), permissionsToCheck)
             ? ContentAuthorizationStatus.Success
-            : ContentAuthorizationStatus.UnauthorizedMissingPathAccess;
+            : ContentAuthorizationStatus.UnauthorizedMissingPermissionAccess;
     }
 
     /// <inheritdoc/>
     public async Task<ContentAuthorizationStatus> AuthorizeDescendantsAccessAsync(
         IUser user,
         Guid parentKey,
-        ISet<char> permissionsToCheck)
+        ISet<string> permissionsToCheck)
     {
         var denied = new List<IUmbracoEntity>();
         var page = 0;
@@ -99,7 +103,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     }
 
     /// <inheritdoc/>
-    public async Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, ISet<char> permissionsToCheck)
+    public async Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, ISet<string> permissionsToCheck)
     {
         var hasAccess = user.HasContentRootAccess(_entityService, _appCaches);
 
@@ -111,11 +115,11 @@ internal sealed class ContentPermissionService : IContentPermissionService
         // In this case, we have to use the Root id as path (i.e. -1) since we don't have a content item
         return HasPermissionAccess(user, new[] { Constants.System.RootString }, permissionsToCheck)
             ? ContentAuthorizationStatus.Success
-            : ContentAuthorizationStatus.UnauthorizedMissingPathAccess;
+            : ContentAuthorizationStatus.UnauthorizedMissingPermissionAccess;
     }
 
     /// <inheritdoc/>
-    public async Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, ISet<char> permissionsToCheck)
+    public async Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, ISet<string> permissionsToCheck)
     {
         var hasAccess = user.HasContentBinAccess(_entityService, _appCaches);
 
@@ -127,7 +131,23 @@ internal sealed class ContentPermissionService : IContentPermissionService
         // In this case, we have to use the Recycle Bin id as path (i.e. -20) since we don't have a content item
         return HasPermissionAccess(user, new[] { Constants.System.RecycleBinContentString }, permissionsToCheck)
             ? ContentAuthorizationStatus.Success
-            : ContentAuthorizationStatus.UnauthorizedMissingPathAccess;
+            : ContentAuthorizationStatus.UnauthorizedMissingPermissionAccess;
+    }
+
+    /// <inheritdoc/>
+    public async Task<ContentAuthorizationStatus> AuthorizeCultureAccessAsync(IUser user, ISet<string> culturesToCheck)
+    {
+        if (user.Groups.Any(group => group.HasAccessToAllLanguages))
+        {
+            return ContentAuthorizationStatus.Success;
+        }
+
+        var allowedLanguages = user.Groups.SelectMany(g => g.AllowedLanguages).Distinct().ToArray();
+        var allowedLanguageIsoCodes = await _languageService.GetIsoCodesByIdsAsync(allowedLanguages);
+
+        return culturesToCheck.All(culture => allowedLanguageIsoCodes.InvariantContains(culture))
+            ? ContentAuthorizationStatus.Success
+            : ContentAuthorizationStatus.UnauthorizedMissingCulture;
     }
 
     /// <summary>
@@ -137,7 +157,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     /// <param name="contentPaths">The paths of the content items to check for access.</param>
     /// <param name="permissionsToCheck">The permissions to authorize.</param>
     /// <returns><c>true</c> if the user has the required permissions; otherwise, <c>false</c>.</returns>
-    private bool HasPermissionAccess(IUser user, IEnumerable<string> contentPaths, IEnumerable<char> permissionsToCheck)
+    private bool HasPermissionAccess(IUser user, IEnumerable<string> contentPaths, ISet<string> permissionsToCheck)
     {
         foreach (var path in contentPaths)
         {
@@ -146,7 +166,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
 
             foreach (var p in permissionsToCheck)
             {
-                if (permissionSet.GetAllPermissions().Contains(p.ToString(CultureInfo.InvariantCulture)) == false)
+                if (permissionSet.GetAllPermissions().Contains(p) == false)
                 {
                     return false;
                 }

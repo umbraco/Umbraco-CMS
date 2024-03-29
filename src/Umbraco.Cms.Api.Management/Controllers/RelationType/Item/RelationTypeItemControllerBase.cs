@@ -6,11 +6,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Item;
 
-[ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.RelationType}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.RelationType}")]
 [ApiExplorerSettings(GroupName = "Relation Type")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessRelationTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessRelationTypes)]
 public class RelationTypeItemControllerBase : ManagementApiControllerBase
 {
-
 }

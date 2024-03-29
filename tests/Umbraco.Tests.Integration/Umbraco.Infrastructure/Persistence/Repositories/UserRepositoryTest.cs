@@ -38,6 +38,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
     private IMediaTypeRepository MediaTypeRepository => GetRequiredService<IMediaTypeRepository>();
 
     private IMediaRepository MediaRepository => GetRequiredService<IMediaRepository>();
+    private IEnumerable<IPermissionMapper> PermissionMappers => GetRequiredService<IEnumerable<IPermissionMapper>>();
 
     private UserRepository CreateRepository(ICoreScopeProvider provider)
     {
@@ -51,8 +52,9 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             Mappers,
             Options.Create(GlobalSettings),
             Options.Create(new UserPasswordConfigurationSettings()),
-            new JsonNetSerializer(),
-            mockRuntimeState.Object);
+            new SystemTextJsonSerializer(),
+            mockRuntimeState.Object,
+            PermissionMappers);
         return repository;
     }
 
@@ -66,7 +68,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
     private UserGroupRepository CreateUserGroupRepository(ICoreScopeProvider provider)
     {
         var accessor = (IScopeAccessor)provider;
-        return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
+        return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper, PermissionMappers);
     }
 
     [Test]
@@ -157,8 +159,9 @@ public class UserRepositoryTest : UmbracoIntegrationTest
                 Mock.Of<IMapperCollection>(),
                 Options.Create(GlobalSettings),
                 Options.Create(new UserPasswordConfigurationSettings()),
-                new JsonNetSerializer(),
-                mockRuntimeState.Object);
+                new SystemTextJsonSerializer(),
+                mockRuntimeState.Object,
+                PermissionMappers);
 
             repository2.Delete(user);
 

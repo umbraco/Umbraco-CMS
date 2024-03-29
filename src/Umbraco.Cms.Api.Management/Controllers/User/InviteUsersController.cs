@@ -33,6 +33,8 @@ public class InviteUserController : UserControllerBase
     [HttpPost("invite")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Invite(InviteUserRequestModel model)
     {
         UserInviteModel userInvite = await _userPresentationFactory.CreateInviteModelAsync(model);
@@ -40,7 +42,7 @@ public class InviteUserController : UserControllerBase
         Attempt<UserInvitationResult, UserOperationStatus> result = await _userService.InviteAsync(CurrentUserKey(_backOfficeSecurityAccessor), userInvite);
 
         return result.Success
-            ? CreatedAtAction<ByKeyUserController>(controller => nameof(controller.ByKey), result.Result.InvitedUser!.Key)
+            ? CreatedAtId<ByKeyUserController>(controller => nameof(controller.ByKey), result.Result.InvitedUser!.Key)
             : UserOperationStatusResult(result.Status, result.Result);
     }
 }

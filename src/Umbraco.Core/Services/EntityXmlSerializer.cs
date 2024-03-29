@@ -418,52 +418,6 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
-    /// <summary>
-    ///     Exports a list of <see cref="IMacro" /> items to xml as an <see cref="XElement" />
-    /// </summary>
-    /// <param name="macros">Macros to export</param>
-    /// <returns><see cref="XElement" /> containing the xml representation of the IMacro objects</returns>
-    public XElement Serialize(IEnumerable<IMacro> macros)
-    {
-        var xml = new XElement("Macros");
-        foreach (IMacro item in macros)
-        {
-            xml.Add(Serialize(item));
-        }
-
-        return xml;
-    }
-
-    public XElement Serialize(IMacro macro)
-    {
-        var xml = new XElement("macro");
-        xml.Add(new XElement("name", macro.Name));
-        xml.Add(new XElement("key", macro.Key));
-        xml.Add(new XElement("alias", macro.Alias));
-        xml.Add(new XElement("macroSource", macro.MacroSource));
-        xml.Add(new XElement("useInEditor", macro.UseInEditor.ToString()));
-        xml.Add(new XElement("dontRender", macro.DontRender.ToString()));
-        xml.Add(new XElement("refreshRate", macro.CacheDuration.ToString(CultureInfo.InvariantCulture)));
-        xml.Add(new XElement("cacheByMember", macro.CacheByMember.ToString()));
-        xml.Add(new XElement("cacheByPage", macro.CacheByPage.ToString()));
-
-        var properties = new XElement("properties");
-        foreach (IMacroProperty property in macro.Properties)
-        {
-            properties.Add(new XElement(
-                "property",
-                new XAttribute("key", property.Key),
-                new XAttribute("name", property.Name!),
-                new XAttribute("alias", property.Alias),
-                new XAttribute("sortOrder", property.SortOrder),
-                new XAttribute("propertyType", property.EditorAlias)));
-        }
-
-        xml.Add(properties);
-
-        return xml;
-    }
-
     public XElement Serialize(IContentType contentType)
     {
         var info = new XElement(
@@ -475,7 +429,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             new XElement("Thumbnail", contentType.Thumbnail),
             new XElement("Description", contentType.Description),
             new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()),
-            new XElement("IsListView", contentType.IsContainer.ToString()),
+            new XElement("ListView", contentType.ListView.ToString()),
             new XElement("IsElement", contentType.IsElement.ToString()),
             new XElement("Variations", contentType.Variations.ToString()));
 

@@ -132,7 +132,7 @@ public partial class ContentEditingServiceTests
             {
                 ContentTypeKey = rootContentType.Key, InvariantName = "Root", ParentKey = Constants.System.RootKey,
             },
-            Constants.Security.SuperUserKey)).Result!;
+            Constants.Security.SuperUserKey)).Result.Content!;
 
         for (var i = 1; i < 11; i++)
         {

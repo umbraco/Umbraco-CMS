@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 
-public class MemberGroupItemResponseModel : ItemResponseModelBase
+public class MemberGroupItemResponseModel : NamedItemResponseModelBase
 {
 }

@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Models.Installer;
 
 namespace Umbraco.Cms.Core.Installer.Steps;
 
-public class FilePermissionsStep : IInstallStep, IUpgradeStep
+public class FilePermissionsStep : StepBase, IInstallStep, IUpgradeStep
 {
     private readonly IFilePermissionHelper _filePermissionHelper;
     private readonly ILocalizedTextService _localizedTextService;
@@ -18,11 +18,11 @@ public class FilePermissionsStep : IInstallStep, IUpgradeStep
         _localizedTextService = localizedTextService;
     }
 
-    public Task ExecuteAsync(InstallData _) => Execute();
+    public Task<Attempt<InstallationResult>> ExecuteAsync(InstallData _) => Execute();
 
-    public Task ExecuteAsync() => Execute();
+    public Task<Attempt<InstallationResult>> ExecuteAsync() => Execute();
 
-    private Task Execute()
+    private Task<Attempt<InstallationResult>> Execute()
     {
         // validate file permissions
         var permissionsOk =
@@ -33,10 +33,11 @@ public class FilePermissionsStep : IInstallStep, IUpgradeStep
             report.ToDictionary(x => _localizedTextService.Localize("permissions", x.Key), x => x.Value);
         if (permissionsOk == false)
         {
-            throw new InstallException("Permission check failed", "permissionsreport", new { errors = translatedErrors });
+            IEnumerable<string> errorstring = translatedErrors.Select(x => $"{x.Key}: {string.Join(", ", x.Value)}");
+            return Task.FromResult(FailWithMessage("Permission check failed:\n " + string.Join("\n", errorstring)));
         }
 
-        return Task.CompletedTask;
+        return Task.FromResult(Success());
     }
 
     public Task<bool> RequiresExecutionAsync(InstallData model) => ShouldExecute();

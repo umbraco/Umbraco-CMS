@@ -25,7 +25,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Cannot_Move_Non_Existing_To_Recycle_Bin()
     {
-        var result = await ContentEditingService.DeleteAsync(Guid.NewGuid(), Constants.Security.SuperUserKey);
+        var result = await ContentEditingService.MoveToRecycleBinAsync(Guid.NewGuid(), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
     }

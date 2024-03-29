@@ -21,25 +21,39 @@ public class ArtifactDependencyCollection : ICollection<ArtifactDependency>
     /// <inheritdoc />
     public void Add(ArtifactDependency item)
     {
-        if (item.Mode == ArtifactDependencyMode.Exist &&
-            _dependencies.TryGetValue(item.Udi, out ArtifactDependency? existingItem) &&
-            existingItem.Mode == ArtifactDependencyMode.Match)
+        if (_dependencies.TryGetValue(item.Udi, out ArtifactDependency? existingItem))
         {
-            // Don't downgrade dependency mode from Match to Exist
-            return;
-        }
+            // Update existing item
+            if (existingItem.Mode is ArtifactDependencyMode.Exist)
+            {
+                // Allow updating dependency mode from Exist to Match
+                existingItem.Mode = item.Mode;
+            }
 
-        _dependencies[item.Udi] = item;
+            if (existingItem.Ordering is false)
+            {
+                // Allow updating non-ordering to ordering
+                existingItem.Ordering = item.Ordering;
+            }
+
+            if (string.IsNullOrEmpty(item.Checksum) is false)
+            {
+                // Allow updating checksum if set
+                existingItem.Checksum = item.Checksum;
+            }
+        }
+        else
+        {
+            // Add new item
+            _dependencies[item.Udi] = item;
+        }
     }
 
     /// <inheritdoc />
     public void Clear() => _dependencies.Clear();
 
     /// <inheritdoc />
-    public bool Contains(ArtifactDependency item)
-        => _dependencies.TryGetValue(item.Udi, out ArtifactDependency? existingItem) &&
-        // Check whether it has the same or higher dependency mode
-        (existingItem.Mode == item.Mode || existingItem.Mode == ArtifactDependencyMode.Match);
+    public bool Contains(ArtifactDependency item) => _dependencies.ContainsKey(item.Udi);
 
     /// <inheritdoc />
     public void CopyTo(ArtifactDependency[] array, int arrayIndex) => _dependencies.Values.CopyTo(array, arrayIndex);

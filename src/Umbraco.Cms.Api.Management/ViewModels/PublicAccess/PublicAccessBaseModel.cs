@@ -2,7 +2,7 @@
 
 public class PublicAccessBaseModel
 {
-    public Guid LoginPageId { get; set; }
+    public required ReferenceByIdModel LoginDocument { get; set; }
 
-    public Guid ErrorPageId { get; set; }
+    public required ReferenceByIdModel ErrorDocument { get; set; }
 }

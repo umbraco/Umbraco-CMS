@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Item;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Item;
@@ -21,7 +20,7 @@ public class ItemTemplateItemController : TemplateItemControllerBase
         _templateService = templateService;
     }
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<TemplateItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)

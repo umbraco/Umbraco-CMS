@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Umbraco.Cms.Core.Models.ContentEditing;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.Content;
 
 public abstract class CreateContentRequestModelBase<TValueModel, TVariantModel>
     : ContentModelBase<TValueModel, TVariantModel>
@@ -6,6 +8,4 @@ public abstract class CreateContentRequestModelBase<TValueModel, TVariantModel>
     where TVariantModel : VariantModelBase
 {
     public Guid? Id { get; set; }
-
-    public Guid? ParentId { get; set; }
 }

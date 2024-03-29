@@ -13,6 +13,7 @@ internal static class MediaTypeBuilderExtensions
         builder.Services.AddTransient<IMediaTypeEditingPresentationFactory, MediaTypeEditingPresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<MediaTypeMapDefinition>();
+        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<MediaTypeCompositionMapDefinition>();
 
         return builder;
     }

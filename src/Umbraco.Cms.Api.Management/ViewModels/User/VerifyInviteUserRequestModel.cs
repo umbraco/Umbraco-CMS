@@ -4,8 +4,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.User;
 
 public class VerifyInviteUserRequestModel
 {
-    [Required]
-    public Guid UserId { get; set; } = Guid.Empty;
+    public required ReferenceByIdModel User { get; set; }
 
     [Required]
     public string Token { get; set; } = string.Empty;

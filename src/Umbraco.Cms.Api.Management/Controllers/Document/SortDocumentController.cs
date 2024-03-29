@@ -7,6 +7,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Sorting;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -40,7 +41,7 @@ public class SortDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionSort.ActionLetter,  new List<Guid?>(sortingRequestModel.Sorting.Select(x => x.Id).Cast<Guid?>()) { sortingRequestModel.ParentId }),
+            ContentPermissionResource.WithKeys(ActionSort.ActionLetter,  new List<Guid?>(sortingRequestModel.Sorting.Select(x => x.Id).Cast<Guid?>()) { sortingRequestModel.Parent?.Id }),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -49,7 +50,7 @@ public class SortDocumentController : DocumentControllerBase
         }
 
         ContentEditingOperationStatus result = await _contentEditingService.SortAsync(
-            sortingRequestModel.ParentId,
+            sortingRequestModel.Parent?.Id,
             sortingRequestModel.Sorting.Select(m => new SortingModel { Key = m.Id, SortOrder = m.SortOrder }),
             CurrentUserKey(_backOfficeSecurityAccessor));
 

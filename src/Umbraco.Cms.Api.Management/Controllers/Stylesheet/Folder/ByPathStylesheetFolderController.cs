@@ -1,20 +1,39 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.ViewModels.Folder;
+using Umbraco.Cms.Api.Management.ViewModels.Stylesheet.Folder;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.FileSystem;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.FileSystem;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Folder;
 
 [ApiVersion("1.0")]
 public class ByPathStylesheetFolderController : StylesheetFolderControllerBase
 {
-    public ByPathStylesheetFolderController(IUmbracoMapper mapper, IStylesheetFolderService stylesheetFolderService) : base(mapper, stylesheetFolderService)
+    private readonly IStylesheetFolderService _stylesheetFolderService;
+    private readonly IUmbracoMapper _mapper;
+
+    public ByPathStylesheetFolderController(IStylesheetFolderService stylesheetFolderService, IUmbracoMapper mapper)
     {
+        _stylesheetFolderService = stylesheetFolderService;
+        _mapper = mapper;
     }
 
-    [HttpGet]
+    [HttpGet("{path}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public Task<IActionResult> ByPath(string path) => GetFolderAsync(path);
+    [ProducesResponseType(typeof(StylesheetFolderResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ByPath(string path)
+    {
+        path = DecodePath(path).VirtualPathToSystemPath();
+        StylesheetFolderModel? folder = await _stylesheetFolderService.GetAsync(path);
+        return folder is not null
+            ? Ok(_mapper.Map<StylesheetFolderResponseModel>(folder))
+            : OperationStatusResult(StylesheetFolderOperationStatus.NotFound);
+    }
 }

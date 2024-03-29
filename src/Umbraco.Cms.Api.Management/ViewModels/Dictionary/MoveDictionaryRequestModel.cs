@@ -2,5 +2,5 @@
 
 public class MoveDictionaryRequestModel
 {
-    public Guid? TargetId { get; set; }
+    public ReferenceByIdModel? Target { get; set; }
 }

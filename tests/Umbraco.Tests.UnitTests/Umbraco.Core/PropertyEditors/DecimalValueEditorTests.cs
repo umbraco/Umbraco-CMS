@@ -87,11 +87,10 @@ public class DecimalValueEditorTests
     private static DecimalPropertyEditor.DecimalPropertyValueEditor CreateValueEditor()
     {
         var valueEditor = new DecimalPropertyEditor.DecimalPropertyValueEditor(
-            Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias", "name", "view"));
+            new DataEditorAttribute("alias"));
         return valueEditor;
     }
 }

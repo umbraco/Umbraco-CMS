@@ -1,67 +1,43 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}/folder")]
 [ApiExplorerSettings(GroupName = "Script")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessScripts)]
-public class ScriptFolderControllerBase : PathFolderManagementControllerBase<ScriptFolderOperationStatus>
+[Authorize(Policy = AuthorizationPolicies.TreeAccessScripts)]
+public class ScriptFolderControllerBase : FileSystemManagementControllerBase
 {
-    private readonly IScriptFolderService _scriptFolderService;
-
-    public ScriptFolderControllerBase(
-        IUmbracoMapper mapper,
-        IScriptFolderService scriptFolderService)
-        : base(mapper)
-    {
-        _scriptFolderService = scriptFolderService;
-    }
-
-    protected override Task<PathContainer?> GetContainerAsync(string path)
-        => _scriptFolderService.GetAsync(path);
-
-    protected override Task<Attempt<PathContainer?, ScriptFolderOperationStatus>> CreateContainerAsync(PathContainer container)
-        => _scriptFolderService.CreateAsync(container);
-
-    protected override Task<Attempt<ScriptFolderOperationStatus>> DeleteContainerAsync(string path) =>
-        _scriptFolderService.DeleteAsync(path);
-
-    protected override IActionResult OperationStatusResult(ScriptFolderOperationStatus status) =>
-        status switch
+    protected IActionResult OperationStatusResult(ScriptFolderOperationStatus status) =>
+        OperationStatusResult(status, problemDetailsBuilder => status switch
         {
-            ScriptFolderOperationStatus.AlreadyExists => BadRequest(new ProblemDetailsBuilder()
+            ScriptFolderOperationStatus.AlreadyExists => BadRequest(problemDetailsBuilder
                 .WithTitle("Folder already exists")
                 .WithDetail("The folder already exists")
                 .Build()),
-            ScriptFolderOperationStatus.NotEmpty => BadRequest(new ProblemDetailsBuilder()
+            ScriptFolderOperationStatus.NotEmpty => BadRequest(problemDetailsBuilder
                 .WithTitle("Not empty")
                 .WithDetail("The folder is not empty and can therefore not be deleted.")
                 .Build()),
-            ScriptFolderOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
+            ScriptFolderOperationStatus.NotFound => NotFound(problemDetailsBuilder
                 .WithTitle("Not found")
                 .WithDetail("The specified folder was not found.")
                 .Build()),
-            ScriptFolderOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
+            ScriptFolderOperationStatus.ParentNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("Parent not found")
                 .WithDetail("The parent folder was not found.")
                 .Build()),
-            ScriptFolderOperationStatus.InvalidName => BadRequest(new ProblemDetailsBuilder()
+            ScriptFolderOperationStatus.InvalidName => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid name")
                 .WithDetail("The name specified is not a valid name.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown script folder operation status.")
                 .Build()),
-        };
+        });
 }

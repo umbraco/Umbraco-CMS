@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Security.Authorization.Media;
-using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -18,21 +18,21 @@ public class ByKeyMediaController : MediaControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IMediaEditingService _mediaEditingService;
-    private readonly IMediaPresentationModelFactory _mediaPresentationModelFactory;
+    private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
     public ByKeyMediaController(
         IAuthorizationService authorizationService,
         IMediaEditingService mediaEditingService,
-        IMediaPresentationModelFactory mediaPresentationModelFactory)
+        IMediaPresentationFactory mediaPresentationFactory)
     {
         _authorizationService = authorizationService;
         _mediaEditingService = mediaEditingService;
-        _mediaPresentationModelFactory = mediaPresentationModelFactory;
+        _mediaPresentationFactory = mediaPresentationFactory;
     }
 
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(DocumentResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MediaResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
@@ -52,7 +52,7 @@ public class ByKeyMediaController : MediaControllerBase
             return MediaNotFound();
         }
 
-        MediaResponseModel model = await _mediaPresentationModelFactory.CreateResponseModelAsync(media);
+        MediaResponseModel model = await _mediaPresentationFactory.CreateResponseModelAsync(media);
         return Ok(model);
     }
 }

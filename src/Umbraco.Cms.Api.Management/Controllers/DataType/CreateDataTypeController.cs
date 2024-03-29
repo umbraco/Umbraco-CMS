@@ -41,7 +41,7 @@ public class CreateDataTypeController : DataTypeControllerBase
         Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CreateAsync(attempt.Result, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyDataTypeController>(controller => nameof(controller.ByKey), result.Result.Key)
+            ? CreatedAtId<ByKeyDataTypeController>(controller => nameof(controller.ByKey), result.Result.Key)
             : DataTypeOperationStatusResult(result.Status);
 
 

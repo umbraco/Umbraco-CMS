@@ -75,7 +75,7 @@ public class PreviewAuthenticationMiddleware : IMiddleware
         catch (Exception ex)
         {
             // log any errors and continue the request without preview
-            _logger.LogError($"Unable to perform preview authentication: {ex.Message}");
+            _logger.LogError("Unable to perform preview authentication: {message}", ex.Message);
         }
         finally
         {

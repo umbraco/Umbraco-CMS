@@ -8,86 +8,102 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("user-group")]
 [ApiExplorerSettings(GroupName = "User Group")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessUsers)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
 public class UserGroupControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UserGroupOperationStatusResult(UserGroupOperationStatus status) =>
-        status switch
+        OperationStatusResult(status, problemDetailsBuilder => status switch
         {
-            UserGroupOperationStatus.NotFound => UserGroupNotFound(),
-            UserGroupOperationStatus.AlreadyExists => Conflict(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.NotFound => UserGroupNotFound(problemDetailsBuilder),
+            UserGroupOperationStatus.UserNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("User key not found")
+                .WithDetail("The provided user key do not exist.")
+                .Build()),
+            UserGroupOperationStatus.AlreadyExists => Conflict(problemDetailsBuilder
                 .WithTitle("User group already exists")
                 .WithDetail("The user group exists already.")
                 .Build()),
-            UserGroupOperationStatus.DuplicateAlias => Conflict(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.DuplicateAlias => Conflict(problemDetailsBuilder
                 .WithTitle("Duplicate alias")
                 .WithDetail("A user group already exists with the attempted alias.")
                 .Build()),
-            UserGroupOperationStatus.MissingUser => Unauthorized(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.MissingUser => Unauthorized(problemDetailsBuilder
                 .WithTitle("Missing user")
                 .WithDetail("A performing user was not found when attempting the operation.")
                 .Build()),
-            UserGroupOperationStatus.IsSystemUserGroup => BadRequest(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.IsSystemUserGroup => BadRequest(problemDetailsBuilder
                 .WithTitle("System user group")
                 .WithDetail("The operation is not allowed on a system user group.")
                 .Build()),
-            UserGroupOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.CancelledByNotification => BadRequest(problemDetailsBuilder
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the language operation.")
                 .Build()),
-            UserGroupOperationStatus.DocumentStartNodeKeyNotFound => NotFound(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.DocumentStartNodeKeyNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("Document start node key not found")
                 .WithDetail("The assigned document start node does not exists.")
                 .Build()),
-            UserGroupOperationStatus.MediaStartNodeKeyNotFound => NotFound(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.MediaStartNodeKeyNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("Media start node key not found")
                 .WithDetail("The assigned media start node does not exists.")
                 .Build()),
-            UserGroupOperationStatus.LanguageNotFound => NotFound(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.DocumentPermissionKeyNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("A document permission key not found")
+                .WithDetail("A assigned document permission not exists.")
+                .Build()),
+            UserGroupOperationStatus.LanguageNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("Language not found")
                 .WithDetail("The specified language cannot be found.")
                 .Build()),
-            UserGroupOperationStatus.NameTooLong => BadRequest(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.NameTooLong => BadRequest(problemDetailsBuilder
                 .WithTitle("Name too long")
                 .WithDetail("User Group name is too long.")
                 .Build()),
-            UserGroupOperationStatus.AliasTooLong => BadRequest(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.AliasTooLong => BadRequest(problemDetailsBuilder
                 .WithTitle("Alias too long")
                 .WithDetail("The user group alias is too long.")
                 .Build()),
-            UserGroupOperationStatus.MissingName => BadRequest(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.MissingName => BadRequest(problemDetailsBuilder
                 .WithTitle("Missing user group name.")
                 .WithDetail("The user group name is required, and cannot be an empty string.")
                 .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingAllowedSectionAccess => Unauthorized(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.AdminGroupCannotBeEmpty => BadRequest(problemDetailsBuilder
+                .WithTitle("Admin group cannot be empty")
+                .WithDetail("The admin group cannot be empty.")
+                .Build()),
+            UserGroupOperationStatus.UserNotInGroup => BadRequest(problemDetailsBuilder
+                .WithTitle("User not in group")
+                .WithDetail("The user is not in the group.")),
+            UserGroupOperationStatus.UnauthorizedMissingAllowedSectionAccess => Unauthorized(problemDetailsBuilder
                 .WithTitle("Unauthorized section access")
                 .WithDetail("The performing user does not have access to all sections specified as allowed for this user group.")
                 .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingContentStartNodeAccess => Unauthorized(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.UnauthorizedMissingContentStartNodeAccess => Unauthorized(problemDetailsBuilder
                 .WithTitle("Unauthorized content start node access")
                 .WithDetail("The performing user does not have access to the specified content start node item.")
                 .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingMediaStartNodeAccess => Unauthorized(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.UnauthorizedMissingMediaStartNodeAccess => Unauthorized(problemDetailsBuilder
                 .WithTitle("Unauthorized media start node access")
                 .WithDetail("The performing user does not have access to the specified media start node item.")
                 .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingUserGroupAccess => Unauthorized(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.UnauthorizedMissingUserGroupAccess => Unauthorized(problemDetailsBuilder
                 .WithTitle("Unauthorized user group access")
                 .WithDetail("The performing user does not have access to the specified user group(s).")
                 .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingUsersSectionAccess => Unauthorized(new ProblemDetailsBuilder()
+            UserGroupOperationStatus.UnauthorizedMissingUsersSectionAccess => Unauthorized(problemDetailsBuilder
                 .WithTitle("Unauthorized access to Users section")
                 .WithDetail("The performing user does not have access to the Users section.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown user group operation status.")
                 .Build()),
-        };
+        });
 
-    protected IActionResult UserGroupNotFound() => NotFound(new ProblemDetailsBuilder()
+    protected IActionResult UserGroupNotFound() => OperationStatusResult(UserGroupOperationStatus.NotFound, UserGroupNotFound);
+
+    protected IActionResult UserGroupNotFound(ProblemDetailsBuilder problemDetailsBuilder) => NotFound(problemDetailsBuilder
         .WithTitle("The user group could not be found")
         .Build());
 }

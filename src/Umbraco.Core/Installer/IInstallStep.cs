@@ -12,7 +12,7 @@ public interface IInstallStep
     /// </summary>
     /// <param name="model">InstallData model containing the data provided by the installer UI.</param>
     /// <returns></returns>
-    Task ExecuteAsync(InstallData model);
+    Task<Attempt<InstallationResult>> ExecuteAsync(InstallData model);
 
     /// <summary>
     /// Determines if the step is required to execute.

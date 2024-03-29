@@ -2,25 +2,29 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
+using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
-using Umbraco.Cms.Api.Management.Routing;
-using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
+using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
 [ApiVersion("1.0")]
-[ApiController]
 [VersionedApiBackOfficeRoute(Common.Security.Paths.BackOfficeApi.EndpointTemplate)]
 [ApiExplorerSettings(IgnoreApi = true)]
 public class BackOfficeController : SecurityControllerBase
@@ -29,24 +33,27 @@ public class BackOfficeController : SecurityControllerBase
     private readonly IBackOfficeSignInManager _backOfficeSignInManager;
     private readonly IBackOfficeUserManager _backOfficeUserManager;
     private readonly IOptions<SecuritySettings> _securitySettings;
+    private readonly ILogger<BackOfficeController> _logger;
 
     public BackOfficeController(
         IHttpContextAccessor httpContextAccessor,
         IBackOfficeSignInManager backOfficeSignInManager,
         IBackOfficeUserManager backOfficeUserManager,
-        IOptions<SecuritySettings> securitySettings)
+        IOptions<SecuritySettings> securitySettings,
+        ILogger<BackOfficeController> logger)
     {
         _httpContextAccessor = httpContextAccessor;
         _backOfficeSignInManager = backOfficeSignInManager;
         _backOfficeUserManager = backOfficeUserManager;
         _securitySettings = securitySettings;
+        _logger = logger;
     }
 
     // FIXME: this is a temporary solution to get the new backoffice auth rolling.
     //        once the old backoffice auth is no longer necessary, clean this up and merge with 2FA handling etc.
-    // [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [HttpPost("login")]
     [MapToApiVersion("1.0")]
+    [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     public async Task<IActionResult> Login(LoginRequestModel model)
     {
         var validated = await _backOfficeUserManager.ValidateCredentialsAsync(model.Username, model.Password);
@@ -55,11 +62,75 @@ public class BackOfficeController : SecurityControllerBase
             return Unauthorized();
         }
 
-        var claims = new List<Claim> { new(ClaimTypes.Name, model.Username) };
-        var claimsIdentity = new ClaimsIdentity(claims, Constants.Security.NewBackOfficeAuthenticationType);
-        await HttpContext.SignInAsync(Constants.Security.NewBackOfficeAuthenticationType, new ClaimsPrincipal(claimsIdentity));
+        IdentitySignInResult result = await _backOfficeSignInManager.PasswordSignInAsync(
+            model.Username, model.Password, true, true);
 
+        if (result.IsNotAllowed)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                .WithTitle("User is not allowed")
+                .WithDetail("The operation is not allowed on the user")
+                .Build());
+        }
+        if (result.IsLockedOut)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                .WithTitle("User is locked")
+                .WithDetail("The user is locked, and need to be unlocked before more login attempts can be executed.")
+                .Build());
+        }
+        if(result.RequiresTwoFactor)
+        {
+            return StatusCode(StatusCodes.Status402PaymentRequired, new ProblemDetailsBuilder()
+                .WithTitle("2FA Required")
+                .WithDetail("The user is protected by 2FA. Please continue the login process and verify a 2FA code.")
+                .Build());
+        }
         return Ok();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("verify-2fa")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> Verify2FACode(Verify2FACodeModel model)
+    {
+        if (ModelState.IsValid == false)
+        {
+            return BadRequest();
+        }
+
+        BackOfficeIdentityUser? user = await _backOfficeSignInManager.GetTwoFactorAuthenticationUserAsync();
+        if (user is null)
+        {
+            return StatusCode(StatusCodes.Status401Unauthorized, new ProblemDetailsBuilder()
+                .WithTitle("No user found")
+                .Build());
+        }
+
+        IdentitySignInResult result =
+            await _backOfficeSignInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.IsPersistent, model.RememberClient);
+        if (result.Succeeded)
+        {
+            return Ok();
+        }
+
+        if (result.IsLockedOut)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                .WithTitle("User is locked.")
+                .Build());
+        }
+
+        if (result.IsNotAllowed)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                .WithTitle("User is not allowed")
+                .Build());
+        }
+
+        return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
+            .WithTitle("Invalid code")
+            .Build());
     }
 
     public class LoginRequestModel
@@ -69,7 +140,7 @@ public class BackOfficeController : SecurityControllerBase
         public required string Password { get; init; }
     }
 
-    // [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
+    [AllowAnonymous]
     [HttpGet("authorize")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Authorize()
@@ -92,6 +163,34 @@ public class BackOfficeController : SecurityControllerBase
             : await AuthorizeExternal(request);
     }
 
+    [AllowAnonymous]
+    [HttpGet("signout")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> Signout()
+    {
+        var userName = await GetUserNameFromAuthCookie();
+
+        await _backOfficeSignInManager.SignOutAsync();
+
+        _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out",
+            userName ?? "UNKNOWN", HttpContext.Connection.RemoteIpAddress);
+
+        // Returning a SignOutResult will ask OpenIddict to redirect the user agent
+        // to the post_logout_redirect_uri specified by the client application.
+        return SignOut(Constants.Security.BackOfficeAuthenticationType, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+    }
+
+    /// <summary>
+    ///     Retrieve the user principal stored in the authentication cookie.
+    /// </summary>
+    private async Task<string?> GetUserNameFromAuthCookie()
+    {
+        AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+        return cookieAuthResult.Succeeded
+            ? cookieAuthResult.Principal?.Identity?.Name
+            : null;
+    }
+
     private async Task<IActionResult> AuthorizeInternal(OpenIddictRequest request)
     {
         // TODO: ensure we handle sign-in notifications for internal logins.
@@ -101,11 +200,7 @@ public class BackOfficeController : SecurityControllerBase
         // for future reference, notifications are already handled for the external login flow by
         // by calling BackOfficeSignInManager.ExternalLoginSignInAsync
 
-        // retrieve the user principal stored in the authentication cookie.
-        AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.NewBackOfficeAuthenticationType);
-        var userName = cookieAuthResult.Succeeded
-            ? cookieAuthResult.Principal?.Identity?.Name
-            : null;
+        var userName = await GetUserNameFromAuthCookie();
 
         if (userName != null)
         {
@@ -171,5 +266,5 @@ public class BackOfficeController : SecurityControllerBase
         return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, backOfficePrincipal);
     }
 
-    private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.NewBackOfficeAuthenticationType);
+    private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.BackOfficeAuthenticationType);
 }

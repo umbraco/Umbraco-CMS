@@ -18,5 +18,5 @@ public class AssignedMemberRolesWebhookEvent : WebhookEventBase<AssignedMemberRo
     {
     }
 
-    public override string Alias => "assignedMemberRoles";
+    public override string Alias => Constants.WebhookEvents.Aliases.AssignedMemberRoles;
 }

@@ -20,7 +20,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
 
     public async Task<Attempt<IMediaType?, ContentTypeOperationStatus>> CreateAsync(MediaTypeCreateModel model, Guid userKey)
     {
-        Attempt<IMediaType?, ContentTypeOperationStatus> result = await ValidateAndMapForCreationAsync(model, model.Key, model.ParentKey);
+        Attempt<IMediaType?, ContentTypeOperationStatus> result = await ValidateAndMapForCreationAsync(model, model.Key, model.ContainerKey);
         if (result.Success)
         {
             IMediaType mediaType = result.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForCreationAsync)} succeeded but did not yield any result");
@@ -42,8 +42,11 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         return result;
     }
 
-    protected override Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, bool isElement)
-        => Array.Empty<Guid>();
+    public async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> GetAvailableCompositionsAsync(
+        Guid? key,
+        IEnumerable<Guid> currentCompositeKeys,
+        IEnumerable<string> currentPropertyAliases) =>
+        await FindAvailableCompositionsAsync(key, currentCompositeKeys, currentPropertyAliases);
 
     protected override IMediaType CreateContentType(IShortStringHelper shortStringHelper, int parentId)
         => new MediaType(shortStringHelper, parentId);

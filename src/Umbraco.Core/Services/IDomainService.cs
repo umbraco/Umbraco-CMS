@@ -47,5 +47,5 @@ public interface IDomainService : IService
     /// </summary>
     /// <param name="contentKey">The key of the content item.</param>
     /// <param name="updateModel">The domain assignments to apply.</param>
-    Task<Attempt<IEnumerable<IDomain>, DomainOperationStatus>> UpdateDomainsAsync(Guid contentKey, DomainsUpdateModel updateModel);
+    Task<Attempt<DomainUpdateResult, DomainOperationStatus>> UpdateDomainsAsync(Guid contentKey, DomainsUpdateModel updateModel);
 }

@@ -1,19 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
 
 public class AuditLogBaseModel
 {
-    public Guid UserId { get; set; }
+    public ReferenceByIdModel User { get; set; } = new();
 
-    public Guid? EntityId { get; set; }
+    public AuditLogEntity? Entity { get; set; }
 
-    public DateTime Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
 
     public AuditType LogType { get; set; }
-
-    public string? EntityType { get; set; }
 
     public string? Comment { get; set; }
 

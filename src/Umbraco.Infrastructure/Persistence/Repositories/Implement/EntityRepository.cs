@@ -30,6 +30,30 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     #region Repository
 
+    public int CountByQuery(IQuery<IUmbracoEntity> query, Guid objectType, IQuery<IUmbracoEntity>? filter)
+    {
+        Sql<ISqlContext> sql = Sql();
+        sql.SelectCount();
+        sql
+            .From<NodeDto>();
+        sql.WhereIn<NodeDto>(x => x.NodeObjectType, new[] { objectType } );
+
+        foreach (Tuple<string, object[]> queryClause in query.GetWhereClauses())
+        {
+            sql.Where(queryClause.Item1, queryClause.Item2);
+        }
+
+        if (filter is not null)
+        {
+            foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
+            {
+                sql.Where(filterClause.Item1, filterClause.Item2);
+            }
+        }
+
+        return Database.ExecuteScalar<int>(sql);
+    }
+
     public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType,
         long pageIndex, int pageSize, out long totalRecords,
         IQuery<IUmbracoEntity>? filter, Ordering? ordering) =>
@@ -289,6 +313,13 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
+    public bool Exists(IEnumerable<Guid> keys)
+    {
+        var distictKeys = keys.Distinct();
+        Sql<ISqlContext> sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => distictKeys.Contains(x.UniqueId));
+        return Database.ExecuteScalar<int>(sql) == distictKeys.Count();
+    }
+
     /// <inheritdoc />
     public bool Exists(Guid key, Guid objectType)
     {
@@ -436,8 +467,13 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             {
                 sql
                     .AndSelect<ContentVersionDto>(x => Alias(x.Id, "versionId"), x => x.VersionDate)
-                    .AndSelect<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer,
-                        x => x.Variations);
+                    .AndSelect<ContentTypeDto>(
+                        x => x.Alias,
+                        x => x.Icon,
+                        x => x.Thumbnail,
+                        x => x.ListView,
+                        x => x.Variations)
+                    .AndSelect<NodeDto>("ContentTypeNode", x => Alias(x.UniqueId, "ContentTypeKey"));
             }
 
             if (isContent)
@@ -463,7 +499,9 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
                 .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
                 .LeftJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
                 .LeftJoin<ContentTypeDto>()
-                .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId);
+                .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId)
+                .LeftJoin<NodeDto>("ContentTypeNode")
+                .On<NodeDto, ContentTypeDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "ContentTypeNode");
         }
 
         if (isContent)
@@ -565,8 +603,13 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         {
             sql
                 .AndBy<ContentVersionDto>(x => x.Id, x => x.VersionDate)
-                .AndBy<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer,
-                    x => x.Variations);
+                .AndBy<ContentTypeDto>(
+                    x => x.Alias,
+                    x => x.Icon,
+                    x => x.Thumbnail,
+                    x => x.ListView,
+                    x => x.Variations)
+                .AndBy<NodeDto>("ContentTypeNode", x => x.UniqueId);
         }
 
         if (defaultSort)
@@ -691,6 +734,10 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         public string? Thumbnail { get; set; }
         public bool IsContainer { get; set; }
 
+        public Guid ContentTypeKey { get; set; }
+
+        public Guid? ListView { get; set; }
+
         // ReSharper restore UnusedAutoPropertyAccessor.Local
         // ReSharper restore UnusedMember.Local
     }
@@ -747,6 +794,8 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         entity.ContentTypeAlias = dto.Alias;
         entity.ContentTypeIcon = dto.Icon;
         entity.ContentTypeThumbnail = dto.Thumbnail;
+        entity.ContentTypeKey = dto.ContentTypeKey;
+        entity.ListViewKey = dto.ListView;
     }
 
     private MediaEntitySlim BuildMediaEntity(BaseDto dto)

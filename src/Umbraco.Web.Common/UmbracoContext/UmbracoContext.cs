@@ -164,7 +164,7 @@ _cleanedUmbracoUrl ??= _uriUtility.UriToUmbraco(OriginalRequestUrl);
     /// <inheritdoc />
     public IDisposable ForcedPreview(bool preview)
     {
-        // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,
+        // say we render an RTE in a give 'preview' mode that might not be the 'current' one,
         // then due to the way it all works at the moment, the 'current' published snapshot need to be in the proper
         // default 'preview' mode - somehow we have to force it. and that could be recursive.
         InPreviewMode = preview;

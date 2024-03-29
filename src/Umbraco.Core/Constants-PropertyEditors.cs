@@ -101,11 +101,6 @@ public static partial class Constants
             public const string ListView = "Umbraco.ListView";
 
             /// <summary>
-            ///     Media Picker.
-            /// </summary>
-            public const string MediaPicker = "Umbraco.MediaPicker";
-
-            /// <summary>
             ///     Media Picker v.3.
             /// </summary>
             public const string MediaPicker3 = "Umbraco.MediaPicker3";

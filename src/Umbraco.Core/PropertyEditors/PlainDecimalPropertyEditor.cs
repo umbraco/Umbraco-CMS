@@ -5,10 +5,6 @@
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.PlainDecimal,
-    EditorType.PropertyValue,
-    "Configuration-less decimal",
-    "not-applicable",
-    Icon = "umb:edit",
     ValueEditorIsReusable = true,
     ValueType = ValueTypes.Decimal)]
 public class PlainDecimalPropertyEditor : DataEditor

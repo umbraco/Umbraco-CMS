@@ -1,8 +1,8 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.TextFiles;
+﻿using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.PartialView;
 
-public class CreatePartialViewRequestModel : CreateTextFileViewModelBase
+public class CreatePartialViewRequestModel : FileSystemFileCreateRequestModelBase
 {
 
 }

@@ -25,7 +25,7 @@ public class ConvertersTests
         var converters =
             new PropertyValueConverterCollection(() => new IPropertyValueConverter[] { new SimpleConverter1() });
 
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), serializer)
@@ -108,7 +108,7 @@ public class ConvertersTests
             new SimpleConverter2(publishedSnapshotAccessor),
         });
 
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), serializer)

@@ -13,7 +13,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.AuditLog;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessContentOrMedia)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessContentOrMedia)]
 public class ByKeyAuditLogController : AuditLogControllerBase
 {
     private readonly IAuditService _auditService;

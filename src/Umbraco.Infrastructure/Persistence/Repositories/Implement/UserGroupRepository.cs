@@ -6,11 +6,13 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -25,18 +27,21 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     private readonly PermissionRepository<IContent> _permissionRepository;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
+    private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
 
     public UserGroupRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
         ILogger<UserGroupRepository> logger,
         ILoggerFactory loggerFactory,
-        IShortStringHelper shortStringHelper)
+        IShortStringHelper shortStringHelper,
+        IEnumerable<IPermissionMapper> permissionMappers)
         : base(scopeAccessor, appCaches, logger)
     {
         _shortStringHelper = shortStringHelper;
         _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeAccessor, appCaches, loggerFactory.CreateLogger<UserGroupWithUsersRepository>());
         _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, appCaches, loggerFactory.CreateLogger<PermissionRepository<IContent>>());
+        _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
     public IUserGroup? Get(string alias)
@@ -86,7 +91,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         sql.Where($"umbracoUserGroup.id IN ({innerSql.SQL})");
         AppendGroupBy(sql);
 
-        return Database.Fetch<UserGroupDto>(sql).Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
+        return Database.Fetch<UserGroupDto>(sql).Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x, _permissionMappers));
     }
 
     public void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[]? userIds) =>
@@ -141,7 +146,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                     // TODO: We could/should change the EntityPermissionsCollection into a KeyedCollection and they key could be
                     // a struct of the nodeid + groupid so then we don't actually allocate this class just to check if it's not
                     // going to be included in the result!
-                    var defaultPermission = new EntityPermission(group.Id, nodeId, group.Permissions?.ToArray() ?? Array.Empty<string>(), true);
+                    var defaultPermission = new EntityPermission(group.Id, nodeId, group.Permissions ?? new HashSet<string>(), true);
 
                     // Since this is a hashset, this will not add anything that already exists by group/node combination
                     result.Add(defaultPermission);
@@ -161,7 +166,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     ///     are removed.
     /// </param>
     /// <param name="entityIds">Specify the nodes to replace permissions for. </param>
-    public void ReplaceGroupPermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds) =>
+    public void ReplaceGroupPermissions(int groupId, ISet<string> permissions, params int[] entityIds) =>
         _permissionRepository.ReplacePermissions(groupId, permissions, entityIds);
 
     /// <summary>
@@ -170,7 +175,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     /// <param name="groupId">Id of group</param>
     /// <param name="permission">Permissions as enumerable list of <see cref="char" /></param>
     /// <param name="entityIds">Specify the nodes to replace permissions for</param>
-    public void AssignGroupPermission(int groupId, char permission, params int[] entityIds) =>
+    public void AssignGroupPermission(int groupId, string permission, params int[] entityIds) =>
         _permissionRepository.AssignPermission(groupId, permission, entityIds);
 
     public static string GetByAliasCacheKey(string alias) => CacheKeys.UserGroupGetByAliasCacheKeyPrefix + alias;
@@ -305,9 +310,10 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         }
 
         dto.UserGroup2LanguageDtos = GetUserGroupLanguages(id);
-        dto.UserGroup2PermissionDtos = GetUserGroupPermissions(id);
+        dto.UserGroup2PermissionDtos = GetUserGroupPermissions(dto.Key);
+        dto.UserGroup2GranularPermissionDtos = GetUserGroupGranularPermissions(dto.Key);
 
-        IUserGroup userGroup = UserGroupFactory.BuildEntity(_shortStringHelper, dto);
+        IUserGroup userGroup = UserGroupFactory.BuildEntity(_shortStringHelper, dto, _permissionMappers);
         return userGroup;
     }
 
@@ -331,7 +337,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
         AssignUserGroupOneToManyTables(ref dtos);
 
-        return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
+        return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x, _permissionMappers));
     }
 
     protected override IEnumerable<IUserGroup> PerformGetByQuery(IQuery<IUserGroup> query)
@@ -347,21 +353,26 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
         AssignUserGroupOneToManyTables(ref dtos);
 
-        return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
+        return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x, _permissionMappers));
     }
 
     private void AssignUserGroupOneToManyTables(ref List<UserGroupDto> userGroupDtos)
     {
         IDictionary<int, List<UserGroup2LanguageDto>> userGroups2Languages = GetAllUserGroupLanguageGrouped();
-        IDictionary<int, List<UserGroup2PermissionDto>> userGroups2Permissions = GetAllUserGroupPermissionsGrouped();
+        IDictionary<Guid, List<UserGroup2PermissionDto>> userGroups2Permissions = GetAllUserGroupPermissionsGrouped();
+        IDictionary<Guid, List<UserGroup2GranularPermissionDto>> userGroup2GranularPermissions = GetAllUserGroupGranularPermissionsGrouped();
 
         foreach (UserGroupDto dto in userGroupDtos)
         {
             userGroups2Languages.TryGetValue(dto.Id, out List<UserGroup2LanguageDto>? userGroup2LanguageDtos);
             dto.UserGroup2LanguageDtos = userGroup2LanguageDtos ?? new List<UserGroup2LanguageDto>();
 
-            userGroups2Permissions.TryGetValue(dto.Id, out List<UserGroup2PermissionDto>? userGroup2PermissionDtos);
+            userGroups2Permissions.TryGetValue(dto.Key, out List<UserGroup2PermissionDto>? userGroup2PermissionDtos);
             dto.UserGroup2PermissionDtos = userGroup2PermissionDtos ?? new List<UserGroup2PermissionDto>();
+
+            userGroup2GranularPermissions.TryGetValue(dto.Key, out List<UserGroup2GranularPermissionDto>? userGroup2GranularPermissionDtos);
+            dto.UserGroup2GranularPermissionDtos = userGroup2GranularPermissionDtos ?? new List<UserGroup2GranularPermissionDto>();
+
         }
     }
 
@@ -420,10 +431,11 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 x => x.StartMediaId,
                 x => x.UpdateDate,
                 x => x.Alias,
-                x => x.DefaultPermissions,
                 x => x.Name,
                 x => x.HasAccessToAllLanguages,
-                x => x.Key)
+                x => x.Key,
+                x => x.DefaultPermissions
+                )
             .AndBy<UserGroup2AppDto>(x => x.AppAlias, x => x.UserGroupId);
 
     protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.UserGroup}.id = @id";
@@ -434,9 +446,9 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         {
             "DELETE FROM umbracoUser2UserGroup WHERE userGroupId = @id",
             "DELETE FROM umbracoUserGroup2App WHERE userGroupId = @id",
-            "DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @id",
-            "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @id",
-            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupId = @id",
+            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
+            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
+            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
             "DELETE FROM umbracoUserGroup WHERE id = @id",
         };
         return list;
@@ -454,6 +466,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         PersistAllowedSections(entity);
         PersistAllowedLanguages(entity);
         PersistPermissions(entity);
+        PersistGranularPermissions(entity);
 
         entity.ResetDirtyProperties();
     }
@@ -469,6 +482,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         PersistAllowedSections(entity);
         PersistAllowedLanguages(entity);
         PersistPermissions(entity);
+        PersistGranularPermissions(entity);
 
         entity.ResetDirtyProperties();
     }
@@ -510,14 +524,35 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
     private void PersistPermissions(IUserGroup userGroup)
     {
-        Database.Delete<UserGroup2PermissionDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
+        Database.Delete<UserGroup2PermissionDto>("WHERE userGroupKey = @UserGroupKey", new { UserGroupKey = userGroup.Key });
 
-        foreach (var permission in userGroup.PermissionNames)
-        {
-            var permissionDto = new UserGroup2PermissionDto { UserGroupId = userGroup.Id, Permission = permission, };
-            Database.Insert(permissionDto);
-        }
+        IEnumerable<UserGroup2PermissionDto> permissionDtos = userGroup.Permissions
+            .Select(permission => new UserGroup2PermissionDto { UserGroupKey = userGroup.Key, Permission = permission });
+
+        Database.InsertBulk(permissionDtos);
     }
+    private void PersistGranularPermissions(IUserGroup userGroup)
+    {
+        Database.Delete<UserGroup2GranularPermissionDto>("WHERE userGroupKey = @UserGroupKey", new { UserGroupKey = userGroup.Key });
+
+        IEnumerable<UserGroup2GranularPermissionDto> permissionDtos = userGroup.GranularPermissions
+            .Select(permission =>
+            {
+                var dto = new UserGroup2GranularPermissionDto
+                {
+                    UserGroupKey = userGroup.Key, Permission = permission.Permission, Context = permission.Context
+                };
+                if (permission is INodeGranularPermission nodeGranularPermission)
+                {
+                    dto.UniqueId = nodeGranularPermission.Key;
+                }
+
+                return dto;
+            });
+
+        Database.InsertBulk(permissionDtos);
+    }
+
 
     private List<UserGroup2LanguageDto> GetUserGroupLanguages(int userGroupId)
     {
@@ -537,25 +572,45 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         return userGroupLanguages.GroupBy(x => x.UserGroupId).ToDictionary(x => x.Key, x => x.ToList());
     }
 
-    private List<UserGroup2PermissionDto> GetUserGroupPermissions(int userGroupId)
+    private List<UserGroup2PermissionDto> GetUserGroupPermissions(Guid userGroupKey)
     {
         Sql<ISqlContext> query = Sql()
             .Select<UserGroup2PermissionDto>()
             .From<UserGroup2PermissionDto>()
-            .Where<UserGroup2PermissionDto>(x => x.UserGroupId == userGroupId);
+            .Where<UserGroup2PermissionDto>(x => x.UserGroupKey == userGroupKey);
 
         return Database.Fetch<UserGroup2PermissionDto>(query);
     }
+    private List<UserGroup2GranularPermissionDto> GetUserGroupGranularPermissions(Guid userGroupKey)
+    {
+        Sql<ISqlContext> query = Sql()
+            .Select<UserGroup2GranularPermissionDto>()
+            .From<UserGroup2GranularPermissionDto>()
+            .Where<UserGroup2GranularPermissionDto>(x => x.UserGroupKey == userGroupKey);
 
-    private Dictionary<int, List<UserGroup2PermissionDto>> GetAllUserGroupPermissionsGrouped()
+        return Database.Fetch<UserGroup2GranularPermissionDto>(query);
+    }
+
+    private Dictionary<Guid, List<UserGroup2PermissionDto>> GetAllUserGroupPermissionsGrouped()
     {
         Sql<ISqlContext> query = Sql()
             .Select<UserGroup2PermissionDto>()
             .From<UserGroup2PermissionDto>();
 
         List<UserGroup2PermissionDto> userGroupPermissions = Database.Fetch<UserGroup2PermissionDto>(query);
-        return userGroupPermissions.GroupBy(x => x.UserGroupId).ToDictionary(x => x.Key, x => x.ToList());
+        return userGroupPermissions.GroupBy(x => x.UserGroupKey).ToDictionary(x => x.Key, x => x.ToList());
     }
+
+    private Dictionary<Guid, List<UserGroup2GranularPermissionDto>> GetAllUserGroupGranularPermissionsGrouped()
+    {
+        Sql<ISqlContext> query = Sql()
+            .Select<UserGroup2GranularPermissionDto>()
+            .From<UserGroup2GranularPermissionDto>();
+
+        List<UserGroup2GranularPermissionDto> userGroupGranularPermissions = Database.Fetch<UserGroup2GranularPermissionDto>(query);
+        return userGroupGranularPermissions.GroupBy(x => x.UserGroupKey).ToDictionary(x => x.Key, x => x.ToList());
+    }
+
 
     #endregion
 }

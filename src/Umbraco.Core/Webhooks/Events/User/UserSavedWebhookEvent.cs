@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -18,7 +18,7 @@ public class UserSavedWebhookEvent : WebhookEventBase<UserSavedNotification>
     {
     }
 
-    public override string Alias => "userSaved";
+    public override string Alias => Constants.WebhookEvents.Aliases.UserSaved;
 
     public override object? ConvertNotificationToRequestPayload(UserSavedNotification notification)
     {

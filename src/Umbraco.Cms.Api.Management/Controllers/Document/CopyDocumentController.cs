@@ -8,6 +8,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -40,7 +41,7 @@ public class CopyDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionCopy.ActionLetter, new[] { copyDocumentRequestModel.TargetId, id }),
+            ContentPermissionResource.WithKeys(ActionCopy.ActionLetter, new[] { copyDocumentRequestModel.Target?.Id, id }),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -50,13 +51,13 @@ public class CopyDocumentController : DocumentControllerBase
 
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.CopyAsync(
             id,
-            copyDocumentRequestModel.TargetId,
+            copyDocumentRequestModel.Target?.Id,
             copyDocumentRequestModel.RelateToOriginal,
             copyDocumentRequestModel.IncludeDescendants,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result!.Key)
+            ? CreatedAtId<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result!.Key)
             : ContentEditingOperationStatusResult(result.Status);
     }
 }

@@ -13,6 +13,7 @@ internal static class DocumentTypeBuilderExtensions
         builder.Services.AddTransient<IDocumentTypeEditingPresentationFactory, DocumentTypeEditingPresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<DocumentTypeMapDefinition>();
+        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<DocumentTypeCompositionMapDefinition>();
 
         return builder;
     }

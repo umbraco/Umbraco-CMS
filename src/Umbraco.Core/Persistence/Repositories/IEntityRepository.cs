@@ -48,6 +48,8 @@ public interface IEntityRepository : IRepository
 
     bool Exists(Guid key);
 
+    bool Exists(IEnumerable<Guid> keys);
+
     /// <summary>
     /// Asserts if an entity with the given object type exists.
     /// </summary>
@@ -83,4 +85,6 @@ public interface IEntityRepository : IRepository
         out long totalRecords,
         IQuery<IUmbracoEntity>? filter,
         Ordering? ordering);
+
+    int CountByQuery(IQuery<IUmbracoEntity> query, Guid objectType, IQuery<IUmbracoEntity>? filter);
 }

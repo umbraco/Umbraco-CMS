@@ -6,10 +6,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Item;
 
-[ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DocumentBlueprint}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.DocumentBlueprint}")]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessContent)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
 public class DocumentBlueprintItemControllerBase : ManagementApiControllerBase
 {
 }

@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Models;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Extensions;
 
@@ -78,7 +79,12 @@ public class DictionaryPresentationFactory : IDictionaryPresentationFactory
                         ? key
                         : null;
 
-                    return new ImportDictionaryItemsPresentationModel { Name = name, Id = itemKey, ParentId = parentKey };
+                    return new ImportDictionaryItemsPresentationModel
+                    {
+                        Name = name,
+                        Id = itemKey,
+                        Parent = ReferenceByIdModel.ReferenceOrNull(parentKey)
+                    };
                 })
                 .WhereNotNull()
                 .ToArray(),

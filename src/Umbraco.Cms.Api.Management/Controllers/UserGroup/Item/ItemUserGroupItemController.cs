@@ -20,7 +20,7 @@ public class ItemUserGroupItemController : UserGroupItemControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<UserGroupItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)

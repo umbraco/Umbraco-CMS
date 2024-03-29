@@ -5,6 +5,7 @@ public enum UserGroupOperationStatus
 {
     Success,
     NotFound,
+    UserNotFound,
     AlreadyExists,
     DuplicateAlias,
     MissingUser,
@@ -12,6 +13,7 @@ public enum UserGroupOperationStatus
     CancelledByNotification,
     MediaStartNodeKeyNotFound,
     DocumentStartNodeKeyNotFound,
+    DocumentPermissionKeyNotFound,
     LanguageNotFound,
     NameTooLong,
     AliasTooLong,
@@ -20,5 +22,7 @@ public enum UserGroupOperationStatus
     UnauthorizedMissingContentStartNodeAccess,
     UnauthorizedMissingMediaStartNodeAccess,
     UnauthorizedMissingUserGroupAccess,
-    UnauthorizedMissingUsersSectionAccess
+    UnauthorizedMissingUsersSectionAccess,
+    AdminGroupCannotBeEmpty,
+    UserNotInGroup,
 }

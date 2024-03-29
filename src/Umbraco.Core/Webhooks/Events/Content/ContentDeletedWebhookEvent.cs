@@ -23,7 +23,7 @@ public class ContentDeletedWebhookEvent : WebhookEventContentBase<ContentDeleted
     {
     }
 
-    public override string Alias => Constants.WebhookEvents.Aliases.ContentUnpublish;
+    public override string Alias => Constants.WebhookEvents.Aliases.ContentDelete;
 
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentDeletedNotification notification) =>
         notification.DeletedEntities;

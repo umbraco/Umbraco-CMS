@@ -2,11 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -20,15 +23,18 @@ public class PublishDocumentController : DocumentControllerBase
     private readonly IAuthorizationService _authorizationService;
     private readonly IContentPublishingService _contentPublishingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
     public PublishDocumentController(
         IAuthorizationService authorizationService,
         IContentPublishingService contentPublishingService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IDocumentPresentationFactory documentPresentationFactory)
     {
         _authorizationService = authorizationService;
         _contentPublishingService = contentPublishingService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _documentPresentationFactory = documentPresentationFactory;
     }
 
     [HttpPut("{id:guid}/publish")]
@@ -40,7 +46,7 @@ public class PublishDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionPublish.ActionLetter, id),
+            ContentPermissionResource.WithKeys(ActionPublish.ActionLetter, id, requestModel.PublishSchedules.Where(x=>x.Culture is not null).Select(x=>x.Culture!)),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -48,12 +54,19 @@ public class PublishDocumentController : DocumentControllerBase
             return Forbidden();
         }
 
-        Attempt<ContentPublishingOperationStatus> attempt = await _contentPublishingService.PublishAsync(
+        Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> modelResult = _documentPresentationFactory.CreateCultureAndScheduleModel(requestModel);
+
+        if (modelResult.Success is false)
+        {
+            return DocumentPublishingOperationStatusResult(modelResult.Status);
+        }
+
+        Attempt<ContentPublishingResult, ContentPublishingOperationStatus> attempt = await _contentPublishingService.PublishAsync(
             id,
-            requestModel.Cultures,
+            modelResult.Result,
             CurrentUserKey(_backOfficeSecurityAccessor));
         return attempt.Success
             ? Ok()
-            : ContentPublishingOperationStatusResult(attempt.Result);
+            : DocumentPublishingOperationStatusResult(attempt.Status, invalidPropertyAliases: attempt.Result.InvalidPropertyAliases);
     }
 }

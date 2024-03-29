@@ -1,4 +1,4 @@
-import type { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui';
+import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
@@ -102,7 +102,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
    * @see https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors
    */
   @property({attribute: 'button-look'})
-  buttonLook: InterfaceLook = 'outline';
+  buttonLook: UUIInterfaceLook = 'outline';
 
   /**
    * Gets or sets the color of the underlying uui-button.
@@ -113,7 +113,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
    * @see https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors
    */
   @property({attribute: 'button-color'})
-  buttonColor: InterfaceColor = 'default';
+  buttonColor: UUIInterfaceColor = 'default';
 
   #externalLoginUrl = '';
 
@@ -203,7 +203,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
       }
 
       #defaultView uui-icon {
-        color: #00000080;
+				opacity: 0.85;
         padding-right: 2px;
       }
 

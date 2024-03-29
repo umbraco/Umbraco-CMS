@@ -28,7 +28,6 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliver
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IHtmlEncodedString);
 
-    // PropertyCacheLevel.Content is ok here because that converter does not parse {locallink} nor executes macros
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Snapshot;
 

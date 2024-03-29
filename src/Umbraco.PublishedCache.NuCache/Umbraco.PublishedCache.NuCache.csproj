@@ -10,7 +10,6 @@
     <PackageReference Include="Umbraco.CSharpTest.Net.Collections"  />
     <PackageReference Include="MessagePack" />
     <PackageReference Include="K4os.Compression.LZ4" />
-    <PackageReference Include="Newtonsoft.Json"/>
   </ItemGroup>
 
   <ItemGroup>

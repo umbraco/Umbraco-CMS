@@ -31,6 +31,7 @@ public class GetDocumentPermissionsCurrentUserController : CurrentUserController
     [MapToApiVersion("1.0")]
     [HttpGet("permissions/document")]
     [ProducesResponseType(typeof(IEnumerable<UserPermissionsResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPermissions([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissionsAttempt = await _userService.GetDocumentPermissionsAsync(CurrentUserKey(_backOfficeSecurityAccessor), ids);
