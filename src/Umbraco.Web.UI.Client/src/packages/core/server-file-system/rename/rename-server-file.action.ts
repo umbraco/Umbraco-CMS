@@ -1,11 +1,11 @@
 import { UMB_RENAME_SERVER_FILE_MODAL } from './modal/rename-server-file-modal.token.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { MetaEntityActionRenameKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { MetaEntityActionRenameServerFileKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
-export class UmbRenameEntityAction extends UmbEntityActionBase<MetaEntityActionRenameKind> {
+export class UmbRenameEntityAction extends UmbEntityActionBase<MetaEntityActionRenameServerFileKind> {
 	async execute() {
 		if (!this.args.unique) throw new Error('Unique is required to rename an entity');
 
