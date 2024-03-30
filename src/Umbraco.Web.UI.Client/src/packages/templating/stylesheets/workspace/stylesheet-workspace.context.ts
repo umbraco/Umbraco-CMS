@@ -107,11 +107,20 @@ export class UmbStylesheetWorkspaceContext
 
 	async load(unique: string) {
 		this.resetState();
-		const { data } = await this.repository.requestByUnique(unique);
+		const { data, asObservable } = await this.repository.requestByUnique(unique);
 
 		if (data) {
 			this.setIsNew(false);
 			this.#data.setValue(data);
+
+			this.observe(asObservable(), (data) => this.onDetailStoreChanges(data), 'umbDetailStoreObserver');
+		}
+	}
+
+	onDetailStoreChanges(data: UmbStylesheetDetailModel | undefined) {
+		// Data is removed from the store
+		if (data === undefined) {
+			console.log('data removed');
 		}
 	}
 

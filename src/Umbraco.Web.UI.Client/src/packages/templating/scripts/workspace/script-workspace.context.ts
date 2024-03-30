@@ -110,16 +110,19 @@ export class UmbScriptWorkspaceContext
 		this.resetState();
 		const { data, asObservable } = await this.repository.requestByUnique(unique);
 
-		this.observe(asObservable(), (data) => this.onDetailStoreChanges(data), 'umbDetailStoreObserver');
-
 		if (data) {
 			this.setIsNew(false);
 			this.#data.setValue(data);
+
+			this.observe(asObservable(), (data) => this.onDetailStoreChanges(data), 'umbDetailStoreObserver');
 		}
 	}
 
 	onDetailStoreChanges(data: UmbScriptDetailModel | undefined) {
-		console.log(data);
+		// Data is removed from the store
+		if (data === undefined) {
+			console.log('data removed');
+		}
 	}
 
 	async create(parent: { entityType: string; unique: string | null }) {
