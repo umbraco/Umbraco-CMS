@@ -51,9 +51,9 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	}
 
 	//TODO How should we handle url stuff?
-	private _handleOpenCard(id: string) {
+	private _handleOpenCard(unique: string) {
 		//TODO this will not be needed when cards works as links with href
-		history.pushState(null, '', 'section/user-management/view/users/user/' + id); //TODO Change to a tag with href and make dynamic
+		history.pushState(null, '', 'section/user-management/view/users/user/edit/' + unique); //TODO Change to a tag with href and make dynamic
 	}
 
 	#onSelect(user: UmbUserDetailModel) {
