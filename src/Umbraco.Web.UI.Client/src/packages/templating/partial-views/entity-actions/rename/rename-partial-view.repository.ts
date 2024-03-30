@@ -6,6 +6,8 @@ import { UmbRenameServerFileRepositoryBase } from '@umbraco-cms/backoffice/serve
 
 export class UmbRenamePartialViewRepository extends UmbRenameServerFileRepositoryBase<UmbPartialViewDetailModel> {
 	constructor(host: UmbControllerHost) {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		super(host, UmbRenamePartialViewServerDataSource, UMB_PARTIAL_VIEW_DETAIL_STORE_CONTEXT);
 	}
 }

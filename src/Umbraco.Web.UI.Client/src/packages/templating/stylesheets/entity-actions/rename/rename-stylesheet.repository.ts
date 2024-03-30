@@ -6,6 +6,8 @@ import { UmbRenameServerFileRepositoryBase } from '@umbraco-cms/backoffice/serve
 
 export class UmbRenameStylesheetRepository extends UmbRenameServerFileRepositoryBase<UmbStylesheetDetailModel> {
 	constructor(host: UmbControllerHost) {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		super(host, UmbRenameStylesheetServerDataSource, UMB_STYLESHEET_DETAIL_STORE_CONTEXT);
 	}
 }
