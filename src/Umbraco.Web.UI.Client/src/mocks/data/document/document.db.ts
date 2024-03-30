@@ -17,6 +17,7 @@ import type {
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
 	DomainsResponseModel,
+	DocumentConfigurationResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel> {
@@ -38,6 +39,17 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 
 	getDomainsForDocument(id: string): DomainsResponseModel {
 		return { defaultIsoCode: 'en-us', domains: [] };
+	}
+
+	getConfiguration(): DocumentConfigurationResponseModel {
+		return {
+			allowEditInvariantFromNonDefault: true,
+			allowNonExistingSegmentsCreation: true,
+			disableDeleteWhenReferenced: true,
+			disableUnpublishWhenReferenced: true,
+			reservedFieldNames: [],
+			sanitizeTinyMce: true,
+		};
 	}
 }
 

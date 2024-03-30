@@ -61,6 +61,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			name: firstUser.name,
 			email: firstUser.email,
 			userName: firstUser.email,
+			hasAccessToSensitiveData: true,
 			avatarUrls: [],
 			hasAccessToAllLanguages: true,
 			languageIsoCode: firstUser.languageIsoCode,

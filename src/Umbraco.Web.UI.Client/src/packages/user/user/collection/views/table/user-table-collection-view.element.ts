@@ -181,11 +181,6 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 			}
-
-			umb-table {
-				padding: 0;
-				margin: 0 var(--uui-size-layout-1) var(--uui-size-layout-1);
-			}
 		`,
 	];
 }
