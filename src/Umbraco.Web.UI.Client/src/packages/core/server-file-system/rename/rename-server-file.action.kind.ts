@@ -3,14 +3,14 @@ import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extensio
 
 export const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.EntityAction.Rename',
-	matchKind: 'rename',
+	alias: 'Umb.Kind.EntityAction.ServerFile.Rename',
+	matchKind: 'renameServerFile',
 	matchType: 'entityAction',
 	manifest: {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
-		kind: 'rename',
-		api: () => import('./rename.action.js'),
+		kind: 'renameServerFile',
+		api: () => import('./rename-server-file.action.js'),
 		weight: 200,
 		forEntityTypes: [],
 		meta: {

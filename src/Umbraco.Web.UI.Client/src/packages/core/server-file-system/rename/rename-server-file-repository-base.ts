@@ -1,14 +1,14 @@
+import type { UmbRenameServerFileDataSource, UmbRenameServerFileDataSourceConstructor } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import type { UmbRenameDataSource, UmbRenameDataSourceConstructor } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export abstract class UmbRenameRepositoryBase<DetailModelType extends { unique: string }> extends UmbRepositoryBase {
-	#renameSource: UmbRenameDataSource<DetailModelType>;
+export abstract class UmbRenameServerFileRepositoryBase<
+	DetailModelType extends { unique: string },
+> extends UmbRepositoryBase {
+	#renameSource: UmbRenameServerFileDataSource<DetailModelType>;
 
-	constructor(host: UmbControllerHost, detailSource: UmbRenameDataSourceConstructor<DetailModelType>) {
+	constructor(host: UmbControllerHost, detailSource: UmbRenameServerFileDataSourceConstructor<DetailModelType>) {
 		super(host);
 		this.#renameSource = new detailSource(host);
 	}
@@ -18,7 +18,7 @@ export abstract class UmbRenameRepositoryBase<DetailModelType extends { unique: 
 	 * @param {string} unique
 	 * @param {string} name
 	 * @return {*}
-	 * @memberof UmbRenameRepositoryBase
+	 * @memberof UmbRenameServerFileRepositoryBase
 	 */
 	async rename(unique: string, name: string) {
 		if (!unique) throw new Error('Unique is missing');

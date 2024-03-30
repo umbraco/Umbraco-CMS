@@ -1,5 +1,5 @@
-import type { UmbRenameRepository } from '../types.js';
-import type { UmbRenameModalData, UmbRenameModalValue } from './rename-modal.token.js';
+import type { UmbRenameServerFileRepository } from '../types.js';
+import type { UmbRenameModalData, UmbRenameServerFileModalValue } from './rename-server-file-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -9,10 +9,10 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-rename-modal')
-export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalData, UmbRenameModalValue> {
+export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalData, UmbRenameServerFileModalValue> {
 	// TODO: make base type for item and detail models
 	#itemRepository?: UmbItemRepository<any>;
-	#renameRepository?: UmbRenameRepository<any>;
+	#renameRepository?: UmbRenameServerFileRepository<any>;
 	#init?: Promise<unknown>;
 
 	@state()
@@ -46,7 +46,7 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 				this.data.renameRepositoryAlias,
 				[this],
 				(permitted, ctrl) => {
-					this.#renameRepository = permitted ? (ctrl.api as UmbRenameRepository<any>) : undefined;
+					this.#renameRepository = permitted ? (ctrl.api as UmbRenameServerFileRepository<any>) : undefined;
 				},
 			).asPromise(),
 		]);
