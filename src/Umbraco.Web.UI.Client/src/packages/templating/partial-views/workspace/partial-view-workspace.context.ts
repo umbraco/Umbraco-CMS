@@ -133,8 +133,9 @@ export class UmbPartialViewWorkspaceContext
 
 	onDetailStoreChanges(data: UmbPartialViewDetailModel | undefined) {
 		// Data is removed from the store
+		// TODO: revisit. We need to handle what should happen when the data is removed from the store
 		if (data === undefined) {
-			console.log('data removed');
+			this.#data.setValue(undefined);
 		}
 	}
 
