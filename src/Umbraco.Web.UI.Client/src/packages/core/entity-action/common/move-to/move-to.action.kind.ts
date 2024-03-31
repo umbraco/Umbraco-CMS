@@ -3,19 +3,19 @@ import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extensio
 
 export const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.EntityAction.Move',
-	matchKind: 'move',
+	alias: 'Umb.Kind.EntityAction.MoveTo',
+	matchKind: 'moveTo',
 	matchType: 'entityAction',
 	manifest: {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
-		kind: 'move',
-		api: () => import('./move.action.js'),
+		kind: 'moveTo',
+		api: () => import('./move-to.action.js'),
 		weight: 700,
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-enter',
-			label: 'Move to (TBD)...',
+			label: 'Move to...',
 			treeRepositoryAlias: '',
 			moveRepositoryAlias: '',
 			pickerModal: '',

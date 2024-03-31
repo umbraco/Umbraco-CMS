@@ -9,7 +9,7 @@ import type {
 	ManifestEntityActionRenameKind,
 	ManifestEntityActionReloadTreeItemChildrenKind,
 	ManifestEntityActionDuplicateKind,
-	ManifestEntityActionMoveKind,
+	ManifestEntityActionMoveToKind,
 	ManifestEntityActionCreateFolderKind,
 	ManifestEntityActionUpdateFolderKind,
 	ManifestEntityActionDeleteFolderKind,
@@ -108,7 +108,7 @@ export type ManifestEntityActions =
 	| ManifestEntityActionRenameKind
 	| ManifestEntityActionReloadTreeItemChildrenKind
 	| ManifestEntityActionDuplicateKind
-	| ManifestEntityActionMoveKind
+	| ManifestEntityActionMoveToKind
 	| ManifestEntityActionCreateFolderKind
 	| ManifestEntityActionUpdateFolderKind
 	| ManifestEntityActionDeleteFolderKind

@@ -100,12 +100,12 @@ export interface MetaEntityActionDuplicateKind extends MetaEntityActionDefaultKi
 }
 
 // MOVE
-export interface ManifestEntityActionMoveKind extends ManifestEntityAction<MetaEntityActionMoveKind> {
+export interface ManifestEntityActionMoveToKind extends ManifestEntityAction<MetaEntityActionMoveToKind> {
 	type: 'entityAction';
-	kind: 'move';
+	kind: 'moveTo';
 }
 
-export interface MetaEntityActionMoveKind extends MetaEntityActionDefaultKind {
+export interface MetaEntityActionMoveToKind extends MetaEntityActionDefaultKind {
 	moveRepositoryAlias: string;
 	itemRepositoryAlias: string;
 	pickerModal: UmbModalToken | string;

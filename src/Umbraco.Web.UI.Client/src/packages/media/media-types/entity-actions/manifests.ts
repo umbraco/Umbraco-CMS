@@ -7,8 +7,8 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
-		kind: 'move',
-		alias: 'Umb.EntityAction.MediaType.Move',
+		kind: 'moveTo',
+		alias: 'Umb.EntityAction.MediaType.MoveTo',
 		name: 'Move Media Type Entity Action',
 		forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		meta: {

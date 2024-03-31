@@ -18,8 +18,8 @@ const entityActions: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityAction',
-		kind: 'move',
-		alias: 'Umb.EntityAction.Dictionary.Move',
+		kind: 'moveTo',
+		alias: 'Umb.EntityAction.Dictionary.MoveTo',
 		name: 'Move Dictionary Entity Action',
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {

@@ -3,7 +3,7 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbMoveRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbMoveEntityAction extends UmbEntityActionBase<any> {
+export class UmbMoveToEntityAction extends UmbEntityActionBase<any> {
 	async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
@@ -22,4 +22,4 @@ export class UmbMoveEntityAction extends UmbEntityActionBase<any> {
 	}
 }
 
-export default UmbMoveEntityAction;
+export default UmbMoveToEntityAction;

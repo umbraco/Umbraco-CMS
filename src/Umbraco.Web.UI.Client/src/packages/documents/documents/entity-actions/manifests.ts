@@ -35,9 +35,9 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Move',
+		alias: 'Umb.EntityAction.Document.MoveTo',
 		name: 'Move Document Entity Action ',
-		kind: 'move',
+		kind: 'moveTo',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		weight: 900,
 		meta: {
