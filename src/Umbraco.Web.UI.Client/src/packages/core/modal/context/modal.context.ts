@@ -2,7 +2,7 @@ import { UmbModalToken } from '../token/modal-token.js';
 import type { UmbModalConfig, UmbModalType } from './modal-manager.context.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
-import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIModalElement, UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -32,6 +32,7 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 	public readonly data: ModalPreset;
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
+	public readonly elementFactory? : () => UUIModalElement;
 	public readonly router: IRouterSlot | null = null;
 	public readonly alias: string | UmbModalToken<ModalPreset, ModalValue>;
 
@@ -51,11 +52,13 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 		if (this.alias instanceof UmbModalToken) {
 			this.type = this.alias.getDefaultModal()?.type || this.type;
 			this.size = this.alias.getDefaultModal()?.size || this.size;
+			this.elementFactory = this.alias.getDefaultModal()?.elementFactory || this.elementFactory;
 		}
 
 		this.type = args.modal?.type || this.type;
 		this.size = args.modal?.size || this.size;
-
+		this.elementFactory = args.modal?.elementFactory || this.elementFactory;
+		//debugger;
 		const defaultData = this.alias instanceof UmbModalToken ? this.alias.getDefaultData() : undefined;
 		this.data = Object.freeze({ ...defaultData, ...args.data } as ModalPreset);
 

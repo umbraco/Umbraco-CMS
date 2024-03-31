@@ -9,6 +9,7 @@ import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBasicState, type UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UUIModalCloseEvent,
+	type UUIModalElement,
 	type UUIDialogElement,
 	type UUIModalDialogElement,
 	type UUIModalSidebarElement,
@@ -36,7 +37,7 @@ export class UmbModalElement extends UmbLitElement {
 		this.#createModalElement();
 	}
 
-	public element?: UUIModalDialogElement | UUIModalSidebarElement;
+	public element?: UUIModalDialogElement | UUIModalSidebarElement | UUIModalElement;
 
 	#innerElement = new UmbBasicState<HTMLElement | undefined>(undefined);
 
@@ -102,6 +103,9 @@ export class UmbModalElement extends UmbLitElement {
 	}
 
 	#createContainerElement() {
+		if(this.#modalContext!.type == 'custom' && this.#modalContext?.elementFactory)
+			return this.#modalContext.elementFactory();
+
 		return this.#modalContext!.type === 'sidebar' ? this.#createSidebarElement() : this.#createDialogElement();
 	}
 
