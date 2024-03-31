@@ -1,4 +1,4 @@
-import type { DemoModalData, DemoModalResult } from './example-modal-token.js';
+import type { ExampleModalData, ExampleModalResult } from './example-modal-token.js';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
@@ -8,7 +8,7 @@ import './example-custom-modal-element.element.js';
 export class UmbExampleModalViewElement extends UmbLitElement {
 
     @property({ attribute: false })
-	public modalContext?: UmbModalContext<DemoModalData, DemoModalResult>;
+	public modalContext?: UmbModalContext<ExampleModalData, ExampleModalResult>;
 
     onClickDone(){
         this.modalContext?.submit();
@@ -44,7 +44,7 @@ export class UmbExampleModalViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbPocModalViewElement
+export default UmbExampleModalViewElement
 
 declare global {
     interface HTMLElementTagNameMap {
