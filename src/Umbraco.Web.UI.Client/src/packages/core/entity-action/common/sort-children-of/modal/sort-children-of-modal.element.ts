@@ -3,8 +3,10 @@ import { html, customElement, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-@customElement('umb-sort-children-of-modal')
-export class UmbRenameModalElement extends UmbModalBaseElement<
+const elementName = 'umb-sort-children-of-modal';
+
+@customElement(elementName)
+export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	UmbSortChildrenOfModalData,
 	UmbSortChildrenOfModalValue
 > {
@@ -28,10 +30,10 @@ export class UmbRenameModalElement extends UmbModalBaseElement<
 	];
 }
 
-export default UmbRenameModalElement;
+export default UmbSortChildrenOfModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-rename-modal': UmbRenameModalElement;
+		[elementName]: UmbSortChildrenOfModalElement;
 	}
 }
