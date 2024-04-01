@@ -6,7 +6,15 @@ import type { MetaEntityActionSortChildrenOfKind } from '@umbraco-cms/backoffice
 export class UmbSortChildrenOfEntityAction extends UmbEntityActionBase<MetaEntityActionSortChildrenOfKind> {
 	async execute() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this._host, UMB_SORT_CHILDREN_OF_MODAL);
+		const modal = modalManager.open(this._host, UMB_SORT_CHILDREN_OF_MODAL, {
+			data: {
+				unique: this.args.unique,
+				entityType: this.args.entityType,
+				itemRepositoryAlias: this.args.meta.itemRepositoryAlias,
+				sortChildrenOfRepositoryAlias: this.args.meta.sortChildrenOfRepositoryAlias,
+				treeRepositoryAlias: this.args.meta.treeRepositoryAlias,
+			},
+		});
 		await modal.onSubmit();
 	}
 }

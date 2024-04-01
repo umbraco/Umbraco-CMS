@@ -141,4 +141,5 @@ export interface ManifestEntityActionSortChildrenOfKind
 export interface MetaEntityActionSortChildrenOfKind extends MetaEntityActionDefaultKind {
 	itemRepositoryAlias: string;
 	sortChildrenOfRepositoryAlias: string;
+	treeRepositoryAlias: string;
 }
