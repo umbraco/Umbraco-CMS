@@ -61,15 +61,6 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 	{
 		type: 'entityAction',
-		kind: 'sort',
-		alias: 'Umb.EntityAction.Document.Sort',
-		name: 'Sort Document Entity Action',
-		weight: 700,
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-		meta: {},
-	},
-	{
-		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Document.Publish',
 		name: 'Publish Document Entity Action',
