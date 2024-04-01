@@ -131,7 +131,7 @@ export interface MetaEntityActionFolderKind extends MetaEntityActionDefaultKind 
 	folderRepositoryAlias: string;
 }
 
-// SORT
+// SORT CHILDREN OF
 export interface ManifestEntityActionSortChildrenOfKind
 	extends ManifestEntityAction<MetaEntityActionSortChildrenOfKind> {
 	type: 'entityAction';
