@@ -15,6 +15,7 @@ import type {
 	ManifestEntityActionDeleteFolderKind,
 	ManifestEntityActionDefaultKind,
 	ManifestEntityActionTrashKind,
+	ManifestEntityActionSortChildrenOfKind,
 } from './entity-action.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.model.js';
@@ -103,16 +104,17 @@ export type * from './workspace.model.js';
 
 export type ManifestEntityActions =
 	| ManifestEntityAction
+	| ManifestEntityActionCreateFolderKind
 	| ManifestEntityActionDefaultKind
+	| ManifestEntityActionDeleteFolderKind
 	| ManifestEntityActionDeleteKind
-	| ManifestEntityActionRenameKind
-	| ManifestEntityActionReloadTreeItemChildrenKind
 	| ManifestEntityActionDuplicateKind
 	| ManifestEntityActionMoveKind
-	| ManifestEntityActionCreateFolderKind
-	| ManifestEntityActionUpdateFolderKind
-	| ManifestEntityActionDeleteFolderKind
-	| ManifestEntityActionTrashKind;
+	| ManifestEntityActionReloadTreeItemChildrenKind
+	| ManifestEntityActionRenameKind
+	| ManifestEntityActionSortChildrenOfKind
+	| ManifestEntityActionTrashKind
+	| ManifestEntityActionUpdateFolderKind;
 
 export type ManifestWorkspaceFooterApps =
 	| ManifestWorkspaceFooterApp

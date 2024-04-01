@@ -132,12 +132,13 @@ export interface MetaEntityActionFolderKind extends MetaEntityActionDefaultKind 
 }
 
 // SORT
-export interface ManifestEntityActionSortKind extends ManifestEntityAction<MetaEntityActionSortKind> {
+export interface ManifestEntityActionSortChildrenOfKind
+	extends ManifestEntityAction<MetaEntityActionSortChildrenOfKind> {
 	type: 'entityAction';
-	kind: 'sort';
+	kind: 'sortChildrenOf';
 }
 
-export interface MetaEntityActionSortKind extends MetaEntityActionDefaultKind {
+export interface MetaEntityActionSortChildrenOfKind extends MetaEntityActionDefaultKind {
 	itemRepositoryAlias: string;
-	sortRepositoryAlias: string;
+	sortChildrenOfRepositoryAlias: string;
 }

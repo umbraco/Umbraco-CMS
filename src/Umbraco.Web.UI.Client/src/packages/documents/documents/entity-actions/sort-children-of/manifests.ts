@@ -5,7 +5,7 @@ import { UMB_SORT_CHILDREN_OF_DOCUMENT_REPOSITORY_ALIAS } from './repository/con
 export const manifests = [
 	{
 		type: 'entityAction',
-		kind: 'sort',
+		kind: 'sortChildrenOf',
 		alias: 'Umb.EntityAction.Document.SortChildrenOf',
 		name: 'Sort Children Of Document Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
