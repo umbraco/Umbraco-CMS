@@ -15,10 +15,9 @@ export const manifest: UmbBackofficeManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-height',
-			label: 'Sort (TBD)...',
+			label: 'Sort...',
 			itemRepositoryAlias: '',
-			moveRepositoryAlias: '',
-			pickerModal: '',
+			sortRepositoryAlias: '',
 		},
 	},
 };
