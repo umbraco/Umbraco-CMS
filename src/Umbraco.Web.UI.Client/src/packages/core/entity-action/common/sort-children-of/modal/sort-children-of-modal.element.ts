@@ -30,7 +30,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	];
 }
 
-export default UmbSortChildrenOfModalElement;
+export { UmbSortChildrenOfModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
