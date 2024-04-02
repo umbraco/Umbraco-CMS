@@ -14,7 +14,7 @@ export const manifests: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityAction',
-		kind: 'rename',
+		kind: 'renameServerFile',
 		alias: UMB_RENAME_STYLESHEET_ENTITY_ACTION_ALIAS,
 		name: 'Rename Stylesheet Entity Action',
 		forEntityTypes: [UMB_STYLESHEET_ENTITY_TYPE],

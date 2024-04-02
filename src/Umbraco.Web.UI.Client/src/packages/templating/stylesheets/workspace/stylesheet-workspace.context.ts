@@ -15,7 +15,7 @@ import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observa
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbStylesheetWorkspaceContext
@@ -32,7 +32,6 @@ export class UmbStylesheetWorkspaceContext
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly content = this.#data.asObservablePart((data) => data?.content);
-	readonly path = this.#data.asObservablePart((data) => data?.path);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
@@ -108,11 +107,21 @@ export class UmbStylesheetWorkspaceContext
 
 	async load(unique: string) {
 		this.resetState();
-		const { data } = await this.repository.requestByUnique(unique);
+		const { data, asObservable } = await this.repository.requestByUnique(unique);
 
 		if (data) {
 			this.setIsNew(false);
 			this.#data.setValue(data);
+
+			this.observe(asObservable(), (data) => this.onDetailStoreChanges(data), 'umbDetailStoreObserver');
+		}
+	}
+
+	onDetailStoreChanges(data: UmbStylesheetDetailModel | undefined) {
+		// Data is removed from the store
+		// TODO: revisit. We need to handle what should happen when the data is removed from the store
+		if (data === undefined) {
+			this.#data.setValue(undefined);
 		}
 	}
 

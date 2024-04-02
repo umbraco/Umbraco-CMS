@@ -6,7 +6,7 @@ import type { ManifestDashboardCollection } from './dashboard-collection.model.j
 import type {
 	ManifestEntityAction,
 	ManifestEntityActionDeleteKind,
-	ManifestEntityActionRenameKind,
+	ManifestEntityActionRenameServerFileKind,
 	ManifestEntityActionReloadTreeItemChildrenKind,
 	ManifestEntityActionDuplicateKind,
 	ManifestEntityActionMoveKind,
@@ -107,7 +107,7 @@ export type ManifestEntityActions =
 	| ManifestEntityAction
 	| ManifestEntityActionDefaultKind
 	| ManifestEntityActionDeleteKind
-	| ManifestEntityActionRenameKind
+	| ManifestEntityActionRenameServerFileKind
 	| ManifestEntityActionReloadTreeItemChildrenKind
 	| ManifestEntityActionDuplicateKind
 	| ManifestEntityActionMoveKind
