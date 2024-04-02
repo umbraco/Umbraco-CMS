@@ -69,6 +69,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
             LastLockoutDate = user.LastLockoutDate,
+            LastPasswordChangeDate = user.LastPasswordChangeDate,
             IsAdmin = user.IsAdmin(),
         };
 
