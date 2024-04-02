@@ -44,7 +44,7 @@ public abstract class ArtifactBase<TUdi> : IArtifact
     public string Name { get; set; }
 
     /// <inheritdoc />
-    public string Alias { get; set; } = string.Empty;
+    public string? Alias { get; set; }
 
     /// <summary>
     /// Gets the checksum.
