@@ -7,7 +7,7 @@ export const manifests = [
 	{
 		type: 'entityAction',
 		kind: 'trash',
-		alias: 'Umb.EntityAction.Document.Trash',
+		alias: 'Umb.EntityAction.Document.RecycleBin.Trash',
 		name: 'Trash Document Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
@@ -18,8 +18,19 @@ export const manifests = [
 	{
 		type: 'entityAction',
 		kind: 'delete',
-		alias: 'Umb.EntityAction.Document.Delete',
-		name: 'Delete Document Entity Action',
+		alias: 'Umb.EntityAction.Document.RecycleBin.Delete',
+		name: 'Delete Document From Recycle Bin Entity Action',
+		forEntityTypes: [UMB_DOCUMENT_RECYCLE_BIN_ENTITY_TYPE],
+		meta: {
+			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
+		},
+	},
+	{
+		type: 'entityAction',
+		kind: 'restoreFromRecycleBin',
+		alias: 'Umb.EntityAction.Document.RecycleBin.Restore',
+		name: 'Restore Document From Recycle Bin Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_RECYCLE_BIN_ENTITY_TYPE],
 		meta: {
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
