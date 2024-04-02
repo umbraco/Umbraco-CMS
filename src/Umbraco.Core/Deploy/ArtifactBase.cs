@@ -53,17 +53,4 @@ public abstract class ArtifactBase<TUdi> : IArtifact
     /// The checksum.
     /// </returns>
     protected abstract string GetChecksum();
-
-    /// <summary>
-    /// Prevents the <see cref="Checksum" /> property from being serialized.
-    /// </summary>
-    /// <returns>
-    /// Returns <c>false</c> to prevent the property from being serialized.
-    /// </returns>
-    /// <remarks>
-    /// Note that we can't use <see cref="NonSerializedAttribute" /> here as that works only on fields, not properties.  And we want to avoid using [JsonIgnore]
-    /// as that would require an external dependency in Umbraco.Cms.Core.
-    /// So using this method of excluding properties from serialized data, documented here: https://www.newtonsoft.com/json/help/html/ConditionalProperties.htm
-    /// </remarks>
-    public bool ShouldSerializeChecksum() => false;
 }
