@@ -18,7 +18,6 @@ import {
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
-import { UmbDocumentWorkspaceEditorElement } from './document-workspace-editor.element.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
@@ -144,7 +143,7 @@ export class UmbDocumentWorkspaceContext
 		this.routes.setRoutes([
 			{
 				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique',
-				component: UmbDocumentWorkspaceEditorElement,
+				component: () => import('./document-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
@@ -160,7 +159,7 @@ export class UmbDocumentWorkspaceContext
 			},
 			{
 				path: 'edit/:unique',
-				component: UmbDocumentWorkspaceEditorElement,
+				component: () => import('./document-workspace-editor.element.js'),
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
 					this.load(unique);

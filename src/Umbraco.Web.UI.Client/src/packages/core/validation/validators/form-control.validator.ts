@@ -1,7 +1,8 @@
 import type { UmbValidator } from '../interfaces/index.js';
 import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
 import type { UmbFormControlMixinInterface } from '../mixins/form-control.mixin.js';
-import { UmbValidationInvalidEvent, UmbValidationValidEvent } from '../index.js';
+import { UmbValidationInvalidEvent } from '../events/validation-invalid.event.js';
+import { UmbValidationValidEvent } from '../events/validation-valid.event.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 

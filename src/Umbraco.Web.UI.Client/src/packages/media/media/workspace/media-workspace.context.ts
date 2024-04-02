@@ -27,7 +27,6 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
-import UmbMediaWorkspaceEditorElement from './media-workspace-editor.element.js';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
@@ -118,7 +117,7 @@ export class UmbMediaWorkspaceContext
 		this.routes.setRoutes([
 			{
 				path: 'create/parent/:entityType/:parentUnique/:mediaTypeUnique',
-				component: UmbMediaWorkspaceEditorElement,
+				component: () => import('./media-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
@@ -134,7 +133,7 @@ export class UmbMediaWorkspaceContext
 			},
 			{
 				path: 'edit/:unique',
-				component: UmbMediaWorkspaceEditorElement,
+				component: () => import('./media-workspace-editor.element.js'),
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
