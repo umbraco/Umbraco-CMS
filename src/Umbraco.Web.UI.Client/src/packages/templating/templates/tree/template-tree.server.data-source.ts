@@ -46,6 +46,8 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return TemplateResource.getTreeTemplateChildren({
 			parentId: args.parentUnique,
+			skip: args.skip,
+			take: args.take,
 		});
 	}
 };
