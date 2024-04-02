@@ -61,7 +61,7 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 	 */
 	async isCurrentUserAdmin(): Promise<boolean> {
 		const currentUser = await firstValueFrom(this.currentUser);
-		return true; // TODO: Implement this
+		return currentUser?.isAdmin ?? false;
 	}
 
 	#observeIsAuthorized() {
