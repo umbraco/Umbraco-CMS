@@ -1,8 +1,10 @@
 const { rest } = window.MockServiceWorker;
 import { umbDocumentMockDb } from '../../data/document/document.db.js';
+import { items as referenceData } from '../../data/tracked-reference.data.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateDocumentRequestModel,
+	PagedIReferenceResponseModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -21,6 +23,22 @@ export const detailHandlers = [
 				'Umb-Generated-Resource': id,
 			}),
 		);
+	}),
+
+	rest.get(umbracoPath(`${UMB_SLUG}/configuration`), (_req, res, ctx) => {
+		return res(ctx.status(200), ctx.json(umbDocumentMockDb.getConfiguration()));
+	}),
+
+	rest.get(umbracoPath(`${UMB_SLUG}/:id/referenced-by`), (_req, res, ctx) => {
+		const id = _req.params.id as string;
+		if (!id) return;
+
+		const PagedTrackedReference = {
+			total: referenceData.length,
+			items: referenceData,
+		};
+
+		return res(ctx.status(200), ctx.json<PagedIReferenceResponseModel>(PagedTrackedReference));
 	}),
 
 	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {

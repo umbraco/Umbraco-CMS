@@ -28,9 +28,10 @@ export class UmbUserWorkspaceContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_USER_WORKSPACE_ALIAS);
+
 		this.routes.setRoutes([
 			{
-				path: ':id',
+				path: 'edit/:id',
 				component: UmbUserWorkspaceEditorElement,
 				setup: (component, info) => {
 					const id = info.match.params.id;

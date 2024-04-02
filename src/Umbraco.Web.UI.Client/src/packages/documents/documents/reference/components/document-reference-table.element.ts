@@ -1,19 +1,24 @@
-import { UmbDocumentTrackedReferenceRepository } from '../repository/index.js';
-import type { RelationItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDocumentReferenceRepository } from '../repository/index.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import {
+	type UmbReferenceModel,
+	isDocumentReference,
+	isMediaReference,
+	isDefaultReference,
+} from '@umbraco-cms/backoffice/relations';
 
-@customElement('umb-document-tracked-reference-table')
-export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
-	#documentTrackedReferenceRepository = new UmbDocumentTrackedReferenceRepository(this);
+@customElement('umb-document-reference-table')
+export class UmbDocumentReferenceTableElement extends UmbLitElement {
+	#documentReferenceRepository = new UmbDocumentReferenceRepository(this);
 	#pageSize = 10;
 
 	@property()
 	unique = '';
 
 	@state()
-	_items: Array<RelationItemResponseModel> = [];
+	_items: Array<UmbReferenceModel> = [];
 
 	/**
 	 * Indicates if there are more references to load, i.e. if the server has more references to return.
@@ -26,16 +31,12 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 	_errorMessage = '';
 
 	firstUpdated() {
-		this.#getTrackedReferences();
+		this.#getReferences();
 	}
 
-	async #getTrackedReferences() {
-		// Get the first 10 tracked references for the document:
-		const { data, error } = await this.#documentTrackedReferenceRepository.requestTrackedReference(
-			this.unique,
-			0,
-			this.#pageSize,
-		);
+	async #getReferences() {
+		// Get the first 10 references for the document:
+		const { data, error } = await this.#documentReferenceRepository.requestReferencedBy(this.unique, 0, this.#pageSize);
 
 		if (error) {
 			this._errorMessage = error.message;
@@ -52,6 +53,32 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 		return html` ${this.#renderErrorMessage()} ${this.#renderTable()} `;
 	}
 
+	#getIcon(item: UmbReferenceModel) {
+		if (isDocumentReference(item)) {
+			return item.documentType.icon ?? 'icon-document';
+		}
+		if (isMediaReference(item)) {
+			return item.mediaType.icon ?? 'icon-picture';
+		}
+		if (isDefaultReference(item)) {
+			return item.icon ?? 'icon-document';
+		}
+		return 'icon-document';
+	}
+
+	#getContentTypeName(item: UmbReferenceModel) {
+		if (isDocumentReference(item)) {
+			return item.documentType.name;
+		}
+		if (isMediaReference(item)) {
+			return item.mediaType.name;
+		}
+		if (isDefaultReference(item)) {
+			return item.type;
+		}
+		return '';
+	}
+
 	#renderTable() {
 		if (this._items?.length === 0) return nothing;
 		return html`
@@ -65,14 +92,14 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 
 					${repeat(
 						this._items,
-						(item) => item.nodeId,
+						(item) => item.id,
 						(item) =>
 							html`<uui-table-row>
-								<uui-table-cell style="text-align:center; vertical-align:revert;">
-									<umb-icon name=${item.contentTypeIcon ?? 'icon-document'}></umb-icon>
+								<uui-table-cell style="text-align:center;">
+									<umb-icon name=${this.#getIcon(item)}></umb-icon>
 								</uui-table-cell>
-								<uui-table-cell class="link-cell"> ${item.nodeName} </uui-table-cell>
-								<uui-table-cell>${item.contentTypeName}</uui-table-cell>
+								<uui-table-cell class="link-cell"> ${item.name} </uui-table-cell>
+								<uui-table-cell>${this.#getContentTypeName(item)}</uui-table-cell>
 							</uui-table-row>`,
 					)}
 					${this._hasMoreReferences
@@ -111,6 +138,6 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-tracked-reference-table': UmbDocumentTrackedReferenceTableElement;
+		'umb-document-reference-table': UmbDocumentReferenceTableElement;
 	}
 }

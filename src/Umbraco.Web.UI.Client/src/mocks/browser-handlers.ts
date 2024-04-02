@@ -31,7 +31,6 @@ import { handlers as stylesheetHandlers } from './handlers/stylesheet/index.js';
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
 import { handlers as telemetryHandlers } from './handlers/telemetry.handlers.js';
 import { handlers as templateHandlers } from './handlers/template/index.js';
-import { handlers as trackedReferenceHandlers } from './handlers/tracked-reference.handlers.js';
 import { handlers as upgradeHandlers } from './handlers/upgrade.handlers.js';
 import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as userHandlers } from './handlers/user/index.js';
@@ -72,7 +71,6 @@ const handlers = [
 	...tagHandlers,
 	...telemetryHandlers,
 	...templateHandlers,
-	...trackedReferenceHandlers,
 	...upgradeHandlers,
 	...userGroupsHandlers,
 	...userHandlers,
