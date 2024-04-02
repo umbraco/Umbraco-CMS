@@ -12,12 +12,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Item;
 [ApiVersion("1.0")]
 public class SearchMediaItemController : MediaItemControllerBase
 {
-    private readonly IEntitySearchService _entitySearchService;
+    private readonly IExamineEntitySearchService _examineEntitySearchService;
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
-    public SearchMediaItemController(IEntitySearchService entitySearchService, IMediaPresentationFactory mediaPresentationFactory)
+    public SearchMediaItemController(IExamineEntitySearchService examineEntitySearchService, IMediaPresentationFactory mediaPresentationFactory)
     {
-        _entitySearchService = entitySearchService;
+        _examineEntitySearchService = examineEntitySearchService;
         _mediaPresentationFactory = mediaPresentationFactory;
     }
 
@@ -26,8 +26,7 @@ public class SearchMediaItemController : MediaItemControllerBase
     [ProducesResponseType(typeof(PagedModel<MediaItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Search(string query, int skip = 0, int take = 100)
     {
-        // FIXME: use Examine and handle user start nodes
-        PagedModel<IEntitySlim> searchResult = _entitySearchService.Search(UmbracoObjectTypes.Media, query, skip, take);
+        PagedModel<IEntitySlim> searchResult = _examineEntitySearchService.Search(UmbracoObjectTypes.Media, query, skip, take);
         var result = new PagedModel<MediaItemResponseModel>
         {
             Items = searchResult.Items.OfType<IMediaEntitySlim>().Select(_mediaPresentationFactory.CreateItemResponseModel),
