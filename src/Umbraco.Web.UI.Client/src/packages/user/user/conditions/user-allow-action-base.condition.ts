@@ -1,3 +1,4 @@
+import { isUserAdmin } from '../utils/index.js';
 import type { UmbUserStateEnum } from '../types.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../workspace/user-workspace.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -56,8 +57,16 @@ export abstract class UmbUserActionConditionBase
 	 * Check if the current user is an admin
 	 * @protected
 	 */
-	protected async isCurrentUserAdmin() {
+	protected isCurrentUserAdmin() {
 		return isCurrentUserAnAdmin(this._host);
+	}
+
+	/**
+	 * Check if the selected user is an admin
+	 * @protected
+	 */
+	protected async isUserAdmin() {
+		return this.userUnique ? isUserAdmin(this._host, this.userUnique) : false;
 	}
 
 	/**

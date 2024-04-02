@@ -3,6 +3,7 @@ import { manifest as userAllowEnableActionManifest } from './user-allow-enable-a
 import { manifest as userAllowUnlockActionManifest } from './user-allow-unlock-action.condition.js';
 import { manifest as userAllowMfaActionManifest } from './user-allow-mfa-action.condition.js';
 import { manifest as userAllowDeleteActionManifest } from './user-allow-delete-action.condition.js';
+import { manifest as userCanPerformActionsManifest } from './user-can-perform-actions.condition.js';
 
 export const manifests = [
 	userAllowDisableActionManifest,
@@ -10,4 +11,5 @@ export const manifests = [
 	userAllowUnlockActionManifest,
 	userAllowMfaActionManifest,
 	userAllowDeleteActionManifest,
+	userCanPerformActionsManifest,
 ];
