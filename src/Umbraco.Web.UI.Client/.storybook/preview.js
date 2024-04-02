@@ -9,10 +9,12 @@ import { setCustomElements } from '@storybook/web-components';
 
 import { startMockServiceWorker } from '../src/mocks';
 
-import { UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext } from '../src/packages/core/modal';
+import '../src/libs/controller-api/controller-host-provider.element';
+import { UmbModalManagerContext } from '../src/packages/core/modal';
 import { UmbDataTypeTreeStore } from '../src/packages/data-type/tree/data-type-tree.store';
 import { UmbDocumentDetailStore } from '../src/packages/documents/documents/repository/detail/document-detail.store';
 import { UmbDocumentTreeStore } from '../src/packages/documents/documents/tree/document-tree.store';
+import { UmbCurrentUserStore } from '../src/packages/user/current-user/repository/current-user.store';
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
 import { UmbIconRegistry } from '../src/packages/core/icon-registry/icon.registry';
 import { UmbLitElement } from '../src/packages/core/lit-element';
@@ -24,6 +26,7 @@ import '../src/packages/core/components';
 
 import { manifests as documentManifests } from '../src/packages/documents';
 import { manifests as localizationManifests } from '../src/packages/core/localization/manifests';
+import { UmbNotificationContext } from '../src/packages/core';
 
 // MSW
 startMockServiceWorker({ serviceWorker: { url: (import.meta.env.VITE_BASE_PATH ?? '/') + 'mockServiceWorker.js' } });
@@ -35,7 +38,9 @@ class UmbStoryBookElement extends UmbLitElement {
 		super();
 		this._umbIconRegistry.attach(this);
 		this._registerExtensions(documentManifests);
-		this.provideContext(UMB_MODAL_MANAGER_CONTEXT, new UmbModalManagerContext(this));
+		new UmbModalManagerContext(this);
+		new UmbCurrentUserStore(this);
+		new UmbNotificationContext(this);
 
 		this._registerExtensions(localizationManifests);
 		umbLocalizationRegistry.loadLanguage('en-us'); // register default language
@@ -50,7 +55,8 @@ class UmbStoryBookElement extends UmbLitElement {
 
 	render() {
 		return html`<slot></slot>
-			<umb-backoffice-modal-container></umb-backoffice-modal-container> `;
+			<umb-backoffice-modal-container></umb-backoffice-modal-container>
+			<umb-backoffice-notification-container></umb-backoffice-notification-container>`;
 	}
 }
 
@@ -77,7 +83,7 @@ const documentTreeStoreProvider = (story) => html`
 `;
 
 // Provide the MSW addon decorator globally
-export const decorators = [storybookProvider, documentStoreProvider, documentTreeStoreProvider, dataTypeStoreProvider];
+export const decorators = [documentStoreProvider, documentTreeStoreProvider, dataTypeStoreProvider, storybookProvider];
 
 export const parameters = {
 	options: {

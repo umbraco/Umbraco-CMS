@@ -4,7 +4,7 @@ import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
 import type { UmbMockUserModel } from './user.data.js';
-import { data } from './user.data.js';
+import { data, mfaLoginProviders } from './user.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	CreateUserRequestModel,
@@ -72,6 +72,30 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			permissions,
 			allowedSections,
 		};
+	}
+
+	getMfaLoginProviders() {
+		return mfaLoginProviders;
+	}
+
+	enableMfaProvider(providerName: string) {
+		const provider = mfaLoginProviders.find((x) => x.providerName === providerName);
+		if (provider) {
+			provider.isEnabledOnUser = true;
+			return true;
+		}
+
+		return false;
+	}
+
+	disableMfaProvider(providerName: string) {
+		const provider = mfaLoginProviders.find((x) => x.providerName === providerName);
+		if (provider) {
+			provider.isEnabledOnUser = false;
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
