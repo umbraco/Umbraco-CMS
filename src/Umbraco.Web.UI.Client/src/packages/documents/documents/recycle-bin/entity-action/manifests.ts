@@ -12,11 +12,5 @@ export const manifests = [
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 			trashRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.UserPermission',
-				match: 'Umb.UserPermission.Document.Delete',
-			},
-		],
 	},
 ];
