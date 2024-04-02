@@ -45,7 +45,7 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 		}
 	}
 
-	#runValidate = this.validate.bind(this);
+	//#runValidate = this.validate.bind(this);
 
 	/**
 	 *
