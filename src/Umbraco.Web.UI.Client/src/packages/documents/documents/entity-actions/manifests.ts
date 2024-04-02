@@ -1,12 +1,24 @@
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_PICKER_MODAL } from '../modals/index.js';
+import { UMB_DOCUMENT_RECYCLE_BIN_ENTITY_TYPE } from '../recycle-bin/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityAction> = [
+	{
+		type: 'entityAction',
+		kind: 'delete',
+		alias: 'Umb.EntityAction.Document.Delete',
+		name: 'Delete Document Entity Action',
+		forEntityTypes: [UMB_DOCUMENT_RECYCLE_BIN_ENTITY_TYPE],
+		meta: {
+			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
+			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+		},
+	},
 	{
 		type: 'entityAction',
 		kind: 'default',
