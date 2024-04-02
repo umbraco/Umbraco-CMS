@@ -61,7 +61,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     // Umbraco.Code.MapAll
     private void Map(IMediaEntitySlim source, MediaTypeReferenceResponseModel target, MapperContext context)
     {
-        target.Id = source.Key;
+        target.Id = source.ContentTypeKey;
         target.Icon = source.ContentTypeIcon ?? string.Empty;
         target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListViewKey);
     }
@@ -69,7 +69,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     // Umbraco.Code.MapAll
     private void Map(IContentEntitySlim source, MediaTypeReferenceResponseModel target, MapperContext context)
     {
-        target.Id = source.Key;
+        target.Id = source.ContentTypeKey;
         target.Icon = source.ContentTypeIcon ?? string.Empty;
         target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListViewKey);
     }

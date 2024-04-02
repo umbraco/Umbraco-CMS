@@ -7,6 +7,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.Filter;
@@ -16,13 +17,16 @@ public class FilterMemberFilterController : MemberFilterControllerBase
 {
     private readonly IMemberService _memberService;
     private readonly IMemberPresentationFactory _memberPresentationFactory;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public FilterMemberFilterController(
         IMemberService memberService,
-        IMemberPresentationFactory memberPresentationFactory)
+        IMemberPresentationFactory memberPresentationFactory,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _memberService = memberService;
         _memberPresentationFactory = memberPresentationFactory;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     [HttpGet]
@@ -53,7 +57,7 @@ public class FilterMemberFilterController : MemberFilterControllerBase
 
         var pageViewModel = new PagedViewModel<MemberResponseModel>
         {
-            Items = await _memberPresentationFactory.CreateMultipleAsync(members.Items),
+            Items = await _memberPresentationFactory.CreateMultipleAsync(members.Items, CurrentUser(_backOfficeSecurityAccessor)),
             Total = members.Total,
         };
 

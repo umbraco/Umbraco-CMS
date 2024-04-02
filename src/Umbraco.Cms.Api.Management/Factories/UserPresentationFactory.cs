@@ -181,6 +181,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages,
+            HasAccessToSensitiveData = user.HasAccessToSensitiveData(),
             AllowedSections = allowedSections,
             IsAdmin = user.IsAdmin()
         });

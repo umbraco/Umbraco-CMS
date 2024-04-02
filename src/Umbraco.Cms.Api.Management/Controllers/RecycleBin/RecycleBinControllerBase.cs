@@ -15,14 +15,9 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
     where TItem : RecycleBinItemResponseModelBase, new()
 {
     private readonly IEntityService _entityService;
-    private readonly string _itemUdiType;
 
     protected RecycleBinControllerBase(IEntityService entityService)
-    {
-        _entityService = entityService;
-        // ReSharper disable once VirtualMemberCallInConstructor
-        _itemUdiType = ItemObjectType.GetUdiType();
-    }
+        => _entityService = entityService;
 
     protected abstract UmbracoObjectTypes ItemObjectType { get; }
 
@@ -59,7 +54,6 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
         var viewModel = new TItem
         {
             Id = entity.Key,
-            Type = _itemUdiType,
             HasChildren = entity.HasChildren,
             Parent = parentKey.HasValue
                 ? new ItemReferenceByIdResponseModel
