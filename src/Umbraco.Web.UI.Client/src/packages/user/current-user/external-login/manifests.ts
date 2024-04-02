@@ -6,7 +6,7 @@ export const userProfileApps: Array<ManifestUserProfileApp> = [
 		alias: 'Umb.UserProfileApp.CurrentUser.ExternalLoginProviders',
 		name: 'External Login Providers User Profile App',
 		element: () => import('./external-login-providers-user-profile-app.element.js'),
-		weight: 800,
+		weight: 700,
 		meta: {
 			label: 'External Login Providers User Profile App',
 			pathname: 'externalLoginProviders',
