@@ -3,7 +3,7 @@ import { UmbWorkspaceActionBase } from '../../workspace-action-base.controller.j
 import { UMB_SUBMITTABLE_WORKSPACE_CONTEXT, type UmbWorkspaceActionArgs } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbSaveWorkspaceAction extends UmbWorkspaceActionBase<UmbSubmittableWorkspaceContext> {
+export class UmbSubmitWorkspaceAction extends UmbWorkspaceActionBase<UmbSubmittableWorkspaceContext> {
 	#workspaceContext?: UmbSubmittableWorkspaceContext;
 
 	constructor(host: UmbControllerHost, args: UmbWorkspaceActionArgs<UmbSubmittableWorkspaceContext>) {
@@ -36,3 +36,8 @@ export class UmbSaveWorkspaceAction extends UmbWorkspaceActionBase<UmbSubmittabl
 		return workspaceContext.requestSubmit();
 	}
 }
+
+/*
+ * @deprecated Use UmbSubmitWorkspaceAction instead
+ */
+export { UmbSubmitWorkspaceAction as UmbSaveWorkspaceAction };

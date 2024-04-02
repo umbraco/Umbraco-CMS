@@ -3,7 +3,7 @@ import type {
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_STYLESHEET_WORKSPACE_ALIAS = 'Umb.Workspace.Stylesheet';
 
@@ -62,7 +62,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Stylesheet.Save',
 		name: 'Save Stylesheet Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',
