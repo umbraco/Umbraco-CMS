@@ -4,7 +4,6 @@ import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action'
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbDisableUserEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
@@ -23,16 +22,12 @@ export class UmbDisableUserEntityAction extends UmbEntityActionBase<never> {
 
 		const item = data[0];
 
-		const localize = new UmbLocalizationController(this._host);
-
-		const confirm = await umbConfirmModal(this._host, {
-			headline: `${localize.term('user_disabled')} ${item.name}`,
-			content: localize.term('defaultdialogs_confirmdisable'),
+		await umbConfirmModal(this._host, {
+			headline: `Disable ${item.name}`,
+			content: 'Are you sure you want to disable this user?',
 			color: 'danger',
-			confirmLabel: localize.term('actions_disable'),
+			confirmLabel: 'Disable',
 		});
-
-		if (!confirm) return;
 
 		const disableUserRepository = new UmbDisableUserRepository(this);
 		await disableUserRepository.disable([this.args.unique]);

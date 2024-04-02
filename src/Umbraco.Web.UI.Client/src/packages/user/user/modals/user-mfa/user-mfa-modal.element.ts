@@ -3,7 +3,7 @@ import type { UmbUserMfaProviderModel } from '../../types.js';
 import type { UmbUserMfaModalConfiguration } from './user-mfa-modal.token.js';
 import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { umbConfirmModal, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
@@ -125,17 +125,23 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 	 * NB! The user must have administrative rights before doing so.
 	 */
 	async #onProviderDisable(item: UmbMfaLoginProviderOption) {
-		const confirm = await umbConfirmModal(this, {
-			headline: this.localize.term('actions_disable'),
-			content: this.localize.term('user_2faDisableForUser'),
-			confirmLabel: this.localize.term('actions_disable'),
-			color: 'danger',
-		});
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const confirm = await modalManager
+			.open(this, UMB_CONFIRM_MODAL, {
+				data: {
+					headline: this.localize.term('actions_disable'),
+					content: this.localize.term('user_2faDisableForUser'),
+					confirmLabel: this.localize.term('actions_disable'),
+					color: 'danger',
+				},
+			})
+			.onSubmit()
+			.catch(() => false);
 
-		if (!confirm) return;
-
-		await this.#userRepository.disableMfaProvider(this.#unique, item.providerName);
-		this.#loadProviders();
+		if (confirm !== false) {
+			await this.#userRepository.disableMfaProvider(this.#unique, item.providerName);
+			this.#loadProviders();
+		}
 	}
 
 	static styles = [

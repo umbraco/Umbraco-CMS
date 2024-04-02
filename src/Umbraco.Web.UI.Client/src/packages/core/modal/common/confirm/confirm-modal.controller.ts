@@ -27,11 +27,6 @@ export class UmbConfirmModalController extends UmbControllerBase {
 	}
 }
 
-export async function umbConfirmModal(host: UmbControllerHost, args: UmbConfirmModalArgs): Promise<boolean> {
-	try {
-		await new UmbConfirmModalController(host).open(args);
-		return true;
-	} catch {
-		return false;
-	}
+export function umbConfirmModal(host: UmbControllerHost, args: UmbConfirmModalArgs) {
+	return new UmbConfirmModalController(host).open(args);
 }

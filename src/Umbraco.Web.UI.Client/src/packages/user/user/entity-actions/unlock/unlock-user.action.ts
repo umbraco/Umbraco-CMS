@@ -22,13 +22,11 @@ export class UmbUnlockUserEntityAction extends UmbEntityActionBase<never> {
 
 		const item = data[0];
 
-		const confirm = await umbConfirmModal(this._host, {
+		await umbConfirmModal(this._host, {
 			headline: `Unlock ${item.name}`,
 			content: 'Are you sure you want to unlock this user?',
 			confirmLabel: 'Unlock',
 		});
-
-		if (!confirm) return;
 
 		const unlockUserRepository = new UmbUnlockUserRepository(this);
 		await unlockUserRepository?.unlock([this.args.unique]);

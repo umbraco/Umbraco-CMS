@@ -22,13 +22,11 @@ export class UmbEnableUserEntityAction extends UmbEntityActionBase<never> {
 
 		const item = data[0];
 
-		const confirm = await umbConfirmModal(this._host, {
+		await umbConfirmModal(this._host, {
 			headline: `Enable ${item.name}`,
 			content: 'Are you sure you want to enable this user?',
 			confirmLabel: 'Enable',
 		});
-
-		if (!confirm) return;
 
 		const enableRepository = new UmbEnableUserRepository(this);
 		await enableRepository.enable([this.args.unique]);
