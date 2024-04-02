@@ -234,7 +234,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		this.#config = config as INTERNAL_UmbSorterConfig<T, ElementType>;
-		host.addController(this);
+		host.addUmbController(this);
 
 		this.#observer = new MutationObserver((mutations) => {
 			mutations.forEach((mutation) => {
