@@ -5,7 +5,6 @@ import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notificatio
 
 export class UmbChangeUserPasswordRepository extends UmbUserRepositoryBase {
 	#changePasswordSource: UmbChangeUserPasswordServerDataSource;
-	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -21,7 +20,7 @@ export class UmbChangeUserPasswordRepository extends UmbUserRepositoryBase {
 
 		if (!error) {
 			const notification = { data: { message: `Password changed` } };
-			this.#notificationContext?.peek('positive', notification);
+			this.notificationContext?.peek('positive', notification);
 		}
 
 		return { data, error };
