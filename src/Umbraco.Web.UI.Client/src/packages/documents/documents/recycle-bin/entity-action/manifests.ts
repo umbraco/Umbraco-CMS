@@ -2,8 +2,9 @@ import { UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS } from '../repository/index.j
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UMB_DOCUMENT_RECYCLE_BIN_ENTITY_TYPE } from '../entity.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		kind: 'trash',
