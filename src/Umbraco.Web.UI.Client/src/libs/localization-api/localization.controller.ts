@@ -51,7 +51,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
 		this.#hostEl = host.getHostElement() as HTMLElement;
-		this.#host.addController(this);
+		this.#host.addUmbController(this);
 	}
 
 	hostConnected(): void {
@@ -63,7 +63,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	}
 
 	destroy(): void {
-		this.#host?.removeController(this);
+		this.#host?.removeUmbController(this);
 		this.#hostEl = undefined as any;
 		this.#usedKeys.length = 0;
 	}

@@ -104,7 +104,7 @@ export class UmbDocumentTypeWorkspaceContext
 				path: 'edit/:id',
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
-					this.removeControllerByAlias('isNewRedirectController');
+					this.removeUmbControllerByAlias('isNewRedirectController');
 					const id = info.match.params.id;
 					this.load(id);
 				},

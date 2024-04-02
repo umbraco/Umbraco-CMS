@@ -48,7 +48,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 					if (Array.isArray(value) && value.length > 0) {
 						this._showSizeOptions = true;
 					}
-					this.removeControllerByAlias('_observeColumnSpanOptions');
+					this.removeUmbControllerByAlias('_observeColumnSpanOptions');
 				},
 				'observeColumnSpanOptions',
 			);

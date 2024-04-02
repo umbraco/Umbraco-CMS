@@ -131,7 +131,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.#blockEntries.layoutOf(unique),
 			(layoutData) => {
 				this.#initialLayout ??= layoutData as LayoutDataType;
-				this.removeControllerByAlias('observeLayoutInitially');
+				this.removeUmbControllerByAlias('observeLayoutInitially');
 			},
 			'observeLayoutInitially',
 		);
@@ -156,7 +156,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 							this.#blockManager!.contentOf(contentUdi),
 							(contentData) => {
 								this.#initialContent ??= contentData;
-								this.removeControllerByAlias('observeContentInitially');
+								this.removeUmbControllerByAlias('observeContentInitially');
 							},
 							'observeContentInitially',
 						);
@@ -178,7 +178,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 							this.#blockManager!.contentOf(settingsUdi),
 							(settingsData) => {
 								this.#initialSettings ??= settingsData;
-								this.removeControllerByAlias('observeSettingsInitially');
+								this.removeUmbControllerByAlias('observeSettingsInitially');
 							},
 							'observeSettingsInitially',
 						);

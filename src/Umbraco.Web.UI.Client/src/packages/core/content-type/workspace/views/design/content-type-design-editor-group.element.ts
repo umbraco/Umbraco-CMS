@@ -68,7 +68,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				// We use name match to determine inheritance, so no name cannot inherit.
 				this._inherited = false;
 				this._hasOwnerContainer = true;
-				this.removeControllerByAlias('observeGroupContainers');
+				this.removeUmbControllerByAlias('observeGroupContainers');
 			}
 		}
 	}
