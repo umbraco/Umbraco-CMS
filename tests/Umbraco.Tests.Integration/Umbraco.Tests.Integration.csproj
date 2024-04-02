@@ -127,8 +127,20 @@
     <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.Update.cs">
       <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.MoveToRecyleBin.cs">
-      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Create.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.CreateFromContent.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Delete.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Get.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Update.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 
