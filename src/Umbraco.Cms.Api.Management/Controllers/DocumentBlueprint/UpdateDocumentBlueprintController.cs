@@ -40,7 +40,7 @@ public class UpdateDocumentBlueprintController : DocumentBlueprintControllerBase
     {
         ContentBlueprintUpdateModel model = _blueprintEditingPresentationFactory.MapUpdateModel(requestModel);
 
-        // We don't need to validate user access because we "only" require access to the Settings section to create new blueprints from scratch
+        // We don't need to validate user access because we "only" require access to the Settings section to update blueprints
         Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await _contentBlueprintEditingService.UpdateAsync(id, model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
