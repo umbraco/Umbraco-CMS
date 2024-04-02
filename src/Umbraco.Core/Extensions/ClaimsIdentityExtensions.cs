@@ -193,6 +193,7 @@ public static class ClaimsIdentityExtensions
     /// </summary>
     /// <param name="identity">this</param>
     /// <param name="userId">The users Id</param>
+    /// <param name="userKey">The users key</param>
     /// <param name="username">Username</param>
     /// <param name="realName">Real name</param>
     /// <param name="startContentNodes">Start content nodes</param>
@@ -201,7 +202,7 @@ public static class ClaimsIdentityExtensions
     /// <param name="securityStamp">Security stamp</param>
     /// <param name="allowedApps">Allowed apps</param>
     /// <param name="roles">Roles</param>
-    public static void AddRequiredClaims(this ClaimsIdentity identity, string userId, string username, string realName, IEnumerable<int>? startContentNodes, IEnumerable<int>? startMediaNodes, string culture, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
+    public static void AddRequiredClaims(this ClaimsIdentity identity, string userId, Guid userKey, string username, string realName, IEnumerable<int>? startContentNodes, IEnumerable<int>? startMediaNodes, string culture, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
     {
         // This is the id that 'identity' uses to check for the user id
         if (identity.HasClaim(x => x.Type == ClaimTypes.NameIdentifier) == false)
@@ -209,6 +210,18 @@ public static class ClaimsIdentityExtensions
             identity.AddClaim(new Claim(
                 ClaimTypes.NameIdentifier,
                 userId,
+                ClaimValueTypes.String,
+                AuthenticationType,
+                AuthenticationType,
+                identity));
+        }
+
+        // This is the id that 'identity' uses to check for the user id
+        if (identity.HasClaim(x => x.Type == "sub") == false)
+        {
+            identity.AddClaim(new Claim(
+                "sub",
+                userKey.ToString(),
                 ClaimValueTypes.String,
                 AuthenticationType,
                 AuthenticationType,
