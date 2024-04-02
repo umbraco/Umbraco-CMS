@@ -5,7 +5,7 @@ import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
 import { UmbMemberTypeDetailRepository } from '@umbraco-cms/backoffice/member-type';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
@@ -26,7 +26,7 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 type EntityType = UmbMemberDetailModel;
 export class UmbMemberWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbVariantDatasetWorkspaceContext<UmbMemberVariantModel>, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbMemberDetailRepository(this);

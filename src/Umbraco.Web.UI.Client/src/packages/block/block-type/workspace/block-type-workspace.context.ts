@@ -7,7 +7,7 @@ import type {
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
@@ -17,7 +17,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
-	extends UmbSaveableWorkspaceContextBase<BlockTypeData>
+	extends UmbSubmittableWorkspaceContextBase<BlockTypeData>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	// Just for context token safety:

@@ -8,7 +8,7 @@ import type {
 	UmbEditableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
@@ -33,7 +33,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 
 type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext, UmbEditableWorkspaceContext
 {
 	//

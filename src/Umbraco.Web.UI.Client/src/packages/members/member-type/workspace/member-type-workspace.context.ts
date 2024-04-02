@@ -3,7 +3,7 @@ import type { UmbMemberTypeDetailModel } from '../types.js';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../index.js';
 import { UmbMemberTypeWorkspaceEditorElement } from './member-type-workspace-editor.element.js';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
@@ -21,7 +21,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 
 type EntityType = UmbMemberTypeDetailModel;
 export class UmbMemberTypeWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbContentTypeWorkspaceContext<EntityType>, UmbRoutableWorkspaceContext
 {
 	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;

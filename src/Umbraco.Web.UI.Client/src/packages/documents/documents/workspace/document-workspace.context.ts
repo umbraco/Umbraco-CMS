@@ -21,7 +21,7 @@ import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
@@ -50,7 +50,7 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements
 		UmbRoutableWorkspaceContext,
 		UmbVariantDatasetWorkspaceContext<UmbDocumentVariantModel>,

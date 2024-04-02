@@ -3,7 +3,7 @@ import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
 import type { UmbMediaTypeDetailModel } from '../types.js';
 import { UmbMediaTypeWorkspaceEditorElement } from './media-type-workspace-editor.element.js';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
@@ -23,7 +23,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 
 type EntityType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbContentTypeWorkspaceContext<EntityType>, UmbRoutableWorkspaceContext
 {
 	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;

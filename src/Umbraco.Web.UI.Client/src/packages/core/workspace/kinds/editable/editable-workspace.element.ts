@@ -1,4 +1,4 @@
-import type { UmbSaveableWorkspaceContext } from '../../contexts/tokens/saveable-workspace-context.interface.js';
+import type { UmbSubmittableWorkspaceContext } from '../../contexts/tokens/submittable-workspace-context.interface.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -10,7 +10,7 @@ export class UmbEditableWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [];
 
-	public set api(api: UmbSaveableWorkspaceContext) {
+	public set api(api: UmbSubmittableWorkspaceContext) {
 		this.observe(api.routes.routes, (routes) => (this._routes = routes));
 
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [api]);

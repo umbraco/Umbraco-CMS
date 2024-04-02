@@ -10,7 +10,7 @@ import type {
 	UmbVariantDatasetWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
@@ -30,7 +30,7 @@ import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbVariantDatasetWorkspaceContext, UmbCollectionWorkspaceContext<UmbMediaTypeDetailModel>
 {
 	//

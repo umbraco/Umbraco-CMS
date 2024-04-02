@@ -2,8 +2,8 @@ import { UmbLanguageDetailRepository } from '../../repository/index.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UmbLanguageWorkspaceEditorElement } from './language-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContext,
-	UmbSaveableWorkspaceContextBase,
+	type UmbSubmittableWorkspaceContext,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
@@ -12,8 +12,8 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbLanguageWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbLanguageDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<UmbLanguageDetailModel>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository: UmbLanguageDetailRepository = new UmbLanguageDetailRepository(this);
 

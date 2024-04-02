@@ -1,6 +1,6 @@
 import { UmbWorkspaceRouteManager } from '../controllers/workspace-route-manager.controller.js';
 import { UMB_WORKSPACE_CONTEXT } from './tokens/workspace.context-token.js';
-import type { UmbSaveableWorkspaceContext } from './tokens/saveable-workspace-context.interface.js';
+import type { UmbSubmittableWorkspaceContext } from './tokens/submittable-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -9,9 +9,9 @@ import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 
-export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
-	extends UmbContextBase<UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>>
-	implements UmbSaveableWorkspaceContext
+export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
+	extends UmbContextBase<UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>>
+	implements UmbSubmittableWorkspaceContext
 {
 	public readonly workspaceAlias: string;
 
@@ -128,9 +128,9 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 }
 
 /*
- * @deprecated Use UmbSaveableWorkspaceContextBase instead — Will be removed before RC.
+ * @deprecated Use UmbSubmittableWorkspaceContextBase instead — Will be removed before RC.
  * TODO: Delete before RC.
  */
 export abstract class UmbEditableWorkspaceContextBase<
 	WorkspaceDataModelType,
-> extends UmbSaveableWorkspaceContextBase<WorkspaceDataModelType> {}
+> extends UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType> {}

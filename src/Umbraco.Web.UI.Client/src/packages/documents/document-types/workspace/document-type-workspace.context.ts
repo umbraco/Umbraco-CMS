@@ -4,7 +4,7 @@ import type { UmbDocumentTypeDetailModel } from '../types.js';
 import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
@@ -23,7 +23,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbContentTypeWorkspaceContext<EntityType>, UmbRoutableWorkspaceContext
 {
 	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
