@@ -39,5 +39,6 @@ export class UmbSubmitWorkspaceAction extends UmbWorkspaceActionBase<UmbSubmitta
 
 /*
  * @deprecated Use UmbSubmitWorkspaceAction instead
+ * TODO: Remove as part of RC
  */
 export { UmbSubmitWorkspaceAction as UmbSaveWorkspaceAction };
