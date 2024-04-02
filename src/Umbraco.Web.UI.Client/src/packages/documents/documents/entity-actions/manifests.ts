@@ -9,19 +9,6 @@ import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-reg
 const entityActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
-		kind: 'delete',
-		alias: 'Umb.EntityAction.Document.Delete',
-		name: 'Delete Document Entity Action',
-		weight: 1100,
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-		meta: {
-			deleteRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			pickerModalAlias: UMB_DOCUMENT_PICKER_MODAL,
-		},
-	},
-	{
-		type: 'entityAction',
 		kind: 'default',
 		alias: 'Umb.EntityAction.Document.CreateBlueprint',
 		name: 'Create Document Blueprint Entity Action',
