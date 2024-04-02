@@ -5,4 +5,5 @@ export * from './entity-action.event.js';
 export * from './entity-action.interface.js';
 export * from './types.js';
 
+export { UmbRequestReloadStructureForEntityEvent } from './request-reload-structure-for-entity.event.js';
 export { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from './default/default.action.kind.js';
