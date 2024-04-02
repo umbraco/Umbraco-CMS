@@ -145,6 +145,8 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	}
 
 	#renderChildren() {
+		if (this._children.length === 0) return html`<uui-label>There are no children</uui-label>`;
+
 		return html`
 			<uui-ref-list>
 				${repeat(
