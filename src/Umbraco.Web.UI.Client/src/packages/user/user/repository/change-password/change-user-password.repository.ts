@@ -1,7 +1,6 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
 import { UmbChangeUserPasswordServerDataSource } from './change-user-password.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 
 export class UmbChangeUserPasswordRepository extends UmbUserRepositoryBase {
 	#changePasswordSource: UmbChangeUserPasswordServerDataSource;
