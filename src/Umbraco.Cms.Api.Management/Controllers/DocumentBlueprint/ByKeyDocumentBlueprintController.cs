@@ -11,7 +11,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
 public class ByKeyDocumentBlueprintController : DocumentBlueprintControllerBase
 {
     private readonly IContentBlueprintEditingService _contentBlueprintEditingService;
