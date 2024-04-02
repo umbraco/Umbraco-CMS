@@ -69,7 +69,6 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				return 'The low value must be less than the high value';
 			},
 			() => {
-				console.log(this._minValue, this._maxValue);
 				return this._minValue !== undefined && this._maxValue !== undefined ? this._minValue > this._maxValue : false;
 			},
 		);
