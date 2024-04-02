@@ -34,7 +34,13 @@ export class UmbIconElement extends UmbLitElement {
 	@property({ type: String })
 	public set name(value: string | undefined) {
 		const [icon, alias] = value ? value.split(' ') : [];
-		if (alias) this.#setColorStyle(alias);
+
+		if (alias) {
+			this.#setColorStyle(alias);
+		} else {
+			this._color = undefined;
+		}
+
 		this._icon = icon;
 	}
 	public get name(): string | undefined {

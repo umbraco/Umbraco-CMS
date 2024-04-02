@@ -96,7 +96,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		if (this._containerId === null) {
 			this.#observeHasPropertiesOf(null);
 			this.#observeRootContainers();
-			this.removeControllerByAlias('_observeContainers');
+			this.removeUmbControllerByAlias('_observeContainers');
 		} else {
 			this.observe(
 				this.#structure.containerById(this._containerId),
@@ -114,7 +114,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 										this._parentType = parent.type;
 										this.#observeSimilarContainers();
 									} else {
-										this.removeControllerByAlias('_observeContainers');
+										this.removeUmbControllerByAlias('_observeContainers');
 										this._parentName = undefined;
 										this._parentType = undefined;
 									}
@@ -122,13 +122,13 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 								'_observeMainParentContainer',
 							);
 						} else {
-							this.removeControllerByAlias('_observeMainParentContainer');
+							this.removeUmbControllerByAlias('_observeMainParentContainer');
 							this._parentName = null; //In this way we want to look for one without a parent. [NL]
 							this._parentType = undefined;
 							this.#observeSimilarContainers();
 						}
 					} else {
-						this.removeControllerByAlias('_observeContainers');
+						this.removeUmbControllerByAlias('_observeContainers');
 						this._containerName = undefined;
 						this._containerType = undefined;
 						// TODO: reset has Properties.

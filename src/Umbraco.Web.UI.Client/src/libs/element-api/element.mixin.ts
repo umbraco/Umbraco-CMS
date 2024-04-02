@@ -41,7 +41,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 				) as unknown as SpecificR;
 			} else {
 				callback(undefined as SpecificT);
-				this.removeControllerByAlias(controllerAlias);
+				this.removeUmbControllerByAlias(controllerAlias);
 				return undefined as SpecificR;
 			}
 		}
