@@ -9,7 +9,7 @@ const DATA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DataType';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
-	kind: 'routable',
+	kind: 'editable',
 	alias: DATA_TYPE_WORKSPACE_ALIAS,
 	name: 'Data Type Workspace',
 	api: () => import('./data-type-workspace.context.js'),

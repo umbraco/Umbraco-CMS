@@ -1,12 +1,12 @@
 import { UmbPackageRepository } from '../../../package/repository/package.repository.js';
 import type { UmbPackageWithMigrationStatus } from '../../../types.js';
 import { html, css, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 import './installed-packages-section-view-item.element.js';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-installed-packages-section-view')
 export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewElement {
@@ -35,7 +35,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 
 		const [package$, migration$] = data;
 
-		this.observe(combineLatest([package$, migration$]), ([packages, migrations]) => {
+		this.observe(observeMultiple([package$, migration$]), ([packages, migrations]) => {
 			this._installedPackages = packages.map((p) => {
 				const migration = migrations.find((m) => m.packageName === p.name);
 				if (migration) {
