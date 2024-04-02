@@ -16,6 +16,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
 [ApiVersion("1.0")]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintControllerBase
 {
     private readonly IAuthorizationService _authorizationService;

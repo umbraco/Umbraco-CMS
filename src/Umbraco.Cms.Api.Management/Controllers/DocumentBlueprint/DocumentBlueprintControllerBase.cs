@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DocumentBlueprint)]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public abstract class DocumentBlueprintControllerBase : ContentControllerBase
 {
     protected IActionResult DocumentBlueprintNotFound()

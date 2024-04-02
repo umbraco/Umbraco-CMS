@@ -1,5 +1,4 @@
 using Asp.Versioning;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -9,12 +8,10 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class UpdateDocumentBlueprintController : DocumentBlueprintControllerBase
 {
     private readonly IDocumentBlueprintEditingPresentationFactory _blueprintEditingPresentationFactory;
