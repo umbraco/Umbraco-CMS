@@ -10,7 +10,6 @@ export class UmbSortChildrenOfEntityAction extends UmbEntityActionBase<MetaEntit
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
-				itemRepositoryAlias: this.args.meta.itemRepositoryAlias,
 				sortChildrenOfRepositoryAlias: this.args.meta.sortChildrenOfRepositoryAlias,
 				treeRepositoryAlias: this.args.meta.treeRepositoryAlias,
 			},
