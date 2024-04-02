@@ -9,30 +9,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 public partial class ContentBlueprintEditingServiceTests
 {
-    // [TestCase(true)]
-    // [TestCase(false)]
-    // public async Task Can_Create_At_Root(bool variant)
-    // {
-    //     // TODO: Have logic here as well?
-    //     var blueprint = await (variant ? CreateVariantContentBlueprint() : CreateInvariantContentBlueprint());
-    //
-    //     VerifyCreate(blueprint);
-    //
-    //     // re-get and re-test
-    //     VerifyCreate(await ContentBlueprintEditingService.GetAsync(blueprint.Key));
-    //
-    //     void VerifyCreate(IContent? createdBlueprint)
-    //     {
-    //         Assert.IsNotNull(createdBlueprint);
-    //         Assert.AreNotEqual(Guid.Empty, createdBlueprint.Key);
-    //         Assert.IsTrue(createdBlueprint.HasIdentity);
-    //     }
-    //
-    //     // ensures it's not found by normal content
-    //     var contentFound = await ContentEditingService.GetAsync(blueprint.Key);
-    //     Assert.IsNull(contentFound);
-    // }
-
     [Test]
     public async Task Can_Create_At_Root()
     {
