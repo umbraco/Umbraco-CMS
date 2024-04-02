@@ -27,6 +27,9 @@ export class UmbWorkspaceActionElement<
 	@state()
 	_href?: string;
 
+	@state()
+	_isDisabled = false;
+
 	@property({ type: Object, attribute: false })
 	public set manifest(value: ManifestWorkspaceAction<MetaType> | undefined) {
 		if (!value) return;
@@ -50,6 +53,8 @@ export class UmbWorkspaceActionElement<
 			this._href = href;
 			// TODO: Do we need to update the component here? [NL]
 		});
+
+		this.#observeIsDisabled();
 	}
 	public get api(): ApiType | undefined {
 		return this.#api;
@@ -93,6 +98,16 @@ export class UmbWorkspaceActionElement<
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
+	#observeIsDisabled() {
+		this.observe(
+			this.#api?.isDisabled,
+			(isDisabled) => {
+				this._isDisabled = isDisabled || false;
+			},
+			'isDisabledObserver',
+		);
+	}
+
 	render() {
 		return html`
 			<uui-button-group>
@@ -103,6 +118,7 @@ export class UmbWorkspaceActionElement<
 					look=${this.#manifest?.meta.look || 'default'}
 					color=${this.#manifest?.meta.color || 'default'}
 					label=${this.#manifest?.meta.label || ''}
+					.disabled=${this._isDisabled}
 					.state=${this._buttonState}></uui-button>
 				<umb-workspace-action-menu
 					.forWorkspaceActions=${this._aliases}

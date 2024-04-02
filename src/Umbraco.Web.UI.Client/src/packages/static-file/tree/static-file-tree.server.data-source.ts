@@ -51,6 +51,8 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return StaticFileResource.getTreeStaticFileChildren({
 			parentPath,
+			skip: args.skip,
+			take: args.take,
 		});
 	}
 };

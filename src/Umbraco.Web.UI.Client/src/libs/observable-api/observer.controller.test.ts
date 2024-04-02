@@ -25,8 +25,8 @@ describe('UmbObserverController', () => {
 			const firstCtrl = new UmbObserverController(hostElement, observable, callbackMethod, 'my-test-alias');
 			const secondCtrl = new UmbObserverController(hostElement, observable, callbackMethod, 'my-test-alias');
 
-			expect(hostElement.hasController(firstCtrl)).to.be.false;
-			expect(hostElement.hasController(secondCtrl)).to.be.true;
+			expect(hostElement.hasUmbController(firstCtrl)).to.be.false;
+			expect(hostElement.hasUmbController(secondCtrl)).to.be.true;
 		});
 
 		it('controller is replaced by another controller using the the same symbol as controller-alias', () => {
@@ -39,8 +39,8 @@ describe('UmbObserverController', () => {
 			const firstCtrl = new UmbObserverController(hostElement, observable, callbackMethod, mySymbol);
 			const secondCtrl = new UmbObserverController(hostElement, observable, callbackMethod, mySymbol);
 
-			expect(hostElement.hasController(firstCtrl)).to.be.false;
-			expect(hostElement.hasController(secondCtrl)).to.be.true;
+			expect(hostElement.hasUmbController(firstCtrl)).to.be.false;
+			expect(hostElement.hasUmbController(secondCtrl)).to.be.true;
 		});
 
 		it('controller is NOT replacing another controller when using a null for controller-alias', () => {
@@ -59,8 +59,8 @@ describe('UmbObserverController', () => {
 			controllerAlias2 ??= controllerAlias2 === undefined ? simpleHashCode(callbackMethod.toString()) : undefined;
 			const secondCtrl = new UmbObserverController(hostElement, observable, callbackMethod, controllerAlias2);
 
-			expect(hostElement.hasController(firstCtrl)).to.be.true;
-			expect(hostElement.hasController(secondCtrl)).to.be.true;
+			expect(hostElement.hasUmbController(firstCtrl)).to.be.true;
+			expect(hostElement.hasUmbController(secondCtrl)).to.be.true;
 		});
 	});
 });

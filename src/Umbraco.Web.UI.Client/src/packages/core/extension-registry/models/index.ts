@@ -6,7 +6,7 @@ import type { ManifestDashboardCollection } from './dashboard-collection.model.j
 import type {
 	ManifestEntityAction,
 	ManifestEntityActionDeleteKind,
-	ManifestEntityActionRenameKind,
+	ManifestEntityActionRenameServerFileKind,
 	ManifestEntityActionReloadTreeItemChildrenKind,
 	ManifestEntityActionDuplicateKind,
 	ManifestEntityActionMoveKind,
@@ -55,6 +55,7 @@ import type {
 import type { ManifestEntityUserPermission } from './entity-user-permission.model.js';
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestCollectionAction } from './collection-action.model.js';
+import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
 import type {
 	ManifestBase,
 	ManifestBundle,
@@ -78,6 +79,7 @@ export type * from './health-check.model.js';
 export type * from './localization.model.js';
 export type * from './menu-item.model.js';
 export type * from './menu.model.js';
+export type * from './mfa-login-provider.model.js';
 export type * from './modal.model.js';
 export type * from './package-view.model.js';
 export type * from './property-action.model.js';
@@ -105,7 +107,7 @@ export type ManifestEntityActions =
 	| ManifestEntityAction
 	| ManifestEntityActionDefaultKind
 	| ManifestEntityActionDeleteKind
-	| ManifestEntityActionRenameKind
+	| ManifestEntityActionRenameServerFileKind
 	| ManifestEntityActionReloadTreeItemChildrenKind
 	| ManifestEntityActionDuplicateKind
 	| ManifestEntityActionMoveKind
@@ -149,6 +151,7 @@ export type ManifestTypes =
 	| ManifestMenu
 	| ManifestMenuItem
 	| ManifestMenuItemTreeKind
+	| ManifestMfaLoginProvider
 	| ManifestModal
 	| ManifestPackageView
 	| ManifestPropertyActions

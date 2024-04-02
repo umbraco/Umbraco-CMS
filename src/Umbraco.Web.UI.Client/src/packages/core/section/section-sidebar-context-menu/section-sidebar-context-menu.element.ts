@@ -37,10 +37,10 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 				// prettier-ignore
 				this.observe(this.#sectionSidebarContext.headline, (value) => (this._headline = value), '_observeHeadline');
 			} else {
-				this.removeControllerByAlias('_observeContextMenuIsOpen');
-				this.removeControllerByAlias('_observeUnique');
-				this.removeControllerByAlias('_observeEntityType');
-				this.removeControllerByAlias('_observeHeadline');
+				this.removeUmbControllerByAlias('_observeContextMenuIsOpen');
+				this.removeUmbControllerByAlias('_observeUnique');
+				this.removeUmbControllerByAlias('_observeEntityType');
+				this.removeUmbControllerByAlias('_observeHeadline');
 			}
 		});
 	}
@@ -79,7 +79,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 						@action-executed=${this.#onActionExecuted}
 						.entityType=${this._entityType}
 						.unique=${this._unique}></umb-entity-action-list>
-			  </div>`
+				</div>`
 			: nothing;
 	}
 

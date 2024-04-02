@@ -1,20 +1,34 @@
 import type { UmbDefaultCollectionContext } from '../default/collection-default.context.js';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '../default/collection-default.context.js';
-import type { ManifestCollectionView } from '../../extension-registry/models/collection-view.model.js';
-import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbCollectionLayoutConfiguration } from '../types.js';
+import { css, html, customElement, state, nothing, repeat, query } from '@umbraco-cms/backoffice/external/lit';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+
+interface UmbCollectionViewLayout {
+	alias: string;
+	label: string;
+	icon: string;
+	pathName: string;
+}
 
 @customElement('umb-collection-view-bundle')
 export class UmbCollectionViewBundleElement extends UmbLitElement {
 	@state()
-	_views: Array<ManifestCollectionView> = [];
+	_views: Array<UmbCollectionViewLayout> = [];
 
 	@state()
-	_currentView?: ManifestCollectionView;
+	_currentView?: UmbCollectionViewLayout;
 
 	@state()
-	private _collectionRootPathname?: string;
+	private _collectionRootPathName?: string;
+
+	@state()
+	private _entityUnique?: string;
 
 	#collectionContext?: UmbDefaultCollectionContext<any, any>;
 
@@ -23,43 +37,86 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 
 		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (context) => {
 			this.#collectionContext = context;
-			if (!this.#collectionContext) return;
-			this.#observeRootPathname();
-			this.#observeViews();
-			this.#observeCurrentView();
+			this.#observeCollection();
+		});
+
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
+			this._entityUnique = context.getUnique() ?? '';
 		});
 	}
 
-	#observeRootPathname() {
-		this.observe(
-			this.#collectionContext!.view.rootPathname,
-			(rootPathname) => {
-				this._collectionRootPathname = rootPathname;
-			},
-			'umbCollectionRootPathnameObserver',
-		);
-	}
+	#observeCollection() {
+		if (!this.#collectionContext) return;
 
-	#observeCurrentView() {
 		this.observe(
-			this.#collectionContext!.view.currentView,
-			(view) => {
-				//TODO: This is not called when the view is changed
-				this._currentView = view;
+			this.#collectionContext.view.rootPathName,
+			(rootPathName) => {
+				this._collectionRootPathName = rootPathName;
+			},
+			'umbCollectionRootPathNameObserver',
+		);
+
+		this.observe(
+			this.#collectionContext.view.currentView,
+			(currentView) => {
+				if (!currentView) return;
+				this._currentView = this._views.find((view) => view.alias === currentView.alias);
 			},
 			'umbCurrentCollectionViewObserver',
 		);
-	}
 
-	#observeViews() {
 		this.observe(
-			this.#collectionContext!.view.views,
-			(views) => {
-				this._views = views;
+			observeMultiple([this.#collectionContext.view.views, this.#collectionContext.viewLayouts]),
+			([manifests, viewLayouts]) => {
+				if (!manifests?.length && !viewLayouts?.length) return;
+				this._views = this.#mapManifestToViewLayout(manifests, viewLayouts);
 			},
-			'umbCollectionViewsObserver',
+			'umbCollectionViewsAndLayoutsObserver',
 		);
 	}
+
+	@query('#collection-view-bundle-popover')
+	private _popover?: UUIPopoverContainerElement;
+
+	#mapManifestToViewLayout(
+		manifests: Array<ManifestCollectionView>,
+		viewLayouts: Array<UmbCollectionLayoutConfiguration>,
+	): typeof this._views {
+		if (viewLayouts.length > 0) {
+			const layouts: typeof this._views = [];
+
+			viewLayouts.forEach((viewLayout) => {
+				const viewManifest = manifests.find((manifest) => manifest.alias === viewLayout.collectionView);
+				if (!viewManifest) return;
+				layouts.push({
+					alias: viewManifest.alias,
+					label: viewLayout.name ?? viewManifest.meta.label,
+					icon: viewLayout.icon ?? viewManifest.meta.icon,
+					pathName: viewManifest.meta.pathName,
+				});
+			});
+
+			return layouts;
+		}
+
+		// fallback on the 'collectionView' manifests
+		return manifests.map((manifest) => ({
+			alias: manifest.alias,
+			label: manifest.meta.label,
+			icon: manifest.meta.icon,
+			pathName: manifest.meta.pathName,
+		}));
+	}
+
+	#onClick(view: UmbCollectionViewLayout) {
+		this.#collectionContext?.setLastSelectedView(this._entityUnique, view.alias);
+
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._popover?.hidePopover();
+	}
+
 	render() {
 		if (!this._currentView) return nothing;
 		if (this._views.length <= 1) return nothing;
@@ -70,22 +127,29 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 			</uui-button>
 			<uui-popover-container id="collection-view-bundle-popover" placement="bottom-end">
 				<umb-popover-layout>
-					<div class="filter-dropdown">${this._views.map((view) => this.#renderItem(view))}</div>
+					<div class="filter-dropdown">
+						${repeat(
+							this._views,
+							(view) => view.alias,
+							(view) => this.#renderItem(view),
+						)}
+					</div>
 				</umb-popover-layout>
 			</uui-popover-container>
 		`;
 	}
 
-	#renderItem(view: ManifestCollectionView) {
+	#renderItem(view: UmbCollectionViewLayout) {
 		return html`
-			<uui-button compact href="${this._collectionRootPathname}/${view.meta.pathName}">
-				${this.#renderItemDisplay(view)} <span class="label">${view.meta.label}</span>
+			<uui-button compact href="${this._collectionRootPathName}/${view.pathName}" @click=${() => this.#onClick(view)}>
+				${this.#renderItemDisplay(view)}
+				<span class="label">${view.label}</span>
 			</uui-button>
 		`;
 	}
 
-	#renderItemDisplay(view: ManifestCollectionView) {
-		return html`<umb-icon name=${view.meta.icon}></umb-icon>`;
+	#renderItemDisplay(view: UmbCollectionViewLayout) {
+		return html`<umb-icon name=${view.icon}></umb-icon>`;
 	}
 
 	static styles = [
@@ -99,8 +163,11 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 			}
 			.filter-dropdown {
 				display: flex;
-				gap: var(--uui-size-space-3);
+				gap: var(--uui-size-space-1);
 				flex-direction: column;
+			}
+			umb-icon {
+				display: inline-block;
 			}
 		`,
 	];

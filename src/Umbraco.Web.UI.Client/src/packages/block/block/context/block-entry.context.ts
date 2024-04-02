@@ -235,7 +235,7 @@ export abstract class UmbBlockEntryContext<
 				'observeWorkspacePath',
 			);
 		} else {
-			this.removeControllerByAlias('observeWorkspacePath');
+			this.removeUmbControllerByAlias('observeWorkspacePath');
 		}
 	}
 
@@ -326,7 +326,7 @@ export abstract class UmbBlockEntryContext<
 		if (!blockType) return;
 
 		if (blockType.label) {
-			this.removeControllerByAlias('observeContentTypeName');
+			this.removeUmbControllerByAlias('observeContentTypeName');
 			// Missing part for label syntax, as we need to store the syntax, interpretive it and then set the label: (here we are just parsing the label syntax)
 			this.#label.setValue(blockType.label);
 			return;

@@ -19,7 +19,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -104,7 +104,7 @@ export class UmbDocumentTypeWorkspaceContext
 				path: 'edit/:id',
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
-					this.removeControllerByAlias('isNewRedirectController');
+					this.removeUmbControllerByAlias('isNewRedirectController');
 					const id = info.match.params.id;
 					this.load(id);
 				},

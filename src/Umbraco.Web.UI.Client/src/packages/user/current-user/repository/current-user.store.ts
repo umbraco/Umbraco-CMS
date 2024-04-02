@@ -1,17 +1,20 @@
-import type { UmbCurrentUserModel } from '../types.js';
+import type { UmbCurrentUserMfaProviderModel, UmbCurrentUserModel } from '../types.js';
 import type { UmbUserDetailModel } from '@umbraco-cms/backoffice/user';
 import { UMB_USER_DETAIL_STORE_CONTEXT } from '@umbraco-cms/backoffice/user';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 	#data = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
+	#mfaProviders = new UmbArrayState<UmbCurrentUserMfaProviderModel>([], (e) => e.providerName);
+	readonly mfaProviders = this.#mfaProviders.asObservable();
+
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_CURRENT_USER_STORE_CONTEXT.toString());
+		super(host, UMB_CURRENT_USER_STORE_CONTEXT);
 
 		this.consumeContext(UMB_USER_DETAIL_STORE_CONTEXT, (instance) => {
 			this.observe(instance?.all(), (users) => this.#onUserDetailStoreUpdate(users));
@@ -73,6 +76,14 @@ export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 
 		this.update(mappedCurrentUser);
 	};
+
+	setMfaProviders(data: Array<UmbCurrentUserMfaProviderModel>) {
+		this.#mfaProviders.setValue(data);
+	}
+
+	updateMfaProvider(data: Partial<UmbCurrentUserMfaProviderModel>) {
+		this.#mfaProviders.updateOne(data.providerName, data);
+	}
 }
 
 export const UMB_CURRENT_USER_STORE_CONTEXT = new UmbContextToken<UmbCurrentUserStore>('UmbCurrentUserStore');

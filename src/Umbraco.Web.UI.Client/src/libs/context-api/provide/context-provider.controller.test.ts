@@ -60,7 +60,7 @@ describe('UmbContextProviderController', () => {
 		}).to.throw();
 
 		// Still has the initial controller:
-		expect(element.hasController(provider)).to.be.true;
+		expect(element.hasUmbController(provider)).to.be.true;
 		// The secondCtrl was never set as a result of the creation failing:
 		expect(secondCtrl).to.be.undefined;
 	});

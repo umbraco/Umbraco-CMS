@@ -140,7 +140,7 @@ export class UmbBlockGridEntriesContext
 				'observeThisLayouts',
 			);
 
-			this.removeControllerByAlias('observeAreaType');
+			this.removeUmbControllerByAlias('observeAreaType');
 
 			const hostEl = this.getHostElement() as HTMLElement | undefined;
 			if (hostEl) {

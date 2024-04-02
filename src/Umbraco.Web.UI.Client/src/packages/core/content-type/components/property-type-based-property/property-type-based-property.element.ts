@@ -50,12 +50,12 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 							(extension) => {
 								if (!extension) return;
 								this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;
-								this.removeControllerByAlias('_observePropertyEditorSchema');
+								this.removeUmbControllerByAlias('_observePropertyEditorSchema');
 							},
 							'_observePropertyEditorSchema',
 						);
 					} else {
-						this.removeControllerByAlias('_observePropertyEditorSchema');
+						this.removeUmbControllerByAlias('_observePropertyEditorSchema');
 					}
 				},
 				'_observeDataType',
