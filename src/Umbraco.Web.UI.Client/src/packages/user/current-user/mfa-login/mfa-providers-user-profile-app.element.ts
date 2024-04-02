@@ -1,4 +1,3 @@
-import { UmbCurrentUserRepository } from '../repository/index.js';
 import { UMB_CURRENT_USER_MFA_MODAL } from '../modals/current-user-mfa/current-user-mfa-modal.token.js';
 import { html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -9,8 +8,6 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-mfa-providers-user-profile-app')
 export class UmbMfaProvidersUserProfileAppElement extends UmbLitElement {
-	#currentUserRepository = new UmbCurrentUserRepository(this);
-
 	@state()
 	_hasProviders = false;
 
