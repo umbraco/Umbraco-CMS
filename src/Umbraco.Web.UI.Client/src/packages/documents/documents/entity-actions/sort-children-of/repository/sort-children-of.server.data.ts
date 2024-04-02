@@ -35,9 +35,7 @@ export class UmbSortChildrenOfDocumentServerDataSource {
 			this.#host,
 			DocumentResource.putDocumentSort({
 				requestBody: {
-					parent: {
-						id: args.unique,
-					},
+					parent: args.unique ? { id: args.unique } : null,
 					sorting: sortingMapping,
 				},
 			}),
