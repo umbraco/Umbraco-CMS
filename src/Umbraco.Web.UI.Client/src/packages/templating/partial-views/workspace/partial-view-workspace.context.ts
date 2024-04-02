@@ -14,7 +14,7 @@ import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
@@ -159,7 +159,7 @@ export class UmbPartialViewWorkspaceContext
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+			const event = new UmbRequestReloadTreeItemChildrenEvent({
 				entityType: parent.entityType,
 				unique: parent.unique,
 			});

@@ -1,7 +1,7 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import { UMB_DEFAULT_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/default-tree.context.js';
 import type { UmbTreeItemModelBase } from '../../types.js';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '../../reload-tree-item-children/index.js';
+import { UmbRequestReloadTreeItemChildrenEvent } from '../../reload-tree-item-children/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
@@ -214,7 +214,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
 			this.#actionEventContext?.removeEventListener(
-				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				UmbRequestReloadTreeItemChildrenEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 
@@ -226,7 +226,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			this.#actionEventContext = instance;
 
 			this.#actionEventContext.addEventListener(
-				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				UmbRequestReloadTreeItemChildrenEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 
@@ -377,7 +377,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	destroy(): void {
 		this.#actionEventContext?.removeEventListener(
-			UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+			UmbRequestReloadTreeItemChildrenEvent.TYPE,
 			this.#onReloadRequest as EventListener,
 		);
 		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
