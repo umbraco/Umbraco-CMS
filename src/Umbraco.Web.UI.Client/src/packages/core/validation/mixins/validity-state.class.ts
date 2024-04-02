@@ -1,3 +1,5 @@
+/*
+NOt used currently [NL]
 type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 export class UmbValidityState implements Writeable<ValidityState> {
@@ -13,3 +15,4 @@ export class UmbValidityState implements Writeable<ValidityState> {
 	valid: boolean = true;
 	valueMissing: boolean = true;
 }
+*/
