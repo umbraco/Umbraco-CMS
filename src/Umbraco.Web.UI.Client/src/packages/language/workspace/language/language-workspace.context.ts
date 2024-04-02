@@ -50,7 +50,7 @@ export class UmbLanguageWorkspaceContext
 				path: 'edit/:unique',
 				component: UmbLanguageWorkspaceEditorElement,
 				setup: (_component, info) => {
-					this.removeControllerByAlias('isNewRedirectController');
+					this.removeUmbControllerByAlias('isNewRedirectController');
 					this.load(info.match.params.unique);
 				},
 			},
