@@ -1,0 +1,39 @@
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+
+export class UmbDocumentRecycleBinServerDataSource {
+	#host: UmbControllerHost;
+
+	constructor(host: UmbControllerHost) {
+		this.#host = host;
+	}
+
+	trash(args: { unique: string }) {
+		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdMoveToRecycleBin({ id: args.unique }));
+	}
+
+	async restore(args: { unique: string; target: { unique: string | null } }) {
+		return tryExecuteAndNotify(this.#host, DocumentResource.putRecycleBinDocumentByIdRestore({ id: args.unique }));
+	}
+
+	emptyBin() {
+		return tryExecuteAndNotify(this.#host, DocumentResource);
+	}
+
+	async getOriginalParent(args: { unique: string }) {
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			DocumentResource.getRecycleBinDocumentByIdOriginalParent({ id: args.unique }),
+		);
+
+		if (data) {
+			const mappedData = {
+				unique: data.id,
+			};
+
+			return { data: mappedData };
+		}
+
+		return { error };
+	}
+}
