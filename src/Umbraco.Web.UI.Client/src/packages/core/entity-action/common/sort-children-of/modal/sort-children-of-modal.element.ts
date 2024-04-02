@@ -111,7 +111,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		});
 
 		if (!error) {
-			console.log('Sorted');
+			this._submitModal();
 		}
 	}
 
