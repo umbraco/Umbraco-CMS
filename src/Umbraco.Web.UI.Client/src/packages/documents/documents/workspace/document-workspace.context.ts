@@ -564,7 +564,7 @@ export class UmbDocumentWorkspaceContext
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
 
-		// TODO: Only validate the specified selction.. [NL]
+		// TODO: Only validate the specified selection.. [NL]
 		return this.validateAndSubmit(async (valid) => {
 			if (valid) {
 				return this.#performSaveAndPublish(variantIds);

@@ -123,7 +123,7 @@ export abstract class UmbSaveableWorkspaceContextBase<WorkspaceDataModelType>
 	abstract getData(): WorkspaceDataModelType | undefined;
 	protected abstract submit(): Promise<boolean | undefined>;
 	protected invalidSubmit(): Promise<boolean | undefined> {
-		return false;
+		return Promise.resolve(false);
 	}
 }
 
