@@ -3,8 +3,8 @@ import type { UmbMemberGroupDetailModel } from '../types.js';
 import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContext,
-	UmbSaveableWorkspaceContextBase,
+	type UmbSubmittableWorkspaceContext,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
@@ -13,8 +13,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbMemberGroupWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbMemberGroupDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<UmbMemberGroupDetailModel>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbMemberGroupDetailRepository(this);
 	#getDataPromise?: Promise<any>;
@@ -101,7 +101,7 @@ export class UmbMemberGroupWorkspaceContext
 		return { data };
 	}
 
-	async save() {
+	async submit() {
 		const data = this.getData();
 		if (!data) throw new Error('No data to save');
 
@@ -112,7 +112,7 @@ export class UmbMemberGroupWorkspaceContext
 		}
 
 		this.setIsNew(false);
-		this.workspaceComplete(data);
+		return true;
 	}
 
 	getData() {

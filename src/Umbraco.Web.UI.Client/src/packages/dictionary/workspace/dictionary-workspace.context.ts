@@ -2,8 +2,8 @@ import { UmbDictionaryDetailRepository } from '../repository/index.js';
 import type { UmbDictionaryDetailModel } from '../types.js';
 import { UmbDictionaryWorkspaceEditorElement } from './dictionary-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContext,
-	UmbSaveableWorkspaceContextBase,
+	type UmbSubmittableWorkspaceContext,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
@@ -15,8 +15,8 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 export class UmbDictionaryWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbDictionaryDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<UmbDictionaryDetailModel>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly detailRepository = new UmbDictionaryDetailRepository(this);
@@ -123,7 +123,7 @@ export class UmbDictionaryWorkspaceContext
 		this.#data.setValue(data);
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#data.value) return;
 		if (!this.#data.value.unique) return;
 
@@ -160,7 +160,7 @@ export class UmbDictionaryWorkspaceContext
 		if (!data) return;
 
 		this.setIsNew(false);
-		this.workspaceComplete(data);
+		return true;
 	}
 
 	public destroy(): void {

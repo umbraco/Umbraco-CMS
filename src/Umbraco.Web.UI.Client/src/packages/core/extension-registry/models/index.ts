@@ -123,7 +123,7 @@ export type ManifestPropertyActions = ManifestPropertyAction | ManifestPropertyA
 
 export type ManifestWorkspaceActions = ManifestWorkspaceAction | ManifestWorkspaceActionDefaultKind;
 
-export type ManifestWorkspaces = ManifestWorkspace | ManifestWorkspaceRoutableKind;
+export type ManifestWorkspaces = ManifestWorkspace | ManifestWorkspaceRoutableKind | ManifestWorkspaceRoutableKind;
 export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceViewContentTypeDesignEditorKind;
 
 export type ManifestTypes =
