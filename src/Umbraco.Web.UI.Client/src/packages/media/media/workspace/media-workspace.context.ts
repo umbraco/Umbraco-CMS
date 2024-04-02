@@ -11,7 +11,7 @@ import type {
 	UmbVariantDatasetWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
@@ -31,7 +31,7 @@ import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbVariantDatasetWorkspaceContext, UmbCollectionWorkspaceContext<UmbMediaTypeDetailModel>
 {
 	//
@@ -118,7 +118,7 @@ export class UmbMediaWorkspaceContext
 		this.routes.setRoutes([
 			{
 				path: 'create/parent/:entityType/:parentUnique/:mediaTypeUnique',
-				component: UmbMediaWorkspaceEditorElement,
+				component: () => import('./media-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
@@ -134,7 +134,7 @@ export class UmbMediaWorkspaceContext
 			},
 			{
 				path: 'edit/:unique',
-				component: UmbMediaWorkspaceEditorElement,
+				component: () => import('./media-workspace-editor.element.js'),
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
@@ -404,12 +404,12 @@ export class UmbMediaWorkspaceContext
 		}
 	}
 
-	async save() {
+	async submit() {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		await this.#createOrSave();
 		this.setIsNew(false);
-		this.workspaceComplete(data);
+		return true;
 	}
 
 	async delete() {

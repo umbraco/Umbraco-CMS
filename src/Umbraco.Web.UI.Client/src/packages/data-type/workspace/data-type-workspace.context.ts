@@ -7,19 +7,19 @@ import type {
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
+	mergeObservables,
 	UmbArrayState,
 	UmbObjectState,
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	PropertyEditorSettingsDefaultData,
 	PropertyEditorSettingsProperty,
@@ -32,7 +32,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 
 type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
@@ -282,17 +282,18 @@ export class UmbDataTypeWorkspaceContext
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		await this.#getDataPromise;
 
-		return combineLatest([
-			this.#currentData.asObservablePart(
-				(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
-			),
-			this.#defaults.asObservablePart(
-				(defaults) => defaults?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
-			),
-		]).pipe(
-			map(([value, defaultValue]) => {
+		return mergeObservables(
+			[
+				this.#currentData.asObservablePart(
+					(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
+				),
+				this.#defaults.asObservablePart(
+					(defaults) => defaults?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
+				),
+			],
+			([value, defaultValue]) => {
 				return value ?? defaultValue;
-			}),
+			},
 		);
 	}
 
@@ -316,7 +317,7 @@ export class UmbDataTypeWorkspaceContext
 		}
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#currentData.value) return;
 		if (!this.#currentData.value.unique) return;
 
@@ -345,12 +346,7 @@ export class UmbDataTypeWorkspaceContext
 		}
 
 		this.setIsNew(false);
-		this.workspaceComplete(this.#currentData.value);
-	}
-
-	protected workspaceComplete(data: EntityType | undefined) {
-		this.dispatchEvent(new CustomEvent('workspace-complete'));
-		super.workspaceComplete(data);
+		return true;
 	}
 
 	async delete(unique: string) {

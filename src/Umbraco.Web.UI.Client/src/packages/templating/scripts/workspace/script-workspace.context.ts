@@ -6,9 +6,9 @@ import { UmbScriptWorkspaceEditorElement } from './script-workspace-editor.eleme
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
-	type UmbSaveableWorkspaceContext,
+	type UmbSubmittableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
@@ -19,8 +19,8 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbScriptWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbScriptDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<UmbScriptDetailModel>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbScriptDetailRepository(this);
 
@@ -127,7 +127,7 @@ export class UmbScriptWorkspaceContext
 		}
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#data.value) throw new Error('Data is missing');
 
 		let newData = undefined;
@@ -162,8 +162,8 @@ export class UmbScriptWorkspaceContext
 			this.#data.setValue(newData);
 
 			this.setIsNew(false);
-			this.workspaceComplete(newData);
 		}
+		return true;
 	}
 
 	destroy(): void {
