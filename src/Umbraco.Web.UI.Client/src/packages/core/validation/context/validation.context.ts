@@ -7,7 +7,6 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	#validators: Array<UmbValidator> = [];
 	#validationMode: boolean = false;
 	#isValid: boolean = false;
-	//#preventFail: boolean = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_VALIDATION_CONTEXT);
@@ -16,16 +15,6 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	get isValid(): boolean {
 		return this.#isValid;
 	}
-
-	/*
-	preventFail(): void {
-		this.#preventFail = true;
-	}
-
-	allowFail(): void {
-		this.#preventFail = false;
-	}
-	*/
 
 	addValidator(validator: UmbValidator) {
 		this.#validators.push(validator);
