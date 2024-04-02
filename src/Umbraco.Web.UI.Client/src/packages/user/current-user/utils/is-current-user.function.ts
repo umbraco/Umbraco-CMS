@@ -15,5 +15,21 @@ export const isCurrentUser = async (host: UmbControllerHost, userUnique: string)
 
 	controller.destroy();
 
-	return await currentUserContext!.isUserCurrentUser(userUnique);
+	return currentUserContext!.isUserCurrentUser(userUnique);
+};
+
+export const isCurrentUserAnAdmin = async (host: UmbControllerHost) => {
+	const ctrl = new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT);
+	let currentUserContext = await ctrl.asPromise();
+	ctrl.destroy();
+
+	const controller = new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT, (context) => {
+		currentUserContext = context;
+	});
+
+	await controller.asPromise();
+
+	controller.destroy();
+
+	return currentUserContext!.isCurrentUserAdmin();
 };
