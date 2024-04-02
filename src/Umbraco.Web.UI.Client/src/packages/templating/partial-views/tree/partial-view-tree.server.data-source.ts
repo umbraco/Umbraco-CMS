@@ -49,6 +49,8 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return PartialViewResource.getTreePartialViewChildren({
 			parentPath,
+			skip: args.skip,
+			take: args.take,
 		});
 	}
 };

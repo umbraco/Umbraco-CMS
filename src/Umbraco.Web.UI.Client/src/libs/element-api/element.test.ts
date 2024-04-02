@@ -15,20 +15,20 @@ describe('UmbElementMixin', () => {
 
 	describe('Element general controller API', () => {
 		describe('methods', () => {
-			it('has an hasController method', () => {
-				expect(hostElement).to.have.property('hasController').that.is.a('function');
+			it('has an hasUmbController method', () => {
+				expect(hostElement).to.have.property('hasUmbController').that.is.a('function');
 			});
-			it('has an getControllers method', () => {
-				expect(hostElement).to.have.property('getControllers').that.is.a('function');
+			it('has an getUmbControllers method', () => {
+				expect(hostElement).to.have.property('getUmbControllers').that.is.a('function');
 			});
-			it('has an addController method', () => {
-				expect(hostElement).to.have.property('addController').that.is.a('function');
+			it('has an addUmbController method', () => {
+				expect(hostElement).to.have.property('addUmbController').that.is.a('function');
 			});
-			it('has an removeControllerByAlias method', () => {
-				expect(hostElement).to.have.property('removeControllerByAlias').that.is.a('function');
+			it('has an removeUmbControllerByAlias method', () => {
+				expect(hostElement).to.have.property('removeUmbControllerByAlias').that.is.a('function');
 			});
-			it('has an removeController method', () => {
-				expect(hostElement).to.have.property('removeController').that.is.a('function');
+			it('has an removeUmbController method', () => {
+				expect(hostElement).to.have.property('removeUmbController').that.is.a('function');
 			});
 			it('has an destroy method', () => {
 				expect(hostElement).to.have.property('destroy').that.is.a('function');
@@ -38,10 +38,10 @@ describe('UmbElementMixin', () => {
 
 	describe('Element helper methods API', () => {
 		describe('methods', () => {
-			it('has an hasController method', () => {
+			it('has an hasUmbController method', () => {
 				expect(hostElement).to.have.property('getHostElement').that.is.a('function');
 			});
-			it('has an hasController should return it self', () => {
+			it('has an hasUmbController should return it self', () => {
 				expect(hostElement.getHostElement()).to.be.equal(hostElement);
 			});
 			it('has an observe method', () => {
@@ -70,12 +70,12 @@ describe('UmbElementMixin', () => {
 			const ctrl = hostElement.observe(myObservable, () => {}, 'observer');
 
 			// The controller is now added to the host:
-			expect(hostElement.hasController(ctrl)).to.be.true;
+			expect(hostElement.hasUmbController(ctrl)).to.be.true;
 
 			ctrl.destroy();
 
 			// The controller is removed from the host:
-			expect(hostElement.hasController(ctrl)).to.be.false;
+			expect(hostElement.hasUmbController(ctrl)).to.be.false;
 		});
 
 		it('observe is destroyed then removed', () => {
@@ -85,12 +85,12 @@ describe('UmbElementMixin', () => {
 			const ctrl = hostElement.observe(myObservable, () => {}, 'observer');
 
 			// The controller is now added to the host:
-			expect(hostElement.hasController(ctrl)).to.be.true;
+			expect(hostElement.hasUmbController(ctrl)).to.be.true;
 
-			hostElement.removeController(ctrl);
+			hostElement.removeUmbController(ctrl);
 
 			// The controller is removed from the host:
-			expect(hostElement.hasController(ctrl)).to.be.false;
+			expect(hostElement.hasUmbController(ctrl)).to.be.false;
 		});
 
 		it('observe is destroyed then removed via alias', () => {
@@ -100,12 +100,12 @@ describe('UmbElementMixin', () => {
 			const ctrl = hostElement.observe(myObservable, () => {}, 'observer');
 
 			// The controller is now added to the host:
-			expect(hostElement.hasController(ctrl)).to.be.true;
+			expect(hostElement.hasUmbController(ctrl)).to.be.true;
 
-			hostElement.removeControllerByAlias('observer');
+			hostElement.removeUmbControllerByAlias('observer');
 
 			// The controller is removed from the host:
-			expect(hostElement.hasController(ctrl)).to.be.false;
+			expect(hostElement.hasUmbController(ctrl)).to.be.false;
 		});
 
 		it('observe is removed when replaced with alias', () => {
@@ -115,14 +115,14 @@ describe('UmbElementMixin', () => {
 			const ctrl = hostElement.observe(myObservable, () => {}, 'observer');
 
 			// The controller is now added to the host:
-			expect(hostElement.hasController(ctrl)).to.be.true;
+			expect(hostElement.hasUmbController(ctrl)).to.be.true;
 
 			const ctrl2 = hostElement.observe(myObservable, () => {}, 'observer');
 
 			// The controller is removed from the host:
-			expect(hostElement.hasController(ctrl)).to.be.false;
+			expect(hostElement.hasUmbController(ctrl)).to.be.false;
 			// The controller is new one is there instead:
-			expect(hostElement.hasController(ctrl2)).to.be.true;
+			expect(hostElement.hasUmbController(ctrl2)).to.be.true;
 		});
 
 		it('observe is removed when replaced with alias made of hash of callback method', () => {
@@ -132,14 +132,14 @@ describe('UmbElementMixin', () => {
 			const ctrl = hostElement.observe(myObservable, () => {});
 
 			// The controller is now added to the host:
-			expect(hostElement.hasController(ctrl)).to.be.true;
+			expect(hostElement.hasUmbController(ctrl)).to.be.true;
 
 			const ctrl2 = hostElement.observe(myObservable, () => {});
 
 			// The controller is removed from the host:
-			expect(hostElement.hasController(ctrl)).to.be.false;
+			expect(hostElement.hasUmbController(ctrl)).to.be.false;
 			// The controller is new one is there instead:
-			expect(hostElement.hasController(ctrl2)).to.be.true;
+			expect(hostElement.hasUmbController(ctrl2)).to.be.true;
 		});
 
 		it('observe is NOT removed when controller alias does not align', () => {
@@ -149,15 +149,15 @@ describe('UmbElementMixin', () => {
 			const ctrl = hostElement.observe(myObservable, () => {});
 
 			// The controller is now added to the host:
-			expect(hostElement.hasController(ctrl)).to.be.true;
+			expect(hostElement.hasUmbController(ctrl)).to.be.true;
 
 			const ctrl2 = hostElement.observe(myObservable, (value) => {
 				const a = value + 'bla';
 			});
 
 			// The controller is not removed from the host:
-			expect(hostElement.hasController(ctrl)).to.be.true;
-			expect(hostElement.hasController(ctrl2)).to.be.true;
+			expect(hostElement.hasUmbController(ctrl)).to.be.true;
+			expect(hostElement.hasUmbController(ctrl2)).to.be.true;
 		});
 
 		it('observe is removed when observer is undefined and using the same alias', () => {
@@ -167,7 +167,7 @@ describe('UmbElementMixin', () => {
 			const ctrl = hostElement.observe(myObservable, () => {}, 'observer');
 
 			// The controller is now added to the host:
-			expect(hostElement.hasController(ctrl)).to.be.true;
+			expect(hostElement.hasUmbController(ctrl)).to.be.true;
 
 			const ctrl2 = hostElement.observe(
 				undefined,
@@ -178,7 +178,7 @@ describe('UmbElementMixin', () => {
 			);
 
 			// The controller is removed from the host, and the new one was NOT added:
-			expect(hostElement.hasController(ctrl)).to.be.false;
+			expect(hostElement.hasUmbController(ctrl)).to.be.false;
 			expect(ctrl2).to.be.undefined;
 		});
 
@@ -189,12 +189,12 @@ describe('UmbElementMixin', () => {
 			const ctrl = hostElement.observe(myObservable, () => {});
 
 			// The controller is now added to the host:
-			expect(hostElement.hasController(ctrl)).to.be.true;
+			expect(hostElement.hasUmbController(ctrl)).to.be.true;
 
 			const ctrl2 = hostElement.observe(undefined, () => {});
 
 			// The controller is removed from the host, and the new one was NOT added:
-			expect(hostElement.hasController(ctrl)).to.be.false;
+			expect(hostElement.hasUmbController(ctrl)).to.be.false;
 			expect(ctrl2).to.be.undefined;
 		});
 
@@ -227,7 +227,7 @@ describe('UmbElementMixin', () => {
 			const check: CheckType<typeof ctrl, UmbObserverController<string>> = ctrl;
 			const check2: ReverseCheckType<typeof ctrl, UmbObserverController<undefined>> = ctrl;
 
-			expect(hostElement.hasController(check)).to.be.true;
+			expect(hostElement.hasUmbController(check)).to.be.true;
 			expect(check === check2).to.be.true; // Just to use the const for something.
 		});
 
@@ -244,7 +244,7 @@ describe('UmbElementMixin', () => {
 			const check2: ReverseCheckType<typeof ctrl, UmbObserverController<undefined>> = ctrl;
 			const check3: ReverseCheckType<typeof ctrl, UmbObserverController<string>> = ctrl;
 
-			expect(hostElement.hasController(check)).to.be.true;
+			expect(hostElement.hasUmbController(check)).to.be.true;
 			expect(check2 === check3).to.be.true; // Just to use the const for something.
 		});
 
@@ -269,7 +269,7 @@ describe('UmbElementMixin', () => {
 			const check3: ReverseCheckType<typeof ctrl, UmbObserverController<string>> = ctrl;
 
 			if (ctrl) {
-				expect(hostElement.hasController(ctrl)).to.be.true;
+				expect(hostElement.hasUmbController(ctrl)).to.be.true;
 			} else {
 				expect(ctrl).to.be.undefined;
 			}
@@ -300,7 +300,7 @@ describe('UmbElementMixin', () => {
 			const check4: ReverseCheckType<typeof ctrl, UmbObserverController<undefined>> = ctrl;
 
 			if (ctrl) {
-				expect(hostElement.hasController(ctrl)).to.be.true;
+				expect(hostElement.hasUmbController(ctrl)).to.be.true;
 			} else {
 				expect(ctrl).to.be.undefined;
 			}

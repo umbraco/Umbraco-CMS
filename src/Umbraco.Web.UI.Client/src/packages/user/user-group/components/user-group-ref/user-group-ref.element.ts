@@ -34,7 +34,7 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 				'userPermissionLabels',
 			);
 		} else {
-			this.removeControllerByAlias('userPermissionLabels');
+			this.removeUmbControllerByAlias('userPermissionLabels');
 		}
 	}
 
