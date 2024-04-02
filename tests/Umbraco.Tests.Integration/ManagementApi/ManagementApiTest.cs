@@ -15,6 +15,7 @@ using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
@@ -60,8 +61,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
             IUser user;
             if (isAdmin)
             {
-                user = await userService.GetAsync(userKey) ??
-                       throw new Exception("Super user not found.");
+                user = await userService.GetRequiredUserAsync(userKey);
                 user.Username = user.Email = username;
                 userService.Save(user);
             }
