@@ -4,9 +4,8 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 export interface UmbSortChildrenOfModalData {
 	unique: string | null;
 	entityType: string;
-	itemRepositoryAlias: string;
-	sortChildrenOfRepositoryAlias: string;
 	treeRepositoryAlias: string;
+	sortChildrenOfRepositoryAlias: string;
 }
 
 export interface UmbSortChildrenOfModalValue {}

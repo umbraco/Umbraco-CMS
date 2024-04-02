@@ -6,7 +6,6 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbTreeRepository, UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
-import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
@@ -27,6 +26,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	_totalPages = 1;
 
 	#pagination = new UmbPaginationManager();
+	#sortedUniques = new Set<string>();
 
 	#sorter = new UmbSorterController<UmbUniqueTreeItemModel>(this, {
 		getUniqueOfElement: (element) => {
@@ -38,9 +38,13 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		identifier: 'Umb.SorterIdentifier.SortChildrenOfModal',
 		itemSelector: 'uui-ref-node',
 		containerSelector: 'uui-ref-list',
-		onChange: (params) => {
-			this._children = params.model;
-			this.requestUpdate('_items');
+		onChange: ({ model }) => {
+			const oldValue = this._children;
+			this._children = model;
+			this.requestUpdate('_children', oldValue);
+		},
+		onEnd: ({ item }) => {
+			this.#sortedUniques.add(item.unique);
 		},
 	});
 
@@ -60,16 +64,10 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 
 	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
 		super.firstUpdated(_changedProperties);
-
-		/*
-		if (!this.data?.itemRepositoryAlias) throw new Error('itemRepositoryAlias is required');
-		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, this.data.itemRepositoryAlias);
-		*/
-
-		this.#requestItems();
+		this.#requestChildren();
 	}
 
-	async #requestItems() {
+	async #requestChildren() {
 		if (!this.data?.unique === undefined) throw new Error('unique is required');
 		if (!this.data?.treeRepositoryAlias) throw new Error('treeRepositoryAlias is required');
 
@@ -95,25 +93,45 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		event.stopPropagation();
 		if (this._currentPage >= this._totalPages) return;
 		this.#pagination.setCurrentPageNumber(this._currentPage + 1);
-		this.#requestItems();
+		this.#requestChildren();
 	}
 
 	async #onSubmit(event: PointerEvent) {
 		event?.stopPropagation();
 		if (!this.data?.sortChildrenOfRepositoryAlias) throw new Error('sortChildrenOfRepositoryAlias is required');
+
 		const sortChildrenOfRepository = await createExtensionApiByAlias<any>(
 			this,
 			this.data.sortChildrenOfRepositoryAlias,
 		);
 
-		debugger;
+		const { error } = await sortChildrenOfRepository.sortChildrenOf({
+			unique: this.data.unique,
+			sorting: this.#getSortOrderOfSortedItems(),
+		});
 
-		/*
-		const { error } = await sortChildrenOfRepository.sortChildrenOf({ unique: this.data.unique });
 		if (!error) {
 			console.log('Sorted');
 		}
-		*/
+	}
+
+	#getSortOrderOfSortedItems() {
+		const sorting = [];
+
+		// get the new sort order from the sorted uniques
+		for (const value of this.#sortedUniques) {
+			const index = this._children.findIndex((child) => child.unique === value);
+			if (index !== -1) {
+				const entry = {
+					unique: value,
+					sortOrder: index,
+				};
+
+				sorting.push(entry);
+			}
+		}
+
+		return sorting;
 	}
 
 	render() {
@@ -121,7 +139,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 			<umb-body-layout headline=${'Sort Children'}>
 				<uui-box> ${this.#renderChildren()} </uui-box>
 				<uui-button slot="actions" label="Cancel" @click="${this._rejectModal}"></uui-button>
-				<uui-button slot="actions" color="positive" look="primary" label="Sort"></uui-button>
+				<uui-button slot="actions" color="positive" look="primary" label="Sort" @click=${this.#onSubmit}></uui-button>
 			</umb-body-layout>
 		`;
 	}
