@@ -1,11 +1,12 @@
 import { UmbEntityActionBase } from '../../entity-action-base.js';
 import { UmbRequestReloadStructureForEntityEvent } from '../../request-reload-structure-for-entity.event.js';
-import { createExtensionApiByAlias, type MetaEntityActionDeleteKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { MetaEntityActionTrashKind } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
-export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionDeleteKind> {
+export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTrashKind> {
 	// TODO: make base type for item and detail models
 
 	async execute() {
@@ -28,8 +29,8 @@ export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionD
 			confirmLabel: 'Trash',
 		});
 
-		const recycleBinRepository = await createExtensionApiByAlias(this, this.args.meta.recycleBinRepositoryAlias);
-		await recycleBinRepository.trash(this.args.unique);
+		const recycleBinRepository = await createExtensionApiByAlias<any>(this, this.args.meta.recycleBinRepositoryAlias);
+		await recycleBinRepository.requestTrash({ unique: this.args.unique });
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		const event = new UmbRequestReloadStructureForEntityEvent({
@@ -42,4 +43,4 @@ export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionD
 		// TODO: reload destination
 	}
 }
-export default UmbDeleteEntityAction;
+export default UmbTrashEntityAction;
