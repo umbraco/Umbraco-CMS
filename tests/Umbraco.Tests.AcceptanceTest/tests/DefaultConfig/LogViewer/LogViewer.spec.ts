@@ -29,8 +29,6 @@ test.describe('Log Viewer tests', () => {
 
   test('can change the search log level', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const logInformation = await umbracoApi.logViewer.getLevelCount();
-    const expectedLogCount = Math.min(logInformation.information, 100);
     const logLevel = 'Information';
 
     // Act
@@ -41,8 +39,6 @@ test.describe('Log Viewer tests', () => {
     // Assert
     // Check if the search log level indicator is visible
     await umbracoUi.logViewer.doesLogLevelIndicatorDisplay(logLevel);
-    // Check if the log count matches the expected count
-    //await umbracoUi.logViewer.doesLogLevelCountMatch(logLevel, expectedLogCount);
   });
 
   test('can create a saved search', async ({umbracoApi, umbracoUi}) => {
