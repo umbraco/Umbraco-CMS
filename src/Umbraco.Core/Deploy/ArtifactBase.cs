@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Deploy;
 public abstract class ArtifactBase<TUdi> : IArtifact
     where TUdi : Udi
 {
-    private IEnumerable<ArtifactDependency> _dependencies;
+    private IEnumerable<ArtifactDependency>? _dependencies;
     private readonly Lazy<string> _checksum;
 
     /// <summary>
@@ -20,7 +20,7 @@ public abstract class ArtifactBase<TUdi> : IArtifact
         Udi = udi ?? throw new ArgumentNullException(nameof(udi));
         Name = Udi.ToString();
 
-        _dependencies = dependencies ?? Enumerable.Empty<ArtifactDependency>();
+        _dependencies = dependencies;
         _checksum = new Lazy<string>(GetChecksum);
     }
 
@@ -33,7 +33,7 @@ public abstract class ArtifactBase<TUdi> : IArtifact
     /// <inheritdoc />
     public IEnumerable<ArtifactDependency> Dependencies
     {
-        get => _dependencies;
+        get => _dependencies ??= Array.Empty<ArtifactDependency>();
         set => _dependencies = value.OrderBy(x => x.Udi);
     }
 
