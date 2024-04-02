@@ -20,6 +20,9 @@ const entityActions: Array<ManifestTypes> = [
 		},
 		conditions: [
 			{
+				alias: 'Umb.Condition.User.CanPerformActions',
+			},
+			{
 				alias: 'Umb.Condition.User.AllowDeleteAction',
 			},
 		],
@@ -37,6 +40,9 @@ const entityActions: Array<ManifestTypes> = [
 			label: 'Enable',
 		},
 		conditions: [
+			{
+				alias: 'Umb.Condition.User.CanPerformActions',
+			},
 			{
 				alias: 'Umb.Condition.User.AllowEnableAction',
 			},
@@ -56,6 +62,9 @@ const entityActions: Array<ManifestTypes> = [
 		},
 		conditions: [
 			{
+				alias: 'Umb.Condition.User.CanPerformActions',
+			},
+			{
 				alias: 'Umb.Condition.User.AllowDisableAction',
 			},
 		],
@@ -72,6 +81,11 @@ const entityActions: Array<ManifestTypes> = [
 			icon: 'icon-key',
 			label: 'Change Password',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.User.CanPerformActions',
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -86,6 +100,9 @@ const entityActions: Array<ManifestTypes> = [
 			label: 'Unlock',
 		},
 		conditions: [
+			{
+				alias: 'Umb.Condition.User.CanPerformActions',
+			},
 			{
 				alias: 'Umb.Condition.User.AllowUnlockAction',
 			},
@@ -104,6 +121,9 @@ const entityActions: Array<ManifestTypes> = [
 			label: 'Configure Two-Factor',
 		},
 		conditions: [
+			{
+				alias: 'Umb.Condition.User.CanPerformActions',
+			},
 			{
 				alias: 'Umb.Condition.User.AllowMfaAction',
 			},
