@@ -760,51 +760,49 @@ public class ContentController : ContentControllerBase
     }
 
     /// <summary>
+    ///     Gets the children for the content id passed in when sorting
+    /// </summary>
+    /// <returns></returns>
+    [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items", ActionSort.ActionLetter)]
+    public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildrenForSort([FromQuery] GetChildrenFilter request) => GetChildren(request);
+
+    /// <summary>
     ///     Gets the children for the content id passed in
     /// </summary>
     /// <returns></returns>
     [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
-    public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
-        int id,
-        string includeProperties,
-        int pageNumber = 0,
-        int pageSize = 0,
-        string orderBy = "SortOrder",
-        Direction orderDirection = Direction.Ascending,
-        bool orderBySystemField = true,
-        string filter = "",
-        string cultureName = "") // TODO: it's not a NAME it's the ISO CODE
+    public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren([FromQuery] GetChildrenFilter request)
     {
         long totalChildren;
         List<IContent> children;
         // Sets the culture to the only existing culture if we only have one culture.
-        if (string.IsNullOrWhiteSpace(cultureName))
+        if (string.IsNullOrWhiteSpace(request.CultureName))
         {
             if (_allLangs.Value.Count == 1)
             {
-                cultureName = _allLangs.Value.First().Key;
+                request.CultureName = _allLangs.Value.First().Key;
             }
         }
-        if (pageNumber > 0 && pageSize > 0)
+        if (request.PageNumber > 0 && request.PageSize > 0)
         {
             IQuery<IContent>? queryFilter = null;
-            if (filter.IsNullOrWhiteSpace() == false)
+            if (request.Filter.IsNullOrWhiteSpace() == false)
             {
-                int.TryParse(filter, out int filterAsIntId);//considering id,key & name as filter param
-                Guid.TryParse(filter, out Guid filterAsGuid);
+                int.TryParse(request.Filter, out int filterAsIntId);//considering id,key & name as filter param
+                Guid.TryParse(request.Filter, out Guid filterAsGuid);
                 //add the default text filter
                 queryFilter = _sqlContext.Query<IContent>()
                     .Where(x => x.Name != null)
-                    .Where(x => x.Name!.Contains(filter)
+                    .Where(x => x.Name!.Contains(request.Filter)
                       || x.Id == filterAsIntId || x.Key == filterAsGuid);
             }
             children = _contentService
-                .GetPagedChildren(id, pageNumber - 1, pageSize, out totalChildren, queryFilter, Ordering.By(orderBy, orderDirection, cultureName, !orderBySystemField)).ToList();
+                .GetPagedChildren(request.Id, request.PageNumber - 1, request.PageSize, out totalChildren, queryFilter, Ordering.By(request.OrderBy, request.OrderDirection, request.CultureName, !request.OrderBySystemField)).ToList();
         }
         else
         {
             //better to not use this without paging where possible, currently only the sort dialog does
-            children = _contentService.GetPagedChildren(id, 0, int.MaxValue, out var total).ToList();
+            children = _contentService.GetPagedChildren(request.Id, 0, int.MaxValue, out var total).ToList();
             totalChildren = children.Count;
         }
 
@@ -813,19 +811,19 @@ public class ContentController : ContentControllerBase
             return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(0, 0, 0);
         }
 
-        var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, pageNumber, pageSize)
+        var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, request.PageNumber, request.PageSize)
         {
             Items = children.Select(content =>
                 _umbracoMapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(
                     content,
                     context =>
                     {
-                        context.SetCulture(cultureName);
+                        context.SetCulture(request.CultureName);
 
                         // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
-                        if (!includeProperties.IsNullOrWhiteSpace())
+                        if (!request.IncludeProperties.IsNullOrWhiteSpace())
                         {
-                            context.SetIncludedProperties(includeProperties.Split(
+                            context.SetIncludedProperties(request.IncludeProperties.Split(
                                 new[] { ", ", "," },
                                 StringSplitOptions.RemoveEmptyEntries));
                         }

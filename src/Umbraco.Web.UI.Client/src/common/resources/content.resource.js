@@ -794,7 +794,8 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @param {String} options.filter if provided, query will only return those with names matching the filter
          * @param {String} options.orderDirection can be `Ascending` or `Descending` - Default: `Ascending`
          * @param {String} options.orderBy property to order items by, default: `SortOrder`
-          * @param {String} options.cultureName if provided, the results will be for this specific culture/variant
+         * @param {String} options.cultureName if provided, the results will be for this specific culture/variant
+         * @param {Boolean} options.isSortRequest if provided, the results will be for this specific culture/variant
          * @returns {Promise} resourcePromise object containing an array of content items.
          *
          */
@@ -839,11 +840,13 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 return false;
             }
 
+            let apiEndpoint = options.isSortRequest ? "GetChildrenForSort" : "GetChildren";
+
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
-                        "GetChildren",
+                        apiEndpoint,
                         {
                             id: parentId,
                             includeProperties: _.pluck(options.includeProperties, 'alias').join(","),
