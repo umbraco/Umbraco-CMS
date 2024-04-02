@@ -1,4 +1,4 @@
 export interface UmbSortChildrenOfArgs {
-	unique: string;
+	unique: string | null;
 	sorting: Array<{ unique: string; sortOrder: number }>;
 }

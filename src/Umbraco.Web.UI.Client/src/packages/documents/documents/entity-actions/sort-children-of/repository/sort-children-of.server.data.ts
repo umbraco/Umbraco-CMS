@@ -27,7 +27,7 @@ export class UmbSortChildrenOfDocumentServerDataSource {
 	 * @memberof UmbSortChildrenOfDocumentServerDataSource
 	 */
 	async sortChildrenOf(args: UmbSortChildrenOfArgs) {
-		if (!args.unique) throw new Error('unique is missing');
+		if (args.unique === undefined) throw new Error('unique is missing');
 
 		const sortingMapping = args.sorting.map((item) => ({ id: item.unique, sortOrder: item.sortOrder }));
 

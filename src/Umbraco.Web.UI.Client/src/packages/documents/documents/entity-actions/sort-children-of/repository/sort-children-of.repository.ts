@@ -22,7 +22,7 @@ export class UmbSortChildrenOfDocumentRepository extends UmbControllerBase imple
 	}
 
 	async sortChildrenOf(args: UmbSortChildrenOfArgs) {
-		if (!args.unique) throw new Error('Unique is missing');
+		if (args.unique === undefined) throw new Error('Unique is missing');
 		if (!args.sorting) throw new Error('Sorting details are missing');
 
 		const { error } = await this.#dataSource.sortChildrenOf(args);
