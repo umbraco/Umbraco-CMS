@@ -31,7 +31,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 
 	constructor() {
 		super();
-		this.#pagination.setPageSize(2);
+		this.#pagination.setPageSize(50);
 
 		this.observe(
 			observeMultiple([this.#pagination.currentPage, this.#pagination.totalPages]),
