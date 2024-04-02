@@ -13,12 +13,12 @@ import { UmbDeepState } from './deep-state.js';
  * The ArrayState provides methods to append data when the data is an Object.
  */
 export class UmbArrayState<T> extends UmbDeepState<T[]> {
-	readonly getUniqueMethod: (entry: T) => unknown;
+	readonly getUniqueMethod?: (entry: T) => unknown;
 	#sortMethod?: (a: T, b: T) => number;
 
-	constructor(initialData: T[], getUniqueOfEntryMethod: (entry: T) => unknown) {
+	constructor(initialData: T[], getUniqueOfEntryMethod: ((entry: T) => unknown) | null) {
 		super(initialData);
-		this.getUniqueMethod = getUniqueOfEntryMethod;
+		this.getUniqueMethod = getUniqueOfEntryMethod ?? undefined;
 	}
 
 	/**
@@ -70,8 +70,8 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * myState.remove([1, 2]);
 	 */
 	remove(uniques: unknown[]) {
-		let next = this.getValue();
 		if (this.getUniqueMethod) {
+			let next = this.getValue();
 			uniques.forEach((unique) => {
 				next = next.filter((x) => {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -99,8 +99,8 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * myState.removeOne(1);
 	 */
 	removeOne(unique: unknown) {
-		let next = this.getValue();
 		if (this.getUniqueMethod) {
+			let next = this.getValue();
 			next = next.filter((x) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
