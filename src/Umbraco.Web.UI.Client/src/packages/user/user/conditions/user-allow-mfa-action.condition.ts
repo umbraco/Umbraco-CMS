@@ -14,10 +14,11 @@ export class UmbUserAllowMfaActionCondition extends UmbUserActionConditionBase {
 
 		const isCurrentUserOrAdmin = isCurrentUser || isAdmin;
 
+		// Check if there are any MFA providers available and if the user is allowed to use them
 		this.observe(
 			umbExtensionsRegistry.byType('mfaLoginProvider'),
 			(exts) => (this.permitted = isCurrentUserOrAdmin && exts.length > 0),
-			'_hasProviders',
+			'_userAllowMfaActionConditionProviders',
 		);
 	}
 }
