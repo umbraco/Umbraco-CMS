@@ -63,7 +63,7 @@ export interface ManifestEntityActionTrashKind extends ManifestEntityAction<Meta
 }
 
 export interface MetaEntityActionTrashKind extends MetaEntityActionDefaultKind {
-	trashRepositoryAlias: string;
+	recycleBinRepositoryAlias: string;
 	itemRepositoryAlias: string;
 }
 
