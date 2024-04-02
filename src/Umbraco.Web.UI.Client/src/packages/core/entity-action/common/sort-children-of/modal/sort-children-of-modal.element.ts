@@ -27,7 +27,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 
 	#pagination = new UmbPaginationManager();
 	#sortedUniques = new Set<string>();
-	#sorter?: UmbSorterController;
+	#sorter?: UmbSorterController<UmbUniqueTreeItemModel>;
 
 	constructor() {
 		super();
@@ -69,7 +69,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 
 			if (data.total > 0) {
 				this.#initSorter();
-				this.#sorter.setModel(this._children);
+				this.#sorter?.setModel(this._children);
 			}
 		}
 	}
