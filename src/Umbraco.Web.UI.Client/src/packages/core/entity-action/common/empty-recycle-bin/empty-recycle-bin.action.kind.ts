@@ -15,7 +15,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-trash',
-			label: 'Empty...',
+			label: 'Empty Recycle Bin...',
 		},
 	},
 };

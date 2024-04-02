@@ -13,11 +13,11 @@ export class UmbDocumentRecycleBinServerDataSource {
 		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdMoveToRecycleBin({ id: args.unique }));
 	}
 
-	async restore(args: { unique: string; target: { unique: string | null } }) {
+	restore(args: { unique: string; target: { unique: string | null } }) {
 		return tryExecuteAndNotify(this.#host, DocumentResource.putRecycleBinDocumentByIdRestore({ id: args.unique }));
 	}
 
-	emptyBin() {
+	empty() {
 		return tryExecuteAndNotify(this.#host, DocumentResource.deleteRecycleBinDocument());
 	}
 

@@ -10,19 +10,19 @@ export class UmbDocumentRecycleBinRepository extends UmbRepositoryBase {
 		this.#recycleBinSource = new UmbDocumentRecycleBinServerDataSource(this);
 	}
 
-	async requestTrash(args) {
+	async requestTrash(args: any) {
 		return this.#recycleBinSource.trash(args);
 	}
 
-	async requestRestore(args) {
+	async requestRestore(args: any) {
 		return this.#recycleBinSource.restore(args);
 	}
 
-	async requestEmptyBin() {
-		return this.#recycleBinSource.emptyBin();
+	async requestEmpty() {
+		return this.#recycleBinSource.empty();
 	}
 
-	async requestOriginalParent(args) {
+	async requestOriginalParent(args: any) {
 		return this.#recycleBinSource.getOriginalParent(args);
 	}
 }
