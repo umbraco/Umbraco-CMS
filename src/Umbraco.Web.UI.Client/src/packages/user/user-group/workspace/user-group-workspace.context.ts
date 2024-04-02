@@ -101,15 +101,21 @@ export class UmbUserGroupWorkspaceContext
 	async submit() {
 		if (!this.#data.value) return;
 
-		//TODO: Could we clean this code up?
 		if (this.getIsNew()) {
-			await this.repository.create(this.#data.value);
+			const { data } = await this.repository.create(this.#data.value);
+			if (data) {
+				// If it went well, then its not new anymore?.
+				this.setIsNew(false);
+				return true;
+			}
 		} else if (this.#data.value.unique) {
-			await this.repository.save(this.#data.value);
-		} else return;
+			const { data } = await this.repository.save(this.#data.value);
+			if (data) {
+				return true;
+			}
+		}
 
-		// If it went well, then its not new anymore?.
-		this.setIsNew(false);
+		return false;
 	}
 
 	destroy(): void {

@@ -121,11 +121,16 @@ export class UmbLanguageWorkspaceContext
 			const { data } = await this.repository.create(newData);
 			if (data) {
 				this.setIsNew(false);
+				return true;
 			}
 		} else {
-			await this.repository.save(newData);
+			const { data } = await this.repository.save(newData);
+			if (data) {
+				return true;
+			}
 			// TODO: Show validation errors as warnings?
 		}
+		return false;
 	}
 
 	destroy(): void {
