@@ -2,7 +2,7 @@ import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element.js';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceRouteManager,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
@@ -20,7 +20,7 @@ import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
-	extends UmbSaveableWorkspaceContextBase<LayoutDataType>
+	extends UmbSubmittableWorkspaceContextBase<LayoutDataType>
 	implements UmbRoutableWorkspaceContext
 {
 	// Just for context token safety:
@@ -300,7 +300,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 	}
 
-	async save() {
+	async submit() {
 		const layoutData = this.#layout.value;
 		const contentData = this.content.getData();
 		if (!layoutData || !this.#blockManager || !this.#blockEntries || !contentData || !this.#modalContext) return;
@@ -333,7 +333,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 
 		this.setIsNew(false);
-		this.workspaceComplete(layoutData);
+		return true;
 	}
 
 	#modalRejected = () => {

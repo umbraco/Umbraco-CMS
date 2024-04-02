@@ -7,7 +7,7 @@ import type {
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
@@ -17,7 +17,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
-	extends UmbSaveableWorkspaceContextBase<BlockTypeData>
+	extends UmbSubmittableWorkspaceContextBase<BlockTypeData>
 	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	// Just for context token safety:
@@ -147,7 +147,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		}
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#data.value) return;
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
@@ -158,7 +158,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		});
 
 		this.setIsNew(false);
-		this.workspaceComplete(this.#data.value);
+		return true;
 	}
 
 	public destroy(): void {

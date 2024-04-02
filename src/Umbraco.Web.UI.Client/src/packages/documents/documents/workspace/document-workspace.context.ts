@@ -18,11 +18,10 @@ import {
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
-import { UmbDocumentWorkspaceEditorElement } from './document-workspace-editor.element.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
@@ -51,7 +50,7 @@ import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/documen
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements
 		UmbRoutableWorkspaceContext,
 		UmbVariantDatasetWorkspaceContext<UmbDocumentVariantModel>,
@@ -144,7 +143,7 @@ export class UmbDocumentWorkspaceContext
 		this.routes.setRoutes([
 			{
 				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique',
-				component: UmbDocumentWorkspaceEditorElement,
+				component: () => import('./document-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
@@ -160,7 +159,7 @@ export class UmbDocumentWorkspaceContext
 			},
 			{
 				path: 'edit/:unique',
-				component: UmbDocumentWorkspaceEditorElement,
+				component: () => import('./document-workspace-editor.element.js'),
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
@@ -189,8 +188,8 @@ export class UmbDocumentWorkspaceContext
 
 		if (data) {
 			this.setIsNew(false);
-			this.#persistedData.update(data);
-			this.#currentData.update(data);
+			this.#persistedData.setValue(data);
+			this.#currentData.setValue(data);
 		}
 
 		this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDocumentStoreObserver');
@@ -486,7 +485,7 @@ export class UmbDocumentWorkspaceContext
 		};
 	}
 
-	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>) {
+	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>): Promise<boolean> {
 		const saveData = this.#buildSaveData(selectedVariants);
 
 		if (this.getIsNew()) {
@@ -500,6 +499,8 @@ export class UmbDocumentWorkspaceContext
 			}
 
 			this.setIsNew(false);
+			this.#persistedData.setValue(create);
+			this.#currentData.setValue(create);
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
@@ -515,6 +516,9 @@ export class UmbDocumentWorkspaceContext
 				throw new Error('Error saving document');
 			}
 
+			this.#persistedData.setValue(save);
+			this.#currentData.setValue(save);
+
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
 				unique: this.getUnique()!,
@@ -524,7 +528,7 @@ export class UmbDocumentWorkspaceContext
 			actionEventContext.dispatchEvent(event);
 		}
 
-		return selectedVariants;
+		return true;
 	}
 
 	async #handleSaveAndPublish() {
@@ -559,23 +563,32 @@ export class UmbDocumentWorkspaceContext
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
 
-		const variants = await this.#performSaveOrCreate(variantIds);
+		// TODO: Only validate the specified selection.. [NL]
+		return this.validateAndSubmit(async (valid) => {
+			if (valid) {
+				return this.#performSaveAndPublish(variantIds);
+			} else {
+				// If data of the selection is not valid Then just save:
+				await this.#performSaveOrCreate(variantIds);
+				// Return false, even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
+				return false;
+			}
+		});
+	}
+	async #performSaveAndPublish(variantIds: Array<UmbVariantId>): Promise<boolean> {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		await this.#performSaveOrCreate(variantIds);
 
 		await this.publishingRepository.publish(
 			unique,
-			variants.map((variantId) => ({ variantId })),
+			variantIds.map((variantId) => ({ variantId })),
 		);
-
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-
-		this.workspaceComplete(data);
+		return true;
 	}
 
-	public async save() {
+	async #handleSave() {
 		const { options, selected } = await this.#determineVariantOptions();
 
 		let variantIds: Array<UmbVariantId> = [];
@@ -605,14 +618,21 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		await this.#performSaveOrCreate(variantIds);
+		return true;
+	}
 
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
+	public async requestSubmit() {
+		const success = await this.#handleSave();
+		if (!success) {
+			await Promise.reject();
+		}
+	}
 
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-
-		this.workspaceComplete(data);
+	public submit() {
+		return this.#handleSave();
+	}
+	public async invalidSubmit() {
+		return false;
 	}
 
 	public async publish() {
@@ -651,14 +671,6 @@ export class UmbDocumentWorkspaceContext
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 		await this.publishingRepository.publish(unique, variants);
-
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-
-		this.workspaceComplete(data);
 	}
 
 	public async unpublish() {
@@ -699,14 +711,6 @@ export class UmbDocumentWorkspaceContext
 			variantIds,
 			result.includeUnpublishedDescendants ?? false,
 		);
-
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-
-		this.workspaceComplete(data);
 	}
 
 	async delete() {
