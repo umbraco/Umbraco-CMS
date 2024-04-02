@@ -25,11 +25,3 @@ export interface ManifestWorkspaceRoutableKind
 }
 
 export interface MetaWorkspaceRoutableKind extends MetaWorkspace {}
-
-export interface ManifestWorkspaceEditableKind
-	extends ManifestWorkspace<MetaWorkspaceEditableKind, UmbControllerHostElement, UmbEditableWorkspaceContext> {
-	type: 'workspace';
-	kind: 'routable';
-}
-
-export interface MetaWorkspaceEditableKind extends MetaWorkspace {}

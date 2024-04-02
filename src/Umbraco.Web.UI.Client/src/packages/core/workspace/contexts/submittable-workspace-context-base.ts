@@ -129,6 +129,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 /*
  * @deprecated Use UmbSubmittableWorkspaceContextBase instead — Will be removed before RC.
+ * Rename `save` to `submit` and return a promise that resolves to true when save is complete.
  * TODO: Delete before RC.
  */
 export abstract class UmbEditableWorkspaceContextBase<

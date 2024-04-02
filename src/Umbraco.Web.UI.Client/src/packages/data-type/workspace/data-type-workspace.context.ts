@@ -5,7 +5,6 @@ import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property
 import type {
 	UmbInvariantDatasetWorkspaceContext,
 	UmbRoutableWorkspaceContext,
-	UmbEditableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbSubmittableWorkspaceContextBase,
@@ -34,7 +33,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<EntityType>
-	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext, UmbEditableWorkspaceContext
+	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
