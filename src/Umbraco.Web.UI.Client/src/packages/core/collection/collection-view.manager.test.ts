@@ -43,7 +43,8 @@ describe('UmbCollectionViewManager', () => {
 
 	beforeEach(() => {
 		const hostElement = new UmbTestControllerHostElement();
-		manager = new UmbCollectionViewManager(hostElement, config);
+		manager = new UmbCollectionViewManager(hostElement);
+		manager.setConfig(config);
 	});
 
 	describe('Public API', () => {
@@ -60,8 +61,8 @@ describe('UmbCollectionViewManager', () => {
 				expect(manager).to.have.property('routes').to.be.an.instanceOf(Observable);
 			});
 
-			it('has a rootPathname property', () => {
-				expect(manager).to.have.property('rootPathname').to.be.an.instanceOf(Observable);
+			it('has a rootPathName property', () => {
+				expect(manager).to.have.property('rootPathName').to.be.an.instanceOf(Observable);
 			});
 		});
 
