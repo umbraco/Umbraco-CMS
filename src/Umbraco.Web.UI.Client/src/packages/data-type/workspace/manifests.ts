@@ -4,6 +4,7 @@ import type {
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbInvalidateWorkspaceAction } from './test-workspace-action.js';
 
 const DATA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DataType';
 
@@ -68,6 +69,24 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
+	},
+	{
+		type: 'workspaceAction',
+		kind: 'default',
+		alias: 'Umb.WorkspaceAction.DataType.Test',
+		name: 'TEST VALIDATION SYSTEM',
+		api: UmbInvalidateWorkspaceAction,
+		meta: {
+			label: 'Invalidate',
+			look: 'primary',
+			color: 'danger',
 		},
 		conditions: [
 			{
