@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
@@ -13,11 +14,16 @@ public class ByKeyMemberController : MemberControllerBase
 {
     private readonly IMemberEditingService _memberEditingService;
     private readonly IMemberPresentationFactory _memberPresentationFactory;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public ByKeyMemberController(IMemberEditingService memberEditingService, IMemberPresentationFactory memberPresentationFactory)
+    public ByKeyMemberController(
+        IMemberEditingService memberEditingService,
+        IMemberPresentationFactory memberPresentationFactory,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _memberEditingService = memberEditingService;
         _memberPresentationFactory = memberPresentationFactory;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     [HttpGet("{id:guid}")]
@@ -32,7 +38,7 @@ public class ByKeyMemberController : MemberControllerBase
             return MemberNotFound();
         }
 
-        MemberResponseModel model = await _memberPresentationFactory.CreateResponseModelAsync(member);
+        MemberResponseModel model = await _memberPresentationFactory.CreateResponseModelAsync(member, CurrentUser(_backOfficeSecurityAccessor));
         return Ok(model);
     }
 }

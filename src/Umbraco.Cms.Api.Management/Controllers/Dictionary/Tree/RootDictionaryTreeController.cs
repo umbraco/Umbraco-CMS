@@ -23,6 +23,6 @@ public class RootDictionaryTreeController : DictionaryTreeControllerBase
     {
         PagedModel<IDictionaryItem> paginatedItems = await DictionaryItemService.GetPagedAsync(null, skip, take);
 
-        return Ok(PagedViewModel(await MapTreeItemViewModels(null, paginatedItems.Items), paginatedItems.Total));
+        return Ok(PagedViewModel(await MapTreeItemViewModels(paginatedItems.Items), paginatedItems.Total));
     }
 }

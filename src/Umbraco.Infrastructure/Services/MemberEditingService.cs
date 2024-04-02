@@ -111,7 +111,17 @@ internal sealed class MemberEditingService : IMemberEditingService
         if (member is null)
         {
             status.ContentEditingOperationStatus = ContentEditingOperationStatus.NotFound;
-            return Attempt.FailWithStatus(new MemberEditingStatus(), new MemberUpdateResult());
+            return Attempt.FailWithStatus(status, new MemberUpdateResult());
+        }
+
+        if (user.HasAccessToSensitiveData() is false)
+        {
+            // handle sensitive data. certain member properties (IsApproved, IsLockedOut) are subject to "sensitive data" rules.
+            if (member.IsLockedOut != updateModel.IsLockedOut || member.IsApproved != updateModel.IsApproved)
+            {
+                status.ContentEditingOperationStatus = ContentEditingOperationStatus.NotAllowed;
+                return Attempt.FailWithStatus(status, new MemberUpdateResult());
+            }
         }
 
         MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(member.Id.ToString());
@@ -165,8 +175,6 @@ internal sealed class MemberEditingService : IMemberEditingService
             return Attempt.FailWithStatus(status, new MemberUpdateResult { Content = member });
         }
 
-        // FIXME: handle sensitive data. certain properties (IsApproved, IsLockedOut, ...) are subject to "sensitive data" rules.
-        //       reverse engineer what's happening in the old backoffice MemberController and replicate here
         member.IsLockedOut = updateModel.IsLockedOut;
         member.IsApproved = updateModel.IsApproved;
         member.Email = updateModel.Email;
