@@ -1,4 +1,5 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbDocumentRecycleBinServerDataSource {
@@ -17,7 +18,7 @@ export class UmbDocumentRecycleBinServerDataSource {
 	}
 
 	emptyBin() {
-		return tryExecuteAndNotify(this.#host, DocumentResource);
+		return tryExecuteAndNotify(this.#host, DocumentResource.deleteRecycleBinDocument());
 	}
 
 	async getOriginalParent(args: { unique: string }) {
