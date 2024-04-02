@@ -18,7 +18,7 @@ test.describe('User Group Tests', () => {
     userGroupId = await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
 
     // Assert
-    expect(umbracoApi.userGroup.doesExist(userGroupId)).toBeTruthy();
+    expect(await umbracoApi.userGroup.doesExist(userGroupId)).toBeTruthy();
   });
 
   test('can update a user group', async ({umbracoApi}) => {

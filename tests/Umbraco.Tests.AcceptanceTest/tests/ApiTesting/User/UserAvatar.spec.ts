@@ -9,7 +9,6 @@ test.describe('User Avatar Tests', () => {
   const userEmail = 'userAvatar@acceptance.test';
   const userName = 'UserAvatarTests';
   // Avatar
-  // Creates a random GUID
   const avatarFileId = crypto.randomUUID();
   const avatarName = 'Umbraco.png';
   const mimeType = 'image/png';

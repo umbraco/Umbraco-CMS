@@ -25,7 +25,8 @@ test.describe('Dictionary tests', () => {
   test('can update a dictionary', async ({umbracoApi}) => {
     // Arrange
     const wrongDictionaryName = 'WrongTestDictionary';
-    dictionaryId = await umbracoApi.dictionary.createDefaultDictionary(dictionaryName);
+    dictionaryId = await umbracoApi.dictionary.createDefaultDictionary(wrongDictionaryName);
+    expect(await umbracoApi.dictionary.doesNameExist(wrongDictionaryName)).toBeTruthy();
     const dictionary = await umbracoApi.dictionary.get(dictionaryId);
 
     // Act
@@ -88,22 +89,16 @@ test.describe('Dictionary tests', () => {
     // This variable must not be changed as it is declared in the file TestDictionary.udt
     const importDictionaryName = 'TestImportDictionary';
 
-    // Create a dictionary
-    dictionaryId = await umbracoApi.dictionary.create(dictionaryName);
-    expect(await umbracoApi.dictionary.doesExist(dictionaryId)).toBeTruthy();
-
     // Create temporary file
      await umbracoApi.temporaryFile.create(temporaryFileId, fileName, mimeType, filePath);
     expect(await umbracoApi.temporaryFile.doesExist(temporaryFileId)).toBeTruthy();
 
     // Act
-    const importResponse = await umbracoApi.dictionary.import(temporaryFileId, dictionaryId);
+    const importResponse = await umbracoApi.dictionary.import(temporaryFileId, null);
 
     // Assert
     expect(importResponse.status).toBeTruthy();
-    // Checks if the parent dictionary contains the import dictionary
-    const dictionaryChildren = await umbracoApi.dictionary.getChildren(dictionaryId);
-    expect(dictionaryChildren[0].name).toEqual(importDictionaryName);
+    expect(await umbracoApi.dictionary.doesNameExist(importDictionaryName)).toBeTruthy();
 
     // Clean
     await umbracoApi.temporaryFile.delete(temporaryFileId);

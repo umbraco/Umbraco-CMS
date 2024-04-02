@@ -27,7 +27,6 @@ test.describe('User Tests', () => {
 
   test('can update a user', async ({umbracoApi}) => {
     // Arrange
-    // Gets userGroup data for Translators
     const anotherUserGroup = await umbracoApi.userGroup.getByName("Translators");
     userId = await umbracoApi.user.createDefaultUser(userName, userEmail, userGroupId);
     const userData = await umbracoApi.user.get(userId);
