@@ -16,6 +16,7 @@ import type {
 	ManifestEntityActionDefaultKind,
 	ManifestEntityActionTrashKind,
 	ManifestEntityActionRestoreFromRecycleBinKind,
+	ManifestEntityActionEmptyRecycleBinKind,
 } from './entity-action.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.model.js';
@@ -111,6 +112,7 @@ export type ManifestEntityActions =
 	| ManifestEntityActionDeleteFolderKind
 	| ManifestEntityActionDeleteKind
 	| ManifestEntityActionDuplicateKind
+	| ManifestEntityActionEmptyRecycleBinKind
 	| ManifestEntityActionMoveKind
 	| ManifestEntityActionReloadTreeItemChildrenKind
 	| ManifestEntityActionRenameServerFileKind

@@ -80,6 +80,17 @@ export interface MetaEntityActionRestoreFromRecycleBinKind extends MetaEntityAct
 	itemRepositoryAlias: string;
 }
 
+// EMPTY RECYCLE BIN
+export interface ManifestEntityActionEmptyRecycleBinKind
+	extends ManifestEntityAction<MetaEntityActionEmptyRecycleBinKind> {
+	type: 'entityAction';
+	kind: 'emptyRecycleBin';
+}
+
+export interface MetaEntityActionEmptyRecycleBinKind extends MetaEntityActionDefaultKind {
+	recycleBinRepositoryAlias: string;
+}
+
 // RENAME
 export interface ManifestEntityActionRenameServerFileKind
 	extends ManifestEntityAction<MetaEntityActionRenameServerFileKind> {

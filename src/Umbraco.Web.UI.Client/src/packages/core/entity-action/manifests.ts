@@ -5,6 +5,7 @@ import { manifests as moveEntityActionManifests } from './common/move/manifests.
 import { manifests as trashEntityActionManifests } from './common/trash/manifests.js';
 import { manifests as sortChildrenOfEntityActionManifests } from './common/sort-children-of/manifests.js';
 import { manifests as restoreFromRecycleBinEntityActionManifests } from './common/restore-from-recycle-bin/manifests.js';
+import { manifests as emptyRecycleBinEntityActionManifests } from './common/empty-recycle-bin/manifests.js';
 
 export const manifests = [
 	...defaultEntityActionManifests,
@@ -14,4 +15,5 @@ export const manifests = [
 	...trashEntityActionManifests,
 	...sortChildrenOfEntityActionManifests,
 	...restoreFromRecycleBinEntityActionManifests,
+	...emptyRecycleBinEntityActionManifests,
 ];
