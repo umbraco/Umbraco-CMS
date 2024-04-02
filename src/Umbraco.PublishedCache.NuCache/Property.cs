@@ -33,7 +33,7 @@ internal class Property : PublishedPropertyBase
     private object? _interValue;
 
     // the variant source and inter values
-    private ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>? _sourceValues;
+    private readonly Lazy<ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>> _sourceValues = new();
 
     private string? _valuesCacheKey;
 
@@ -56,7 +56,7 @@ internal class Property : PublishedPropertyBase
         PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
         : base(propertyType, referenceCacheLevel)
     {
-        if (sourceValues != null)
+        if (sourceValues is not null)
         {
             foreach (PropertyData sourceValue in sourceValues)
             {
@@ -66,12 +66,7 @@ internal class Property : PublishedPropertyBase
                 }
                 else
                 {
-                    if (_sourceValues == null)
-                    {
-                        _sourceValues = new ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>();
-                    }
-
-                    _sourceValues[new CompositeStringStringKey(sourceValue.Culture, sourceValue.Segment)]
+                    _sourceValues.Value[new CompositeStringStringKey(sourceValue.Culture, sourceValue.Segment)]
                         = new SourceInterValue
                         {
                             Culture = sourceValue.Culture,
@@ -157,12 +152,7 @@ internal class Property : PublishedPropertyBase
             return _sourceValue;
         }
 
-        if (_sourceValues == null)
-        {
-            return null;
-        }
-
-        return _sourceValues.TryGetValue(
+        return _sourceValues.Value.TryGetValue(
             new CompositeStringStringKey(culture, segment),
             out SourceInterValue? sourceValue)
             ? sourceValue.SourceValue
@@ -235,21 +225,14 @@ internal class Property : PublishedPropertyBase
             return _interValue;
         }
 
-        if (_sourceValues == null)
-        {
-            _sourceValues = new ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>();
-        }
-
         var k = new CompositeStringStringKey(culture, segment);
-        if (!_sourceValues.TryGetValue(k, out SourceInterValue? vvalue))
+
+        SourceInterValue vvalue = _sourceValues.Value.GetOrAdd(k, _ => new SourceInterValue
         {
-            _sourceValues[k] = vvalue = new SourceInterValue
-            {
-                Culture = culture,
-                Segment = segment,
-                SourceValue = GetSourceValue(culture, segment),
-            };
-        }
+            Culture = culture,
+            Segment = segment,
+            SourceValue = GetSourceValue(culture, segment),
+        });
 
         if (vvalue.InterInitialized)
         {
@@ -366,7 +349,7 @@ internal class Property : PublishedPropertyBase
 
     private class CacheValues : CacheValue
     {
-        private ConcurrentDictionary<CompositeStringStringKey, CacheValue>? _values;
+        private readonly Lazy<ConcurrentDictionary<CompositeStringStringKey, CacheValue>> _values = new();
 
         public CacheValue For(string? culture, string? segment)
         {
@@ -375,16 +358,9 @@ internal class Property : PublishedPropertyBase
                 return this;
             }
 
-            if (_values == null)
-            {
-                _values = new ConcurrentDictionary<CompositeStringStringKey, CacheValue>();
-            }
-
             var k = new CompositeStringStringKey(culture, segment);
-            if (!_values.TryGetValue(k, out CacheValue? value))
-            {
-                _values[k] = value = new CacheValue();
-            }
+
+            CacheValue value = _values.Value.GetOrAdd(k, _ => new CacheValue());
 
             return value;
         }
