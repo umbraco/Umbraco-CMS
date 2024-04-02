@@ -67,6 +67,19 @@ export interface MetaEntityActionTrashKind extends MetaEntityActionDefaultKind {
 	itemRepositoryAlias: string;
 }
 
+// RESTORE FROM RECYCLE BIN
+
+export interface ManifestEntityActionRestoreFromRecycleBinKind
+	extends ManifestEntityAction<MetaEntityActionRestoreFromRecycleBinKind> {
+	type: 'entityAction';
+	kind: 'restoreFromRecycleBin';
+}
+
+export interface MetaEntityActionRestoreFromRecycleBinKind extends MetaEntityActionDefaultKind {
+	recycleBinRepositoryAlias: string;
+	itemRepositoryAlias: string;
+}
+
 // RENAME
 export interface ManifestEntityActionRenameServerFileKind
 	extends ManifestEntityAction<MetaEntityActionRenameServerFileKind> {
