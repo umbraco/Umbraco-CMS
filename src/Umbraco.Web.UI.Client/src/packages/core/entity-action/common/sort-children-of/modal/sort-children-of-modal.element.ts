@@ -27,26 +27,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 
 	#pagination = new UmbPaginationManager();
 	#sortedUniques = new Set<string>();
-
-	#sorter = new UmbSorterController<UmbUniqueTreeItemModel>(this, {
-		getUniqueOfElement: (element) => {
-			return element.dataset.unique;
-		},
-		getUniqueOfModel: (modelEntry) => {
-			return modelEntry.unique;
-		},
-		identifier: 'Umb.SorterIdentifier.SortChildrenOfModal',
-		itemSelector: 'uui-ref-node',
-		containerSelector: 'uui-ref-list',
-		onChange: ({ model }) => {
-			const oldValue = this._children;
-			this._children = model;
-			this.requestUpdate('_children', oldValue);
-		},
-		onEnd: ({ item }) => {
-			this.#sortedUniques.add(item.unique);
-		},
-	});
+	#sorter?: UmbSorterController;
 
 	constructor() {
 		super();
@@ -85,8 +66,36 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		if (data) {
 			this._children = [...this._children, ...data.items];
 			this.#pagination.setTotalItems(data.total);
-			this.#sorter.setModel(this._children);
+
+			if (data.total > 0) {
+				this.#initSorter();
+				this.#sorter.setModel(this._children);
+			}
 		}
+	}
+
+	#initSorter() {
+		if (this.#sorter) return;
+
+		this.#sorter = new UmbSorterController<UmbUniqueTreeItemModel>(this, {
+			getUniqueOfElement: (element) => {
+				return element.dataset.unique;
+			},
+			getUniqueOfModel: (modelEntry) => {
+				return modelEntry.unique;
+			},
+			identifier: 'Umb.SorterIdentifier.SortChildrenOfModal',
+			itemSelector: 'uui-ref-node',
+			containerSelector: 'uui-ref-list',
+			onChange: ({ model }) => {
+				const oldValue = this._children;
+				this._children = model;
+				this.requestUpdate('_children', oldValue);
+			},
+			onEnd: ({ item }) => {
+				this.#sortedUniques.add(item.unique);
+			},
+		});
 	}
 
 	#onLoadMore(event: PointerEvent) {
