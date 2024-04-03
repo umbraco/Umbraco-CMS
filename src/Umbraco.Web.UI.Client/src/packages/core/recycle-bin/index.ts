@@ -7,3 +7,8 @@ export {
 
 export type { UmbRecycleBinDataSource } from './recycle-bin-data-source.interface.js';
 export type { UmbRecycleBinRepository } from './recycle-bin-repository.interface.js';
+export type {
+	UmbRecycleBinRestoreRequestArgs,
+	UmbRecycleBinTrashRequestArgs,
+	UmbRecycleBinOriginalParentRequestArgs,
+} from './types.js';
