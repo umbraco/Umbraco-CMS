@@ -8,10 +8,12 @@ export interface UmbRestoreFromRecycleBinModalData {
 }
 
 export interface UmbRestoreFromRecycleBinModalValue {
-	destination: {
-		unique: string;
-		entityType: string;
-	};
+	destination:
+		| {
+				unique: string;
+				entityType: string;
+		  }
+		| undefined;
 }
 
 export const UMB_RESTORE_FROM_RECYCLE_BIN_MODAL = new UmbModalToken<
