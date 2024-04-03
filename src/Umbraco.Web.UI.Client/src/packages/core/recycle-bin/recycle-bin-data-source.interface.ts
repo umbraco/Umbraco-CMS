@@ -1,3 +1,8 @@
+import type {
+	UmbRecycleBinOriginalParentRequestArgs,
+	UmbRecycleBinRestoreRequestArgs,
+	UmbRecycleBinTrashRequestArgs,
+} from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -6,8 +11,8 @@ export interface UmbRecycleBinDataSourceConstructor {
 }
 
 export interface UmbRecycleBinDataSource {
-	trash(args: any): Promise<UmbDataSourceResponse>;
-	restore(args: any): Promise<UmbDataSourceResponse>;
+	trash(args: UmbRecycleBinTrashRequestArgs): Promise<UmbDataSourceResponse>;
+	restore(args: UmbRecycleBinRestoreRequestArgs): Promise<UmbDataSourceResponse>;
 	empty(): Promise<UmbDataSourceResponse>;
-	getOriginalParent(args: any): Promise<UmbDataSourceResponse>;
+	getOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs): Promise<UmbDataSourceResponse>;
 }
