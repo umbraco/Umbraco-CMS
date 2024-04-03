@@ -21,7 +21,7 @@
     "@umbraco-ui/uui": "1.7.1",
     "@umbraco-ui/uui-css": "1.7.0",
 		"typescript": "^5.3.3",
-		"vite": "^5.1.1"
+		"vite": "^5.1.7"
 	},
 	"msw": {
 		"workerDirectory": "public"
