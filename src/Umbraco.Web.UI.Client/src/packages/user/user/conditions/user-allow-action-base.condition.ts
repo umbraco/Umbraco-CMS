@@ -1,13 +1,14 @@
 import type { UmbUserStateEnum } from '../types.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../workspace/user-workspace.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { isCurrentUser, isCurrentUserAnAdmin } from '@umbraco-cms/backoffice/current-user';
+import { isCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import type {
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 export abstract class UmbUserActionConditionBase
 	extends UmbConditionBase<UmbConditionConfigBase>
@@ -19,11 +20,6 @@ export abstract class UmbUserActionConditionBase
 	protected userUnique?: string;
 
 	/**
-	 * Whether the user being edited is an admin
-	 */
-	protected userAdmin?: boolean;
-
-	/**
 	 * The state of the user being edited
 	 */
 	protected userState?: UmbUserStateEnum | null;
@@ -33,11 +29,10 @@ export abstract class UmbUserActionConditionBase
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
-				context.data,
-				(user) => {
-					this.userUnique = user?.unique;
-					this.userAdmin = user?.isAdmin;
-					this.userState = user?.state;
+				observeMultiple([context.unique, context.state]),
+				([unique, state]) => {
+					this.userUnique = unique;
+					this.userState = state;
 					this._onUserDataChange();
 				},
 				'_umbActiveUser',
@@ -53,14 +48,6 @@ export abstract class UmbUserActionConditionBase
 	 */
 	protected async isCurrentUser() {
 		return this.userUnique ? isCurrentUser(this._host, this.userUnique) : false;
-	}
-
-	/**
-	 * Check if the current user is an admin
-	 * @protected
-	 */
-	protected isCurrentUserAdmin() {
-		return isCurrentUserAnAdmin(this._host);
 	}
 
 	/**
