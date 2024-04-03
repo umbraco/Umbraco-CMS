@@ -49,6 +49,7 @@ export class UmbUserRepository extends UmbUserRepositoryBase {
 			};
 			this.notificationContext?.peek('positive', notification);
 		} else {
+			console.error('Failed to disable MFA provider', error);
 			const notification = {
 				data: { message: localize.term('user_2faProviderIsNotDisabledMsg', displayName ?? providerName) },
 			};
