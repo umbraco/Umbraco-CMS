@@ -37368,9 +37368,6 @@
         "additionalProperties": false
       },
       "DocumentVersionResponseModel": {
-        "required": [
-          "documentType"
-        ],
         "type": "object",
         "allOf": [
           {
@@ -37385,13 +37382,6 @@
               }
             ],
             "nullable": true
-          },
-          "documentType": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
-              }
-            ]
           }
         },
         "additionalProperties": false
