@@ -6,6 +6,7 @@ import {
 	type MetaEntityActionEmptyRecycleBinKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 export class UmbEmptyRecycleBinEntityAction extends UmbEntityActionBase<MetaEntityActionEmptyRecycleBinKind> {
 	async execute() {
@@ -20,7 +21,7 @@ export class UmbEmptyRecycleBinEntityAction extends UmbEntityActionBase<MetaEnti
 		await recycleBinRepository.requestEmpty();
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbRequestReloadStructureForEntityEvent({
+		const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,
 		});
