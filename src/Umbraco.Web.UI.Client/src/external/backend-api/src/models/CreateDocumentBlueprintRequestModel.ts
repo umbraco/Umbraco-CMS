@@ -4,9 +4,6 @@
 /* eslint-disable */
 
 import type { CreateContentForDocumentRequestModel } from './CreateContentForDocumentRequestModel';
-import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type CreateDocumentRequestModel = (CreateContentForDocumentRequestModel & {
-    template?: ReferenceByIdModel | null;
-});
+export type CreateDocumentBlueprintRequestModel = CreateContentForDocumentRequestModel;
 
