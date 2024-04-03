@@ -102,7 +102,7 @@ export class UmbCurrentUserMfaDisableProviderModalElement extends UmbModalBaseEl
 		const success = await this.#currentUserRepository.disableMfaProvider(this.data.providerName, code);
 
 		if (success) {
-			this.#peek(this.localize.term('user_2faProviderIsDisabledMsg'));
+			this.#peek(this.localize.term('user_2faProviderIsDisabledMsg', this.data.displayName));
 			this.modalContext?.submit();
 			this._buttonState = 'success';
 		} else {
@@ -119,7 +119,7 @@ export class UmbCurrentUserMfaDisableProviderModalElement extends UmbModalBaseEl
 	async #peek(message: string, color?: UmbNotificationColor) {
 		this.#notificationContext?.peek(color ?? 'positive', {
 			data: {
-				headline: this.localize.term('member_2fa'),
+				headline: `${this.localize.term('member_2fa')} "${this.data?.displayName ?? this.data?.providerName}"`,
 				message,
 			},
 		});
