@@ -71,6 +71,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			fallbackPermissions: [],
 			permissions,
 			allowedSections,
+			isAdmin: firstUser.isAdmin,
 		};
 	}
 
@@ -203,6 +204,7 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		lastLoginDate: null,
 		lastLockoutDate: null,
 		lastPasswordChangeDate: null,
+		isAdmin: false,
 	};
 };
 
@@ -224,6 +226,7 @@ const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
 		lastLoginDate: item.lastLoginDate,
 		lastLockoutDate: item.lastLockoutDate,
 		lastPasswordChangeDate: item.lastPasswordChangeDate,
+		isAdmin: item.isAdmin,
 	};
 };
 

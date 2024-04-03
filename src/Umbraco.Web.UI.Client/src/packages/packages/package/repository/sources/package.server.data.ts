@@ -1,6 +1,6 @@
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Data source for packages from the server
@@ -15,6 +15,14 @@ export class UmbPackageServerDataSource {
 	 */
 	getRootItems() {
 		return tryExecuteAndNotify(this.host, PackageResource.getPackageManifest());
+	}
+
+	/**
+	 * Get the package configuration from the server
+	 * @memberof UmbPackageServerDataSource
+	 */
+	getPackageConfiguration() {
+		return tryExecuteAndNotify(this.host, PackageResource.getPackageConfiguration());
 	}
 
 	/**
