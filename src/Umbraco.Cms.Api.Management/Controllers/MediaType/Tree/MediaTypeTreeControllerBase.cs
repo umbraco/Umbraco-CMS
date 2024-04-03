@@ -26,17 +26,6 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.MediaTypeContainer;
 
-    protected override Ordering ItemOrdering
-    {
-        get
-        {
-            var ordering = Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.NodeObjectType), Direction.Descending); // We need to override to change direction
-            ordering.Next = Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text));
-
-            return ordering;
-        }
-    }
-
     protected override MediaTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var mediaTypes = _mediaTypeService
