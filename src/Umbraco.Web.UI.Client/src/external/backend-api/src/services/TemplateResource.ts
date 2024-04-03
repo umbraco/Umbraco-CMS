@@ -9,6 +9,7 @@ import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTr
 import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
 import type { MediaTypeTreeItemResponseModel } from '../models/MediaTypeTreeItemResponseModel';
 import type { NamedEntityTreeItemResponseModel } from '../models/NamedEntityTreeItemResponseModel';
+import type { PagedModelTemplateItemResponseModel } from '../models/PagedModelTemplateItemResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { RelationTypeTreeItemResponseModel } from '../models/RelationTypeTreeItemResponseModel';
 import type { TemplateConfigurationResponseModel } from '../models/TemplateConfigurationResponseModel';
@@ -39,6 +40,33 @@ export class TemplateResource {
             url: '/umbraco/management/api/v1/item/template',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedModelTemplateItemResponseModel Success
+     * @throws ApiError
+     */
+    public static getItemTemplateSearch({
+        query,
+        skip,
+        take = 100,
+    }: {
+        query?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedModelTemplateItemResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/template/search',
+            query: {
+                'query': query,
+                'skip': skip,
+                'take': take,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,

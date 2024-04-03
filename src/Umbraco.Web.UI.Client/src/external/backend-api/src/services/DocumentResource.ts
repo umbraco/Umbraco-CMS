@@ -17,6 +17,7 @@ import type { PagedDocumentCollectionResponseModel } from '../models/PagedDocume
 import type { PagedDocumentRecycleBinItemResponseModel } from '../models/PagedDocumentRecycleBinItemResponseModel';
 import type { PagedDocumentTreeItemResponseModel } from '../models/PagedDocumentTreeItemResponseModel';
 import type { PagedIReferenceResponseModel } from '../models/PagedIReferenceResponseModel';
+import type { PagedModelDocumentItemResponseModel } from '../models/PagedModelDocumentItemResponseModel';
 import type { PagedReferenceByIdModel } from '../models/PagedReferenceByIdModel';
 import type { PublicAccessRequestModel } from '../models/PublicAccessRequestModel';
 import type { PublishDocumentRequestModel } from '../models/PublishDocumentRequestModel';
@@ -742,6 +743,33 @@ export class DocumentResource {
             url: '/umbraco/management/api/v1/item/document',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedModelDocumentItemResponseModel Success
+     * @throws ApiError
+     */
+    public static getItemDocumentSearch({
+        query,
+        skip,
+        take = 100,
+    }: {
+        query?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedModelDocumentItemResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/document/search',
+            query: {
+                'query': query,
+                'skip': skip,
+                'take': take,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,

@@ -21,5 +21,6 @@ export type CurrentUserResponseModel = {
     fallbackPermissions: Array<string>;
     permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
     allowedSections: Array<string>;
+    isAdmin: boolean;
 };
 
