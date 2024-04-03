@@ -102,6 +102,7 @@ export class UmbModalElement extends UmbLitElement {
 	}
 
 	#createContainerElement() {
+		console.log('Creating modal element', this.#modalContext);
 		return this.#modalContext!.type === 'sidebar' ? this.#createSidebarElement() : this.#createDialogElement();
 	}
 

@@ -15,11 +15,15 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_MODAL_MANAGER_CONTEXT, type UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_ROLLBACK_MODAL_ALIAS } from '../../../modals/manifests.js';
+import { UMB_ROLLBACK_MODAL } from '../../../modals/rollback/index.js';
 
 @customElement('umb-document-workspace-view-info-history')
 export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	#logRepository: UmbAuditLogRepository;
 	#itemsPerPage = 10;
+	#modalContext?: UmbModalManagerContext;
 
 	@property()
 	documentUnique = '';
@@ -36,10 +40,16 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.#logRepository = new UmbAuditLogRepository(this);
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
+			this.#modalContext = instance;
+		});
 	}
 
 	protected firstUpdated(): void {
 		this.#getLogs();
+
+		//TODO: REMOVE THIS
+		this.#onRollbackModalOpen();
 	}
 
 	async #getLogs() {
@@ -88,6 +98,16 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		this.#getLogs();
 	}
 
+	#onRollbackModalOpen = () => {
+		const modalContext = this.#modalContext?.open(this, UMB_ROLLBACK_MODAL, {});
+
+		if (!modalContext) return;
+
+		modalContext.onSubmit().then(() => {
+			console.log('Rollback modal submitted');
+		});
+	};
+
 	render() {
 		return html`<uui-box>
 				<div id="rollback" slot="header">
@@ -96,7 +116,7 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 						label=${this.localize.term('actions_rollback')}
 						look="secondary"
 						slot="actions"
-						@click=${() => alert('TODO: Rollback Modal')}>
+						@click=${this.#onRollbackModalOpen}>
 						<uui-icon name="icon-undo"></uui-icon>
 						<umb-localize key="actions_rollback"></umb-localize>
 					</uui-button>
