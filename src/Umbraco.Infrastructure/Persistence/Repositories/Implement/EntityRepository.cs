@@ -30,13 +30,13 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     #region Repository
 
-    public int CountByQuery(IQuery<IUmbracoEntity> query, Guid objectType, IQuery<IUmbracoEntity>? filter)
+    public int CountByQuery(IQuery<IUmbracoEntity> query, IEnumerable<Guid> objectTypes, IQuery<IUmbracoEntity>? filter)
     {
         Sql<ISqlContext> sql = Sql();
         sql.SelectCount();
         sql
             .From<NodeDto>();
-        sql.WhereIn<NodeDto>(x => x.NodeObjectType, new[] { objectType } );
+        sql.WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes );
 
         foreach (Tuple<string, object[]> queryClause in query.GetWhereClauses())
         {
@@ -54,10 +54,11 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return Database.ExecuteScalar<int>(sql);
     }
 
-    public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType,
+    public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, ISet<Guid> objectTypes,
         long pageIndex, int pageSize, out long totalRecords,
         IQuery<IUmbracoEntity>? filter, Ordering? ordering) =>
-        GetPagedResultsByQuery(query, new[] {objectType}, pageIndex, pageSize, out totalRecords, filter, ordering);
+        GetPagedResultsByQuery(query, objectTypes.ToArray(), pageIndex, pageSize, out totalRecords, filter, ordering);
+
 
     // get a page of entities
     public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid[] objectTypes,
@@ -635,25 +636,37 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         // TODO: although the default ordering string works for name, it wont work for others without a table or an alias of some sort
         // As more things are attempted to be sorted we'll prob have to add more expressions here
         string orderBy;
-        switch (ordering.OrderBy?.ToUpperInvariant())
-        {
-            case "PATH":
-                orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
-                break;
 
-            default:
-                orderBy = ordering.OrderBy ?? string.Empty;
-                break;
-        }
+        Ordering? runner = ordering;
 
-        if (ordering.Direction == Direction.Ascending)
+        do
         {
-            sql.OrderBy(orderBy);
+
+            switch (runner.OrderBy?.ToUpperInvariant())
+            {
+                case "PATH":
+                    orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
+                    break;
+
+                default:
+                    orderBy = runner.OrderBy ?? string.Empty;
+                    break;
+            }
+
+            if (runner.Direction == Direction.Ascending)
+            {
+                sql.OrderBy(orderBy);
+            }
+            else
+            {
+                sql.OrderByDescending(orderBy);
+            }
+
+            runner = runner.Next;
         }
-        else
-        {
-            sql.OrderByDescending(orderBy);
-        }
+        while (runner is not null);
+
+
     }
 
     #endregion
