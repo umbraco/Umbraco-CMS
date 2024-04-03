@@ -20,6 +20,7 @@ export class UmbRestoreFromRecycleBinEntityAction extends UmbEntityActionBase<Me
 		});
 
 		const { destination } = await modal.onSubmit();
+		if (!destination) throw new Error('Cannot reload the structure without a destination.');
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		const event = new UmbRequestReloadStructureForEntityEvent({
