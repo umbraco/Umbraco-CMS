@@ -19,24 +19,31 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 	UmbRestoreFromRecycleBinModalValue
 > {
 	@state()
+	_isAutomaticRestore = false;
+
+	@state()
 	_customSelectDestination = false;
 
 	@state()
-	_destinationItem: any;
+	_destinationItem?: any;
 
-	constructor() {
-		super();
-	}
+	#recycleBinRepository?: UmbRecycleBinRepository;
 
 	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
 		super.firstUpdated(_changedProperties);
 
-		const restoreDestination = await this.#requestRestoreDestination();
+		const restoreDestinationUnique = await this.#requestRestoreDestination();
 
-		if (!restoreDestination) {
-			this._customSelectDestination = true;
-			this.requestUpdate();
-			return;
+		if (restoreDestinationUnique) {
+			this._destinationItem = await this.#requestDestinationItem(restoreDestinationUnique);
+			if (!this._destinationItem) throw new Error('Cant find destination item.');
+
+			this.#setDestinationValue({
+				unique: this._destinationItem.unique,
+				entityType: this._destinationItem.entityType,
+			});
+
+			this._isAutomaticRestore = true;
 		}
 	}
 
@@ -45,16 +52,15 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		if (!this.data?.recycleBinRepositoryAlias)
 			throw new Error('Cannot restore an item without a recycle bin repository alias.');
 
-		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
+		this.#recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
 			this,
 			this.data.recycleBinRepositoryAlias,
 		);
 
-		const { data } = await recycleBinRepository.requestOriginalParent({
+		const { data } = await this.#recycleBinRepository.requestOriginalParent({
 			unique: this.data.unique,
 		});
 
-		// The original parent is still available. We will restore to that
 		if (data) {
 			return data.unique;
 		}
@@ -74,44 +80,96 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 
 		if (selection.length > 0) {
 			const destinationUnique = selection[0];
+			this._destinationItem = await this.#requestDestinationItem(destinationUnique);
+			if (!this._destinationItem) throw new Error('Cant find destination item.');
 
-			console.log(data);
-			debugger;
+			this.#setDestinationValue({
+				unique: this._destinationItem.unique,
+				entityType: this._destinationItem.entityType,
+			});
 		}
 	}
 
-	async requestDestinationItem(unique: string | null) {
+	async #requestDestinationItem(unique: string | null) {
+		if (unique === null) {
+			console.log('ROOT IS SELECTED, HANDLE THIS CASE');
+			return;
+		}
+
 		if (!this.data?.itemRepositoryAlias) throw new Error('Cannot restore an item without an item repository alias.');
 
 		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, this.data.itemRepositoryAlias);
 		const { data } = await itemRepository.requestItems([unique]);
+
+		return data?.[0];
+	}
+
+	async #onSubmit() {
+		if (!this.value.destination) throw new Error('Cannot restore an item without a destination.');
+		if (!this.#recycleBinRepository) throw new Error('Cannot restore an item without a destination.');
+		if (!this.data?.unique) throw new Error('Cannot restore an item without a unique identifier.');
+
+		const { error } = await this.#recycleBinRepository.requestRestore({
+			unique: this.data.unique,
+			destination: { unique: this.value.destination.unique },
+		});
+
+		if (!error) {
+			this._submitModal();
+		}
+	}
+
+	#setDestinationValue(destination: { unique: string; entityType: string }) {
+		this.updateValue({ destination });
 	}
 
 	render() {
 		return html`
 			<umb-body-layout headline="Restore">
 				<uui-box>
-					${this._customSelectDestination
-						? html`
-								<h4>Cannot automatically restore this item.</h4>
-								<p>
-									There is no location where this item can be automatically restored. You can select a new location
-									below.
-								</p>
-
-								<uui-button look="secondary" @click=${this.#onSelectCustomDestination}>Select location</uui-button>
-							`
-						: nothing}
+					${this._isAutomaticRestore
+						? html` Restore (ITEM NAME HERE) to ${this._destinationItem.name}`
+						: this.#renderCustomSelectDestination()}
 				</uui-box>
+				${this.#renderActions()}
 			</umb-body-layout>
 		`;
 	}
 
-	#renderDestination() {}
+	#renderCustomSelectDestination() {
+		return html`
+			<h4>Cannot automatically restore this item.</h4>
+			<p>There is no location where this item can be automatically restored. You can select a new location below.</p>
 
-	#renderCustomSelection() {}
+			${this._destinationItem
+				? html`<uui-ref-node name=${this._destinationItem.name}>
+						<uui-action-bar slot="actions">
+							<uui-button @click=${() => (this._destinationItem = undefined)} label="Remove"
+								>${this.localize.term('general_remove')}</uui-button
+							>
+						</uui-action-bar>
+					</uui-ref-node>`
+				: html` <uui-button id="placeholder" look="placeholder" @click=${this.#onSelectCustomDestination}
+						>Select location</uui-button
+					>`}
+		`;
+	}
 
-	static styles = [UmbTextStyles, css``];
+	#renderActions() {
+		return html`
+			<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
+			<uui-button slot="actions" color="positive" look="primary" label="Restore" @click=${this.#onSubmit}></uui-button>
+		`;
+	}
+
+	static styles = [
+		UmbTextStyles,
+		css`
+			#placeholder {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbRestoreFromRecycleBinModalElement;
