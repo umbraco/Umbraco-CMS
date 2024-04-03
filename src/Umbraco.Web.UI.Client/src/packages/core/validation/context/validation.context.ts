@@ -1,4 +1,5 @@
 import type { UmbValidator } from '../interfaces/validator.interface.js';
+import { UmbValidationMessagesManager } from './validation-messages.manager.js';
 import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -7,6 +8,8 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	#validators: Array<UmbValidator> = [];
 	#validationMode: boolean = false;
 	#isValid: boolean = false;
+
+	public readonly messages = new UmbValidationMessagesManager();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_VALIDATION_CONTEXT);
@@ -18,7 +21,7 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 
 	addValidator(validator: UmbValidator) {
 		this.#validators.push(validator);
-		//validator.addEventListener('change', this.#runValidate);
+		//validator.addEventListener('change', this.#onValidatorChange);
 		if (this.#validationMode) {
 			this.validate();
 		}
@@ -26,15 +29,40 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	removeValidator(validator: UmbValidator) {
 		const index = this.#validators.indexOf(validator);
 		if (index !== -1) {
+			// Remove the validator:
 			this.#validators.splice(index, 1);
-			//validator.removeEventListener('change', this.#runValidate);
+			//validator.removeEventListener('change', this.#onValidatorChange);
+			// Check if we have any client messages from this validator and remove them:
+			const dataPath = validator.dataPath;
+			if (dataPath) {
+				this.messages.removeMessagesByTypeAndPath('client', dataPath);
+			}
+			// If we are in validation mode then we should re-validate to focus next invalid element:
 			if (this.#validationMode) {
 				this.validate();
 			}
 		}
 	}
 
-	//#runValidate = this.validate.bind(this);
+	/*#onValidatorChange = (e: Event) => {
+		const target = e.target as unknown as UmbValidator | undefined;
+		if (!target) {
+			console.error('Validator did not exist.');
+			return;
+		}
+		const dataPath = target.dataPath;
+		if (!dataPath) {
+			console.error('Validator did not exist or did not provide a data-path.');
+			return;
+		}
+
+		console.log('change,..', dataPath, target.isValid);
+		if (target.isValid) {
+			this.messages.removeMessagesByTypeAndPath('client', dataPath);
+		} else {
+			this.messages.addMessages('client', dataPath, target.getMessages());
+		}
+	};*/
 
 	/**
 	 *
@@ -62,9 +90,9 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 		}
 	}
 
-	getMessages(): string[] {
+	/*getMessages(): string[] {
 		return this.#validators.reduce((acc, v) => acc.concat(v.getMessages()), [] as string[]);
-	}
+	}*/
 
 	reset(): void {
 		this.#validationMode = false;

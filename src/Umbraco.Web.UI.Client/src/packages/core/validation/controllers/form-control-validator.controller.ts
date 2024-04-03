@@ -7,15 +7,19 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbFormControlValidator extends UmbControllerBase implements UmbValidator {
+	// The path to the data that this validator is validating. Public so the ValidationContext can access it.
+	readonly #dataPath?: string;
+
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 
 	#control: UmbFormControlMixinInterface<unknown, unknown>;
 	readonly controllerAlias: UmbControllerAlias;
 
-	#isValid = false;
+	#isValid = true;
 
-	constructor(host: UmbControllerHost, formControl: UmbFormControlMixinInterface<unknown, unknown>) {
+	constructor(host: UmbControllerHost, formControl: UmbFormControlMixinInterface<unknown, unknown>, dataPath?: string) {
 		super(host);
+		this.#dataPath = dataPath;
 		this.consumeContext(UMB_VALIDATION_CONTEXT, (context) => {
 			if (this.#context) {
 				this.#context.removeValidator(this);
@@ -34,7 +38,15 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 	#setIsValid(newVal: boolean) {
 		if (this.#isValid === newVal) return;
 		this.#isValid = newVal;
-		this.dispatchEvent(new CustomEvent('change'));
+
+		if (this.#dataPath) {
+			if (newVal) {
+				this.#context?.messages.removeMessagesByTypeAndPath('client', this.#dataPath);
+			} else {
+				this.#context?.messages.addMessages('client', this.#dataPath, [this.#control.validationMessage]);
+			}
+		}
+		//this.dispatchEvent(new CustomEvent('change')); // To let the ValidationContext know that the validation state has changed.
 	}
 
 	#setInvalid = this.#setIsValid.bind(this, false);
@@ -53,9 +65,9 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 		this.#control.pristine = true; // Make sure the control goes back into not-validation-mode/'untouched'/pristine state.
 	}
 
-	getMessages(): string[] {
+	/*getMessages(): string[] {
 		return [this.#control.validationMessage];
-	}
+	}*/
 
 	focusFirstInvalidElement(): void {
 		this.#control.focusFirstInvalidElement();

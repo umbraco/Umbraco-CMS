@@ -36,7 +36,7 @@ export class UmbPropertyEditorUINumberRangeElement
 			min: (event.target as UmbInputNumberRangeElement).minValue,
 			max: (event.target as UmbInputNumberRangeElement).maxValue,
 		};
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new CustomEvent('change'));
 	}
 
 	@state()
