@@ -1,5 +1,5 @@
-import { UmbEntityActionBase } from '../../entity-action-base.js';
-import { UmbRequestReloadStructureForEntityEvent } from '../../request-reload-structure-for-entity.event.js';
+import { UmbEntityActionBase } from '../../../entity-action/entity-action-base.js';
+import { UmbRequestReloadStructureForEntityEvent } from '../../../entity-action/request-reload-structure-for-entity.event.js';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import {
 	createExtensionApiByAlias,
