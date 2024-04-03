@@ -1,5 +1,6 @@
 import { UmbEntityActionBase } from '../../../entity-action/entity-action-base.js';
 import { UmbRequestReloadStructureForEntityEvent } from '../../../entity-action/request-reload-structure-for-entity.event.js';
+import type { UmbRecycleBinRepository } from '../../recycle-bin-repository.interface.js';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import {
 	createExtensionApiByAlias,
@@ -17,7 +18,10 @@ export class UmbEmptyRecycleBinEntityAction extends UmbEntityActionBase<MetaEnti
 			confirmLabel: 'Empty Recycle Bin',
 		});
 
-		const recycleBinRepository = await createExtensionApiByAlias<any>(this, this.args.meta.recycleBinRepositoryAlias);
+		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
+			this,
+			this.args.meta.recycleBinRepositoryAlias,
+		);
 		await recycleBinRepository.requestEmpty();
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);

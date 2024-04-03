@@ -29,7 +29,10 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTr
 			confirmLabel: 'Trash',
 		});
 
-		const recycleBinRepository = await createExtensionApiByAlias<any>(this, this.args.meta.recycleBinRepositoryAlias);
+		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
+			this,
+			this.args.meta.recycleBinRepositoryAlias,
+		);
 		await recycleBinRepository.requestTrash({ unique: this.args.unique });
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);

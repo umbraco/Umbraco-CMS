@@ -16,6 +16,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		meta: {
 			icon: 'icon-undo',
 			label: 'Restore...',
+			pickerModal: '',
 		},
 	},
 };

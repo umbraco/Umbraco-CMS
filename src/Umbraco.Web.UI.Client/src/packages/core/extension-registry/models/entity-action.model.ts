@@ -78,6 +78,7 @@ export interface ManifestEntityActionRestoreFromRecycleBinKind
 export interface MetaEntityActionRestoreFromRecycleBinKind extends MetaEntityActionDefaultKind {
 	recycleBinRepositoryAlias: string;
 	itemRepositoryAlias: string;
+	pickerModal: UmbModalToken | string;
 }
 
 // EMPTY RECYCLE BIN

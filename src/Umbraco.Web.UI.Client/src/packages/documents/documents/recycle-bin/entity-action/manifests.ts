@@ -2,6 +2,7 @@ import { UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS } from '../repository/index.j
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_PICKER_MODAL } from '../../modals/document-picker-modal.token.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
@@ -25,6 +26,7 @@ export const manifests: Array<ManifestTypes> = [
 		meta: {
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 			recycleBinRepositoryAlias: UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
+			pickerModal: UMB_DOCUMENT_PICKER_MODAL,
 		},
 	},
 	{
