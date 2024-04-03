@@ -26,7 +26,7 @@ export class UmbUserCanPerformActionsCondition extends UmbUserActionConditionBas
 		}
 
 		// Otherwise, the current user can only perform actions on other users
-		if (await this.isUserAdmin()) {
+		if (this.userAdmin) {
 			this.permitted = false;
 			return;
 		}

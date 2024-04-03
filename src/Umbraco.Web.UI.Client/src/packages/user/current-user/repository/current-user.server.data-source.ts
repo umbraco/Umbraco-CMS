@@ -43,6 +43,7 @@ export class UmbCurrentUserServerDataSource {
 				fallbackPermissions: data.fallbackPermissions,
 				permissions: data.permissions,
 				allowedSections: data.allowedSections,
+				isAdmin: data.isAdmin,
 			};
 			return { data: user };
 		}

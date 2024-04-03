@@ -1,4 +1,3 @@
-import { isUserAdmin } from '../utils/index.js';
 import type { UmbUserStateEnum } from '../types.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../workspace/user-workspace.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -14,7 +13,19 @@ export abstract class UmbUserActionConditionBase
 	extends UmbConditionBase<UmbConditionConfigBase>
 	implements UmbExtensionCondition
 {
+	/**
+	 * The unique identifier of the user being edited
+	 */
 	protected userUnique?: string;
+
+	/**
+	 * Whether the user being edited is an admin
+	 */
+	protected userAdmin?: boolean;
+
+	/**
+	 * The state of the user being edited
+	 */
 	protected userState?: UmbUserStateEnum | null;
 
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbConditionConfigBase>) {
@@ -22,23 +33,14 @@ export abstract class UmbUserActionConditionBase
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
-				context.unique,
-				(unique) => {
-					this.userUnique = unique;
+				context.data,
+				(user) => {
+					this.userUnique = user?.unique;
+					this.userAdmin = user?.isAdmin;
+					this.userState = user?.state;
 					this._onUserDataChange();
 				},
 				'umbUserUnique',
-			);
-			this.observe(
-				context.state,
-				(state) => {
-					this.userState = state;
-					// TODO: Investigate if we can remove this observation and just use the unique change to trigger the state change. [NL]
-					// Can user state change over time? if not then this observation is not needed and then we just need to retrieve the state when the unique has changed. [NL]
-					// These two could also be combined via the observeMultiple method, that could prevent triggering onUserDataChanged twice. [NL]
-					this._onUserDataChange();
-				},
-				'umbUserState',
 			);
 		});
 	}
@@ -59,14 +61,6 @@ export abstract class UmbUserActionConditionBase
 	 */
 	protected isCurrentUserAdmin() {
 		return isCurrentUserAnAdmin(this._host);
-	}
-
-	/**
-	 * Check if the selected user is an admin
-	 * @protected
-	 */
-	protected async isUserAdmin() {
-		return this.userUnique ? isUserAdmin(this._host, this.userUnique) : false;
 	}
 
 	/**

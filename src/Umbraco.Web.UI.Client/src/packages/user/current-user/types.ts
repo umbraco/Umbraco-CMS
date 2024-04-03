@@ -18,6 +18,7 @@ export interface UmbCurrentUserModel {
 	allowedSections: Array<string>;
 	fallbackPermissions: Array<string>;
 	permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
+	isAdmin: boolean;
 }
 
 export type UmbCurrentUserMfaProviderModel = UserTwoFactorProviderModel;
