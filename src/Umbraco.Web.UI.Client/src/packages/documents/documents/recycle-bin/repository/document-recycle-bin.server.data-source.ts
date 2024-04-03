@@ -21,4 +21,21 @@ export class UmbDocumentRecycleBinServerDataSource implements UmbRecycleBinDataS
 	empty() {
 		return tryExecuteAndNotify(this.#host, DocumentResource.deleteRecycleBinDocument());
 	}
+
+	async getOriginalParent(args: { unique: string }) {
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			DocumentResource.getRecycleBinDocumentByIdOriginalParent({ id: args.unique }),
+		);
+
+		if (data) {
+			const mappedData = {
+				unique: data.id,
+			};
+
+			return { data: mappedData };
+		}
+
+		return { error };
+	}
 }

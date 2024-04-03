@@ -9,4 +9,5 @@ export interface UmbRecycleBinDataSource {
 	trash(args: any): Promise<UmbDataSourceResponse>;
 	restore(args: any): Promise<UmbDataSourceResponse>;
 	empty(): Promise<UmbDataSourceResponse>;
+	getOriginalParent(args: any): Promise<UmbDataSourceResponse>;
 }

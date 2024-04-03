@@ -50,4 +50,8 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 
 		return this.#recycleBinSource.empty();
 	}
+
+	async requestOriginalParent(args: any) {
+		return this.#recycleBinSource.getOriginalParent(args);
+	}
 }
