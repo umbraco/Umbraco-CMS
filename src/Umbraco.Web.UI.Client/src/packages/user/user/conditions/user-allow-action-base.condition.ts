@@ -40,7 +40,7 @@ export abstract class UmbUserActionConditionBase
 					this.userState = user?.state;
 					this._onUserDataChange();
 				},
-				'umbUserUnique',
+				'_umbActiveUser',
 			);
 		});
 	}
