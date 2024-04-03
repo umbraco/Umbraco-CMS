@@ -1,12 +1,11 @@
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './rollback-modal.token.js';
+import { UmbRollbackRepository } from './repository/rollback.repository.js';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../shared/document-variant-language-picker.element.js';
-import UmbRollbackRepository from './repository/rollback.repository.js';
 import { UmbUserRepository } from '@umbraco-cms/backoffice/user';
-import { UmbLocalizeDateElement } from 'src/packages/core/localization/localize-date.element.js';
 
 @customElement('umb-rollback-modal')
 export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModalData, UmbRollbackModalValue> {
@@ -131,7 +130,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 		return html`
 			<div>
-				<h3>${this.currentVersion.name}</h3>
+				<p>name: ${this.currentVersion.name}</p>
 				${repeat(
 					this.currentVersion.properties,
 					(item) => item.alias,
@@ -156,6 +155,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 					</uui-box>
 					<uui-box headline=${this.currentVersionHeader} id="box-right"> ${this.#renderCurrentVersion()} </uui-box>
 				</div>
+				<umb-footer-layout slot="footer">
+					<uui-button slot="actions" look="secondary" @click=${this.#onCancel}>Cancel</uui-button>
+					<uui-button slot="actions" look="primary" @click=${this.#onRollback}>Rollback</uui-button>
+				</umb-footer-layout>
 			</umb-body-layout>
 		`;
 	}
@@ -187,16 +190,21 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				display: flex;
 				gap: var(--uui-size-space-4);
 				width: 100%;
+				height: 100%;
 			}
 
 			#box-left {
 				--uui-box-default-padding: 0;
 				max-width: 500px;
 				flex: 1;
+				overflow: auto;
+				height: 100%;
 			}
 
 			#box-right {
 				flex: 1;
+				overflow: auto;
+				height: 100%;
 			}
 		`,
 	];
