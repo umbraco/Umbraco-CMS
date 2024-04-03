@@ -35,18 +35,23 @@ export class UmbUserRepository extends UmbUserRepositoryBase {
 	 * Disables a MFA provider for a user
 	 * @param unique The unique id of the user
 	 * @param providerName The name of the provider
+	 * @param displayName The display name of the provider to show in the notification (optional)
 	 * @memberof UmbUserRepository
 	 */
-	async disableMfaProvider(unique: string, providerName: string) {
+	async disableMfaProvider(unique: string, providerName: string, displayName?: string) {
 		const { data, error } = await this.#userMfaSource.disableMfaProvider(unique, providerName);
 
 		const localize = new UmbLocalizationController(this._host);
 
 		if (!error) {
-			const notification = { data: { message: localize.term('user_2faProviderIsDisabledMsg') } };
+			const notification = {
+				data: { message: localize.term('user_2faProviderIsDisabledMsg', displayName ?? providerName) },
+			};
 			this.notificationContext?.peek('positive', notification);
 		} else {
-			const notification = { data: { message: localize.term('user_2faProviderIsNotDisabledMsg') } };
+			const notification = {
+				data: { message: localize.term('user_2faProviderIsNotDisabledMsg', displayName ?? providerName) },
+			};
 			this.notificationContext?.peek('warning', notification);
 		}
 
