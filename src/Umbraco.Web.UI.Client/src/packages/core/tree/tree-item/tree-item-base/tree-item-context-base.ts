@@ -41,7 +41,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	#hasChildren = new UmbBooleanState(false);
 	hasChildren = this.#hasChildren.asObservable();
-	#hasChildrenInitValueFlag = false;
 
 	#isLoading = new UmbBooleanState(false);
 	isLoading = this.#isLoading.asObservable();
@@ -151,8 +150,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.#observeIsSelectable();
 		this.#observeIsSelected();
 		this.#observeSectionPath();
-		this.#hasChildrenInitValueFlag = false;
-		this.#observeHasChildren();
 	}
 
 	public async loadChildren() {
@@ -210,8 +207,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
-			this.#hasChildrenInitValueFlag = false;
-			this.#observeHasChildren();
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
@@ -298,28 +293,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			},
 			'observeActions',
 		);
-	}
-
-	async #observeHasChildren() {
-		if (!this.treeContext || !this.unique) return;
-
-		const repository = this.treeContext.getRepository();
-		if (!repository) return;
-
-		// TODO: use createObservablePart, to prevent unnesecary changes.
-		const hasChildrenObservable = (await repository.treeItemsOf(this.unique)).pipe(
-			map((children) => children.length > 0),
-		);
-
-		// observe if any children will be added runtime to a tree item. Nested items/folders etc.
-		this.observe(hasChildrenObservable, (hasChildren) => {
-			/* we need to skip the first value, because it will also return false until a child is in the store
-			we therefor rely on the value from the tree item itself */
-			if (this.#hasChildrenInitValueFlag === true) {
-				this.#hasChildren.setValue(hasChildren);
-			}
-			this.#hasChildrenInitValueFlag = true;
-		});
 	}
 
 	#onReloadRequest = (event: UmbEntityActionEvent) => {
