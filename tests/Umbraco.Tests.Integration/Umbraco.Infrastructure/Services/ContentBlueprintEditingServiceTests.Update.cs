@@ -25,8 +25,11 @@ public partial class ContentBlueprintEditingServiceTests
 
         var result = await ContentBlueprintEditingService.UpdateAsync(blueprint.Key, updateModel, Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        });
         VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
@@ -35,9 +38,12 @@ public partial class ContentBlueprintEditingServiceTests
         void VerifyUpdate(IContent? updatedContent)
         {
             Assert.IsNotNull(updatedContent);
-            Assert.AreEqual("Updated Blueprint Name", updatedContent.Name);
-            Assert.AreEqual("The updated title", updatedContent.GetValue<string>("title"));
-            Assert.AreEqual("The updated text", updatedContent.GetValue<string>("text"));
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("Updated Blueprint Name", updatedContent.Name);
+                Assert.AreEqual("The updated title", updatedContent.GetValue<string>("title"));
+                Assert.AreEqual("The updated text", updatedContent.GetValue<string>("text"));
+            });
         }
     }
 
@@ -76,8 +82,12 @@ public partial class ContentBlueprintEditingServiceTests
         };
 
         var result = await ContentBlueprintEditingService.UpdateAsync(blueprint.Key, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        });
         VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
@@ -86,11 +96,14 @@ public partial class ContentBlueprintEditingServiceTests
         void VerifyUpdate(IContent? updatedContent)
         {
             Assert.IsNotNull(updatedContent);
-            Assert.AreEqual("Updated Blueprint English Name", updatedContent.GetCultureName("en-US"));
-            Assert.AreEqual("Updated Blueprint Danish Name", updatedContent.GetCultureName("da-DK"));
-            Assert.AreEqual("The updated blueprint invariant title", updatedContent.GetValue<string>("invariantTitle"));
-            Assert.AreEqual("The updated English title", updatedContent.GetValue<string>("variantTitle", "en-US"));
-            Assert.AreEqual("The updated Danish title", updatedContent.GetValue<string>("variantTitle", "da-DK"));
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("Updated Blueprint English Name", updatedContent.GetCultureName("en-US"));
+                Assert.AreEqual("Updated Blueprint Danish Name", updatedContent.GetCultureName("da-DK"));
+                Assert.AreEqual("The updated blueprint invariant title", updatedContent.GetValue<string>("invariantTitle"));
+                Assert.AreEqual("The updated English title", updatedContent.GetValue<string>("variantTitle", "en-US"));
+                Assert.AreEqual("The updated Danish title", updatedContent.GetValue<string>("variantTitle", "da-DK"));
+            });
         }
     }
 
@@ -112,9 +125,13 @@ public partial class ContentBlueprintEditingServiceTests
         };
 
         var createResult = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, createResult.Status);
-        Assert.IsNotNull(createResult.Result);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(createResult.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, createResult.Status);
+            Assert.IsNotNull(createResult.Result);
+        });
 
         // update a blueprint with the same name
         var updateModel = new ContentBlueprintUpdateModel
@@ -123,9 +140,13 @@ public partial class ContentBlueprintEditingServiceTests
         };
 
         var updateResult = await ContentBlueprintEditingService.UpdateAsync(blueprintToUpdate.Key, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(updateResult.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.DuplicateName, updateResult.Status);
-        Assert.IsNotNull(updateResult.Result);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(updateResult.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.DuplicateName, updateResult.Status);
+            Assert.IsNotNull(updateResult.Result);
+        });
         Assert.IsNull(updateResult.Result.Content);
     }
 }

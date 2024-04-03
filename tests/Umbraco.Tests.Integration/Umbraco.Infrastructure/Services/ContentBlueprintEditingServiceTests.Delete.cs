@@ -13,8 +13,12 @@ public partial class ContentBlueprintEditingServiceTests
         var blueprint = await (variant ? CreateVariantContentBlueprint() : CreateInvariantContentBlueprint());
 
         var result = await ContentBlueprintEditingService.DeleteAsync(blueprint.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        });
 
         // re-get and verify deletion
         blueprint = await ContentBlueprintEditingService.GetAsync(blueprint.Key);
@@ -25,7 +29,11 @@ public partial class ContentBlueprintEditingServiceTests
     public async Task Cannot_Delete_Non_Existing()
     {
         var result = await ContentBlueprintEditingService.DeleteAsync(Guid.NewGuid(), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
+        });
     }
 }
