@@ -1932,8 +1932,8 @@ export default {
 		'2faDisableText':
 			'If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:',
 		'2faProviderIsEnabled': 'This two-factor provider is enabled',
-		'2faProviderIsEnabledMsg': 'This two-factor provider is now enabled',
-		'2faProviderIsNotEnabledMsg': 'Something went wrong with trying to enable this two-factor provider',
+		'2faProviderIsEnabledMsg': '{0} is now enabled',
+		'2faProviderIsNotEnabledMsg': 'Something went wrong with trying to enable {0}',
 		'2faProviderIsDisabledMsg': '{0} is now disabled',
 		'2faProviderIsNotDisabledMsg': 'Something went wrong with trying to disable {0}',
 		'2faDisableForUser': 'Do you want to disable "{0}" on this user?',

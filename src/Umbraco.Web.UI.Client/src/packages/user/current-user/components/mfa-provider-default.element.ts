@@ -150,7 +150,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	protected peek(message: string, color?: UmbNotificationColor) {
 		this.notificationContext?.peek(color ?? 'positive', {
 			data: {
-				headline: this.localize.term('member_2fa'),
+				headline: `${this.localize.term('member_2fa')} ${this.displayName ?? this.providerName}`,
 				message,
 			},
 		});
@@ -177,10 +177,14 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		const successful = await this.callback(this.providerName, code, this._secret);
 
 		if (successful) {
-			this.peek(this.localize.term('user_2faProviderIsEnabled'));
+			this.peek(this.localize.term('user_2faProviderIsEnabledMsg', this.displayName ?? this.providerName));
 			this._buttonState = 'success';
 			this.close();
 		} else {
+			this.peek(
+				this.localize.term('user_2faProviderIsNotEnabledMsg', this.displayName ?? this.providerName),
+				'warning',
+			);
 			this.codeField?.setCustomValidity(this.localize.term('user_2faInvalidCode'));
 			this.codeField?.focus();
 			this._buttonState = 'failed';

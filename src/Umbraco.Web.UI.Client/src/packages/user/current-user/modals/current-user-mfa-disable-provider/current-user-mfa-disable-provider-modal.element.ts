@@ -102,10 +102,14 @@ export class UmbCurrentUserMfaDisableProviderModalElement extends UmbModalBaseEl
 		const success = await this.#currentUserRepository.disableMfaProvider(this.data.providerName, code);
 
 		if (success) {
-			this.#peek(this.localize.term('user_2faProviderIsDisabledMsg', this.data.displayName));
+			this.#peek(this.localize.term('user_2faProviderIsDisabledMsg', this.data.displayName ?? this.data.providerName));
 			this.modalContext?.submit();
 			this._buttonState = 'success';
 		} else {
+			this.#peek(
+				this.localize.term('user_2faProviderIsNotDisabledMsg', this.data.displayName ?? this.data.providerName),
+				'warning',
+			);
 			this._codeInput.setCustomValidity(this.localize.term('user_2faInvalidCode'));
 			this._codeInput.focus();
 			this._buttonState = 'failed';
