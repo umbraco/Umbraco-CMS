@@ -171,6 +171,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		if (data) {
 			this.#childItems.setValue(data.items);
+			this.#hasChildren.setValue(data.total > 0);
 			this.pagination.setTotalItems(data.total);
 		}
 
