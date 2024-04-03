@@ -90,7 +90,7 @@ test.describe('Dictionary tests', () => {
     const importDictionaryName = 'TestImportDictionary';
 
     // Create temporary file
-     await umbracoApi.temporaryFile.create(temporaryFileId, fileName, mimeType, filePath);
+    await umbracoApi.temporaryFile.create(temporaryFileId, fileName, mimeType, filePath);
     expect(await umbracoApi.temporaryFile.doesExist(temporaryFileId)).toBeTruthy();
 
     // Act
