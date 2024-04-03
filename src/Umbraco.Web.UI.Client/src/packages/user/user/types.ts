@@ -22,6 +22,7 @@ export interface UmbUserDetailModel {
 	lastLoginDate: string | null;
 	lastLockoutDate: string | null;
 	lastPasswordChangeDate: string | null;
+	isAdmin: boolean;
 }
 
 export type UmbUserMfaProviderModel = UserTwoFactorProviderModel;
