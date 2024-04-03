@@ -36085,6 +36085,7 @@
           "hasAccessToAllLanguages",
           "hasAccessToSensitiveData",
           "id",
+          "isAdmin",
           "languages",
           "mediaStartNodeIds",
           "name",
@@ -36171,6 +36172,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "isAdmin": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -37368,9 +37372,6 @@
         "additionalProperties": false
       },
       "DocumentVersionResponseModel": {
-        "required": [
-          "documentType"
-        ],
         "type": "object",
         "allOf": [
           {
@@ -37385,13 +37386,6 @@
               }
             ],
             "nullable": true
-          },
-          "documentType": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
-              }
-            ]
           }
         },
         "additionalProperties": false
@@ -43827,6 +43821,7 @@
           "documentStartNodeIds",
           "failedLoginAttempts",
           "id",
+          "isAdmin",
           "mediaStartNodeIds",
           "state",
           "updateDate"
@@ -43897,6 +43892,9 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "isAdmin": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
