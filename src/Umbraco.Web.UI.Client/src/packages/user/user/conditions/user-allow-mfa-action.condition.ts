@@ -8,7 +8,6 @@ export class UmbUserAllowMfaActionCondition extends UmbConditionBase<never> {
 		super(host, args);
 
 		// Check if there are any MFA providers available
-		this.permitted = false;
 		this.observe(
 			umbExtensionsRegistry.byType('mfaLoginProvider'),
 			(exts) => (this.permitted = exts.length > 0),
