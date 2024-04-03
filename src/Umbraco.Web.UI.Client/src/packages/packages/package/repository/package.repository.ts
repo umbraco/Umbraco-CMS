@@ -1,11 +1,11 @@
-import type { UmbPackageStore } from './package.store.js';
 import { UMB_PACKAGE_STORE_TOKEN } from './package.store.js';
 import { UmbPackageServerDataSource } from './sources/package.server.data.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbApi, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbPackageStore } from './package.store.js';
 import { isManifestBaseType } from '@umbraco-cms/backoffice/extension-api';
 import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbApi, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * A repository for Packages which mimics a tree store.
@@ -23,11 +23,19 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 		this.#init = new Promise((res) => {
 			this.consumeContext(UMB_PACKAGE_STORE_TOKEN, (instance) => {
 				this.#packageStore = instance;
+				this.requestConfiguration(instance);
 				this.requestRootItems(instance);
 				this.requestPackageMigrations(instance);
 				res();
 			});
 		});
+	}
+
+	async requestConfiguration(store: UmbPackageStore) {
+		const { data } = await this.#packageSource.getPackageConfiguration();
+		if (data) {
+			store.setConfiguration(data);
+		}
 	}
 
 	/**
@@ -89,6 +97,11 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 		if (migrations) {
 			store.appendMigrations(migrations.items);
 		}
+	}
+
+	async configuration() {
+		await this.#init;
+		return this.#packageStore!.configuration;
 	}
 
 	/**

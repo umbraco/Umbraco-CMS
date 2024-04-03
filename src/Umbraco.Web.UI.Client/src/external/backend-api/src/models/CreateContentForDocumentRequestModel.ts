@@ -12,5 +12,6 @@ export type CreateContentForDocumentRequestModel = {
     variants: Array<DocumentVariantRequestModel>;
     id?: string | null;
     parent?: ReferenceByIdModel | null;
+    documentType: ReferenceByIdModel;
 };
 

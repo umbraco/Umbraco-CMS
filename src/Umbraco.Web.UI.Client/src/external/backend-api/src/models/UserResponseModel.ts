@@ -19,5 +19,6 @@ export type UserResponseModel = (UserPresentationBaseModel & {
     lastLoginDate?: string | null;
     lastLockoutDate?: string | null;
     lastPasswordChangeDate?: string | null;
+    isAdmin: boolean;
 });
 
