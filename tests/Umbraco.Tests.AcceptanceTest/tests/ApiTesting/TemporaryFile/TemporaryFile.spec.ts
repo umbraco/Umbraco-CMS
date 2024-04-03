@@ -21,7 +21,7 @@ test.describe('Temporary File tests', () => {
     await umbracoApi.temporaryFile.create(temporaryFileId, fileName, mimeType, filePath);
 
     // Assert
-    expect(await umbracoApi.temporaryFile.exists(temporaryFileId)).toBeTruthy();
+    expect(await umbracoApi.temporaryFile.doesExist(temporaryFileId)).toBeTruthy();
   });
 
   test('can delete temporary file', async ({umbracoApi}) => {
@@ -33,6 +33,6 @@ test.describe('Temporary File tests', () => {
     await umbracoApi.temporaryFile.delete(temporaryFileId);
 
     // Assert
-    expect(await umbracoApi.temporaryFile.exists(temporaryFileId)).toBeFalsy();
+    expect(await umbracoApi.temporaryFile.doesExist(temporaryFileId)).toBeFalsy();
   });
 });
