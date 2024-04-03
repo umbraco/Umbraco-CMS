@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_RECYCLE_BIN_ENTITY_TYPE, UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
@@ -7,6 +7,6 @@ export const manifests: Array<ManifestTypes> = [
 		kind: 'reloadTreeItemChildren',
 		alias: 'Umb.EntityAction.DocumentRecycleBin.Tree.ReloadChildrenOf',
 		name: 'Reload Document Recycle Bin Tree Item Children Entity Action',
-		forEntityTypes: [UMB_DOCUMENT_RECYCLE_BIN_ENTITY_TYPE, UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE],
+		forEntityTypes: [UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE],
 	},
 ];
