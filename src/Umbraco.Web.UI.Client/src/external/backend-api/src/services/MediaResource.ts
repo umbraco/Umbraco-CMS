@@ -13,6 +13,7 @@ import type { PagedIReferenceResponseModel } from '../models/PagedIReferenceResp
 import type { PagedMediaCollectionResponseModel } from '../models/PagedMediaCollectionResponseModel';
 import type { PagedMediaRecycleBinItemResponseModel } from '../models/PagedMediaRecycleBinItemResponseModel';
 import type { PagedMediaTreeItemResponseModel } from '../models/PagedMediaTreeItemResponseModel';
+import type { PagedModelMediaItemResponseModel } from '../models/PagedModelMediaItemResponseModel';
 import type { PagedReferenceByIdModel } from '../models/PagedReferenceByIdModel';
 import type { ReferenceByIdModel } from '../models/ReferenceByIdModel';
 import type { SortingRequestModel } from '../models/SortingRequestModel';
@@ -79,6 +80,33 @@ export class MediaResource {
             url: '/umbraco/management/api/v1/item/media',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedModelMediaItemResponseModel Success
+     * @throws ApiError
+     */
+    public static getItemMediaSearch({
+        query,
+        skip,
+        take = 100,
+    }: {
+        query?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedModelMediaItemResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/media/search',
+            query: {
+                'query': query,
+                'skip': skip,
+                'take': take,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
