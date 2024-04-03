@@ -203,6 +203,7 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		lastLoginDate: null,
 		lastLockoutDate: null,
 		lastPasswordChangeDate: null,
+		isAdmin: item.userGroupIds.includes(umbUserGroupMockDb.getAll()[0].id),
 	};
 };
 
@@ -224,6 +225,7 @@ const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
 		lastLoginDate: item.lastLoginDate,
 		lastLockoutDate: item.lastLockoutDate,
 		lastPasswordChangeDate: item.lastPasswordChangeDate,
+		isAdmin: item.isAdmin,
 	};
 };
 
