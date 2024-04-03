@@ -1,4 +1,6 @@
 import type {
+	ApiError,
+	CancelError,
 	DocumentPermissionPresentationModel,
 	UnknownTypePermissionPresentationModel,
 	UserTwoFactorProviderModel,
@@ -23,6 +25,8 @@ export interface UmbCurrentUserModel {
 
 export type UmbCurrentUserMfaProviderModel = UserTwoFactorProviderModel;
 
+export type UmbMfaProviderConfigurationCallback = Promise<{ error?: ApiError | CancelError }>;
+
 export interface UmbMfaProviderConfigurationElementProps {
 	/**
 	 * The name of the provider reflecting the provider name in the backend.
@@ -39,9 +43,9 @@ export interface UmbMfaProviderConfigurationElementProps {
 	 * @param providerName The name of the provider to enable.
 	 * @param code The authentication code from the authentication method.
 	 * @param secret The secret from the authentication backend.
-	 * @returns True if the provider action was executed successfully.
+	 * @returns A promise that resolves when the action is completed with an error if the action failed.
 	 */
-	callback: (providerName: string, code: string, secret: string) => Promise<boolean>;
+	callback: (providerName: string, code: string, secret: string) => UmbMfaProviderConfigurationCallback;
 
 	/**
 	 * Call this function to close the modal.
