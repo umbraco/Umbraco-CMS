@@ -55,8 +55,9 @@ public class SchemaIdSelector : ISchemaIdSelector
             })
             .Where(info => info.GenericTypes != null);
 
+        // We need FirstOrDefault() because through inheritance, the attribute can be on several classes implementing a base
         var matchingType = assignableTypesWithAttributeInfo
-            .SingleOrDefault(t => t.GenericTypes!.Length == type.GenericTypeArguments.Length
+            .FirstOrDefault(t => t.GenericTypes!.Length == type.GenericTypeArguments.Length
                                   && t.GenericTypes.Intersect(type.GenericTypeArguments).Count() ==
                                   type.GenericTypeArguments.Length && t.SchemaName.IsNullOrWhiteSpace() == false);
 
