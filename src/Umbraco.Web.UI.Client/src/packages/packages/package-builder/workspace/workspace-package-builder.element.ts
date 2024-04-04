@@ -1,68 +1,78 @@
-import type { UmbInputDocumentElement } from '../../../documents/documents/components/input-document/input-document.element.js';
-import type { UmbInputMediaElement } from '../../../media/media/components/input-media/input-media.element.js';
+import { UmbPackageRepository } from '../../package/repository/index.js';
+import type { UmbCreatedPackageDefinition } from '../../types.js';
 import type { UmbInputLanguageElement } from '../../../language/components/input-language/input-language.element.js';
-import type { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	html,
-	nothing,
 	customElement,
 	property,
 	query,
 	state,
+	when,
+	nothing,
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
-// TODO: update to module imports when ready
 import { blobDownload } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { PackageDefinitionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import type { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
+import type { UmbInputEntityElement } from '@umbraco-cms/backoffice/components';
+import type { UmbInputMediaTypeElement } from '@umbraco-cms/backoffice/media-type';
+import type { UmbMediaItemModel } from '@umbraco-cms/backoffice/media';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import type {
+	UUIBooleanInputEvent,
+	UUIButtonState,
+	UUIInputElement,
+	UUIInputEvent,
+} from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-workspace-package-builder')
 export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	@property()
-	entityId?: string;
+	entityUnique?: string;
+
+	@property()
+	workspaceAlias?: string;
 
 	@state()
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	private _package: PackageDefinitionResponseModel = {};
+	private _package?: UmbCreatedPackageDefinition;
 
 	@query('#package-name-input')
-	private _packageNameInput!: UUIInputElement;
+	private _packageNameInput?: UUIInputElement;
 
-	private _notificationContext?: UmbNotificationContext;
+	@state()
+	private _submitState?: UUIButtonState;
+
+	#notificationContext?: UmbNotificationContext;
+	#packageRepository = new UmbPackageRepository(this);
+	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-			this._notificationContext = instance;
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
+			this.#notificationContext = context;
 		});
 	}
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		if (this.entityId) this.#getPackageCreated();
+		this.#getPackageCreated();
+		requestAnimationFrame(() => this._packageNameInput?.focus());
 	}
 
 	async #getPackageCreated() {
-		if (!this.entityId) return;
-		const { data } = await tryExecuteAndNotify(this, PackageResource.getPackageCreatedById({ id: this.entityId }));
-		if (!data) return;
-		this._package = data as PackageDefinitionResponseModel;
+		this._package = await this.#packageRepository.getCreatedPackage(this.entityUnique);
+		this.requestUpdate('_package');
 	}
 
 	async #download() {
-		if (!this._package?.id) return;
-		const { data } = await tryExecuteAndNotify(
-			this,
-			PackageResource.getPackageCreatedByIdDownload({ id: this._package.id }),
-		);
+		if (!this._package?.unique) return;
 
+		const data = await this.#packageRepository.getCreatePackageDownload(this._package.unique);
 		if (!data) return;
 
 		// TODO: [LK] Need to review what the server is doing, as different data is returned depending on schema configuration.
@@ -71,85 +81,99 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		blobDownload(data, 'package.zip', 'application/zip');
 	}
 
-	#nameDefined() {
-		const valid = this._packageNameInput.checkValidity();
-		if (!valid) this._notificationContext?.peek('danger', { data: { message: 'Package missing a name' } });
+	#isNameDefined() {
+		const valid = this._packageNameInput?.checkValidity() ?? false;
+		if (!valid) this.#notificationContext?.peek('danger', { data: { message: 'Package missing a name' } });
 		return valid;
 	}
 
 	async #save() {
-		if (!this.#nameDefined()) return;
-		const response = await tryExecuteAndNotify(
-			this,
-			PackageResource.postPackageCreated({ requestBody: this._package }),
-		);
-		if (!response.data || response.error) return;
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this._package = response.data as PackageDefinitionResponseModel;
-		this.#navigateBack();
+		if (!this.#isNameDefined()) return;
+		if (!this._package) return;
+
+		this._submitState = 'waiting';
+
+		const unique = await this.#packageRepository.saveCreatedPackage(this._package);
+		if (!unique) return;
+
+		this._package.unique = unique;
+		this.requestUpdate('_package');
+
+		this._submitState = 'success';
+
+		this.#notificationContext?.peek('positive', { data: { message: 'Package saved' } });
 	}
 
 	async #update() {
-		if (!this.#nameDefined()) return;
-		if (!this._package?.id) return;
-		const response = await tryExecuteAndNotify(
-			this,
-			PackageResource.putPackageCreatedById({ id: this._package.id, requestBody: this._package }),
-		);
+		if (!this.#isNameDefined()) return;
+		if (!this._package?.unique) return;
 
-		if (response.error) return;
-		this.#navigateBack();
-	}
+		this._submitState = 'waiting';
 
-	#navigateBack() {
-		window.history.pushState({}, '', 'section/packages/view/created');
+		const success = await this.#packageRepository.updateCreatedPackage(this._package);
+		if (!success) return;
+
+		this._submitState = 'success';
+
+		this.#notificationContext?.peek('positive', { data: { message: 'Package updated' } });
 	}
 
 	render() {
+		if (!this.workspaceAlias) return nothing;
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.PackageBuilder">
+			<umb-workspace-editor alias=${this.workspaceAlias}>
 				${this.#renderHeader()}
-				<uui-box class="wrapper" headline="Package Content"> ${this.#renderEditors()} </uui-box>
+				${this.#renderEditors()}
 				${this.#renderActions()}
 			</umb-workspace-editor>
 		`;
 	}
 
 	#renderHeader() {
-		return html`<div class="header" slot="header">
-			<uui-button compact @click="${this.#navigateBack}" label="Back to created package overview">
-				<uui-icon name="icon-arrow-left"></uui-icon>
-			</uui-button>
-			<uui-input
-				required
-				id="package-name-input"
-				label="Name of the package"
-				placeholder="Enter a name"
-				value="${ifDefined(this._package?.name)}"
-				@change="${(e: UUIInputEvent) => (this._package.name = e.target.value as string)}"></uui-input>
-		</div>`;
+		if (!this._package) return nothing;
+		return html`
+			<div id="header" slot="header">
+				<uui-button href="section/packages/view/created" label=${this.localize.term('general_backToOverview')} compact>
+					<uui-icon name="icon-arrow-left"></uui-icon>
+				</uui-button>
+				<uui-input
+					id="package-name-input"
+					required
+					label="Name of the package"
+					placeholder=${this.localize.term('placeholders_entername')}
+					.value=${this._package?.name ?? ''}
+					@input=${(e: UUIInputEvent) => (this._package!.name = e.target.value as string)}></uui-input>
+			</div>
+		`;
 	}
 
 	#renderActions() {
-		return html`<div slot="actions">
-			${this._package?.id
-				? html`<uui-button @click="${this.#download}" color="" look="secondary" label="Download package">
-						Download
-					</uui-button>`
-				: nothing}
-			<uui-button
-				@click="${this._package.id ? this.#update : this.#save}"
-				color="positive"
-				look="primary"
-				label="Save changes to package">
-				Save
-			</uui-button>
-		</div>`;
+		return html`
+			<div slot="actions">
+				${when(
+					this._package?.unique,
+					() => html`
+						<uui-button
+							color="default"
+							look="secondary"
+							label=${this.localize.term('general_download')}
+							@click=${this.#download}></uui-button>
+					`,
+				)}
+				<uui-button
+					color="positive"
+					look="primary"
+					state=${ifDefined(this._submitState)}
+					label=${this._package?.unique ? 'Update' : 'Create'}
+					@click=${this._package?.unique ? this.#update : this.#save}></uui-button>
+			</div>
+		`;
 	}
 
 	#renderEditors() {
-		return html`<umb-property-layout label="Content" description="">
+		return html`
+			<uui-box headline="Package Content">
+			<umb-property-layout label="Content" description="">
 				${this.#renderContentSection()}
 			</umb-property-layout>
 
@@ -177,7 +201,9 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 			<umb-property-layout label="Partial Views" description="">
 				${this.#renderPartialViewSection()}
-			</umb-property-layout>`;
+			</umb-property-layout>
+			</uui-box>
+		`;
 	}
 
 	#renderContentSection() {
@@ -282,14 +308,19 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				height: 100%;
 			}
 
-			.header {
-				margin: 0 var(--uui-size-layout-1);
+			#header {
 				display: flex;
 				gap: var(--uui-size-space-4);
+				margin-right: var(--uui-size-layout-1);
+				width: 100%;
+			}
+
+			uui-input {
+				width: 100%;
 			}
 
 			uui-box {
-				margin: var(--uui-size-layout-1);
+				margin: var(--uui-size-layout-2);
 			}
 
 			uui-checkbox {
