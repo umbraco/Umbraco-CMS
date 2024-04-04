@@ -1,4 +1,4 @@
-import type { UmbCollectionBulkActionPermissions } from '../../../../../../core/collection/types.js';
+import type { UmbCollectionBulkActionPermissions } from '../../../../../collection/types.js';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -15,10 +15,10 @@ type BulkActionPermissionType =
 	| 'allowBulkUnpublish';
 
 /**
- * @element umb-property-editor-ui-collection-view-bulk-action-permissions
+ * @element umb-property-editor-ui-collection-view-permissions
  */
-@customElement('umb-property-editor-ui-collection-view-bulk-action-permissions')
-export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement
+@customElement('umb-property-editor-ui-collection-view-permissions')
+export class UmbPropertyEditorUICollectionViewPermissionsElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
@@ -98,10 +98,10 @@ export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement
 	];
 }
 
-export default UmbPropertyEditorUICollectionViewBulkActionPermissionsElement;
+export default UmbPropertyEditorUICollectionViewPermissionsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-collection-view-bulk-action-permissions': UmbPropertyEditorUICollectionViewBulkActionPermissionsElement;
+		'umb-property-editor-ui-collection-view-permissions': UmbPropertyEditorUICollectionViewPermissionsElement;
 	}
 }
