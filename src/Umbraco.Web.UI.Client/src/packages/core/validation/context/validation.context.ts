@@ -19,14 +19,14 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 		return this.#isValid;
 	}
 
-	addValidator(validator: UmbValidator) {
+	addValidator(validator: UmbValidator): void {
 		this.#validators.push(validator);
 		//validator.addEventListener('change', this.#onValidatorChange);
 		if (this.#validationMode) {
 			this.validate();
 		}
 	}
-	removeValidator(validator: UmbValidator) {
+	removeValidator(validator: UmbValidator): void {
 		const index = this.#validators.indexOf(validator);
 		if (index !== -1) {
 			// Remove the validator:
@@ -93,7 +93,7 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 		this.#validators.forEach((v) => v.reset());
 	}
 
-	#destroyValidators() {
+	#destroyValidators(): void {
 		if (this.#validators === undefined || this.#validators.length === 0) return;
 		this.#validators.forEach((validator) => {
 			validator.destroy();
