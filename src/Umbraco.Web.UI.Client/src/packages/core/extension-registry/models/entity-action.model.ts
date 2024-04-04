@@ -156,3 +156,15 @@ export interface ManifestEntityActionDeleteFolderKind extends ManifestEntityActi
 export interface MetaEntityActionFolderKind extends MetaEntityActionDefaultKind {
 	folderRepositoryAlias: string;
 }
+
+// SORT CHILDREN OF
+export interface ManifestEntityActionSortChildrenOfKind
+	extends ManifestEntityAction<MetaEntityActionSortChildrenOfKind> {
+	type: 'entityAction';
+	kind: 'sortChildrenOf';
+}
+
+export interface MetaEntityActionSortChildrenOfKind extends MetaEntityActionDefaultKind {
+	sortChildrenOfRepositoryAlias: string;
+	treeRepositoryAlias: string;
+}

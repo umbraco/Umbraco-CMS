@@ -4,6 +4,7 @@ import { UMB_DOCUMENT_PICKER_MODAL } from '../modals/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
+import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityAction> = [
@@ -56,15 +57,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			pickerModal: UMB_DOCUMENT_PICKER_MODAL,
 		},
-	},
-	{
-		type: 'entityAction',
-		kind: 'sort',
-		alias: 'Umb.EntityAction.Document.Sort',
-		name: 'Sort Document Entity Action',
-		weight: 700,
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-		meta: {},
 	},
 	{
 		type: 'entityAction',
@@ -124,5 +116,6 @@ export const manifests = [
 	...createManifests,
 	...publicAccessManifests,
 	...cultureAndHostnamesManifests,
+	...sortChildrenOfManifests,
 	...entityActions,
 ];

@@ -1,7 +1,7 @@
 import { manifests as workspaceViewManifests } from './views/manifests.js';
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_ALIAS } from './index.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<ManifestTypes> = [
 	...workspaceViewManifests,
@@ -19,7 +19,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.BlockGridAreaType.Save',
 		name: 'Save Block Grid Area Type Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Submit',
 			look: 'primary',

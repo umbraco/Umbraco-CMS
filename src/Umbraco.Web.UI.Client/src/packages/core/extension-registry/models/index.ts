@@ -17,6 +17,7 @@ import type {
 	ManifestEntityActionTrashKind,
 	ManifestEntityActionRestoreFromRecycleBinKind,
 	ManifestEntityActionEmptyRecycleBinKind,
+	ManifestEntityActionSortChildrenOfKind,
 } from './entity-action.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.model.js';
@@ -117,6 +118,7 @@ export type ManifestEntityActions =
 	| ManifestEntityActionReloadTreeItemChildrenKind
 	| ManifestEntityActionRenameServerFileKind
 	| ManifestEntityActionRestoreFromRecycleBinKind
+	| ManifestEntityActionSortChildrenOfKind
 	| ManifestEntityActionTrashKind
 	| ManifestEntityActionUpdateFolderKind;
 
