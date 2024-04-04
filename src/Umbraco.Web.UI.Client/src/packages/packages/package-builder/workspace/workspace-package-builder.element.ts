@@ -1,6 +1,7 @@
 import { UmbDictionaryPickerContext } from '../../../dictionary/components/input-dictionary/input-dictionary.context.js';
 import { UmbMediaPickerContext } from '../../../media/media/components/input-media/input-media.context.js';
 import { UmbPackageRepository } from '../../package/repository/index.js';
+import { UmbTemplatePickerContext } from '../../../templating/templates/components/input-template/input-template.context.js';
 import type { UmbCreatedPackageDefinition } from '../../types.js';
 import type { UmbDataTypeInputElement } from '../../../data-type/components/data-type-input/data-type-input.element.js';
 import type { UmbInputLanguageElement } from '../../../language/components/input-language/input-language.element.js';
@@ -183,8 +184,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				${this.#renderLanguageSection()}
 				${this.#renderDictionarySection()}
 				${this.#renderDataTypeSection()}
-
-			<umb-property-layout label="Templates" description=""> ${this.#renderTemplateSection()} </umb-property-layout>
+				${this.#renderTemplateSection()}
 
 			<umb-property-layout label="Stylesheets" description="">
 				${this.#renderStylesheetsSection()}
@@ -347,10 +347,27 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		`;
 	}
 
+	#onTemplateChange(event: { target: UmbInputEntityElement }) {
+		if (!this._package) return;
+
+		this._package.templates = event.target.selection ?? [];
+		this.requestUpdate('_package');
+	}
+
 	#renderTemplateSection() {
-		return html`<div slot="editor">
-			<umb-input-checkbox-list></umb-input-checkbox-list>
-		</div>`;
+		if (!this._package) return nothing;
+		return html`
+			<umb-property-layout label="Templates">
+				<div slot="editor">
+					<umb-input-entity
+						.getIcon=${() => 'icon-newspaper'}
+						.pickerContext=${UmbTemplatePickerContext}
+						.selection=${this._package.templates ?? []}
+						@change=${this.#onTemplateChange}>
+					</umb-input-entity>
+				</div>
+			</umb-property-layout>
+		`;
 	}
 
 	#renderStylesheetsSection() {
