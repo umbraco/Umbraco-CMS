@@ -7,9 +7,17 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
+/**
+ * Entity action for trashing an item.
+ * @export
+ * @class UmbTrashEntityAction
+ * @extends {UmbEntityActionBase<MetaEntityActionTrashKind>}
+ */
 export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTrashKind> {
-	// TODO: make base type for item and detail models
-
+	/**
+	 * Executes the action.
+	 * @memberof UmbTrashEntityAction
+	 */
 	async execute() {
 		if (!this.args.unique) throw new Error('Cannot trash an item without a unique identifier.');
 
@@ -47,4 +55,5 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<MetaEntityActionTr
 		// TODO: reload destination
 	}
 }
-export default UmbTrashEntityAction;
+
+export { UmbTrashEntityAction as api };

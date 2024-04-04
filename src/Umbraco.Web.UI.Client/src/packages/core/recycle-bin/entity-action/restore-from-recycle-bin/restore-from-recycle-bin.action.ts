@@ -5,7 +5,17 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { MetaEntityActionRestoreFromRecycleBinKind } from '@umbraco-cms/backoffice/extension-registry';
 
+/**
+ * Entity action for restoring an item from the recycle bin.
+ * @export
+ * @class UmbRestoreFromRecycleBinEntityAction
+ * @extends {UmbEntityActionBase<MetaEntityActionRestoreFromRecycleBinKind>}
+ */
 export class UmbRestoreFromRecycleBinEntityAction extends UmbEntityActionBase<MetaEntityActionRestoreFromRecycleBinKind> {
+	/**
+	 * Executes the action.
+	 * @memberof UmbRestoreFromRecycleBinEntityAction
+	 */
 	async execute() {
 		if (!this.args.unique) throw new Error('Cannot restore an item without a unique identifier.');
 
