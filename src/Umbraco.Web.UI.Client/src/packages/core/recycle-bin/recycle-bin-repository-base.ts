@@ -3,19 +3,44 @@ import type {
 	UmbRecycleBinDataSource,
 	UmbRecycleBinDataSourceConstructor,
 } from './recycle-bin-data-source.interface.js';
+import type {
+	UmbRecycleBinOriginalParentRequestArgs,
+	UmbRecycleBinRestoreRequestArgs,
+	UmbRecycleBinTrashRequestArgs,
+} from './types.js';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
+/**
+ * Base class for recycle bin repositories.
+ * @export
+ * @abstract
+ * @class UmbRecycleBinRepositoryBase
+ * @extends {UmbRepositoryBase}
+ * @implements {UmbRecycleBinRepository}
+ */
 export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase implements UmbRecycleBinRepository {
 	#recycleBinSource: UmbRecycleBinDataSource;
 
+	/**
+	 * Creates an instance of UmbRecycleBinRepositoryBase.
+	 * @param {UmbControllerHost} host
+	 * @param {UmbRecycleBinDataSourceConstructor} recycleBinSource
+	 * @memberof UmbRecycleBinRepositoryBase
+	 */
 	constructor(host: UmbControllerHost, recycleBinSource: UmbRecycleBinDataSourceConstructor) {
 		super(host);
 		this.#recycleBinSource = new recycleBinSource(this);
 	}
 
-	async requestTrash(args: any) {
+	/**
+	 * Requests to trash an item.
+	 * @param {UmbRecycleBinTrashRequestArgs} args
+	 * @return {*}
+	 * @memberof UmbRecycleBinRepositoryBase
+	 */
+	async requestTrash(args: UmbRecycleBinTrashRequestArgs) {
 		const { error } = await this.#recycleBinSource.trash(args);
 
 		if (!error) {
@@ -27,7 +52,13 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 		return { error };
 	}
 
-	async requestRestore(args: any) {
+	/**
+	 * Requests to restore an item.
+	 * @param {UmbRecycleBinRestoreRequestArgs} args
+	 * @return {*}
+	 * @memberof UmbRecycleBinRepositoryBase
+	 */
+	async requestRestore(args: UmbRecycleBinRestoreRequestArgs) {
 		const { error } = await this.#recycleBinSource.restore(args);
 
 		if (!error) {
@@ -39,6 +70,11 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 		return { error };
 	}
 
+	/**
+	 * Requests to empty the recycle bin.
+	 * @return {*}
+	 * @memberof UmbRecycleBinRepositoryBase
+	 */
 	async requestEmpty() {
 		const { error } = await this.#recycleBinSource.empty();
 
@@ -51,7 +87,13 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 		return this.#recycleBinSource.empty();
 	}
 
-	async requestOriginalParent(args: any) {
+	/**
+	 * Requests the original parent of an item.
+	 * @param {UmbRecycleBinOriginalParentRequestArgs} args
+	 * @return {*}
+	 * @memberof UmbRecycleBinRepositoryBase
+	 */
+	async requestOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs) {
 		return this.#recycleBinSource.getOriginalParent(args);
 	}
 }
