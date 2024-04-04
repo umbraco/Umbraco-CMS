@@ -15,12 +15,15 @@ export class UmbDocumentRecycleBinTreeRepository
 	}
 
 	async requestTreeRoot() {
+		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 1 });
+		const hasChildren = treeRootData?.total > 0;
+
 		const data = {
 			unique: null,
 			entityType: UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 			name: 'Recycle Bin',
 			icon: 'icon-trash',
-			hasChildren: true,
+			hasChildren,
 			isContainer: false,
 			isFolder: true,
 		};
