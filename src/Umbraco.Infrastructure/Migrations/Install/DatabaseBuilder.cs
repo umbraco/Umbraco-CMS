@@ -383,6 +383,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
         }
 
+        public Result? UpgradeSchemaAndData(UmbracoPlan plan) => UpgradeSchemaAndData((MigrationPlan)plan);
+
         /// <summary>
         /// Upgrades the database schema and data by running migrations.
         /// </summary>
@@ -391,7 +393,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// configured and it is possible to connect to the database.</para>
         /// <para>Runs whichever migrations need to run.</para>
         /// </remarks>
-        public Result? UpgradeSchemaAndData(UmbracoPlan plan)
+        public Result? UpgradeSchemaAndData(MigrationPlan plan)
         {
             try
             {
