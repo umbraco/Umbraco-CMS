@@ -5,12 +5,20 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../shared/document-variant-language-picker.element.js';
-import { UmbUserItemRepository, UmbUserRepository } from '@umbraco-cms/backoffice/user';
+import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
+
+type DocumentVersion = {
+	id: string;
+	date: string;
+	user: string;
+	isCurrentlyPublishedVersion: boolean;
+	preventCleanup: boolean;
+};
 
 @customElement('umb-rollback-modal')
 export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModalData, UmbRollbackModalValue> {
 	@state()
-	versions: { date: string; user: string; isCurrentlyPublishedVersion: boolean; id: string }[] = [];
+	versions: DocumentVersion[] = [];
 
 	@state()
 	currentVersion?: {
@@ -40,7 +48,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			'en-us',
 		);
 
-		const tempItems: { date: string; user: string; isCurrentlyPublishedVersion: boolean; id: string }[] = [];
+		const tempItems: DocumentVersion[] = [];
 
 		const uniqueUserIds = [...new Set(data?.items.map((item) => item.user.id))];
 
@@ -52,6 +60,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				user: userItems?.find((user) => user.unique === item.user.id)?.name || '',
 				isCurrentlyPublishedVersion: item.isCurrentPublishedVersion,
 				id: item.id,
+				preventCleanup: item.preventCleanup,
 			});
 		});
 
@@ -101,6 +110,18 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		this.#setCurrentVersion(id);
 	}
 
+	#onPreventCleanup(event: Event, id: string, preventCleanup: boolean) {
+		event.preventDefault();
+		event.stopImmediatePropagation();
+		this.#rollbackRepository.setPreventCleanup(id, preventCleanup);
+
+		const version = this.versions.find((item) => item.id === id);
+		if (!version) return;
+
+		version.preventCleanup = preventCleanup;
+		this.requestUpdate('versions');
+	}
+
 	#renderVersions() {
 		return repeat(
 			this.versions,
@@ -118,7 +139,11 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 							<p>${item.user}</p>
 							<p>${item.isCurrentlyPublishedVersion ? 'Current published version' : ''}</p>
 						</div>
-						<uui-button look="secondary" @click=${this.#onRollback}>Prevent cleanup</uui-button>
+						<uui-button
+							look="secondary"
+							@click=${(event: Event) => this.#onPreventCleanup(event, item.id, !item.preventCleanup)}>
+							${item.preventCleanup ? 'Enable cleanup' : 'Prevent cleanup'}
+						</uui-button>
 					</div>
 				`;
 			},
@@ -180,6 +205,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				inset: 2px;
 				display: block;
 				border: 2px solid transparent;
+				pointer-events: none;
 			}
 			.rollback-item.active::after,
 			.rollback-item:hover::after {
