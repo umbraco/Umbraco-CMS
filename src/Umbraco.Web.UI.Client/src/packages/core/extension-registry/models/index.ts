@@ -1,3 +1,4 @@
+import type { ManifestAuthProvider } from './auth-provider.model.js';
 import type { ManifestBlockEditorCustomView } from './block-editor-custom-view.model.js';
 import type { ManifestCollection } from './collection.models.js';
 import type { ManifestCollectionView } from './collection-view.model.js';
@@ -64,6 +65,7 @@ import type {
 	ManifestEntryPoint,
 } from '@umbraco-cms/backoffice/extension-api';
 
+export type * from './auth-provider.model.js';
 export type * from './block-editor-custom-view.model.js';
 export type * from './collection.models.js';
 export type * from './collection-action.model.js';
@@ -131,12 +133,13 @@ export type ManifestWorkspaces = ManifestWorkspace | ManifestWorkspaceRoutableKi
 export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceViewContentTypeDesignEditorKind;
 
 export type ManifestTypes =
+	| ManifestAuthProvider
 	| ManifestBundle<ManifestTypes>
-	| ManifestCondition
 	| ManifestBlockEditorCustomView
 	| ManifestCollection
 	| ManifestCollectionView
 	| ManifestCollectionAction
+	| ManifestCondition
 	| ManifestDashboard
 	| ManifestDashboardCollection
 	| ManifestDynamicRootOrigin
