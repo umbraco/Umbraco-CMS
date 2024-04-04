@@ -20,6 +20,6 @@ public class DocumentTypeDeletedWebhookEvent : WebhookEventBase<ContentTypeDelet
 
     public override string Alias => Constants.WebhookEvents.Aliases.DocumentTypeDeleted;
 
-    public override object? ConvertNotificationToRequestPayload(ContentTypeDeletedNotification notification)
+    public override object ConvertNotificationToRequestPayload(ContentTypeDeletedNotification notification)
         => notification.DeletedEntities;
 }

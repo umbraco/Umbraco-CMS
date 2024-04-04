@@ -81,7 +81,7 @@ internal class DefaultCultureDictionary : ICultureDictionary
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public string? this[string key]
+    public string this[string key]
     {
         get
         {

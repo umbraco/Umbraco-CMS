@@ -137,7 +137,7 @@ public class PreviewController : Controller
         return RedirectPermanent($"../../{id}{query}");
     }
 
-    public ActionResult? EnterPreview(int id)
+    public ActionResult EnterPreview(int id)
     {
         IUser? user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
         _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, "preview");

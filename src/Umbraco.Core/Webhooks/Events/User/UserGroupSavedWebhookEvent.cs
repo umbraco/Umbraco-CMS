@@ -20,5 +20,5 @@ public class UserGroupSavedWebhookEvent : WebhookEventBase<UserGroupSavedNotific
 
     public override string Alias => Constants.WebhookEvents.Aliases.UserGroupSaved;
 
-    public override object? ConvertNotificationToRequestPayload(UserGroupSavedNotification notification) => notification.SavedEntities;
+    public override object ConvertNotificationToRequestPayload(UserGroupSavedNotification notification) => notification.SavedEntities;
 }

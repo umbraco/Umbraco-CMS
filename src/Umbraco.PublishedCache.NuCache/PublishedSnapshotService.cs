@@ -1237,7 +1237,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         return _contentStore;
     }
 
-    internal ContentStore? GetMediaStore()
+    internal ContentStore GetMediaStore()
     {
         EnsureCaches();
         return _mediaStore;

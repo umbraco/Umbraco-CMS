@@ -72,7 +72,7 @@ public static class ModelStateExtensions
     ///     A list of cultures that have property validation errors. The default culture will be returned for any invariant
     ///     property errors.
     /// </returns>
-    internal static IReadOnlyList<(string? culture, string? segment)>? GetVariantsWithPropertyErrors(
+    internal static IReadOnlyList<(string? culture, string? segment)> GetVariantsWithPropertyErrors(
         this ModelStateDictionary modelState,
         string? cultureForInvariantErrors)
     {

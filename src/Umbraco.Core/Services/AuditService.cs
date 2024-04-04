@@ -284,7 +284,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     // TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
-    internal IEnumerable<IAuditEntry>? GetAll()
+    internal IEnumerable<IAuditEntry> GetAll()
     {
         if (_isAvailable.Value == false)
         {

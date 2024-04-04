@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => typeof(ApiBlockGridModel);
 
         /// <inheritdoc />
-        public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
+        public object ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
         {
             const int defaultColumns = 12;
 

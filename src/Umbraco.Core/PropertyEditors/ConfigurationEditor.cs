@@ -44,7 +44,7 @@ public class ConfigurationEditor : IConfigurationEditor
     }
 
     /// <inheritdoc />
-    public virtual object? DefaultConfigurationObject => DefaultConfiguration;
+    public virtual object DefaultConfigurationObject => DefaultConfiguration;
 
     /// <summary>
     ///     Converts a configuration object into a serialized database value.
