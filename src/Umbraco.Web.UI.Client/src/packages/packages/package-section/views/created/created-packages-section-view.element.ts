@@ -1,24 +1,29 @@
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import type { ManifestWorkspace, UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { ManifestWorkspace, UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-created-packages-section-view')
 export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewElement {
 	@state()
 	private _routes: UmbRoute[] = [];
 
-	private _workspaces: Array<ManifestWorkspace> = [];
+	#workspaces: Array<ManifestWorkspace> = [];
 
 	constructor() {
 		super();
-		// TODO: Do not implement all workspaces at this point. We should only implement the 'package-builder' workspace.
-		this.observe(umbExtensionsRegistry?.byType('workspace'), (workspaceExtensions) => {
-			this._workspaces = workspaceExtensions;
-			this._createRoutes();
-		});
+		this.observe(
+			umbExtensionsRegistry.byTypeAndFilter(
+				'workspace',
+				(workspace) => workspace.meta.entityType === 'package-builder',
+			),
+			(workspaceExtensions) => {
+				this.#workspaces = workspaceExtensions;
+				this._createRoutes();
+			},
+		);
 	}
 
 	private _createRoutes() {
@@ -30,7 +35,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 		];
 
 		// TODO: find a way to make this reuseable across:
-		this._workspaces?.map((workspace: ManifestWorkspace) => {
+		this.#workspaces?.map((workspace: ManifestWorkspace) => {
 			routes.push({
 				path: `${workspace.meta.entityType}/:id`,
 				component: () => createExtensionElement(workspace),
