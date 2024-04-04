@@ -6,10 +6,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../shared/document-variant-language-picker.element.js';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/index.js';
-import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT } from '../../property-dataset-context/document-property-dataset-context.token.js';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UUISelectEvent } from '@umbraco-ui/uui';
+import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 type DocumentVersion = {
 	id: string;
@@ -41,7 +39,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 	@state()
 	availableVariants: Option[] = [
-		{ name: 'English', value: 'en-us', selected: true },
+		{ name: 'English', value: 'en-US', selected: true },
 		{ name: 'Danish', value: 'da-dk' },
 	];
 
@@ -64,10 +62,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		if (!this.#propertyDatasetContext) return;
 
 		const documentId = this.#propertyDatasetContext.getUnique();
-
 		if (!documentId) return;
 
 		const { data } = await this.#rollbackRepository.requestVersionsByDocumentId(documentId, this.currentCulture);
+		if (!data) return;
 
 		const tempItems: DocumentVersion[] = [];
 
@@ -78,7 +76,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		data?.items.forEach((item: any) => {
 			tempItems.push({
 				date: item.versionDate,
-				user: userItems?.find((user) => user.unique === item.user.id)?.name || '',
+				user: userItems?.find((user) => user.unique === item.user.id)?.name || 'Unknown user',
 				isCurrentlyPublishedVersion: item.isCurrentPublishedVersion,
 				id: item.id,
 				preventCleanup: item.preventCleanup,
@@ -103,14 +101,16 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		this.currentVersion = {
 			date: version.date || '',
 			user: version.user,
-			name: data.variants[0].name,
+			name: data.variants.find((x) => x.culture === this.currentCulture)?.name || data.variants[0].name,
 			id: data.id,
-			properties: data.values.map((value: any) => {
-				return {
-					alias: value.alias,
-					value: value.value,
-				};
-			}),
+			properties: data.values
+				.filter((x) => x.culture === this.currentCulture)
+				.map((value: any) => {
+					return {
+						alias: value.alias,
+						value: value.value,
+					};
+				}),
 		};
 	}
 
@@ -118,7 +118,8 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		if (!this.currentVersion) return;
 
 		const id = this.currentVersion.id;
-		this.#rollbackRepository.rollback(id);
+		const culture = this.availableVariants.length > 1 ? this.currentCulture : undefined;
+		this.#rollbackRepository.rollback(id, culture);
 
 		this.modalContext?.reject();
 	}
