@@ -12,12 +12,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member.Item;
 [ApiVersion("1.0")]
 public class SearchMemberItemController : MemberItemControllerBase
 {
-    private readonly IEntitySearchService _entitySearchService;
+    private readonly IExamineEntitySearchService _examineEntitySearchService;
     private readonly IMemberPresentationFactory _memberPresentationFactory;
 
-    public SearchMemberItemController(IEntitySearchService entitySearchService, IMemberPresentationFactory memberPresentationFactory)
+    public SearchMemberItemController(IExamineEntitySearchService examineEntitySearchService, IMemberPresentationFactory memberPresentationFactory)
     {
-        _entitySearchService = entitySearchService;
+        _examineEntitySearchService = examineEntitySearchService;
         _memberPresentationFactory = memberPresentationFactory;
     }
 
@@ -26,8 +26,7 @@ public class SearchMemberItemController : MemberItemControllerBase
     [ProducesResponseType(typeof(PagedModel<MemberItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Search(string query, int skip = 0, int take = 100)
     {
-        // FIXME: use Examine
-        PagedModel<IEntitySlim> searchResult = _entitySearchService.Search(UmbracoObjectTypes.Member, query, skip, take);
+        PagedModel<IEntitySlim> searchResult = _examineEntitySearchService.Search(UmbracoObjectTypes.Member, query, skip, take);
         var result = new PagedModel<MemberItemResponseModel>
         {
             Items = searchResult.Items.OfType<IMemberEntitySlim>().Select(_memberPresentationFactory.CreateItemResponseModel),

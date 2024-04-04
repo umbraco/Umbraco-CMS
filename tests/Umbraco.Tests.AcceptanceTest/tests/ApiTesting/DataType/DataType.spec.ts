@@ -97,5 +97,8 @@ test.describe('DataType tests', () => {
     // Checks if both dataTypes exists
     expect(await umbracoApi.dataType.doesExist(dataTypeId)).toBeTruthy();
     expect(await umbracoApi.dataType.doesExist(copiedDataTypeId)).toBeTruthy();
+
+    // Clean
+    await umbracoApi.dataType.delete(copiedDataTypeId);
   });
 });
