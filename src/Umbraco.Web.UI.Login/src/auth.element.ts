@@ -1,15 +1,17 @@
-import { html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { until } from 'lit/directives/until.js';
+import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
+import { type InputType, type UUIFormLayoutItemElement, type UUILabelElement } from "@umbraco-cms/backoffice/external/uui";
+import { umbExtensionsRegistry } from "@umbraco-cms/backoffice/extension-registry";
 
-import { umbAuthContext } from './context/auth.context.js';
-import { umbLocalizationContext } from './external/localization/localization-context.js';
-import { UmbLocalizeElement } from './external/localization/localize.element.js';
-import type { UmbLoginInputElement } from './components/login-input.element.js';
-import type { InputType, UUIFormLayoutItemElement, UUILabelElement } from '@umbraco-ui/uui';
+import { UMB_AUTH_CONTEXT, UmbAuthContext } from "./contexts";
+import type { UmbLoginInputElement } from "./components";
+import { UmbSlimBackofficeController } from "./controllers";
 
+// We import the authStyles here so that we can inline it in the shadow DOM that is created outside of the UmbAuthElement.
 import authStyles from './auth-styles.css?inline';
+
+// Import the main bundle
+import { extensions } from './umbraco-package.js';
 
 const createInput = (opts: {
   id: string;
@@ -34,10 +36,11 @@ const createInput = (opts: {
   return input;
 };
 
-const createLabel = (opts: { forId: string; localizeAlias: string }) => {
+const createLabel = (opts: { forId: string; localizeAlias: string; localizeFallback: string; }) => {
   const label = document.createElement('uui-label');
-  const umbLocalize = document.createElement('umb-localize') as UmbLocalizeElement;
+  const umbLocalize = document.createElement('umb-localize');
   umbLocalize.key = opts.localizeAlias;
+  umbLocalize.innerHTML = opts.localizeFallback;
   label.for = opts.forId;
   label.appendChild(umbLocalize);
 
@@ -67,19 +70,14 @@ const createForm = (elements: HTMLElement[]) => {
 };
 
 @customElement('umb-auth')
-export default class UmbAuthElement extends LitElement {
+export default class UmbAuthElement extends UmbLitElement {
   /**
    * Disables the local login form and only allows external login providers.
    *
    * @attr disable-local-login
    */
   @property({type: Boolean, attribute: 'disable-local-login'})
-  set disableLocalLogin(value: boolean) {
-    umbAuthContext.disableLocalLogin = value;
-  }
-  get disableLocalLogin() {
-    return umbAuthContext.disableLocalLogin;
-  }
+  disableLocalLogin = false;
 
   @property({attribute: 'background-image'})
   backgroundImage?: string;
@@ -101,10 +99,10 @@ export default class UmbAuthElement extends LitElement {
 
   @property({attribute: 'return-url'})
   set returnPath(value: string) {
-    umbAuthContext.returnPath = value;
+    this.#authContext.returnPath = value;
   }
   get returnPath() {
-    return umbAuthContext.returnPath;
+    return this.#authContext.returnPath;
   }
 
   /**
@@ -120,6 +118,8 @@ export default class UmbAuthElement extends LitElement {
   _usernameLabel?: UUILabelElement;
   _passwordLabel?: UUILabelElement;
 
+  #authContext = new UmbAuthContext(this, UMB_AUTH_CONTEXT);
+
   constructor() {
     super();
 
@@ -129,14 +129,20 @@ export default class UmbAuthElement extends LitElement {
       }
       this.requestUpdate();
     });
+
+    // Bind the (slim) Backoffice controller to this element so that we can use utilities from the Backoffice app.
+    new UmbSlimBackofficeController(this);
+
+    // Register the main package for Umbraco.Auth
+    umbExtensionsRegistry.registerMany(extensions);
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.classList.add('uui-text');
-    this.classList.add('uui-font');
-
-    this.#initializeForm();
+  firstUpdated() {
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        this.#initializeForm();
+      });
+    }, 100);
   }
 
   disconnectedCallback() {
@@ -156,12 +162,12 @@ export default class UmbAuthElement extends LitElement {
    * @see Track this intent-to-ship for Chrome https://groups.google.com/a/chromium.org/g/blink-dev/c/RY9leYMu5hI?pli=1
    * @private
    */
-  async #initializeForm() {
+  #initializeForm() {
     const labelUsername = this.usernameIsEmail
-      ? await umbLocalizationContext.localize('general_email', undefined, 'Email')
-      : await umbLocalizationContext.localize('general_username', undefined, 'Username');
-    const labelPassword = await umbLocalizationContext.localize('general_password', undefined, 'Password');
-    const requiredMessage = await umbLocalizationContext.localize('general_required', undefined, 'Required');
+      ? this.localize.term('auth_email')
+      : this.localize.term('auth_username');
+    const labelPassword = this.localize.term('auth_password');
+    const requiredMessage = this.localize.term('auth_required');
 
     this._usernameInput = createInput({
       id: 'username-input',
@@ -183,9 +189,10 @@ export default class UmbAuthElement extends LitElement {
     });
     this._usernameLabel = createLabel({
       forId: 'username-input',
-      localizeAlias: this.usernameIsEmail ? 'general_email' : 'general_username',
+      localizeAlias: this.usernameIsEmail ? 'auth_email' : 'auth_username',
+      localizeFallback: this.usernameIsEmail ? 'Email' : 'Username',
     });
-    this._passwordLabel = createLabel({forId: 'password-input', localizeAlias: 'general_password'});
+    this._passwordLabel = createLabel({forId: 'password-input', localizeAlias: 'auth_password', localizeFallback: 'Password'});
 
     this._usernameLayoutItem = createFormLayoutItem(this._usernameLabel, this._usernameInput);
     this._passwordLayoutItem = createFormLayoutItem(this._passwordLabel, this._passwordInput);
@@ -207,6 +214,14 @@ export default class UmbAuthElement extends LitElement {
   }
 
   private _renderFlowAndStatus() {
+    if (this.disableLocalLogin) {
+      return html`
+        <umb-error-layout no-back-link>
+          <umb-localize key="auth_localLoginDisabled">Unfortunately, it is not possible to log in directly. It has been disabled by a login provider.</umb-localize>
+        </umb-error-layout>
+      `;
+    }
+
     const searchParams = new URLSearchParams(window.location.search);
     let flow = this.flow || searchParams.get('flow')?.toLowerCase();
     const status = searchParams.get('status');
@@ -214,34 +229,20 @@ export default class UmbAuthElement extends LitElement {
     if (status === 'resetCodeExpired') {
       return html`
         <umb-error-layout
-          header="Hi there"
-          message=${until(
-            umbLocalizationContext.localize(
-              'login_resetCodeExpired',
-              undefined,
-              'The link you have clicked on is invalid or has expired'
-            )
-          )}>
+          message=${this.localize.term('auth_resetCodeExpired')}>
         </umb-error-layout>`;
     }
 
     if (flow === 'invite-user' && status === 'false') {
       return html`
         <umb-error-layout
-          header="Hi there"
-          message=${until(
-            umbLocalizationContext.localize(
-              'user_userinviteExpiredMessage',
-              undefined,
-              'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.'
-            )
-          )}>
+          message=${this.localize.term('auth_userInviteExpiredMessage')}>
         </umb-error-layout>`;
     }
 
     // validate
     if (flow) {
-      if (flow === 'mfa' && !umbAuthContext.isMfaEnabled) {
+      if (flow === 'mfa' && !this.#authContext.isMfaEnabled) {
         flow = undefined;
       }
     }
@@ -267,7 +268,6 @@ export default class UmbAuthElement extends LitElement {
             ?username-is-email=${this.usernameIsEmail}>
             <slot></slot>
             <slot name="subheadline" slot="subheadline"></slot>
-            <slot name="external" slot="external"></slot>
           </umb-login-page>`;
     }
   }
