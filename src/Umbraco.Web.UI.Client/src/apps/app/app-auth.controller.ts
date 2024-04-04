@@ -1,9 +1,13 @@
 import { UMB_AUTH_CONTEXT, UMB_STORAGE_REDIRECT_URL } from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+	#serverExtensionRegistrator = new UmbServerExtensionRegistrator(this, umbExtensionsRegistry);
+	#init;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -11,6 +15,8 @@ export class UmbAppAuthController extends UmbControllerBase {
 		this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
 			this.#authContext = context;
 		});
+
+		this.#init = Promise.all([this.#serverExtensionRegistrator.registerPublicExtensions()]);
 	}
 
 	/**
@@ -35,10 +41,16 @@ export class UmbAppAuthController extends UmbControllerBase {
 		return this.makeAuthorizationRequest();
 	}
 
+	/**
+	 * Starts the authorization flow.
+	 * It will check which providers are available and either redirect directly to the provider or show a provider selection screen.
+	 */
 	async makeAuthorizationRequest(): Promise<boolean> {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
+
+		await this.#init;
 
 		this.#authContext.makeAuthorizationRequest();
 

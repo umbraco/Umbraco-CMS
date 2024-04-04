@@ -1,11 +1,7 @@
 import { UmbBackofficeContext } from './backoffice.context.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbBundleExtensionInitializer,
-	UmbEntryPointExtensionInitializer,
-	UmbServerExtensionRegistrator,
-} from '@umbraco-cms/backoffice/extension-api';
+import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './components/index.js';
@@ -53,8 +49,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		super();
 
 		new UmbBackofficeContext(this);
-		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
-		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerAllExtensions();
 
 		// So far local packages are this simple to registerer, so no need for a manager to do that:

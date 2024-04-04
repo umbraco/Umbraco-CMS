@@ -67,6 +67,9 @@ export class UmbAppElement extends UmbLitElement {
 
 		new UmbContextDebugController(this);
 
+		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
+		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+
 		this.#umbIconRegistry.attach(this);
 		this.#uuiIconRegistry.attach(this);
 	}
