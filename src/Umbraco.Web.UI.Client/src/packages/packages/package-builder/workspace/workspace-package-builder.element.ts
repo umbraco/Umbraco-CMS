@@ -173,9 +173,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	#renderEditors() {
 		return html`
 			<uui-box headline="Package Content">
-			<umb-property-layout label="Content" description="">
-				${this.#renderContentSection()}
-			</umb-property-layout>
+				${this.#renderDocumentSection()}
 
 			<umb-property-layout label="Media" description="">${this.#renderMediaSection()} </umb-property-layout>
 
@@ -206,22 +204,34 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		`;
 	}
 
-	#renderContentSection() {
+	#onContentChange(event: { target: UmbInputDocumentElement }) {
+		if (!this._package) return;
+
+		this._package.contentNodeId = event.target.selection[0];
+
+		if (this._package.contentLoadChildNodes && !this._package.contentNodeId) {
+			this._package.contentLoadChildNodes = false;
+		}
+
+		this.requestUpdate('_package');
+	}
+
+	#renderDocumentSection() {
+		if (!this._package) return nothing;
 		return html`
-			<div slot="editor">
-				<umb-input-document
-					.value=${this._package.contentNodeId ?? ''}
-					max="1"
-					@change="${(e: CustomEvent) =>
-						(this._package.contentNodeId = (e.target as UmbInputDocumentElement).selection[0])}">
-				</umb-input-document>
-				<uui-checkbox
-					label="Include child nodes"
-					.checked="${this._package.contentLoadChildNodes ?? false}"
-					@change="${(e: UUIBooleanInputEvent) => (this._package.contentLoadChildNodes = e.target.checked)}">
-					Include child nodes
-				</uui-checkbox>
-			</div>
+			<umb-property-layout label="Content" description="Select the starting root content">
+				<div slot="editor">
+					<umb-input-document max="1" .value=${this._package.contentNodeId ?? ''} @change=${this.#onContentChange}>
+					</umb-input-document>
+					<uui-checkbox
+						label="Include child nodes"
+						.checked=${this._package.contentLoadChildNodes ?? false}
+						.disabled=${!this._package.contentNodeId}
+						@change=${(e: UUIBooleanInputEvent) => (this._package!.contentLoadChildNodes = e.target.checked)}>
+						Include child nodes
+					</uui-checkbox>
+				</div>
+			</umb-property-layout>
 		`;
 	}
 
