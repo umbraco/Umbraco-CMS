@@ -178,8 +178,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				${this.#renderMediaSection()}
 				${this.#renderDocumentTypeSection()}
 				${this.#renderMediaTypeSection()}
-
-			<umb-property-layout label="Languages" description=""> ${this.#renderLanguageSection()} </umb-property-layout>
+				${this.#renderLanguageSection()}
 
 			<umb-property-layout label="Dictionary" description=""> ${this.#renderDictionarySection()} </umb-property-layout>
 
@@ -297,13 +296,18 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	}
 
 	#renderLanguageSection() {
-		return html`<div slot="editor">
-			<umb-input-language
-				.value="${this._package.languages?.join(',') ?? ''}"
-				@change="${(e: CustomEvent) => {
-					this._package.languages = (e.target as UmbInputLanguageElement).selection;
-				}}"></umb-input-language>
-		</div>`;
+		if (!this._package) return nothing;
+		return html`
+			<umb-property-layout label="Languages">
+				<div slot="editor">
+					<umb-input-language
+						.value="${this._package.languages?.join(',') ?? ''}"
+						@change="${(e: CustomEvent) => {
+							this._package!.languages = (e.target as UmbInputLanguageElement).selection;
+						}}"></umb-input-language>
+				</div>
+			</umb-property-layout>
+		`;
 	}
 
 	#renderDictionarySection() {
