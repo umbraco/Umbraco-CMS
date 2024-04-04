@@ -177,8 +177,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				${this.#renderDocumentSection()}
 				${this.#renderMediaSection()}
 				${this.#renderDocumentTypeSection()}
-
-			<umb-property-layout label="Media Types" description=""> ${this.#renderMediaTypeSection()} </umb-property-layout>
+				${this.#renderMediaTypeSection()}
 
 			<umb-property-layout label="Languages" description=""> ${this.#renderLanguageSection()} </umb-property-layout>
 
@@ -283,9 +282,18 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	}
 
 	#renderMediaTypeSection() {
-		return html`<div slot="editor">
-			<umb-input-checkbox-list></umb-input-checkbox-list>
-		</div>`;
+		if (!this._package) return nothing;
+		return html`
+			<umb-property-layout label="Media Types">
+				<div slot="editor">
+					<umb-input-media-type
+						.selection=${this._package.mediaTypes ?? []}
+						@change=${(e: CustomEvent) =>
+							(this._package!.mediaTypes = (e.target as UmbInputMediaTypeElement).selection)}>
+					</umb-input-media-type>
+				</div>
+			</umb-property-layout>
+		`;
 	}
 
 	#renderLanguageSection() {
