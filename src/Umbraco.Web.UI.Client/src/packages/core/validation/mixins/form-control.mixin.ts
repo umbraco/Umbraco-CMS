@@ -124,6 +124,9 @@ export const UmbFormControlMixin = <
 		public set pristine(value: boolean) {
 			if (this._pristine !== value) {
 				this._pristine = value;
+				/*this.#formCtrlElements.forEach((el) => {
+					el.pristine = value;
+				});*/
 				this.#dispatchValidationState();
 			}
 		}
@@ -236,6 +239,7 @@ export const UmbFormControlMixin = <
 			});
 			// If we are in validationMode/'touched'/not-pristine then we need to validate this newly added control. [NL]
 			if (this._pristine === false) {
+				element.checkValidity();
 				// I think we could just execute validators for the new control, but now lets just run al of it again. [NL]
 				this._runValidators();
 			}

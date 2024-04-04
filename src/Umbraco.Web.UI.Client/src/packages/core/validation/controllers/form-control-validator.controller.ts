@@ -26,6 +26,10 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 			}
 			this.#context = context;
 			context.addValidator(this);
+			// If we have a message already, then un-pristine the control:
+			if (dataPath && context.messages.getHasMessagesOfPathAndDescendant(dataPath)) {
+				formControl.pristine = false;
+			}
 		});
 		this.#control = formControl;
 		this.#control.addEventListener(UmbValidationInvalidEvent.TYPE, this.#setInvalid);
@@ -53,6 +57,7 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 	#setValid = this.#setIsValid.bind(this, true);
 
 	validate(): Promise<boolean> {
+		console.log('form control validator validate() called.');
 		this.#isValid = this.#control.checkValidity();
 		return Promise.resolve(this.#isValid);
 	}
@@ -73,15 +78,27 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 		this.#control.focusFirstInvalidElement();
 	}
 
-	destroy(): void {
+	hostConnected(): void {
+		super.hostConnected();
+		if (this.#context) {
+			this.#context.addValidator(this);
+		}
+	}
+	hostDisconnected(): void {
+		super.hostDisconnected();
 		if (this.#context) {
 			this.#context.removeValidator(this);
 			// Remove any messages that this validator has added:
 			if (this.#dataPath) {
-				this.#context.messages.removeMessagesByTypeAndPath('client', this.#dataPath);
+				//this.#context.messages.removeMessagesByTypeAndPath('client', this.#dataPath);
 			}
 			this.#context = undefined;
 		}
+	}
+
+	destroy(): void {
+		console.log('destroy form control validator.  GOOD THIS SHOULD HAPPEN.');
+
 		if (this.#control) {
 			this.#control.removeEventListener(UmbValidationInvalidEvent.TYPE, this.#setInvalid);
 			this.#control.removeEventListener(UmbValidationValidEvent.TYPE, this.#setValid);

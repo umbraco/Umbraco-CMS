@@ -20,6 +20,7 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	}
 
 	addValidator(validator: UmbValidator): void {
+		if (this.#validators.includes(validator)) return;
 		this.#validators.push(validator);
 		//validator.addEventListener('change', this.#onValidatorChange);
 		if (this.#validationMode) {
@@ -65,7 +66,10 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	async validate(): Promise<boolean> {
 		this.#validationMode = true;
 		const results = await Promise.all(this.#validators.map((v) => v.validate()));
-		const isValid = results.every((r) => r);
+
+		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
+		// This enables us to keep client validations though UI is not present anymore — because the client validations got defined as messages. [NL]
+		const isValid = this.messages.getHasAnyMessages() ? false : results.every((r) => r);
 		this.#isValid = isValid;
 
 		// Focus first invalid element:
@@ -83,10 +87,6 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 			firstInvalid.focusFirstInvalidElement();
 		}
 	}
-
-	/*getMessages(): string[] {
-		return this.#validators.reduce((acc, v) => acc.concat(v.getMessages()), [] as string[]);
-	}*/
 
 	reset(): void {
 		this.#validationMode = false;
