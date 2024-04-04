@@ -41,11 +41,9 @@ export class UmbDocumentRecycleBinServerDataSource implements UmbRecycleBinDataS
 			DocumentResource.getRecycleBinDocumentByIdOriginalParent({ id: args.unique }),
 		);
 
-		if (data) {
-			const mappedData = {
-				unique: data.id,
-			};
-
+		// only check for undefined because data can be null if the parent is the root
+		if (data !== undefined) {
+			const mappedData = data ? { unique: data.id } : null;
 			return { data: mappedData };
 		}
 

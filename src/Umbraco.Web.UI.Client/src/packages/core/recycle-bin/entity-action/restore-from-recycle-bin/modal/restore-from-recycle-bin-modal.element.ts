@@ -34,6 +34,21 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 
 		const restoreDestinationUnique = await this.#requestRestoreDestination();
 
+		// TODO: handle ROOT lookup. Currently, we can't look up the root in the item repository.
+		// This is a temp solution to show something in the UI.
+		if (restoreDestinationUnique === null) {
+			this._destinationItem = {
+				name: 'ROOT',
+			};
+
+			this.#setDestinationValue({
+				unique: null,
+				entityType: 'unknown',
+			});
+
+			this._isAutomaticRestore = true;
+		}
+
 		if (restoreDestinationUnique) {
 			this._destinationItem = await this.#requestDestinationItem(restoreDestinationUnique);
 			if (!this._destinationItem) throw new Error('Cant find destination item.');
@@ -47,7 +62,7 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	async #requestRestoreDestination(): Promise<string | undefined> {
+	async #requestRestoreDestination(): Promise<string | null | undefined> {
 		if (!this.data?.unique) throw new Error('Cannot restore an item without a unique identifier.');
 		if (!this.data?.recycleBinRepositoryAlias)
 			throw new Error('Cannot restore an item without a recycle bin repository alias.');
@@ -61,8 +76,9 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 			unique: this.data.unique,
 		});
 
-		if (data) {
-			return data.unique;
+		// only check for undefined because data can be null if the parent is the root
+		if (data !== undefined) {
+			return data ? data.unique : null;
 		}
 
 		return undefined;
@@ -119,7 +135,7 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	#setDestinationValue(destination: { unique: string; entityType: string }) {
+	#setDestinationValue(destination: UmbRestoreFromRecycleBinModalValue['destination']) {
 		this.updateValue({ destination });
 	}
 

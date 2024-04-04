@@ -10,7 +10,7 @@ export interface UmbRestoreFromRecycleBinModalData {
 export interface UmbRestoreFromRecycleBinModalValue {
 	destination:
 		| {
-				unique: string;
+				unique: string | null;
 				entityType: string;
 		  }
 		| undefined;
