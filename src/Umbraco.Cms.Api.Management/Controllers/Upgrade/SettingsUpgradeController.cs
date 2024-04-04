@@ -26,7 +26,7 @@ public class SettingsUpgradeController : UpgradeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UpgradeSettingsResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
-    public async Task<ActionResult<UpgradeSettingsResponseModel>> Settings()
+    public async Task<ActionResult<UpgradeSettingsResponseModel>> Settings(CancellationToken cancellationToken)
     {
         // TODO: Async - We need to figure out what we want to do with async endpoints that doesn't do anything async
         // We want these to be async for future use (Ideally we'll have more async things),

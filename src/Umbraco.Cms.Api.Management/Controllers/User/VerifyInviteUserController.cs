@@ -22,7 +22,7 @@ public class VerifyInviteUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Invite(VerifyInviteUserRequestModel model)
+    public async Task<IActionResult> Invite(CancellationToken cancellationToken, VerifyInviteUserRequestModel model)
     {
         Attempt<UserOperationStatus> result = await _userService.VerifyInviteAsync(model.User.Id, model.Token);
 

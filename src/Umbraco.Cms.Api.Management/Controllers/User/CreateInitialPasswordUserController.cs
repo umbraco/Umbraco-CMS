@@ -24,7 +24,9 @@ public class CreateInitialPasswordUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateInitialPassword(CreateInitialPasswordUserRequestModel model)
+    public async Task<IActionResult> CreateInitialPassword(
+        CancellationToken cancellationToken,
+        CreateInitialPasswordUserRequestModel model)
     {
         Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.CreateInitialPasswordAsync(model.User.Id, model.Token, model.Password);
 

@@ -32,7 +32,7 @@ public class CreateUserGroupController : UserGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create(CreateUserGroupRequestModel createUserGroupRequestModel)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateUserGroupRequestModel createUserGroupRequestModel)
     {
         // FIXME: Comment this in when auth is in place and we can get a currently logged in user.
         // IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;

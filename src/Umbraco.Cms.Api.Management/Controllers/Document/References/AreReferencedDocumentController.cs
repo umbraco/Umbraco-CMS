@@ -31,7 +31,11 @@ public class AreReferencedDocumentController : DocumentControllerBase
     [HttpGet("are-referenced")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ReferenceByIdModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> GetPagedReferencedItems([FromQuery(Name="id")]HashSet<Guid> ids, int skip = 0, int take = 20)
+    public async Task<ActionResult<PagedViewModel<ReferenceByIdModel>>> GetPagedReferencedItems(
+        CancellationToken cancellationToken,
+        [FromQuery(Name="id")]HashSet<Guid> ids,
+        int skip = 0,
+        int take = 20)
     {
         PagedModel<RelationItemModel> distinctByKeyItemsWithReferencedRelations = await _trackedReferencesSkipTakeService.GetPagedItemsWithRelationsAsync(ids, skip, take, true);
         var pagedViewModel = new PagedViewModel<ReferenceByIdModel>

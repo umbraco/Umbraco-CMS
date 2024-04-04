@@ -40,7 +40,9 @@ public class OriginalParentMediaRecycleBinController : MediaRecycleBinController
     [ProducesResponseType(typeof(ReferenceByIdModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> OriginalParent(Guid id)
+    public async Task<IActionResult> OriginalParent(
+        CancellationToken cancellationToken,
+        Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

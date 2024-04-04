@@ -18,7 +18,7 @@ public class ConfigurationTemporaryFileController : TemporaryFileControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemporaryFileConfigurationResponseModel), StatusCodes.Status200OK)]
-    public Task<IActionResult> Configuration()
+    public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         TemporaryFileConfigurationResponseModel responseModel = _temporaryFileConfigurationPresentationFactory.Create();
         return Task.FromResult<IActionResult>(Ok(responseModel));

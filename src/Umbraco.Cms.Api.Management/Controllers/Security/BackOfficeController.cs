@@ -54,7 +54,7 @@ public class BackOfficeController : SecurityControllerBase
     [HttpPost("login")]
     [MapToApiVersion("1.0")]
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
-    public async Task<IActionResult> Login(LoginRequestModel model)
+    public async Task<IActionResult> Login(CancellationToken cancellationToken, LoginRequestModel model)
     {
         var validated = await _backOfficeUserManager.ValidateCredentialsAsync(model.Username, model.Password);
         if (validated is false)
@@ -92,7 +92,7 @@ public class BackOfficeController : SecurityControllerBase
     [AllowAnonymous]
     [HttpPost("verify-2fa")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> Verify2FACode(Verify2FACodeModel model)
+    public async Task<IActionResult> Verify2FACode(CancellationToken cancellationToken, Verify2FACodeModel model)
     {
         if (ModelState.IsValid == false)
         {
@@ -143,7 +143,7 @@ public class BackOfficeController : SecurityControllerBase
     [AllowAnonymous]
     [HttpGet("authorize")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> Authorize()
+    public async Task<IActionResult> Authorize(CancellationToken cancellationToken)
     {
         HttpContext context = _httpContextAccessor.GetRequiredHttpContext();
         OpenIddictRequest? request = context.GetOpenIddictServerRequest();
@@ -166,7 +166,7 @@ public class BackOfficeController : SecurityControllerBase
     [AllowAnonymous]
     [HttpGet("signout")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> Signout()
+    public async Task<IActionResult> Signout(CancellationToken cancellationToken)
     {
         var userName = await GetUserNameFromAuthCookie();
 
