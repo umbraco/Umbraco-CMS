@@ -22,18 +22,23 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 	_isAutomaticRestore = false;
 
 	@state()
+	_restoreItem?: any;
+
+	@state()
 	_destinationItem?: any;
 
 	#recycleBinRepository?: UmbRecycleBinRepository;
 
 	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
 		super.firstUpdated(_changedProperties);
+		if (!this.data?.unique) throw new Error('Cannot restore an item without a unique identifier.');
 
+		this._restoreItem = await this.#requestItem(this.data.unique);
 		const unique = await this.#requestAutomaticRestoreDestination();
 
 		if (unique !== undefined) {
-			this._isAutomaticRestore = true;
 			this.setDestination(unique);
+			this._isAutomaticRestore = true;
 		}
 	}
 
@@ -84,6 +89,15 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		return undefined;
 	}
 
+	async #requestItem(unique: string) {
+		if (!this.data?.itemRepositoryAlias) throw new Error('Cannot restore an item without an item repository alias.');
+
+		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, this.data.itemRepositoryAlias);
+		const { data } = await itemRepository.requestItems([unique]);
+
+		return data?.[0];
+	}
+
 	async #onSelectCustomDestination() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modal = modalManager.open(this, UMB_DOCUMENT_PICKER_MODAL, {
@@ -98,15 +112,6 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 			const unique = selection[0];
 			this.setDestination(unique);
 		}
-	}
-
-	async #requestItem(unique: string) {
-		if (!this.data?.itemRepositoryAlias) throw new Error('Cannot restore an item without an item repository alias.');
-
-		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, this.data.itemRepositoryAlias);
-		const { data } = await itemRepository.requestItems([unique]);
-
-		return data?.[0];
 	}
 
 	async #onSubmit() {
@@ -133,7 +138,7 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 			<umb-body-layout headline="Restore">
 				<uui-box>
 					${this._isAutomaticRestore
-						? html` Restore (ITEM NAME HERE) to ${this._destinationItem.name}`
+						? html` Restore ${this._restoreItem?.name} to ${this._destinationItem?.name}`
 						: this.#renderCustomSelectDestination()}
 				</uui-box>
 				${this.#renderActions()}
