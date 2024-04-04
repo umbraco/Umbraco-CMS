@@ -60,10 +60,10 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2023-10-12T18:30:32.879Z',
 		createDate: '2023-10-12T18:30:32.879Z',
 		failedLoginAttempts: 0,
-		userGroupIds: ['user-group-administrators-id'],
+		userGroupIds: ['user-group-editors-id'],
 		userName: '',
 		avatarUrls: [],
-		isAdmin: true,
+		isAdmin: false,
 	},
 	{
 		id: 'ff2f4a50-d3d4-4bc4-869d-c7948c160e54',
@@ -79,10 +79,10 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2023-10-12T18:30:32.879Z',
 		createDate: '2023-10-12T18:30:32.879Z',
 		failedLoginAttempts: 0,
-		userGroupIds: ['user-group-administrators-id'],
+		userGroupIds: ['user-group-editors-id'],
 		userName: '',
 		avatarUrls: [],
-		isAdmin: true,
+		isAdmin: false,
 	},
 	{
 		id: 'c290c6d9-9f12-4838-8567-621b52a178de',
@@ -98,13 +98,17 @@ export const data: Array<UmbMockUserModel> = [
 		updateDate: '2023-10-12T18:30:32.879Z',
 		createDate: '2023-10-12T18:30:32.879Z',
 		failedLoginAttempts: 25,
-		userGroupIds: ['user-group-administrators-id'],
+		userGroupIds: ['user-group-editors-id', 'user-group-sensitive-data-id'],
 		userName: '',
 		avatarUrls: [],
-		isAdmin: true,
+		isAdmin: false,
 	},
 ];
 
+/**
+ * Mock data for MFA login providers
+ * This is usually linked to a user, but for the sake of the mock, we're just going to have a list of providers
+ */
 export const mfaLoginProviders: Array<UserTwoFactorProviderModel> = [
 	{
 		isEnabledOnUser: true,
