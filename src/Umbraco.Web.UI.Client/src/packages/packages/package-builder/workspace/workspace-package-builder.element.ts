@@ -176,10 +176,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<uui-box headline="Package Content">
 				${this.#renderDocumentSection()}
 				${this.#renderMediaSection()}
-
-			<umb-property-layout label="Document Types" description="">
 				${this.#renderDocumentTypeSection()}
-			</umb-property-layout>
 
 			<umb-property-layout label="Media Types" description=""> ${this.#renderMediaTypeSection()} </umb-property-layout>
 
@@ -271,9 +268,18 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	}
 
 	#renderDocumentTypeSection() {
-		return html`<div slot="editor">
-			<umb-input-checkbox-list></umb-input-checkbox-list>
-		</div>`;
+		if (!this._package) return nothing;
+		return html`
+			<umb-property-layout label="Document Types">
+				<div slot="editor">
+					<umb-input-document-type
+						.selection=${this._package.documentTypes ?? []}
+						@change=${(e: CustomEvent) =>
+							(this._package!.documentTypes = (e.target as UmbInputDocumentTypeElement).selection)}>
+					</umb-input-document-type>
+				</div>
+			</umb-property-layout>
+		`;
 	}
 
 	#renderMediaTypeSection() {
