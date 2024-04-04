@@ -1,10 +1,13 @@
+import type { UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbRestoreFromRecycleBinModalData {
 	unique: string;
 	entityType: string;
 	recycleBinRepositoryAlias: string;
 	itemRepositoryAlias: string;
+	pickerModal: UmbModalToken<UmbTreePickerModalData<UmbUniqueTreeItemModel | UmbUniqueTreeRootModel>> | string;
 }
 
 export interface UmbRestoreFromRecycleBinModalValue {
