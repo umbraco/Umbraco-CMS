@@ -5,7 +5,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../shared/document-variant-language-picker.element.js';
-import { UmbUserRepository } from '@umbraco-cms/backoffice/user';
+import { UmbUserItemRepository, UmbUserRepository } from '@umbraco-cms/backoffice/user';
 
 @customElement('umb-rollback-modal')
 export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModalData, UmbRollbackModalValue> {
@@ -26,7 +26,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 	#rollbackRepository = new UmbRollbackRepository(this);
 
-	#userRepository = new UmbUserRepository(this);
+	#userItemRepository = new UmbUserItemRepository(this);
 
 	constructor() {
 		super();
@@ -42,10 +42,14 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 		const tempItems: { date: string; user: string; isCurrentlyPublishedVersion: boolean; id: string }[] = [];
 
+		const uniqueUserIds = [...new Set(data?.items.map((item) => item.user.id))];
+
+		const { data: userItems } = await this.#userItemRepository.requestItems(uniqueUserIds);
+
 		data?.items.forEach((item: any) => {
 			tempItems.push({
 				date: item.versionDate,
-				user: item.user.id,
+				user: userItems?.find((user) => user.unique === item.user.id)?.name || '',
 				isCurrentlyPublishedVersion: item.isCurrentPublishedVersion,
 				id: item.id,
 			});
@@ -85,19 +89,16 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 		const id = this.currentVersion.id;
 		this.#rollbackRepository.rollback(id);
+
+		this.modalContext?.reject();
 	}
 
 	#onCancel() {
 		this.modalContext?.reject();
 	}
 
-	async #onVersionClicked(id: string) {
+	#onVersionClicked(id: string) {
 		this.#setCurrentVersion(id);
-		// this.currentVersion = { id };
-		// console.log('Version clicked', id);
-
-		// const { data } = await this.#rollbackRepository.requestVersionById(id);
-		// console.log('datasss', data);
 	}
 
 	#renderVersions() {
