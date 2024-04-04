@@ -21,6 +21,13 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
 	/**
+	 * Backoffice extension registry.
+	 * This enables to register and unregister extensions via DevTools, or just via querying this element via the DOM.
+	 * @type {UmbExtensionsRegistry}
+	 */
+	public extensionRegistry = umbExtensionsRegistry;
+
+	/**
 	 * The base URL of the configured Umbraco server.
 	 *
 	 * @attr
@@ -69,7 +76,7 @@ export class UmbAppElement extends UmbLitElement {
 	#umbIconRegistry = new UmbIconRegistry();
 	#uuiIconRegistry = new UUIIconRegistryEssential();
 	#serverConnection?: UmbServerConnection;
-	#authController = new UmbAppAuthController(this);
+	#authController?: UmbAppAuthController;
 
 	constructor() {
 		super();
@@ -91,6 +98,7 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	async #setup() {
+		this.#authController = new UmbAppAuthController(this);
 		this.#serverConnection = await new UmbServerConnection(this.serverUrl).connect();
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
@@ -191,7 +199,7 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#isAuthorizedGuard(): Guard {
-		return () => this.#authController.isAuthorized();
+		return () => this.#authController?.isAuthorized() ?? false;
 	}
 
 	#errorPage(errorMsg: string, error?: unknown) {

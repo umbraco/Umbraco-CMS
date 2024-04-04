@@ -38,13 +38,6 @@ const CORE_PACKAGES = [
 
 @customElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
-	/**
-	 * Backoffice extension registry.
-	 * This enables to register and unregister extensions via DevTools, or just via querying this element via the DOM.
-	 * @type {UmbExtensionsRegistry}
-	 */
-	public extensionRegistry = umbExtensionsRegistry;
-
 	constructor() {
 		super();
 
