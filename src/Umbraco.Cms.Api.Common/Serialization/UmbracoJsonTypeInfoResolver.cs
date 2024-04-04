@@ -11,12 +11,15 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
     private readonly ConcurrentDictionary<Type, ISet<Type>> _subTypesCache = new ConcurrentDictionary<Type, ISet<Type>>();
 
     public UmbracoJsonTypeInfoResolver(ITypeFinder typeFinder)
-    {
-        _typeFinder = typeFinder;
-    }
+        => _typeFinder = typeFinder;
 
     public IEnumerable<Type> FindSubTypes(Type type)
     {
+        if (type.IsInterface is false)
+        {
+            return Enumerable.Empty<Type>();
+        }
+
         if (_subTypesCache.TryGetValue(type, out ISet<Type>? cachedResult))
         {
             return cachedResult;
@@ -30,32 +33,9 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
     {
         JsonTypeInfo result = base.GetTypeInfo(type, options);
-
-        if (type.IsInterface)
-        {
-            return GetTypeInfoForInterface(result, type, options);
-        }
-        else
-        {
-            return GetTypeInfoForClass(result, type, options);
-        }
-
-    }
-
-    private JsonTypeInfo GetTypeInfoForClass(JsonTypeInfo result, Type type, JsonSerializerOptions options)
-    {
-        if (result.Kind != JsonTypeInfoKind.Object || !type.GetInterfaces().Any())
-        {
-            return result;
-        }
-
-        JsonPolymorphismOptions jsonPolymorphismOptions = result.PolymorphismOptions ?? new JsonPolymorphismOptions();
-
-        jsonPolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(type, type.Name));
-
-        result.PolymorphismOptions = jsonPolymorphismOptions;
-
-        return result;
+        return type.IsInterface
+            ? GetTypeInfoForInterface(result, type, options)
+            : result;
     }
 
     private JsonTypeInfo GetTypeInfoForInterface(JsonTypeInfo result, Type type, JsonSerializerOptions options)

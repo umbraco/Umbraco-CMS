@@ -28,6 +28,7 @@ public class UpdateDomainsController : DocumentControllerBase
 
     [MapToApiVersion("1.0")]
     [HttpPut("{id:guid}/domains")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
