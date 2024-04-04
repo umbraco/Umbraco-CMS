@@ -232,7 +232,6 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.setEditor(this._element);
 
 			if (this._element) {
-				// TODO: Could this be changed to change event? (or additionally support the change event? [NL])
 				this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
 				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 
