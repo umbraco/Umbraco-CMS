@@ -27,7 +27,12 @@ export class UmbAppElement extends UmbLitElement {
 	 * @remarks This is the base URL of the Umbraco server, not the base URL of the backoffice.
 	 */
 	@property({ type: String })
-	serverUrl = window.location.origin;
+	set serverUrl(url: string) {
+		OpenAPI.BASE = url;
+	}
+	get serverUrl() {
+		return OpenAPI.BASE;
+	}
 
 	/**
 	 * The base path of the backoffice.
@@ -70,6 +75,8 @@ export class UmbAppElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		OpenAPI.BASE = window.location.origin;
+
 		new UmbContextDebugController(this);
 
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
@@ -85,14 +92,6 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	async #setup() {
-		if (this.serverUrl === undefined) throw new Error('No serverUrl provided');
-
-		/* All requests to the server requires the base URL to be set.
-		We make sure it happens before we get the server status.
-		TODO: find the right place to set this
-		*/
-		OpenAPI.BASE = this.serverUrl;
-
 		this.#serverConnection = await new UmbServerConnection(this.serverUrl).connect();
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
