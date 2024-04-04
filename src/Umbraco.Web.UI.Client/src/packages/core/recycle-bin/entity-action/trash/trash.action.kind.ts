@@ -11,7 +11,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		type: 'entityAction',
 		kind: 'trash',
 		api: () => import('./trash.action.js'),
-		weight: 1050,
+		weight: 1150,
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-trash',
