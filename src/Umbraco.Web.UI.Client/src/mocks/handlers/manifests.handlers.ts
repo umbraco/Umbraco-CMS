@@ -90,6 +90,32 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifes
 					},
 				],
 			},
+			{
+				name: 'My Auth Package',
+				extensions: [
+					{
+						type: 'authProvider',
+						alias: 'My.AuthProvider.Google',
+						name: 'My Custom Auth Provider',
+						forProviderName: 'Umbraco.Google',
+						meta: {
+							label: 'Sign in with Google',
+						},
+					},
+					{
+						type: 'authProvider',
+						alias: 'My.AUthProvider.Github',
+						name: 'My Github Auth Provider',
+						forProviderName: 'Umbraco.Github',
+						meta: {
+							label: 'Use Github!',
+							look: 'primary',
+							icon: 'icon-github',
+							color: 'success',
+						},
+					},
+				],
+			},
 		]),
 	);
 });
