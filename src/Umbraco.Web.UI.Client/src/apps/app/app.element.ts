@@ -1,3 +1,4 @@
+import { extensions as coreExtensions } from '../../packages/core/umbraco-package.js';
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppContext } from './app.context.js';
 import { UmbServerConnection } from './server-connection.js';
@@ -90,6 +91,8 @@ export class UmbAppElement extends UmbLitElement {
 
 		this.#umbIconRegistry.attach(this);
 		this.#uuiIconRegistry.attach(this);
+
+		umbExtensionsRegistry.registerMany(coreExtensions);
 	}
 
 	connectedCallback(): void {
