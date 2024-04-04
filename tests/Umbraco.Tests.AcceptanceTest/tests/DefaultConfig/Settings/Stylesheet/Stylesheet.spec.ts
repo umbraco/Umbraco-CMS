@@ -15,7 +15,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   });
 
-  test('can create a empty stylesheet', async ({umbracoApi, umbracoUi}) => {
+  test('can create a empty stylesheet @smoke', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
     await umbracoUi.stylesheet.clickCreateThreeDotsButton();
@@ -82,7 +82,7 @@ test.describe('Stylesheets tests', () => {
     // TODO: when frontend is ready, verify the notification displays
   });
 
-  test('can delete a stylesheet', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a stylesheet @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.stylesheet.create(stylesheetName, '', '/');
 

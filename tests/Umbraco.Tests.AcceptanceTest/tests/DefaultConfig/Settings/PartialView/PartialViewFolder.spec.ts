@@ -29,7 +29,7 @@ test.describe('Partial View Folder tests', () => {
     await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(folderName)).toBeVisible();  
   });
 
-  test('can delete a folder', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a folder @smoke', async ({umbracoApi, umbracoUi}) => {
     //Arrange
     await umbracoApi.partialView.createFolder(folderName);
     expect(await umbracoApi.partialView.doesFolderExist(folderName)).toBeTruthy();
