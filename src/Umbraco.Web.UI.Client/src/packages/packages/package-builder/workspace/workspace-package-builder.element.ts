@@ -1,3 +1,4 @@
+import { UmbMediaPickerContext } from '../../../media/media/components/input-media/input-media.context.js';
 import { UmbPackageRepository } from '../../package/repository/index.js';
 import type { UmbCreatedPackageDefinition } from '../../types.js';
 import type { UmbInputLanguageElement } from '../../../language/components/input-language/input-language.element.js';
@@ -174,8 +175,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		return html`
 			<uui-box headline="Package Content">
 				${this.#renderDocumentSection()}
-
-			<umb-property-layout label="Media" description="">${this.#renderMediaSection()} </umb-property-layout>
+				${this.#renderMediaSection()}
 
 			<umb-property-layout label="Document Types" description="">
 				${this.#renderDocumentTypeSection()}
@@ -235,20 +235,38 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		`;
 	}
 
+	#onMediaChange(event: { target: UmbInputEntityElement }) {
+		if (!this._package) return;
+
+		this._package.mediaIds = event.target.selection ?? [];
+
+		if (this._package.mediaLoadChildNodes && !this._package.mediaIds.length) {
+			this._package.mediaLoadChildNodes = false;
+		}
+
+		this.requestUpdate('_package');
+	}
+
 	#renderMediaSection() {
+		if (!this._package) return nothing;
 		return html`
-			<div slot="editor">
-				<umb-input-media
-					.selection=${this._package.mediaIds ?? []}
-					@change="${(e: CustomEvent) =>
-						(this._package.mediaIds = (e.target as UmbInputMediaElement).selection)}"></umb-input-media>
-				<uui-checkbox
-					label="Include child nodes"
-					.checked="${this._package.mediaLoadChildNodes ?? false}"
-					@change="${(e: UUIBooleanInputEvent) => (this._package.mediaLoadChildNodes = e.target.checked)}">
-					Include child nodes
-				</uui-checkbox>
-			</div>
+			<umb-property-layout label="Media">
+				<div slot="editor">
+					<umb-input-entity
+						.getIcon=${(item: UmbMediaItemModel) => item.mediaType.icon ?? 'icon-picture'}
+						.pickerContext=${UmbMediaPickerContext}
+						.selection=${this._package.mediaIds ?? []}
+						@change=${this.#onMediaChange}>
+					</umb-input-entity>
+					<uui-checkbox
+						label="Include child nodes"
+						.checked=${this._package.mediaLoadChildNodes ?? false}
+						.disabled=${!this._package.mediaIds?.length}
+						@change=${(e: UUIBooleanInputEvent) => (this._package!.mediaLoadChildNodes = e.target.checked)}>
+						Include child nodes
+					</uui-checkbox>
+				</div>
+			</umb-property-layout>
 		`;
 	}
 
