@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUICollectionViewPermissionsElement } from './property-editor-ui-collection-view-permissions.element.js';
+import { UmbPropertyEditorUICollectionViewPermissionsElement } from './collection-view-permissions.element.js';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUICollectionViewPermissionsElement', () => {
