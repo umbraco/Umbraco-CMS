@@ -4,11 +4,11 @@ import * as crypto from 'crypto';
 
 test.describe('User Avatar Tests', () => {
   // User
-  let userId = "";
-  const userEmail = "userAvatar@email.com";
-  const userName = "UserAvatarTests";
+  let userId = '';
+  let userGroupId = '';
+  const userEmail = 'userAvatar@acceptance.test';
+  const userName = 'UserAvatarTests';
   // Avatar
-  // Creates a random GUID
   const avatarFileId = crypto.randomUUID();
   const avatarName = 'Umbraco.png';
   const mimeType = 'image/png';
@@ -17,6 +17,8 @@ test.describe('User Avatar Tests', () => {
   test.beforeEach(async ({umbracoApi}) => {
     await umbracoApi.user.ensureNameNotExists(userName);
     await umbracoApi.temporaryFile.delete(avatarFileId);
+    const userGroupData = await umbracoApi.userGroup.getByName('Writers');
+    userGroupId = userGroupData.id;
   });
 
   test.afterEach(async ({umbracoApi}) => {
@@ -26,10 +28,7 @@ test.describe('User Avatar Tests', () => {
 
   test('can add an avatar to a user', async ({umbracoApi}) => {
     // Arrange
-    const userGroup = await umbracoApi.userGroup.getByName("Writers");
-    const userGroupData = [userGroup.id];
-
-    userId = await umbracoApi.user.create(userEmail, userName, userGroupData);
+    userId = await umbracoApi.user.createDefaultUser(userName, userEmail, userGroupId);
     await umbracoApi.temporaryFile.create(avatarFileId, avatarName, mimeType, avatarFilePath);
 
     // Act
@@ -43,10 +42,7 @@ test.describe('User Avatar Tests', () => {
 
   test('can remove an avatar from a user', async ({umbracoApi}) => {
     // Arrange
-    const userGroup = await umbracoApi.userGroup.getByName("Writers");
-    const userGroupData = [userGroup.id];
-
-    userId = await umbracoApi.user.create(userEmail, userName, userGroupData);
+    userId = await umbracoApi.user.createDefaultUser(userName, userEmail, userGroupId);
     await umbracoApi.temporaryFile.create(avatarFileId, avatarName, mimeType, avatarFilePath);
     await umbracoApi.user.addAvatar(userId, avatarFileId);
 

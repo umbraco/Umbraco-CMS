@@ -22,9 +22,10 @@ public class
 }
 
 [ApiExplorerSettings(IgnoreApi=true)]
-[Route("/umbraco/login")]
+[Route(LoginPath)]
 public class BackOfficeLoginController : Controller
 {
+    public const string LoginPath = "/umbraco/login";
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly GlobalSettings _globalSettings;
 

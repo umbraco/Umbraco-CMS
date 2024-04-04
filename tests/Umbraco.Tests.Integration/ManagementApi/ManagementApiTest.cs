@@ -7,14 +7,15 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Web;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
@@ -60,8 +61,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
             IUser user;
             if (isAdmin)
             {
-                user = await userService.GetAsync(userKey) ??
-                       throw new Exception("Super user not found.");
+                user = await userService.GetRequiredUserAsync(userKey);
                 user.Username = user.Email = username;
                 userService.Save(user);
             }
@@ -101,7 +101,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
             scope.Complete();
         }
 
-        var loginModel = new BackOfficeController.LoginRequestModel { Username = username, Password = password };
+        var loginModel = new LoginRequestModel { Username = username, Password = password };
 
         // Login to ensure the cookie is set (used in next request)
         var loginResponse = await client.PostAsync(
