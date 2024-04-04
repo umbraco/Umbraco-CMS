@@ -644,6 +644,9 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
             switch (runner.OrderBy?.ToUpperInvariant())
             {
+                case "NODEOBJECTTYPE":
+                    orderBy = $"UPPER({SqlSyntax.GetQuotedColumn(NodeDto.TableName, "nodeObjectType")})";
+                    break;
                 case "PATH":
                     orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
                     break;
