@@ -6,6 +6,9 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../shared/document-variant-language-picker.element.js';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/index.js';
+import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT } from '../../property-dataset-context/document-property-dataset-context.token.js';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 type DocumentVersion = {
 	id: string;
@@ -33,20 +36,31 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	};
 
 	#rollbackRepository = new UmbRollbackRepository(this);
-
 	#userItemRepository = new UmbUserItemRepository(this);
+
+	#propertyDatasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
+
+	#documentId?: string | undefined;
+	#documentCulture?: string | undefined;
 
 	constructor() {
 		super();
 
-		this.#requestVersions();
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
+			this.#propertyDatasetContext = instance;
+			this.#requestVersions();
+		});
 	}
 
 	async #requestVersions() {
-		const { data } = await this.#rollbackRepository.requestVersionsByDocumentId(
-			'bf327b58-9036-498b-9904-9b01b697b830',
-			'en-us',
-		);
+		if (!this.#propertyDatasetContext) return;
+
+		const documentId = this.#propertyDatasetContext.getUnique();
+		const documentCulture = this.#propertyDatasetContext.getVariantId().culture;
+
+		if (!documentId || !documentCulture) return;
+
+		const { data } = await this.#rollbackRepository.requestVersionsByDocumentId(documentId, documentCulture);
 
 		const tempItems: DocumentVersion[] = [];
 

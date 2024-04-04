@@ -12,7 +12,7 @@ export class UmbRollbackRepository extends UmbControllerBase implements UmbApi {
 		this.#dataSource = new UmbRollbackServerDataSource(this);
 	}
 
-	async requestVersionsByDocumentId(id: string, culture: string) {
+	async requestVersionsByDocumentId(id: string, culture?: string) {
 		const { data, error } = await this.#dataSource.getVersionsByDocumentId(id, culture);
 		return { data, error };
 	}

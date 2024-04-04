@@ -25,7 +25,7 @@ export class UmbRollbackServerDataSource {
 	 * @return {*}
 	 * @memberof UmbRollbackServerDataSource
 	 */
-	getVersionsByDocumentId(id: string, culture: string) {
+	getVersionsByDocumentId(id: string, culture?: string) {
 		return tryExecuteAndNotify(this.#host, DocumentVersionResource.getDocumentVersion({ documentId: id, culture }));
 	}
 
