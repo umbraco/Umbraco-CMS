@@ -40,7 +40,6 @@ export class UmbAppElement extends UmbLitElement {
 	 * @attr
 	 */
 	@property({ type: String })
-	// TODO: get from base element or maybe move to UmbAuthContext.#getRedirectUrl since it is only used there
 	backofficePath = '/umbraco';
 
 	/**
