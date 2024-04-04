@@ -82,10 +82,9 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		const data = await this.#packageRepository.getCreatePackageDownload(this._package.unique);
 		if (!data) return;
 
-		// TODO: [LK] Need to review what the server is doing, as different data is returned depending on schema configuration.
-		// e.g. selecting Media items will return a ZIP file, otherwise it's an XML file. It should be consistent.
-		//blobDownload(data, 'package.xml', 'text/xml');
-		blobDownload(data, 'package.zip', 'application/zip');
+		const filename = typeof data === 'object' ? 'package.zip' : 'package.xml';
+		const mimeType = typeof data === 'object' ? 'application/zip' : 'text/xml';
+		blobDownload(data, filename, mimeType);
 	}
 
 	#isNameDefined() {
