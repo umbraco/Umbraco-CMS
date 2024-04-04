@@ -6,6 +6,6 @@
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type CopyDataTypeRequestModel = {
-    target: ReferenceByIdModel;
+    target?: ReferenceByIdModel | null;
 };
 

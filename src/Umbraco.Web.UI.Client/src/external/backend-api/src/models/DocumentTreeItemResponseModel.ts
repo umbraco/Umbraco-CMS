@@ -9,7 +9,7 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type DocumentTreeItemResponseModel = {
     hasChildren: boolean;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
     noAccess: boolean;
     isTrashed: boolean;
     id: string;

@@ -13,6 +13,6 @@ export type DocumentVersionResponseModel = {
     variants: Array<DocumentVariantResponseModel>;
     id: string;
     documentType: DocumentTypeReferenceResponseModel;
-    document: ReferenceByIdModel;
+    document?: ReferenceByIdModel | null;
 };
 

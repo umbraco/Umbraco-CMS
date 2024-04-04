@@ -40,7 +40,7 @@ import { request as __request } from '../core/request';
 export class UserResource {
 
     /**
-     * @returns PagedUserResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getFilterUser({
@@ -81,7 +81,7 @@ export class UserResource {
     }
 
     /**
-     * @returns UserItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemUser({
@@ -148,7 +148,7 @@ export class UserResource {
     }
 
     /**
-     * @returns PagedUserResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUser({
@@ -173,7 +173,7 @@ export class UserResource {
     }
 
     /**
-     * @returns UserResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUserById({
@@ -250,7 +250,7 @@ export class UserResource {
     }
 
     /**
-     * @returns UserTwoFactorProviderModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUserById2Fa({
@@ -330,7 +330,7 @@ export class UserResource {
     }
 
     /**
-     * @returns ResetPasswordUserResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static postUserByIdResetPassword({
@@ -408,7 +408,7 @@ export class UserResource {
     }
 
     /**
-     * @returns UserConfigurationResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUserConfiguration(): CancelablePromise<UserConfigurationResponseModel> {
@@ -422,7 +422,7 @@ export class UserResource {
     }
 
     /**
-     * @returns CurrentUserResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUserCurrent(): CancelablePromise<CurrentUserResponseModel> {
@@ -437,7 +437,7 @@ export class UserResource {
     }
 
     /**
-     * @returns UserTwoFactorProviderModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUserCurrent2Fa(): CancelablePromise<Array<UserTwoFactorProviderModel>> {
@@ -575,7 +575,7 @@ export class UserResource {
     }
 
     /**
-     * @returns CurrenUserConfigurationResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUserCurrentConfiguration(): CancelablePromise<CurrenUserConfigurationResponseModel> {
@@ -589,7 +589,7 @@ export class UserResource {
     }
 
     /**
-     * @returns LinkedLoginsRequestModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUserCurrentLogins(): CancelablePromise<LinkedLoginsRequestModel> {
@@ -603,7 +603,7 @@ export class UserResource {
     }
 
     /**
-     * @returns UserPermissionsResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUserCurrentPermissions({
@@ -625,7 +625,7 @@ export class UserResource {
     }
 
     /**
-     * @returns UserPermissionsResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUserCurrentPermissionsDocument({
@@ -647,7 +647,7 @@ export class UserResource {
     }
 
     /**
-     * @returns UserPermissionsResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUserCurrentPermissionsMedia({
@@ -785,7 +785,7 @@ export class UserResource {
     }
 
     /**
-     * @returns VerifyInviteUserResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static postUserInviteVerify({

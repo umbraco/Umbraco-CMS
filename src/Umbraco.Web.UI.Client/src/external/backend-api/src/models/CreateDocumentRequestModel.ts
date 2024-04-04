@@ -11,8 +11,8 @@ export type CreateDocumentRequestModel = {
     values: Array<DocumentValueModel>;
     variants: Array<DocumentVariantRequestModel>;
     id?: string | null;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
     documentType: ReferenceByIdModel;
-    template: ReferenceByIdModel;
+    template?: ReferenceByIdModel | null;
 };
 

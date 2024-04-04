@@ -16,7 +16,7 @@ export type CreateMemberTypeRequestModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection: ReferenceByIdModel;
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<CreateMemberTypePropertyTypeRequestModel>;
     containers: Array<CreateMemberTypePropertyTypeContainerRequestModel>;

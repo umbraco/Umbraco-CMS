@@ -15,7 +15,7 @@ import { request as __request } from '../core/request';
 export class HealthCheckResource {
 
     /**
-     * @returns PagedHealthCheckGroupResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getHealthCheckGroup({
@@ -39,7 +39,7 @@ export class HealthCheckResource {
     }
 
     /**
-     * @returns HealthCheckGroupPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getHealthCheckGroupByName({
@@ -61,7 +61,7 @@ export class HealthCheckResource {
     }
 
     /**
-     * @returns HealthCheckGroupWithResultResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static postHealthCheckGroupByNameCheck({
@@ -83,7 +83,7 @@ export class HealthCheckResource {
     }
 
     /**
-     * @returns HealthCheckResultResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static postHealthCheckExecuteAction({

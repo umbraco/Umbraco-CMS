@@ -13,7 +13,7 @@ import { request as __request } from '../core/request';
 export class StaticFileResource {
 
     /**
-     * @returns StaticFileItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemStaticFile({
@@ -34,7 +34,7 @@ export class StaticFileResource {
     }
 
     /**
-     * @returns FileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeStaticFileAncestors({
@@ -55,7 +55,7 @@ export class StaticFileResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeStaticFileChildren({
@@ -82,7 +82,7 @@ export class StaticFileResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeStaticFileRoot({

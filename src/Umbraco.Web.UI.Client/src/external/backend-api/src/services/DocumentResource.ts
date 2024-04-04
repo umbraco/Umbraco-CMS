@@ -36,7 +36,7 @@ import { request as __request } from '../core/request';
 export class DocumentResource {
 
     /**
-     * @returns PagedDocumentCollectionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getCollectionDocumentById({
@@ -106,7 +106,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns DocumentResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentById({
@@ -211,7 +211,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns DomainsResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentByIdDomains({
@@ -315,7 +315,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns DocumentNotificationResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentByIdNotifications({
@@ -526,7 +526,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedIReferenceResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentByIdReferencedBy({
@@ -555,7 +555,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedReferenceByIdModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentByIdReferencedDescendants({
@@ -642,7 +642,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedReferenceByIdModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentAreReferenced({
@@ -669,7 +669,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns DocumentConfigurationResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentConfiguration(): CancelablePromise<DocumentConfigurationResponseModel> {
@@ -731,7 +731,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns DocumentItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemDocument({
@@ -752,7 +752,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedModelDocumentItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemDocumentSearch({
@@ -821,7 +821,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns ReferenceByIdModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getRecycleBinDocumentByIdOriginalParent({
@@ -874,7 +874,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentRecycleBinItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getRecycleBinDocumentChildren({
@@ -901,7 +901,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentRecycleBinItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getRecycleBinDocumentRoot({
@@ -925,7 +925,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns DocumentTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDocumentAncestors({
@@ -946,7 +946,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDocumentChildren({
@@ -976,7 +976,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDocumentRoot({

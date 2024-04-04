@@ -41,7 +41,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns PackageConfigurationResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageConfiguration(): CancelablePromise<PackageConfigurationResponseModel> {
@@ -55,7 +55,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns PagedPackageDefinitionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageCreated({
@@ -102,7 +102,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns PackageDefinitionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageCreatedById({
@@ -174,7 +174,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns binary Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageCreatedByIdDownload({
@@ -196,7 +196,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns PackageManifestResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageManifest(): CancelablePromise<Array<PackageManifestResponseModel>> {
@@ -210,7 +210,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns PackageManifestResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageManifestPublic(): CancelablePromise<Array<PackageManifestResponseModel>> {
@@ -221,7 +221,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns PagedPackageMigrationStatusResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageMigrationStatus({

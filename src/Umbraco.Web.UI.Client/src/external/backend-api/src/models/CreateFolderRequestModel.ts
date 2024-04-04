@@ -8,6 +8,6 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 export type CreateFolderRequestModel = {
     name: string;
     id?: string | null;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
 };
 

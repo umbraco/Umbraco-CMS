@@ -10,7 +10,7 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type MemberTypePropertyTypeResponseModel = {
     id: string;
-    container: ReferenceByIdModel;
+    container?: ReferenceByIdModel | null;
     sortOrder: number;
     alias: string;
     name: string;

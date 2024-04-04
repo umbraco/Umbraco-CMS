@@ -39,7 +39,7 @@ export class DocumentBlueprintResource {
     }
 
     /**
-     * @returns DocumentBlueprintResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentBlueprintById({
@@ -136,7 +136,7 @@ export class DocumentBlueprintResource {
     }
 
     /**
-     * @returns DocumentBlueprintItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemDocumentBlueprint({
@@ -157,7 +157,7 @@ export class DocumentBlueprintResource {
     }
 
     /**
-     * @returns PagedDocumentBlueprintTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDocumentBlueprintRoot({

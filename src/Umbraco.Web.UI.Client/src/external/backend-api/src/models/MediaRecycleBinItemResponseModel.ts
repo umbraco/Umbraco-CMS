@@ -10,7 +10,7 @@ import type { VariantItemResponseModel } from './VariantItemResponseModel';
 export type MediaRecycleBinItemResponseModel = {
     id: string;
     hasChildren: boolean;
-    parent: ItemReferenceByIdResponseModel;
+    parent?: ItemReferenceByIdResponseModel | null;
     mediaType: MediaTypeReferenceResponseModel;
     variants: Array<VariantItemResponseModel>;
 };

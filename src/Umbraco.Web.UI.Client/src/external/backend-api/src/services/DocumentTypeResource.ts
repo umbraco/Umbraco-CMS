@@ -50,7 +50,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns DocumentTypeResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentTypeById({
@@ -123,7 +123,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns PagedAllowedDocumentTypeModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentTypeByIdAllowedChildren({
@@ -153,7 +153,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns DocumentTypeCompositionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentTypeByIdCompositionReferences({
@@ -232,7 +232,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns PagedAllowedDocumentTypeModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentTypeAllowedAtRoot({
@@ -256,7 +256,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns AvailableDocumentTypeCompositionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static postDocumentTypeAvailableCompositions({
@@ -276,7 +276,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns DocumentTypeConfigurationResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentTypeConfiguration(): CancelablePromise<DocumentTypeConfigurationResponseModel> {
@@ -313,7 +313,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns FolderResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentTypeFolderById({
@@ -387,7 +387,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns DocumentTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemDocumentType({
@@ -408,7 +408,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns PagedModelDocumentTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemDocumentTypeSearch({
@@ -435,7 +435,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns DocumentTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDocumentTypeAncestors({
@@ -456,7 +456,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns PagedDocumentTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDocumentTypeChildren({
@@ -486,7 +486,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns PagedDocumentTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDocumentTypeRoot({

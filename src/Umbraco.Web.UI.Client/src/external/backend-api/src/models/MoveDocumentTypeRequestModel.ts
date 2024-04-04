@@ -6,6 +6,6 @@
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type MoveDocumentTypeRequestModel = {
-    target: ReferenceByIdModel;
+    target?: ReferenceByIdModel | null;
 };
 

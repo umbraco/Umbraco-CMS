@@ -7,6 +7,6 @@ import type { FileSystemFolderModel } from './FileSystemFolderModel';
 
 export type CreatePartialViewFolderRequestModel = {
     name: string;
-    parent: FileSystemFolderModel;
+    parent?: FileSystemFolderModel | null;
 };
 

@@ -48,7 +48,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns DataTypeResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDataTypeById({
@@ -198,7 +198,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns DataTypeReferenceResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDataTypeByIdReferences({
@@ -220,7 +220,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns DatatypeConfigurationResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDataTypeConfiguration(): CancelablePromise<DatatypeConfigurationResponseModel> {
@@ -257,7 +257,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns FolderResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDataTypeFolderById({
@@ -331,7 +331,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns PagedDataTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getFilterDataType({
@@ -364,7 +364,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns DataTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemDataType({
@@ -385,7 +385,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns PagedModelDataTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemDataTypeSearch({
@@ -412,7 +412,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns DataTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDataTypeAncestors({
@@ -433,7 +433,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns PagedDataTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDataTypeChildren({
@@ -463,7 +463,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns PagedDataTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDataTypeRoot({

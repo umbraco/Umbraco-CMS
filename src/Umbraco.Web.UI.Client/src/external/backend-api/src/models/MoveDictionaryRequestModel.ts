@@ -6,6 +6,6 @@
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type MoveDictionaryRequestModel = {
-    target: ReferenceByIdModel;
+    target?: ReferenceByIdModel | null;
 };
 

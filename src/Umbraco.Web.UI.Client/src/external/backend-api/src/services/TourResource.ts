@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class TourResource {
 
     /**
-     * @returns UserTourStatusesResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTour(): CancelablePromise<UserTourStatusesResponseModel> {

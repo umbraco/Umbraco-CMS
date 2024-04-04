@@ -12,6 +12,6 @@ export type CreateDataTypeRequestModel = {
     editorUiAlias?: string | null;
     values: Array<DataTypePropertyPresentationModel>;
     id?: string | null;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
 };
 

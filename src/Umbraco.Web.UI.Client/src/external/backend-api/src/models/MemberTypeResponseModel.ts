@@ -16,7 +16,7 @@ export type MemberTypeResponseModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection: ReferenceByIdModel;
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<MemberTypePropertyTypeResponseModel>;
     containers: Array<MemberTypePropertyTypeContainerResponseModel>;

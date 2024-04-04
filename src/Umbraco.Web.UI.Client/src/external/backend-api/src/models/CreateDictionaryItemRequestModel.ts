@@ -10,6 +10,6 @@ export type CreateDictionaryItemRequestModel = {
     name: string;
     translations: Array<DictionaryItemTranslationModel>;
     id?: string | null;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
 };
 

@@ -7,7 +7,7 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type UpdateDocumentTypePropertyTypeContainerRequestModel = {
     id: string;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
     name?: string | null;
     type: string;
     sortOrder: number;

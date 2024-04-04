@@ -10,6 +10,6 @@ export type TemplateResponseModel = {
     alias: string;
     content?: string | null;
     id: string;
-    masterTemplate: ReferenceByIdModel;
+    masterTemplate?: ReferenceByIdModel | null;
 };
 

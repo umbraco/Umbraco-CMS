@@ -8,7 +8,7 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 export type NamedEntityTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
     name: string;
 };
 

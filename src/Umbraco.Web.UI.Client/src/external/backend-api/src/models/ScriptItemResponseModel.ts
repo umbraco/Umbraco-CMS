@@ -8,7 +8,7 @@ import type { FileSystemFolderModel } from './FileSystemFolderModel';
 export type ScriptItemResponseModel = {
     path: string;
     name: string;
-    parent: FileSystemFolderModel;
+    parent?: FileSystemFolderModel | null;
     isFolder: boolean;
 };
 

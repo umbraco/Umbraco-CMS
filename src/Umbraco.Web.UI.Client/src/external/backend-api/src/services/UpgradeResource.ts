@@ -28,7 +28,7 @@ export class UpgradeResource {
     }
 
     /**
-     * @returns UpgradeSettingsResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUpgradeSettings(): CancelablePromise<UpgradeSettingsResponseModel> {

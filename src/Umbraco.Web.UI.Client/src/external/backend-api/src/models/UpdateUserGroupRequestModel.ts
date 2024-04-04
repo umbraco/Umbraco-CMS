@@ -13,9 +13,9 @@ export type UpdateUserGroupRequestModel = {
     sections: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
-    documentStartNode: ReferenceByIdModel;
+    documentStartNode?: ReferenceByIdModel | null;
     documentRootAccess: boolean;
-    mediaStartNode: ReferenceByIdModel;
+    mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;

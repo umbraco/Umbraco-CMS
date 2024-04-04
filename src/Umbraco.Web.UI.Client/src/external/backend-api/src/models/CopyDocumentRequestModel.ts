@@ -6,7 +6,7 @@
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type CopyDocumentRequestModel = {
-    target: ReferenceByIdModel;
+    target?: ReferenceByIdModel | null;
     relateToOriginal: boolean;
     includeDescendants: boolean;
 };

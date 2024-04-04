@@ -17,7 +17,7 @@ export type MediaTypeResponseModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection: ReferenceByIdModel;
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<MediaTypePropertyTypeResponseModel>;
     containers: Array<MediaTypePropertyTypeContainerResponseModel>;

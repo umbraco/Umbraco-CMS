@@ -19,7 +19,7 @@ import { request as __request } from '../core/request';
 export class DictionaryResource {
 
     /**
-     * @returns PagedDictionaryOverviewResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDictionary({
@@ -71,7 +71,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns DictionaryItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDictionaryById({
@@ -146,7 +146,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns binary Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDictionaryByIdExport({
@@ -224,7 +224,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns DictionaryItemItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemDictionary({
@@ -245,7 +245,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns NamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDictionaryAncestors({
@@ -266,7 +266,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDictionaryChildren({
@@ -293,7 +293,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDictionaryRoot({

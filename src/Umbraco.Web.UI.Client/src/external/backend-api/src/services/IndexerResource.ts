@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class IndexerResource {
 
     /**
-     * @returns PagedIndexResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getIndexer({
@@ -36,7 +36,7 @@ export class IndexerResource {
     }
 
     /**
-     * @returns IndexResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getIndexerByIndexName({

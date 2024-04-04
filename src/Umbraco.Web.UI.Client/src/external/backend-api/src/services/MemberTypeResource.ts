@@ -19,7 +19,7 @@ import { request as __request } from '../core/request';
 export class MemberTypeResource {
 
     /**
-     * @returns MemberTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemMemberType({
@@ -40,7 +40,7 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns PagedModelMemberTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemMemberTypeSearch({
@@ -90,7 +90,7 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns MemberTypeResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMemberTypeById({
@@ -163,7 +163,7 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns MemberTypeCompositionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMemberTypeByIdCompositionReferences({
@@ -210,7 +210,7 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns AvailableMemberTypeCompositionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static postMemberTypeAvailableCompositions({
@@ -230,7 +230,7 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMemberTypeRoot({

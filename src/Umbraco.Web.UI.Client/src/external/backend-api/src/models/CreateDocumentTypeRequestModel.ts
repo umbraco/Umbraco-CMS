@@ -18,14 +18,14 @@ export type CreateDocumentTypeRequestModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection: ReferenceByIdModel;
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<CreateDocumentTypePropertyTypeRequestModel>;
     containers: Array<CreateDocumentTypePropertyTypeContainerRequestModel>;
     id?: string | null;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
     allowedTemplates: Array<ReferenceByIdModel>;
-    defaultTemplate: ReferenceByIdModel;
+    defaultTemplate?: ReferenceByIdModel | null;
     cleanup: DocumentTypeCleanupModel;
     allowedDocumentTypes: Array<DocumentTypeSortModel>;
     compositions: Array<DocumentTypeCompositionModel>;

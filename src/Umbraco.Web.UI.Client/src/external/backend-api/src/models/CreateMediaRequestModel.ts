@@ -11,7 +11,7 @@ export type CreateMediaRequestModel = {
     values: Array<MediaValueModel>;
     variants: Array<MediaVariantRequestModel>;
     id?: string | null;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
     mediaType: ReferenceByIdModel;
 };
 

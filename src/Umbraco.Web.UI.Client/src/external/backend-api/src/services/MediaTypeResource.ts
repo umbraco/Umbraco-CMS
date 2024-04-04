@@ -26,7 +26,7 @@ import { request as __request } from '../core/request';
 export class MediaTypeResource {
 
     /**
-     * @returns MediaTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemMediaType({
@@ -47,7 +47,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedModelMediaTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemMediaTypeSearch({
@@ -97,7 +97,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns MediaTypeResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMediaTypeById({
@@ -170,7 +170,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedAllowedMediaTypeModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMediaTypeByIdAllowedChildren({
@@ -200,7 +200,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns MediaTypeCompositionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMediaTypeByIdCompositionReferences({
@@ -279,7 +279,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedAllowedMediaTypeModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMediaTypeAllowedAtRoot({
@@ -303,7 +303,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns AvailableMediaTypeCompositionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static postMediaTypeAvailableCompositions({
@@ -346,7 +346,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns FolderResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMediaTypeFolderById({
@@ -420,7 +420,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns MediaTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMediaTypeAncestors({
@@ -441,7 +441,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedMediaTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMediaTypeChildren({
@@ -471,7 +471,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedMediaTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMediaTypeRoot({

@@ -18,7 +18,7 @@ import { request as __request } from '../core/request';
 export class MemberResource {
 
     /**
-     * @returns PagedMemberResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getFilterMember({
@@ -64,7 +64,7 @@ export class MemberResource {
     }
 
     /**
-     * @returns MemberItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemMember({
@@ -85,7 +85,7 @@ export class MemberResource {
     }
 
     /**
-     * @returns PagedModelMemberItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemMemberSearch({
@@ -135,7 +135,7 @@ export class MemberResource {
     }
 
     /**
-     * @returns MemberResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMemberById({
@@ -237,7 +237,7 @@ export class MemberResource {
     }
 
     /**
-     * @returns MemberConfigurationResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMemberConfiguration(): CancelablePromise<MemberConfigurationResponseModel> {

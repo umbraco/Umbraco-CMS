@@ -8,6 +8,6 @@ import type { FileSystemFolderModel } from './FileSystemFolderModel';
 export type ScriptFolderResponseModel = {
     path: string;
     name: string;
-    parent: FileSystemFolderModel;
+    parent?: FileSystemFolderModel | null;
 };
 

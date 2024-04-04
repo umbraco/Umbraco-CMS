@@ -21,7 +21,7 @@ import { request as __request } from '../core/request';
 export class TemplateResource {
 
     /**
-     * @returns TemplateItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemTemplate({
@@ -42,7 +42,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns PagedModelTemplateItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemTemplateSearch({
@@ -92,7 +92,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns TemplateResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTemplateById({
@@ -166,7 +166,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns TemplateConfigurationResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTemplateConfiguration(): CancelablePromise<TemplateConfigurationResponseModel> {
@@ -180,7 +180,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns TemplateQueryResultResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static postTemplateQueryExecute({
@@ -200,7 +200,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns TemplateQuerySettingsResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTemplateQuerySettings(): CancelablePromise<TemplateQuerySettingsResponseModel> {
@@ -214,7 +214,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns NamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeTemplateAncestors({
@@ -235,7 +235,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeTemplateChildren({
@@ -262,7 +262,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeTemplateRoot({

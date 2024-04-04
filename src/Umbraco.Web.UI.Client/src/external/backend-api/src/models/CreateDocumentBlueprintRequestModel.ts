@@ -11,7 +11,7 @@ export type CreateDocumentBlueprintRequestModel = {
     values: Array<DocumentValueModel>;
     variants: Array<DocumentVariantRequestModel>;
     id?: string | null;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
     documentType: ReferenceByIdModel;
 };
 

@@ -19,7 +19,7 @@ import { request as __request } from '../core/request';
 export class ScriptResource {
 
     /**
-     * @returns ScriptItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemScript({
@@ -63,7 +63,7 @@ export class ScriptResource {
     }
 
     /**
-     * @returns ScriptResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getScriptByPath({
@@ -188,7 +188,7 @@ export class ScriptResource {
     }
 
     /**
-     * @returns ScriptFolderResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getScriptFolderByPath({
@@ -234,7 +234,7 @@ export class ScriptResource {
     }
 
     /**
-     * @returns FileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeScriptAncestors({
@@ -255,7 +255,7 @@ export class ScriptResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeScriptChildren({
@@ -282,7 +282,7 @@ export class ScriptResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeScriptRoot({

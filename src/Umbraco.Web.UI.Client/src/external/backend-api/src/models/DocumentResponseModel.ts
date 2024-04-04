@@ -15,7 +15,7 @@ export type DocumentResponseModel = {
     id: string;
     documentType: DocumentTypeReferenceResponseModel;
     urls: Array<DocumentUrlInfoModel>;
-    template: ReferenceByIdModel;
+    template?: ReferenceByIdModel | null;
     isTrashed: boolean;
 };
 

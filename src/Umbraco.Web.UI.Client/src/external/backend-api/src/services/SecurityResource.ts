@@ -15,7 +15,7 @@ import { request as __request } from '../core/request';
 export class SecurityResource {
 
     /**
-     * @returns SecurityConfigurationResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getSecurityConfiguration(): CancelablePromise<SecurityConfigurationResponseModel> {
@@ -73,7 +73,7 @@ export class SecurityResource {
     }
 
     /**
-     * @returns VerifyResetPasswordResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static postSecurityForgotPasswordVerify({

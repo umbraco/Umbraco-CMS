@@ -9,7 +9,7 @@ export type FileSystemTreeItemPresentationModel = {
     hasChildren: boolean;
     name: string;
     path: string;
-    parent: FileSystemFolderModel;
+    parent?: FileSystemFolderModel | null;
     isFolder: boolean;
 };
 

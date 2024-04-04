@@ -9,7 +9,7 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type MediaTypePropertyTypeResponseModel = {
     id: string;
-    container: ReferenceByIdModel;
+    container?: ReferenceByIdModel | null;
     sortOrder: number;
     alias: string;
     name: string;

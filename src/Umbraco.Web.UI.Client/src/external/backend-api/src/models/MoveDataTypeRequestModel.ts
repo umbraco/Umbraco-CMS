@@ -6,6 +6,6 @@
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type MoveDataTypeRequestModel = {
-    target: ReferenceByIdModel;
+    target?: ReferenceByIdModel | null;
 };
 

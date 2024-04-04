@@ -8,7 +8,7 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 export type DocumentTypeTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
     name: string;
     isFolder: boolean;
     isElement: boolean;

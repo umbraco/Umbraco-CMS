@@ -37,7 +37,7 @@ export class TemporaryFileResource {
     }
 
     /**
-     * @returns TemporaryFileResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTemporaryFileById({
@@ -84,7 +84,7 @@ export class TemporaryFileResource {
     }
 
     /**
-     * @returns TemporaryFileConfigurationResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTemporaryFileConfiguration(): CancelablePromise<TemporaryFileConfigurationResponseModel> {

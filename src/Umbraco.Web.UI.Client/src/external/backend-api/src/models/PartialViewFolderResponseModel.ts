@@ -8,6 +8,6 @@ import type { FileSystemFolderModel } from './FileSystemFolderModel';
 export type PartialViewFolderResponseModel = {
     path: string;
     name: string;
-    parent: FileSystemFolderModel;
+    parent?: FileSystemFolderModel | null;
 };
 

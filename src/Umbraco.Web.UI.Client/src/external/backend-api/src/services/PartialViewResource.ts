@@ -21,7 +21,7 @@ import { request as __request } from '../core/request';
 export class PartialViewResource {
 
     /**
-     * @returns PartialViewItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemPartialView({
@@ -65,7 +65,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns PartialViewResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPartialViewByPath({
@@ -190,7 +190,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns PartialViewFolderResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPartialViewFolderByPath({
@@ -236,7 +236,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns PagedPartialViewSnippetItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPartialViewSnippet({
@@ -260,7 +260,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns PartialViewSnippetResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPartialViewSnippetById({
@@ -282,7 +282,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns FileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreePartialViewAncestors({
@@ -303,7 +303,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreePartialViewChildren({
@@ -330,7 +330,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreePartialViewRoot({

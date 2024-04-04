@@ -4,6 +4,7 @@
 /* eslint-disable */
 
 export type UnknownTypePermissionPresentationModel = {
+    $type: string;
     verbs: Array<string>;
     context: string;
 };

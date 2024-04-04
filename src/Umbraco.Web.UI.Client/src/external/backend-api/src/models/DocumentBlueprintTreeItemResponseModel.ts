@@ -9,7 +9,7 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 export type DocumentBlueprintTreeItemResponseModel = {
     hasChildren: boolean;
     id: string;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
     name: string;
     documentType: DocumentTypeReferenceResponseModel;
 };

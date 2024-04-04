@@ -15,7 +15,7 @@ import { request as __request } from '../core/request';
 export class WebhookResource {
 
     /**
-     * @returns PagedWebhookResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getWebhook({
@@ -62,7 +62,7 @@ export class WebhookResource {
     }
 
     /**
-     * @returns WebhookResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getWebhookById({
@@ -136,7 +136,7 @@ export class WebhookResource {
     }
 
     /**
-     * @returns WebhookItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getWebhookItem({

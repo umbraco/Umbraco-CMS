@@ -8,10 +8,10 @@ import type { TemplateQueryExecuteFilterPresentationModel } from './TemplateQuer
 import type { TemplateQueryExecuteSortModel } from './TemplateQueryExecuteSortModel';
 
 export type TemplateQueryExecuteModel = {
-    rootDocument: ReferenceByIdModel;
+    rootDocument?: ReferenceByIdModel | null;
     documentTypeAlias?: string | null;
     filters?: Array<TemplateQueryExecuteFilterPresentationModel> | null;
-    sort: TemplateQueryExecuteSortModel;
+    sort?: TemplateQueryExecuteSortModel | null;
     take: number;
 };
 

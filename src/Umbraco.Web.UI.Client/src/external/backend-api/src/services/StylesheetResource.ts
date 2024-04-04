@@ -19,7 +19,7 @@ import { request as __request } from '../core/request';
 export class StylesheetResource {
 
     /**
-     * @returns StylesheetItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemStylesheet({
@@ -63,7 +63,7 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns StylesheetResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getStylesheetByPath({
@@ -188,7 +188,7 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns StylesheetFolderResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getStylesheetFolderByPath({
@@ -234,7 +234,7 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns FileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeStylesheetAncestors({
@@ -255,7 +255,7 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeStylesheetChildren({
@@ -282,7 +282,7 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeStylesheetRoot({

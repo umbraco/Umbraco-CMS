@@ -17,7 +17,7 @@ export type UpdateMediaTypeRequestModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection: ReferenceByIdModel;
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<UpdateMediaTypePropertyTypeRequestModel>;
     containers: Array<UpdateMediaTypePropertyTypeContainerRequestModel>;

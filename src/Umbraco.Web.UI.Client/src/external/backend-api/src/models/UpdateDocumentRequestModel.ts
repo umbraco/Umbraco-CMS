@@ -10,6 +10,6 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 export type UpdateDocumentRequestModel = {
     values: Array<DocumentValueModel>;
     variants: Array<DocumentVariantRequestModel>;
-    template: ReferenceByIdModel;
+    template?: ReferenceByIdModel | null;
 };
 

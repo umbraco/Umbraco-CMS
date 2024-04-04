@@ -9,6 +9,6 @@ export type CreateDocumentBlueprintFromDocumentRequestModel = {
     document: ReferenceByIdModel;
     id?: string | null;
     name: string;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
 };
 

@@ -7,7 +7,7 @@ import type { FileSystemFolderModel } from './FileSystemFolderModel';
 
 export type CreateStylesheetRequestModel = {
     name: string;
-    parent: FileSystemFolderModel;
+    parent?: FileSystemFolderModel | null;
     content: string;
 };
 

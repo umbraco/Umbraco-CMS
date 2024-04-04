@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class DocumentVersionResource {
 
     /**
-     * @returns PagedDocumentVersionItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentVersion({
@@ -44,7 +44,7 @@ export class DocumentVersionResource {
     }
 
     /**
-     * @returns DocumentVersionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentVersionById({

@@ -8,6 +8,6 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 export type DocumentTypeReferenceResponseModel = {
     id: string;
     icon: string;
-    collection: ReferenceByIdModel;
+    collection?: ReferenceByIdModel | null;
 };
 

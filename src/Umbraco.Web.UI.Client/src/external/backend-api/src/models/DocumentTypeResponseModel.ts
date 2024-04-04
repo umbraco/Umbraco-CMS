@@ -18,13 +18,13 @@ export type DocumentTypeResponseModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection: ReferenceByIdModel;
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<DocumentTypePropertyTypeResponseModel>;
     containers: Array<DocumentTypePropertyTypeContainerResponseModel>;
     id: string;
     allowedTemplates: Array<ReferenceByIdModel>;
-    defaultTemplate: ReferenceByIdModel;
+    defaultTemplate?: ReferenceByIdModel | null;
     cleanup: DocumentTypeCleanupModel;
     allowedDocumentTypes: Array<DocumentTypeSortModel>;
     compositions: Array<DocumentTypeCompositionModel>;

@@ -10,7 +10,7 @@ import type { ItemReferenceByIdResponseModel } from './ItemReferenceByIdResponse
 export type DocumentRecycleBinItemResponseModel = {
     id: string;
     hasChildren: boolean;
-    parent: ItemReferenceByIdResponseModel;
+    parent?: ItemReferenceByIdResponseModel | null;
     documentType: DocumentTypeReferenceResponseModel;
     variants: Array<DocumentVariantItemResponseModel>;
 };

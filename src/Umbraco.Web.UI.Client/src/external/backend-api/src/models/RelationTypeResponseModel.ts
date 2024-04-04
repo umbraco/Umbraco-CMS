@@ -11,7 +11,7 @@ export type RelationTypeResponseModel = {
     isDependency: boolean;
     id: string;
     alias?: string | null;
-    parentObject: ObjectTypeResponseModel;
-    childObject: ObjectTypeResponseModel;
+    parentObject?: ObjectTypeResponseModel | null;
+    childObject?: ObjectTypeResponseModel | null;
 };
 

@@ -16,7 +16,7 @@ export type UpdateMemberTypeRequestModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
-    collection: ReferenceByIdModel;
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<UpdateMemberTypePropertyTypeRequestModel>;
     containers: Array<UpdateMemberTypePropertyTypeContainerRequestModel>;

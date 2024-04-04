@@ -21,9 +21,9 @@ export type CreateMediaTypeRequestModel = {
     properties: Array<CreateMediaTypePropertyTypeRequestModel>;
     containers: Array<CreateMediaTypePropertyTypeContainerRequestModel>;
     id?: string | null;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
     allowedMediaTypes: Array<MediaTypeSortModel>;
     compositions: Array<MediaTypeCompositionModel>;
-    collection: ReferenceByIdModel;
+    collection?: ReferenceByIdModel | null;
 };
 

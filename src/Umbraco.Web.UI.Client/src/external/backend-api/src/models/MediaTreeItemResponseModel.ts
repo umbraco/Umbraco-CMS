@@ -9,7 +9,7 @@ import type { VariantItemResponseModel } from './VariantItemResponseModel';
 
 export type MediaTreeItemResponseModel = {
     hasChildren: boolean;
-    parent: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
     noAccess: boolean;
     isTrashed: boolean;
     id: string;

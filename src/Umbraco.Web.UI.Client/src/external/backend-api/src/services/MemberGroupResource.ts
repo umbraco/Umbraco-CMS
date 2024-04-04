@@ -16,7 +16,7 @@ import { request as __request } from '../core/request';
 export class MemberGroupResource {
 
     /**
-     * @returns MemberGroupItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemMemberGroup({
@@ -37,7 +37,7 @@ export class MemberGroupResource {
     }
 
     /**
-     * @returns PagedMemberGroupResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMemberGroup({
@@ -61,7 +61,7 @@ export class MemberGroupResource {
     }
 
     /**
-     * @returns MemberGroupResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static postMemberGroup({
@@ -82,7 +82,7 @@ export class MemberGroupResource {
     }
 
     /**
-     * @returns MemberGroupResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMemberGroupById({
@@ -128,7 +128,7 @@ export class MemberGroupResource {
     }
 
     /**
-     * @returns MemberGroupResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static putMemberGroupById({
@@ -155,7 +155,7 @@ export class MemberGroupResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMemberGroupRoot({

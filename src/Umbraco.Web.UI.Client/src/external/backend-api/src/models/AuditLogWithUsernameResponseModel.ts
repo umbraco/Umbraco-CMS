@@ -9,7 +9,7 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type AuditLogWithUsernameResponseModel = {
     user: ReferenceByIdModel;
-    entity: AuditLogEntityModel;
+    entity?: AuditLogEntityModel | null;
     timestamp: string;
     logType: AuditTypeModel;
     comment?: string | null;
