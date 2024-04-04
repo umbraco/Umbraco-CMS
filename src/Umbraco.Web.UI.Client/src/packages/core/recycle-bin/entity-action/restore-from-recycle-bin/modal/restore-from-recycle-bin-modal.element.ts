@@ -22,9 +22,6 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 	_isAutomaticRestore = false;
 
 	@state()
-	_customSelectDestination = false;
-
-	@state()
 	_destinationItem?: any;
 
 	#recycleBinRepository?: UmbRecycleBinRepository;
@@ -32,11 +29,18 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
 		super.firstUpdated(_changedProperties);
 
-		const restoreDestinationUnique = await this.#requestRestoreDestination();
+		const unique = await this.#requestAutomaticRestoreDestination();
 
+		if (unique !== undefined) {
+			this._isAutomaticRestore = true;
+			this.something(unique);
+		}
+	}
+
+	async something(unique: string | null) {
 		// TODO: handle ROOT lookup. Currently, we can't look up the root in the item repository.
 		// This is a temp solution to show something in the UI.
-		if (restoreDestinationUnique === null) {
+		if (unique === null) {
 			this._destinationItem = {
 				name: 'ROOT',
 			};
@@ -45,24 +49,20 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 				unique: null,
 				entityType: 'unknown',
 			});
-
-			this._isAutomaticRestore = true;
 		}
 
-		if (restoreDestinationUnique) {
-			this._destinationItem = await this.#requestDestinationItem(restoreDestinationUnique);
+		if (unique) {
+			this._destinationItem = await this.#requestItem(unique);
 			if (!this._destinationItem) throw new Error('Cant find destination item.');
 
 			this.#setDestinationValue({
 				unique: this._destinationItem.unique,
 				entityType: this._destinationItem.entityType,
 			});
-
-			this._isAutomaticRestore = true;
 		}
 	}
 
-	async #requestRestoreDestination(): Promise<string | null | undefined> {
+	async #requestAutomaticRestoreDestination(): Promise<string | null | undefined> {
 		if (!this.data?.unique) throw new Error('Cannot restore an item without a unique identifier.');
 		if (!this.data?.recycleBinRepositoryAlias)
 			throw new Error('Cannot restore an item without a recycle bin repository alias.');
@@ -95,23 +95,12 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		const { selection } = await modal.onSubmit();
 
 		if (selection.length > 0) {
-			const destinationUnique = selection[0];
-			this._destinationItem = await this.#requestDestinationItem(destinationUnique);
-			if (!this._destinationItem) throw new Error('Cant find destination item.');
-
-			this.#setDestinationValue({
-				unique: this._destinationItem.unique,
-				entityType: this._destinationItem.entityType,
-			});
+			const unique = selection[0];
+			this.something(unique);
 		}
 	}
 
-	async #requestDestinationItem(unique: string | null) {
-		if (unique === null) {
-			console.log('ROOT IS SELECTED, HANDLE THIS CASE');
-			return;
-		}
-
+	async #requestItem(unique: string) {
 		if (!this.data?.itemRepositoryAlias) throw new Error('Cannot restore an item without an item repository alias.');
 
 		const itemRepository = await createExtensionApiByAlias<UmbItemRepository<any>>(this, this.data.itemRepositoryAlias);
@@ -156,7 +145,7 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 		return html`
 			<h4>Cannot automatically restore this item.</h4>
 			<p>There is no location where this item can be automatically restored. You can select a new location below.</p>
-
+			<h5>Restore to:</h5>
 			${this._destinationItem
 				? html`<uui-ref-node name=${this._destinationItem.name}>
 						<uui-action-bar slot="actions">
