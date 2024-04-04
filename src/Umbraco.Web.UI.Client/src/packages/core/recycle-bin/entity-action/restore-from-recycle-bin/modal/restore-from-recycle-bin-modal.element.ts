@@ -4,11 +4,10 @@ import type {
 	UmbRestoreFromRecycleBinModalValue,
 } from './restore-from-recycle-bin-modal.token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, customElement, state, nothing, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_DOCUMENT_PICKER_MODAL } from '@umbraco-cms/backoffice/document';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 const elementName = 'umb-restore-from-recycle-bin-modal';
@@ -99,8 +98,10 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 	}
 
 	async #onSelectCustomDestination() {
+		if (!this.data?.pickerModal) throw new Error('Cannot select a destination without a picker modal.');
+
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this, UMB_DOCUMENT_PICKER_MODAL, {
+		const modal = modalManager.open(this, this.data.pickerModal, {
 			data: {
 				multiple: false,
 			},
