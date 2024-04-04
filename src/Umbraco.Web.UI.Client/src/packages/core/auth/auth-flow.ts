@@ -187,15 +187,23 @@ export class UmbAuthFlow {
 	}
 
 	/**
-	 * This method will make an authorization request to the server.
+	 * Make an authorization request to the server using the specified identity provider.
+	 * This method will redirect the user to the authorization endpoint of the server.
 	 *
-	 * @param username The username to use for the authorization request. It will be provided to the OpenID server as a hint.
+	 * @param identityProvider The identity provider to use for the authorization request.
+	 * @param usernameHint (Optional) The username to use for the authorization request. It will be provided to the OpenID server as a hint.
 	 */
-	makeAuthorizationRequest(username?: string): void {
+	makeAuthorizationRequest(identityProvider: string, usernameHint?: string): void {
 		const extras: StringMap = { prompt: 'consent', access_type: 'offline' };
 
-		if (username) {
-			extras['login_hint'] = username;
+		// If the identity provider is not 'Umbraco', we will add it to the extras.
+		if (identityProvider !== 'Umbraco') {
+			extras['identity_provider'] = identityProvider;
+		}
+
+		// If there is a username hint, we will add it to the extras.
+		if (usernameHint) {
+			extras['login_hint'] = usernameHint;
 		}
 
 		// create a request

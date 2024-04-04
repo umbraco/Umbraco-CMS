@@ -26,9 +26,11 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 
 	/**
 	 * Initiates the login flow.
+	 * @param identityProvider The provider to use for login. Default is 'Umbraco'.
+	 * @param usernameHint The username hint to use for login.
 	 */
-	makeAuthorizationRequest() {
-		return this.#authFlow.makeAuthorizationRequest();
+	makeAuthorizationRequest(identityProvider = 'Umbraco', usernameHint?: string) {
+		return this.#authFlow.makeAuthorizationRequest(identityProvider, usernameHint);
 	}
 
 	/**
