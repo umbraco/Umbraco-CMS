@@ -48,13 +48,9 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 		this.router = args.router ?? null;
 		this.alias = modalAlias;
 
-		console.log('this.alias', this.alias);
-
 		if (this.alias instanceof UmbModalToken) {
 			this.type = this.alias.getDefaultModal()?.type || this.type;
 			this.size = this.alias.getDefaultModal()?.size || this.size;
-			console.log('this.alias', this.alias);
-			console.log('this.alias.getDefaultData()', this.alias.getDefaultData());
 		}
 
 		this.type = args.modal?.type || this.type;
