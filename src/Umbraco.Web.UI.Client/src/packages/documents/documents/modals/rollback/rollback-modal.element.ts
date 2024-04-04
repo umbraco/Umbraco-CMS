@@ -48,6 +48,13 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 	#propertyDatasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
+	#localizeDateOptions: Intl.DateTimeFormatOptions = {
+		day: 'numeric',
+		month: 'long',
+		hour: 'numeric',
+		minute: '2-digit',
+	};
+
 	constructor() {
 		super();
 
@@ -171,7 +178,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 						class="rollback-item ${this.currentVersion?.id === item.id ? 'active' : ''}">
 						<div>
 							<p class="rollback-item-date">
-								<umb-localize-date date="${item.date}"></umb-localize-date>
+								<umb-localize-date date="${item.date}" .options=${this.#localizeDateOptions}></umb-localize-date>
 							</p>
 							<p>${item.user}</p>
 							<p>${item.isCurrentlyPublishedVersion ? 'Current published version' : ''}</p>
@@ -205,7 +212,9 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	}
 
 	get currentVersionHeader() {
-		return this.localize.date(this.currentVersion?.date || '') + ' - ' + this.currentVersion?.user;
+		return (
+			this.localize.date(this.currentVersion?.date || '', this.#localizeDateOptions) + ' - ' + this.currentVersion?.user
+		);
 	}
 
 	render() {
@@ -255,7 +264,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				margin: 0;
 				opacity: 0.5;
 			}
-			.rollback-item-date {
+			p.rollback-item-date {
 				opacity: 1;
 			}
 			.rollback-item uui-button {
