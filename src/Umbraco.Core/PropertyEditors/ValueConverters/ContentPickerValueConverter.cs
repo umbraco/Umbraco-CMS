@@ -1,11 +1,9 @@
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -20,14 +18,6 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
 
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IApiContentBuilder _apiContentBuilder;
-
-    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
-    public ContentPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
-        : this(
-            publishedSnapshotAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IApiContentBuilder>())
-    {
-    }
 
     public ContentPickerValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
