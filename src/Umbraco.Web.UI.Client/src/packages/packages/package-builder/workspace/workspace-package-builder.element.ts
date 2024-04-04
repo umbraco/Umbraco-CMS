@@ -1,6 +1,7 @@
 import { UmbDictionaryPickerContext } from '../../../dictionary/components/input-dictionary/input-dictionary.context.js';
 import { UmbMediaPickerContext } from '../../../media/media/components/input-media/input-media.context.js';
 import { UmbPackageRepository } from '../../package/repository/index.js';
+import { UmbStylesheetPickerContext } from '../../../templating/stylesheets/components/stylesheet-input/stylesheet-input.context.js';
 import { UmbTemplatePickerContext } from '../../../templating/templates/components/input-template/input-template.context.js';
 import type { UmbCreatedPackageDefinition } from '../../types.js';
 import type { UmbDataTypeInputElement } from '../../../data-type/components/data-type-input/data-type-input.element.js';
@@ -185,10 +186,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				${this.#renderDictionarySection()}
 				${this.#renderDataTypeSection()}
 				${this.#renderTemplateSection()}
-
-			<umb-property-layout label="Stylesheets" description="">
 				${this.#renderStylesheetsSection()}
-			</umb-property-layout>
 
 			<umb-property-layout label="Scripts" description=""> ${this.#renderScriptsSection()} </umb-property-layout>
 
@@ -370,10 +368,29 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		`;
 	}
 
+	#onStylesheetsChange(event: { target: UmbInputEntityElement }) {
+		if (!this._package) return;
+
+		this._package.stylesheets =
+			event.target.selection?.map((path) => this.#serverFilePathUniqueSerializer.toServerPath(path) as string) ?? [];
+		this.requestUpdate('_package');
+	}
+
 	#renderStylesheetsSection() {
-		return html`<div slot="editor">
-			<umb-input-checkbox-list></umb-input-checkbox-list>
-		</div>`;
+		if (!this._package) return nothing;
+		return html`
+			<umb-property-layout label="Stylesheets">
+				<div slot="editor">
+					<umb-input-entity
+						.getIcon=${() => 'icon-brush-alt'}
+						.pickerContext=${UmbStylesheetPickerContext}
+						.selection=${this._package.stylesheets.map((path) => this.#serverFilePathUniqueSerializer.toUnique(path)) ??
+						[]}
+						@change=${this.#onStylesheetsChange}>
+					</umb-input-entity>
+				</div>
+			</umb-property-layout>
+		`;
 	}
 
 	#renderScriptsSection() {
