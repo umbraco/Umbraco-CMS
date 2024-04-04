@@ -3,13 +3,18 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTreeItemResponseModel } from './ContentTreeItemResponseModel';
 import type { DocumentTypeReferenceResponseModel } from './DocumentTypeReferenceResponseModel';
 import type { DocumentVariantItemResponseModel } from './DocumentVariantItemResponseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type DocumentTreeItemResponseModel = (ContentTreeItemResponseModel & {
+export type DocumentTreeItemResponseModel = {
+    hasChildren: boolean;
+    parent: ReferenceByIdModel;
+    noAccess: boolean;
+    isTrashed: boolean;
+    id: string;
     isProtected: boolean;
     documentType: DocumentTypeReferenceResponseModel;
     variants: Array<DocumentVariantItemResponseModel>;
-});
+};
 

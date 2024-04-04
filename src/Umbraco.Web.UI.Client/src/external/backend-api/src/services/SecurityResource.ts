@@ -5,6 +5,7 @@
 import type { ResetPasswordRequestModel } from '../models/ResetPasswordRequestModel';
 import type { ResetPasswordTokenRequestModel } from '../models/ResetPasswordTokenRequestModel';
 import type { SecurityConfigurationResponseModel } from '../models/SecurityConfigurationResponseModel';
+import type { VerifyResetPasswordResponseModel } from '../models/VerifyResetPasswordResponseModel';
 import type { VerifyResetPasswordTokenRequestModel } from '../models/VerifyResetPasswordTokenRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -14,7 +15,7 @@ import { request as __request } from '../core/request';
 export class SecurityResource {
 
     /**
-     * @returns any Success
+     * @returns SecurityConfigurationResponseModel Success
      * @throws ApiError
      */
     public static getSecurityConfiguration(): CancelablePromise<SecurityConfigurationResponseModel> {
@@ -72,14 +73,14 @@ export class SecurityResource {
     }
 
     /**
-     * @returns void
+     * @returns VerifyResetPasswordResponseModel Success
      * @throws ApiError
      */
     public static postSecurityForgotPasswordVerify({
         requestBody,
     }: {
-        requestBody?: (VerifyResetPasswordTokenRequestModel | ResetPasswordTokenRequestModel),
-    }): CancelablePromise<void> {
+        requestBody?: VerifyResetPasswordTokenRequestModel,
+    }): CancelablePromise<VerifyResetPasswordResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/security/forgot-password/verify',

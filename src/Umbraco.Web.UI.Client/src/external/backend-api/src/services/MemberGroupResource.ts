@@ -16,7 +16,7 @@ import { request as __request } from '../core/request';
 export class MemberGroupResource {
 
     /**
-     * @returns any Success
+     * @returns MemberGroupItemResponseModel Success
      * @throws ApiError
      */
     public static getItemMemberGroup({
@@ -61,7 +61,7 @@ export class MemberGroupResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MemberGroupResponseModel Success
      * @throws ApiError
      */
     public static postMemberGroup({
@@ -82,7 +82,7 @@ export class MemberGroupResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MemberGroupResponseModel Success
      * @throws ApiError
      */
     public static getMemberGroupById({
@@ -128,7 +128,7 @@ export class MemberGroupResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MemberGroupResponseModel Success
      * @throws ApiError
      */
     public static putMemberGroupById({

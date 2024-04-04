@@ -43,7 +43,7 @@ export class LogViewerResource {
     }
 
     /**
-     * @returns any Success
+     * @returns LogLevelCountsReponseModel Success
      * @throws ApiError
      */
     public static getLogViewerLevelCount({
@@ -184,7 +184,7 @@ export class LogViewerResource {
     }
 
     /**
-     * @returns any Success
+     * @returns SavedLogSearchResponseModel Success
      * @throws ApiError
      */
     public static getLogViewerSavedSearchByName({

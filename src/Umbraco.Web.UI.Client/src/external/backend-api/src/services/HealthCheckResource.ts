@@ -39,7 +39,7 @@ export class HealthCheckResource {
     }
 
     /**
-     * @returns any Success
+     * @returns HealthCheckGroupPresentationModel Success
      * @throws ApiError
      */
     public static getHealthCheckGroupByName({
@@ -61,7 +61,7 @@ export class HealthCheckResource {
     }
 
     /**
-     * @returns any Success
+     * @returns HealthCheckGroupWithResultResponseModel Success
      * @throws ApiError
      */
     public static postHealthCheckGroupByNameCheck({
@@ -83,7 +83,7 @@ export class HealthCheckResource {
     }
 
     /**
-     * @returns any Success
+     * @returns HealthCheckResultResponseModel Success
      * @throws ApiError
      */
     public static postHealthCheckExecuteAction({

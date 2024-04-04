@@ -3,7 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { PropertyTypeContainerModelBaseModel } from './PropertyTypeContainerModelBaseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type UpdateMemberTypePropertyTypeContainerRequestModel = PropertyTypeContainerModelBaseModel;
+export type UpdateMemberTypePropertyTypeContainerRequestModel = {
+    id: string;
+    parent: ReferenceByIdModel;
+    name?: string | null;
+    type: string;
+    sortOrder: number;
+};
 

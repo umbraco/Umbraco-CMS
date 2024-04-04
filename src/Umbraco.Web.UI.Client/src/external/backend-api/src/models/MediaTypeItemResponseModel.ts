@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
-
-export type MediaTypeItemResponseModel = (NamedItemResponseModelBaseModel & {
+export type MediaTypeItemResponseModel = {
+    id: string;
+    name: string;
     icon?: string | null;
-});
+};
 

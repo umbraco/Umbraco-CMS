@@ -14,7 +14,7 @@ import { request as __request } from '../core/request';
 export class ServerResource {
 
     /**
-     * @returns any Success
+     * @returns ServerConfigurationResponseModel Success
      * @throws ApiError
      */
     public static getServerConfiguration(): CancelablePromise<ServerConfigurationResponseModel> {
@@ -28,7 +28,7 @@ export class ServerResource {
     }
 
     /**
-     * @returns any Success
+     * @returns ServerInformationResponseModel Success
      * @throws ApiError
      */
     public static getServerInformation(): CancelablePromise<ServerInformationResponseModel> {
@@ -42,7 +42,7 @@ export class ServerResource {
     }
 
     /**
-     * @returns any Success
+     * @returns ServerStatusResponseModel Success
      * @throws ApiError
      */
     public static getServerStatus(): CancelablePromise<ServerStatusResponseModel> {
@@ -56,7 +56,7 @@ export class ServerResource {
     }
 
     /**
-     * @returns any Success
+     * @returns ServerTroubleshootingResponseModel Success
      * @throws ApiError
      */
     public static getServerTroubleshooting(): CancelablePromise<ServerTroubleshootingResponseModel> {

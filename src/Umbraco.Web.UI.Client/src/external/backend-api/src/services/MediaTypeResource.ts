@@ -26,7 +26,7 @@ import { request as __request } from '../core/request';
 export class MediaTypeResource {
 
     /**
-     * @returns any Success
+     * @returns MediaTypeItemResponseModel Success
      * @throws ApiError
      */
     public static getItemMediaType({
@@ -97,7 +97,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MediaTypeResponseModel Success
      * @throws ApiError
      */
     public static getMediaTypeById({
@@ -200,7 +200,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MediaTypeCompositionResponseModel Success
      * @throws ApiError
      */
     public static getMediaTypeByIdCompositionReferences({
@@ -303,7 +303,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns AvailableMediaTypeCompositionResponseModel Success
      * @throws ApiError
      */
     public static postMediaTypeAvailableCompositions({
@@ -346,7 +346,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns FolderResponseModel Success
      * @throws ApiError
      */
     public static getMediaTypeFolderById({
@@ -420,7 +420,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MediaTypeTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeMediaTypeAncestors({

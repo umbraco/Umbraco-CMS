@@ -67,7 +67,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MediaItemResponseModel Success
      * @throws ApiError
      */
     public static getItemMedia({
@@ -139,7 +139,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MediaResponseModel Success
      * @throws ApiError
      */
     public static getMediaById({
@@ -383,7 +383,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MediaConfigurationResponseModel Success
      * @throws ApiError
      */
     public static getMediaConfiguration(): CancelablePromise<MediaConfigurationResponseModel> {
@@ -487,7 +487,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns any Success
+     * @returns ReferenceByIdModel Success
      * @throws ApiError
      */
     public static getRecycleBinMediaByIdOriginalParent({
@@ -591,7 +591,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MediaTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeMediaAncestors({

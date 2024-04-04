@@ -19,7 +19,7 @@ import { request as __request } from '../core/request';
 export class MemberTypeResource {
 
     /**
-     * @returns any Success
+     * @returns MemberTypeItemResponseModel Success
      * @throws ApiError
      */
     public static getItemMemberType({
@@ -90,7 +90,7 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MemberTypeResponseModel Success
      * @throws ApiError
      */
     public static getMemberTypeById({
@@ -163,7 +163,7 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MemberTypeCompositionResponseModel Success
      * @throws ApiError
      */
     public static getMemberTypeByIdCompositionReferences({
@@ -210,7 +210,7 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns AvailableMemberTypeCompositionResponseModel Success
      * @throws ApiError
      */
     public static postMemberTypeAvailableCompositions({

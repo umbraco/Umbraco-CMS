@@ -62,7 +62,7 @@ export class WebhookResource {
     }
 
     /**
-     * @returns any Success
+     * @returns WebhookResponseModel Success
      * @throws ApiError
      */
     public static getWebhookById({
@@ -136,7 +136,7 @@ export class WebhookResource {
     }
 
     /**
-     * @returns any Success
+     * @returns WebhookItemResponseModel Success
      * @throws ApiError
      */
     public static getWebhookItem({

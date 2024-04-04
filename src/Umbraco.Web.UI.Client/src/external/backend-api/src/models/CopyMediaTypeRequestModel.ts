@@ -6,6 +6,6 @@
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type CopyMediaTypeRequestModel = {
-    target?: ReferenceByIdModel | null;
+    target: ReferenceByIdModel;
 };
 

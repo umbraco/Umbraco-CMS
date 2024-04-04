@@ -3,10 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
-
-export type DocumentTypeItemResponseModel = (NamedItemResponseModelBaseModel & {
+export type DocumentTypeItemResponseModel = {
+    id: string;
+    name: string;
     isElement: boolean;
     icon?: string | null;
-});
+};
 

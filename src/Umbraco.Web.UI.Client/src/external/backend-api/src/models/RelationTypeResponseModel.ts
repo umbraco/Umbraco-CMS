@@ -4,12 +4,14 @@
 /* eslint-disable */
 
 import type { ObjectTypeResponseModel } from './ObjectTypeResponseModel';
-import type { RelationTypeBaseModel } from './RelationTypeBaseModel';
 
-export type RelationTypeResponseModel = (RelationTypeBaseModel & {
+export type RelationTypeResponseModel = {
+    name: string;
+    isBidirectional: boolean;
+    isDependency: boolean;
     id: string;
     alias?: string | null;
-    parentObject?: ObjectTypeResponseModel | null;
-    childObject?: ObjectTypeResponseModel | null;
-});
+    parentObject: ObjectTypeResponseModel;
+    childObject: ObjectTypeResponseModel;
+};
 

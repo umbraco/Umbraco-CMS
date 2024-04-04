@@ -41,7 +41,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns any Success
+     * @returns PackageConfigurationResponseModel Success
      * @throws ApiError
      */
     public static getPackageConfiguration(): CancelablePromise<PackageConfigurationResponseModel> {
@@ -102,7 +102,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns any Success
+     * @returns PackageDefinitionResponseModel Success
      * @throws ApiError
      */
     public static getPackageCreatedById({
@@ -196,7 +196,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns any Success
+     * @returns PackageManifestResponseModel Success
      * @throws ApiError
      */
     public static getPackageManifest(): CancelablePromise<Array<PackageManifestResponseModel>> {
@@ -210,7 +210,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns any Success
+     * @returns PackageManifestResponseModel Success
      * @throws ApiError
      */
     public static getPackageManifestPublic(): CancelablePromise<Array<PackageManifestResponseModel>> {

@@ -7,6 +7,6 @@ import type { ScheduleRequestModel } from './ScheduleRequestModel';
 
 export type CultureAndScheduleRequestModel = {
     culture?: string | null;
-    schedule?: ScheduleRequestModel | null;
+    schedule: ScheduleRequestModel;
 };
 

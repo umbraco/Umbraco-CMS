@@ -44,7 +44,7 @@ export class DocumentVersionResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentVersionResponseModel Success
      * @throws ApiError
      */
     public static getDocumentVersionById({

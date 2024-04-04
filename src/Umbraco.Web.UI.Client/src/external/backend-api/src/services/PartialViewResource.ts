@@ -21,7 +21,7 @@ import { request as __request } from '../core/request';
 export class PartialViewResource {
 
     /**
-     * @returns any Success
+     * @returns PartialViewItemResponseModel Success
      * @throws ApiError
      */
     public static getItemPartialView({
@@ -65,7 +65,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns any Success
+     * @returns PartialViewResponseModel Success
      * @throws ApiError
      */
     public static getPartialViewByPath({
@@ -190,7 +190,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns any Success
+     * @returns PartialViewFolderResponseModel Success
      * @throws ApiError
      */
     public static getPartialViewFolderByPath({
@@ -260,7 +260,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns any Success
+     * @returns PartialViewSnippetResponseModel Success
      * @throws ApiError
      */
     public static getPartialViewSnippetById({
@@ -282,7 +282,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns any Success
+     * @returns FileSystemTreeItemPresentationModel Success
      * @throws ApiError
      */
     public static getTreePartialViewAncestors({

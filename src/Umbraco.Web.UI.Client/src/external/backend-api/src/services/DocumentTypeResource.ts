@@ -50,7 +50,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentTypeResponseModel Success
      * @throws ApiError
      */
     public static getDocumentTypeById({
@@ -153,7 +153,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentTypeCompositionResponseModel Success
      * @throws ApiError
      */
     public static getDocumentTypeByIdCompositionReferences({
@@ -256,7 +256,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns AvailableDocumentTypeCompositionResponseModel Success
      * @throws ApiError
      */
     public static postDocumentTypeAvailableCompositions({
@@ -276,7 +276,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentTypeConfigurationResponseModel Success
      * @throws ApiError
      */
     public static getDocumentTypeConfiguration(): CancelablePromise<DocumentTypeConfigurationResponseModel> {
@@ -313,7 +313,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns FolderResponseModel Success
      * @throws ApiError
      */
     public static getDocumentTypeFolderById({
@@ -387,7 +387,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentTypeItemResponseModel Success
      * @throws ApiError
      */
     public static getItemDocumentType({
@@ -435,7 +435,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentTypeTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeDocumentTypeAncestors({

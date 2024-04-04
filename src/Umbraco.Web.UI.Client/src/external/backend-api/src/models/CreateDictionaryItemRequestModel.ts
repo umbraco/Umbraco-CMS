@@ -3,11 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DictionaryItemModelBaseModel } from './DictionaryItemModelBaseModel';
+import type { DictionaryItemTranslationModel } from './DictionaryItemTranslationModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type CreateDictionaryItemRequestModel = (DictionaryItemModelBaseModel & {
+export type CreateDictionaryItemRequestModel = {
+    name: string;
+    translations: Array<DictionaryItemTranslationModel>;
     id?: string | null;
-    parent?: ReferenceByIdModel | null;
-});
+    parent: ReferenceByIdModel;
+};
 

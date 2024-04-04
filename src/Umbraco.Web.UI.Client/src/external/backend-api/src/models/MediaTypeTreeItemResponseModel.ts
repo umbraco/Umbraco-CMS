@@ -3,9 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FolderTreeItemResponseModel } from './FolderTreeItemResponseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type MediaTypeTreeItemResponseModel = (FolderTreeItemResponseModel & {
+export type MediaTypeTreeItemResponseModel = {
+    hasChildren: boolean;
+    id: string;
+    parent: ReferenceByIdModel;
+    name: string;
+    isFolder: boolean;
     icon: string;
-});
+};
 

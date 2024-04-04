@@ -7,13 +7,25 @@ import type { DocumentTypeCleanupModel } from './DocumentTypeCleanupModel';
 import type { DocumentTypeCompositionModel } from './DocumentTypeCompositionModel';
 import type { DocumentTypeSortModel } from './DocumentTypeSortModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
-import type { UpdateContentTypeForDocumentTypeRequestModel } from './UpdateContentTypeForDocumentTypeRequestModel';
+import type { UpdateDocumentTypePropertyTypeContainerRequestModel } from './UpdateDocumentTypePropertyTypeContainerRequestModel';
+import type { UpdateDocumentTypePropertyTypeRequestModel } from './UpdateDocumentTypePropertyTypeRequestModel';
 
-export type UpdateDocumentTypeRequestModel = (UpdateContentTypeForDocumentTypeRequestModel & {
+export type UpdateDocumentTypeRequestModel = {
+    alias: string;
+    name: string;
+    description?: string | null;
+    icon: string;
+    allowedAsRoot: boolean;
+    variesByCulture: boolean;
+    variesBySegment: boolean;
+    collection: ReferenceByIdModel;
+    isElement: boolean;
+    properties: Array<UpdateDocumentTypePropertyTypeRequestModel>;
+    containers: Array<UpdateDocumentTypePropertyTypeContainerRequestModel>;
     allowedTemplates: Array<ReferenceByIdModel>;
-    defaultTemplate?: ReferenceByIdModel | null;
+    defaultTemplate: ReferenceByIdModel;
     cleanup: DocumentTypeCleanupModel;
     allowedDocumentTypes: Array<DocumentTypeSortModel>;
     compositions: Array<DocumentTypeCompositionModel>;
-});
+};
 

@@ -13,7 +13,7 @@ import { request as __request } from '../core/request';
 export class RelationTypeResource {
 
     /**
-     * @returns any Success
+     * @returns RelationTypeItemResponseModel Success
      * @throws ApiError
      */
     public static getItemRelationType({
@@ -58,7 +58,7 @@ export class RelationTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns RelationTypeResponseModel Success
      * @throws ApiError
      */
     public static getRelationTypeById({

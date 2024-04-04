@@ -39,7 +39,7 @@ export class DocumentBlueprintResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentBlueprintResponseModel Success
      * @throws ApiError
      */
     public static getDocumentBlueprintById({
@@ -136,7 +136,7 @@ export class DocumentBlueprintResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentBlueprintItemResponseModel Success
      * @throws ApiError
      */
     public static getItemDocumentBlueprint({

@@ -3,7 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentUrlInfoBaseModel } from './ContentUrlInfoBaseModel';
-
-export type DocumentUrlInfoModel = ContentUrlInfoBaseModel;
+export type DocumentUrlInfoModel = {
+    culture?: string | null;
+    url: string;
+};
 

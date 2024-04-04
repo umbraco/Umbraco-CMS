@@ -28,7 +28,7 @@ export class ModelsBuilderResource {
     }
 
     /**
-     * @returns any Success
+     * @returns ModelsBuilderResponseModel Success
      * @throws ApiError
      */
     public static getModelsBuilderDashboard(): CancelablePromise<ModelsBuilderResponseModel> {
@@ -42,7 +42,7 @@ export class ModelsBuilderResource {
     }
 
     /**
-     * @returns any Success
+     * @returns OutOfDateStatusResponseModel Success
      * @throws ApiError
      */
     public static getModelsBuilderStatus(): CancelablePromise<OutOfDateStatusResponseModel> {

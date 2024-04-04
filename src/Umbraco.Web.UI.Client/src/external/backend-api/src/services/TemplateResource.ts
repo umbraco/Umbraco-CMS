@@ -3,15 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateTemplateRequestModel } from '../models/CreateTemplateRequestModel';
-import type { DataTypeTreeItemResponseModel } from '../models/DataTypeTreeItemResponseModel';
-import type { DocumentBlueprintTreeItemResponseModel } from '../models/DocumentBlueprintTreeItemResponseModel';
-import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
-import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
-import type { MediaTypeTreeItemResponseModel } from '../models/MediaTypeTreeItemResponseModel';
 import type { NamedEntityTreeItemResponseModel } from '../models/NamedEntityTreeItemResponseModel';
 import type { PagedModelTemplateItemResponseModel } from '../models/PagedModelTemplateItemResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
-import type { RelationTypeTreeItemResponseModel } from '../models/RelationTypeTreeItemResponseModel';
 import type { TemplateConfigurationResponseModel } from '../models/TemplateConfigurationResponseModel';
 import type { TemplateItemResponseModel } from '../models/TemplateItemResponseModel';
 import type { TemplateQueryExecuteModel } from '../models/TemplateQueryExecuteModel';
@@ -27,7 +21,7 @@ import { request as __request } from '../core/request';
 export class TemplateResource {
 
     /**
-     * @returns any Success
+     * @returns TemplateItemResponseModel Success
      * @throws ApiError
      */
     public static getItemTemplate({
@@ -98,7 +92,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns any Success
+     * @returns TemplateResponseModel Success
      * @throws ApiError
      */
     public static getTemplateById({
@@ -172,7 +166,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns any Success
+     * @returns TemplateConfigurationResponseModel Success
      * @throws ApiError
      */
     public static getTemplateConfiguration(): CancelablePromise<TemplateConfigurationResponseModel> {
@@ -186,7 +180,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns any Success
+     * @returns TemplateQueryResultResponseModel Success
      * @throws ApiError
      */
     public static postTemplateQueryExecute({
@@ -206,7 +200,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns any Success
+     * @returns TemplateQuerySettingsResponseModel Success
      * @throws ApiError
      */
     public static getTemplateQuerySettings(): CancelablePromise<TemplateQuerySettingsResponseModel> {
@@ -220,14 +214,14 @@ export class TemplateResource {
     }
 
     /**
-     * @returns any Success
+     * @returns NamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeTemplateAncestors({
         descendantId,
     }: {
         descendantId?: string,
-    }): CancelablePromise<Array<(NamedEntityTreeItemResponseModel | DataTypeTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel | MediaTypeTreeItemResponseModel | RelationTypeTreeItemResponseModel)>> {
+    }): CancelablePromise<Array<NamedEntityTreeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/template/ancestors',

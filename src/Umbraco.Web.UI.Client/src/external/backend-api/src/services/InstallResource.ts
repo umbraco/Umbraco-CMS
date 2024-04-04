@@ -13,7 +13,7 @@ import { request as __request } from '../core/request';
 export class InstallResource {
 
     /**
-     * @returns any Success
+     * @returns InstallSettingsResponseModel Success
      * @throws ApiError
      */
     public static getInstallSettings(): CancelablePromise<InstallSettingsResponseModel> {

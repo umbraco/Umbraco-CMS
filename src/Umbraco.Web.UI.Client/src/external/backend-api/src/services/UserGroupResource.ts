@@ -16,7 +16,7 @@ import { request as __request } from '../core/request';
 export class UserGroupResource {
 
     /**
-     * @returns any Success
+     * @returns UserGroupItemResponseModel Success
      * @throws ApiError
      */
     public static getItemUserGroup({
@@ -106,7 +106,7 @@ export class UserGroupResource {
     }
 
     /**
-     * @returns any Success
+     * @returns UserGroupResponseModel Success
      * @throws ApiError
      */
     public static getUserGroupById({

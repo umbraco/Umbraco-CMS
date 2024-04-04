@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class DynamicRootResource {
 
     /**
-     * @returns any Success
+     * @returns DynamicRootResponseModel Success
      * @throws ApiError
      */
     public static postDynamicRootQuery({

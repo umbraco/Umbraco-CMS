@@ -3,9 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ChangePasswordUserRequestModel } from './ChangePasswordUserRequestModel';
-
-export type ChangePasswordCurrentUserRequestModel = (ChangePasswordUserRequestModel & {
+export type ChangePasswordCurrentUserRequestModel = {
+    newPassword: string;
     oldPassword?: string | null;
-});
+};
 

@@ -64,7 +64,7 @@ export class MemberResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MemberItemResponseModel Success
      * @throws ApiError
      */
     public static getItemMember({
@@ -135,7 +135,7 @@ export class MemberResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MemberResponseModel Success
      * @throws ApiError
      */
     public static getMemberById({
@@ -237,7 +237,7 @@ export class MemberResource {
     }
 
     /**
-     * @returns any Success
+     * @returns MemberConfigurationResponseModel Success
      * @throws ApiError
      */
     public static getMemberConfiguration(): CancelablePromise<MemberConfigurationResponseModel> {

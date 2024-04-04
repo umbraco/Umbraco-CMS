@@ -106,7 +106,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentResponseModel Success
      * @throws ApiError
      */
     public static getDocumentById({
@@ -211,7 +211,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DomainsResponseModel Success
      * @throws ApiError
      */
     public static getDocumentByIdDomains({
@@ -233,7 +233,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns void
+     * @returns string Success
      * @throws ApiError
      */
     public static putDocumentByIdDomains({
@@ -242,7 +242,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: UpdateDomainsRequestModel,
-    }): CancelablePromise<void> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/domains',
@@ -251,6 +251,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -314,7 +315,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentNotificationResponseModel Success
      * @throws ApiError
      */
     public static getDocumentByIdNotifications({
@@ -668,7 +669,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentConfigurationResponseModel Success
      * @throws ApiError
      */
     public static getDocumentConfiguration(): CancelablePromise<DocumentConfigurationResponseModel> {
@@ -730,7 +731,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentItemResponseModel Success
      * @throws ApiError
      */
     public static getItemDocument({
@@ -820,7 +821,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns ReferenceByIdModel Success
      * @throws ApiError
      */
     public static getRecycleBinDocumentByIdOriginalParent({
@@ -924,7 +925,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DocumentTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeDocumentAncestors({

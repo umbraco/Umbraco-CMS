@@ -13,7 +13,7 @@ import { request as __request } from '../core/request';
 export class StaticFileResource {
 
     /**
-     * @returns any Success
+     * @returns StaticFileItemResponseModel Success
      * @throws ApiError
      */
     public static getItemStaticFile({
@@ -34,7 +34,7 @@ export class StaticFileResource {
     }
 
     /**
-     * @returns any Success
+     * @returns FileSystemTreeItemPresentationModel Success
      * @throws ApiError
      */
     public static getTreeStaticFileAncestors({

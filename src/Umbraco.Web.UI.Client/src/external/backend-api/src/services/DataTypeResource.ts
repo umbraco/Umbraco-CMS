@@ -48,7 +48,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DataTypeResponseModel Success
      * @throws ApiError
      */
     public static getDataTypeById({
@@ -198,7 +198,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DataTypeReferenceResponseModel Success
      * @throws ApiError
      */
     public static getDataTypeByIdReferences({
@@ -220,7 +220,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DatatypeConfigurationResponseModel Success
      * @throws ApiError
      */
     public static getDataTypeConfiguration(): CancelablePromise<DatatypeConfigurationResponseModel> {
@@ -257,7 +257,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns FolderResponseModel Success
      * @throws ApiError
      */
     public static getDataTypeFolderById({
@@ -364,7 +364,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DataTypeItemResponseModel Success
      * @throws ApiError
      */
     public static getItemDataType({
@@ -412,7 +412,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns DataTypeTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeDataTypeAncestors({

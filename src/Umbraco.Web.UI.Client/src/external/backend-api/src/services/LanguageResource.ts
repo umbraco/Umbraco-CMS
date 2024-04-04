@@ -15,7 +15,7 @@ import { request as __request } from '../core/request';
 export class LanguageResource {
 
     /**
-     * @returns any Success
+     * @returns LanguageItemResponseModel Success
      * @throws ApiError
      */
     public static getItemLanguage({
@@ -83,7 +83,7 @@ export class LanguageResource {
     }
 
     /**
-     * @returns any Success
+     * @returns LanguageResponseModel Success
      * @throws ApiError
      */
     public static getLanguageByIsoCode({

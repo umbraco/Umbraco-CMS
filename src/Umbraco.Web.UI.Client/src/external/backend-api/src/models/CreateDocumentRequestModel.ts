@@ -3,10 +3,16 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { CreateContentForDocumentRequestModel } from './CreateContentForDocumentRequestModel';
+import type { DocumentValueModel } from './DocumentValueModel';
+import type { DocumentVariantRequestModel } from './DocumentVariantRequestModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type CreateDocumentRequestModel = (CreateContentForDocumentRequestModel & {
-    template?: ReferenceByIdModel | null;
-});
+export type CreateDocumentRequestModel = {
+    values: Array<DocumentValueModel>;
+    variants: Array<DocumentVariantRequestModel>;
+    id?: string | null;
+    parent: ReferenceByIdModel;
+    documentType: ReferenceByIdModel;
+    template: ReferenceByIdModel;
+};
 

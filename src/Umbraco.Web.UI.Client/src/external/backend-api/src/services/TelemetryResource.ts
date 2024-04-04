@@ -37,7 +37,7 @@ export class TelemetryResource {
     }
 
     /**
-     * @returns any Success
+     * @returns TelemetryResponseModel Success
      * @throws ApiError
      */
     public static getTelemetryLevel(): CancelablePromise<TelemetryResponseModel> {

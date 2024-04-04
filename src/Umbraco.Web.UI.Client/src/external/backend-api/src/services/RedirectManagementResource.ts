@@ -92,7 +92,7 @@ export class RedirectManagementResource {
     }
 
     /**
-     * @returns any Success
+     * @returns RedirectUrlStatusResponseModel Success
      * @throws ApiError
      */
     public static getRedirectManagementStatus(): CancelablePromise<RedirectUrlStatusResponseModel> {

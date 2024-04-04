@@ -3,7 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FileSystemFileResponseModelBaseModel } from './FileSystemFileResponseModelBaseModel';
+import type { FileSystemFolderModel } from './FileSystemFolderModel';
 
-export type PartialViewResponseModel = FileSystemFileResponseModelBaseModel;
+export type PartialViewResponseModel = {
+    path: string;
+    name: string;
+    parent: FileSystemFolderModel;
+    content: string;
+};
 

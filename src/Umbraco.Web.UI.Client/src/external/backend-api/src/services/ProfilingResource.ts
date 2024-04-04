@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class ProfilingResource {
 
     /**
-     * @returns any Success
+     * @returns ProfilingStatusResponseModel Success
      * @throws ApiError
      */
     public static getProfilingStatus(): CancelablePromise<ProfilingStatusResponseModel> {

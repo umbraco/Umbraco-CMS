@@ -3,12 +3,15 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ItemReferenceByIdResponseModel } from './ItemReferenceByIdResponseModel';
 import type { MediaTypeReferenceResponseModel } from './MediaTypeReferenceResponseModel';
-import type { RecycleBinItemResponseModelBaseModel } from './RecycleBinItemResponseModelBaseModel';
 import type { VariantItemResponseModel } from './VariantItemResponseModel';
 
-export type MediaRecycleBinItemResponseModel = (RecycleBinItemResponseModelBaseModel & {
+export type MediaRecycleBinItemResponseModel = {
+    id: string;
+    hasChildren: boolean;
+    parent: ItemReferenceByIdResponseModel;
     mediaType: MediaTypeReferenceResponseModel;
     variants: Array<VariantItemResponseModel>;
-});
+};
 

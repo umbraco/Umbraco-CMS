@@ -7,7 +7,7 @@ import type { ItemSortingRequestModel } from './ItemSortingRequestModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type SortingRequestModel = {
-    parent?: ReferenceByIdModel | null;
+    parent: ReferenceByIdModel;
     sorting: Array<ItemSortingRequestModel>;
 };
 

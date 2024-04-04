@@ -8,7 +8,7 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 export type DictionaryOverviewResponseModel = {
     name?: string | null;
     id: string;
-    parent?: ReferenceByIdModel | null;
+    parent: ReferenceByIdModel;
     translatedIsoCodes: Array<string>;
 };
 

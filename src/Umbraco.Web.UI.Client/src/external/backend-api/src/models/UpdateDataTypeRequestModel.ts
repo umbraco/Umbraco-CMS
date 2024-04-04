@@ -3,7 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DataTypeModelBaseModel } from './DataTypeModelBaseModel';
+import type { DataTypePropertyPresentationModel } from './DataTypePropertyPresentationModel';
 
-export type UpdateDataTypeRequestModel = DataTypeModelBaseModel;
+export type UpdateDataTypeRequestModel = {
+    name: string;
+    editorAlias: string;
+    editorUiAlias?: string | null;
+    values: Array<DataTypePropertyPresentationModel>;
+};
 

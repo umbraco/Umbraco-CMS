@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { IndexResponseModel } from '../models/IndexResponseModel';
-import type { OkResult } from '../models/OkResult';
 import type { PagedIndexResponseModel } from '../models/PagedIndexResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -37,7 +36,7 @@ export class IndexerResource {
     }
 
     /**
-     * @returns any Success
+     * @returns IndexResponseModel Success
      * @throws ApiError
      */
     public static getIndexerByIndexName({
@@ -59,20 +58,21 @@ export class IndexerResource {
     }
 
     /**
-     * @returns OkResult Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postIndexerByIndexNameRebuild({
         indexName,
     }: {
         indexName: string,
-    }): CancelablePromise<OkResult> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/indexer/{indexName}/rebuild',
             path: {
                 'indexName': indexName,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
