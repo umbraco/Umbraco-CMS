@@ -8,6 +8,7 @@ import type { MemberConfigurationResponseModel } from '../models/MemberConfigura
 import type { MemberItemResponseModel } from '../models/MemberItemResponseModel';
 import type { MemberResponseModel } from '../models/MemberResponseModel';
 import type { PagedMemberResponseModel } from '../models/PagedMemberResponseModel';
+import type { PagedModelMemberItemResponseModel } from '../models/PagedModelMemberItemResponseModel';
 import type { UpdateMemberRequestModel } from '../models/UpdateMemberRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -76,6 +77,33 @@ export class MemberResource {
             url: '/umbraco/management/api/v1/item/member',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedModelMemberItemResponseModel Success
+     * @throws ApiError
+     */
+    public static getItemMemberSearch({
+        query,
+        skip,
+        take = 100,
+    }: {
+        query?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedModelMemberItemResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/member/search',
+            query: {
+                'query': query,
+                'skip': skip,
+                'take': take,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,

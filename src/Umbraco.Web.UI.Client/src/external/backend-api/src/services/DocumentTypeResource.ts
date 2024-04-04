@@ -16,6 +16,7 @@ import type { FolderResponseModel } from '../models/FolderResponseModel';
 import type { MoveDocumentTypeRequestModel } from '../models/MoveDocumentTypeRequestModel';
 import type { PagedAllowedDocumentTypeModel } from '../models/PagedAllowedDocumentTypeModel';
 import type { PagedDocumentTypeTreeItemResponseModel } from '../models/PagedDocumentTypeTreeItemResponseModel';
+import type { PagedModelDocumentTypeItemResponseModel } from '../models/PagedModelDocumentTypeItemResponseModel';
 import type { UpdateDocumentTypeRequestModel } from '../models/UpdateDocumentTypeRequestModel';
 import type { UpdateFolderResponseModel } from '../models/UpdateFolderResponseModel';
 
@@ -399,6 +400,33 @@ export class DocumentTypeResource {
             url: '/umbraco/management/api/v1/item/document-type',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedModelDocumentTypeItemResponseModel Success
+     * @throws ApiError
+     */
+    public static getItemDocumentTypeSearch({
+        query,
+        skip,
+        take = 100,
+    }: {
+        query?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedModelDocumentTypeItemResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/document-type/search',
+            query: {
+                'query': query,
+                'skip': skip,
+                'take': take,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,

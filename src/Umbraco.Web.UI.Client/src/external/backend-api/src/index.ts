@@ -50,6 +50,8 @@ export type { CreateContentTypeForMediaTypeRequestModel } from './models/CreateC
 export type { CreateContentTypeForMemberTypeRequestModel } from './models/CreateContentTypeForMemberTypeRequestModel';
 export type { CreateDataTypeRequestModel } from './models/CreateDataTypeRequestModel';
 export type { CreateDictionaryItemRequestModel } from './models/CreateDictionaryItemRequestModel';
+export type { CreateDocumentBlueprintFromDocumentRequestModel } from './models/CreateDocumentBlueprintFromDocumentRequestModel';
+export type { CreateDocumentBlueprintRequestModel } from './models/CreateDocumentBlueprintRequestModel';
 export type { CreateDocumentRequestModel } from './models/CreateDocumentRequestModel';
 export type { CreateDocumentTypePropertyTypeContainerRequestModel } from './models/CreateDocumentTypePropertyTypeContainerRequestModel';
 export type { CreateDocumentTypePropertyTypeRequestModel } from './models/CreateDocumentTypePropertyTypeRequestModel';
@@ -103,6 +105,7 @@ export type { DictionaryItemTranslationModel } from './models/DictionaryItemTran
 export type { DictionaryOverviewResponseModel } from './models/DictionaryOverviewResponseModel';
 export { DirectionModel } from './models/DirectionModel';
 export type { DisableUserRequestModel } from './models/DisableUserRequestModel';
+export type { DocumentBlueprintItemResponseModel } from './models/DocumentBlueprintItemResponseModel';
 export type { DocumentBlueprintResponseModel } from './models/DocumentBlueprintResponseModel';
 export type { DocumentBlueprintTreeItemResponseModel } from './models/DocumentBlueprintTreeItemResponseModel';
 export type { DocumentCollectionResponseModel } from './models/DocumentCollectionResponseModel';
@@ -133,6 +136,8 @@ export type { DocumentVariantItemResponseModel } from './models/DocumentVariantI
 export type { DocumentVariantRequestModel } from './models/DocumentVariantRequestModel';
 export type { DocumentVariantResponseModel } from './models/DocumentVariantResponseModel';
 export { DocumentVariantStateModel } from './models/DocumentVariantStateModel';
+export type { DocumentVersionItemResponseModel } from './models/DocumentVersionItemResponseModel';
+export type { DocumentVersionResponseModel } from './models/DocumentVersionResponseModel';
 export type { DomainPresentationModel } from './models/DomainPresentationModel';
 export type { DomainsPresentationModelBaseModel } from './models/DomainsPresentationModelBaseModel';
 export type { DomainsResponseModel } from './models/DomainsResponseModel';
@@ -266,6 +271,7 @@ export type { PagedDocumentCollectionResponseModel } from './models/PagedDocumen
 export type { PagedDocumentRecycleBinItemResponseModel } from './models/PagedDocumentRecycleBinItemResponseModel';
 export type { PagedDocumentTreeItemResponseModel } from './models/PagedDocumentTreeItemResponseModel';
 export type { PagedDocumentTypeTreeItemResponseModel } from './models/PagedDocumentTypeTreeItemResponseModel';
+export type { PagedDocumentVersionItemResponseModel } from './models/PagedDocumentVersionItemResponseModel';
 export type { PagedFileSystemTreeItemPresentationModel } from './models/PagedFileSystemTreeItemPresentationModel';
 export type { PagedHealthCheckGroupResponseModel } from './models/PagedHealthCheckGroupResponseModel';
 export type { PagedHelpPageResponseModel } from './models/PagedHelpPageResponseModel';
@@ -281,6 +287,14 @@ export type { PagedMediaTreeItemResponseModel } from './models/PagedMediaTreeIte
 export type { PagedMediaTypeTreeItemResponseModel } from './models/PagedMediaTypeTreeItemResponseModel';
 export type { PagedMemberGroupResponseModel } from './models/PagedMemberGroupResponseModel';
 export type { PagedMemberResponseModel } from './models/PagedMemberResponseModel';
+export type { PagedModelDataTypeItemResponseModel } from './models/PagedModelDataTypeItemResponseModel';
+export type { PagedModelDocumentItemResponseModel } from './models/PagedModelDocumentItemResponseModel';
+export type { PagedModelDocumentTypeItemResponseModel } from './models/PagedModelDocumentTypeItemResponseModel';
+export type { PagedModelMediaItemResponseModel } from './models/PagedModelMediaItemResponseModel';
+export type { PagedModelMediaTypeItemResponseModel } from './models/PagedModelMediaTypeItemResponseModel';
+export type { PagedModelMemberItemResponseModel } from './models/PagedModelMemberItemResponseModel';
+export type { PagedModelMemberTypeItemResponseModel } from './models/PagedModelMemberTypeItemResponseModel';
+export type { PagedModelTemplateItemResponseModel } from './models/PagedModelTemplateItemResponseModel';
 export type { PagedNamedEntityTreeItemResponseModel } from './models/PagedNamedEntityTreeItemResponseModel';
 export type { PagedObjectTypeResponseModel } from './models/PagedObjectTypeResponseModel';
 export type { PagedPackageDefinitionResponseModel } from './models/PagedPackageDefinitionResponseModel';
@@ -398,6 +412,7 @@ export type { UpdateContentTypeForMediaTypeRequestModel } from './models/UpdateC
 export type { UpdateContentTypeForMemberTypeRequestModel } from './models/UpdateContentTypeForMemberTypeRequestModel';
 export type { UpdateDataTypeRequestModel } from './models/UpdateDataTypeRequestModel';
 export type { UpdateDictionaryItemRequestModel } from './models/UpdateDictionaryItemRequestModel';
+export type { UpdateDocumentBlueprintRequestModel } from './models/UpdateDocumentBlueprintRequestModel';
 export type { UpdateDocumentNotificationsRequestModel } from './models/UpdateDocumentNotificationsRequestModel';
 export type { UpdateDocumentRequestModel } from './models/UpdateDocumentRequestModel';
 export type { UpdateDocumentTypePropertyTypeContainerRequestModel } from './models/UpdateDocumentTypePropertyTypeContainerRequestModel';
@@ -459,6 +474,7 @@ export { DictionaryResource } from './services/DictionaryResource';
 export { DocumentResource } from './services/DocumentResource';
 export { DocumentBlueprintResource } from './services/DocumentBlueprintResource';
 export { DocumentTypeResource } from './services/DocumentTypeResource';
+export { DocumentVersionResource } from './services/DocumentVersionResource';
 export { DynamicRootResource } from './services/DynamicRootResource';
 export { HealthCheckResource } from './services/HealthCheckResource';
 export { HelpResource } from './services/HelpResource';
