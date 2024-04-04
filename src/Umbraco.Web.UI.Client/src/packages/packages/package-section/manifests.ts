@@ -22,9 +22,9 @@ const section: ManifestSection = {
 const sectionsViews: Array<ManifestSectionView> = [
 	{
 		type: 'sectionView',
-		alias: 'Umb.SectionView.Packages.Repo',
-		name: 'Packages Repo Section View',
-		element: () => import('./views/market-place/packages-market-place-section-view.element.js'),
+		alias: 'Umb.SectionView.Packages.Marketplace',
+		name: 'Packages Marketplace Section View',
+		element: () => import('./views/marketplace/packages-marketplace-section-view.element.js'),
 		weight: 300,
 		meta: {
 			label: 'Packages',
