@@ -56,7 +56,6 @@ const sectionsViews: Array<ManifestSectionView> = [
 			},
 		],
 	},
-	/* // Temp removed until is is finished
 	{
 		type: 'sectionView',
 		alias: 'Umb.SectionView.Packages.Builder',
@@ -75,7 +74,6 @@ const sectionsViews: Array<ManifestSectionView> = [
 			},
 		],
 	},
-	*/
 ];
 
 export const manifests = [section, ...sectionsViews];
