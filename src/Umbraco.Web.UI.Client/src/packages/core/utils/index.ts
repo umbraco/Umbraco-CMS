@@ -14,3 +14,4 @@ export * from './type/diff.type.js';
 export * from './string/to-camel-case/to-camel-case.function.js';
 export * from './string/from-camel-case.function.js';
 export * from './debounce/debounce.function.js';
+export * from './download/blob-download.function.js';
