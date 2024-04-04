@@ -125,10 +125,6 @@ export class UmbPropertyElement extends UmbLitElement {
 	@state()
 	private _element?: ManifestPropertyEditorUi['ELEMENT_TYPE'];
 
-	// Not begin used currently [NL]
-	//@state()
-	//private _value?: unknown;
-
 	@state()
 	private _invalid?: boolean;
 
@@ -239,7 +235,6 @@ export class UmbPropertyElement extends UmbLitElement {
 				this.#valueObserver = this.observe(
 					this.#propertyContext.value,
 					(value) => {
-						//this._value = value;// This was not used currently [NL]
 						this._element!.value = value;
 						if (this.#validationMessageBinder) {
 							this.#validationMessageBinder.value = value;
