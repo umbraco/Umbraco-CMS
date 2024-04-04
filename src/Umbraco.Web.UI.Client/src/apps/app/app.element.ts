@@ -186,24 +186,7 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#isAuthorizedGuard(): Guard {
-		return async () => {
-			if (!this.#authContext) {
-				throw new Error('[Fatal] AuthContext requested before it was initialized');
-			}
-
-			if (this.#authContext.getIsAuthorized()) {
-				return true;
-			}
-
-			// Save location.href so we can redirect to it after login
-			window.sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, location.href);
-
-			// Make a request to the auth server to start the auth flow
-			await this.#authController.makeAuthorizationRequest();
-
-			// Return false to prevent the route from being rendered
-			return false;
-		};
+		return () => this.#authController.isAuthorized();
 	}
 
 	#errorPage(errorMsg: string, error?: unknown) {
