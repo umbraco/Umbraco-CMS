@@ -34,7 +34,21 @@ export class UmbRollbackServerDataSource {
 	 * @return {*}
 	 * @memberof UmbRollbackServerDataSource
 	 */
-	getVersionById(id: string) {
-		return tryExecuteAndNotify(this.#host, DocumentVersionResource.getDocumentVersionById({ id }));
+	getVersionById(versionId: string) {
+		return tryExecuteAndNotify(this.#host, DocumentVersionResource.getDocumentVersionById({ id: versionId }));
+	}
+
+	setPreventCleanup(versionId: string, preventCleanup: boolean) {
+		return tryExecuteAndNotify(
+			this.#host,
+			DocumentVersionResource.putDocumentVersionByIdPreventCleanup({ id: versionId, preventCleanup }),
+		);
+	}
+
+	rollback(versionId: string, culture?: string) {
+		return tryExecuteAndNotify(
+			this.#host,
+			DocumentVersionResource.postDocumentVersionByIdRollback({ id: versionId, culture }),
+		);
 	}
 }

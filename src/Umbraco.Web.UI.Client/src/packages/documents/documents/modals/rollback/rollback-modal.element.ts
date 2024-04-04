@@ -66,8 +66,6 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		const { data } = await this.#rollbackRepository.requestVersionById(id);
 		if (!data) return;
 
-		console.log('data', data);
-
 		this.currentVersion = {
 			date: version.date || '',
 			user: version.user,
@@ -83,9 +81,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	}
 
 	#onRollback() {
-		console.log('Rollback');
-		return;
-		this.modalContext?.submit();
+		if (!this.currentVersion) return;
+
+		const id = this.currentVersion.id;
+		this.#rollbackRepository.rollback(id);
 	}
 
 	#onCancel() {
@@ -166,15 +165,27 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	static styles = [
 		UmbTextStyles,
 		css`
-			.rollback-item.active {
-				border-color: var(--uui-color-selected);
-			}
 			.rollback-item {
-				border: 2px solid transparent;
+				position: relative;
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
 				padding: var(--uui-size-space-5);
+				cursor: pointer;
+			}
+			.rollback-item::after {
+				content: '';
+				position: absolute;
+				inset: 2px;
+				display: block;
+				border: 2px solid transparent;
+			}
+			.rollback-item.active::after,
+			.rollback-item:hover::after {
+				border-color: var(--uui-color-selected);
+			}
+			.rollback-item:not(.active):hover::after {
+				opacity: 0.5;
 			}
 			.rollback-item p {
 				margin: 0;
