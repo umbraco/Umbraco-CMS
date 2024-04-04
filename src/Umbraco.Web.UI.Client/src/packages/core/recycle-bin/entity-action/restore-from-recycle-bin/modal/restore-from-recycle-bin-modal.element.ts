@@ -33,11 +33,11 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 
 		if (unique !== undefined) {
 			this._isAutomaticRestore = true;
-			this.something(unique);
+			this.setDestination(unique);
 		}
 	}
 
-	async something(unique: string | null) {
+	async setDestination(unique: string | null) {
 		// TODO: handle ROOT lookup. Currently, we can't look up the root in the item repository.
 		// This is a temp solution to show something in the UI.
 		if (unique === null) {
@@ -96,7 +96,7 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 
 		if (selection.length > 0) {
 			const unique = selection[0];
-			this.something(unique);
+			this.setDestination(unique);
 		}
 	}
 
