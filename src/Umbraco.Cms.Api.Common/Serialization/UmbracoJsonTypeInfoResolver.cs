@@ -17,7 +17,10 @@ public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, I
     {
         if (type.IsInterface is false)
         {
-            return Enumerable.Empty<Type>();
+            // IMPORTANT: do NOT return an empty enumerable here. it will cause nullability to fail on reference
+            //            properties, because "$ref" does not mix and match well with "nullable" in OpenAPI.
+            //            see also https://github.com/OAI/OpenAPI-Specification/issues/1368
+            return new[] { type };
         }
 
         if (_subTypesCache.TryGetValue(type, out ISet<Type>? cachedResult))
