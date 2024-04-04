@@ -11,3 +11,5 @@ export interface UmbPickerModalValue {
 export interface UmbTreePickerModalData<TreeItemType> extends UmbPickerModalData<TreeItemType> {
 	treeAlias?: string;
 }
+
+export interface UmbTreePickerModalValue extends UmbPickerModalValue {}
