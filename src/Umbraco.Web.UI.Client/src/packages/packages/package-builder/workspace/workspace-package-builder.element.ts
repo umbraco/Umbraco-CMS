@@ -1,6 +1,7 @@
 import { UmbDictionaryPickerContext } from '../../../dictionary/components/input-dictionary/input-dictionary.context.js';
 import { UmbMediaPickerContext } from '../../../media/media/components/input-media/input-media.context.js';
 import { UmbPackageRepository } from '../../package/repository/index.js';
+import { UmbScriptPickerContext } from '../../../templating/scripts/components/input-script/input-script.context.js';
 import { UmbStylesheetPickerContext } from '../../../templating/stylesheets/components/stylesheet-input/stylesheet-input.context.js';
 import { UmbTemplatePickerContext } from '../../../templating/templates/components/input-template/input-template.context.js';
 import type { UmbCreatedPackageDefinition } from '../../types.js';
@@ -187,8 +188,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				${this.#renderDataTypeSection()}
 				${this.#renderTemplateSection()}
 				${this.#renderStylesheetsSection()}
-
-			<umb-property-layout label="Scripts" description=""> ${this.#renderScriptsSection()} </umb-property-layout>
+				${this.#renderScriptsSection()}
 
 			<umb-property-layout label="Partial Views" description="">
 				${this.#renderPartialViewSection()}
@@ -393,10 +393,28 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		`;
 	}
 
+	#onScriptsChange(event: { target: UmbInputEntityElement }) {
+		if (!this._package) return;
+
+		this._package.scripts =
+			event.target.selection?.map((path) => this.#serverFilePathUniqueSerializer.toServerPath(path) as string) ?? [];
+		this.requestUpdate('_package');
+	}
+
 	#renderScriptsSection() {
-		return html`<div slot="editor">
-			<umb-input-checkbox-list></umb-input-checkbox-list>
-		</div>`;
+		if (!this._package) return nothing;
+		return html`
+			<umb-property-layout label="Scripts">
+				<div slot="editor">
+					<umb-input-entity
+						.getIcon=${() => 'icon-diploma'}
+						.pickerContext=${UmbScriptPickerContext}
+						.selection=${this._package.scripts.map((path) => this.#serverFilePathUniqueSerializer.toUnique(path)) ?? []}
+						@change=${this.#onScriptsChange}>
+					</umb-input-entity>
+				</div>
+			</umb-property-layout>
+		`;
 	}
 
 	#renderPartialViewSection() {
