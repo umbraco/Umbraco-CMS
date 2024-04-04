@@ -53,7 +53,7 @@ if (hasError) {
 	console.error('\n-----------------------------------');
 	console.error(ERROR_COLOR, 'Path length check failed');
 	console.error('-----------------------------------\n');
-	if (processExitCode) {
+	if (IS_CI && processExitCode) {
 		process.exit(processExitCode);
 	}
 } else {
