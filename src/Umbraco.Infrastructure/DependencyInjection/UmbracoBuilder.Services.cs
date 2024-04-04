@@ -22,10 +22,8 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers;
-using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Cms.Infrastructure.Templates.PartialViews;
 using Umbraco.Extensions;
-using CacheInstructionService = Umbraco.Cms.Core.Services.Implement.CacheInstructionService;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 

@@ -56,22 +56,6 @@ public class IdentityMapDefinition : IMapDefinition
     {
     }
 
-    [Obsolete("Use constructor that also takes an ITwoFactorLoginService. Scheduled for removal in V12")]
-    public IdentityMapDefinition(
-        ILocalizedTextService textService,
-        IEntityService entityService,
-        IOptions<GlobalSettings> globalSettings,
-        AppCaches appCaches)
-        : this(
-            textService,
-            entityService,
-            globalSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
-            appCaches,
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
-    {
-    }
-
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IUser, BackOfficeIdentityUser>(
