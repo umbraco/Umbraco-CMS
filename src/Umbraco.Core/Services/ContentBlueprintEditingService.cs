@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -12,6 +13,8 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class ContentBlueprintEditingService
     : ContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>, IContentBlueprintEditingService
 {
+    private readonly IContentBlueprintContainerService _containerService;
+
     public ContentBlueprintEditingService(
         IContentService contentService,
         IContentTypeService contentTypeService,
@@ -20,10 +23,10 @@ internal sealed class ContentBlueprintEditingService
         ILogger<ContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
-        IContentValidationService validationService)
+        IContentValidationService validationService,
+        IContentBlueprintContainerService containerService)
         : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService)
-    {
-    }
+        => _containerService = containerService;
 
     public async Task<IContent?> GetAsync(Guid key)
     {
@@ -138,6 +141,19 @@ internal sealed class ContentBlueprintEditingService
     protected override IContent New(string? name, int parentId, IContentType contentType)
         => new Content(name, parentId, contentType);
 
+    protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)
+    {
+        if (parentKey.HasValue is false)
+        {
+            return (Constants.System.Root, ContentEditingOperationStatus.Success);
+        }
+
+        EntityContainer? container = await _containerService.GetAsync(parentKey.Value);
+        return container is not null
+            ? (container.Id, ContentEditingOperationStatus.Success)
+            : (null, ContentEditingOperationStatus.ParentNotFound);
+    }
+
     /// <summary>
     ///     NB: Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
     ///     but there are others that are not required to be implemented in the case of blueprints, therefore they throw NotImplementedException as default.
@@ -160,5 +176,44 @@ internal sealed class ContentBlueprintEditingService
     {
         IEnumerable<IContent> existing = ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
         return existing.Any(c => c.Name == name && c.Id != content.Id) is false;
+    }
+
+    public async Task<Attempt<ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        IContent? toMove = ContentService.GetBlueprintById(key);
+        if (toMove is null)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
+        }
+
+        EntityContainer? container = null;
+        var parentId = Constants.System.Root;
+        if (containerKey.HasValue && containerKey.Value != Guid.Empty)
+        {
+            container = await _containerService.GetAsync(containerKey.Value);
+            if (container is null)
+            {
+                return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
+            }
+
+            parentId = container.Id;
+        }
+
+        if (toMove.ParentId == parentId)
+        {
+            return Attempt.Succeed(ContentEditingOperationStatus.Success);
+        }
+
+        // NOTE: as long as the parent ID is correct the document repo takes care of updating the rest of the
+        //       structural node data like path, level, sort orders etc.
+        toMove.ParentId = parentId;
+
+        var performingUserId = await GetUserIdAsync(userKey);
+        ContentService.SaveBlueprint(toMove, performingUserId);
+
+        scope.Complete();
+
+        return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 }
