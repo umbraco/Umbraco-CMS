@@ -8,6 +8,7 @@ import '../shared/document-variant-language-picker.element.js';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 type DocumentVersion = {
 	id: string;
@@ -39,14 +40,15 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 	@state()
 	availableVariants: Option[] = [
-		{ name: 'English', value: 'en-US', selected: true },
-		{ name: 'Danish', value: 'da-dk' },
+		// { name: 'English', value: 'en-US', selected: true },
+		// { name: 'Danish', value: 'da-dk' },
 	];
 
 	#rollbackRepository = new UmbRollbackRepository(this);
 	#userItemRepository = new UmbUserItemRepository(this);
 
 	#propertyDatasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
+	#variantWorkspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 
 	#localizeDateOptions: Intl.DateTimeFormatOptions = {
 		day: 'numeric',
@@ -60,8 +62,25 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
 			this.#propertyDatasetContext = instance;
-			this.currentCulture = this.#propertyDatasetContext.getVariantId().culture ?? undefined;
+			this.currentCulture = instance.getVariantId().culture ?? undefined;
 			this.#requestVersions();
+		});
+
+		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
+			this.#variantWorkspaceContext = instance;
+
+			// TODO: For some reason TS cant find languages on the context
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			instance.languages.subscribe((languages) => {
+				this.availableVariants = languages.map((language: any) => {
+					return {
+						name: language.name,
+						value: language.unique,
+						selected: language.unique === this.currentCulture,
+					};
+				});
+			});
 		});
 	}
 
@@ -106,7 +125,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		if (!data) return;
 
 		this.currentVersion = {
-			date: version.date || '',
+			date: version.date,
 			user: version.user,
 			name: data.variants.find((x) => x.culture === this.currentCulture)?.name || data.variants[0].name,
 			id: data.id,
