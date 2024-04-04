@@ -125,6 +125,7 @@ test.describe('Template tests', () => {
     // Act
     await umbracoUi.template.goToTemplate(templateName);
     await umbracoUi.template.clickSectionsButton();
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.clickSubmitButton();
     await umbracoUi.template.clickSaveButton();
 
