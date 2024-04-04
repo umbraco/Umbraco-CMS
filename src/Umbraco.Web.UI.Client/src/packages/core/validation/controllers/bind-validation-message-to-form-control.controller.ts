@@ -16,7 +16,7 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 
 	#control: UmbFormControlMixinInterface<unknown, unknown>;
 
-	#controlValidator?: ReturnType<UmbFormControlMixinInterface<unknown, unknown>['addValidator']>;
+	#controlValidator?: ReturnType<UmbFormControlMixinInterface<unknown, unknown>['addValidation']>;
 	#messages: Array<UmbValidationMessage> = [];
 	#isValid = false;
 
@@ -46,7 +46,7 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 			this.#context = context;
 
 			this.observe(
-				context.messages.messagesOfTypeAndExactPath('server', dataPath),
+				context.messages.messagesOfTypeAndPath('server', dataPath),
 				(messages) => {
 					this.#messages = messages;
 					this.#isValid = messages.length === 0;
@@ -63,7 +63,7 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 
 	#setup() {
 		if (!this.#controlValidator) {
-			this.#controlValidator = this.#control.addValidator(
+			this.#controlValidator = this.#control.addValidation(
 				'customError',
 				() => this.#messages.map((x) => x.message).join(', '),
 				() => !this.#isValid,
@@ -78,7 +78,7 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 	#demolish() {
 		if (!this.#control || !this.#controlValidator) return;
 
-		this.#control.removeValidator(this.#controlValidator);
+		this.#control.removeValidation(this.#controlValidator);
 		//this.#control.removeEventListener('change', this.#onControlChange);
 		// Legacy event, used by some controls:
 		//this.#control.removeEventListener('property-value-change', this.#onControlChange);

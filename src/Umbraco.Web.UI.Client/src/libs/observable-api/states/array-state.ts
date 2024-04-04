@@ -13,12 +13,12 @@ import { UmbDeepState } from './deep-state.js';
  * The ArrayState provides methods to append data when the data is an Object.
  */
 export class UmbArrayState<T> extends UmbDeepState<T[]> {
-	readonly getUniqueMethod?: (entry: T) => unknown;
+	readonly getUniqueMethod: (entry: T) => unknown;
 	#sortMethod?: (a: T, b: T) => number;
 
-	constructor(initialData: T[], getUniqueOfEntryMethod: ((entry: T) => unknown) | null) {
+	constructor(initialData: T[], getUniqueOfEntryMethod: (entry: T) => unknown) {
 		super(initialData);
-		this.getUniqueMethod = getUniqueOfEntryMethod ?? undefined;
+		this.getUniqueMethod = getUniqueOfEntryMethod;
 	}
 
 	/**

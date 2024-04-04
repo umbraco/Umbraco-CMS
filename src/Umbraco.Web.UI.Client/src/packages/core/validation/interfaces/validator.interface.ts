@@ -2,7 +2,7 @@ export interface UmbValidator extends EventTarget {
 	/**
 	 * The path to the data that the validator is validating.
 	 */
-	//readonly dataPath?: string;
+	readonly dataPath?: string;
 
 	/**
 	 * Validate the form, will return a promise that resolves to true if what the Validator represents is valid.

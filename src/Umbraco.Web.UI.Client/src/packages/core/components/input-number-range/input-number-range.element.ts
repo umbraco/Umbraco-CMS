@@ -63,8 +63,8 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	constructor() {
 		super();
 
-		this.addValidator(
-			'customError',
+		this.addValidation(
+			'patternMismatch',
 			() => {
 				return 'The low value must be less than the high value';
 			},

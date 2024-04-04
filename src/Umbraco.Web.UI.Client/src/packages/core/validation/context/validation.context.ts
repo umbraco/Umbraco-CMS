@@ -31,12 +31,6 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 		if (index !== -1) {
 			// Remove the validator:
 			this.#validators.splice(index, 1);
-			//validator.removeEventListener('change', this.#onValidatorChange);
-			// Check if we have any client messages from this validator and remove them:
-			const dataPath = validator.dataPath;
-			if (dataPath) {
-				this.messages.removeMessagesByTypeAndPath('client', dataPath);
-			}
 			// If we are in validation mode then we should re-validate to focus next invalid element:
 			if (this.#validationMode) {
 				this.validate();

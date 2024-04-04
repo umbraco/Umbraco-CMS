@@ -31,8 +31,8 @@ interface UmbFormControlValidationConfig {
 }
 
 export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> extends HTMLElement {
-	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
-	removeValidator: (obj: UmbFormControlValidationConfig) => void;
+	addValidation: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
+	removeValidation: (obj: UmbFormControlValidationConfig) => void;
 	//static formAssociated: boolean;
 	getFormElement(): HTMLElement | undefined | null; // allows for null as it makes it simpler to just implement a querySelector as that might return null. [NL]
 	focusFirstInvalidElement(): void;
@@ -53,8 +53,8 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 {
 	protected _internals: ElementInternals;
 	protected _runValidators(): void;
-	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
-	removeValidator: (obj: UmbFormControlValidationConfig) => void;
+	addValidation: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
+	removeValidation: (obj: UmbFormControlValidationConfig) => void;
 	protected addFormControlElement(element: UmbNativeFormControlElement): void;
 
 	//static formAssociated: boolean;
@@ -80,10 +80,10 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 export const UmbFormControlMixin = <
 	ValueType = FormDataEntryValue | FormData,
 	T extends HTMLElementConstructor<LitElement> = HTMLElementConstructor<LitElement>,
-	DefaultValueType = unknown,
+	DefaultValueType = undefined,
 >(
 	superClass: T,
-	defaultValue: DefaultValueType,
+	defaultValue: DefaultValueType = undefined as DefaultValueType,
 ) => {
 	abstract class UmbFormControlMixinClass extends superClass {
 		/**
@@ -214,7 +214,7 @@ export const UmbFormControlMixin = <
 			this.#validators.push(validator);
 			return validator;
 		}
-		removeValidator(validator: UmbFormControlValidationConfig) {
+		removeValidation(validator: UmbFormControlValidationConfig) {
 			const index = this.#validators.indexOf(validator);
 			if (index !== -1) {
 				this.#validators.splice(index, 1);

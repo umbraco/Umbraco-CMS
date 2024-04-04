@@ -13,12 +13,6 @@ export interface UmbValidationMessage {
 export class UmbValidationMessagesManager {
 	#messages = new UmbArrayState<UmbValidationMessage>([], (x) => x.key);
 
-	constructor() {
-		this.#messages.asObservable().subscribe((x) => {
-			console.log('— Messages:', x);
-		});
-	}
-
 	/*messagesOf(path: string): Observable<Array<UmbValidationMessage>> {
 		// Find messages that starts with the given path, if the path is longer then require a dot or [ as the next character. using a more performant way than Regex:
 		return this.#messages.asObservablePart((msgs) =>
@@ -30,15 +24,12 @@ export class UmbValidationMessagesManager {
 		);
 	}*/
 
-	messagesOfTypeAndExactPath(
-		type: UmbValidationMessageType,
-		exactPath: string,
-	): Observable<Array<UmbValidationMessage>> {
+	messagesOfTypeAndPath(type: UmbValidationMessageType, path: string): Observable<Array<UmbValidationMessage>> {
 		// Find messages that matches the given type and path.
-		return this.#messages.asObservablePart((msgs) => msgs.filter((x) => x.type === type && x.path === exactPath));
+		return this.#messages.asObservablePart((msgs) => msgs.filter((x) => x.type === type && x.path === path));
 	}
 
-	hasMessagesOf(path: string): Observable<boolean> {
+	hasMessagesOfPathAndDescendant(path: string): Observable<boolean> {
 		return this.#messages.asObservablePart((msgs) =>
 			// Find messages that starts with the given path, if the path is longer then require a dot or [ as the next character. Using a more performant way than Regex:
 			msgs.some(
