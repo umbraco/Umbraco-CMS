@@ -132,7 +132,6 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this.observe(this.#managerContext.layouts, (layouts) => {
 			this._value = { ...this._value, layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS]: layouts } };
 			// Notify that the value has changed.
-			//console.log('layout changed', this._value);
 			// TODO: idea: consider inserting an await here, so other changes could appear first? Maybe some mechanism to only fire change event onces?
 			//this.#entriesContext.setLayoutEntries(layouts);
 			this.dispatchEvent(new UmbChangeEvent());
@@ -147,13 +146,11 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this.observe(this.#managerContext.contents, (contents) => {
 			this._value = { ...this._value, contentData: contents };
 			// Notify that the value has changed.
-			//console.log('content changed', this._value);
 			this.dispatchEvent(new UmbChangeEvent());
 		});
 		this.observe(this.#managerContext.settings, (settings) => {
 			this._value = { ...this._value, settingsData: settings };
 			// Notify that the value has changed.
-			//console.log('settings changed', this._value);
 			this.dispatchEvent(new UmbChangeEvent());
 		});
 		this.observe(this.#managerContext.blockTypes, (blockTypes) => {

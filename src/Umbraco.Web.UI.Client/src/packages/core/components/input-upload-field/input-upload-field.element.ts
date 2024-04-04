@@ -82,12 +82,11 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		super();
 		this.#manager = new UmbTemporaryFileManager(this);
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
+		/*this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.observe(await context.propertyValueByAlias('umbracoExtension'), (value) => {
 				//const test = value;
-				//console.log('test', test);
 			});
-		});
+		});*/
 
 		this.#serverUrlPromise = this.consumeContext(UMB_APP_CONTEXT, (instance) => {
 			this.#serverUrl = instance.getServerUrl();
@@ -257,7 +256,6 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 
 		// Extract the file extension from the path
 		const extension = path.split('.').pop()?.toLowerCase();
-		console.log('extension', extension, path);
 		if (!extension) return 'file';
 		if (['svg'].includes(extension)) return 'svg';
 		if (['mp3', 'weba', 'oga', 'opus'].includes(extension)) return 'audio';
