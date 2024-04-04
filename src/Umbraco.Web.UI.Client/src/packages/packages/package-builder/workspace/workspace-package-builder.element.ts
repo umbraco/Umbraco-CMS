@@ -1,3 +1,4 @@
+import { UmbDictionaryPickerContext } from '../../../dictionary/components/input-dictionary/input-dictionary.context.js';
 import { UmbMediaPickerContext } from '../../../media/media/components/input-media/input-media.context.js';
 import { UmbPackageRepository } from '../../package/repository/index.js';
 import type { UmbCreatedPackageDefinition } from '../../types.js';
@@ -179,8 +180,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				${this.#renderDocumentTypeSection()}
 				${this.#renderMediaTypeSection()}
 				${this.#renderLanguageSection()}
-
-			<umb-property-layout label="Dictionary" description=""> ${this.#renderDictionarySection()} </umb-property-layout>
+				${this.#renderDictionarySection()}
 
 			<umb-property-layout label="Data Types" description=""> ${this.#renderDataTypeSection()} </umb-property-layout>
 
@@ -310,10 +310,27 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		`;
 	}
 
+	#onDictionaryChange(event: { target: UmbInputEntityElement }) {
+		if (!this._package) return;
+
+		this._package.dictionaryItems = event.target.selection ?? [];
+		this.requestUpdate('_package');
+	}
+
 	#renderDictionarySection() {
-		return html`<div slot="editor">
-			<umb-input-checkbox-list></umb-input-checkbox-list>
-		</div>`;
+		if (!this._package) return nothing;
+		return html`
+			<umb-property-layout label="Dictionary">
+				<div slot="editor">
+					<umb-input-entity
+						.getIcon=${() => 'icon-book-alt'}
+						.pickerContext=${UmbDictionaryPickerContext}
+						.selection=${this._package.dictionaryItems ?? []}
+						@change=${this.#onDictionaryChange}>
+					</umb-input-entity>
+				</div>
+			</umb-property-layout>
+		`;
 	}
 
 	#renderDataTypeSection() {
