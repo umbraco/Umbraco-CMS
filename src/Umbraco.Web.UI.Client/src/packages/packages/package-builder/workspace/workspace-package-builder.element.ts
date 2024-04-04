@@ -2,6 +2,7 @@ import { UmbDictionaryPickerContext } from '../../../dictionary/components/input
 import { UmbMediaPickerContext } from '../../../media/media/components/input-media/input-media.context.js';
 import { UmbPackageRepository } from '../../package/repository/index.js';
 import type { UmbCreatedPackageDefinition } from '../../types.js';
+import type { UmbDataTypeInputElement } from '../../../data-type/components/data-type-input/data-type-input.element.js';
 import type { UmbInputLanguageElement } from '../../../language/components/input-language/input-language.element.js';
 import {
 	css,
@@ -181,8 +182,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				${this.#renderMediaTypeSection()}
 				${this.#renderLanguageSection()}
 				${this.#renderDictionarySection()}
-
-			<umb-property-layout label="Data Types" description=""> ${this.#renderDataTypeSection()} </umb-property-layout>
+				${this.#renderDataTypeSection()}
 
 			<umb-property-layout label="Templates" description=""> ${this.#renderTemplateSection()} </umb-property-layout>
 
@@ -334,9 +334,17 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	}
 
 	#renderDataTypeSection() {
-		return html`<div slot="editor">
-			<umb-data-type-input></umb-data-type-input>
-		</div>`;
+		if (!this._package) return nothing;
+		return html`
+			<umb-property-layout label="Data Types">
+				<div slot="editor">
+					<umb-data-type-input
+						.selection=${this._package.dataTypes}
+						@change=${(e: CustomEvent) =>
+							(this._package!.dataTypes = (e.target as UmbDataTypeInputElement).selection ?? [])}></umb-data-type-input>
+				</div>
+			</umb-property-layout>
+		`;
 	}
 
 	#renderTemplateSection() {
