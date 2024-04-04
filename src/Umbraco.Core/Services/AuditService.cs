@@ -40,24 +40,6 @@ public sealed class AuditService : RepositoryService, IAuditService
         _isAvailable = new Lazy<bool>(DetermineIsAvailable);
     }
 
-    [Obsolete("Use constructor that also takes IUserService & IEntityRepository instead, scheduled for removal in v13")]
-    public AuditService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
-        IAuditEntryRepository auditEntryRepository)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            auditRepository,
-            auditEntryRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IEntityRepository>())
-    {
-    }
-
     public void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())

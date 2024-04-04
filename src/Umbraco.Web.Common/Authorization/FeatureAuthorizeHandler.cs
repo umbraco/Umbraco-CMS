@@ -25,13 +25,6 @@ public class FeatureAuthorizeHandler : AuthorizationHandler<FeatureAuthorizeRequ
         _runtimeState = runtimeState;
     }
 
-    [Obsolete("Use ctor that is not obsolete. This will be removed in v13.")]
-    public FeatureAuthorizeHandler(UmbracoFeatures umbracoFeatures)
-        :this(umbracoFeatures, StaticServiceProvider.Instance.GetRequiredService<IRuntimeState>())
-    {
-
-    }
-
     protected override Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         FeatureAuthorizeRequirement requirement)
