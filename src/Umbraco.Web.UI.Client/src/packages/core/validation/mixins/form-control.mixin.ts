@@ -187,21 +187,21 @@ export const UmbFormControlMixin = <
 		}
 
 		/**
-		 * Add validator, to validate this Form Control.
+		 * Add validation, to validate this Form Control.
 		 * See https://developer.mozilla.org/en-US/docs/Web/API/ValidityState for available Validator FlagTypes.
 		 *
 		 * @example
-		 * this.addValidator(
+		 * this.addValidation(
 		 *  'tooLong',
 		 *  () => 'This input contains too many characters',
 		 *  () => this._value.length > 10
 		 * );
-		 * @method addValidator
+		 * @method addValidation
 		 * @param {FlagTypes} flagKey the type of validation.
 		 * @param {method} getMessageMethod method to retrieve relevant message. Is executed every time the validator is re-executed.
 		 * @param {method} checkMethod method to determine if this validator should invalidate this form control. Return true if this should prevent submission.
 		 */
-		addValidator(
+		addValidation(
 			flagKey: FlagTypes,
 			getMessageMethod: () => string,
 			checkMethod: () => boolean,
