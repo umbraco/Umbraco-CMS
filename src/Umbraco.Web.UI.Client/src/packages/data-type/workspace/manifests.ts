@@ -1,10 +1,10 @@
+import { UmbInvalidateWorkspaceAction } from './test-workspace-action.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbInvalidateWorkspaceAction } from './test-workspace-action.js';
 
 const DATA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DataType';
 
