@@ -2,20 +2,20 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Package;
+using Umbraco.Cms.Api.Management.ViewModels.Manifest;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Mapping;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Package;
+namespace Umbraco.Cms.Api.Management.Controllers.Manifest;
 
 [ApiVersion("1.0")]
 [AllowAnonymous]
-public class PublicPackageManifestController : PackageControllerBase
+public class PublicManifestManifestController : ManifestControllerBase
 {
     private readonly IPackageManifestService _packageManifestService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public PublicPackageManifestController(IPackageManifestService packageManifestService, IUmbracoMapper umbracoMapper)
+    public PublicManifestManifestController(IPackageManifestService packageManifestService, IUmbracoMapper umbracoMapper)
     {
         _packageManifestService = packageManifestService;
         _umbracoMapper = umbracoMapper;
@@ -24,10 +24,10 @@ public class PublicPackageManifestController : PackageControllerBase
     // NOTE: this endpoint is deliberately created as non-paginated to ensure the fastest possible client initialization
     [HttpGet("manifest/public")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<PackageManifestResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> PublicPackageManifests()
+    [ProducesResponseType(typeof(IEnumerable<ManifestResponseModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> PublicManifests()
     {
         PackageManifest[] packageManifests = (await _packageManifestService.GetPublicPackageManifestsAsync()).ToArray();
-        return Ok(_umbracoMapper.MapEnumerable<PackageManifest, PackageManifestResponseModel>(packageManifests));
+        return Ok(_umbracoMapper.MapEnumerable<PackageManifest, ManifestResponseModel>(packageManifests));
     }
 }
