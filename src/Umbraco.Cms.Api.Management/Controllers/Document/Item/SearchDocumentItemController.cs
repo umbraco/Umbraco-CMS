@@ -12,12 +12,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Item;
 [ApiVersion("1.0")]
 public class SearchDocumentItemController : DocumentItemControllerBase
 {
-    private readonly IEntitySearchService _entitySearchService;
+    private readonly IExamineEntitySearchService _examineEntitySearchService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
-    public SearchDocumentItemController(IEntitySearchService entitySearchService, IDocumentPresentationFactory documentPresentationFactory)
+    public SearchDocumentItemController(IExamineEntitySearchService examineEntitySearchService, IDocumentPresentationFactory documentPresentationFactory)
     {
-        _entitySearchService = entitySearchService;
+        _examineEntitySearchService = examineEntitySearchService;
         _documentPresentationFactory = documentPresentationFactory;
     }
 
@@ -26,8 +26,7 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Search(string query, int skip = 0, int take = 100)
     {
-        // FIXME: use Examine and handle user start nodes
-        PagedModel<IEntitySlim> searchResult = _entitySearchService.Search(UmbracoObjectTypes.Document, query, skip, take);
+        PagedModel<IEntitySlim> searchResult = _examineEntitySearchService.Search(UmbracoObjectTypes.Document, query, skip, take);
         var result = new PagedModel<DocumentItemResponseModel>
         {
             Items = searchResult.Items.OfType<IDocumentEntitySlim>().Select(_documentPresentationFactory.CreateItemResponseModel),
