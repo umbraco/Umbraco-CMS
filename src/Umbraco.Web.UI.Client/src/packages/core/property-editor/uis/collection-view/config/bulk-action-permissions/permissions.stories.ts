@@ -1,8 +1,8 @@
 import type { Meta, Story } from '@storybook/web-components';
-import type { UmbPropertyEditorUICollectionViewPermissionsElement } from './collection-view-permissions.element.js';
+import type { UmbPropertyEditorUICollectionViewPermissionsElement } from './permissions.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import './collection-view-permissions.element.js';
+import './permissions.element.js';
 
 export default {
 	title: 'Property Editor UIs/Collection View Bulk Action Permissions',

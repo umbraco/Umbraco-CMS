@@ -1,18 +1,18 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUICollectionViewPermissionsElement } from './collection-view-permissions.element.js';
+import { UmbPropertyEditorUICollectionViewOrderByElement } from './order-by.element.js';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
-describe('UmbPropertyEditorUICollectionViewPermissionsElement', () => {
-	let element: UmbPropertyEditorUICollectionViewPermissionsElement;
+describe('UmbPropertyEditorUICollectionViewOrderByElement', () => {
+	let element: UmbPropertyEditorUICollectionViewOrderByElement;
 
 	beforeEach(async () => {
 		element = await fixture(html`
-			<umb-property-editor-ui-collection-view-permissions></umb-property-editor-ui-collection-view-permissions>
+			<umb-property-editor-ui-collection-view-order-by></umb-property-editor-ui-collection-view-order-by>
 		`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbPropertyEditorUICollectionViewPermissionsElement);
+		expect(element).to.be.instanceOf(UmbPropertyEditorUICollectionViewOrderByElement);
 	});
 
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
