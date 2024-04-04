@@ -47,9 +47,6 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 
 	protected firstUpdated(): void {
 		this.#getLogs();
-
-		//TODO: REMOVE THIS
-		this.#onRollbackModalOpen();
 	}
 
 	async #getLogs() {
