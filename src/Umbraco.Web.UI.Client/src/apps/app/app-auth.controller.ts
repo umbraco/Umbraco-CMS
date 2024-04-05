@@ -1,15 +1,11 @@
 import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH, UMB_STORAGE_REDIRECT_URL } from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
-	#serverExtensionRegistrator = new UmbServerExtensionRegistrator(this, umbExtensionsRegistry);
-	#init;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -17,8 +13,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 		this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
 			this.#authContext = context;
 		});
-
-		this.#init = Promise.all([this.#serverExtensionRegistrator.registerPublicExtensions()]);
 	}
 
 	/**
@@ -52,28 +46,40 @@ export class UmbAppAuthController extends UmbControllerBase {
 			throw new Error('[Fatal] Auth context is not available');
 		}
 
-		await this.#init;
-
 		// Figure out which providers are available
-		const availableProviders = await firstValueFrom(umbExtensionsRegistry.byType('authProvider'));
+		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders());
+
 		if (availableProviders.length === 0) {
-			// No providers available, initiate the authorization request to the default provider
+			throw new Error('[Fatal] No auth providers available');
+		}
+
+		if (availableProviders.length === 1) {
+			// One provider available (most likely the Umbraco provider), so initiate the authorization request to the default provider
 			this.#authContext.makeAuthorizationRequest();
 		} else {
-			// Check if any provider is redirecting directly to the provider, and if so, redirect to that provider
-			const redirectProvider = availableProviders.find((provider) => provider.meta?.autoRedirect);
-			if (redirectProvider) {
-				this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName);
-				return true;
-			}
+			// Check if any provider is redirecting directly to the provider
+			const redirectProvider = availableProviders.find((provider) => provider.meta?.behavior?.autoRedirect);
 
-			// Show the provider selection screen
-			console.log('show modal for', availableProviders);
-			const modalContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-			await modalContext
-				.open(this._host, UMB_MODAL_APP_AUTH)
-				.onSubmit()
-				.catch(() => undefined);
+			if (redirectProvider) {
+				// Redirect directly to the provider
+				this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName);
+			} else {
+				// Show the provider selection screen
+				console.log('show modal for', availableProviders);
+				const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+				await modalManager
+					.open(this._host, UMB_MODAL_APP_AUTH)
+					.onSubmit()
+					.catch(() => undefined);
+			}
+		}
+
+		return this.#updateState();
+	}
+
+	#updateState() {
+		if (!this.#authContext) {
+			throw new Error('[Fatal] Auth context is not available');
 		}
 
 		// Reinitialize the auth flow (load the state from local storage)
