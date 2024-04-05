@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Core.Xml
     /// <para>Discussed in http://weblogs.asp.net/cazzu/archive/2003/10/07/30888.aspx</para>
     /// <para>Author: Daniel Cazzulino, <a href="http://clariusconsulting.net/kzu">blog</a></para>
     /// </remarks>
+    [Obsolete("The current implementation is not used anymore and will be removed entirely in a future version. Scheduled for removal in v15")]
     public class DynamicContext : XsltContext
     {
         #region Private vars
@@ -118,7 +119,6 @@ namespace Umbraco.Cms.Core.Xml
         /// <summary>
         /// Same as <see cref="XsltContext"/>.
         /// </summary>
-        [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
         public override bool PreserveWhitespace(XPathNavigator node)
         {
             return true;
@@ -190,7 +190,6 @@ namespace Umbraco.Cms.Core.Xml
         /// <summary>
         /// See <see cref="XsltContext"/>. Not used in our implementation.
         /// </summary>
-        [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
         public override IXsltContextFunction ResolveFunction(string prefix, string name, XPathResultType[] argTypes) => throw new NotImplementedException();
 
         /// <summary>
