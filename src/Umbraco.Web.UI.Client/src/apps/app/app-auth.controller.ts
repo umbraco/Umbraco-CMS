@@ -11,6 +11,7 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+	#firstTimeLoggingIn = true;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -29,6 +30,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 					filter((x) => !x),
 				),
 				() => {
+					this.#firstTimeLoggingIn = false;
 					this.makeAuthorizationRequest('timedOut');
 				},
 				'_authState',
@@ -91,6 +93,11 @@ export class UmbAppAuthController extends UmbControllerBase {
 					.open(this._host, UMB_MODAL_APP_AUTH, {
 						data: {
 							userLoginState,
+						},
+						modal: {
+							backdropBackground: this.#firstTimeLoggingIn
+								? "url('https://picsum.photos/1440') center center / cover no-repeat"
+								: 'rgb(0, 0, 0)',
 						},
 					})
 					.onSubmit()
