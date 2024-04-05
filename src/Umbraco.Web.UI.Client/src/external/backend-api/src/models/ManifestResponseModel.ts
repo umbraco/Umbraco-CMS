@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type PackageManifestResponseModel = {
+export type ManifestResponseModel = {
     name: string;
     version?: string | null;
     extensions: Array<any>;
