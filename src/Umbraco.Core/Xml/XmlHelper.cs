@@ -72,6 +72,176 @@ public class XmlHelper
     }
 
     /// <summary>
+    ///     Creates a new <c>XPathDocument</c> from an xml string.
+    /// </summary>
+    /// <param name="xml">The xml string.</param>
+    /// <returns>An <c>XPathDocument</c> created from the xml string.</returns>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
+    public static XPathDocument CreateXPathDocument(string xml) =>
+        new XPathDocument(new XmlTextReader(new StringReader(xml)));
+
+    /// <summary>
+    ///     Tries to create a new <c>XPathDocument</c> from an xml string.
+    /// </summary>
+    /// <param name="xml">The xml string.</param>
+    /// <param name="doc">The XPath document.</param>
+    /// <returns>A value indicating whether it has been possible to create the document.</returns>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
+    public static bool TryCreateXPathDocument(string xml, out XPathDocument? doc)
+    {
+        try
+        {
+            doc = CreateXPathDocument(xml);
+            return true;
+        }
+        catch (Exception)
+        {
+            doc = null;
+            return false;
+        }
+    }
+
+    /// <summary>
+    ///     Tries to create a new <c>XPathDocument</c> from a property value.
+    /// </summary>
+    /// <param name="value">The value of the property.</param>
+    /// <param name="doc">The XPath document.</param>
+    /// <returns>A value indicating whether it has been possible to create the document.</returns>
+    /// <remarks>The value can be anything... Performance-wise, this is bad.</remarks>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
+    public static bool TryCreateXPathDocumentFromPropertyValue(object value, out XPathDocument? doc)
+    {
+        // DynamicNode.ConvertPropertyValueByDataType first cleans the value by calling
+        // XmlHelper.StripDashesInElementOrAttributeName - this is because the XML is
+        // to be returned as a DynamicXml and element names such as "value-item" are
+        // invalid and must be converted to "valueitem". But we don't have that sort of
+        // problem here - and we don't need to bother with dashes nor dots, etc.
+        doc = null;
+        if (value is not string xml)
+        {
+            return false; // no a string
+        }
+
+        if (CouldItBeXml(xml) == false)
+        {
+            return false; // string does not look like it's xml
+        }
+
+        if (IsXmlWhitespace(xml))
+        {
+            return false; // string is whitespace, xml-wise
+        }
+
+        if (TryCreateXPathDocument(xml, out doc) == false)
+        {
+            return false; // string can't be parsed into xml
+        }
+
+        XPathNavigator nav = doc!.CreateNavigator();
+        if (nav.MoveToFirstChild())
+        {
+            // SD: This used to do this but the razor macros and the entire razor macros section is gone, it was all legacy, it seems this method isn't even
+            // used apart from for tests so don't think this matters. In any case, we no longer check for this!
+
+            // var name = nav.LocalName; // must not match an excluded tag
+            // if (UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false)) return true;
+            return true;
+        }
+
+        doc = null;
+        return false;
+    }
+
+    /// <summary>
+    ///     Sorts the children of a parentNode.
+    /// </summary>
+    /// <param name="parentNode">The parent node.</param>
+    /// <param name="childNodesXPath">An XPath expression to select children of <paramref name="parentNode" /> to sort.</param>
+    /// <param name="orderBy">A function returning the value to order the nodes by.</param>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
+    public static void SortNodes(
+        XmlNode parentNode,
+        string childNodesXPath,
+        Func<XmlNode, int> orderBy)
+    {
+        XmlNode[]? sortedChildNodes = parentNode.SelectNodes(childNodesXPath)?.Cast<XmlNode>()
+            .OrderBy(orderBy)
+            .ToArray();
+
+        // append child nodes to last position, in sort-order
+        // so all child nodes will go after the property nodes
+        if (sortedChildNodes is not null)
+        {
+            foreach (XmlNode node in sortedChildNodes)
+            {
+                parentNode.AppendChild(node); // moves the node to the last position
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Sorts a single child node of a parentNode.
+    /// </summary>
+    /// <param name="parentNode">The parent node.</param>
+    /// <param name="childNodesXPath">An XPath expression to select children of <paramref name="parentNode" /> to sort.</param>
+    /// <param name="node">The child node to sort.</param>
+    /// <param name="orderBy">A function returning the value to order the nodes by.</param>
+    /// <returns>A value indicating whether sorting was needed.</returns>
+    /// <remarks>
+    ///     Assuming all nodes but <paramref name="node" /> are sorted, this will move the node to
+    ///     the right position without moving all the nodes (as SortNodes would do) - should improve perfs.
+    /// </remarks>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
+    public static bool SortNode(
+        XmlNode parentNode,
+        string childNodesXPath,
+        XmlNode node,
+        Func<XmlNode, int> orderBy)
+    {
+        var nodeSortOrder = orderBy(node);
+        Tuple<XmlNode, int>[]? childNodesAndOrder = parentNode.SelectNodes(childNodesXPath)?.Cast<XmlNode>()
+            .Select(x => Tuple.Create(x, orderBy(x))).ToArray();
+
+        // only one node = node is in the right place already, obviously
+        if (childNodesAndOrder is null || childNodesAndOrder.Length == 1)
+        {
+            return false;
+        }
+
+        // find the first node with a sortOrder > node.sortOrder
+        var i = 0;
+        while (i < childNodesAndOrder.Length && childNodesAndOrder[i].Item2 <= nodeSortOrder)
+        {
+            i++;
+        }
+
+        // if one was found
+        if (i < childNodesAndOrder.Length)
+        {
+            // and node is just before, we're done already
+            // else we need to move it right before the node that was found
+            if (i == 0 || childNodesAndOrder[i - 1].Item1 != node)
+            {
+                parentNode.InsertBefore(node, childNodesAndOrder[i].Item1);
+                return true;
+            }
+        }
+        else // i == childNodesAndOrder.Length && childNodesAndOrder.Length > 1
+        {
+            // and node is the last one, we're done already
+            // else we need to append it as the last one
+            // (and i > 1, see above)
+            if (childNodesAndOrder[i - 1].Item1 != node)
+            {
+                parentNode.AppendChild(node);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     ///     Opens a file as a XmlDocument.
     /// </summary>
     /// <param name="filePath">The relative file path. ie. /config/umbraco.config</param>
