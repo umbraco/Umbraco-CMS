@@ -1,3 +1,4 @@
+import { UMB_ENTITY_CONTEXT } from './entity.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
@@ -21,7 +22,7 @@ export class UmbEntityContext extends UmbContextBase<UmbEntityContext> {
 	 * @memberof UmbEntityContext
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, 'entity');
+		super(host, UMB_ENTITY_CONTEXT);
 	}
 
 	setEntityType(entityType: string | undefined) {
