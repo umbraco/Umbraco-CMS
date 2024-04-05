@@ -65,12 +65,17 @@ export class UmbAppAuthController extends UmbControllerBase {
 				this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName);
 			} else {
 				// Show the provider selection screen
-				console.log('show modal for', availableProviders);
 				const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-				await modalManager
+				const selected = await modalManager
 					.open(this._host, UMB_MODAL_APP_AUTH)
 					.onSubmit()
 					.catch(() => undefined);
+
+				if (!selected?.providerName) {
+					return false;
+				}
+
+				this.#authContext.makeAuthorizationRequest(selected.providerName);
 			}
 		}
 
