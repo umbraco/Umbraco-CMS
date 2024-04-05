@@ -1,10 +1,7 @@
-import type { UmbCurrentUserMfaProviderModel } from '../types.js';
 import { UmbCurrentUserServerDataSource } from './current-user.server.data-source.js';
 import { UMB_CURRENT_USER_STORE_CONTEXT } from './current-user.store.js';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A repository for the current user
@@ -13,14 +10,12 @@ import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
  * @extends {UmbRepositoryBase}
  */
 export class UmbCurrentUserRepository extends UmbRepositoryBase {
-	#currentUserSource: UmbCurrentUserServerDataSource;
+	#currentUserSource = new UmbCurrentUserServerDataSource(this._host);
 	#currentUserStore?: typeof UMB_CURRENT_USER_STORE_CONTEXT.TYPE;
 	#init: Promise<unknown>;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-
-		this.#currentUserSource = new UmbCurrentUserServerDataSource(host);
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT, (instance) => {
@@ -67,19 +62,16 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	 * @param code The activation code of the provider to enable
 	 * @memberof UmbCurrentUserRepository
 	 */
-	async enableMfaProvider(providerName: string, code: string, secret: string): Promise<boolean> {
-		const { error } = await tryExecuteAndNotify(
-			this._host,
-			UserResource.postUserCurrent2FaByProviderName({ providerName, requestBody: { code, secret } }),
-		);
+	async enableMfaProvider(providerName: string, code: string, secret: string) {
+		const { error } = await this.#currentUserSource.enableMfaProvider(providerName, code, secret);
 
 		if (error) {
-			return false;
+			return { error };
 		}
 
 		this.#currentUserStore?.updateMfaProvider({ providerName, isEnabledOnUser: true });
 
-		return true;
+		return {};
 	}
 
 	/**
@@ -88,19 +80,16 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	 * @param code The activation code of the provider to disable
 	 * @memberof UmbCurrentUserRepository
 	 */
-	async disableMfaProvider(providerName: string, code: string): Promise<boolean> {
-		const { error } = await tryExecuteAndNotify(
-			this._host,
-			UserResource.deleteUserCurrent2FaByProviderName({ providerName, code }),
-		);
+	async disableMfaProvider(providerName: string, code: string) {
+		const { error } = await this.#currentUserSource.disableMfaProvider(providerName, code);
 
 		if (error) {
-			return false;
+			return { error };
 		}
 
 		this.#currentUserStore?.updateMfaProvider({ providerName, isEnabledOnUser: false });
 
-		return true;
+		return {};
 	}
 }
 

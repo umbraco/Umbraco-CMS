@@ -13,6 +13,7 @@ import {
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 // TODO: update to module imports when ready
+import { blobDownload } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { PackageDefinitionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
@@ -57,7 +58,17 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	async #download() {
 		if (!this._package?.id) return;
-		await tryExecuteAndNotify(this, PackageResource.getPackageCreatedByIdDownload({ id: this._package.id }));
+		const { data } = await tryExecuteAndNotify(
+			this,
+			PackageResource.getPackageCreatedByIdDownload({ id: this._package.id }),
+		);
+
+		if (!data) return;
+
+		// TODO: [LK] Need to review what the server is doing, as different data is returned depending on schema configuration.
+		// e.g. selecting Media items will return a ZIP file, otherwise it's an XML file. It should be consistent.
+		//blobDownload(data, 'package.xml', 'text/xml');
+		blobDownload(data, 'package.zip', 'application/zip');
 	}
 
 	#nameDefined() {

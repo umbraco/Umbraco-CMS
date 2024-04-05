@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
+import type { ContentForDocumentResponseModel } from './ContentForDocumentResponseModel';
 
-export type DocumentBlueprintResponseModel = NamedItemResponseModelBaseModel;
+export type DocumentBlueprintResponseModel = ContentForDocumentResponseModel;
 
