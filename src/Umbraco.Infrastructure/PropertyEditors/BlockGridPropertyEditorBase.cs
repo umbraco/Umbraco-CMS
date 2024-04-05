@@ -2,10 +2,8 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -23,13 +21,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public abstract class BlockGridPropertyEditorBase : DataEditor
 {
     private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
-
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
-    protected BlockGridPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory)
-        : this(dataValueEditorFactory, StaticServiceProvider.Instance.GetRequiredService<IBlockValuePropertyIndexValueFactory>())
-    {
-
-    }
 
     protected BlockGridPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
         : base(dataValueEditorFactory)
