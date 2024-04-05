@@ -65,6 +65,9 @@ export class UmbDebugElement extends UmbLitElement {
 	}
 
 	private _openDialog() {
+
+		this._update();
+
 		this._modalContext?.open(this, UMB_CONTEXT_DEBUGGER_MODAL, {
 			data: {
 				content: html`${this._renderContextAliases()}`,
@@ -73,9 +76,10 @@ export class UmbDebugElement extends UmbLitElement {
 	}
 
 	private _renderDialog() {
-		return html` <div id="container">
+		return html`
+		<div id="container">
 			<uui-badge color="danger" look="primary" attention @click="${this._openDialog}">
-				<uui-icon name="icon-bug"></uui-icon> Debug
+				<uui-icon name="icon-bug"></uui-icon>&nbsp;Debug
 			</uui-badge>
 		</div>`;
 	}

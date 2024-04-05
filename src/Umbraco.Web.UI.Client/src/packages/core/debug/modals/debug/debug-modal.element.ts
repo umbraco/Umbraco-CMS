@@ -13,7 +13,9 @@ export default class UmbContextDebuggerModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-dialog-layout>
 				<span slot="headline"> <uui-icon name="icon-bug"></uui-icon> Debug: Contexts </span>
-				<uui-scroll-container id="field-settings"> ${this.data?.content} </uui-scroll-container>
+				<uui-scroll-container id="field-settings"> 
+					${this.data?.content} 
+				</uui-scroll-container>
 				<uui-button slot="actions" look="primary" label="Close sidebar" @click="${this._handleClose}">Close</uui-button>
 			</uui-dialog-layout>
 		`;
