@@ -11,7 +11,7 @@ import { UMB_ENTITY_WITH_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/bac
 /**
  * Condition to apply extension based on a entities content type unique
  */
-export class UmbWorkspaceContentTypeCondition extends UmbConditionBase<WorkspaceEntityContentTypeConditionConfig> implements UmbExtensionCondition {
+export class UmbWorkspaceEntityContentTypeCondition extends UmbConditionBase<WorkspaceEntityContentTypeConditionConfig> implements UmbExtensionCondition {
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<WorkspaceEntityContentTypeConditionConfig>) {
 		super(host, args);
 
@@ -61,5 +61,5 @@ export const manifest: ManifestCondition = {
 	type: 'condition',
 	name: 'Workspace Entity Content Type Condition',
 	alias: 'Umb.Condition.EntityContentType',
-	api: UmbWorkspaceContentTypeCondition,
+	api: UmbWorkspaceEntityContentTypeCondition,
 };
