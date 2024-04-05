@@ -40,6 +40,9 @@ internal sealed class PackageManifestService : IPackageManifestService
     public async Task<IEnumerable<PackageManifest>> GetPublicPackageManifestsAsync()
         => (await GetAllPackageManifestsAsync()).Where(manifest => manifest.AllowPublicAccess).ToArray();
 
+    public async Task<IEnumerable<PackageManifest>> GetPrivatePackageManifestsAsync()
+        => (await GetAllPackageManifestsAsync()).Where(manifest => manifest.AllowPublicAccess == false).ToArray();
+
     public async Task<PackageManifestImportmap> GetPackageManifestImportmapAsync()
     {
         IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();

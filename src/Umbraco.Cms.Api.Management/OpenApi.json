@@ -12949,6 +12949,57 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/manifest/manifest/private": {
+      "get": {
+        "tags": [
+          "Manifest"
+        ],
+        "operationId": "GetManifestManifestPrivate",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ManifestResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ManifestResponseModel"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ManifestResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/manifest/manifest/public": {
       "get": {
         "tags": [
