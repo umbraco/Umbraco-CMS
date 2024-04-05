@@ -13,8 +13,9 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<never, UmbModalA
 
 	render() {
 		return html`
-			<umb-body-layout .headline=${this.localize.term('general_login')}>
+			<umb-body-layout id="layout" .headline=${this.localize.term('login_instruction')}>
 				<umb-extension-slot
+					id="providers"
 					type="authProvider"
 					default-element="umb-auth-provider-default"
 					.props=${this.props}></umb-extension-slot>
@@ -33,6 +34,12 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<never, UmbModalA
 			:host {
 				display: block;
 				padding: 20px;
+				width: 380px;
+				max-width: 80vw;
+			}
+
+			#layout {
+				--umb-body-layout-color-background: #fff;
 			}
 		`,
 	];
