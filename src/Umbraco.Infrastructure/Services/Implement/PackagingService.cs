@@ -6,6 +6,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
@@ -126,7 +127,7 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.NotFound, null);
         }
 
-        int currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
         _auditService.Add(AuditType.Delete, currentUserId, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
         _createdPackages.Delete(package.Id);
 
@@ -189,7 +190,7 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus(PackageOperationStatus.DuplicateItemName, package);
         }
 
-        int currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
         _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
         scope.Complete();
         return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
@@ -205,7 +206,7 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus(PackageOperationStatus.NotFound, package);
         }
 
-        int currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
         _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
         scope.Complete();
         return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));

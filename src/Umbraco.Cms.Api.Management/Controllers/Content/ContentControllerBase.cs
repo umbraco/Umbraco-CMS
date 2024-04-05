@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
-public class ContentControllerBase : ManagementApiControllerBase
+public abstract class ContentControllerBase : ManagementApiControllerBase
 {
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
@@ -67,6 +67,10 @@ public class ContentControllerBase : ManagementApiControllerBase
             ContentEditingOperationStatus.DuplicateKey => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid Id")
                 .WithDetail("The supplied id is already in use.")
+                .Build()),
+            ContentEditingOperationStatus.DuplicateName => BadRequest(problemDetailsBuilder
+                .WithTitle("Duplicate name")
+                .WithDetail("The supplied name is already in use for the same content type.")
                 .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,
