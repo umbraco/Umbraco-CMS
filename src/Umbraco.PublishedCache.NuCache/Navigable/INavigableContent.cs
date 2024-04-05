@@ -1,10 +1,10 @@
-namespace Umbraco.Cms.Core.Xml.XPath;
+namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
 
 /// <summary>
 ///     Represents a content that can be navigated via XPath.
 /// </summary>
 [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v15. Still needed for NuCache")]
-public interface INavigableContent
+internal interface INavigableContent
 {
     /// <summary>
     ///     Gets the unique identifier of the navigable content.

@@ -1,10 +1,10 @@
-namespace Umbraco.Cms.Core.Xml.XPath;
+namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
 
 /// <summary>
 ///     Represents a source of content that can be navigated via XPath.
 /// </summary>
 [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v15. Still needed for NuCache")]
-public interface INavigableSource
+internal interface INavigableSource
 {
     /// <summary>
     ///     Gets the index of the last attribute in the fields collections.
