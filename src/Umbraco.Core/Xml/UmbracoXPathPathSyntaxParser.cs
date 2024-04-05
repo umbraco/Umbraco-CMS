@@ -9,13 +9,6 @@ namespace Umbraco.Cms.Core.Xml;
 [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
 public class UmbracoXPathPathSyntaxParser
 {
-    [Obsolete("This will be removed in Umbraco 13. Use ParseXPathQuery which accepts a parentId instead")]
-    public static string ParseXPathQuery(
-        string xpathExpression,
-        int? nodeContextId,
-        Func<int, IEnumerable<string>?> getPath,
-        Func<int, bool> publishedContentExists) => ParseXPathQuery(xpathExpression, nodeContextId, null, getPath, publishedContentExists);
-
     /// <summary>
     ///     Parses custom umbraco xpath expression
     /// </summary>
