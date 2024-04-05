@@ -1,11 +1,41 @@
-import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalBaseElement } from '../../modal/index.js';
+import type { UmbModalAppAuthValue } from './umb-app-auth-modal.token.js';
+import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-app-auth-modal')
-export class UmbAppAuthModalElement extends UmbLitElement {
-	render() {
-		return html`<h1>Umb App Auth Modal</h1>`;
+export class UmbAppAuthModalElement extends UmbModalBaseElement<never, UmbModalAppAuthValue> {
+	get props() {
+		return {
+			onSubmit: this.onSubmit,
+		};
 	}
+
+	render() {
+		return html`
+			<umb-body-layout .headline=${this.localize.term('general_login')}>
+				<umb-extension-slot
+					type="authProvider"
+					default-element="umb-auth-provider-default"
+					.props=${this.props}></umb-extension-slot>
+			</umb-body-layout>
+		`;
+	}
+
+	private onSubmit = (providerName: string) => {
+		this.value = { providerName };
+		this._submitModal();
+	};
+
+	static styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				display: block;
+				padding: 20px;
+			}
+		`,
+	];
 }
 
 export default UmbAppAuthModalElement;
