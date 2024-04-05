@@ -29,7 +29,7 @@ export interface MetaAuthProvider {
 	 * The default view of the provider that is shown to the user.
 	 * If no element is provided, then the button will be rendered as a @see {UUIButtonElement} using these options.
 	 */
-	defaultView: {
+	defaultView?: {
 		/**
 		 * The icon of the provider that is shown to the user.
 		 * @examples ['icon-cloud', 'icon-github', 'icon-google', 'icon-facebook', 'icon-twitter', 'icon-x', 'icon-microsoft']
@@ -51,14 +51,30 @@ export interface MetaAuthProvider {
 	};
 
 	/**
-	 * If true, the Umbraco backoffice login will be disabled.
-	 * @default false
+	 * The behavior of the provider when it is used.
 	 */
-	denyLocalLogin?: boolean;
+	behavior?: {
+		/**
+		 * If true, the Umbraco backoffice login will be disabled.
+		 * @default false
+		 */
+		denyLocalLogin?: boolean;
+
+		/**
+		 * If true, the user will be redirected to the provider's login page immediately.
+		 * @default false
+		 */
+		autoRedirect?: boolean;
+	};
 
 	/**
-	 * If true, the user will be redirected to the provider's login page immediately.
-	 * @default false
+	 * The linking options of the provider when it is used.
 	 */
-	autoRedirect?: boolean;
+	linking?: {
+		/**
+		 * If true, the user will be able to link the provider to an existing account.
+		 * @default false
+		 */
+		allowManualLinking?: boolean;
+	};
 }
