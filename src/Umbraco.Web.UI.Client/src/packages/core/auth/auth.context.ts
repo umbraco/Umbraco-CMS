@@ -96,6 +96,16 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	}
 
 	/**
+	 * Handles the case where the user has timed out, i.e. the token has expired.
+	 * This will clear the token storage and set the user as unauthorized.
+	 * @memberof UmbAuthContext
+	 */
+	timeOut() {
+		this.clearTokenStorage();
+		this.#isAuthorized.setValue(false);
+	}
+
+	/**
 	 * Signs the user out by removing any tokens from the browser.
 	 * @memberof UmbAuthContext
 	 */
