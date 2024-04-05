@@ -39,10 +39,10 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	extensionRegistry.registerMany(coreManifests);
 
 	const notificationContainerElement = new UmbBackofficeNotificationContainerElement();
-	host.appendChild(notificationContainerElement);
+	host.shadowRoot?.appendChild(notificationContainerElement);
 
 	const modalContainerElement = new UmbBackofficeModalContainerElement();
-	host.appendChild(modalContainerElement);
+	host.shadowRoot?.appendChild(modalContainerElement);
 
 	new UmbNotificationContext(host);
 	new UmbModalManagerContext(host);
