@@ -44,6 +44,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Invalid container name")
                     .WithDetail("One or more container names are invalid")
                     .Build()),
+                ContentTypeOperationStatus.InvalidContainerType => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid container type")
+                    .WithDetail("One or more container types are invalid")
+                    .Build()),
                 ContentTypeOperationStatus.MissingContainer => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Missing container")
                     .WithDetail("One or more containers or properties are listed as parents to containers that are not defined.")

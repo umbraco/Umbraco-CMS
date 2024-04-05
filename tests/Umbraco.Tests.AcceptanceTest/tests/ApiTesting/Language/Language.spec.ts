@@ -35,7 +35,7 @@ test.describe('Language tests', () => {
     expect(await umbracoApi.language.doesExist(isoCodeDanish)).toBeTruthy();
     // Checks if the language name was updated
     const updatedLanguage = await umbracoApi.language.get(isoCodeDanish);
-    await expect(updatedLanguage.name).toEqual(languageNameDanish);
+    expect(updatedLanguage.name).toEqual(languageNameDanish);
   });
 
   test('can delete a language', async ({umbracoApi}) => {
