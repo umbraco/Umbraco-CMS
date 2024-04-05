@@ -1,11 +1,10 @@
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import type { UmbSectionSidebarContext } from '../section-sidebar/index.js';
 import { UMB_SECTION_SIDEBAR_CONTEXT } from '../section-sidebar/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbStringState, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-section-sidebar-context-menu')
 export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
@@ -22,8 +21,6 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 
 	@state()
 	private _headline?: string;
-
-	#entityContext = new UmbEntityContext(this);
 
 	constructor() {
 		super();
@@ -56,9 +53,6 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 			(values) => {
 				this._unique = values[0];
 				this._entityType = values[1];
-
-				this.#entityContext.setEntityType(this._entityType);
-				this.#entityContext.setUnique(this._unique);
 			},
 		),
 			'_observeEntityModel';

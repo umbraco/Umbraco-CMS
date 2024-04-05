@@ -1,3 +1,4 @@
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityActionArgs } from './types.js';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestEntityAction, MetaEntityAction } from '@umbraco-cms/backoffice/extension-registry';
@@ -43,8 +44,13 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		[UmbEntityActionArgs<MetaEntityAction>]
 	>;
 
+	#entityContext = new UmbEntityContext(this);
+
 	#generateApiArgs() {
 		if (!this._props.entityType || this._props.unique !== undefined) return;
+
+		this.#entityContext.setEntityType(this._props.entityType);
+		this.#entityContext.setUnique(this._props.unique);
 
 		this._apiArgs = (manifest: ManifestEntityAction<MetaEntityAction>) => {
 			return [{ entityType: this._props.entityType!, unique: this._props.unique!, meta: manifest.meta }];
@@ -59,7 +65,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 						.filter=${this._filter}
 						.elementProps=${this._props}
 						.apiArgs=${this._apiArgs}></umb-extension-with-api-slot>
-			  `
+				`
 			: '';
 	}
 
