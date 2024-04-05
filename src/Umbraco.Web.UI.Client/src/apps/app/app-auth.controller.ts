@@ -96,8 +96,8 @@ export class UmbAppAuthController extends UmbControllerBase {
 						},
 						modal: {
 							backdropBackground: this.#firstTimeLoggingIn
-								? "url('https://picsum.photos/1440?grayscale&blur=2') center center / cover no-repeat"
-								: 'rgb(0, 0, 0)',
+								? "var(--umb-auth-backdrop, url('https://picsum.photos/1440?grayscale&blur=2') center center / cover no-repeat)"
+								: 'var(--umb-auth-backdrop-timedout, rgb(0, 0, 0))',
 						},
 					})
 					.onSubmit()
