@@ -5,6 +5,7 @@ import { css, customElement, html, query, state } from '@umbraco-cms/backoffice/
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { isApiError } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-current-user-mfa-disable-provider-modal')
 export class UmbCurrentUserMfaDisableProviderModalElement extends UmbModalBaseElement<
@@ -99,16 +100,27 @@ export class UmbCurrentUserMfaDisableProviderModalElement extends UmbModalBaseEl
 		if (!code) return;
 
 		this._buttonState = 'waiting';
-		const success = await this.#currentUserRepository.disableMfaProvider(this.data.providerName, code);
+		const { error } = await this.#currentUserRepository.disableMfaProvider(this.data.providerName, code);
 
-		if (success) {
-			this.#peek(this.localize.term('user_2faProviderIsDisabledMsg'));
+		if (!error) {
+			this.#peek(this.localize.term('user_2faProviderIsDisabledMsg', this.data.displayName ?? this.data.providerName));
 			this.modalContext?.submit();
 			this._buttonState = 'success';
 		} else {
-			this._codeInput.setCustomValidity(this.localize.term('user_2faInvalidCode'));
-			this._codeInput.focus();
 			this._buttonState = 'failed';
+			if (isApiError(error)) {
+				if (error.body.operationStatus === 'InvalidCode') {
+					this._codeInput.setCustomValidity(this.localize.term('user_2faInvalidCode'));
+					this._codeInput.focus();
+				} else {
+					this.#peek(
+						this.localize.term('user_2faProviderIsNotDisabledMsg', this.data.displayName ?? this.data.providerName),
+						'warning',
+					);
+				}
+			} else {
+				this.#peek(error.message, 'warning');
+			}
 		}
 	}
 

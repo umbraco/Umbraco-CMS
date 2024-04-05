@@ -91,7 +91,7 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 
 		this.observe(
 			this.#pickerContext.selection,
-			(selection) => (super.value = selection.join(',')),
+			(selection) => (this.value = selection.join(',')),
 			'umbUserGroupInputSelectionObserver',
 		);
 		this.observe(

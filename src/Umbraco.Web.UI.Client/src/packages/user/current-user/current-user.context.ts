@@ -55,6 +55,15 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 		return currentUser?.unique === userUnique;
 	}
 
+	/**
+	 * Checks if the current user is an admin.
+	 * @returns True if the current user is an admin, otherwise false
+	 */
+	async isCurrentUserAdmin(): Promise<boolean> {
+		const currentUser = await firstValueFrom(this.currentUser);
+		return currentUser?.isAdmin ?? false;
+	}
+
 	#observeIsAuthorized() {
 		if (!this.#authContext) return;
 		this.observe(this.#authContext.isAuthorized, (isAuthorized) => {

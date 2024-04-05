@@ -1,8 +1,8 @@
-import type { UmbMfaProviderConfigurationElementProps } from '../types.js';
+import type { UmbMfaProviderConfigurationCallback, UmbMfaProviderConfigurationElementProps } from '../types.js';
 import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { css, customElement, html, property, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { isApiError, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
@@ -20,7 +20,8 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 	displayName = '';
 
 	@property({ attribute: false })
-	callback: (providerName: string, code: string, secret: string) => Promise<boolean> = async () => false;
+	callback: (providerName: string, code: string, secret: string) => UmbMfaProviderConfigurationCallback =
+		async () => ({});
 
 	@property({ attribute: false })
 	close = () => {};
@@ -174,16 +175,27 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		if (!code) return;
 
 		this._buttonState = 'waiting';
-		const successful = await this.callback(this.providerName, code, this._secret);
+		const { error } = await this.callback(this.providerName, code, this._secret);
 
-		if (successful) {
-			this.peek(this.localize.term('user_2faProviderIsEnabled'));
+		if (!error) {
+			this.peek(this.localize.term('user_2faProviderIsEnabledMsg', this.displayName ?? this.providerName));
 			this._buttonState = 'success';
 			this.close();
 		} else {
-			this.codeField?.setCustomValidity(this.localize.term('user_2faInvalidCode'));
-			this.codeField?.focus();
 			this._buttonState = 'failed';
+			if (isApiError(error)) {
+				if (error.body.operationStatus === 'InvalidCode') {
+					this.codeField?.setCustomValidity(this.localize.term('user_2faInvalidCode'));
+					this.codeField?.focus();
+				} else {
+					this.peek(
+						this.localize.term('user_2faProviderIsNotEnabledMsg', this.displayName ?? this.providerName),
+						'warning',
+					);
+				}
+			} else {
+				this.peek(error.message, 'warning');
+			}
 		}
 	}
 
