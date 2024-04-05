@@ -117,7 +117,6 @@
 		"url": "https://umbraco.com"
 	},
 	"scripts": {
-		"auth:test:e2e": "npx playwright test --config apps/auth/",
 		"backoffice:test:e2e": "npx playwright test",
 		"build-storybook": "npm run wc-analyze && storybook build",
 		"build:for:cms": "npm run build && node ./devops/build/copy-to-cms.js",
@@ -146,7 +145,7 @@
 		"preview": "vite preview --open",
 		"storybook:build": "npm run wc-analyze && storybook build",
 		"storybook": "npm run wc-analyze && storybook dev -p 6006",
-		"test:e2e": "npm run auth:test:e2e && npm run backoffice:test:e2e",
+		"test:e2e": "npm run backoffice:test:e2e",
 		"test:dev": "web-test-runner --config ./web-test-runner.dev.config.mjs",
 		"test:dev-watch": "web-test-runner --watch --config ./web-test-runner.dev.config.mjs",
 		"test:watch": "web-test-runner --watch",
