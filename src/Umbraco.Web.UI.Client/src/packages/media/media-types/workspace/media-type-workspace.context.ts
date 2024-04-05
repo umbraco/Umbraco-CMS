@@ -197,16 +197,17 @@ export class UmbMediaTypeWorkspaceContext
 	 */
 	async submit() {
 		const data = this.getData();
-
 		if (!data) {
-			return Promise.reject('Something went wrong, there is no data for media type you want to save...');
+			throw new Error('Something went wrong, there is no data for media type you want to save...');
 		}
 
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
+
 			if ((await this.structure.create(parent.unique)) === true) {
 				if (!parent) throw new Error('Parent is not set');
+
 				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
 					entityType: parent.entityType,
@@ -226,9 +227,6 @@ export class UmbMediaTypeWorkspaceContext
 
 			actionEventContext.dispatchEvent(event);
 		}
-
-		this.setIsNew(false);
-		return true;
 	}
 
 	public destroy(): void {

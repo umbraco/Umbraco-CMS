@@ -406,10 +406,11 @@ export class UmbMediaWorkspaceContext
 
 	async submit() {
 		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
+		if (!data) {
+			throw new Error('Data is missing');
+		}
 		await this.#createOrSave();
 		this.setIsNew(false);
-		return true;
 	}
 
 	async delete() {

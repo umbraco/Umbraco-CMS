@@ -57,7 +57,6 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 	#setValid = this.#setIsValid.bind(this, true);
 
 	validate(): Promise<boolean> {
-		console.log('form control validator validate() called.');
 		this.#isValid = this.#control.checkValidity();
 		return Promise.resolve(this.#isValid);
 	}

@@ -318,13 +318,20 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	async submit() {
-		if (!this.#currentData.value) return;
-		if (!this.#currentData.value.unique) return;
+		if (!this.#currentData.value) {
+			throw new Error('Data is not set');
+		}
+		if (!this.#currentData.value.unique) {
+			throw new Error('Unique is not set');
+		}
 
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
-			await this.repository.create(this.#currentData.value, parent.unique);
+			const { error, data } = await this.repository.create(this.#currentData.value, parent.unique);
+			if (error || !data) {
+				throw error?.message ?? 'Repository did not return data after create.';
+			}
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
@@ -333,8 +340,14 @@ export class UmbDataTypeWorkspaceContext
 				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
+			this.setIsNew(false);
 		} else {
-			await this.repository.save(this.#currentData.value);
+			const { error, data } = await this.repository.save(this.#currentData.value);
+			if (error || !data) {
+				console.log('error');
+				throw error?.message ?? 'Repository did not return data after create.';
+			}
+			console.log('success');
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
@@ -344,9 +357,6 @@ export class UmbDataTypeWorkspaceContext
 
 			actionEventContext.dispatchEvent(event);
 		}
-
-		this.setIsNew(false);
-		return true;
 	}
 
 	async delete(unique: string) {

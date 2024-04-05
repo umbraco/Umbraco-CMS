@@ -306,6 +306,15 @@ export class UmbDocumentWorkspaceContext
 					?.value as PropertyValueType,
 		);
 	}
+	// TODO: Re-evaluate if this is begin used, i wrote this as part of a POC... [NL]
+	async propertyIndexByAlias(
+		propertyAlias: string,
+		variantId?: UmbVariantId,
+	): Promise<Observable<number | undefined> | undefined> {
+		return this.#currentData.asObservablePart((data) =>
+			data?.values?.findIndex((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true)),
+		);
+	}
 
 	/**
 	 * Get the current value of the property with the given alias and variantId.
@@ -485,22 +494,22 @@ export class UmbDocumentWorkspaceContext
 		};
 	}
 
-	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>): Promise<boolean> {
+	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>): Promise<void> {
 		const saveData = this.#buildSaveData(selectedVariants);
 
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
 
-			const { data: create, error } = await this.repository.create(saveData, parent.unique);
-			if (!create || error) {
+			const { data, error } = await this.repository.create(saveData, parent.unique);
+			if (!data || error) {
 				console.error('Error creating document', error);
 				throw new Error('Error creating document');
 			}
 
 			this.setIsNew(false);
-			this.#persistedData.setValue(create);
-			this.#currentData.setValue(create);
+			this.#persistedData.setValue(data);
+			this.#currentData.setValue(data);
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
@@ -510,14 +519,14 @@ export class UmbDocumentWorkspaceContext
 			});
 			eventContext.dispatchEvent(event);
 		} else {
-			const { data: save, error } = await this.repository.save(saveData);
-			if (!save || error) {
+			const { data, error } = await this.repository.save(saveData);
+			if (!data || error) {
 				console.error('Error saving document', error);
 				throw new Error('Error saving document');
 			}
 
-			this.#persistedData.setValue(save);
-			this.#currentData.setValue(save);
+			this.#persistedData.setValue(data);
+			this.#currentData.setValue(data);
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
@@ -527,8 +536,6 @@ export class UmbDocumentWorkspaceContext
 
 			actionEventContext.dispatchEvent(event);
 		}
-
-		return true;
 	}
 
 	async #handleSaveAndPublish() {
@@ -564,18 +571,19 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		// TODO: Only validate the specified selection.. [NL]
-		return this.validateAndSubmit(async (valid) => {
-			if (valid) {
+		return this.validateAndSubmit(
+			async () => {
 				return this.#performSaveAndPublish(variantIds);
-			} else {
+			},
+			async () => {
 				// If data of the selection is not valid Then just save:
 				await this.#performSaveOrCreate(variantIds);
-				// Return false, even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
-				return false;
-			}
-		});
+				// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
+				return await Promise.reject();
+			},
+		);
 	}
-	async #performSaveAndPublish(variantIds: Array<UmbVariantId>): Promise<boolean> {
+	async #performSaveAndPublish(variantIds: Array<UmbVariantId>): Promise<void> {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
@@ -585,7 +593,6 @@ export class UmbDocumentWorkspaceContext
 			unique,
 			variantIds.map((variantId) => ({ variantId })),
 		);
-		return true;
 	}
 
 	async #handleSave() {
@@ -617,22 +624,18 @@ export class UmbDocumentWorkspaceContext
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
 
-		await this.#performSaveOrCreate(variantIds);
-		return true;
+		return await this.#performSaveOrCreate(variantIds);
 	}
 
-	public async requestSubmit() {
-		const success = await this.#handleSave();
-		if (!success) {
-			await Promise.reject();
-		}
+	public requestSubmit() {
+		return this.#handleSave();
 	}
 
 	public submit() {
 		return this.#handleSave();
 	}
-	public async invalidSubmit() {
-		return false;
+	public invalidSubmit() {
+		return this.#handleSave();
 	}
 
 	public async publish() {

@@ -115,22 +115,22 @@ export class UmbLanguageWorkspaceContext
 
 	async submit() {
 		const newData = this.getData();
-		if (!newData) return;
+		if (!newData) {
+			throw new Error('No data to submit');
+		}
 
 		if (this.getIsNew()) {
-			const { data } = await this.repository.create(newData);
-			if (data) {
-				this.setIsNew(false);
-				return true;
+			const { error } = await this.repository.create(newData);
+			if (error) {
+				throw new Error(error.message);
 			}
+			this.setIsNew(false);
 		} else {
-			const { data } = await this.repository.save(newData);
-			if (data) {
-				return true;
+			const { error } = await this.repository.save(newData);
+			if (error) {
+				throw new Error(error.message);
 			}
-			// TODO: Show validation errors as warnings?
 		}
-		return false;
 	}
 
 	destroy(): void {

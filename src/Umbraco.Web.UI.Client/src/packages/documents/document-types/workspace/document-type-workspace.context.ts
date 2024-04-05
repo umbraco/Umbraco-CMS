@@ -220,7 +220,9 @@ export class UmbDocumentTypeWorkspaceContext
 	 */
 	async submit() {
 		const data = this.getData();
-		if (data === undefined) throw new Error('Cannot save, no data');
+		if (data === undefined) {
+			throw new Error('Cannot save, no data');
+		}
 
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
@@ -248,9 +250,6 @@ export class UmbDocumentTypeWorkspaceContext
 
 			actionEventContext.dispatchEvent(event);
 		}
-
-		this.setIsNew(false);
-		return true;
 	}
 
 	public destroy(): void {

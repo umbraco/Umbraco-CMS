@@ -99,15 +99,15 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 	 */
 	public async save() {
 		const contentType = this.getOwnerContentType();
-		if (!contentType || !contentType.unique) return false;
+		if (!contentType || !contentType.unique) throw new Error('Could not find the Content Type to save');
 
-		const { data } = await this.#repository.save(contentType);
-		if (!data) return false;
+		const { error, data } = await this.#repository.save(contentType);
+		if (error || !data) return { error, data };
 
 		// Update state with latest version:
 		this.#contentTypes.updateOne(contentType.unique, data);
 
-		return true;
+		return { error, data };
 	}
 
 	/**
