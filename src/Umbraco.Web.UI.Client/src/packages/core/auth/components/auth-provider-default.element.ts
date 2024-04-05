@@ -1,4 +1,5 @@
 import type { ManifestAuthProvider } from '../../index.js';
+import type { UmbAuthProviderDefaultProps } from '../types.js';
 import { UmbLitElement } from '../../lit-element/lit-element.element.js';
 import { UmbTextStyles } from '../../style/index.js';
 import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
@@ -10,6 +11,11 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 
 	@property({ attribute: false })
 	onSubmit!: (providerName: string, loginHint?: string) => void;
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.setAttribute('part', 'auth-provider-default');
+	}
 
 	render() {
 		return html`
@@ -33,7 +39,6 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 		css`
 			:host {
 				display: block;
-				margin-bottom: var(--uui-size-space-5);
 			}
 
 			#auth-provider-button {
