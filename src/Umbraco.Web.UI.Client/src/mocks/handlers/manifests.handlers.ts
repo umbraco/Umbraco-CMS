@@ -4,7 +4,7 @@ import type { PackageManifestResponse } from '../../packages/packages/types.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const manifestDevelopmentHandlers = [
-	rest.get(umbracoPath('/package/manifest'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/manifest/manifest/private'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
@@ -94,7 +94,7 @@ export const manifestDevelopmentHandlers = [
 			]),
 		);
 	}),
-	rest.get(umbracoPath('/package/manifest/public'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/manifest/manifest/public'), (_req, res, ctx) => {
 		return res(
 			ctx.status(200),
 			ctx.json<PackageManifestResponse>([
@@ -112,14 +112,16 @@ export const manifestDevelopmentHandlers = [
 						},
 						{
 							type: 'authProvider',
-							alias: 'My.AUthProvider.Github',
+							alias: 'My.AuthProvider.Github',
 							name: 'My Github Auth Provider',
 							forProviderName: 'Umbraco.Github',
 							meta: {
-								label: 'Use Github!',
-								look: 'primary',
-								icon: 'icon-github',
-								color: 'success',
+								label: 'GitHub',
+								defaultView: {
+									look: 'primary',
+									icon: 'icon-github',
+									color: 'success',
+								},
 							},
 						},
 					],
@@ -130,10 +132,10 @@ export const manifestDevelopmentHandlers = [
 ];
 
 export const manifestEmptyHandlers = [
-	rest.get(umbracoPath('/package/manifest'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/manifest/manifest/private'), (_req, res, ctx) => {
 		return res(ctx.status(200), ctx.json<PackageManifestResponse>([]));
 	}),
-	rest.get(umbracoPath('/package/manifest/public'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/manifest/manifest/public'), (_req, res, ctx) => {
 		return res(ctx.status(200), ctx.json<PackageManifestResponse>([]));
 	}),
 ];
