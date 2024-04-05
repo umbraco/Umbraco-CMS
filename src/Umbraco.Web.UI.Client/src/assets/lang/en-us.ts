@@ -1010,6 +1010,10 @@ export default {
 		lockoutWillOccur: "You've been idle and logout will automatically occur in",
 		renewSession: 'Renew now to save your work',
 	},
+	login: {
+		instruction: 'Sign in to Umbraco',
+		signInWith: 'Sign in with {0}',
+	},
 	main: {
 		dashboard: 'Dashboard',
 		sections: 'Sections',

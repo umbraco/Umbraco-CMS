@@ -1013,6 +1013,10 @@ export default {
 		lockoutWillOccur: 'Du har været inaktiv, og du vil blive logget ud om',
 		renewSession: 'Forny for at gemme dine ændringer',
 	},
+	login: {
+		instruction: 'Log ind på Umbraco',
+		signInWith: 'Log ind med {0}',
+	},
 	main: {
 		dashboard: 'Skrivebord',
 		sections: 'Sektioner',
