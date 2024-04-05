@@ -12,6 +12,7 @@ const umbracoSvgDirectory = `${moduleDirectory}/svgs`;
 const iconMapJson = `${moduleDirectory}/icon-dictionary.json`;
 
 const lucideSvgDirectory = 'node_modules/lucide-static/icons';
+const simpleIconsSvgDirectory = 'node_modules/simple-icons/icons';
 
 const run = async () => {
 	var icons = await collectDictionaryIcons();
@@ -50,8 +51,39 @@ const collectDictionaryIcons = async () => {
 				};
 
 				icons.push(icon);
-			} catch(e) {
-				console.log(`Could not load file: '${path}'`);
+			} catch (e) {
+				console.log(`[Lucide] Could not load file: '${path}'`);
+			}
+		}
+	});
+
+	// SimpleIcons:
+	fileJSON.simpleIcons.forEach((iconDef) => {
+		if (iconDef.file && iconDef.name) {
+			const path = simpleIconsSvgDirectory + "/" + iconDef.file;
+
+			try {
+				const rawData = readFileSync(path);
+				let svg = rawData.toString()
+				const iconFileName = iconDef.name;
+
+				// SimpleIcons need to use fill="currentColor"
+				const pattern = /fill=/g;
+				if (!pattern.test(svg)) {
+					svg = svg.replace(/<path/g, '<path fill="currentColor"');
+				}
+
+				const icon = {
+					name: iconDef.name,
+					legacy: iconDef.legacy,
+					fileName: iconFileName,
+					svg,
+					output: `${iconsOutputDirectory}/${iconFileName}.js`,
+				};
+
+				icons.push(icon);
+			} catch (e) {
+				console.log(`[SimpleIcons] Could not load file: '${path}'`);
 			}
 		}
 	});

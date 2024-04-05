@@ -1486,7 +1486,7 @@
 		{
 			"name": "icon-newspaper-alt",
 			"file": "newspaper.svg",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-newspaper",
@@ -1737,22 +1737,22 @@
 		{
 			"name": "icon-price-dollar",
 			"file": "badge-dollar-sign.svg",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-price-euro",
 			"file": "badge-euro.svg",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-price-pound",
 			"file": "badge-pound-sterling.svg",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-price-yen",
 			"file": "badge-japanese-yen",
-			"legacy":true
+			"legacy": true
 		},
 		{
 			"name": "icon-print",
@@ -2429,10 +2429,6 @@
 			"name": "icon-zoom-in",
 			"file": "zoom-in.svg"
 		},
-
-
-
-
 		{
 			"name": "icon-zoom-out",
 			"file": "zoom-out.svg"
@@ -2444,6 +2440,52 @@
 		{
 			"name": "icon-database",
 			"file": "database.svg"
+		}
+	],
+	"simpleIcons": [
+		{
+			"name": "icon-azure",
+			"file": "microsoftazure.svg"
+		},
+		{
+			"name": "icon-facebook",
+			"file": "facebook.svg"
+		},
+		{
+			"name": "icon-gitbook",
+			"file": "gitbook.svg"
+		},
+		{
+			"name": "icon-github",
+			"file": "github.svg"
+		},
+		{
+			"name": "icon-gitlab",
+			"file": "gitlab.svg"
+		},
+		{
+			"name": "icon-google",
+			"file": "google.svg"
+		},
+		{
+			"name": "icon-linkedin",
+			"file": "linkedin.svg"
+		},
+		{
+			"name": "icon-mastodon",
+			"file": "mastodon.svg"
+		},
+		{
+			"name": "icon-microsoft",
+			"file": "microsoft.svg"
+		},
+		{
+			"name": "icon-twitter",
+			"file": "twitter.svg"
+		},
+		{
+			"name": "icon-twitter-x",
+			"file": "x.svg"
 		}
 	],
 	"umbraco": [

@@ -226,6 +226,7 @@
 		"rollup-plugin-import-css": "^3.4.0",
 		"rollup-plugin-web-worker-loader": "^1.6.1",
 		"storybook": "^7.6.17",
+		"simple-icons": "^11.11.0",
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.8",
 		"typedoc": "^0.25.10",
