@@ -34,7 +34,7 @@ public abstract class ArtifactBase<TUdi> : IArtifact
     public IEnumerable<ArtifactDependency> Dependencies
     {
         get => _dependencies ??= Array.Empty<ArtifactDependency>();
-        set => _dependencies = value.OrderBy(x => x.Udi);
+        set => _dependencies = value.OrderBy(x => x.Udi).ToArray();
     }
 
     /// <inheritdoc />
