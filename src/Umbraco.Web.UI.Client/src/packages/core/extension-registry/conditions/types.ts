@@ -5,6 +5,7 @@ import type { SectionAliasConditionConfig } from './section-alias.condition.js';
 import type { SwitchConditionConfig } from './switch.condition.js';
 import type {
 	WorkspaceAliasConditionConfig,
+	WorkspaceEntityContentTypeConditionConfig,
 	WorkspaceEntityTypeConditionConfig,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
@@ -22,7 +23,7 @@ export type BlockWorkspaceHasSettingsConditionConfig =
 export type BlockEntryShowContentEditConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.BlockEntryShowContentEdit'>;
 
-export type ConditionTypes =
+	export type ConditionTypes =
 	| BlockEntryShowContentEditConditionConfig
 	| BlockWorkspaceHasSettingsConditionConfig
 	| CollectionAliasConditionConfig
@@ -33,4 +34,5 @@ export type ConditionTypes =
 	| UmbSectionUserPermissionConditionConfig
 	| WorkspaceAliasConditionConfig
 	| WorkspaceEntityTypeConditionConfig
-	| UmbConditionConfigBase;
+	| UmbConditionConfigBase
+	| WorkspaceEntityContentTypeConditionConfig;
