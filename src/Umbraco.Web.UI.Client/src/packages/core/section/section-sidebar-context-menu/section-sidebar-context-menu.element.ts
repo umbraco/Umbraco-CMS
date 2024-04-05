@@ -3,6 +3,9 @@ import { UMB_SECTION_SIDEBAR_CONTEXT } from '../section-sidebar/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbStringState, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-section-sidebar-context-menu')
 export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
@@ -20,29 +23,45 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 	@state()
 	private _headline?: string;
 
+	#entityContext = new UmbEntityContext(this);
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT, (instance) => {
 			this.#sectionSidebarContext = instance;
+			this.#observeEntityModel();
 
 			if (this.#sectionSidebarContext) {
 				// make prettier not break the lines on the next 4 lines:
 				// prettier-ignore
 				this.observe( this.#sectionSidebarContext.contextMenuIsOpen, (value) => (this._isOpen = value), '_observeContextMenuIsOpen');
 				// prettier-ignore
-				this.observe(this.#sectionSidebarContext.unique, (value) => (this._unique = value), '_observeUnique');
-				// prettier-ignore
-				this.observe(this.#sectionSidebarContext.entityType, (value) => (this._entityType = value), '_observeEntityType');
-				// prettier-ignore
 				this.observe(this.#sectionSidebarContext.headline, (value) => (this._headline = value), '_observeHeadline');
 			} else {
 				this.removeUmbControllerByAlias('_observeContextMenuIsOpen');
-				this.removeUmbControllerByAlias('_observeUnique');
-				this.removeUmbControllerByAlias('_observeEntityType');
 				this.removeUmbControllerByAlias('_observeHeadline');
 			}
 		});
+	}
+
+	#observeEntityModel() {
+		if (!this.#sectionSidebarContext) {
+			this.removeUmbControllerByAlias('_observeEntityModel');
+			return;
+		}
+
+		this.observe(
+			observeMultiple([this.#sectionSidebarContext.unique, this.#sectionSidebarContext.entityType]),
+			(values) => {
+				this._unique = values[0];
+				this._entityType = values[1];
+
+				this.#entityContext.setEntityType(this._entityType);
+				this.#entityContext.setUnique(this._unique);
+			},
+		),
+			'_observeEntityModel';
 	}
 
 	#closeContextMenu() {
@@ -70,7 +89,6 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 		return this._isOpen ? html`<div id="backdrop" @click=${this.#closeContextMenu}></div>` : nothing;
 	}
 
-	// TODO: allow different views depending on left or right click
 	#renderModal() {
 		return this._isOpen && this._unique !== undefined && this._entityType
 			? html`<div id="action-modal">
