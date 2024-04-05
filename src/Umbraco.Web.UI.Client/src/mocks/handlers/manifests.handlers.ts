@@ -64,6 +64,26 @@ export const manifestDevelopmentHandlers = [
 					],
 				},
 				{
+					name: 'My MFA Package',
+					extensions: [
+						{
+							type: 'mfaLoginProvider',
+							alias: 'My.MfaLoginProvider.Custom.Google',
+							name: 'My Custom Google MFA Provider',
+							forProviderName: 'Google Authenticator',
+						},
+						{
+							type: 'mfaLoginProvider',
+							alias: 'My.MfaLoginProvider.Custom.SMS',
+							name: 'My Custom SMS MFA Provider',
+							forProviderName: 'sms',
+							meta: {
+								label: 'Setup SMS Verification',
+							},
+						},
+					],
+				},
+				{
 					name: 'Package with a view',
 					extensions: [
 						{
