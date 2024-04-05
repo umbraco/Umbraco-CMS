@@ -1,3 +1,4 @@
+import { umbExtensionsRegistry } from '../extension-registry/index.js';
 import { UmbAuthFlow } from './auth-flow.js';
 import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
@@ -5,10 +6,14 @@ import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { ReplaySubject, filter, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
 	readonly isAuthorized = this.#isAuthorized.asObservable();
+
+	#isInitialized = new ReplaySubject<boolean>(1);
+	readonly isInitialized = this.#isInitialized.asObservable().pipe(filter((isInitialized) => isInitialized));
 
 	#isBypassed = false;
 	#serverUrl;
@@ -141,6 +146,14 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 			credentials: OpenAPI.CREDENTIALS,
 			token: () => this.getLatestToken(),
 		};
+	}
+
+	setInitialized() {
+		this.#isInitialized.next(true);
+	}
+
+	getAuthProviders() {
+		return this.isInitialized.pipe(switchMap(() => umbExtensionsRegistry.byType('authProvider')));
 	}
 
 	#getRedirectUrl() {
