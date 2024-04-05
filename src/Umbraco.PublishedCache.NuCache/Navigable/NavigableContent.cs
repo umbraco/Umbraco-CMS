@@ -62,15 +62,8 @@ internal class NavigableContent : INavigableContent
             return _builtInValues[index];
         }
 
-        index -= NavigableContentType.BuiltinProperties.Length;
-        IPublishedProperty[] properties = _content.PropertiesArray;
-        if (index >= properties.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
         // custom property, ie element
-        return properties[index].GetXPathValue();
+        return null;
     }
 
     #endregion
