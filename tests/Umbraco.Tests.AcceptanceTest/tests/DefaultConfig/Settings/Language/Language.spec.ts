@@ -62,7 +62,7 @@ test.describe('Language tests', () => {
 
     // Act
     await umbracoUi.language.clickLanguageByName(languageName);
-    await umbracoUi.language.switchManatoryLanguageOption();
+    await umbracoUi.language.switchMandatoryLanguageOption();
     await umbracoUi.language.clickSaveButton();
 
     // Assert
