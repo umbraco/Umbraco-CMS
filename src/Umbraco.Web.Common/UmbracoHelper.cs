@@ -1,11 +1,9 @@
 using System.Globalization;
-using System.Xml.XPath;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
-using Umbraco.Cms.Core.Xml;
 
 namespace Umbraco.Cms.Web.Common;
 
@@ -176,10 +174,6 @@ public class UmbracoHelper
 
     private IPublishedContent? ContentForObject(object id) => _publishedContentQuery.Content(id);
 
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public IPublishedContent? ContentSingleAtXPath(string xpath, params XPathVariable[] vars) =>
-        _publishedContentQuery.ContentSingleAtXPath(xpath, vars);
-
     /// <summary>
     ///     Gets a content item from the cache.
     /// </summary>
@@ -288,14 +282,6 @@ public class UmbracoHelper
     /// <returns>The existing contents corresponding to the identifiers.</returns>
     /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
     public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids) => _publishedContentQuery.Content(ids);
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars) =>
-        _publishedContentQuery.ContentAtXPath(xpath, vars);
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars) =>
-        _publishedContentQuery.ContentAtXPath(xpath, vars);
 
     public IEnumerable<IPublishedContent> ContentAtRoot() => _publishedContentQuery.ContentAtRoot();
 

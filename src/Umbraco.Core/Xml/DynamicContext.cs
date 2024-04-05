@@ -134,21 +134,6 @@ namespace Umbraco.Cms.Core.Xml
 
         #endregion Common Overrides
 
-        #region Public Members
-
-        /// <summary>
-        /// Shortcut method that compiles an expression using an empty navigator.
-        /// </summary>
-        /// <param name="xpath">The expression to compile</param>
-        /// <returns>A compiled <see cref="XPathExpression"/>.</returns>
-        [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-        public static XPathExpression? Compile(string xpath)
-        {
-            return new XmlDocument().CreateNavigator()?.Compile(xpath);
-        }
-
-        #endregion Public Members
-
         #region Variable Handling Code
 
         /// <summary>
