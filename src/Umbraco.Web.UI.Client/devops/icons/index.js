@@ -6,7 +6,7 @@ const path = pathModule.default;
 const getDirName = path.dirname;
 const glob = globModule.default;
 
-const moduleDirectory = 'src/shared/icon-registry';
+const moduleDirectory = 'src/packages/core/icon-registry';
 const iconsOutputDirectory = `${moduleDirectory}/icons`;
 const umbracoSvgDirectory = `${moduleDirectory}/svgs`;
 const iconMapJson = `${moduleDirectory}/icon-dictionary.json`;
@@ -31,7 +31,7 @@ const collectDictionaryIcons = async () => {
 
 	// Lucide:
 	fileJSON.lucide.forEach((iconDef) => {
-		if(iconDef.file && iconDef.name) {
+		if (iconDef.file && iconDef.name) {
 			const path = lucideSvgDirectory + "/" + iconDef.file;
 
 			try {
@@ -90,7 +90,7 @@ const collectDictionaryIcons = async () => {
 
 	// Umbraco:
 	fileJSON.umbraco.forEach((iconDef) => {
-		if(iconDef.file && iconDef.name) {
+		if (iconDef.file && iconDef.name) {
 			const path = umbracoSvgDirectory + "/" + iconDef.file;
 
 			try {
@@ -107,8 +107,8 @@ const collectDictionaryIcons = async () => {
 				};
 
 				icons.push(icon);
-			} catch(e) {
-				console.log(`Could not load file: '${path}'`);
+			} catch (e) {
+				console.log(`[Umbraco] Could not load file: '${path}'`);
 			}
 		}
 	});
@@ -136,7 +136,7 @@ const collectDiskIcons = async (icons) => {
 		const iconName = iconFileName;
 
 		// Only append not already defined icons:
-		if(!icons.find(x => x.name === iconName)) {
+		if (!icons.find(x => x.name === iconName)) {
 
 			const icon = {
 				name: iconName,
