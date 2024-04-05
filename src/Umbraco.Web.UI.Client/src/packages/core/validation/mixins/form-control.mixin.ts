@@ -3,7 +3,10 @@ import { UmbValidationValidEvent } from '../events/validation-valid.event.js';
 import { property, type LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 
-type UmbNativeFormControlElement = Pick<HTMLInputElement, 'validity' | 'checkValidity' | 'validationMessage'> &
+type UmbNativeFormControlElement = Pick<
+	HTMLObjectElement,
+	'validity' | 'checkValidity' | 'validationMessage' | 'setCustomValidity'
+> &
 	HTMLElement; // Eventually use a specific interface or list multiple options like appending these types: ... | HTMLTextAreaElement | HTMLSelectElement
 
 /* FlagTypes type options originate from:
@@ -245,6 +248,30 @@ export const UmbFormControlMixin = <
 			}
 		}
 
+		private _customValidityObject?: UmbFormControlValidationConfig;
+
+		/**
+		 * @method setCustomValidity
+		 * @description Set custom validity state, set to empty string to remove the custom message.
+		 * @param message {string} - The message to be shown
+		 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/setCustomValidity|HTMLObjectElement:setCustomValidity}
+		 */
+		protected setCustomValidity(message: string | null) {
+			if (this._customValidityObject) {
+				this.removeValidation(this._customValidityObject);
+			}
+
+			if (message != null && message !== '') {
+				this._customValidityObject = this.addValidation(
+					'customError',
+					(): string => message,
+					() => true,
+				);
+			}
+
+			this._runValidators();
+		}
+
 		/**
 		 * @method _runValidators
 		 * @description Run all validators and set the validityState of this form control.
@@ -295,6 +322,12 @@ export const UmbFormControlMixin = <
 				[...messages].join(', '),
 				innerFormControlEl ?? this.getFormElement() ?? undefined,
 			);
+
+			/*
+			this.#formCtrlElements.forEach((formCtrlEl) => {
+				formCtrlEl.setCustomValidity(this.validationMessage);
+			});
+			*/
 
 			/*
 			if (!hasError) {

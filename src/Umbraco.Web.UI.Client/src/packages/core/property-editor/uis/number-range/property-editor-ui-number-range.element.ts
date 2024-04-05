@@ -49,6 +49,10 @@ export class UmbPropertyEditorUINumberRangeElement
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-number-range')!);
 	}
 
+	focus(): void {
+		this.shadowRoot!.querySelector('umb-input-number-range')!.focus();
+	}
+
 	render() {
 		return html`<umb-input-number-range
 			.minValue=${this._minValue}
