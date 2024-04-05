@@ -75,8 +75,6 @@ export class UmbAppElement extends UmbLitElement {
 	];
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
-	#umbIconRegistry = new UmbIconRegistry();
-	#uuiIconRegistry = new UUIIconRegistryEssential();
 	#serverConnection?: UmbServerConnection;
 	#authController?: UmbAppAuthController;
 
@@ -85,13 +83,13 @@ export class UmbAppElement extends UmbLitElement {
 
 		OpenAPI.BASE = window.location.origin;
 
+		new UmbIconRegistry().attach(this);
+		new UUIIconRegistryEssential().attach(this);
+
 		new UmbContextDebugController(this);
 
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-
-		this.#umbIconRegistry.attach(this);
-		this.#uuiIconRegistry.attach(this);
 
 		umbExtensionsRegistry.registerMany(coreExtensions);
 	}
