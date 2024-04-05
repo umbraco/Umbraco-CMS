@@ -41,13 +41,13 @@ export interface MetaAuthProvider {
 		 * The color of the provider that is shown to the user.
 		 * @default 'secondary'
 		 */
-		color?: UUIInterfaceLook;
+		color?: UUIInterfaceColor;
 
 		/**
 		 * The look of the provider that is shown to the user.
 		 * @default 'default'
 		 */
-		look?: UUIInterfaceColor;
+		look?: UUIInterfaceLook;
 	};
 
 	/**
