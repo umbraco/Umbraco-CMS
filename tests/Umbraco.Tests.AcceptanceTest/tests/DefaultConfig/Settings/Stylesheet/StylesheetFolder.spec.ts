@@ -26,7 +26,7 @@ test.describe('Stylesheets tests', () => {
     // TODO: when frontend is ready, verify the new folder is displayed under the Stylesheets section
   });
 
-  test('can delete a folder', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a folder @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.stylesheet.createFolder(stylesheetFolderName, '');
 
@@ -41,7 +41,7 @@ test.describe('Stylesheets tests', () => {
     // TODO: when frontend is ready, verify the removed folder is NOT displayed under the Stylesheets section
   });
 
-  test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test('can create a folder in a folder @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
     const childFolderName = 'ChildFolderName';
@@ -59,7 +59,7 @@ test.describe('Stylesheets tests', () => {
     // TODO: when frontend is ready, verify the new folder is displayed under the Stylesheets section
   });
 
-  test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test('can create a folder in a folder in a folder @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     const childOfChildFolderName = 'ChildOfChildFolderName';

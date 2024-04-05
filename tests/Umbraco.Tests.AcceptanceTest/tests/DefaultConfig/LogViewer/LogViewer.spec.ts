@@ -14,7 +14,7 @@ test.describe('Log Viewer tests', () => {
     await umbracoApi.telemetry.setLevel(startTelemetryLevel);
   });
 
-  test('can search', async ({umbracoApi, umbracoUi}) => {
+  test('can search @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const telemetryLevel = 'Minimal';
     await umbracoApi.telemetry.setLevel(telemetryLevel);
@@ -46,7 +46,7 @@ test.describe('Log Viewer tests', () => {
     await umbracoUi.logViewer.doesLogLevelIndicatorDisplay(logLevel);
   });
 
-  test('can create a saved search', async ({umbracoApi, umbracoUi}) => {
+  test('can create a saved search @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const searchName = 'TestSavedSearch';
     const search = 'test saved search';

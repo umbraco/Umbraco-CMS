@@ -25,7 +25,7 @@ test.describe('Data Types Folder tests', () => {
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
   });
 
-  test('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
+  test('can rename a data type folder @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongDataTypeFolderName = 'Wrong Folder';
     await umbracoApi.dataType.ensureNameNotExists(wrongDataTypeFolderName);
@@ -44,7 +44,7 @@ test.describe('Data Types Folder tests', () => {
     expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeFolderName)).toBeFalsy();
   });
 
-  test('can delete a data type folder', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a data type folder @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.dataType.createFolder(dataTypeFolderName);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();

@@ -14,7 +14,7 @@ test.describe('Template tests', () => {
     await umbracoApi.template.ensureNameNotExists(templateName);
   });
 
-  test.skip('can create a template', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a template @smoke', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.template.clickActionsMenuAtRoot();
     await umbracoUi.template.clickNewTemplateButton();
@@ -26,7 +26,7 @@ test.describe('Template tests', () => {
     expect(await umbracoApi.template.doesNameExist(templateName)).toBeTruthy();
   });
 
-  test('can update a template', async ({umbracoApi, umbracoUi}) => {
+  test('can update a template @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const templateAlias = AliasHelper.toAlias(templateName);
     const updatedTemplateContent = '@using Umbraco.Cms.Web.Common.PublishedModels;\r\n' +
@@ -50,7 +50,7 @@ test.describe('Template tests', () => {
     expect(updatedTemplate.content).toBe(updatedTemplateContent);
   });
 
-  test('can delete a template', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a template @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const templateAlias = AliasHelper.toAlias(templateName);
     await umbracoApi.template.create(templateName, templateAlias, '');
@@ -65,7 +65,7 @@ test.describe('Template tests', () => {
     expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
   });
 
-  test.skip('can set a template as master template', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can set a template as master template @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const templateAlias = AliasHelper.toAlias(templateName);
     const childTemplateName = 'ChildTemplate';

@@ -50,7 +50,7 @@ test.describe('Stylesheets tests', () => {
   });
 
   //  We are not able to create stylesheet with RTE styles.
-  test.skip('can create a new Rich Text Editor stylesheet file', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a new Rich Text Editor stylesheet file @smoke', async ({umbracoApi, umbracoUi}) => {
     //Act
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
     await umbracoUi.stylesheet.clickCreateThreeDotsButton();
@@ -67,7 +67,7 @@ test.describe('Stylesheets tests', () => {
   });
 
   // We are not able to update a stylesheet with RTE styles.
-  test.skip('can update a stylesheet', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can update a stylesheet @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.stylesheet.create(stylesheetName, '', '/');
 
