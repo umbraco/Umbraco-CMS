@@ -1,12 +1,12 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
 /// <summary>
-/// Converts a boolean (like) value to or from JSON.
+/// Converts a boolean value to or from JSON, always converting a boolean like value (like <c>1</c> or <c>0</c>) to a boolean.
 /// </summary>
-public sealed class JsonFuzzyBooleanConverter : JsonConverter<bool>
+public sealed class JsonBooleanConverter : JsonConverter<bool>
 {
     /// <inheritdoc />
     public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
