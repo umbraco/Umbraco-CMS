@@ -1,10 +1,25 @@
+import type { UmbUserLoginState } from '../types.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export type UmbModalAppAuthValue = {
-	providerName?: string;
+export type UmbModalAppAuthConfig = {
+	userLoginState: UmbUserLoginState;
 };
 
-export const UMB_MODAL_APP_AUTH = new UmbModalToken<never, UmbModalAppAuthValue>('Umb.Modal.AppAuth', {
+export type UmbModalAppAuthValue = {
+	/**
+	 * The name of the provider that the user has selected to authenticate with.
+	 * @required
+	 */
+	providerName?: string;
+
+	/**
+	 * The login hint that the user has provided to the provider.
+	 * @optional
+	 */
+	loginHint?: string;
+};
+
+export const UMB_MODAL_APP_AUTH = new UmbModalToken<UmbModalAppAuthConfig, UmbModalAppAuthValue>('Umb.Modal.AppAuth', {
 	modal: {
 		type: 'dialog',
 	},

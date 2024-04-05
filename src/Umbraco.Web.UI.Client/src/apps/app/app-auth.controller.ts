@@ -1,4 +1,9 @@
-import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH, UMB_STORAGE_REDIRECT_URL } from '@umbraco-cms/backoffice/auth';
+import {
+	UMB_AUTH_CONTEXT,
+	UMB_MODAL_APP_AUTH,
+	UMB_STORAGE_REDIRECT_URL,
+	type UmbUserLoginState,
+} from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
@@ -41,7 +46,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	 * Starts the authorization flow.
 	 * It will check which providers are available and either redirect directly to the provider or show a provider selection screen.
 	 */
-	async makeAuthorizationRequest(): Promise<boolean> {
+	async makeAuthorizationRequest(userLoginState: UmbUserLoginState = 'loggingIn'): Promise<boolean> {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
@@ -67,7 +72,11 @@ export class UmbAppAuthController extends UmbControllerBase {
 				// Show the provider selection screen
 				const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 				const selected = await modalManager
-					.open(this._host, UMB_MODAL_APP_AUTH)
+					.open(this._host, UMB_MODAL_APP_AUTH, {
+						data: {
+							userLoginState,
+						},
+					})
 					.onSubmit()
 					.catch(() => undefined);
 
@@ -75,7 +84,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 					return false;
 				}
 
-				this.#authContext.makeAuthorizationRequest(selected.providerName);
+				this.#authContext.makeAuthorizationRequest(selected.providerName, selected.loginHint);
 			}
 		}
 
