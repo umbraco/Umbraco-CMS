@@ -33,7 +33,6 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				padding: 20px;
 			}
 
 			#auth-provider-button {
