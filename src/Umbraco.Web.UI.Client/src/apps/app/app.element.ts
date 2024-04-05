@@ -16,6 +16,7 @@ import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
 import {
 	UmbBundleExtensionInitializer,
 	UmbEntryPointExtensionInitializer,
+	UmbServerExtensionRegistrator,
 } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -101,11 +102,12 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	async #setup() {
-		this.#authController = new UmbAppAuthController(this);
 		this.#serverConnection = await new UmbServerConnection(this.serverUrl).connect();
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
 		new UmbAppContext(this, { backofficePath: this.backofficePath, serverUrl: this.serverUrl });
+
+		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
@@ -114,6 +116,7 @@ export class UmbAppElement extends UmbLitElement {
 			if (this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL) {
 				await this.#authContext.clearTokenStorage();
 			} else {
+				this.#authController = new UmbAppAuthController(this);
 				await this.#setAuthStatus();
 			}
 
