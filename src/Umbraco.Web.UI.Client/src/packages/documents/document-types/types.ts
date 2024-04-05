@@ -10,8 +10,8 @@ export interface UmbDocumentTypeDetailModel extends UmbContentTypeModel {
 
 export type UmbDocumentTypeCleanupModel = {
 	preventCleanup: boolean;
-	keepAllVersionsNewerThanDays: number | null;
-	keepLatestVersionPerDayForDays: number | null;
+	keepAllVersionsNewerThanDays?: number | null;
+	keepLatestVersionPerDayForDays?: number | null;
 };
 
 export interface UmbDocumentTypeCompositionRequestModel {
