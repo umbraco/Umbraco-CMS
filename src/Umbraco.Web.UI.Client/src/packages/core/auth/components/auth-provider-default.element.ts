@@ -4,12 +4,12 @@ import { UmbTextStyles } from '../../style/index.js';
 import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-auth-provider-default')
-export class UmbAuthProviderDefaultElement extends UmbLitElement {
+export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbAuthProviderDefaultProps {
 	@property({ attribute: false })
 	manifest!: ManifestAuthProvider;
 
 	@property({ attribute: false })
-	onSubmit!: (providerName: string) => void;
+	onSubmit!: (providerName: string, loginHint?: string) => void;
 
 	render() {
 		return html`
