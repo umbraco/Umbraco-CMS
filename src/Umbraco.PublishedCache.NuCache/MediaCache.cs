@@ -1,11 +1,12 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache;
 
-public class MediaCache : PublishedCacheBase, IPublishedMediaCache, IDisposable
+public class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableData, IDisposable
 {
     private readonly ContentStore.Snapshot _snapshot;
     private readonly IVariationContextAccessor _variationContextAccessor;
@@ -68,6 +69,8 @@ public class MediaCache : PublishedCacheBase, IPublishedMediaCache, IDisposable
         ContentNode? n = _snapshot.Get(contentId);
         return n != null;
     }
+
+    IEnumerable<IPublishedContent> INavigableData.GetAtRoot(bool preview) => GetAtRoot(preview);
 
     public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
     {
