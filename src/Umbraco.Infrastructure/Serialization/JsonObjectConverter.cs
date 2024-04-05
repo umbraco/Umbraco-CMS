@@ -22,17 +22,18 @@ public sealed class JsonObjectConverter : JsonConverter<object>
             return;
         }
 
-        // If an object is equals "new object()", Json.Serialize would recurse forever and cause a stack overflow
+        // If the value equals an empty object, Json.Serialize would recurse forever and cause a stack overflow
         // We have no good way of checking if its an empty object
         // which is why we try to check if the object has any properties, and thus will be empty.
-        if (value.GetType().Name is "Object" && !value.GetType().GetProperties().Any())
+        Type inputType = value.GetType();
+        if (inputType == typeof(object) && inputType.GetProperties().Length == 0)
         {
             writer.WriteStartObject();
             writer.WriteEndObject();
         }
         else
         {
-            JsonSerializer.Serialize(writer, value, value.GetType(), options);
+            JsonSerializer.Serialize(writer, value, inputType, options);
         }
     }
 
