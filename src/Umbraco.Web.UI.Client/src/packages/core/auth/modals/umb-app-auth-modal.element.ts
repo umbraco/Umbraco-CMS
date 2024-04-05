@@ -43,8 +43,10 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				--umb-body-layout-color-background: #fff;
 			}
 
-			#providers::part(auth-provider-default) {
-				margin-bottom: var(--uui-size-space-5);
+			#providers {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-5);
 			}
 		`,
 	];
