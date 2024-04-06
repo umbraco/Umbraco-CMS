@@ -1,3 +1,4 @@
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
@@ -132,6 +133,9 @@ export class UmbDocumentWorkspaceContext
 		},
 	);
 
+	// TODO: this should be set up for all entity workspace contexts in a base class
+	#entityContext = new UmbEntityContext(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
 
@@ -162,6 +166,8 @@ export class UmbDocumentWorkspaceContext
 				component: () => import('./document-workspace-editor.element.js'),
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
+					this.#entityContext.setEntityType(UMB_DOCUMENT_ENTITY_TYPE);
+					this.#entityContext.setUnique(unique);
 					this.load(unique);
 				},
 			},
