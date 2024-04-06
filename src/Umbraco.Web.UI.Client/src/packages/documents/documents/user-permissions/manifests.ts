@@ -17,6 +17,7 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_ROLLBACK,
 } from './constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { manifest as conditionManifest } from './document-user-permission.condition.js';
 import type {
 	ManifestGranularUserPermission,
 	ManifestEntityUserPermission,
@@ -211,4 +212,4 @@ export const granularPermissions: Array<ManifestGranularUserPermission> = [
 	},
 ];
 
-export const manifests = [...repositoryManifests, ...permissions, ...granularPermissions];
+export const manifests = [...repositoryManifests, ...permissions, ...granularPermissions, conditionManifest];
