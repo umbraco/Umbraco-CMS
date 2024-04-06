@@ -47,7 +47,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	#entityContext = new UmbEntityContext(this);
 
 	#generateApiArgs() {
-		if (!this._props.entityType || this._props.unique !== undefined) return;
+		if (!this._props.entityType || this._props.unique === undefined) return;
 
 		this.#entityContext.setEntityType(this._props.entityType);
 		this.#entityContext.setUnique(this._props.unique);
