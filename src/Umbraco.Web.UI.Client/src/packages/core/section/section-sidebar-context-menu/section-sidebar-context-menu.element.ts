@@ -1,4 +1,3 @@
-import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import type { UmbSectionSidebarContext } from '../section-sidebar/index.js';
 import { UMB_SECTION_SIDEBAR_CONTEXT } from '../section-sidebar/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
