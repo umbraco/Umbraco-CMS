@@ -1,4 +1,4 @@
-import type { ManifestAuthProvider } from '../../index.js';
+import type { ManifestAuthProvider } from '../../extension-registry/models/index.js';
 import type { UmbAuthProviderDefaultProps } from '../types.js';
 import { UmbLitElement } from '../../lit-element/lit-element.element.js';
 import { UmbTextStyles } from '../../style/index.js';
