@@ -6,7 +6,7 @@ import {
 } from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { distinctUntilChanged, filter, firstValueFrom, skip } from '@umbraco-cms/backoffice/external/rxjs';
+import { filter, firstValueFrom, skip } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbAppAuthController extends UmbControllerBase {
@@ -22,8 +22,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 			// Observe the user's authorization state and start the authorization flow if the user is not authorized
 			this.observe(
 				context.isAuthorized.pipe(
-					// Only continue if the value has changed
-					distinctUntilChanged(),
 					// Skip the first since it is always false
 					skip(1),
 					// Only continue if the value is false
