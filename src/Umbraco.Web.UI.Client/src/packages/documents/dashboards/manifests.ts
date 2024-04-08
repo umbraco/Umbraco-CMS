@@ -8,7 +8,7 @@ const dashboards: Array<ManifestDashboard> = [
 		js: () => import('./redirect-management/dashboard-redirect-management.element.js'),
 		weight: 10,
 		meta: {
-			label: 'Redirect Management',
+			label: '#dashboardTabs_contentRedirectManager',
 			pathname: 'redirect-management',
 		},
 		conditions: [
