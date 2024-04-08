@@ -2,10 +2,8 @@ using System.Net.Mime;
 using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Services;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -28,11 +26,6 @@ public class BootFailedMiddleware : IMiddleware
         _hostingEnvironment = hostingEnvironment;
         _webHostEnvironment = webHostEnvironment;
     }
-
-    [Obsolete("Use ctor with all params. This will be removed in Umbraco 12")]
-    public BootFailedMiddleware(IRuntimeState runtimeState, IHostingEnvironment hostingEnvironment)
-        : this(runtimeState, hostingEnvironment, StaticServiceProvider.Instance.GetRequiredService<IWebHostEnvironment>())
-    { }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
