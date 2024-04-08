@@ -157,6 +157,8 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		const culture = this.availableVariants.length > 1 ? this.currentCulture : undefined;
 		this.#rollbackRepository.rollback(id, culture);
 
+		const docUnique = this.#workspaceContext?.getUnique() ?? '';
+		this.#workspaceContext?.load(docUnique);
 		this.modalContext?.reject();
 	}
 
