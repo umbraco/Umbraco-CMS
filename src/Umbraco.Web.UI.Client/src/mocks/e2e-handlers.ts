@@ -20,7 +20,7 @@ import { handlers as configHandlers } from './handlers/config.handlers.js';
 export const handlers = [
 	serverHandlers.serverRunningHandler,
 	serverHandlers.serverInformationHandler,
-	manifestsHandlers.manifestEmptyHandler,
+	manifestsHandlers.manifestEmptyHandlers,
 	...auditLogHandlers,
 	...installHandlers,
 	...upgradeHandlers,
