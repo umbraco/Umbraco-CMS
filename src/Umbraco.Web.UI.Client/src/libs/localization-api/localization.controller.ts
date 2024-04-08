@@ -159,4 +159,18 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	relativeTime(value: number, unit: Intl.RelativeTimeFormatUnit, options?: Intl.RelativeTimeFormatOptions): string {
 		return new Intl.RelativeTimeFormat(this.lang(), options).format(value, unit);
 	}
+
+	string(text: string): string {
+		// find all words starting with #
+		const regex = /#\w+/g;
+
+		const localizedText = text.replace(regex, (match: string) => {
+			const key = match.slice(1);
+			const localized = this.term(key);
+			// we didn't find a localized string, so we return the original string with the #
+			return localized === key ? match : localized;
+		});
+
+		return localizedText;
+	}
 }
