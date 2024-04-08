@@ -10,7 +10,7 @@ export const manifests: Array<ManifestTypes> = [
 		name: 'Save Block Type Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Submit',
+			label: '#general_submit',
 			look: 'primary',
 			color: 'positive',
 		},

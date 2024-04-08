@@ -31,7 +31,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		meta: {
 			look: 'primary',
 			color: 'positive',
-			label: 'Save',
+			label: '#buttons_save',
 		},
 		conditions: [
 			{
