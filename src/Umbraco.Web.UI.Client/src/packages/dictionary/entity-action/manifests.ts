@@ -13,7 +13,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create',
+			label: '#dictionary_createNew',
 		},
 	},
 	{
@@ -36,7 +36,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-download-alt',
-			label: 'Export',
+			label: '#actions_export',
 		},
 	},
 	{
@@ -49,7 +49,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-page-up',
-			label: 'Import',
+			label: '#actions_import',
 		},
 	},
 	{

@@ -31,7 +31,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-blueprint',
-			label: 'Create Document Blueprint (TBD)',
+			label: '#actions_createblueprint',
 		},
 	},
 	{
@@ -70,7 +70,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-globe',
-			label: 'Publish',
+			label: '#actions_publish',
 		},
 	},
 	{
@@ -83,7 +83,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-globe',
-			label: 'Unpublish...',
+			label: '#actions_unpublish',
 		},
 	},
 	{
@@ -96,7 +96,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		api: () => import('./permissions.action.js'),
 		meta: {
 			icon: 'icon-name-badge',
-			label: 'Permissions...',
+			label: '#actions_setPermissions',
 		},
 	},
 	{
@@ -109,7 +109,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		api: () => import('./permissions.action.js'),
 		meta: {
 			icon: 'icon-megaphone',
-			label: 'Notifications...',
+			label: '#actions_notify',
 		},
 	},
 ];

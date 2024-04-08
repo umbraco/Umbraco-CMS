@@ -15,7 +15,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-trash',
-			label: 'Delete...',
+			label: '#actions_delete',
 			itemRepositoryAlias: '',
 			detailRepositoryAlias: '',
 		},
