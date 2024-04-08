@@ -9,20 +9,17 @@ public class MoveDocumentBlueprintsToFolders : MigrationBase
 {
     private readonly IEntityService _entityService;
     private readonly IContentService _contentService;
-    private readonly IDocumentBlueprintRepository _blueprintRepository;
     private readonly IDocumentBlueprintContainerRepository _containerRepository;
 
     public MoveDocumentBlueprintsToFolders(
         IMigrationContext context,
         IEntityService entityService,
         IContentService contentService,
-        IDocumentBlueprintRepository blueprintRepository,
         IDocumentBlueprintContainerRepository containerRepository)
         : base(context)
     {
         _entityService = entityService;
         _contentService = contentService;
-        _blueprintRepository = blueprintRepository;
         _containerRepository = containerRepository;
     }
 
