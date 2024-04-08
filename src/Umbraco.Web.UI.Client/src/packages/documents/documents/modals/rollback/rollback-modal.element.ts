@@ -10,6 +10,9 @@ import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
+import { diffWords } from 'diff';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT, UmbDocumentWorkspaceContext } from '../../workspace/index.js';
+
 type DocumentVersion = {
 	id: string;
 	date: string;
@@ -47,6 +50,8 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	#rollbackRepository = new UmbRollbackRepository(this);
 	#userItemRepository = new UmbUserItemRepository(this);
 
+	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+
 	#propertyDatasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 	#variantWorkspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 
@@ -64,6 +69,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			this.#propertyDatasetContext = instance;
 			this.currentCulture = instance.getVariantId().culture ?? undefined;
 			this.#requestVersions();
+		});
+
+		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance;
 		});
 
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
@@ -216,14 +225,49 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	#renderCurrentVersion() {
 		if (!this.currentVersion) return;
 
+		let draftValues =
+			(this.#workspaceContext?.getData()?.values as Array<{ alias: string; culture: string; value: any }>) ?? [];
+
+		draftValues = draftValues.filter((x) => x.culture === this.currentCulture);
+
+		const diffs = this.currentVersion.properties.map((item) => {
+			const draftValue = draftValues.find((x) => x.alias === item.alias);
+
+			if (!draftValue) return;
+
+			const draftValueString = trimQuotes(JSON.stringify(draftValue.value));
+			const versionValueString = trimQuotes(JSON.stringify(item.value));
+
+			const diff = diffWords(draftValueString, versionValueString);
+			return { alias: item.alias, diff };
+		});
+
+		function trimQuotes(str: string): string {
+			return str.replace(/^['"]|['"]$/g, '');
+		}
+
 		return html`
-			<div>
+			<div id="diff">
 				<p>name: ${this.currentVersion.name}</p>
 				${repeat(
 					this.currentVersion.properties,
 					(item) => item.alias,
 					(item) => {
-						return html` <p>${item.alias}: ${JSON.stringify(item.value)}</p> `;
+						const diff = diffs.find((x) => x.alias === item.alias);
+						return html`
+							<p>
+								${item.alias}:
+								${diff
+									? diff.diff.map((part) =>
+											part.added
+												? html`<span class="added">${part.value}</span>`
+												: part.removed
+													? html`<span class="removed">${part.value}</span>`
+													: part.value,
+										)
+									: JSON.stringify(item.value)}
+							</p>
+						`;
 					},
 				)}
 			</div>
@@ -256,6 +300,12 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	static styles = [
 		UmbTextStyles,
 		css`
+			#diff .added {
+				background-color: #d1ffdb;
+			}
+			#diff .removed {
+				background-color: #ffd1d1;
+			}
 			.rollback-item {
 				position: relative;
 				display: flex;
