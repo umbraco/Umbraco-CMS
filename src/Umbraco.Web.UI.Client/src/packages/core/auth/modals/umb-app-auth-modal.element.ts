@@ -12,14 +12,33 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		};
 	}
 
+	get headline() {
+		return this.data?.userLoginState === 'timedOut'
+			? this.localize.term('login_instruction')
+			: this.localize.term(
+					[
+						'login_greeting0',
+						'login_greeting1',
+						'login_greeting2',
+						'login_greeting3',
+						'login_greeting4',
+						'login_greeting5',
+						'login_greeting6',
+					][new Date().getDay()],
+				);
+	}
+
 	render() {
 		return html`
 			<div id="layout">
 				<div id="graphics" aria-hidden="true">
 					<img id="logo" alt="logo" src="umbraco_logo_white.svg" />
 				</div>
-				<umb-body-layout id="login-layout" .headline=${this.localize.term('login_instruction')}>
-					${this.data?.userLoginState === 'timedOut' ? html`<p>${this.localize.term('login_timeout')}</p>` : ''}
+				<umb-body-layout id="login-layout">
+					<h1 id="greeting" slot="header">${this.headline}</h1>
+					${this.data?.userLoginState === 'timedOut'
+						? html`<p style="margin-top:0">${this.localize.term('login_timeout')}</p>`
+						: ''}
 					<umb-extension-slot
 						id="providers"
 						type="authProvider"
@@ -78,6 +97,16 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				min-height: 327px;
 			}
 
+			#greeting {
+				width: 100%;
+				color: var(--umb-login-header-color, var(--uui-color-interactive));
+				text-align: center;
+				font-weight: 400;
+				font-size: var(--umb-login-header-font-size, 2rem);
+				line-height: 1.2;
+				margin: 0;
+			}
+
 			#providers {
 				display: flex;
 				flex-direction: column;
@@ -92,6 +121,10 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				#login-layout {
 					max-width: none;
 					min-height: none;
+				}
+
+				#greeting {
+					text-align: center;
 				}
 			}
 		`,

@@ -1011,6 +1011,13 @@ export default {
 		renewSession: 'Renew now to save your work',
 	},
 	login: {
+		greeting0: 'Welcome',
+		greeting1: 'Welcome',
+		greeting2: 'Welcome',
+		greeting3: 'Welcome',
+		greeting4: 'Welcome',
+		greeting5: 'Welcome',
+		greeting6: 'Welcome',
 		instruction: 'Sign in to Umbraco',
 		signInWith: 'Sign in with {0}',
 		timeout: 'Your session has timed out. Please sign in again below.',
