@@ -19,12 +19,8 @@ import { manifests as workspaceManifests } from './workspace/manifests.js';
 import type { ManifestTypes, UmbBackofficeManifestKind } from './extension-registry/index.js';
 
 export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
-	...collectionManifests,
-	...contentTypeManifests,
-	...cultureManifests,
-	...debugManifests,
-	...entityActionManifests,
 	...extensionManifests,
+	...cultureManifests,
 	...localizationManifests,
 	...modalManifests,
 	...propertyActionManifests,
@@ -34,6 +30,16 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...serverFileSystemManifests,
 	...settingsManifests,
 	...themeManifests,
+	...sectionManifests,
 	...treeManifests,
+	...collectionManifests,
 	...workspaceManifests,
+	...contentTypeManifests,
+	...propertyEditorManifests,
+	...settingsManifests,
+	...modalManifests,
+	...entityActionManifests,
+	...propertyActionManifests,
+	...serverFileSystemManifests,
+	...debugManifests,
 ];
