@@ -97,7 +97,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							}}>
 						</umb-router-slot>
 					</umb-body-layout>
-			  `
+				`
 			: html`${nothing}`;
 	}
 
@@ -107,17 +107,16 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			? html`
 					<uui-tab-group slot="header" id="dashboards">
 						${this._dashboards.map((dashboard) => {
-							const dashboardName = dashboard.meta.label ?? dashboard.name;
 							const dashboardPath = this.#constructDashboardPath(dashboard);
 							return html`
 								<uui-tab
 									href="${this._routerPath}/${dashboardPath}"
-									label="${dashboardName}"
+									label="${dashboard.meta.label ? this.localize.string(dashboard.meta.label) : dashboard.name}"
 									?active="${this._activePath === dashboardPath}"></uui-tab>
 							`;
 						})}
 					</uui-tab-group>
-			  `
+				`
 			: '';
 	}
 
@@ -140,7 +139,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							`;
 						})}
 					</uui-tab-group>
-			  `
+				`
 			: '';
 	}
 
