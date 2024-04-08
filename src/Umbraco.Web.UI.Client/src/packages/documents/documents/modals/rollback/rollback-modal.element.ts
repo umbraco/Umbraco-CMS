@@ -1,7 +1,7 @@
-import { diffWords } from '@umbraco-cms/backoffice/external/diff';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/index.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './rollback-modal.token.js';
 import { UmbRollbackRepository } from './repository/rollback.repository.js';
+import { diffWords } from '@umbraco-cms/backoffice/external/diff';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
