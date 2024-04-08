@@ -76,25 +76,9 @@ public class UserGroupControllerBase : ManagementApiControllerBase
             UserGroupOperationStatus.UserNotInGroup => BadRequest(problemDetailsBuilder
                 .WithTitle("User not in group")
                 .WithDetail("The user is not in the group.")),
-            UserGroupOperationStatus.UnauthorizedMissingAllowedSectionAccess => Unauthorized(problemDetailsBuilder
-                .WithTitle("Unauthorized section access")
-                .WithDetail("The performing user does not have access to all sections specified as allowed for this user group.")
-                .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingContentStartNodeAccess => Unauthorized(problemDetailsBuilder
-                .WithTitle("Unauthorized content start node access")
-                .WithDetail("The performing user does not have access to the specified content start node item.")
-                .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingMediaStartNodeAccess => Unauthorized(problemDetailsBuilder
-                .WithTitle("Unauthorized media start node access")
-                .WithDetail("The performing user does not have access to the specified media start node item.")
-                .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingUserGroupAccess => Unauthorized(problemDetailsBuilder
-                .WithTitle("Unauthorized user group access")
-                .WithDetail("The performing user does not have access to the specified user group(s).")
-                .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingUsersSectionAccess => Unauthorized(problemDetailsBuilder
-                .WithTitle("Unauthorized access to Users section")
-                .WithDetail("The performing user does not have access to the Users section.")
+            UserGroupOperationStatus.Unauthorized => Unauthorized(problemDetailsBuilder
+                .WithTitle("Unauthorized access")
+                .WithDetail("The performing user does not have the necessary access to perform this operation. Check the log for details.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown user group operation status.")
