@@ -2,7 +2,7 @@ import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/index.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './rollback-modal.token.js';
 import { UmbRollbackRepository } from './repository/rollback.repository.js';
 import { diffWords } from '@umbraco-cms/backoffice/external/diff';
-import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -10,7 +10,6 @@ import '../shared/document-variant-language-picker.element.js';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 type DocumentVersion = {
 	id: string;
@@ -41,10 +40,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	currentCulture?: string;
 
 	@state()
-	availableVariants: Option[] = [
-		// { name: 'English', value: 'en-US', selected: true },
-		// { name: 'Danish', value: 'da-dk' },
-	];
+	availableVariants: Option[] = [];
 
 	#rollbackRepository = new UmbRollbackRepository(this);
 	#userItemRepository = new UmbUserItemRepository(this);
@@ -52,7 +48,6 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
 	#propertyDatasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
-	#variantWorkspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 
 	#localizeDateOptions: Intl.DateTimeFormatOptions = {
 		day: 'numeric',
@@ -72,20 +67,13 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-		});
 
-		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
-			this.#variantWorkspaceContext = instance;
-
-			// TODO: For some reason TS cant find languages on the context
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			instance.languages.subscribe((languages) => {
-				this.availableVariants = languages.map((language: any) => {
+			this.observe(instance.variantOptions, (options) => {
+				this.availableVariants = options.map((option) => {
 					return {
-						name: language.name,
-						value: language.unique,
-						selected: language.unique === this.currentCulture,
+						name: option.language.name,
+						value: option.language.unique,
+						selected: option.language.unique === this.currentCulture,
 					};
 				});
 			});
@@ -190,6 +178,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	}
 
 	#renderCultureSelect() {
+		if (this.availableVariants.length < 2) return nothing;
 		return html`
 			<div id="language-select">
 				<b>Language</b>
