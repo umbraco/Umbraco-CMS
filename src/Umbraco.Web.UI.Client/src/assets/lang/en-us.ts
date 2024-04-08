@@ -1013,6 +1013,7 @@ export default {
 	login: {
 		instruction: 'Sign in to Umbraco',
 		signInWith: 'Sign in with {0}',
+		timeout: 'Your session has timed out. Please sign in again below.',
 	},
 	main: {
 		dashboard: 'Dashboard',

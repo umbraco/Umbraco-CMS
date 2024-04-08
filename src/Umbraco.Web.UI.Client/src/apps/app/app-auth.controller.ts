@@ -69,6 +69,17 @@ export class UmbAppAuthController extends UmbControllerBase {
 			throw new Error('[Fatal] Auth context is not available');
 		}
 
+		// If the user is timed out, we can show the login modal directly
+		if (userLoginState === 'timedOut') {
+			const selected = await this.#showLoginModal(userLoginState);
+
+			if (!selected) {
+				return false;
+			}
+
+			return this.#updateState();
+		}
+
 		// Figure out which providers are available
 		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders());
 
@@ -88,30 +99,45 @@ export class UmbAppAuthController extends UmbControllerBase {
 				this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName);
 			} else {
 				// Show the provider selection screen
-				const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-				const selected = await modalManager
-					.open(this._host, UMB_MODAL_APP_AUTH, {
-						data: {
-							userLoginState,
-						},
-						modal: {
-							backdropBackground: this.#firstTimeLoggingIn
-								? "var(--umb-auth-backdrop, url('https://picsum.photos/1440?grayscale&blur=2') center center / cover no-repeat)"
-								: 'var(--umb-auth-backdrop-timedout, rgb(0, 0, 0))',
-						},
-					})
-					.onSubmit()
-					.catch(() => undefined);
+				const selected = await this.#showLoginModal(userLoginState);
 
-				if (!selected?.providerName) {
+				if (!selected) {
 					return false;
 				}
-
-				this.#authContext.makeAuthorizationRequest(selected.providerName, selected.loginHint);
 			}
 		}
 
 		return this.#updateState();
+	}
+
+	async #showLoginModal(userLoginState: UmbUserLoginState): Promise<boolean> {
+		if (!this.#authContext) {
+			throw new Error('[Fatal] Auth context is not available');
+		}
+
+		// Show the provider selection screen
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const selected = await modalManager
+			.open(this._host, UMB_MODAL_APP_AUTH, {
+				data: {
+					userLoginState,
+				},
+				modal: {
+					backdropBackground: this.#firstTimeLoggingIn
+						? "var(--umb-auth-backdrop, url('https://picsum.photos/1440?grayscale&blur=2') center center / cover no-repeat)"
+						: 'var(--umb-auth-backdrop-timedout, rgb(0, 0, 0))',
+				},
+			})
+			.onSubmit()
+			.catch(() => undefined);
+
+		if (!selected?.providerName) {
+			return false;
+		}
+
+		this.#authContext.makeAuthorizationRequest(selected.providerName, selected.loginHint);
+
+		return true;
 	}
 
 	#updateState() {

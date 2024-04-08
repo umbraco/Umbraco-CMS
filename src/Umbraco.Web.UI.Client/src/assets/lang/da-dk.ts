@@ -1016,6 +1016,7 @@ export default {
 	login: {
 		instruction: 'Log ind på Umbraco',
 		signInWith: 'Log ind med {0}',
+		timeout: 'Du er blevet logget ud på grund af inaktivitet, vil du logge ind igen?',
 	},
 	main: {
 		dashboard: 'Skrivebord',
