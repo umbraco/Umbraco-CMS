@@ -51,9 +51,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 			return true;
 		}
 
-		// Save location.href so we can redirect to it after login
-		window.sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, location.href);
-
 		// Make a request to the auth server to start the auth flow
 		return this.makeAuthorizationRequest();
 	}
@@ -66,6 +63,9 @@ export class UmbAppAuthController extends UmbControllerBase {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
+
+		// Save location.href so we can redirect to it after login
+		window.sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, location.href);
 
 		// If the user is timed out, we can show the login modal directly
 		if (userLoginState === 'timedOut') {
