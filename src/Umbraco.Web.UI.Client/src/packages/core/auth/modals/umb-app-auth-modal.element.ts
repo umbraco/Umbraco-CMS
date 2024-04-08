@@ -32,7 +32,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		return html`
 			<div id="layout">
 				<div id="graphics" aria-hidden="true">
-					<img id="logo" alt="logo" src="umbraco_logo_white.svg" />
+					<img id="logo" alt="logo" src="/umbraco/backoffice/assets/umbraco_logo_white.svg" />
 				</div>
 				<umb-body-layout id="login-layout">
 					<h1 id="greeting" slot="header">${this.headline}</h1>
@@ -64,7 +64,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				max-width: 80vw;
 
 				--umb-body-layout-color-background: #fff;
-				--umb-login-image: url('login.jpg') center center / cover no-repeat;
+				--umb-login-image: url('/umbraco/backoffice/assets/login.jpg') center center / cover no-repeat;
 			}
 
 			#layout {
