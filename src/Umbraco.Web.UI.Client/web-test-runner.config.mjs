@@ -35,7 +35,7 @@ export default {
 			},
 		}),
 		commonjs({
-			include: ['node_modules/**', 'src/external/**'],
+			include: [/node_modules/],
 		}),
 	],
 	testRunnerHtml: (testFramework, devMode) =>

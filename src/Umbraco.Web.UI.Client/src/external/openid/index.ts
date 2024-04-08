@@ -1,16 +1,17 @@
 export {
-	BaseTokenRequestHandler,
-	BasicQueryStringUtils,
-	FetchRequestor,
-	LocalStorageBackend,
-	RedirectRequestHandler,
-	RevokeTokenRequest,
 	AuthorizationNotifier,
 	AuthorizationRequest,
 	AuthorizationServiceConfiguration,
-	GRANT_TYPE_AUTHORIZATION_CODE,
-	GRANT_TYPE_REFRESH_TOKEN,
+	BaseTokenRequestHandler,
+	FetchRequestor,
+	BasicQueryStringUtils,
+	LocalStorageBackend,
+	RedirectRequestHandler,
 	TokenRequest,
 	TokenResponse,
-} from '@openid/appauth';
-export type { LocationLike, StringMap } from '@openid/appauth';
+	RevokeTokenRequest,
+	GRANT_TYPE_AUTHORIZATION_CODE,
+	GRANT_TYPE_REFRESH_TOKEN,
+} from '@openid/appauth/src/index.js';
+
+export type { LocationLike, StringMap } from '@openid/appauth/src/types.js';
