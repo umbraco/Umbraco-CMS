@@ -61,7 +61,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IContentListViewService, ContentListViewService>();
         builder.Services.AddUnique<IMediaListViewService, MediaListViewService>();
         builder.Services.AddUnique<IEntitySearchService, EntitySearchService>();
-        builder.Services.AddUnique<IExamineEntitySearchService, ExamineEntitySearchService>();
+        builder.Services.AddUnique<IIndexedEntitySearchService, IndexedEntitySearchService>();
 
         return builder;
     }

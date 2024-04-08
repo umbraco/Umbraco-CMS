@@ -12,12 +12,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Item;
 [ApiVersion("1.0")]
 public class SearchDocumentItemController : DocumentItemControllerBase
 {
-    private readonly IExamineEntitySearchService _examineEntitySearchService;
+    private readonly IIndexedEntitySearchService _indexedEntitySearchService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
-    public SearchDocumentItemController(IExamineEntitySearchService examineEntitySearchService, IDocumentPresentationFactory documentPresentationFactory)
+    public SearchDocumentItemController(IIndexedEntitySearchService indexedEntitySearchService, IDocumentPresentationFactory documentPresentationFactory)
     {
-        _examineEntitySearchService = examineEntitySearchService;
+        _indexedEntitySearchService = indexedEntitySearchService;
         _documentPresentationFactory = documentPresentationFactory;
     }
 
@@ -26,7 +26,7 @@ public class SearchDocumentItemController : DocumentItemControllerBase
     [ProducesResponseType(typeof(PagedModel<DocumentItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Search(string query, int skip = 0, int take = 100)
     {
-        PagedModel<IEntitySlim> searchResult = _examineEntitySearchService.Search(UmbracoObjectTypes.Document, query, skip, take);
+        PagedModel<IEntitySlim> searchResult = _indexedEntitySearchService.Search(UmbracoObjectTypes.Document, query, skip, take);
         var result = new PagedModel<DocumentItemResponseModel>
         {
             Items = searchResult.Items.OfType<IDocumentEntitySlim>().Select(_documentPresentationFactory.CreateItemResponseModel),
