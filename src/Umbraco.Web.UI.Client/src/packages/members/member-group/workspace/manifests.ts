@@ -1,5 +1,5 @@
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../entity.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
@@ -25,7 +25,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.MemberGroup.Save',
 		name: 'Save Member Group Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',

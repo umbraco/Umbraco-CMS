@@ -1,8 +1,9 @@
 import { UMB_PARTIAL_VIEW_TREE_ALIAS } from '../../partial-views/tree/manifests.js';
-import { UmbModalToken, type UmbPickerModalValue, type UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
-import type { UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbPartialViewTreeItemModel } from '../../partial-views/tree/index.js';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type { UmbPickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 
-export type UmbPartialViewPickerModalData = UmbTreePickerModalData<UmbUniqueTreeItemModel>;
+export type UmbPartialViewPickerModalData = UmbTreePickerModalData<UmbPartialViewTreeItemModel>;
 export type UmbPartialViewPickerModalValue = UmbPickerModalValue;
 
 export const UMB_PARTIAL_VIEW_PICKER_MODAL = new UmbModalToken<
@@ -13,6 +14,5 @@ export const UMB_PARTIAL_VIEW_PICKER_MODAL = new UmbModalToken<
 		type: 'sidebar',
 		size: 'small',
 	},
-
 	data: { treeAlias: UMB_PARTIAL_VIEW_TREE_ALIAS, hideTreeRoot: true },
 });

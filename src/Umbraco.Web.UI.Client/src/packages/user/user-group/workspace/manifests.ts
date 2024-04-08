@@ -3,7 +3,7 @@ import type {
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 const workspace: ManifestWorkspaces = {
 	type: 'workspace',
@@ -23,7 +23,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.UserGroup.Save',
 		name: 'Save User Group Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',

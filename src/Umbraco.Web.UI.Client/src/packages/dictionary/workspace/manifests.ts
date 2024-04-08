@@ -1,5 +1,5 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
@@ -45,7 +45,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		alias: 'Umb.WorkspaceAction.Dictionary.Save',
 		name: 'Save Dictionary Workspace Action',
 		weight: 90,
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',

@@ -16,6 +16,8 @@ import type { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input
 
 @customElement('umb-input-entity')
 export class UmbInputEntityElement extends FormControlMixin(UmbLitElement) {
+	// TODO: [LK] Add sort ordering.
+
 	protected getFormElement() {
 		return undefined;
 	}
@@ -42,6 +44,9 @@ export class UmbInputEntityElement extends FormControlMixin(UmbLitElement) {
 		return this.#pickerContext?.max ?? Infinity;
 	}
 
+	@property({ attribute: false })
+	getIcon?: (item: any) => string;
+
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
@@ -53,13 +58,11 @@ export class UmbInputEntityElement extends FormControlMixin(UmbLitElement) {
 		return this.selection?.join(',') ?? '';
 	}
 
+	@property({ attribute: false })
 	public set pickerContext(ctor: new (host: UmbControllerHost) => UmbPickerInputContext<any>) {
 		if (this.#pickerContext) return;
 		this.#pickerContext = new ctor(this);
 		this.#observePickerContext();
-	}
-	public get pickerContext(): UmbPickerInputContext<any> | undefined {
-		return this.#pickerContext;
 	}
 	#pickerContext?: UmbPickerInputContext<any>;
 
@@ -78,30 +81,30 @@ export class UmbInputEntityElement extends FormControlMixin(UmbLitElement) {
 		super();
 	}
 
-	// connectedCallback() {
-	// 	super.connectedCallback();
+	connectedCallback() {
+		super.connectedCallback();
 
-	// 	if (!this.#pickerContext) return;
+		if (!this.#pickerContext) return;
 
-	// 	this.addValidator(
-	// 		'rangeUnderflow',
-	// 		() => this.minMessage,
-	// 		() => !!this.min && this.#pickerContext.getSelection().length < this.min,
-	// 	);
+		this.addValidator(
+			'rangeUnderflow',
+			() => this.minMessage,
+			() => !!this.min && (this.#pickerContext?.getSelection().length ?? 0) < this.min,
+		);
 
-	// 	this.addValidator(
-	// 		'rangeOverflow',
-	// 		() => this.maxMessage,
-	// 		() => !!this.max && this.#pickerContext.getSelection().length > this.max,
-	// 	);
-	// }
+		this.addValidator(
+			'rangeOverflow',
+			() => this.maxMessage,
+			() => !!this.max && (this.#pickerContext?.getSelection().length ?? 0) > this.max,
+		);
+	}
 
 	async #observePickerContext() {
 		if (!this.#pickerContext) return;
 
 		this.observe(
 			this.#pickerContext.selection,
-			(selection) => (super.value = selection?.join(',') ?? ''),
+			(selection) => (this.value = selection?.join(',') ?? ''),
 			'observeSelection',
 		);
 
@@ -121,7 +124,7 @@ export class UmbInputEntityElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
+		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
 	#renderAddButton() {
@@ -150,9 +153,10 @@ export class UmbInputEntityElement extends FormControlMixin(UmbLitElement) {
 
 	#renderItem(item: any) {
 		if (!item.unique) return;
+		const icon = this.getIcon?.(item) ?? item.icon;
 		return html`
 			<uui-ref-node name=${ifDefined(item.name)}>
-				${when(item.icon, () => html`<umb-icon slot="icon" name=${item.icon}></umb-icon>`)}
+				${when(icon, () => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext?.requestRemoveItem(item.unique)}
