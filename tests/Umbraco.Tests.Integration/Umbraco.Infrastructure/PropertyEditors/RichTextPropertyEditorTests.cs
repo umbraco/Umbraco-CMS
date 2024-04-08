@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -17,11 +16,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class RichTextPropertyEditorTests : UmbracoIntegrationTest
 {
-    // FIXME: This test NEEDS the System.Text.Json serializer.
-    //        When the ContextualJsonSerializer is removed, this can be removed too.
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.Services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
-
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private IContentService ContentService => GetRequiredService<IContentService>();
