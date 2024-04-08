@@ -138,7 +138,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			name: data.variants.find((x) => x.culture === this.currentCulture)?.name || data.variants[0].name,
 			id: data.id,
 			properties: data.values
-				.filter((x) => x.culture === this.currentCulture)
+				.filter((x) => x.culture === this.currentCulture || !x.culture) // When invariant, culture is undefined or null.
 				.map((value: any) => {
 					return {
 						alias: value.alias,
