@@ -26,13 +26,19 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
     public async Task Can_Create_Container_At_Root()
     {
         var result = await ContentBlueprintContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        });
 
         var created = await ContentBlueprintContainerService.GetAsync(result.Result.Key);
         Assert.NotNull(created);
-        Assert.AreEqual("Root Container", created.Name);
-        Assert.AreEqual(Constants.System.Root, created.ParentId);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Root Container", created.Name);
+            Assert.AreEqual(Constants.System.Root, created.ParentId);
+        });
     }
 
     [Test]
@@ -41,13 +47,19 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
         EntityContainer root = (await ContentBlueprintContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result;
 
         var result = await ContentBlueprintContainerService.CreateAsync(null, "Child Container", root.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        });
 
         var created = await ContentBlueprintContainerService.GetAsync(result.Result.Key);
         Assert.NotNull(created);
-        Assert.AreEqual("Child Container", created.Name);
-        Assert.AreEqual(root.Id, created.ParentId);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Child Container", created.Name);
+            Assert.AreEqual(root.Id, created.ParentId);
+        });
     }
 
     [Test]
@@ -55,14 +67,20 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
     {
         var key = Guid.NewGuid();
         var result = await ContentBlueprintContainerService.CreateAsync(key, "Root Container", null, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
-        Assert.AreEqual(key, result.Result.Key);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+            Assert.AreEqual(key, result.Result.Key);
+        });
 
         var created = await ContentBlueprintContainerService.GetAsync(key);
         Assert.NotNull(created);
-        Assert.AreEqual("Root Container", created.Name);
-        Assert.AreEqual(Constants.System.Root, created.ParentId);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Root Container", created.Name);
+            Assert.AreEqual(Constants.System.Root, created.ParentId);
+        });
     }
 
     [Test]
@@ -71,13 +89,19 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
         var key = (await ContentBlueprintContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result.Key;
 
         var result = await ContentBlueprintContainerService.UpdateAsync(key, "Root Container UPDATED", Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        });
 
         var updated = await ContentBlueprintContainerService.GetAsync(key);
         Assert.NotNull(updated);
-        Assert.AreEqual("Root Container UPDATED", updated.Name);
-        Assert.AreEqual(Constants.System.Root, updated.ParentId);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Root Container UPDATED", updated.Name);
+            Assert.AreEqual(Constants.System.Root, updated.ParentId);
+        });
     }
 
     [Test]
@@ -87,13 +111,19 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
         EntityContainer child = (await ContentBlueprintContainerService.CreateAsync(null, "Child Container", root.Key, Constants.Security.SuperUserKey)).Result;
 
         var result = await ContentBlueprintContainerService.UpdateAsync(child.Key, "Child Container UPDATED", Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        });
 
         EntityContainer updated = await ContentBlueprintContainerService.GetAsync(child.Key);
         Assert.NotNull(updated);
-        Assert.AreEqual("Child Container UPDATED", updated.Name);
-        Assert.AreEqual(root.Id, updated.ParentId);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Child Container UPDATED", updated.Name);
+            Assert.AreEqual(root.Id, updated.ParentId);
+        });
     }
 
     [Test]
@@ -103,8 +133,11 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
 
         EntityContainer created = await ContentBlueprintContainerService.GetAsync(root.Key);
         Assert.NotNull(created);
-        Assert.AreEqual("Root Container", created.Name);
-        Assert.AreEqual(Constants.System.Root, created.ParentId);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Root Container", created.Name);
+            Assert.AreEqual(Constants.System.Root, created.ParentId);
+        });
     }
 
     [Test]
@@ -115,8 +148,11 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
 
         EntityContainer created = await ContentBlueprintContainerService.GetAsync(child.Key);
         Assert.IsNotNull(created);
-        Assert.AreEqual("Child Container", created.Name);
-        Assert.AreEqual(root.Id, child.ParentId);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Child Container", created.Name);
+            Assert.AreEqual(root.Id, child.ParentId);
+        });
     }
 
     [Test]
@@ -125,8 +161,11 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
         EntityContainer root = (await ContentBlueprintContainerService.CreateAsync(null,"Root Container", null, Constants.Security.SuperUserKey)).Result;
 
         var result = await ContentBlueprintContainerService.DeleteAsync(root.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        });
 
         var current = await ContentBlueprintContainerService.GetAsync(root.Key);
         Assert.IsNull(current);
@@ -139,8 +178,11 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
         EntityContainer child = (await ContentBlueprintContainerService.CreateAsync(null, "Child Container", root.Key, Constants.Security.SuperUserKey)).Result;
 
         var result = await ContentBlueprintContainerService.DeleteAsync(child.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+        });
 
         child = await ContentBlueprintContainerService.GetAsync(child.Key);
         Assert.IsNull(child);
@@ -154,8 +196,11 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
     {
         var key = Guid.NewGuid();
         var result = await ContentBlueprintContainerService.CreateAsync(key, "Child Container", Guid.NewGuid(), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(EntityContainerOperationStatus.ParentNotFound, result.Status);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.ParentNotFound, result.Status);
+        });
 
         var created = await ContentBlueprintContainerService.GetAsync(key);
         Assert.IsNull(created);
@@ -168,8 +213,11 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
         EntityContainer child = (await ContentBlueprintContainerService.CreateAsync(null, "Child Container", root.Key, Constants.Security.SuperUserKey)).Result;
 
         var result = await ContentBlueprintContainerService.DeleteAsync(root.Key, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(EntityContainerOperationStatus.NotEmpty, result.Status);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.NotEmpty, result.Status);
+        });
 
         var current = await ContentBlueprintContainerService.GetAsync(root.Key);
         Assert.IsNotNull(current);
@@ -190,8 +238,11 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
         await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
 
         var result = await ContentBlueprintContainerService.DeleteAsync(container.Key, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(EntityContainerOperationStatus.NotEmpty, result.Status);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.NotEmpty, result.Status);
+        });
 
         var currentContainer = await ContentBlueprintContainerService.GetAsync(container.Key);
         Assert.IsNotNull(currentContainer);
@@ -204,7 +255,10 @@ public class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
     public async Task Cannot_Delete_Non_Existing_Container()
     {
         var result = await ContentBlueprintContainerService.DeleteAsync(Guid.NewGuid(), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(EntityContainerOperationStatus.NotFound, result.Status);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.NotFound, result.Status);
+        });
     }
 }
