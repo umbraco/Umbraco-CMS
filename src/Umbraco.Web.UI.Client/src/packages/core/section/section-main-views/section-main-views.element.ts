@@ -126,7 +126,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			? html`
 					<uui-tab-group slot="navigation" id="views">
 						${this._views.map((view) => {
-							const viewName = view.meta.label ?? view.name;
+							const viewName = view.meta.label ? this.localize.string(view.meta.label) : view.name;
 							const viewPath = this.#constructViewPath(view);
 							return html`
 								<uui-tab
