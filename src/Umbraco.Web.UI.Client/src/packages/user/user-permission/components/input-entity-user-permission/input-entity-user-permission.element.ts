@@ -94,10 +94,8 @@ export class UmbInputEntityUserPermissionElement extends FormControlMixin(UmbLit
 
 	#renderPermission(manifest: ManifestEntityUserPermission) {
 		return html` <umb-input-user-permission-verb
-			label=${ifDefined(manifest.meta.labelKey ? this.localize.term(manifest.meta.labelKey) : manifest.meta.label)}
-			description=${ifDefined(
-				manifest.meta.descriptionKey ? this.localize.term(manifest.meta.descriptionKey) : manifest.meta.description,
-			)}
+			label=${ifDefined(manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name)}
+			description=${ifDefined(manifest.meta.description ? this.localize.string(manifest.meta.description) : undefined)}
 			?allowed=${this.#isAllowed(manifest.meta.verbs)}
 			@change=${(event: UmbChangeEvent) =>
 				this.#onChangeUserPermission(event, manifest.meta.verbs)}></umb-input-user-permission-verb>`;
