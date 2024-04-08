@@ -13,7 +13,7 @@ setup('authenticate', async ({page}) => {
   // Assert
   //await expect(page.locator('uui-tab-group').locator('[label="Settings"]')).toBeVisible({timeout: 10000});
   // DELETE LATER
-  await umbracoUi.waitForTimeout(10000);
+  await umbracoUi.waitForTimeout(20000);
   await umbracoUi.login.goToSection(ConstantHelper.sections.settings);
   await page.context().storageState({path: STORAGE_STATE});
 });

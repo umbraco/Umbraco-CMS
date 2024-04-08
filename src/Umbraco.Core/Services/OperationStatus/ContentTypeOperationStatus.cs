@@ -12,7 +12,9 @@ public enum ContentTypeOperationStatus
     InvalidComposition,
     InvalidParent,
     InvalidContainerName,
+    InvalidContainerType,
     MissingContainer,
     DuplicateContainer,
     NotFound,
+    NotAllowed
 }

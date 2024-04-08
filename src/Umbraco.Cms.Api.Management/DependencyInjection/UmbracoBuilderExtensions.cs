@@ -32,6 +32,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddSearchManagement()
                 .AddTrees()
                 .AddAuditLogs()
+                .AddConfigurationFactories()
                 .AddDocuments()
                 .AddDocumentTypes()
                 .AddMedia()
@@ -84,8 +85,8 @@ public static partial class UmbracoBuilderExtensions
                 options.AddFilter(new UmbracoPipelineFilter(
                     "BackOfficeManagementApiFilter",
                     applicationBuilder => applicationBuilder.UseProblemDetailsExceptionHandling(),
-                    applicationBuilder => { },
-                    applicationBuilder => applicationBuilder.UseEndpoints()));
+                    postPipeline: _ => { },
+                    endpoints: applicationBuilder => applicationBuilder.UseEndpoints()));
             });
         }
 

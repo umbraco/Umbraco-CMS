@@ -20,7 +20,7 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
     // Act
-    await umbracoUi.dictionary.clickCreateButton();
+    await umbracoUi.dictionary.clickCreateLink();
     await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
     await umbracoUi.dictionary.clickSaveButton();
 

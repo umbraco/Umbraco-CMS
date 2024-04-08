@@ -4,22 +4,12 @@
 using System.Globalization;
 using System.Security.Claims;
 using System.Security.Principal;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions;
 
 public static class ClaimsPrincipalExtensions
 {
-    private static string? _authenticationType;
-    private static string AuthenticationType =>
-        _authenticationType ??= StaticServiceProvider.Instance?.GetService<IOptions<BackOfficeAuthenticationTypeSettings>>()?
-            .Value?
-            .AuthenticationType ?? Constants.Security.BackOfficeAuthenticationType;
-
     public static bool IsBackOfficeAuthenticationType(this ClaimsIdentity? claimsIdentity)
     {
         if (claimsIdentity is null)
@@ -27,7 +17,8 @@ public static class ClaimsPrincipalExtensions
             return false;
         }
 
-        return claimsIdentity.IsAuthenticated && claimsIdentity.AuthenticationType == AuthenticationType;
+        return claimsIdentity.IsAuthenticated &&
+               claimsIdentity.AuthenticationType == Constants.Security.BackOfficeAuthenticationType;
     }
 
     /// <summary>

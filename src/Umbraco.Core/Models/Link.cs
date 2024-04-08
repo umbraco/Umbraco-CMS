@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core.Models.PublishedContent;
+
 namespace Umbraco.Cms.Core.Models;
 
 public class Link

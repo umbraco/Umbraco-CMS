@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -69,6 +70,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             LastLoginDate = user.LastLoginDate,
             LastLockoutDate = user.LastLockoutDate,
             LastPasswordChangeDate = user.LastPasswordChangeDate,
+            IsAdmin = user.IsAdmin(),
         };
 
         return responseModel;
@@ -164,6 +166,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         var hasAccessToAllLanguages = presentationGroups.Any(x => x.HasAccessToAllLanguages);
 
         var allowedSections = presentationGroups.SelectMany(x => x.Sections).ToHashSet();
+
         return await Task.FromResult(new CurrentUserResponseModel()
         {
             Id = presentationUser.Id,
@@ -178,7 +181,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages,
-            AllowedSections = allowedSections
+            HasAccessToSensitiveData = user.HasAccessToSensitiveData(),
+            AllowedSections = allowedSections,
+            IsAdmin = user.IsAdmin()
         });
     }
 
