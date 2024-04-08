@@ -222,7 +222,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		let draftValues =
 			(this.#workspaceContext?.getData()?.values as Array<{ alias: string; culture: string; value: any }>) ?? [];
 
-		draftValues = draftValues.filter((x) => x.culture === this.currentCulture);
+		draftValues = draftValues.filter((x) => x.culture === this.currentCulture || !x.culture); // When invariant, culture is undefined or null.
 
 		const diffs = this.currentVersion.properties.map((item) => {
 			const draftValue = draftValues.find((x) => x.alias === item.alias);
