@@ -36,7 +36,7 @@ public class UpdateDocumentBlueprintController : DocumentBlueprintControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateDocumentBlueprintRequestModel requestModel)
+    public async Task<IActionResult> Update(CancellationToken cancellationToken, Guid id, UpdateDocumentBlueprintRequestModel requestModel)
     {
         ContentBlueprintUpdateModel model = _blueprintEditingPresentationFactory.MapUpdateModel(requestModel);
 
