@@ -48,7 +48,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/info/member-type-workspace-view-info.element.js'),
 		weight: 300,
 		meta: {
-			label: 'Info',
+			label: '#general_info',
 			pathname: 'info',
 			icon: 'icon-document',
 		},

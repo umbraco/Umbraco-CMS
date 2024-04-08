@@ -9,7 +9,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./block-rte-type-workspace-view.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Settings',
+			label: '#general_settings',
 			pathname: 'settings',
 			icon: 'icon-settings',
 		},

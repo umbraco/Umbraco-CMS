@@ -750,6 +750,7 @@ export default {
 		deleted: 'Deleted',
 		deleting: 'Deleting...',
 		design: 'Design',
+		details: 'Details',
 		dictionary: 'Dictionary',
 		dimensions: 'Dimensions',
 		discard: 'Discard',
