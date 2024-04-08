@@ -1,5 +1,5 @@
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '../default/collection-default.context.js';
-import type { MetaEntityBulkAction, ManifestEntityBulkAction } from '../../index.js';
+import type { ManifestEntityBulkAction, MetaEntityBulkAction } from '../../extension-registry/models/index.js';
 import type { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
