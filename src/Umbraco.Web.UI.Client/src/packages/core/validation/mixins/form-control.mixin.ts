@@ -220,6 +220,16 @@ export const UmbFormControlMixin = <
 			this.#validators.push(validator);
 			return validator;
 		}
+		/**
+		 * @deprecated Use addValidation instead.
+		 */
+		addValidator = this.addValidation;
+
+		/**
+		 * Remove validation from this form control.
+		 * @method removeValidation
+		 * @param {UmbFormControlValidationConfig} validation - The specific validation configuration to remove.
+		 */
 		removeValidation(validator: UmbFormControlValidationConfig) {
 			const index = this.#validators.indexOf(validator);
 			if (index !== -1) {
