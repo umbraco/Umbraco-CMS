@@ -25,7 +25,6 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		const data: UmbPartialViewDetailModel = {
 			entityType: UMB_PARTIAL_VIEW_ENTITY_TYPE,
 			unique: '',
-			path: '',
 			name: '',
 			content: '',
 			...preset,
@@ -81,7 +80,6 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		const partialView: UmbPartialViewDetailModel = {
 			entityType: UMB_PARTIAL_VIEW_ENTITY_TYPE,
 			unique: this.#serverFilePathUniqueSerializer.toUnique(data.path),
-			path: data.path,
 			name: data.name,
 			content: data.content,
 		};

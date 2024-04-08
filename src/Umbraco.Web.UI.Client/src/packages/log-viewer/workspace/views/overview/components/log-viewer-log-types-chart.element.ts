@@ -1,5 +1,5 @@
-import type { UmbLogViewerWorkspaceContext } from '../../../logviewer.context.js';
-import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
+import type { UmbLogViewerWorkspaceContext } from '../../../logviewer-workspace.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LogLevelCountsReponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -76,7 +76,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 													>${level}
 												</button>
 											</li>`,
-								  )
+									)
 								: ''}
 						</ul>
 					</div>
@@ -89,7 +89,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 											.amount=${number}
 											.kind=${'messages'}
 											.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice> `,
-							  )
+								)
 							: ''}
 					</umb-donut-chart>
 				</div>

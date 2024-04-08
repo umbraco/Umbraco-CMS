@@ -23,7 +23,7 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
-			this.#workspaceContext?.createPropertyDatasetContext(this);
+			this.#workspaceContext.createPropertyDatasetContext(this);
 			this.#observeIsNew();
 			this.#observeName();
 		});
@@ -41,7 +41,7 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 						(this.shadowRoot!.querySelector('#nameInput') as HTMLElement).focus();
 					});
 				}
-				this.removeControllerByAlias('isNewRedirectController');
+				this.removeUmbControllerByAlias('isNewRedirectController');
 			},
 			'_observeIsNew',
 		);

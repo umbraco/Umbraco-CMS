@@ -25,7 +25,6 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const data: UmbStylesheetDetailModel = {
 			entityType: UMB_STYLESHEET_ENTITY_TYPE,
 			unique: '',
-			path: '',
 			name: '',
 			content: '',
 			...preset,
@@ -81,7 +80,6 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const stylesheet: UmbStylesheetDetailModel = {
 			entityType: UMB_STYLESHEET_ENTITY_TYPE,
 			unique: this.#serverFilePathUniqueSerializer.toUnique(data.path),
-			path: data.path,
 			name: data.name,
 			content: data.content,
 		};

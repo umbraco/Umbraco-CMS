@@ -2,14 +2,16 @@ import { UmbMemberDetailRepository } from '../repository/index.js';
 import type { UmbMemberDetailModel, UmbMemberVariantModel, UmbMemberVariantOptionModel } from '../types.js';
 import { UmbMemberPropertyDataContext } from '../property-dataset-context/member-property-dataset-context.js';
 import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
+import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
 import { UmbMemberTypeDetailRepository } from '@umbraco-cms/backoffice/member-type';
-import { UmbEditableWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
-import type {
-	UmbVariantableWorkspaceContextInterface,
-	UmbSaveableWorkspaceContextInterface,
+import {
+	UmbSubmittableWorkspaceContextBase,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
+	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
+import type { UmbRoutableWorkspaceContext, UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import {
 	UmbArrayState,
 	UmbObjectState,
@@ -20,17 +22,18 @@ import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 type EntityType = UmbMemberDetailModel;
 export class UmbMemberWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbVariantableWorkspaceContextInterface<UmbMemberVariantModel>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
+	implements UmbVariantDatasetWorkspaceContext<UmbMemberVariantModel>, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbMemberDetailRepository(this);
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
-	#getDataPromise?: Promise<any>;
+	#getDataPromise?: Promise<UmbDataSourceResponse<UmbMemberDetailModel>>;
 
 	// TODo: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
@@ -42,7 +45,7 @@ export class UmbMemberWorkspaceContext
 	}
 
 	readonly data = this.#currentData.asObservable();
-	readonly name = this.#currentData.asObservablePart((data) => data?.variants[0].name);
+	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 	readonly createDate = this.#currentData.asObservablePart((data) => data?.variants[0].createDate);
 	readonly updateDate = this.#currentData.asObservablePart((data) => data?.variants[0].updateDate);
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.memberType.unique);
@@ -55,8 +58,7 @@ export class UmbMemberWorkspaceContext
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
 
-	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
-
+	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly variantOptions = mergeObservables(
@@ -97,6 +99,31 @@ export class UmbMemberWorkspaceContext
 		this.observe(this.varies, (varies) => (this.#varies = varies));
 
 		this.loadLanguages();
+
+		this.routes.setRoutes([
+			{
+				path: 'create/:memberTypeUnique',
+				component: () => new UmbMemberWorkspaceEditorElement(),
+				setup: async (_component, info) => {
+					const memberTypeUnique = info.match.params.memberTypeUnique;
+					this.create(memberTypeUnique);
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: () => new UmbMemberWorkspaceEditorElement(),
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	resetState() {
@@ -202,6 +229,10 @@ export class UmbMemberWorkspaceContext
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
+	name(variantId?: UmbVariantId) {
+		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '');
+	}
+
 	async propertyStructureById(propertyId: string) {
 		return this.structure.propertyStructureById(propertyId);
 	}
@@ -295,7 +326,7 @@ export class UmbMemberWorkspaceContext
 		}
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#currentData.value) throw new Error('Data is missing');
 		if (!this.#currentData.value.unique) throw new Error('Unique is missing');
 
@@ -313,8 +344,8 @@ export class UmbMemberWorkspaceContext
 			this.#persistedData.setValue(newData);
 			this.#currentData.setValue(newData);
 			this.setIsNew(false);
-			this.workspaceComplete(newData);
 		}
+		return true;
 	}
 
 	async delete() {
@@ -397,11 +428,4 @@ export class UmbMemberWorkspaceContext
 	}
 }
 
-export const UMB_MEMBER_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbMemberWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbMemberWorkspaceContext => context.getEntityType?.() === 'member',
-);
+export { UmbMemberWorkspaceContext as api };

@@ -37,7 +37,7 @@ export class UmbScriptItemServerDataSource implements UmbItemDataSource<UmbScrip
 		const paths = uniques
 			.map((unique) => {
 				const serverPath = this.#serverFilePathUniqueSerializer.toServerPath(unique);
-				return serverPath ? encodeURI(serverPath) : null;
+				return serverPath ? serverPath : null;
 			})
 			.filter((x) => x !== null) as string[];
 

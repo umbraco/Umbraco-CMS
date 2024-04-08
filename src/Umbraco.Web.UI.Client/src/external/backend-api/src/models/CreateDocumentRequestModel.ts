@@ -7,7 +7,6 @@ import type { CreateContentForDocumentRequestModel } from './CreateContentForDoc
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type CreateDocumentRequestModel = (CreateContentForDocumentRequestModel & {
-    documentType: ReferenceByIdModel;
     template?: ReferenceByIdModel | null;
 });
 

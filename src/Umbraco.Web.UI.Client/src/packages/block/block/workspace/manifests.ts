@@ -1,13 +1,14 @@
 import { UMB_BLOCK_WORKSPACE_ALIAS } from './index.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'workspaceAction',
+		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Block.Save',
 		name: 'Save Block Type Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Submit',
 			look: 'primary',
@@ -22,11 +23,10 @@ export const manifests: Array<ManifestTypes> = [
 	},
 	{
 		type: 'workspace',
+		kind: 'routable',
 		name: 'Block List Type Workspace',
 		alias: UMB_BLOCK_WORKSPACE_ALIAS,
-		element: () => import('./block-workspace.element.js'),
 		api: () => import('./block-workspace.context.js'),
-		weight: 900,
 		meta: {
 			entityType: 'block',
 		},
@@ -48,6 +48,8 @@ export const manifests: Array<ManifestTypes> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
+		],
+		TODO_conditions: [
 			{
 				alias: 'Umb.Condition.BlockEntryShowContentEdit',
 			},
@@ -71,6 +73,8 @@ export const manifests: Array<ManifestTypes> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
+		],
+		TODO_conditions: [
 			{
 				alias: 'Umb.Condition.BlockWorkspaceHasSettings',
 			},

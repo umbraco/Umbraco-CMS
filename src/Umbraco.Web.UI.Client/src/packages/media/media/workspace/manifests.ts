@@ -1,15 +1,15 @@
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: 'Umb.Workspace.Media',
 	name: 'Media Workspace',
-	element: () => import('./media-workspace.element.js'),
 	api: () => import('./media-workspace.context.js'),
 	meta: {
 		entityType: 'media',
@@ -19,10 +19,9 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		kind: 'collection',
 		alias: 'Umb.WorkspaceView.Media.Collection',
 		name: 'Media Workspace Collection View',
-		element: () => import('./views/collection/media-workspace-view-collection.element.js'),
-		weight: 300,
 		meta: {
 			label: 'Collection',
 			pathname: 'collection',
@@ -82,7 +81,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Media.Save',
 		name: 'Save Media Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',

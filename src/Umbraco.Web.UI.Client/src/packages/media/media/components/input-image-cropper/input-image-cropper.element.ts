@@ -55,7 +55,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 
 		this.value = assignToFrozenObject(this.value, { src: unique });
 
-		this.#manager?.uploadOne(unique, file, 'waiting');
+		this.#manager?.uploadOne({ unique, file });
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}

@@ -5,6 +5,7 @@ import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 /**
  * A data source that fetches the data-type collection data from the server.
@@ -14,6 +15,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  */
 export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataSource<UmbDataTypeItemModel> {
 	#host: UmbControllerHost;
+	#manifestPropertyEditorUis: Array<ManifestPropertyEditorUi> = [];
 
 	/**
 	 * Creates an instance of UmbDataTypeCollectionServerDataSource.
@@ -22,6 +24,12 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
+		umbExtensionsRegistry
+			.byType('propertyEditorUi')
+			.subscribe((manifestPropertyEditorUIs) => {
+				this.#manifestPropertyEditorUis = manifestPropertyEditorUIs;
+			})
+			.unsubscribe();
 	}
 
 	/**
@@ -48,6 +56,7 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 				unique: item.id,
 				name: item.name,
 				propertyEditorUiAlias: item.editorUiAlias!,
+				icon: this.#manifestPropertyEditorUis.find((ui) => ui.alias === item.editorUiAlias!)?.meta.icon,
 			};
 
 			return dataTypeDetail;

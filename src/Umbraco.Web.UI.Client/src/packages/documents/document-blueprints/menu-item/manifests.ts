@@ -10,7 +10,9 @@ const menuItem: ManifestTypes = {
 	meta: {
 		treeAlias: UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS,
 		label: 'Document Blueprints',
-		menus: ['Umb.Menu.Settings'],
+		icon: 'icon-blueprint',
+		entityType: 'document-blueprint-root',
+		menus: ['Umb.Menu.StructureSettings'],
 	},
 };
 

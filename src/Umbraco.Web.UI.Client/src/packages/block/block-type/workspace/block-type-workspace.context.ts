@@ -1,22 +1,24 @@
 import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../types.js';
+import { UmbBlockTypeWorkspaceEditorElement } from './block-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
-	UmbInvariantableWorkspaceContextInterface,
-	UmbWorkspaceContextInterface,
+	UmbInvariantDatasetWorkspaceContext,
+	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
-	extends UmbEditableWorkspaceContextBase<BlockTypeData>
-	implements UmbInvariantableWorkspaceContextInterface
+	extends UmbSubmittableWorkspaceContextBase<BlockTypeData>
+	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	// Just for context token safety:
 	public readonly IS_BLOCK_TYPE_WORKSPACE_CONTEXT = true;
@@ -32,9 +34,43 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
 
-	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
-		super(host, workspaceArgs.manifest.alias);
-		this.#entityType = workspaceArgs.manifest.meta?.entityType;
+	readonly routes = new UmbWorkspaceRouteManager(this);
+
+	constructor(host: UmbControllerHost, args: { manifest: ManifestWorkspace }) {
+		super(host, args.manifest.alias);
+		const manifest = args.manifest;
+		this.#entityType = manifest.meta?.entityType;
+
+		this.routes.setRoutes([
+			{
+				// Would it make more sense to have groupKey before elementTypeKey?
+				path: 'create/:elementTypeKey/:groupKey',
+				component: UmbBlockTypeWorkspaceEditorElement,
+				setup: async (component, info) => {
+					(component as UmbBlockTypeWorkspaceEditorElement).workspaceAlias = manifest.alias;
+
+					const elementTypeKey = info.match.params.elementTypeKey;
+					const groupKey = info.match.params.groupKey === 'null' ? null : info.match.params.groupKey;
+					this.create(elementTypeKey, groupKey);
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:id',
+				component: UmbBlockTypeWorkspaceEditorElement,
+				setup: (component, info) => {
+					(component as UmbBlockTypeWorkspaceEditorElement).workspaceAlias = manifest.alias;
+
+					const id = info.match.params.id;
+					this.load(id);
+				},
+			},
+		]);
 	}
 
 	protected resetState() {
@@ -111,7 +147,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		}
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#data.value) return;
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
@@ -122,7 +158,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		});
 
 		this.setIsNew(false);
-		this.workspaceComplete(this.#data.value);
+		return true;
 	}
 
 	public destroy(): void {
@@ -131,13 +167,4 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	}
 }
 
-export default UmbBlockTypeWorkspaceContext;
-
-export const UMB_BLOCK_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbWorkspaceContextInterface,
-	UmbBlockTypeWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbBlockTypeWorkspaceContext => (context as any).IS_BLOCK_TYPE_WORKSPACE_CONTEXT,
-);
+export { UmbBlockTypeWorkspaceContext as api };

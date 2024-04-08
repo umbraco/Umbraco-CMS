@@ -1,6 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, css, html, property, map, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -25,7 +25,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	@property()
+	@property({ attribute: false })
 	set value(value: string | string[] | null) {
 		if (!value) return;
 
@@ -48,7 +48,6 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 			v.selected = this.#selectedValues.includes(v.alias);
 		});
 	}
-
 	get value(): string[] {
 		return this.#selectedValues;
 	}
@@ -101,19 +100,20 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 		const checkbox = event.target as HTMLInputElement;
 		const alias = checkbox.value;
 
-		if (checkbox.checked) {
-			this.value = [...this.value, alias];
-		} else {
-			this.value = this.value.filter((v) => v !== alias);
-		}
+		const value = this._toolbarConfig
+			.filter((t) => (t.alias !== alias && t.selected) || (t.alias === alias && checkbox.checked))
+			.map((v) => v.alias);
+
+		this.value = value;
 
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	render() {
 		return html`<ul>
-			${map(
+			${repeat(
 				this._toolbarConfig,
+				(v) => v.alias,
 				(v) =>
 					html`<li>
 						<uui-checkbox label=${v.label} value=${v.alias} ?checked=${v.selected} @change=${this.onChange}>

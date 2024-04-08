@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/composition/index.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceActions,
@@ -10,9 +10,10 @@ export const UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DocumentType';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
-	alias: 'Umb.Workspace.DocumentType',
+	kind: 'routable',
+	alias: UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS,
 	name: 'Document Type Workspace',
-	element: () => import('./document-type-workspace.element.js'),
+	api: () => import('./document-type-workspace.context.js'),
 	meta: {
 		entityType: 'document-type',
 	},
@@ -99,7 +100,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.DocumentType.Save',
 		name: 'Save Document Type Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',

@@ -120,7 +120,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 				this._editMediaPath = routeBuilder({});
 			});
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 
 		this.addValidator(

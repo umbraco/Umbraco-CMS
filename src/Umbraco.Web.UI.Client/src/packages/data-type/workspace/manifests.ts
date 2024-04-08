@@ -1,17 +1,18 @@
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const DATA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DataType';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'editable',
 	alias: DATA_TYPE_WORKSPACE_ALIAS,
 	name: 'Data Type Workspace',
-	js: () => import('./data-type-workspace.element.js'),
+	api: () => import('./data-type-workspace.context.js'),
 	meta: {
 		entityType: 'data-type',
 	},
@@ -62,7 +63,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.DataType.Save',
 		name: 'Save Data Type Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',

@@ -9,12 +9,16 @@ import type { DocumentConfigurationResponseModel } from '../models/DocumentConfi
 import type { DocumentItemResponseModel } from '../models/DocumentItemResponseModel';
 import type { DocumentNotificationResponseModel } from '../models/DocumentNotificationResponseModel';
 import type { DocumentResponseModel } from '../models/DocumentResponseModel';
+import type { DocumentTreeItemResponseModel } from '../models/DocumentTreeItemResponseModel';
 import type { DomainsResponseModel } from '../models/DomainsResponseModel';
 import type { MoveDocumentRequestModel } from '../models/MoveDocumentRequestModel';
 import type { MoveMediaRequestModel } from '../models/MoveMediaRequestModel';
 import type { PagedDocumentCollectionResponseModel } from '../models/PagedDocumentCollectionResponseModel';
 import type { PagedDocumentRecycleBinItemResponseModel } from '../models/PagedDocumentRecycleBinItemResponseModel';
 import type { PagedDocumentTreeItemResponseModel } from '../models/PagedDocumentTreeItemResponseModel';
+import type { PagedIReferenceResponseModel } from '../models/PagedIReferenceResponseModel';
+import type { PagedModelDocumentItemResponseModel } from '../models/PagedModelDocumentItemResponseModel';
+import type { PagedReferenceByIdModel } from '../models/PagedReferenceByIdModel';
 import type { PublicAccessRequestModel } from '../models/PublicAccessRequestModel';
 import type { PublishDocumentRequestModel } from '../models/PublishDocumentRequestModel';
 import type { PublishDocumentWithDescendantsRequestModel } from '../models/PublishDocumentWithDescendantsRequestModel';
@@ -521,6 +525,64 @@ export class DocumentResource {
     }
 
     /**
+     * @returns PagedIReferenceResponseModel Success
+     * @throws ApiError
+     */
+    public static getDocumentByIdReferencedBy({
+        id,
+        skip,
+        take = 20,
+    }: {
+        id: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedIReferenceResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document/{id}/referenced-by',
+            path: {
+                'id': id,
+            },
+            query: {
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedReferenceByIdModel Success
+     * @throws ApiError
+     */
+    public static getDocumentByIdReferencedDescendants({
+        id,
+        skip,
+        take = 20,
+    }: {
+        id: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedReferenceByIdModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document/{id}/referenced-descendants',
+            path: {
+                'id': id,
+            },
+            query: {
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
      * @returns string Success
      * @throws ApiError
      */
@@ -574,6 +636,33 @@ export class DocumentResource {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedReferenceByIdModel Success
+     * @throws ApiError
+     */
+    public static getDocumentAreReferenced({
+        id,
+        skip,
+        take = 20,
+    }: {
+        id?: Array<string>,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedReferenceByIdModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document/are-referenced',
+            query: {
+                'id': id,
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -654,6 +743,33 @@ export class DocumentResource {
             url: '/umbraco/management/api/v1/item/document',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedModelDocumentItemResponseModel Success
+     * @throws ApiError
+     */
+    public static getItemDocumentSearch({
+        query,
+        skip,
+        take = 100,
+    }: {
+        query?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedModelDocumentItemResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/document/search',
+            query: {
+                'query': query,
+                'skip': skip,
+                'take': take,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
@@ -800,6 +916,27 @@ export class DocumentResource {
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreeDocumentAncestors({
+        descendantId,
+    }: {
+        descendantId?: string,
+    }): CancelablePromise<Array<DocumentTreeItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/document/ancestors',
+            query: {
+                'descendantId': descendantId,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,

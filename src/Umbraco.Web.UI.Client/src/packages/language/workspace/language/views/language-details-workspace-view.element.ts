@@ -1,4 +1,4 @@
-import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../language-workspace.context.js';
+import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../language-workspace.context-token.js';
 import type { UmbInputLanguageElement } from '../../../components/input-language/input-language.element.js';
 import type { UmbLanguageDetailModel } from '../../../types.js';
 import type { UmbLanguageItemModel } from '../../../repository/index.js';
@@ -21,9 +21,6 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 
 	@state()
 	_isNew?: boolean;
-
-	@state()
-	_validationErrors?: { [key: string]: Array<any> };
 
 	#languageWorkspaceContext?: typeof UMB_LANGUAGE_WORKSPACE_CONTEXT.TYPE;
 
@@ -51,11 +48,6 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 
 			this.observe(this.#languageWorkspaceContext.isNew, (isNew) => {
 				this._isNew = isNew;
-			});
-
-			this.observe(this.#languageWorkspaceContext.validationErrors, (value) => {
-				this._validationErrors = value;
-				this.requestUpdate('_validationErrors');
 			});
 		});
 	}
@@ -123,9 +115,6 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 							value=${ifDefined(this._language?.unique)}
 							@change=${this.#handleCultureChange}
 							?readonly=${this._isNew === false}></umb-input-culture-select>
-
-						<!-- TEMP VALIDATION ERROR -->
-						${this._validationErrors?.isoCode.map((error) => html`<div class="validation-message">${error}</div>`)}
 					</div>
 				</umb-property-layout>
 

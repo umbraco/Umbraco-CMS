@@ -4,9 +4,11 @@
 /* eslint-disable */
 import type { CreateMemberRequestModel } from '../models/CreateMemberRequestModel';
 import type { DirectionModel } from '../models/DirectionModel';
+import type { MemberConfigurationResponseModel } from '../models/MemberConfigurationResponseModel';
 import type { MemberItemResponseModel } from '../models/MemberItemResponseModel';
 import type { MemberResponseModel } from '../models/MemberResponseModel';
 import type { PagedMemberResponseModel } from '../models/PagedMemberResponseModel';
+import type { PagedModelMemberItemResponseModel } from '../models/PagedModelMemberItemResponseModel';
 import type { UpdateMemberRequestModel } from '../models/UpdateMemberRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -21,6 +23,9 @@ export class MemberResource {
      */
     public static getFilterMember({
         memberTypeId,
+        memberGroupName,
+        isApproved,
+        isLockedOut,
         orderBy = 'username',
         orderDirection,
         filter,
@@ -28,6 +33,9 @@ export class MemberResource {
         take = 100,
     }: {
         memberTypeId?: string,
+        memberGroupName?: string,
+        isApproved?: boolean,
+        isLockedOut?: boolean,
         orderBy?: string,
         orderDirection?: DirectionModel,
         filter?: string,
@@ -39,6 +47,9 @@ export class MemberResource {
             url: '/umbraco/management/api/v1/filter/member',
             query: {
                 'memberTypeId': memberTypeId,
+                'memberGroupName': memberGroupName,
+                'isApproved': isApproved,
+                'isLockedOut': isLockedOut,
                 'orderBy': orderBy,
                 'orderDirection': orderDirection,
                 'filter': filter,
@@ -66,6 +77,33 @@ export class MemberResource {
             url: '/umbraco/management/api/v1/item/member',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedModelMemberItemResponseModel Success
+     * @throws ApiError
+     */
+    public static getItemMemberSearch({
+        query,
+        skip,
+        take = 100,
+    }: {
+        query?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedModelMemberItemResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/member/search',
+            query: {
+                'query': query,
+                'skip': skip,
+                'take': take,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
@@ -194,6 +232,20 @@ export class MemberResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getMemberConfiguration(): CancelablePromise<MemberConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/member/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

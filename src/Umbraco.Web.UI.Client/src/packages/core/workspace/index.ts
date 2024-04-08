@@ -1,10 +1,9 @@
 export * from './components/index.js';
-export * from './publishable-workspace.context-token.js';
-export * from './saveable-workspace.context-token.js';
-export * from './workspace-context/index.js';
-export * from './workspace-is-new-redirect-controller/index.js';
-export * from './workspace-modal/index.js';
+export * from './contexts/index.js';
+export * from './controllers/index.js';
+export * from './modals/index.js';
 export * from './workspace-property-dataset/index.js';
-export * from './workspace-split-view-manager.class.js';
-export type { WorkspaceAliasConditionConfig } from './workspace-alias.condition.js';
-export type { WorkspaceEntityTypeConditionConfig } from './workspace-entity-type.condition.js';
+export * from './workspace.element.js';
+
+export type * from './conditions/index.js';
+export type * from './types.js';

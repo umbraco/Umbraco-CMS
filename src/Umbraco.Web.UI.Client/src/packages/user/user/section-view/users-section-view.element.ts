@@ -1,8 +1,11 @@
 import { UMB_USER_COLLECTION_ALIAS } from '../collection/manifests.js';
+import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbCollectionElement } from '@umbraco-cms/backoffice/collection';
+import { UmbWorkspaceElement } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbLitElement {
@@ -10,14 +13,18 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 		{
 			path: 'collection',
 			component: () => {
-				const element = document.createElement('umb-collection');
+				const element = new UmbCollectionElement();
 				element.setAttribute('alias', UMB_USER_COLLECTION_ALIAS);
 				return element;
 			},
 		},
 		{
 			path: 'user',
-			component: () => import('../workspace/user-workspace.element.js'),
+			component: () => {
+				const element = new UmbWorkspaceElement();
+				element.setAttribute('entity-type', UMB_USER_ENTITY_TYPE);
+				return element;
+			},
 		},
 		{
 			path: '',

@@ -54,7 +54,7 @@ export class UmbDocumentBlueprintRootWorkspaceElement extends UmbLitElement {
 	];
 }
 
-export default UmbDocumentBlueprintRootWorkspaceElement;
+export { UmbDocumentBlueprintRootWorkspaceElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

@@ -2,6 +2,7 @@ import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '../types.js
 import type { UmbTreeStore } from './tree-store.interface.js';
 import type { UmbTreeRepository } from './tree-repository.interface.js';
 import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
+import type { UmbTreeAncestorsOfRequestArgs } from './types.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -90,6 +91,22 @@ export abstract class UmbTreeRepositoryBase<
 		}
 
 		return { data, error, asObservable: () => this._treeStore!.childrenOf(args.parentUnique) };
+	}
+
+	/**
+	 * Requests ancestors of a given item
+	 * @param {UmbTreeAncestorsOfRequestArgs} args
+	 * @return {*}
+	 * @memberof UmbTreeRepositoryBase
+	 */
+	async requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
+		if (args.descendantUnique === undefined) throw new Error('Descendant unique is missing');
+		await this._init;
+
+		const { data, error } = await this.#treeSource.getAncestorsOf(args);
+
+		// TODO: implement observable for ancestor items in the store
+		return { data, error };
 	}
 
 	/**

@@ -1,55 +1,52 @@
 import { css, html, nothing, repeat, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-radio-button-list')
 export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitElement) {
-	/**
-	 * List of items.
-	 */
-	@property({ attribute: false })
-	public list: Array<{ key: string; sortOrder: number; value: string }> = [];
-
-	#selected = '';
-	public set selected(key: string) {
-		this.#selected = key;
-		super.value = key;
-	}
-	public get selected(): string {
-		return this.#selected;
-	}
+	#value: string = '';
 
 	@property()
-	public set value(key: string) {
-		if (key !== this._value) {
-			this.selected = key;
-		}
+	public set value(value: string) {
+		this.#value = value;
 	}
 	public get value(): string {
-		return this.selected;
+		return this.#value;
 	}
+
+	@property({ type: Array })
+	public list: Array<{ label: string; value: string }> = [];
 
 	protected getFormElement() {
 		return undefined;
 	}
 
-	#setSelection(e: UUIBooleanInputEvent) {
-		e.stopPropagation();
-		if (e.target.value) this.selected = e.target.value;
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+	#onChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+
+		this.value = event.target.value;
+
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	render() {
 		if (!this.list) return nothing;
 
-		return html`<uui-radio-group .value=${this.value} @change=${this.#setSelection}>
-			${repeat(this.list, (item) => item, this.renderRadioButton)}
-		</uui-radio-group>`;
+		return html`
+			<uui-radio-group .value=${this.value} @change=${this.#onChange}>
+				${repeat(
+					this.list,
+					(item) => item,
+					(item) => this.#renderRadioButton(item),
+				)}
+			</uui-radio-group>
+		`;
 	}
 
-	renderRadioButton(item: { key: string; sortOrder: number; value: string }) {
-		return html`<uui-radio value="${item.value}" label="${item.value}"></uui-radio>`;
+	#renderRadioButton(item: (typeof this.list)[0]) {
+		return html`<uui-radio value="${item.value}" label="${item.label}"></uui-radio>`;
 	}
 
 	static styles = [

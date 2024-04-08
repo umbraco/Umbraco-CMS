@@ -105,7 +105,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (this.#conditionControllers === undefined || this.#conditionControllers.length === 0) return;
 		this.#conditionControllers.forEach((controller) => controller.destroy());
 		this.#conditionControllers = [];
-		this.removeControllerByAlias('_observeConditions');
+		this.removeUmbControllerByAlias('_observeConditions');
 	}
 
 	#gotManifest() {
@@ -149,7 +149,7 @@ export abstract class UmbBaseExtensionInitializer<
 				'_observeConditions',
 			);
 		} else {
-			this.removeControllerByAlias('_observeConditions');
+			this.removeUmbControllerByAlias('_observeConditions');
 		}
 
 		if (noChangeInConditions) {

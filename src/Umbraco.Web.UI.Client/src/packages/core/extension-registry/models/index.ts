@@ -6,7 +6,7 @@ import type { ManifestDashboardCollection } from './dashboard-collection.model.j
 import type {
 	ManifestEntityAction,
 	ManifestEntityActionDeleteKind,
-	ManifestEntityActionRenameKind,
+	ManifestEntityActionRenameServerFileKind,
 	ManifestEntityActionReloadTreeItemChildrenKind,
 	ManifestEntityActionDuplicateKind,
 	ManifestEntityActionMoveKind,
@@ -15,6 +15,7 @@ import type {
 	ManifestEntityActionDeleteFolderKind,
 	ManifestEntityActionDefaultKind,
 	ManifestEntityActionTrashKind,
+	ManifestEntityActionSortChildrenOfKind,
 } from './entity-action.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.model.js';
@@ -39,11 +40,15 @@ import type { ManifestLocalization } from './localization.model.js';
 import type { ManifestTree } from './tree.model.js';
 import type { ManifestTreeItem } from './tree-item.model.js';
 import type { ManifestUserProfileApp } from './user-profile-app.model.js';
-import type { ManifestWorkspace } from './workspace.model.js';
+import type { ManifestWorkspace, ManifestWorkspaceRoutableKind } from './workspace.model.js';
 import type { ManifestWorkspaceAction, ManifestWorkspaceActionDefaultKind } from './workspace-action.model.js';
 import type { ManifestWorkspaceActionMenuItem } from './workspace-action-menu-item.model.js';
 import type { ManifestWorkspaceContext } from './workspace-context.model.js';
-import type { ManifestWorkspaceFooterApp } from './workspace-footer-app.model.js';
+import type {
+	ManifestWorkspaceFooterApp,
+	ManifestWorkspaceFooterAppMenuBreadcrumbKind,
+	ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind,
+} from './workspace-footer-app.model.js';
 import type {
 	ManifestWorkspaceView,
 	ManifestWorkspaceViewContentTypeDesignEditorKind,
@@ -51,6 +56,7 @@ import type {
 import type { ManifestEntityUserPermission } from './entity-user-permission.model.js';
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestCollectionAction } from './collection-action.model.js';
+import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
 import type {
 	ManifestBase,
 	ManifestBundle,
@@ -74,6 +80,7 @@ export type * from './health-check.model.js';
 export type * from './localization.model.js';
 export type * from './menu-item.model.js';
 export type * from './menu.model.js';
+export type * from './mfa-login-provider.model.js';
 export type * from './modal.model.js';
 export type * from './package-view.model.js';
 export type * from './property-action.model.js';
@@ -99,21 +106,28 @@ export type * from './workspace.model.js';
 
 export type ManifestEntityActions =
 	| ManifestEntityAction
+	| ManifestEntityActionCreateFolderKind
 	| ManifestEntityActionDefaultKind
+	| ManifestEntityActionDeleteFolderKind
 	| ManifestEntityActionDeleteKind
-	| ManifestEntityActionRenameKind
-	| ManifestEntityActionReloadTreeItemChildrenKind
 	| ManifestEntityActionDuplicateKind
 	| ManifestEntityActionMoveKind
-	| ManifestEntityActionCreateFolderKind
-	| ManifestEntityActionUpdateFolderKind
-	| ManifestEntityActionDeleteFolderKind
-	| ManifestEntityActionTrashKind;
+	| ManifestEntityActionReloadTreeItemChildrenKind
+	| ManifestEntityActionRenameServerFileKind
+	| ManifestEntityActionSortChildrenOfKind
+	| ManifestEntityActionTrashKind
+	| ManifestEntityActionUpdateFolderKind;
+
+export type ManifestWorkspaceFooterApps =
+	| ManifestWorkspaceFooterApp
+	| ManifestWorkspaceFooterAppMenuBreadcrumbKind
+	| ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind;
 
 export type ManifestPropertyActions = ManifestPropertyAction | ManifestPropertyActionDefaultKind;
 
 export type ManifestWorkspaceActions = ManifestWorkspaceAction | ManifestWorkspaceActionDefaultKind;
 
+export type ManifestWorkspaces = ManifestWorkspace | ManifestWorkspaceRoutableKind | ManifestWorkspaceRoutableKind;
 export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceViewContentTypeDesignEditorKind;
 
 export type ManifestTypes =
@@ -139,6 +153,7 @@ export type ManifestTypes =
 	| ManifestMenu
 	| ManifestMenuItem
 	| ManifestMenuItemTreeKind
+	| ManifestMfaLoginProvider
 	| ManifestModal
 	| ManifestPackageView
 	| ManifestPropertyActions
@@ -157,11 +172,11 @@ export type ManifestTypes =
 	| ManifestTreeItem
 	| ManifestTreeStore
 	| ManifestUserProfileApp
-	| ManifestWorkspace
-	| ManifestWorkspaceActions
 	| ManifestWorkspaceActionMenuItem
+	| ManifestWorkspaceActions
 	| ManifestWorkspaceContext
-	| ManifestWorkspaceFooterApp
+	| ManifestWorkspaceFooterApps
+	| ManifestWorkspaces
 	| ManifestWorkspaceViews
 	| ManifestEntityUserPermission
 	| ManifestGranularUserPermission

@@ -1,8 +1,9 @@
 import type { UmbInputSliderElement } from '../../../components/input-slider/input-slider.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 /**
  * @element umb-property-editor-ui-slider
@@ -10,12 +11,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 @customElement('umb-property-editor-ui-slider')
 export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
-	value:
-		| {
-				to?: number;
-				from?: number;
-		  }
-		| undefined = undefined;
+	value: { to?: number; from?: number } | undefined = undefined;
 
 	@state()
 	_enableRange?: boolean;
@@ -44,29 +40,26 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 		this._max = config?.getValueByAlias('maxVal');
 	}
 
-	#getValueObject(val: string) {
-		if (!val.includes(',')) return { from: parseInt(val), to: parseInt(val) };
-		const from = val.slice(0, val.indexOf(','));
-		const to = val.slice(val.indexOf(',') + 1);
-		return { from: parseInt(from), to: parseInt(to) };
+	#getValueObject(value: string) {
+		const [from, to] = value.split(',').map(Number);
+		return { from, to: to ?? from };
 	}
 
-	private _onChange(event: CustomEvent) {
-		const eventVal = this.#getValueObject((event.target as UmbInputSliderElement).value as string);
-		this.value = eventVal;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+	#onChange(event: CustomEvent) {
+		const element = event.target as UmbInputSliderElement;
+		this.value = this.#getValueObject(element.value as string);
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	// TODO: This does not seem to take current value into account?
 	render() {
 		return html`<umb-input-slider
-			.initVal1="${this._initVal1 ?? 0}"
-			.initVal2="${this._initVal2 ?? 0}"
-			.step="${this._step ?? 0}"
-			.min="${this._min ?? 0}"
-			.max="${this._max ?? 0}"
+			.valueLow=${this.value?.from ?? this._initVal1 ?? 0}
+			.valueHigh=${this.value?.to ?? this._initVal2 ?? 0}
+			.step=${this._step ?? 0}
+			.min=${this._min ?? 0}
+			.max=${this._max ?? 0}
 			?enable-range=${this._enableRange}
-			@change="${this._onChange}"></umb-input-slider>`;
+			@change=${this.#onChange}></umb-input-slider>`;
 	}
 }
 

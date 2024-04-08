@@ -15,6 +15,7 @@ export const manifests: Array<ManifestTypes> = [
 	},
 	{
 		type: 'workspaceAction',
+		kind: 'default',
 		name: 'Example Count Incerementor Workspace Action',
 		alias: 'example.workspaceAction.incrementor',
 		weight: 1000,

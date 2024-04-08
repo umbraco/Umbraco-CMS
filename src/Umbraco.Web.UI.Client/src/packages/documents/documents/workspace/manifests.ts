@@ -3,9 +3,9 @@ import { UmbDocumentSaveAndScheduleWorkspaceAction } from './actions/save-and-sc
 import { UmbDocumentUnpublishWorkspaceAction } from './actions/unpublish.action.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
 import { UmbDocumentPublishWithDescendantsWorkspaceAction } from './actions/publish-with-descendants.action.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
-	ManifestWorkspace,
+	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceActionMenuItem,
 	ManifestWorkspaceView,
@@ -13,11 +13,11 @@ import type {
 
 export const UMB_DOCUMENT_WORKSPACE_ALIAS = 'Umb.Workspace.Document';
 
-const workspace: ManifestWorkspace = {
+const workspace: ManifestWorkspaces = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: UMB_DOCUMENT_WORKSPACE_ALIAS,
 	name: 'Document Workspace',
-	element: () => import('./document-workspace.element.js'),
 	api: () => import('./document-workspace.context.js'),
 	meta: {
 		entityType: UMB_DOCUMENT_ENTITY_TYPE,
@@ -27,12 +27,11 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		kind: 'collection',
 		alias: 'Umb.WorkspaceView.Document.Collection',
 		name: 'Document Workspace Collection View',
-		element: () => import('./views/collection/document-workspace-view-collection.element.js'),
-		weight: 300,
 		meta: {
-			label: 'Documents',
+			label: 'Collection',
 			pathname: 'collection',
 			icon: 'icon-grid',
 		},
@@ -110,7 +109,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		alias: 'Umb.WorkspaceAction.Document.Save',
 		name: 'Save Document Workspace Action',
 		weight: 80,
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'secondary',

@@ -9,10 +9,12 @@ import type { DatatypeConfigurationResponseModel } from '../models/DatatypeConfi
 import type { DataTypeItemResponseModel } from '../models/DataTypeItemResponseModel';
 import type { DataTypeReferenceResponseModel } from '../models/DataTypeReferenceResponseModel';
 import type { DataTypeResponseModel } from '../models/DataTypeResponseModel';
+import type { DataTypeTreeItemResponseModel } from '../models/DataTypeTreeItemResponseModel';
 import type { FolderResponseModel } from '../models/FolderResponseModel';
 import type { MoveDataTypeRequestModel } from '../models/MoveDataTypeRequestModel';
 import type { PagedDataTypeItemResponseModel } from '../models/PagedDataTypeItemResponseModel';
 import type { PagedDataTypeTreeItemResponseModel } from '../models/PagedDataTypeTreeItemResponseModel';
+import type { PagedModelDataTypeItemResponseModel } from '../models/PagedModelDataTypeItemResponseModel';
 import type { UpdateDataTypeRequestModel } from '../models/UpdateDataTypeRequestModel';
 import type { UpdateFolderResponseModel } from '../models/UpdateFolderResponseModel';
 
@@ -375,6 +377,54 @@ export class DataTypeResource {
             url: '/umbraco/management/api/v1/item/data-type',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedModelDataTypeItemResponseModel Success
+     * @throws ApiError
+     */
+    public static getItemDataTypeSearch({
+        query,
+        skip,
+        take = 100,
+    }: {
+        query?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedModelDataTypeItemResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/data-type/search',
+            query: {
+                'query': query,
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreeDataTypeAncestors({
+        descendantId,
+    }: {
+        descendantId?: string,
+    }): CancelablePromise<Array<DataTypeTreeItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/data-type/ancestors',
+            query: {
+                'descendantId': descendantId,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,

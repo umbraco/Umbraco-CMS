@@ -1,4 +1,3 @@
-import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.js';
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../workspace/data-type-workspace.modal-token.js';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbDataTypeCollectionRepository } from '../../collection/index.js';
@@ -275,10 +274,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				dataTypes,
 				(dataType) => dataType.unique,
 				(dataType) =>
-					html`<li class="item" ?selected=${this.value.selection.includes(dataType.unique)}>
+					html` <li class="item" ?selected=${this.value.selection.includes(dataType.unique)}>
 						<uui-button .label=${dataType.name} type="button" @click="${() => this._handleDataTypeClick(dataType)}">
 							<div class="item-content">
-								<uui-icon name="${'icon-bug'}" class="icon"></uui-icon>
+								<umb-icon name=${dataType.icon ?? 'icon-circle-dotted'} class="icon"></umb-icon>
 								${dataType.name}
 							</div>
 						</uui-button>

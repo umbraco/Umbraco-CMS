@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "14.0.0-beta002",
+	"version": "14.0.0-beta003",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -83,6 +83,7 @@
 		"./user-permission": "./dist-cms/packages/user/user-permission/index.js",
 		"./user": "./dist-cms/packages/user/user/index.js",
 		"./utils": "./dist-cms/packages/core/utils/index.js",
+		"./validation": "./dist-cms/packages/core/validation/index.js",
 		"./variant": "./dist-cms/packages/core/variant/index.js",
 		"./webhook": "./dist-cms/packages/webhook/index.js",
 		"./workspace": "./dist-cms/packages/core/workspace/index.js",
@@ -122,8 +123,9 @@
 		"build:for:cms": "npm run build && node ./devops/build/copy-to-cms.js",
 		"build:for:static": "vite build",
 		"build:vite": "tsc && vite build --mode staging",
-		"build": "tsc --project ./src/tsconfig.build.json && rollup -c ./src/rollup.config.js && npm run package:validate && npm run generate:manifest",
+		"build": "tsc --project ./src/tsconfig.build.json && rollup -c ./src/rollup.config.js && npm run package:validate && npm run generate:manifest && npm run check:paths",
 		"check": "npm run lint:errors && npm run compile && npm run build-storybook && npm run generate:jsonschema:dist",
+		"check:paths": "node ./devops/build/check-path-length.js src 140",
 		"compile": "tsc",
 		"dev": "vite",
 		"dev:server": "VITE_UMBRACO_USE_MSW=off vite",
@@ -131,9 +133,9 @@
 		"example": "node ./devops/example-runner/index.js",
 		"format:fix": "npm run format -- --write",
 		"format": "prettier 'src/**/*.ts' -- check",
-		"generate:api-local": "openapi --input ../Umbraco.Cms.Api.Management/OpenApi.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
-		"generate:api-dev": "openapi --input http://localhost:11000/umbraco/swagger/management/swagger.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
-		"generate:api": "openapi --input https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v14/dev/src/Umbraco.Cms.Api.Management/OpenApi.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
+		"generate:server-api-local": "openapi --input ../Umbraco.Cms.Api.Management/OpenApi.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
+		"generate:server-api-dev": "openapi --input http://localhost:11000/umbraco/swagger/management/swagger.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
+		"generate:server-api": "openapi --input https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v14/dev/src/Umbraco.Cms.Api.Management/OpenApi.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
 		"generate:icons": "node ./devops/icons/index.js",
 		"generate:jsonschema:dist": "typescript-json-schema --required --include \"./src/packages/core/extension-registry/umbraco-package.ts\" --out dist-cms/umbraco-package-schema.json tsconfig.json UmbracoPackage",
 		"generate:jsonschema": "typescript-json-schema --required --include \"./src/packages/core/extension-registry/*.ts\"",
@@ -154,7 +156,7 @@
 		"generate:tsconfig": "node ./devops/tsconfig/index.js",
 		"generate:manifest": "node ./devops/build/create-umbraco-package.js",
 		"package:validate": "node ./devops/package/validate-exports.js",
-		"generate:api-docs": "typedoc --options typedoc.config.js"
+		"generate:ui-api-docs": "typedoc --options typedoc.config.js"
 	},
 	"engines": {
 		"node": ">=20.9 <21",
@@ -164,8 +166,8 @@
 		"@openid/appauth": "^1.3.1",
 		"@types/dompurify": "^3.0.5",
 		"@types/uuid": "^9.0.8",
-		"@umbraco-ui/uui": "1.7.1",
-		"@umbraco-ui/uui-css": "1.7.0",
+		"@umbraco-ui/uui": "1.7.2",
+		"@umbraco-ui/uui-css": "1.7.2",
 		"dompurify": "^3.0.9",
 		"element-internals-polyfill": "^1.3.10",
 		"lit": "^3.1.2",
@@ -177,7 +179,7 @@
 		"uuid": "^9.0.1"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.23.7",
+		"@babel/core": "^7.24.3",
 		"@mdx-js/react": "^3.0.0",
 		"@open-wc/testing": "^4.0.0",
 		"@playwright/test": "^1.41.1",
@@ -230,7 +232,7 @@
 		"typedoc": "^0.25.10",
 		"typescript": "^5.3.3",
 		"typescript-json-schema": "^0.63.0",
-		"vite": "^5.1.1",
+		"vite": "^5.1.7",
 		"vite-plugin-static-copy": "^1.0.1",
 		"vite-tsconfig-paths": "^4.3.1",
 		"web-component-analyzer": "^2.0.0"

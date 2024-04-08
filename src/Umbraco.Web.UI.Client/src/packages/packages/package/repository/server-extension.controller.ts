@@ -26,7 +26,7 @@ export class UmbExtensionInitializer extends UmbControllerBase {
 	}
 
 	hostDisconnected(): void {
-		this.removeControllerByAlias('_observeExtensions');
+		this.removeUmbControllerByAlias('_observeExtensions');
 	}
 
 	async #loadLocalPackages() {

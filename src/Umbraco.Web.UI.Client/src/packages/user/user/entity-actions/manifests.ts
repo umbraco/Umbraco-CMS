@@ -4,6 +4,7 @@ import { UmbDisableUserEntityAction } from './disable/disable-user.action.js';
 import { UmbEnableUserEntityAction } from './enable/enable-user.action.js';
 import { UmbChangeUserPasswordEntityAction } from './change-password/change-user-password.action.js';
 import { UmbUnlockUserEntityAction } from './unlock/unlock-user.action.js';
+import { UmbMfaUserEntityAction } from './mfa/mfa-user.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -87,6 +88,24 @@ const entityActions: Array<ManifestTypes> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.User.AllowUnlockAction',
+			},
+		],
+	},
+	{
+		type: 'entityAction',
+		kind: 'default',
+		alias: 'Umb.EntityAction.User.ConfigureMfa',
+		name: 'Configure MFA Entity Action',
+		weight: 500,
+		api: UmbMfaUserEntityAction,
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
+		meta: {
+			icon: 'icon-settings',
+			label: 'Configure Two-Factor',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.User.AllowMfaAction',
 			},
 		],
 	},

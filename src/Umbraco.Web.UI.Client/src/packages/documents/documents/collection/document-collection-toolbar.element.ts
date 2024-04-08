@@ -1,11 +1,11 @@
-import type { UmbDocumentCollectionContext } from './document-collection.context.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 
 @customElement('umb-document-collection-toolbar')
 export class UmbDocumentCollectionToolbarElement extends UmbLitElement {
-	#collectionContext?: UmbDocumentCollectionContext;
+	#collectionContext?: UmbDefaultCollectionContext;
 
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 500;
@@ -14,7 +14,7 @@ export class UmbDocumentCollectionToolbarElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance as UmbDocumentCollectionContext;
+			this.#collectionContext = instance;
 		});
 	}
 

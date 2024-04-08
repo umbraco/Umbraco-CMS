@@ -1,4 +1,4 @@
-import type { UmbContextToken } from '../token/context-token.js';
+import type { UmbContextToken } from '../token/index.js';
 import { UmbContextProvider } from './context-provider.js';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 
@@ -29,7 +29,7 @@ export class UmbContextProviderController<
 		this.#controllerAlias = contextAlias.toString() + '_' + (instance as any).constructor?.name;
 
 		// If this API is already provided with this alias? Then we do not want to register this controller:
-		const existingControllers = host.getControllers((x) => x.controllerAlias === this.controllerAlias);
+		const existingControllers = host.getUmbControllers((x) => x.controllerAlias === this.controllerAlias);
 		if (
 			existingControllers.length > 0 &&
 			(existingControllers[0] as UmbContextProviderController).providerInstance?.() === instance
@@ -42,13 +42,13 @@ export class UmbContextProviderController<
 				}' is already provided by another Context Provider Controller.`,
 			);
 		} else {
-			host.addController(this);
+			host.addUmbController(this);
 		}
 	}
 
 	public destroy(): void {
 		if (this.#host) {
-			this.#host.removeController(this);
+			this.#host.removeUmbController(this);
 			(this.#host as any) = undefined;
 		}
 		super.destroy();

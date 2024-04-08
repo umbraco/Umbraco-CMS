@@ -1,7 +1,7 @@
 import type { UmbCurrentUserModel } from '../types.js';
 import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the current user that fetches data from the server
@@ -43,10 +43,53 @@ export class UmbCurrentUserServerDataSource {
 				fallbackPermissions: data.fallbackPermissions,
 				permissions: data.permissions,
 				allowedSections: data.allowedSections,
+				isAdmin: data.isAdmin,
 			};
 			return { data: user };
 		}
 
 		return { error };
+	}
+
+	/**
+	 * Get the current user's available MFA login providers
+	 * @memberof UmbCurrentUserServerDataSource
+	 */
+	async getMfaLoginProviders() {
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getUserCurrent2Fa());
+
+		if (data) {
+			return { data };
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Enable an MFA provider
+	 */
+	async enableMfaProvider(providerName: string, code: string, secret: string) {
+		const { error } = await tryExecute(
+			UserResource.postUserCurrent2FaByProviderName({ providerName, requestBody: { code, secret } }),
+		);
+
+		if (error) {
+			return { error };
+		}
+
+		return {};
+	}
+
+	/**
+	 * Disable an MFA provider
+	 */
+	async disableMfaProvider(providerName: string, code: string) {
+		const { error } = await tryExecute(UserResource.deleteUserCurrent2FaByProviderName({ providerName, code }));
+
+		if (error) {
+			return { error };
+		}
+
+		return {};
 	}
 }

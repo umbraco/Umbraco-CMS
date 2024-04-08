@@ -1,4 +1,4 @@
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '../reload-tree-item-children/index.js';
+import { UmbRequestReloadTreeItemChildrenEvent } from '../reload-tree-item-children/index.js';
 import type { UmbTreeItemModelBase } from '../types.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
@@ -144,11 +144,11 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
 			this.#actionEventContext = instance;
 			this.#actionEventContext.removeEventListener(
-				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				UmbRequestReloadTreeItemChildrenEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 			this.#actionEventContext.addEventListener(
-				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				UmbRequestReloadTreeItemChildrenEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 		});
@@ -188,7 +188,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 	destroy(): void {
 		this.#actionEventContext?.removeEventListener(
-			UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+			UmbRequestReloadTreeItemChildrenEvent.TYPE,
 			this.#onReloadRequest as EventListener,
 		);
 		super.destroy();

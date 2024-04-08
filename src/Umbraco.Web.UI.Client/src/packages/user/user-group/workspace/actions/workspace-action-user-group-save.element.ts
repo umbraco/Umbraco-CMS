@@ -1,7 +1,9 @@
-import { UMB_USER_WORKSPACE_CONTEXT } from '../../../user/workspace/user-workspace.context.js';
+import { UMB_USER_WORKSPACE_CONTEXT } from '../../../user/workspace/user-workspace.context-token.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+// TODO: Revisit this component, it can be made via a kind with api instead. [NL]
+// TODO: This seems like legacy code [NL]
 @customElement('umb-workspace-action-user-group-save')
 export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
 	@state()
@@ -22,7 +24,7 @@ export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
 
 		this._saveButtonState = 'waiting';
 		await this._workspaceContext
-			.save()
+			.requestSubmit()
 			.then(() => {
 				this._saveButtonState = 'success';
 			})

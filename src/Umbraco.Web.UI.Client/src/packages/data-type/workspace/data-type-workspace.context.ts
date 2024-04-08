@@ -1,19 +1,25 @@
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
+import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import type { UmbInvariantableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbInvariantDatasetWorkspaceContext,
+	UmbRoutableWorkspaceContext,
+} from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
+	mergeObservables,
 	UmbArrayState,
 	UmbObjectState,
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	PropertyEditorSettingsDefaultData,
 	PropertyEditorSettingsProperty,
@@ -21,18 +27,20 @@ import type {
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbInvariantableWorkspaceContextInterface
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
+	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
-	#parent?: { entityType: string; unique: string | null };
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
 
@@ -72,9 +80,37 @@ export class UmbDataTypeWorkspaceContext
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DataType');
 		this.#observePropertyEditorUIAlias();
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique',
+				component: UmbDataTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique });
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: UmbDataTypeWorkspaceEditorElement,
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	resetState() {
@@ -203,7 +239,7 @@ export class UmbDataTypeWorkspaceContext
 
 	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		const request = this.repository.createScaffold();
 		this.#getDataPromise = request;
 		let { data } = await request;
@@ -246,17 +282,18 @@ export class UmbDataTypeWorkspaceContext
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		await this.#getDataPromise;
 
-		return combineLatest([
-			this.#currentData.asObservablePart(
-				(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
-			),
-			this.#defaults.asObservablePart(
-				(defaults) => defaults?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
-			),
-		]).pipe(
-			map(([value, defaultValue]) => {
+		return mergeObservables(
+			[
+				this.#currentData.asObservablePart(
+					(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
+				),
+				this.#defaults.asObservablePart(
+					(defaults) => defaults?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
+				),
+			],
+			([value, defaultValue]) => {
 				return value ?? defaultValue;
-			}),
+			},
 		);
 	}
 
@@ -280,19 +317,20 @@ export class UmbDataTypeWorkspaceContext
 		}
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#currentData.value) return;
 		if (!this.#currentData.value.unique) return;
 
 		if (this.getIsNew()) {
-			if (!this.#parent) throw new Error('Parent is not set');
-			await this.repository.create(this.#currentData.value, this.#parent.unique);
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
+			await this.repository.create(this.#currentData.value, parent.unique);
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: this.#parent.entityType,
-				unique: this.#parent.unique,
+			const event = new UmbRequestReloadTreeItemChildrenEvent({
+				entityType: parent.entityType,
+				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
 		} else {
@@ -308,7 +346,7 @@ export class UmbDataTypeWorkspaceContext
 		}
 
 		this.setIsNew(false);
-		this.workspaceComplete(this.#currentData.value);
+		return true;
 	}
 
 	async delete(unique: string) {
@@ -326,3 +364,5 @@ export class UmbDataTypeWorkspaceContext
 		super.destroy();
 	}
 }
+
+export { UmbDataTypeWorkspaceContext as api };

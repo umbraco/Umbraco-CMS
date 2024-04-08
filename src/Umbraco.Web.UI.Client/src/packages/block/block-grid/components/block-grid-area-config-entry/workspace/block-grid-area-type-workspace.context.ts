@@ -1,12 +1,9 @@
 import type { UmbBlockGridTypeAreaType } from '../../../types.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type {
-	UmbInvariantableWorkspaceContextInterface,
-	UmbWorkspaceContextInterface,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbInvariantDatasetWorkspaceContext, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
@@ -15,8 +12,8 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBlockGridAreaTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbBlockGridTypeAreaType>
-	implements UmbInvariantableWorkspaceContextInterface
+	extends UmbSubmittableWorkspaceContextBase<UmbBlockGridTypeAreaType>
+	implements UmbInvariantDatasetWorkspaceContext
 {
 	// Just for context token safety:
 	public readonly IS_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT = true;
@@ -111,7 +108,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		}
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#data.value) return;
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
@@ -120,7 +117,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		});
 
 		this.setIsNew(false);
-		this.workspaceComplete(this.#data.value);
+		return true;
 	}
 
 	public destroy(): void {
@@ -132,7 +129,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 export default UmbBlockGridAreaTypeWorkspaceContext;
 
 export const UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbWorkspaceContextInterface,
+	UmbWorkspaceContext,
 	UmbBlockGridAreaTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',
