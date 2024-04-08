@@ -158,7 +158,9 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		this.#rollbackRepository.rollback(id, culture);
 
 		const docUnique = this.#workspaceContext?.getUnique() ?? '';
-		this.#workspaceContext?.load(docUnique);
+		//TODO Use the load method on the context instead of location.href, when it works.
+		// this.#workspaceContext?.load(docUnique);
+		location.href = 'section/content/workspace/document/edit/' + docUnique;
 		this.modalContext?.reject();
 	}
 
@@ -258,7 +260,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 					this.currentVersion.properties,
 					(item) => item.alias,
 					(item) => {
-						const diff = diffs.find((x) => x.alias === item.alias);
+						const diff = diffs.find((x) => x?.alias === item.alias);
 						return html`
 							<p>
 								${item.alias}:
