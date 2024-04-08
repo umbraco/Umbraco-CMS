@@ -1,4 +1,4 @@
-import { extensions as coreExtensions } from '../../packages/core/umbraco-package.js';
+import { onInit } from '../../packages/core/index.js';
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppContext } from './app.context.js';
 import { UmbServerConnection } from './server-connection.js';
@@ -13,22 +13,11 @@ import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { OpenAPI, RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
-import {
-	UmbBundleExtensionInitializer,
-	UmbEntryPointExtensionInitializer,
-	UmbServerExtensionRegistrator,
-} from '@umbraco-cms/backoffice/extension-api';
+import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
-	/**
-	 * Backoffice extension registry.
-	 * This enables to register and unregister extensions via DevTools, or just via querying this element via the DOM.
-	 * @type {UmbExtensionsRegistry}
-	 */
-	public extensionRegistry = umbExtensionsRegistry;
-
 	/**
 	 * The base URL of the configured Umbraco server.
 	 *
@@ -87,11 +76,6 @@ export class UmbAppElement extends UmbLitElement {
 		new UUIIconRegistryEssential().attach(this);
 
 		new UmbContextDebugController(this);
-
-		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
-		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-
-		umbExtensionsRegistry.registerMany(coreExtensions);
 	}
 
 	connectedCallback(): void {
@@ -105,6 +89,10 @@ export class UmbAppElement extends UmbLitElement {
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
 		new UmbAppContext(this, { backofficePath: this.backofficePath, serverUrl: this.serverUrl });
 
+		// Register Core extensions
+		onInit(this, umbExtensionsRegistry);
+
+		// Register public extensions
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 
 		// Try to initialise the auth flow and get the runtime status
@@ -202,7 +190,7 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#isAuthorizedGuard(): Guard {
-		return () => this.#authController?.isAuthorized() ?? false;
+		return () => this.#authController.isAuthorized() ?? false;
 	}
 
 	#errorPage(errorMsg: string, error?: unknown) {
