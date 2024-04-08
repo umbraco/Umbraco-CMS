@@ -3,8 +3,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPackageRepository } from '@umbraco-cms/backoffice/package';
 import type { UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('umb-packages-market-place-section-view')
-export class UmbPackagesMarketPlaceSectionViewElement extends UmbLitElement implements UmbSectionViewElement {
+@customElement('umb-packages-marketplace-section-view')
+export class UmbPackagesMarketplaceSectionViewElement extends UmbLitElement implements UmbSectionViewElement {
 	@state()
 	private _marketplaceUrl?: string;
 
@@ -71,10 +71,10 @@ export class UmbPackagesMarketPlaceSectionViewElement extends UmbLitElement impl
 	];
 }
 
-export default UmbPackagesMarketPlaceSectionViewElement;
+export default UmbPackagesMarketplaceSectionViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-packages-market-place-section-view': UmbPackagesMarketPlaceSectionViewElement;
+		'umb-packages-marketplace-section-view': UmbPackagesMarketplaceSectionViewElement;
 	}
 }
