@@ -28,7 +28,7 @@ public class AllManifestController : ManifestControllerBase
     [ProducesResponseType(typeof(IEnumerable<ManifestResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> AllManifests()
     {
-        PackageManifest[] packageManifests = (await _packageManifestService.GetAllPackageManifestsAsync()).ToArray();
+        IEnumerable<PackageManifest> packageManifests = await _packageManifestService.GetAllPackageManifestsAsync();
         return Ok(_umbracoMapper.MapEnumerable<PackageManifest, ManifestResponseModel>(packageManifests));
     }
 }

@@ -28,7 +28,7 @@ public class PrivateManifestManifestController : ManifestControllerBase
     [ProducesResponseType(typeof(IEnumerable<ManifestResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> PrivateManifests()
     {
-        PackageManifest[] packageManifests = (await _packageManifestService.GetPrivatePackageManifestsAsync()).ToArray();
+        IEnumerable<PackageManifest> packageManifests = await _packageManifestService.GetPrivatePackageManifestsAsync();
         return Ok(_umbracoMapper.MapEnumerable<PackageManifest, ManifestResponseModel>(packageManifests));
     }
 }
