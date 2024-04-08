@@ -13,18 +13,28 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.BlockList,
     ValueType = ValueTypes.Json,
     ValueEditorIsReusable = false)]
-public class BlockListPropertyEditor : BlockEditorPropertyEditor
+public class BlockListPropertyEditor : BlockListPropertyEditorBase
 {
     private readonly IIOHelper _ioHelper;
 
+    public BlockListPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        IIOHelper ioHelper,
+        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory,
+        IJsonSerializer jsonSerializer)
+        : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory, jsonSerializer)
+        => _ioHelper = ioHelper;
+
+    [Obsolete("Use constructor that doesn't take PropertyEditorCollection, scheduled for removal in V15")]
     public BlockListPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         PropertyEditorCollection propertyEditors,
         IIOHelper ioHelper,
         IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory,
         IJsonSerializer jsonSerializer)
-        : base(dataValueEditorFactory, propertyEditors, blockValuePropertyIndexValueFactory, jsonSerializer)
-        => _ioHelper = ioHelper;
+        : this(dataValueEditorFactory, ioHelper, blockValuePropertyIndexValueFactory, jsonSerializer)
+    {
+    }
 
     #region Pre Value Editor
 

@@ -1,9 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Scoping;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 using StaticServiceProvider = Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider;
 
