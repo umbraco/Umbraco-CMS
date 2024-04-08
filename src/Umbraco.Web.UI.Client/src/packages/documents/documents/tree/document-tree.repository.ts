@@ -18,7 +18,7 @@ export class UmbDocumentTreeRepository
 		const data: UmbDocumentTreeRootModel = {
 			unique: null,
 			entityType: UMB_DOCUMENT_ROOT_ENTITY_TYPE,
-			name: '#treeHeaders_content',
+			name: this._localization.term('treeHeaders_content'),
 			hasChildren: true,
 			isFolder: true,
 		};

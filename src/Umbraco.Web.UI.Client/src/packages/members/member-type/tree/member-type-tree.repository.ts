@@ -18,7 +18,7 @@ export class UmbMemberTypeTreeRepository
 		const data: UmbMemberTypeTreeRootModel = {
 			unique: null,
 			entityType: UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE,
-			name: '#treeHeaders_memberTypes',
+			name: this._localization.term('treeHeaders_memberTypes'),
 			hasChildren: true,
 			isFolder: true,
 		};

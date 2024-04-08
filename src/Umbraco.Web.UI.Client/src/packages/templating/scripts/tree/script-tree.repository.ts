@@ -15,7 +15,7 @@ export class UmbScriptTreeRepository extends UmbTreeRepositoryBase<UmbScriptTree
 		const data: UmbScriptTreeRootModel = {
 			unique: null,
 			entityType: UMB_SCRIPT_ROOT_ENTITY_TYPE,
-			name: '#treeHeaders_scripts',
+			name: this._localization.term('treeHeaders_scripts'),
 			hasChildren: true,
 			isFolder: true,
 		};
