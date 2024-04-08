@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/index.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './rollback-modal.token.js';
 import { UmbRollbackRepository } from './repository/rollback.repository.js';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
@@ -10,8 +11,8 @@ import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
+//TODO: Import through backoffice/internal
 import { diffWords } from 'diff';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT, UmbDocumentWorkspaceContext } from '../../workspace/index.js';
 
 type DocumentVersion = {
 	id: string;
@@ -188,8 +189,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 	#renderCultureSelect() {
 		return html`
-			<b>Language</b>
-			<uui-select @change=${this.#onChangeCulture} .options=${this.availableVariants}></uui-select>
+			<div id="language-select">
+				<b>Language</b>
+				<uui-select @change=${this.#onChangeCulture} .options=${this.availableVariants}></uui-select>
+			</div>
 		`;
 	}
 
@@ -300,6 +303,14 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	static styles = [
 		UmbTextStyles,
 		css`
+			#language-select {
+				display: flex;
+				flex-direction: column;
+				padding: var(--uui-size-space-5);
+				padding-bottom: 0;
+				gap: var(--uui-size-space-2);
+				font-size: 15px;
+			}
 			#diff .added {
 				background-color: #d1ffdb;
 			}
