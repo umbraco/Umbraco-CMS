@@ -1,3 +1,4 @@
+import { diffWords } from '@umbraco-cms/backoffice/external/diff';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/index.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './rollback-modal.token.js';
 import { UmbRollbackRepository } from './repository/rollback.repository.js';
@@ -10,9 +11,6 @@ import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-
-//TODO: Import through backoffice/internal
-import { diffWords } from 'diff';
 
 type DocumentVersion = {
 	id: string;
@@ -158,7 +156,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		this.#rollbackRepository.rollback(id, culture);
 
 		const docUnique = this.#workspaceContext?.getUnique() ?? '';
-		//TODO Use the load method on the context instead of location.href, when it works.
+		// TODO Use the load method on the context instead of location.href, when it works.
 		// this.#workspaceContext?.load(docUnique);
 		location.href = 'section/content/workspace/document/edit/' + docUnique;
 		this.modalContext?.reject();

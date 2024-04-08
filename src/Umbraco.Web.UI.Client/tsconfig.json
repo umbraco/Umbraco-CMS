@@ -106,6 +106,7 @@
 			"@umbraco-cms/backoffice/webhook": ["./src/packages/webhook/index.ts"],
 			"@umbraco-cms/backoffice/workspace": ["./src/packages/core/workspace/index.ts"],
 			"@umbraco-cms/backoffice/external/backend-api": ["./src/external/backend-api/index.ts"],
+			"@umbraco-cms/backoffice/external/diff": ["./src/external/diff/index.ts"],
 			"@umbraco-cms/backoffice/external/dompurify": ["./src/external/dompurify/index.ts"],
 			"@umbraco-cms/backoffice/external/lit": ["./src/external/lit/index.ts"],
 			"@umbraco-cms/backoffice/external/marked": ["./src/external/marked/index.ts"],
