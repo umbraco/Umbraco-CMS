@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -181,17 +180,16 @@ internal sealed class ContentBlueprintEditingService
     public async Task<Attempt<ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        IContent? toMove = ContentService.GetBlueprintById(key);
+        IContent? toMove = await GetAsync(key);
         if (toMove is null)
         {
             return Attempt.Fail(ContentEditingOperationStatus.NotFound);
         }
 
-        EntityContainer? container = null;
         var parentId = Constants.System.Root;
         if (containerKey.HasValue && containerKey.Value != Guid.Empty)
         {
-            container = await _containerService.GetAsync(containerKey.Value);
+            EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
             if (container is null)
             {
                 return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
@@ -209,8 +207,8 @@ internal sealed class ContentBlueprintEditingService
         //       structural node data like path, level, sort orders etc.
         toMove.ParentId = parentId;
 
-        var performingUserId = await GetUserIdAsync(userKey);
-        ContentService.SaveBlueprint(toMove, performingUserId);
+        // Save blueprint
+        await SaveAsync(toMove, userKey);
 
         scope.Complete();
 
