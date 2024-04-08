@@ -4,7 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
- * UmbEntityContext
+ * Provides the entity context
  * @export
  * @class UmbEntityContext
  * @extends {UmbContextBase<UmbEntityContext>}
@@ -25,18 +25,38 @@ export class UmbEntityContext extends UmbContextBase<UmbEntityContext> {
 		super(host, UMB_ENTITY_CONTEXT);
 	}
 
+	/**
+	 * Set the entity type
+	 * @param {string | undefined} entityType
+	 * @memberof UmbEntityContext
+	 */
 	setEntityType(entityType: string | undefined) {
 		this.#entityType.setValue(entityType);
 	}
 
-	getEntityType() {
+	/**
+	 * Get the entity type
+	 * @returns {string | undefined}
+	 * @memberof UmbEntityContext
+	 */
+	getEntityType(): string | undefined {
 		return this.#entityType.getValue();
 	}
 
+	/**
+	 * Set the unique
+	 * @param {string | null | undefined} unique
+	 * @memberof UmbEntityContext
+	 */
 	setUnique(unique: string | null | undefined) {
 		this.#unique.setValue(unique);
 	}
 
+	/**
+	 * Get the unique
+	 * @returns {string | null | undefined}
+	 * @memberof UmbEntityContext
+	 */
 	getUnique() {
 		return this.#unique.getValue();
 	}
