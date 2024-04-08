@@ -5,8 +5,8 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserData;
 
-[VersionedApiBackOfficeRoute("UserData")]
-[ApiExplorerSettings(GroupName = "UserData")]
+[VersionedApiBackOfficeRoute("user-data")]
+[ApiExplorerSettings(GroupName = "User Data")]
 public class UserDataControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UserDataOperationStatusResult(UserDataOperationStatus status) =>
