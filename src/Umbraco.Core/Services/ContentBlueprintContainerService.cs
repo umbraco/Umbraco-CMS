@@ -22,7 +22,7 @@ internal sealed class ContentBlueprintContainerService : EntityTypeContainerServ
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentBlueprint;
 
-    protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.DataTypeContainer;
+    protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.DocumentBlueprintContainer;
 
     protected override int[] ReadLockIds => new [] { Constants.Locks.ContentTree };
 

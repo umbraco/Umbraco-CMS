@@ -11,7 +11,7 @@ internal class DocumentBlueprintContainerRepository : EntityContainerRepository,
     public DocumentBlueprintContainerRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
-        ILogger<DataTypeContainerRepository> logger)
+        ILogger<DocumentBlueprintContainerRepository> logger)
         : base(scopeAccessor, cache, logger, Constants.ObjectTypes.DocumentBlueprintContainer)
     {
     }

@@ -123,7 +123,7 @@ public enum UmbracoObjectTypes
     DataTypeContainer,
 
     /// <summary>
-    ///     Media type container
+    ///     Document blueprint container.
     /// </summary>
     [UmbracoObjectType(Constants.ObjectTypes.Strings.DocumentBlueprintContainer)]
     [FriendlyName("Document Blueprint Container")]
