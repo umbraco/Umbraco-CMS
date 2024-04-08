@@ -33,7 +33,7 @@ internal class Property : PublishedPropertyBase
     private object? _interValue;
 
     // the variant source and inter values
-    private readonly Lazy<ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>> _sourceValues = new();
+    private readonly Lazy<ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>> _sourceValues = new(() => new(-1, 5));
 
     private string? _valuesCacheKey;
 
@@ -349,7 +349,7 @@ internal class Property : PublishedPropertyBase
 
     private class CacheValues : CacheValue
     {
-        private readonly Lazy<ConcurrentDictionary<CompositeStringStringKey, CacheValue>> _values = new();
+        private readonly Lazy<ConcurrentDictionary<CompositeStringStringKey, CacheValue>> _values = new(() => new(-1, 5));
 
         public CacheValue For(string? culture, string? segment)
         {
