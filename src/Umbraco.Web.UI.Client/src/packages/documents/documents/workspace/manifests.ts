@@ -152,7 +152,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		api: UmbDocumentUnpublishWorkspaceAction,
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: '#buttons_unpublish',
+			label: '#actions_unpublish',
 			icon: 'icon-globe',
 		},
 	},
@@ -165,7 +165,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		api: UmbDocumentPublishWithDescendantsWorkspaceAction,
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: '#buttons_publishWithDescendants',
+			label: '#buttons_publishDescendants',
 			icon: 'icon-globe',
 		},
 	},
