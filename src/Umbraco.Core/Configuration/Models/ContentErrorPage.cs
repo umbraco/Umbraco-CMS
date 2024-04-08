@@ -39,5 +39,5 @@ public class ContentErrorPage : ValidatableEntryBase
 
     internal override bool IsValid() =>
         base.IsValid() &&
-        (HasContentId ? 1 : 0) + (HasContentKey ? 1 : 0) == 1;
+        (HasContentId ^ HasContentKey);
 }
