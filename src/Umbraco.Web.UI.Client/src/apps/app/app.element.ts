@@ -76,7 +76,7 @@ export class UmbAppElement extends UmbLitElement {
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#serverConnection?: UmbServerConnection;
-	#authController?: UmbAppAuthController;
+	#authController = new UmbAppAuthController(this);
 
 	constructor() {
 		super();
@@ -114,7 +114,6 @@ export class UmbAppElement extends UmbLitElement {
 			if (this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL) {
 				await this.#authContext.clearTokenStorage();
 			} else {
-				this.#authController = new UmbAppAuthController(this);
 				await this.#setAuthStatus();
 			}
 
