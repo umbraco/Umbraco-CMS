@@ -14,14 +14,19 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 
 	render() {
 		return html`
-			<umb-body-layout id="layout" .headline=${this.localize.term('login_instruction')}>
-				${this.data?.userLoginState === 'timedOut' ? html`<p>${this.localize.term('login_timeout')}</p>` : ''}
-				<umb-extension-slot
-					id="providers"
-					type="authProvider"
-					default-element="umb-auth-provider-default"
-					.props=${this.props}></umb-extension-slot>
-			</umb-body-layout>
+			<div id="layout">
+				<div id="graphics" aria-hidden="true">
+					<img id="logo" alt="logo" src="umbraco_logo_white.svg" />
+				</div>
+				<umb-body-layout id="login-layout" .headline=${this.localize.term('login_instruction')}>
+					${this.data?.userLoginState === 'timedOut' ? html`<p>${this.localize.term('login_timeout')}</p>` : ''}
+					<umb-extension-slot
+						id="providers"
+						type="authProvider"
+						default-element="umb-auth-provider-default"
+						.props=${this.props}></umb-extension-slot>
+				</umb-body-layout>
+			</div>
 		`;
 	}
 
@@ -36,18 +41,58 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 			:host {
 				display: block;
 				padding: 20px;
-				width: 380px;
+				width: 800px;
 				max-width: 80vw;
+
+				--umb-body-layout-color-background: #fff;
+				--umb-login-image: url('login.jpg') center center / cover no-repeat;
 			}
 
 			#layout {
-				--umb-body-layout-color-background: #fff;
+				display: flex;
+				flex-direction: row;
+				height: 100%;
+				gap: var(--uui-size-space-5);
+				container-type: inline-size;
+				container-name: umb-app-auth-modal;
+			}
+
+			#graphics {
+				position: relative;
+				align-self: center;
+				text-align: center;
+				background: var(--umb-login-image);
+				width: 400px;
+				height: 327px;
+			}
+
+			#logo {
+				position: absolute;
+				top: 20px;
+				left: 20px;
+				width: calc(100% / 3);
+			}
+
+			#login-layout {
+				max-width: 380px;
+				min-height: 327px;
 			}
 
 			#providers {
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-5);
+			}
+
+			@container umb-app-auth-modal (width < 568px) {
+				#graphics {
+					display: none;
+				}
+
+				#login-layout {
+					max-width: none;
+					min-height: none;
+				}
 			}
 		`,
 	];
