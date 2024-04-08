@@ -1,5 +1,9 @@
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { ManifestResource, PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	CreatePackageRequestModel,
+	UpdatePackageRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -8,6 +12,22 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  */
 export class UmbPackageServerDataSource {
 	constructor(private readonly host: UmbControllerHost) {}
+
+	async deleteCreatedPackage(unique: string) {
+		return await tryExecuteAndNotify(this.host, PackageResource.deletePackageCreatedById({ id: unique }));
+	}
+
+	getCreatedPackage(unique: string) {
+		return tryExecuteAndNotify(this.host, PackageResource.getPackageCreatedById({ id: unique }));
+	}
+
+	getCreatedPackages({ skip, take }: { skip: number; take: number }) {
+		return tryExecuteAndNotify(this.host, PackageResource.getPackageCreated({ skip, take }));
+	}
+
+	getCreatePackageDownload(unique: string) {
+		return tryExecuteAndNotify(this.host, PackageResource.getPackageCreatedByIdDownload({ id: unique }));
+	}
 
 	/**
 	 * Get the root items from the server
@@ -31,5 +51,13 @@ export class UmbPackageServerDataSource {
 	 */
 	getPackageMigrations() {
 		return tryExecuteAndNotify(this.host, PackageResource.getPackageMigrationStatus({ skip: 0, take: 9999 }));
+	}
+
+	async saveCreatedPackage(requestBody: CreatePackageRequestModel) {
+		return await tryExecuteAndNotify(this.host, PackageResource.postPackageCreated({ requestBody }));
+	}
+
+	async updateCreatedPackage(id: string, requestBody: UpdatePackageRequestModel) {
+		return await tryExecuteAndNotify(this.host, PackageResource.putPackageCreatedById({ id, requestBody }));
 	}
 }
