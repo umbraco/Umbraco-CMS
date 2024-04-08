@@ -96,22 +96,16 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         }
     }
 
-    public OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri backOfficeUrl) =>
-        new()
+    public OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri backOfficeUrl)
+    {
+        Uri backOfficeRedirectUrl = CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName);
+        return new OpenIddictApplicationDescriptor
         {
             DisplayName = "Umbraco back-office access",
             ClientId = Constants.OAuthClientIds.BackOffice,
-            RedirectUris =
-            {
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName)
-            },
+            RedirectUris = { backOfficeRedirectUrl },
             Type = OpenIddictConstants.ClientTypes.Public,
-            PostLogoutRedirectUris =
-            {
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName + "/login"),
-                // FIXME: remove when we no longer use Umbraco.Web.UI project
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName)
-            },
+            PostLogoutRedirectUris = { backOfficeRedirectUrl },
             Permissions =
             {
                 OpenIddictConstants.Permissions.Endpoints.Authorization,
@@ -123,6 +117,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                 OpenIddictConstants.Permissions.ResponseTypes.Code
             }
         };
+    }
 
     private static Uri CallbackUrlFor(Uri url, string relativePath) => new Uri($"{url.GetLeftPart(UriPartial.Authority)}/{relativePath.TrimStart(Constants.CharArrays.ForwardSlash)}");
 }
