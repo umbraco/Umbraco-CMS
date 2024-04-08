@@ -8,7 +8,7 @@ const section: ManifestSection = {
 	name: 'Packages Section',
 	weight: 200,
 	meta: {
-		label: 'Packages',
+		label: '#sections_packages',
 		pathname: 'packages',
 	},
 	conditions: [
