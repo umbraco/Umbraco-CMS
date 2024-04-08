@@ -23,7 +23,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
         Guid[] allowedContainers =
         {
             Constants.ObjectTypes.DocumentTypeContainer, Constants.ObjectTypes.MediaTypeContainer,
-            Constants.ObjectTypes.DataTypeContainer,
+            Constants.ObjectTypes.DataTypeContainer, Constants.ObjectTypes.DocumentBlueprintContainer,
         };
         NodeObjectTypeId = containerObjectType;
         if (allowedContainers.Contains(NodeObjectTypeId) == false)

@@ -125,7 +125,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
 
                 if (container.IsPropertyDirty(nameof(EntityContainer.ParentId)))
                 {
-                    LoggerFactory.CreateLogger<DataTypeContainerService>().LogWarning(
+                    LoggerFactory.CreateLogger(GetType()).LogWarning(
                         $"Cannot use {nameof(UpdateAsync)} to change the container parent. Move the container instead.");
                     return EntityContainerOperationStatus.ParentNotFound;
                 }
