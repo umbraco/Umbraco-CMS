@@ -11,7 +11,7 @@ export class UmbRefSectionElement extends UmbElementMixin(UUIRefElement) {
 	public render() {
 		return html`
 			<div id="info">
-				<div id="name">${this.item?.meta.label}</div>
+				<div id="name">${this.item?.meta.label ? this.localize.string(this.item.meta.label) : this.item?.name}</div>
 			</div>
 			<slot></slot>
 			<slot name="actions" id="actions-container"></slot>
