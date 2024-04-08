@@ -204,7 +204,7 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		lastLoginDate: null,
 		lastLockoutDate: null,
 		lastPasswordChangeDate: null,
-		isAdmin: false,
+		isAdmin: item.userGroupIds.includes(umbUserGroupMockDb.getAll()[0].id),
 	};
 };
 

@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUICollectionViewColumnConfigurationElement } from './property-editor-ui-collection-view-column-configuration.element.js';
+import { UmbPropertyEditorUICollectionViewColumnConfigurationElement } from './column-configuration.element.js';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUICollectionViewColumnConfigurationElement', () => {

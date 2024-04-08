@@ -72,6 +72,7 @@ export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 			documentStartNodeUniques: updatedCurrentUser.documentStartNodeUniques,
 			mediaStartNodeUniques: updatedCurrentUser.mediaStartNodeUniques,
 			avatarUrls: updatedCurrentUser.avatarUrls,
+			isAdmin: updatedCurrentUser.isAdmin,
 		};
 
 		this.update(mappedCurrentUser);
