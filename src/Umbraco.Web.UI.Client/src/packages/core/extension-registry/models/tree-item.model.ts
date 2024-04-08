@@ -1,4 +1,5 @@
-import type { UmbTreeItemContext, UmbTreeItemModelBase } from '../../index.js';
+import type { UmbTreeItemModelBase } from '../../tree/types.js';
+import type { UmbTreeItemContext } from '../../tree/tree-item/index.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
 

@@ -9,6 +9,6 @@ export class UmbStylesheetPickerContext extends UmbPickerInputContext<UmbStylesh
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		// TODO: Item and tree item types collide
-		super(host, UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS, UMB_STYLESHEET_PICKER_MODAL, (item) => item.unique);
+		super(host, UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS, UMB_STYLESHEET_PICKER_MODAL);
 	}
 }

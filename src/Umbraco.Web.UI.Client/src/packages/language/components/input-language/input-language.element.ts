@@ -109,7 +109,11 @@ export class UmbInputLanguageElement extends FormControlMixin(UmbLitElement) {
 	render() {
 		return html`
 			<uui-ref-list> ${this._items.map((item) => this.#renderItem(item))} </uui-ref-list>
-			<uui-button id="add-button" look="placeholder" @click=${this.#openPicker} label="open">Add</uui-button>
+			<uui-button
+				id="add-button"
+				look="placeholder"
+				@click=${this.#openPicker}
+				label=${this.localize.term('general_choose')}></uui-button>
 		`;
 	}
 
@@ -119,9 +123,9 @@ export class UmbInputLanguageElement extends FormControlMixin(UmbLitElement) {
 			<!-- TODO: add language ref element -->
 			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.unique)}>
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.unique!)} label="Remove ${item.name}"
-						>Remove</uui-button
-					>
+					<uui-button
+						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
+						label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;

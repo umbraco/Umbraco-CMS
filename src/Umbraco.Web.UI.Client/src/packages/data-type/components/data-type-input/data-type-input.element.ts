@@ -53,11 +53,12 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
+	@property({ type: Array })
+	public set selection(ids: Array<string> | undefined) {
+		this.#pickerContext.setSelection(ids ?? []);
 	}
-	public set selection(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+	public get selection(): Array<string> | undefined {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property()
@@ -66,7 +67,7 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 		this.selection = splitStringToArray(idsString);
 	}
 	public get value(): string {
-		return this.selection.join(',');
+		return this.selection?.join(',') ?? '';
 	}
 
 	@state()
@@ -100,9 +101,11 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	render() {
 		return html`
 			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open"
-				>Add</uui-button
-			>
+			<uui-button
+				id="add-button"
+				look="placeholder"
+				@click=${() => this.#pickerContext.openPicker({ hideTreeRoot: true })}
+				label=${this.localize.term('general_choose')}></uui-button>
 		`;
 	}
 
@@ -113,9 +116,7 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
-						label="Remove Data Type ${item.name}"
-						>Remove</uui-button
-					>
+						label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node-data-type>
 		`;
