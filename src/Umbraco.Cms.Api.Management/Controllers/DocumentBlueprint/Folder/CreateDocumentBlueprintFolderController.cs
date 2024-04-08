@@ -22,7 +22,7 @@ public class CreateDocumentBlueprintFolderController : DocumentBlueprintFolderCo
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateFolderRequestModel createFolderRequestModel)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateFolderRequestModel createFolderRequestModel)
         => await CreateFolderAsync<ByKeyDocumentBlueprintFolderController>(
             createFolderRequestModel,
             controller => nameof(controller.ByKey));

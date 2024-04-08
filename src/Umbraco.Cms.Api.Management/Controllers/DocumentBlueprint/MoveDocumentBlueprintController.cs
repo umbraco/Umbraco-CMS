@@ -25,7 +25,7 @@ public class MoveDocumentBlueprintController : DocumentBlueprintControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Move(Guid id, MoveDocumentBlueprintRequestModel requestModel)
+    public async Task<IActionResult> Move(CancellationToken cancellationToken, Guid id, MoveDocumentBlueprintRequestModel requestModel)
     {
         Attempt<ContentEditingOperationStatus> result = await _contentBlueprintEditingService.MoveAsync(id, requestModel.Target?.Id, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
