@@ -1,5 +1,8 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using OpenIddict.Abstractions;
 using StackExchange.Profiling;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
@@ -35,9 +38,17 @@ internal sealed class ConfigureMiniProfilerOptions : IConfigureOptions<MiniProfi
         options.IgnoredPaths.Add(WebPath.Combine(options.RouteBasePath, "results-index"));
         options.IgnoredPaths.Add(WebPath.Combine(options.RouteBasePath, "results"));
 
-        options.ResultsAuthorize = IsBackofficeUserAuthorized;
-        options.ResultsListAuthorize = IsBackofficeUserAuthorized;
+        options.ResultsAuthorizeAsync = IsBackofficeUserAuthorized;
+        options.ResultsListAuthorizeAsync = IsBackofficeUserAuthorized;
     }
 
-    private bool IsBackofficeUserAuthorized(HttpRequest request) => true;// FIXME when we can get current backoffice user, _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null;
+    private async Task<bool> IsBackofficeUserAuthorized(HttpRequest request)
+    {
+        AuthenticateResult authenticateResult = await request.HttpContext.AuthenticateBackOfficeAsync();
+        ClaimsIdentity? identity = authenticateResult.Principal?.GetUmbracoIdentity();
+
+        return identity?.GetClaims(Core.Constants.Security.AllowedApplicationsClaimType)
+            .InvariantContains(Core.Constants.Applications.Settings) ?? false;
+
+    }
 }
