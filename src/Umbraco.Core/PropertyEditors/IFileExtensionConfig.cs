@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public interface IFileExtensionsConfig
 {
-    List<FileExtensionConfigItem> FileExtensions { get; set; }
+    IEnumerable<string> FileExtensions { get; set; }
 }

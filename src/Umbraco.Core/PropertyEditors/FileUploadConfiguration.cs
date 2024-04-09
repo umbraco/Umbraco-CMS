@@ -6,5 +6,5 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class FileUploadConfiguration : IFileExtensionsConfig
 {
     [ConfigurationField("fileExtensions")]
-    public List<FileExtensionConfigItem> FileExtensions { get; set; } = new();
+    public IEnumerable<string> FileExtensions { get; set; } = Enumerable.Empty<string>();
 }

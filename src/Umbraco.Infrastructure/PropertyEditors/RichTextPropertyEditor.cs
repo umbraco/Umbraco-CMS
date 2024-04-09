@@ -222,8 +222,10 @@ public class RichTextPropertyEditor : DataEditor
                 return null;
             }
 
-            var parseAndSaveBase64Images = _pastedImages.FindAndPersistEmbeddedImages(
-                richTextEditorValue.Markup, mediaParentId, userKey);
+            var parseAndSaveBase64Images = _pastedImages
+                .FindAndPersistEmbeddedImagesAsync(richTextEditorValue.Markup, mediaParentId, userKey)
+                .GetAwaiter()
+                .GetResult();
             var parseAndSavedTempImages = _pastedImages
                 .FindAndPersistPastedTempImagesAsync(parseAndSaveBase64Images, mediaParentId, userKey)
                 .GetAwaiter()
