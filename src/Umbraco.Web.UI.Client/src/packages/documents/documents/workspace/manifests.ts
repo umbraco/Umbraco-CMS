@@ -15,6 +15,7 @@ import type {
 	ManifestWorkspaceActionMenuItem,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
 
 export const UMB_DOCUMENT_WORKSPACE_ALIAS = 'Umb.Workspace.Document';
 
@@ -131,9 +132,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			},
 		],
 	},
-	/*
 	{
 		type: 'workspaceAction',
+		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPreview',
 		name: 'Save And Preview Document Workspace Action',
 		weight: 90,
@@ -148,7 +149,6 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			},
 		],
 	},
-	*/
 ];
 
 const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
