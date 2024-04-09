@@ -4,19 +4,12 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 } from '../user-permissions/index.js';
-import { UmbDocumentSaveAndScheduleWorkspaceAction } from './actions/save-and-schedule.action.js';
-import { UmbDocumentUnpublishWorkspaceAction } from './actions/unpublish.action.js';
-import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
-import { UmbDocumentPublishWithDescendantsWorkspaceAction } from './actions/publish-with-descendants.action.js';
-import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceActionMenuItem,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
-import { UmbDocumentSaveWorkspaceAction } from './actions/save.action.js';
 
 export const UMB_DOCUMENT_WORKSPACE_ALIAS = 'Umb.Workspace.Document';
 
@@ -97,7 +90,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		name: 'Save And Publish Document Workspace Action',
 		weight: 70,
-		api: UmbDocumentSaveAndPublishWorkspaceAction,
+		api: () => import('./actions/save-and-publish.action.js'),
 		meta: {
 			label: 'Save And Publish',
 			look: 'primary',
@@ -135,7 +128,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPreview',
 		name: 'Save And Preview Document Workspace Action',
 		weight: 90,
-		api: UmbDocumentSaveAndPreviewWorkspaceAction,
+		api: () => import('./actions/save-and-preview.action.js'),
 		meta: {
 			label: 'Save And Preview',
 		},
@@ -155,7 +148,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		alias: 'Umb.Document.WorkspaceActionMenuItem.Unpublish',
 		name: 'Unpublish',
 		weight: 0,
-		api: UmbDocumentUnpublishWorkspaceAction,
+		api: () => import('./actions/unpublish.action.js'),
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
 			label: 'Unpublish...',
@@ -174,7 +167,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		alias: 'Umb.Document.WorkspaceActionMenuItem.PublishWithDescendants',
 		name: 'Publish with descendants',
 		weight: 10,
-		api: UmbDocumentPublishWithDescendantsWorkspaceAction,
+		api: () => import('./actions/publish-with-descendants.action.js'),
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
 			label: 'Publish with descendants...',
@@ -193,7 +186,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		alias: 'Umb.Document.WorkspaceActionMenuItem.SchedulePublishing',
 		name: 'Schedule publishing',
 		weight: 20,
-		api: UmbDocumentSaveAndScheduleWorkspaceAction,
+		api: () => import('./actions/save-and-schedule.action.js'),
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
 			label: 'Schedule...',

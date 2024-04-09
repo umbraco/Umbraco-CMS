@@ -32,3 +32,5 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 		return workspaceContext.saveAndPublish();
 	}
 }
+
+export { UmbDocumentSaveAndPublishWorkspaceAction as api };

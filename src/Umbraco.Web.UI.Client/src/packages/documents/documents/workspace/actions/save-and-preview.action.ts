@@ -27,3 +27,5 @@ export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceAction
 		alert('Save and preview');
 	}
 }
+
+export { UmbDocumentSaveAndPreviewWorkspaceAction as api };
