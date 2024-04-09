@@ -166,6 +166,9 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 
 		const localizedText = text.replace(regex, (match: string) => {
 			const key = match.slice(1);
+			// TODO: find solution to pass dynamic string to term
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			const localized = this.term(key);
 			// we didn't find a localized string, so we return the original string with the #
 			return localized === key ? match : localized;
