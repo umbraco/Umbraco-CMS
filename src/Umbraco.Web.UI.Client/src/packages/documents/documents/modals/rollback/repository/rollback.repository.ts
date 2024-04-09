@@ -13,23 +13,19 @@ export class UmbRollbackRepository extends UmbControllerBase implements UmbApi {
 	}
 
 	async requestVersionsByDocumentId(id: string, culture?: string) {
-		const { data, error } = await this.#dataSource.getVersionsByDocumentId(id, culture);
-		return { data, error };
+		return await this.#dataSource.getVersionsByDocumentId(id, culture);
 	}
 
 	async requestVersionById(id: string) {
-		const { data, error } = await this.#dataSource.getVersionById(id);
-		return { data, error };
+		return await this.#dataSource.getVersionById(id);
 	}
 
 	async setPreventCleanup(versionId: string, preventCleanup: boolean) {
-		const { error } = await this.#dataSource.setPreventCleanup(versionId, preventCleanup);
-		return { error };
+		return await this.#dataSource.setPreventCleanup(versionId, preventCleanup);
 	}
 
 	async rollback(versionId: string, culture?: string) {
-		const { error } = await this.#dataSource.rollback(versionId, culture);
-		return { error };
+		return await this.#dataSource.rollback(versionId, culture);
 	}
 }
 

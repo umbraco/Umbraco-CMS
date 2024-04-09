@@ -1,3 +1,4 @@
+import { UMB_ROLLBACK_MODAL } from '../../../modals/rollback/index.js';
 import { HistoryTagStyleAndText, TimeOptions } from './utils.js';
 import { UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
 import {
@@ -15,15 +16,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UMB_MODAL_MANAGER_CONTEXT, type UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_ROLLBACK_MODAL_ALIAS } from '../../../modals/manifests.js';
-import { UMB_ROLLBACK_MODAL } from '../../../modals/rollback/index.js';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-document-workspace-view-info-history')
 export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	#logRepository: UmbAuditLogRepository;
 	#itemsPerPage = 10;
-	#modalContext?: UmbModalManagerContext;
 
 	@property()
 	documentUnique = '';
@@ -40,9 +38,6 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.#logRepository = new UmbAuditLogRepository(this);
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalContext = instance;
-		});
 	}
 
 	protected firstUpdated(): void {
@@ -95,8 +90,9 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		this.#getLogs();
 	}
 
-	#onRollbackModalOpen = () => {
-		const modalContext = this.#modalContext?.open(this, UMB_ROLLBACK_MODAL, {});
+	#onRollbackModalOpen = async () => {
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManagerContext.open(this, UMB_ROLLBACK_MODAL, {});
 
 		if (!modalContext) return;
 
