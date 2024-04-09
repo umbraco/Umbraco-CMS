@@ -17,6 +17,7 @@ import {
 } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
+import { UmbDocumentValidationRepository } from '../repository/validation/document-validation.repository.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -47,6 +48,7 @@ import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import { UmbServerModelValidationContext } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -73,6 +75,9 @@ export class UmbDocumentWorkspaceContext
 	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public readonly languages = this.#languages.asObservable();
+
+	#serverValidation = new UmbServerModelValidationContext(this);
+	#validationRepository?: UmbDocumentValidationRepository;
 
 	public isLoaded() {
 		return this.#getDataPromise;
@@ -473,7 +478,7 @@ export class UmbDocumentWorkspaceContext
 					if (variantIdsToParseForValues.some((x) => x.compare(value))) {
 						return value;
 					} else {
-						// If not we will find the value in the persisted data and use that instead.
+						// If not, then we will find the value in the persisted data and use that instead.
 						return persistedData?.values.find(
 							(x) => x.alias === value.alias && x.culture === value.culture && x.segment === value.segment,
 						);
@@ -494,9 +499,7 @@ export class UmbDocumentWorkspaceContext
 		};
 	}
 
-	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>): Promise<void> {
-		const saveData = this.#buildSaveData(selectedVariants);
-
+	async #performSaveOrCreate(saveData: UmbDocumentDetailModel): Promise<void> {
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
@@ -528,13 +531,13 @@ export class UmbDocumentWorkspaceContext
 			this.#persistedData.setValue(data);
 			this.#currentData.setValue(data);
 
-			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
 				unique: this.getUnique()!,
 				entityType: this.getEntityType(),
 			});
 
-			actionEventContext.dispatchEvent(event);
+			eventContext.dispatchEvent(event);
 		}
 	}
 
@@ -570,24 +573,36 @@ export class UmbDocumentWorkspaceContext
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
 
+		const saveData = this.#buildSaveData(variantIds);
+
+		this.#validationRepository ??= new UmbDocumentValidationRepository(this);
+
+		if (this.getIsNew()) {
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
+			this.#serverValidation.askServerForValidation(this.#validationRepository.validateCreate(saveData, parent.unique));
+		} else {
+			this.#serverValidation.askServerForValidation(this.#validationRepository.validateSave(saveData));
+		}
+
 		// TODO: Only validate the specified selection.. [NL]
 		return this.validateAndSubmit(
 			async () => {
-				return this.#performSaveAndPublish(variantIds);
+				return this.#performSaveAndPublish(variantIds, saveData);
 			},
 			async () => {
 				// If data of the selection is not valid Then just save:
-				await this.#performSaveOrCreate(variantIds);
+				await this.#performSaveOrCreate(saveData);
 				// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
 				return await Promise.reject();
 			},
 		);
 	}
-	async #performSaveAndPublish(variantIds: Array<UmbVariantId>): Promise<void> {
+	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
-		await this.#performSaveOrCreate(variantIds);
+		await this.#performSaveOrCreate(saveData);
 
 		await this.publishingRepository.publish(
 			unique,
@@ -624,7 +639,8 @@ export class UmbDocumentWorkspaceContext
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
 
-		return await this.#performSaveOrCreate(variantIds);
+		const saveData = this.#buildSaveData(variantIds);
+		return await this.#performSaveOrCreate(saveData);
 	}
 
 	public requestSubmit() {

@@ -1,4 +1,3 @@
-import type { UmbValidationMessageTranslator } from '../interfaces/validation-message-translator.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -12,24 +11,10 @@ export interface UmbValidationMessage {
 }
 
 export class UmbValidationMessagesManager {
-	#translators: Array<UmbValidationMessageTranslator> = [];
 	#messages = new UmbArrayState<UmbValidationMessage>([], (x) => x.key);
 
 	constructor() {
 		this.#messages.asObservable().subscribe((x) => console.log('messages:', x));
-	}
-
-	addTranslator(translator: UmbValidationMessageTranslator): void {
-		if (this.#translators.indexOf(translator) === -1) {
-			this.#translators.push(translator);
-		}
-	}
-
-	removeTranslator(translator: UmbValidationMessageTranslator): void {
-		const index = this.#translators.indexOf(translator);
-		if (index !== -1) {
-			this.#translators.splice(index, 1);
-		}
 	}
 
 	/*
