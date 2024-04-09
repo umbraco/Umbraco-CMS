@@ -17,6 +17,8 @@ public class AncestorsScriptTreeController : ScriptTreeControllerBase
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<FileSystemTreeItemPresentationModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> Ancestors(string descendantPath)
+    public async Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> Ancestors(
+        CancellationToken cancellationToken,
+        string descendantPath)
         => await GetAncestors(descendantPath);
 }

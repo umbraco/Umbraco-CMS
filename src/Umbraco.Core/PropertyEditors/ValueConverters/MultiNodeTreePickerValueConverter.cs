@@ -1,5 +1,4 @@
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -30,20 +29,6 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IApiContentBuilder _apiContentBuilder;
     private readonly IApiMediaBuilder _apiMediaBuilder;
-
-    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
-    public MultiNodeTreePickerValueConverter(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IMemberService memberService)
-        : this(
-            publishedSnapshotAccessor,
-            umbracoContextAccessor,
-            memberService,
-            StaticServiceProvider.Instance.GetRequiredService<IApiContentBuilder>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiMediaBuilder>())
-    {
-    }
 
     public MultiNodeTreePickerValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,

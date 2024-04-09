@@ -31,7 +31,12 @@ public class AllDocumentVersionController : DocumentVersionControllerBase
     [ProducesResponseType(typeof(PagedViewModel<DocumentVersionItemResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> All([Required] Guid documentId, string? culture, int skip = 0, int take = 100)
+    public async Task<IActionResult> All(
+        CancellationToken cancellationToken,
+        [Required] Guid documentId,
+        string? culture,
+        int skip = 0,
+        int take = 100)
     {
         Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus> attempt =
             await _contentVersionService.GetPagedContentVersionsAsync(documentId, culture, skip, take);

@@ -26,7 +26,7 @@ public class DeleteTemplateController : TemplateControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         Attempt<ITemplate?, TemplateOperationStatus> result = await _templateService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success

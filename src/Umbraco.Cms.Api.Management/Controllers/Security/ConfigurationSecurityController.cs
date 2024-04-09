@@ -18,7 +18,7 @@ public class ConfigurationSecurityController : SecurityControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(SecurityConfigurationResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Configuration()
+    public async Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         var viewModel = new SecurityConfigurationResponseModel
         {

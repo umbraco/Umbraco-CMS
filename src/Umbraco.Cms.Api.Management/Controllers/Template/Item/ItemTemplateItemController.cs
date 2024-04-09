@@ -23,7 +23,9 @@ public class ItemTemplateItemController : TemplateItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<TemplateItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<IActionResult> Item(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         // This is far from ideal, that we pick out the entire model, however, we must do this to get the alias.
         // This is (for one) needed for when specifying master template, since alias + .cshtml

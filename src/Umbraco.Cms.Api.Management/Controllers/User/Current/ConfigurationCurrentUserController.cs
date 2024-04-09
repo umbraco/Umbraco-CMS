@@ -19,7 +19,7 @@ public class ConfigurationCurrentUserController : CurrentUserControllerBase
     [MapToApiVersion("1.0")]
     [HttpGet("configuration")]
     [ProducesResponseType(typeof(CurrenUserConfigurationResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Configuration()
+    public async Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         CurrenUserConfigurationResponseModel model = await _userPresentationFactory.CreateCurrentUserConfigurationModelAsync();
         return Ok(model);
