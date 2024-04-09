@@ -184,7 +184,7 @@ public class CoreRuntime : IRuntime
         switch (premigrationUpgradeNotification.UpgradeResult)
         {
             case RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.HasErrors:
-                if (State.BootFailedException == null)
+                if (State.BootFailedException is null)
                 {
                     throw new InvalidOperationException($"Premigration upgrade result was {RuntimePremigrationsUpgradeNotification.PremigrationUpgradeResult.HasErrors} but no {nameof(BootFailedException)} was registered");
                 }

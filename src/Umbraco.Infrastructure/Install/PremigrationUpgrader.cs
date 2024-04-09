@@ -55,12 +55,12 @@ public class PremigrationUpgrader : INotificationAsyncHandler<RuntimePremigratio
             return Task.CompletedTask;
         }
 
-        using (!_profilingLogger.IsEnabled(LogLevel.Verbose) ? null : _profilingLogger.TraceDuration<UnattendedUpgrader>(
+        using (_profilingLogger.IsEnabled(LogLevel.Verbose) is false ? null : _profilingLogger.TraceDuration<UnattendedUpgrader>(
                    "Starting premigration upgrade.",
                    "Unattended premigration completed."))
         {
             DatabaseBuilder.Result? result = _databaseBuilder.UpgradeSchemaAndData(plan);
-            if (result?.Success == false)
+            if (result?.Success is false)
             {
                 var innerException = new IOException(
                     "An error occurred while running the premigration upgrade.\n" + result.Message);
