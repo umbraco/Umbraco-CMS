@@ -12,9 +12,8 @@ setup('authenticate', async ({page}) => {
   //await umbracoUi.login.enterPassword(process.env.UMBRACO_USER_PASSWORD);
   await expect(umbracoUi.page.locator('[name="username"]')).toBeVisible({timeout: 20000});
   await umbracoUi.page.locator('[name="username"]').fill(process.env.UMBRACO_USER_LOGIN);
-  await umbracoUi.page.locator('[name="password"]').fill(process.env.UMBRACO_USER_LOGIN);
+  await umbracoUi.page.locator('[name="password"]').fill(process.env.UMBRACO_USER_PASSWORD);
   await umbracoUi.login.clickLoginButton();
-  await umbracoUi.waitForTimeout(20000);
   await umbracoUi.login.goToSection(ConstantHelper.sections.settings);
   await page.context().storageState({path: STORAGE_STATE});
 });
