@@ -34,7 +34,7 @@ public class CreateUserDataController : UserDataControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateUserDataRequestModel model)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateUserDataRequestModel model)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
 

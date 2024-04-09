@@ -19,7 +19,6 @@ public class UpdateUserDataController : UserDataControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
 
     public UpdateUserDataController(
-        CancellationToken cancellationToken,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserDataService userDataService,
         IUmbracoMapper umbracoMapper)
@@ -34,7 +33,7 @@ public class UpdateUserDataController : UserDataControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(UserDataOperationStatus), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(UpdateUserDataRequestModel model)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, UpdateUserDataRequestModel model)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
 

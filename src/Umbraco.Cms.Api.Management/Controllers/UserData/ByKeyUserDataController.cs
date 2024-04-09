@@ -33,7 +33,7 @@ public class ByKeyUserDataController : UserDataControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UserDataViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByKey(Guid id)
+    public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
         IUserData? data = await _userDataService.GetAsync(id);
