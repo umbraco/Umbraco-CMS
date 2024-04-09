@@ -3,10 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentForMemberResponseModel } from './ContentForMemberResponseModel';
 import type { MemberTypeReferenceResponseModel } from './MemberTypeReferenceResponseModel';
+import type { MemberValueModel } from './MemberValueModel';
+import type { MemberVariantResponseModel } from './MemberVariantResponseModel';
 
-export type MemberResponseModel = (ContentForMemberResponseModel & {
+export type MemberResponseModel = {
+    values: Array<MemberValueModel>;
+    variants: Array<MemberVariantResponseModel>;
+    id: string;
     email: string;
     username: string;
     memberType: MemberTypeReferenceResponseModel;
@@ -18,5 +22,5 @@ export type MemberResponseModel = (ContentForMemberResponseModel & {
     lastLockoutDate?: string | null;
     lastPasswordChangeDate?: string | null;
     groups: Array<string>;
-});
+};
 

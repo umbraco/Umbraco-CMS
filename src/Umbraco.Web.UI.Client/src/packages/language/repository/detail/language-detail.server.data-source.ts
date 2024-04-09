@@ -2,7 +2,10 @@ import type { UmbLanguageDetailModel } from '../../types.js';
 import { UMB_LANGUAGE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { CreateLanguageRequestModel, LanguageModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	CreateLanguageRequestModel,
+	UpdateLanguageRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { LanguageResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -118,7 +121,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: LanguageModelBaseModel = {
+		const requestBody: UpdateLanguageRequestModel = {
 			fallbackIsoCode: model.fallbackIsoCode?.toLowerCase(),
 			isDefault: model.isDefault,
 			isMandatory: model.isMandatory,

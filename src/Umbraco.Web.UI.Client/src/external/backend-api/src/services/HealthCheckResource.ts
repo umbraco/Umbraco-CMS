@@ -15,7 +15,7 @@ import { request as __request } from '../core/request';
 export class HealthCheckResource {
 
     /**
-     * @returns PagedHealthCheckGroupResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getHealthCheckGroup({

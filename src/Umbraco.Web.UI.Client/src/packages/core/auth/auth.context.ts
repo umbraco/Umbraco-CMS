@@ -1,3 +1,4 @@
+import { umbExtensionsRegistry } from '../extension-registry/index.js';
 import { UmbAuthFlow } from './auth-flow.js';
 import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
@@ -5,10 +6,14 @@ import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { ReplaySubject, filter, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
 	readonly isAuthorized = this.#isAuthorized.asObservable();
+
+	#isInitialized = new ReplaySubject<boolean>(1);
+	readonly isInitialized = this.#isInitialized.asObservable().pipe(filter((isInitialized) => isInitialized));
 
 	#isBypassed = false;
 	#serverUrl;
@@ -21,14 +26,16 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		this.#serverUrl = serverUrl;
 		this.#backofficePath = backofficePath;
 
-		this.#authFlow = new UmbAuthFlow(serverUrl, this.#getRedirectUrl());
+		this.#authFlow = new UmbAuthFlow(serverUrl, this.getRedirectUrl(), this.getPostLogoutRedirectUrl());
 	}
 
 	/**
 	 * Initiates the login flow.
+	 * @param identityProvider The provider to use for login. Default is 'Umbraco'.
+	 * @param usernameHint The username hint to use for login.
 	 */
-	makeAuthorizationRequest() {
-		return this.#authFlow.makeAuthorizationRequest();
+	makeAuthorizationRequest(identityProvider = 'Umbraco', usernameHint?: string) {
+		return this.#authFlow.makeAuthorizationRequest(identityProvider, usernameHint);
 	}
 
 	/**
@@ -89,6 +96,16 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	}
 
 	/**
+	 * Handles the case where the user has timed out, i.e. the token has expired.
+	 * This will clear the token storage and set the user as unauthorized.
+	 * @memberof UmbAuthContext
+	 */
+	timeOut() {
+		this.clearTokenStorage();
+		this.#isAuthorized.setValue(false);
+	}
+
+	/**
 	 * Signs the user out by removing any tokens from the browser.
 	 * @memberof UmbAuthContext
 	 */
@@ -141,7 +158,19 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		};
 	}
 
-	#getRedirectUrl() {
+	setInitialized() {
+		this.#isInitialized.next(true);
+	}
+
+	getAuthProviders() {
+		return this.isInitialized.pipe(switchMap(() => umbExtensionsRegistry.byType('authProvider')));
+	}
+
+	getRedirectUrl() {
 		return `${window.location.origin}${this.#backofficePath}`;
+	}
+
+	getPostLogoutRedirectUrl() {
+		return `${window.location.origin}${this.#backofficePath.endsWith('/') ? this.#backofficePath : this.#backofficePath + '/'}logout`;
 	}
 }

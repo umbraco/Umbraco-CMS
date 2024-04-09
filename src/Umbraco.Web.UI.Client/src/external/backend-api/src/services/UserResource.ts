@@ -31,6 +31,7 @@ import type { UserResponseModel } from '../models/UserResponseModel';
 import type { UserStateModel } from '../models/UserStateModel';
 import type { UserTwoFactorProviderModel } from '../models/UserTwoFactorProviderModel';
 import type { VerifyInviteUserRequestModel } from '../models/VerifyInviteUserRequestModel';
+import type { VerifyInviteUserResponseModel } from '../models/VerifyInviteUserResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -39,7 +40,7 @@ import { request as __request } from '../core/request';
 export class UserResource {
 
     /**
-     * @returns PagedUserResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getFilterUser({
@@ -107,7 +108,7 @@ export class UserResource {
     public static postUser({
         requestBody,
     }: {
-        requestBody?: (CreateUserRequestModel | InviteUserRequestModel),
+        requestBody?: CreateUserRequestModel,
     }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -147,7 +148,7 @@ export class UserResource {
     }
 
     /**
-     * @returns PagedUserResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUser({
@@ -308,7 +309,7 @@ export class UserResource {
         requestBody,
     }: {
         id: string,
-        requestBody?: (ChangePasswordUserRequestModel | ChangePasswordCurrentUserRequestModel),
+        requestBody?: ChangePasswordUserRequestModel,
     }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -755,7 +756,6 @@ export class UserResource {
             responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
-                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -785,20 +785,19 @@ export class UserResource {
     }
 
     /**
-     * @returns string Success
+     * @returns any Success
      * @throws ApiError
      */
     public static postUserInviteVerify({
         requestBody,
     }: {
-        requestBody?: (VerifyInviteUserRequestModel | CreateInitialPasswordUserRequestModel),
-    }): CancelablePromise<string> {
+        requestBody?: VerifyInviteUserRequestModel,
+    }): CancelablePromise<VerifyInviteUserResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user/invite/verify',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,

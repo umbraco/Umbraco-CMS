@@ -82,7 +82,7 @@ export class UserGroupResource {
     }
 
     /**
-     * @returns PagedUserGroupResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUserGroup({

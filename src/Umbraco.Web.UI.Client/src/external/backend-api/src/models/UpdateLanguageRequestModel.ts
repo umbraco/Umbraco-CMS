@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { LanguageModelBaseModel } from './LanguageModelBaseModel';
-
-export type UpdateLanguageRequestModel = LanguageModelBaseModel;
+export type UpdateLanguageRequestModel = {
+    name: string;
+    isDefault: boolean;
+    isMandatory: boolean;
+    fallbackIsoCode?: string | null;
+};
 

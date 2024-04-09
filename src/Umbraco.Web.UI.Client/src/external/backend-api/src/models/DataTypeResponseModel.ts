@@ -3,11 +3,15 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DataTypeModelBaseModel } from './DataTypeModelBaseModel';
+import type { DataTypePropertyPresentationModel } from './DataTypePropertyPresentationModel';
 
-export type DataTypeResponseModel = (DataTypeModelBaseModel & {
+export type DataTypeResponseModel = {
+    name: string;
+    editorAlias: string;
+    editorUiAlias?: string | null;
+    values: Array<DataTypePropertyPresentationModel>;
     id: string;
     isDeletable: boolean;
     canIgnoreStartNodes: boolean;
-});
+};
 

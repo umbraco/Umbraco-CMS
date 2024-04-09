@@ -15,7 +15,7 @@ import { request as __request } from '../core/request';
 export class WebhookResource {
 
     /**
-     * @returns PagedWebhookResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getWebhook({

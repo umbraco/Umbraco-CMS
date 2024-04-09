@@ -4,10 +4,14 @@
 /* eslint-disable */
 
 import type { DocumentVariantStateModel } from './DocumentVariantStateModel';
-import type { VariantResponseModelBaseModel } from './VariantResponseModelBaseModel';
 
-export type DocumentVariantResponseModel = (VariantResponseModelBaseModel & {
+export type DocumentVariantResponseModel = {
+    culture?: string | null;
+    segment?: string | null;
+    name: string;
+    createDate: string;
+    updateDate: string;
     state: DocumentVariantStateModel;
     publishDate?: string | null;
-});
+};
 

@@ -3,9 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeCompositionRequestModelBaseModel } from './ContentTypeCompositionRequestModelBaseModel';
-
-export type DocumentTypeCompositionRequestModel = (ContentTypeCompositionRequestModelBaseModel & {
+export type DocumentTypeCompositionRequestModel = {
+    id?: string | null;
+    currentPropertyAliases: Array<string>;
+    currentCompositeIds: Array<string>;
     isElement: boolean;
-});
+};
 

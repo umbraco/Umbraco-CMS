@@ -11,7 +11,7 @@ import { request as __request } from '../core/request';
 export class HelpResource {
 
     /**
-     * @returns PagedHelpPageResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getHelp({

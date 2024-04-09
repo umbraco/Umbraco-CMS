@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DictionaryItemModelBaseModel } from './DictionaryItemModelBaseModel';
+import type { DictionaryItemTranslationModel } from './DictionaryItemTranslationModel';
 
-export type UpdateDictionaryItemRequestModel = DictionaryItemModelBaseModel;
+export type UpdateDictionaryItemRequestModel = {
+    name: string;
+    translations: Array<DictionaryItemTranslationModel>;
+};
 

@@ -5,10 +5,13 @@
 
 import type { DocumentTypeReferenceResponseModel } from './DocumentTypeReferenceResponseModel';
 import type { DocumentVariantItemResponseModel } from './DocumentVariantItemResponseModel';
-import type { RecycleBinItemResponseModelBaseModel } from './RecycleBinItemResponseModelBaseModel';
+import type { ItemReferenceByIdResponseModel } from './ItemReferenceByIdResponseModel';
 
-export type DocumentRecycleBinItemResponseModel = (RecycleBinItemResponseModelBaseModel & {
+export type DocumentRecycleBinItemResponseModel = {
+    id: string;
+    hasChildren: boolean;
+    parent?: ItemReferenceByIdResponseModel | null;
     documentType: DocumentTypeReferenceResponseModel;
     variants: Array<DocumentVariantItemResponseModel>;
-});
+};
 

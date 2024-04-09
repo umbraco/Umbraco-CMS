@@ -55,7 +55,7 @@ export class StaticFileResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeStaticFileChildren({
@@ -82,7 +82,7 @@ export class StaticFileResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeStaticFileRoot({

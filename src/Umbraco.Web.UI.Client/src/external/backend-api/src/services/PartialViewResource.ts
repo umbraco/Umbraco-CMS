@@ -236,7 +236,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns PagedPartialViewSnippetItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPartialViewSnippet({
@@ -303,7 +303,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreePartialViewChildren({
@@ -330,7 +330,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreePartialViewRoot({

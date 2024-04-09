@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeCleanupBaseModel } from './ContentTypeCleanupBaseModel';
-
-export type DocumentTypeCleanupModel = ContentTypeCleanupBaseModel;
+export type DocumentTypeCleanupModel = {
+    preventCleanup: boolean;
+    keepAllVersionsNewerThanDays?: number | null;
+    keepLatestVersionPerDayForDays?: number | null;
+};
 
