@@ -123,7 +123,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns PagedAllowedDocumentTypeModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentTypeByIdAllowedChildren({
@@ -232,7 +232,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns PagedAllowedDocumentTypeModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentTypeAllowedAtRoot({
@@ -408,7 +408,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns PagedModelDocumentTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemDocumentTypeSearch({
@@ -456,7 +456,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns PagedDocumentTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDocumentTypeChildren({
@@ -486,7 +486,7 @@ export class DocumentTypeResource {
     }
 
     /**
-     * @returns PagedDocumentTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDocumentTypeRoot({

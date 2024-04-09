@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { TelemetryRepresentationBaseModel } from './TelemetryRepresentationBaseModel';
+import type { TelemetryLevelModel } from './TelemetryLevelModel';
 
-export type TelemetryRequestModel = TelemetryRepresentationBaseModel;
+export type TelemetryRequestModel = {
+    telemetryLevel: TelemetryLevelModel;
+};
 

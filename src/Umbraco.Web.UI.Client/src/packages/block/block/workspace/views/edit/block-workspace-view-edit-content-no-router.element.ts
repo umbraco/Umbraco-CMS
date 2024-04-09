@@ -4,7 +4,7 @@ import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 /**
@@ -20,7 +20,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	private _hasRootGroups = false;
 
 	@state()
-	_tabs?: Array<PropertyTypeContainerModelBaseModel>;
+	_tabs?: Array<UmbPropertyTypeContainerModel>;
 
 	@state()
 	private _activeTabId?: string | null | undefined;

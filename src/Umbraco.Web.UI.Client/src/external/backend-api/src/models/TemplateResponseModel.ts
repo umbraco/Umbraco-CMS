@@ -4,10 +4,12 @@
 /* eslint-disable */
 
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
-import type { TemplateModelBaseModel } from './TemplateModelBaseModel';
 
-export type TemplateResponseModel = (TemplateModelBaseModel & {
+export type TemplateResponseModel = {
+    name: string;
+    alias: string;
+    content?: string | null;
     id: string;
     masterTemplate?: ReferenceByIdModel | null;
-});
+};
 

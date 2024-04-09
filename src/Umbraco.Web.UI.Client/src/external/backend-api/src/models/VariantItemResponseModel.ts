@@ -3,7 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { VariantItemResponseModelBaseModel } from './VariantItemResponseModelBaseModel';
-
-export type VariantItemResponseModel = VariantItemResponseModelBaseModel;
+export type VariantItemResponseModel = {
+    name: string;
+    culture?: string | null;
+};
 

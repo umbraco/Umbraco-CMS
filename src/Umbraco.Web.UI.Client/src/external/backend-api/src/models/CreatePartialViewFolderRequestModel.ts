@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FileSystemCreateRequestModelBaseModel } from './FileSystemCreateRequestModelBaseModel';
+import type { FileSystemFolderModel } from './FileSystemFolderModel';
 
-export type CreatePartialViewFolderRequestModel = FileSystemCreateRequestModelBaseModel;
+export type CreatePartialViewFolderRequestModel = {
+    name: string;
+    parent?: FileSystemFolderModel | null;
+};
 
