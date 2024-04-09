@@ -1,3 +1,4 @@
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
@@ -18,19 +19,18 @@ import {
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
-import { UmbDocumentWorkspaceEditorElement } from './document-workspace-editor.element.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import type {
-	UmbWorkspaceCollectionContextInterface,
-	UmbVariantableWorkspaceContextInterface,
-	UmbPublishableWorkspaceContextInterface,
+	UmbCollectionWorkspaceContext,
+	UmbVariantDatasetWorkspaceContext,
+	UmbPublishableWorkspaceContext,
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
@@ -44,24 +44,25 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { type Observable, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements
 		UmbRoutableWorkspaceContext,
-		UmbVariantableWorkspaceContextInterface<UmbDocumentVariantModel>,
-		UmbPublishableWorkspaceContextInterface,
-		UmbWorkspaceCollectionContextInterface<UmbDocumentTypeDetailModel>
+		UmbVariantDatasetWorkspaceContext<UmbDocumentVariantModel>,
+		UmbPublishableWorkspaceContext,
+		UmbCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
 {
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 
-	#parent?: { entityType: string; unique: string | null };
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 
 	/**
 	 * The document is the current state/draft version of the document.
@@ -132,6 +133,9 @@ export class UmbDocumentWorkspaceContext
 		},
 	);
 
+	// TODO: this should be set up for all entity workspace contexts in a base class
+	#entityContext = new UmbEntityContext(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
 
@@ -143,7 +147,7 @@ export class UmbDocumentWorkspaceContext
 		this.routes.setRoutes([
 			{
 				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique',
-				component: UmbDocumentWorkspaceEditorElement,
+				component: () => import('./document-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
@@ -159,9 +163,11 @@ export class UmbDocumentWorkspaceContext
 			},
 			{
 				path: 'edit/:unique',
-				component: UmbDocumentWorkspaceEditorElement,
+				component: () => import('./document-workspace-editor.element.js'),
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
+					this.#entityContext.setEntityType(UMB_DOCUMENT_ENTITY_TYPE);
+					this.#entityContext.setUnique(unique);
 					this.load(unique);
 				},
 			},
@@ -188,8 +194,8 @@ export class UmbDocumentWorkspaceContext
 
 		if (data) {
 			this.setIsNew(false);
-			this.#persistedData.update(data);
-			this.#currentData.update(data);
+			this.#persistedData.setValue(data);
+			this.#currentData.setValue(data);
 		}
 
 		this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDocumentStoreObserver');
@@ -204,7 +210,7 @@ export class UmbDocumentWorkspaceContext
 
 	async create(parent: { entityType: string; unique: string | null }, documentTypeUnique: string) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		this.#getDataPromise = this.repository.createScaffold({
 			documentType: {
 				unique: documentTypeUnique,
@@ -282,6 +288,10 @@ export class UmbDocumentWorkspaceContext
 		*/
 		// TODO: We should move this type of logic to the act of saving [NL]
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
+	}
+
+	name(variantId?: UmbVariantId) {
+		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '');
 	}
 
 	setTemplate(templateUnique: string) {
@@ -481,25 +491,28 @@ export class UmbDocumentWorkspaceContext
 		};
 	}
 
-	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>) {
+	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>): Promise<boolean> {
 		const saveData = this.#buildSaveData(selectedVariants);
 
 		if (this.getIsNew()) {
-			if (!this.#parent) throw new Error('Parent is not set');
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
 
-			const { data: create, error } = await this.repository.create(saveData, this.#parent.unique);
+			const { data: create, error } = await this.repository.create(saveData, parent.unique);
 			if (!create || error) {
 				console.error('Error creating document', error);
 				throw new Error('Error creating document');
 			}
 
 			this.setIsNew(false);
+			this.#persistedData.setValue(create);
+			this.#currentData.setValue(create);
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: this.#parent.entityType,
-				unique: this.#parent.unique,
+			const event = new UmbRequestReloadTreeItemChildrenEvent({
+				entityType: parent.entityType,
+				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
 		} else {
@@ -508,6 +521,9 @@ export class UmbDocumentWorkspaceContext
 				console.error('Error saving document', error);
 				throw new Error('Error saving document');
 			}
+
+			this.#persistedData.setValue(save);
+			this.#currentData.setValue(save);
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
@@ -518,7 +534,7 @@ export class UmbDocumentWorkspaceContext
 			actionEventContext.dispatchEvent(event);
 		}
 
-		return selectedVariants;
+		return true;
 	}
 
 	async #handleSaveAndPublish() {
@@ -553,23 +569,32 @@ export class UmbDocumentWorkspaceContext
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
 
-		const variants = await this.#performSaveOrCreate(variantIds);
+		// TODO: Only validate the specified selection.. [NL]
+		return this.validateAndSubmit(async (valid) => {
+			if (valid) {
+				return this.#performSaveAndPublish(variantIds);
+			} else {
+				// If data of the selection is not valid Then just save:
+				await this.#performSaveOrCreate(variantIds);
+				// Return false, even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
+				return false;
+			}
+		});
+	}
+	async #performSaveAndPublish(variantIds: Array<UmbVariantId>): Promise<boolean> {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		await this.#performSaveOrCreate(variantIds);
 
 		await this.publishingRepository.publish(
 			unique,
-			variants.map((variantId) => ({ variantId })),
+			variantIds.map((variantId) => ({ variantId })),
 		);
-
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-
-		this.workspaceComplete(data);
+		return true;
 	}
 
-	public async save() {
+	async #handleSave() {
 		const { options, selected } = await this.#determineVariantOptions();
 
 		let variantIds: Array<UmbVariantId> = [];
@@ -599,14 +624,21 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		await this.#performSaveOrCreate(variantIds);
+		return true;
+	}
 
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
+	public async requestSubmit() {
+		const success = await this.#handleSave();
+		if (!success) {
+			await Promise.reject();
+		}
+	}
 
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-
-		this.workspaceComplete(data);
+	public submit() {
+		return this.#handleSave();
+	}
+	public async invalidSubmit() {
+		return false;
 	}
 
 	public async publish() {
@@ -645,14 +677,6 @@ export class UmbDocumentWorkspaceContext
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 		await this.publishingRepository.publish(unique, variants);
-
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-
-		this.workspaceComplete(data);
 	}
 
 	public async unpublish() {
@@ -693,14 +717,6 @@ export class UmbDocumentWorkspaceContext
 			variantIds,
 			result.includeUnpublishedDescendants ?? false,
 		);
-
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-
-		this.workspaceComplete(data);
 	}
 
 	async delete() {

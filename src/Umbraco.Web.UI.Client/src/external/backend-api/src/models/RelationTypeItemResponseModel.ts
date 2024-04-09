@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
-
-export type RelationTypeItemResponseModel = (NamedItemResponseModelBaseModel & {
+export type RelationTypeItemResponseModel = {
+    id: string;
+    name: string;
     isDeletable: boolean;
-});
+};
 

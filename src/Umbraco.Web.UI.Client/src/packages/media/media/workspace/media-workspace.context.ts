@@ -3,43 +3,42 @@ import { UmbMediaPropertyDataContext } from '../property-dataset-context/media-p
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
 import type { UmbMediaDetailModel, UmbMediaVariantModel, UmbMediaVariantOptionModel } from '../types.js';
+import UmbMediaWorkspaceEditorElement from './media-workspace-editor.element.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import type {
-	UmbWorkspaceCollectionContextInterface,
-	UmbVariantableWorkspaceContextInterface,
+	UmbCollectionWorkspaceContext,
+	UmbVariantDatasetWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
-	jsonStringComparison,
 	mergeObservables,
-	partialUpdateFrozenArray,
 	UmbArrayState,
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
-import UmbMediaWorkspaceEditorElement from './media-workspace-editor.element.js';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbVariantableWorkspaceContextInterface, UmbWorkspaceCollectionContextInterface<UmbMediaTypeDetailModel>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
+	implements UmbVariantDatasetWorkspaceContext, UmbCollectionWorkspaceContext<UmbMediaTypeDetailModel>
 {
 	//
 	public readonly repository = new UmbMediaDetailRepository(this);
 
-	#parent?: { entityType: string; unique: string | null };
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 
 	/**
 	 * The media is the current state/draft version of the media.
@@ -119,7 +118,7 @@ export class UmbMediaWorkspaceContext
 		this.routes.setRoutes([
 			{
 				path: 'create/parent/:entityType/:parentUnique/:mediaTypeUnique',
-				component: UmbMediaWorkspaceEditorElement,
+				component: () => import('./media-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
@@ -135,7 +134,7 @@ export class UmbMediaWorkspaceContext
 			},
 			{
 				path: 'edit/:unique',
-				component: UmbMediaWorkspaceEditorElement,
+				component: () => import('./media-workspace-editor.element.js'),
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
@@ -180,7 +179,7 @@ export class UmbMediaWorkspaceContext
 
 	async create(parent: { entityType: string; unique: string | null }, mediaTypeUnique: string) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		this.#getDataPromise = this.repository.createScaffold({ mediaType: { unique: mediaTypeUnique, collection: null } });
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
@@ -244,6 +243,10 @@ export class UmbMediaWorkspaceContext
 		// this.#currentData.update({ variants });
 
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
+	}
+
+	name(variantId?: UmbVariantId) {
+		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '');
 	}
 
 	async propertyStructureById(propertyId: string) {
@@ -373,17 +376,18 @@ export class UmbMediaWorkspaceContext
 		if (!this.#currentData.value?.unique) throw new Error('Unique is missing');
 
 		if (this.getIsNew()) {
-			if (!this.#parent) throw new Error('Parent is not set');
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
 			const value = this.#currentData.value;
 
-			if ((await this.repository.create(value, this.#parent.unique)).data !== undefined) {
+			if ((await this.repository.create(value, parent.unique)).data !== undefined) {
 				this.setIsNew(false);
 
 				// TODO: this might not be the right place to alert the tree, but it works for now
 				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-					entityType: this.#parent.entityType,
-					unique: this.#parent.unique,
+				const event = new UmbRequestReloadTreeItemChildrenEvent({
+					entityType: parent.entityType,
+					unique: parent.unique,
 				});
 				eventContext.dispatchEvent(event);
 			}
@@ -400,12 +404,12 @@ export class UmbMediaWorkspaceContext
 		}
 	}
 
-	async save() {
+	async submit() {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		await this.#createOrSave();
 		this.setIsNew(false);
-		this.workspaceComplete(data);
+		return true;
 	}
 
 	async delete() {

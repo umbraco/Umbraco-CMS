@@ -1,5 +1,5 @@
 import type { UmbUserEntityType } from './entity.js';
-import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserStateModel, type UserTwoFactorProviderModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbUserStateEnum = UserStateModel;
 export const UmbUserStateEnum = UserStateModel;
@@ -22,4 +22,7 @@ export interface UmbUserDetailModel {
 	lastLoginDate: string | null;
 	lastLockoutDate: string | null;
 	lastPasswordChangeDate: string | null;
+	isAdmin: boolean;
 }
+
+export type UmbUserMfaProviderModel = UserTwoFactorProviderModel;

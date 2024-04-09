@@ -8,6 +8,7 @@ import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-regis
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbLitElement {
 	#alias?: string;
+
 	@property({ type: String, reflect: true })
 	set alias(newVal) {
 		this.#alias = newVal;
@@ -17,7 +18,8 @@ export class UmbCollectionElement extends UmbLitElement {
 		return this.#alias;
 	}
 
-	#config?: UmbCollectionConfiguration = { pageSize: 50 };
+	#config?: UmbCollectionConfiguration;
+
 	@property({ type: Object, attribute: false })
 	set config(newVal: UmbCollectionConfiguration | undefined) {
 		this.#config = newVal;

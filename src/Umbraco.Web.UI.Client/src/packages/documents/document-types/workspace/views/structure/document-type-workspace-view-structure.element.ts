@@ -1,9 +1,9 @@
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbInputDocumentTypeElement } from '../../../components/input-document-type/input-document-type.element.js';
+import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbInputCollectionConfigurationElement } from '@umbraco-cms/backoffice/components';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -26,7 +26,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 		super();
 
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (documentTypeContext) => {
+		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (documentTypeContext) => {
 			this.#workspaceContext = documentTypeContext as UmbDocumentTypeWorkspaceContext;
 			this._observeDocumentType();
 		});

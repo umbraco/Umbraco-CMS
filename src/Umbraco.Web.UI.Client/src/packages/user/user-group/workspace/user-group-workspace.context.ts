@@ -2,12 +2,9 @@ import { UmbUserGroupDetailRepository } from '../repository/detail/index.js';
 import type { UmbUserGroupDetailModel } from '../types.js';
 import { UmbUserGroupWorkspaceEditorElement } from './user-group-workspace-editor.element.js';
 import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
-import type {
-	UmbRoutableWorkspaceContext,
-	UmbSaveableWorkspaceContextInterface,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
@@ -15,8 +12,8 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbUserGroupDetailModel>
-	implements UmbSaveableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<UmbUserGroupDetailModel>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	//
 	public readonly repository: UmbUserGroupDetailRepository = new UmbUserGroupDetailRepository(this);
@@ -24,6 +21,7 @@ export class UmbUserGroupWorkspaceContext
 	#data = new UmbObjectState<UmbUserGroupDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name || '');
 	readonly icon = this.#data.asObservablePart((data) => data?.icon || null);
 	readonly sections = this.#data.asObservablePart((data) => data?.sections || []);
@@ -100,18 +98,24 @@ export class UmbUserGroupWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#data.value) return;
 
-		//TODO: Could we clean this code up?
 		if (this.getIsNew()) {
-			await this.repository.create(this.#data.value);
+			const { data } = await this.repository.create(this.#data.value);
+			if (data) {
+				// If it went well, then its not new anymore?.
+				this.setIsNew(false);
+				return true;
+			}
 		} else if (this.#data.value.unique) {
-			await this.repository.save(this.#data.value);
-		} else return;
+			const { data } = await this.repository.save(this.#data.value);
+			if (data) {
+				return true;
+			}
+		}
 
-		// If it went well, then its not new anymore?.
-		this.setIsNew(false);
+		return false;
 	}
 
 	destroy(): void {

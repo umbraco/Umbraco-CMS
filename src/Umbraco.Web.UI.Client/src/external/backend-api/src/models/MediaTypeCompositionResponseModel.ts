@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeCompositionResponseModelBaseModel } from './ContentTypeCompositionResponseModelBaseModel';
-
-export type MediaTypeCompositionResponseModel = ContentTypeCompositionResponseModelBaseModel;
+export type MediaTypeCompositionResponseModel = {
+    id: string;
+    name: string;
+    icon: string;
+};
 

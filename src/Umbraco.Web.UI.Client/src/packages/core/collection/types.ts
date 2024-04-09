@@ -14,6 +14,7 @@ export interface UmbCollectionConfiguration {
 	unique?: string;
 	dataTypeId?: string;
 	allowedEntityBulkActions?: UmbCollectionBulkActionPermissions;
+	layouts?: Array<UmbCollectionLayoutConfiguration>;
 	orderBy?: string;
 	orderDirection?: string;
 	pageSize?: number;
@@ -29,6 +30,12 @@ export interface UmbCollectionColumnConfiguration {
 	elementName?: string;
 	// TODO: [LK] Remove `nameTemplate`, to be replaced with `elementName`.
 	nameTemplate?: string;
+}
+
+export interface UmbCollectionLayoutConfiguration {
+	icon?: string;
+	name: string;
+	collectionView: string;
 }
 
 export interface UmbCollectionContext {

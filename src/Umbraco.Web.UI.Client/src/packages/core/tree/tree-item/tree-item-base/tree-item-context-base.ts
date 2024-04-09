@@ -1,7 +1,7 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import { UMB_DEFAULT_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/default-tree.context.js';
 import type { UmbTreeItemModelBase } from '../../types.js';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '../../reload-tree-item-children/index.js';
+import { UmbRequestReloadTreeItemChildrenEvent } from '../../reload-tree-item-children/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
@@ -12,9 +12,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
-import { UmbChangeEvent, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
 	x: TreeItemType,
@@ -214,7 +215,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
 			this.#actionEventContext?.removeEventListener(
-				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				UmbRequestReloadTreeItemChildrenEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 
@@ -226,7 +227,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			this.#actionEventContext = instance;
 
 			this.#actionEventContext.addEventListener(
-				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				UmbRequestReloadTreeItemChildrenEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 
@@ -377,7 +378,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	destroy(): void {
 		this.#actionEventContext?.removeEventListener(
-			UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+			UmbRequestReloadTreeItemChildrenEvent.TYPE,
 			this.#onReloadRequest as EventListener,
 		);
 		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);

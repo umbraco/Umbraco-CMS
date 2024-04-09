@@ -1,10 +1,10 @@
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import type { UmbMediaWorkspaceContext } from './media-workspace.context.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_MEDIA_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
+	UmbSubmittableWorkspaceContext,
 	UmbMediaWorkspaceContext
 >(
 	'UmbWorkspaceContext',

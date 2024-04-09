@@ -50,6 +50,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			updateDate: null,
 			userGroupUniques: [],
 			userName: '',
+			isAdmin: false,
 		};
 
 		return { data };
@@ -89,6 +90,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			updateDate: data.updateDate,
 			userGroupUniques: data.userGroupIds,
 			userName: data.userName,
+			isAdmin: data.isAdmin,
 		};
 
 		return { data: dataType };

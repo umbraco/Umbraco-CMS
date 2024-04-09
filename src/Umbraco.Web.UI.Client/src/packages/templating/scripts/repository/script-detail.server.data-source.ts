@@ -22,7 +22,6 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const data: UmbScriptDetailModel = {
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
 			unique: '',
-			path: '',
 			name: '',
 			content: '',
 			...preset,
@@ -78,7 +77,6 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const script: UmbScriptDetailModel = {
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
 			unique: this.#serverFilePathUniqueSerializer.toUnique(data.path),
-			path: data.path,
 			name: data.name,
 			content: data.content,
 		};

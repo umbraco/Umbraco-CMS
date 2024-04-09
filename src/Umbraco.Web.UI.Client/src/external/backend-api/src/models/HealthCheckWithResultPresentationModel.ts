@@ -3,10 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { HealthCheckModelBaseModel } from './HealthCheckModelBaseModel';
 import type { HealthCheckResultResponseModel } from './HealthCheckResultResponseModel';
 
-export type HealthCheckWithResultPresentationModel = (HealthCheckModelBaseModel & {
+export type HealthCheckWithResultPresentationModel = {
+    id: string;
     results?: Array<HealthCheckResultResponseModel> | null;
-});
+};
 

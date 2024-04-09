@@ -86,11 +86,11 @@ describe('UmbLocalizeController', () => {
 		await aTimeout(0);
 		const host = {
 			getHostElement: () => document.createElement('div'),
-			addController: () => {},
-			removeController: () => {},
-			hasController: () => false,
-			getControllers: () => [],
-			removeControllerByAlias: () => {},
+			addUmbController: () => {},
+			removeUmbController: () => {},
+			hasUmbController: () => false,
+			getUmbControllers: () => [],
+			removeUmbControllerByAlias: () => {},
 		} satisfies UmbControllerHost;
 		controller = new UmbLocalizationController(host);
 	});

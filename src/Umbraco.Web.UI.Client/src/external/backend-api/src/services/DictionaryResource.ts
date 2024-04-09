@@ -7,6 +7,7 @@ import type { DictionaryItemItemResponseModel } from '../models/DictionaryItemIt
 import type { DictionaryItemResponseModel } from '../models/DictionaryItemResponseModel';
 import type { ImportDictionaryRequestModel } from '../models/ImportDictionaryRequestModel';
 import type { MoveDictionaryRequestModel } from '../models/MoveDictionaryRequestModel';
+import type { NamedEntityTreeItemResponseModel } from '../models/NamedEntityTreeItemResponseModel';
 import type { PagedDictionaryOverviewResponseModel } from '../models/PagedDictionaryOverviewResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { UpdateDictionaryItemRequestModel } from '../models/UpdateDictionaryItemRequestModel';
@@ -18,7 +19,7 @@ import { request as __request } from '../core/request';
 export class DictionaryResource {
 
     /**
-     * @returns PagedDictionaryOverviewResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDictionary({
@@ -145,7 +146,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns binary Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDictionaryByIdExport({
@@ -244,7 +245,28 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreeDictionaryAncestors({
+        descendantId,
+    }: {
+        descendantId?: string,
+    }): CancelablePromise<Array<NamedEntityTreeItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/dictionary/ancestors',
+            query: {
+                'descendantId': descendantId,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDictionaryChildren({
@@ -271,7 +293,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDictionaryRoot({

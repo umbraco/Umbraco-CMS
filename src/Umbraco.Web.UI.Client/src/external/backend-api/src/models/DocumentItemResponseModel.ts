@@ -5,12 +5,12 @@
 
 import type { DocumentTypeReferenceResponseModel } from './DocumentTypeReferenceResponseModel';
 import type { DocumentVariantItemResponseModel } from './DocumentVariantItemResponseModel';
-import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
-export type DocumentItemResponseModel = (ItemResponseModelBaseModel & {
+export type DocumentItemResponseModel = {
+    id: string;
     isTrashed: boolean;
     isProtected: boolean;
     documentType: DocumentTypeReferenceResponseModel;
     variants: Array<DocumentVariantItemResponseModel>;
-});
+};
 

@@ -3,11 +3,11 @@ import { UmbBlockTypeWorkspaceEditorElement } from './block-type-workspace-edito
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
-	UmbInvariantableWorkspaceContextInterface,
+	UmbInvariantDatasetWorkspaceContext,
 	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
@@ -17,8 +17,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
-	extends UmbEditableWorkspaceContextBase<BlockTypeData>
-	implements UmbInvariantableWorkspaceContextInterface, UmbRoutableWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<BlockTypeData>
+	implements UmbInvariantDatasetWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	// Just for context token safety:
 	public readonly IS_BLOCK_TYPE_WORKSPACE_CONTEXT = true;
@@ -147,7 +147,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		}
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#data.value) return;
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
@@ -158,7 +158,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		});
 
 		this.setIsNew(false);
-		this.workspaceComplete(this.#data.value);
+		return true;
 	}
 
 	public destroy(): void {

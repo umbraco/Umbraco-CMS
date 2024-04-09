@@ -3,10 +3,23 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { UserGroupBaseModel } from './UserGroupBaseModel';
+import type { DocumentPermissionPresentationModel } from './DocumentPermissionPresentationModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+import type { UnknownTypePermissionPresentationModel } from './UnknownTypePermissionPresentationModel';
 
-export type UserGroupResponseModel = (UserGroupBaseModel & {
+export type UserGroupResponseModel = {
+    name: string;
+    icon?: string | null;
+    sections: Array<string>;
+    languages: Array<string>;
+    hasAccessToAllLanguages: boolean;
+    documentStartNode?: ReferenceByIdModel | null;
+    documentRootAccess: boolean;
+    mediaStartNode?: ReferenceByIdModel | null;
+    mediaRootAccess: boolean;
+    fallbackPermissions: Array<string>;
+    permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
     id: string;
     isSystemGroup: boolean;
-});
+};
 

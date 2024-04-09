@@ -1,10 +1,10 @@
 import type { UmbMediaTypeWorkspaceContext } from './media-type-workspace.context.js';
+import { UMB_MEDIA_TYPE_WORKSPACE_CONTEXT } from './media-type-workspace.context-token.js';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-media-type-workspace-editor')
@@ -26,8 +26,8 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance as UmbMediaTypeWorkspaceContext;
+		this.consumeContext(UMB_MEDIA_TYPE_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
 			this.#observeMediaType();
 		});
 	}
@@ -45,7 +45,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 					// TODO: Would be good with a more general way to bring focus to the name input.
 					(this.shadowRoot?.querySelector('#name') as HTMLElement)?.focus();
 				}
-				this.removeControllerByAlias('isNewRedirectController');
+				this.removeUmbControllerByAlias('isNewRedirectController');
 			},
 			'_observeIsNew',
 		);
@@ -131,20 +131,6 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 						</div>
 					</uui-input>
 				</uui-input>
-			</div>
-
-			<div slot="footer-info">
-				<!-- TODO: Shortcuts Modal? -->
-				<uui-button label="Show keyboard shortcuts">
-					Keyboard Shortcuts
-					<uui-keyboard-shortcut>
-						<uui-key>ALT</uui-key>
-						+
-						<uui-key>shift</uui-key>
-						+
-						<uui-key>k</uui-key>
-					</uui-keyboard-shortcut>
-				</uui-button>
 			</div>
 		</umb-workspace-editor>`;
 	}

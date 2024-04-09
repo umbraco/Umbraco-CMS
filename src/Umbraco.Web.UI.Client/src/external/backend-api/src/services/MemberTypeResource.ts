@@ -8,6 +8,7 @@ import type { MemberTypeCompositionRequestModel } from '../models/MemberTypeComp
 import type { MemberTypeCompositionResponseModel } from '../models/MemberTypeCompositionResponseModel';
 import type { MemberTypeItemResponseModel } from '../models/MemberTypeItemResponseModel';
 import type { MemberTypeResponseModel } from '../models/MemberTypeResponseModel';
+import type { PagedModelMemberTypeItemResponseModel } from '../models/PagedModelMemberTypeItemResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { UpdateMemberTypeRequestModel } from '../models/UpdateMemberTypeRequestModel';
 
@@ -31,6 +32,33 @@ export class MemberTypeResource {
             url: '/umbraco/management/api/v1/item/member-type',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemMemberTypeSearch({
+        query,
+        skip,
+        take = 100,
+    }: {
+        query?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedModelMemberTypeItemResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/member-type/search',
+            query: {
+                'query': query,
+                'skip': skip,
+                'take': take,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
@@ -202,7 +230,7 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMemberTypeRoot({

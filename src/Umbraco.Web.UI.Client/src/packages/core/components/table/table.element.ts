@@ -264,8 +264,6 @@ export class UmbTableElement extends LitElement {
 		css`
 			:host {
 				height: fit-content;
-				padding: var(--uui-size-space-4);
-				padding-top: 0;
 			}
 
 			uui-table {

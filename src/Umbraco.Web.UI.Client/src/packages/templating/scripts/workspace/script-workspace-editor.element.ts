@@ -1,9 +1,8 @@
-import type { UmbScriptWorkspaceContext } from './script-workspace.context.js';
+import { UMB_SCRIPT_WORKSPACE_CONTEXT } from './script-workspace.context-token.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-script-workspace-editor')
@@ -15,39 +14,32 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	private _content?: string | null = '';
 
 	@state()
-	private _path?: string | null = '';
-
-	@state()
 	private _ready?: boolean = false;
 
 	@state()
 	private _isNew?: boolean = false;
 
-	#scriptsWorkspaceContext?: UmbScriptWorkspaceContext;
+	#context?: typeof UMB_SCRIPT_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#scriptsWorkspaceContext = workspaceContext as UmbScriptWorkspaceContext;
+		this.consumeContext(UMB_SCRIPT_WORKSPACE_CONTEXT, (context) => {
+			this.#context = context;
 
-			this.observe(this.#scriptsWorkspaceContext.name, (name) => {
+			this.observe(this.#context.name, (name) => {
 				this._name = name;
 			});
 
-			this.observe(this.#scriptsWorkspaceContext.content, (content) => {
+			this.observe(this.#context.content, (content) => {
 				this._content = content;
 			});
 
-			this.observe(this.#scriptsWorkspaceContext.path, (path) => {
-				this._path = path;
-			});
-
-			this.observe(this.#scriptsWorkspaceContext.isCodeEditorReady, (isReady) => {
+			this.observe(this.#context.isCodeEditorReady, (isReady) => {
 				this._ready = isReady;
 			});
 
-			this.observe(this.#scriptsWorkspaceContext.isNew, (isNew) => {
+			this.observe(this.#context.isNew, (isNew) => {
 				this._isNew = isNew;
 			});
 		});
@@ -56,13 +48,13 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	#onNameInput(event: Event) {
 		const target = event.target as UUIInputElement;
 		const value = target.value as string;
-		this.#scriptsWorkspaceContext?.setName(value);
+		this.#context?.setName(value);
 	}
 
 	#onCodeEditorInput(event: Event) {
 		const target = event.target as UmbCodeEditorElement;
 		const value = target.code as string;
-		this.#scriptsWorkspaceContext?.setContent(value);
+		this.#context?.setContent(value);
 	}
 
 	#renderCodeEditor() {
@@ -82,7 +74,6 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 					@input=${this.#onNameInput}
 					label="Script name"
 					?readonly=${this._isNew === false}></uui-input>
-				<small>/scripts${this._path}</small>
 			</div>
 			<uui-box>
 				<!-- the div below in the header is to make the box display nicely with code editor -->
@@ -91,7 +82,7 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 					? this.#renderCodeEditor()
 					: html`<div id="loader-container">
 							<uui-loader></uui-loader>
-					  </div>`}
+						</div>`}
 			</uui-box>
 		</umb-workspace-editor>`;
 	}

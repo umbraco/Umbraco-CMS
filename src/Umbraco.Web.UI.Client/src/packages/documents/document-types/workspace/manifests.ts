@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/composition/index.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceActions,
@@ -100,7 +100,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.DocumentType.Save',
 		name: 'Save Document Type Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			label: 'Save',
 			look: 'primary',

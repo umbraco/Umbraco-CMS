@@ -68,19 +68,20 @@ export interface MetaEntityActionTrashKind extends MetaEntityActionDefaultKind {
 }
 
 // RENAME
-export interface ManifestEntityActionRenameKind extends ManifestEntityAction<MetaEntityActionRenameKind> {
+export interface ManifestEntityActionRenameServerFileKind
+	extends ManifestEntityAction<MetaEntityActionRenameServerFileKind> {
 	type: 'entityAction';
-	kind: 'rename';
+	kind: 'renameServerFile';
 }
 
-export interface MetaEntityActionRenameKind extends MetaEntityActionDefaultKind {
+export interface MetaEntityActionRenameServerFileKind extends MetaEntityActionDefaultKind {
 	renameRepositoryAlias: string;
 	itemRepositoryAlias: string;
 }
 
 // RELOAD TREE ITEM CHILDREN
 export interface ManifestEntityActionReloadTreeItemChildrenKind
-	extends ManifestEntityAction<MetaEntityActionRenameKind> {
+	extends ManifestEntityAction<MetaEntityActionRenameServerFileKind> {
 	type: 'entityAction';
 	kind: 'reloadTreeItemChildren';
 }
@@ -129,4 +130,16 @@ export interface ManifestEntityActionDeleteFolderKind extends ManifestEntityActi
 
 export interface MetaEntityActionFolderKind extends MetaEntityActionDefaultKind {
 	folderRepositoryAlias: string;
+}
+
+// SORT CHILDREN OF
+export interface ManifestEntityActionSortChildrenOfKind
+	extends ManifestEntityAction<MetaEntityActionSortChildrenOfKind> {
+	type: 'entityAction';
+	kind: 'sortChildrenOf';
+}
+
+export interface MetaEntityActionSortChildrenOfKind extends MetaEntityActionDefaultKind {
+	sortChildrenOfRepositoryAlias: string;
+	treeRepositoryAlias: string;
 }

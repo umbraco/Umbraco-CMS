@@ -48,7 +48,7 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 					// TODO: Would be good with a more general way to bring focus to the name input.
 					(this.shadowRoot?.querySelector('#name') as HTMLElement)?.focus();
 				}
-				this.removeControllerByAlias('_observeIsNew');
+				this.removeUmbControllerByAlias('_observeIsNew');
 			},
 			'_observeIsNew',
 		);
@@ -134,20 +134,6 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 							</div>
 						</uui-input>
 					</uui-input>
-				</div>
-
-				<div slot="footer-info">
-					<!-- TODO: Shortcuts Modal? -->
-					<uui-button label="Show keyboard shortcuts">
-						Keyboard Shortcuts
-						<uui-keyboard-shortcut>
-							<uui-key>ALT</uui-key>
-							+
-							<uui-key>shift</uui-key>
-							+
-							<uui-key>k</uui-key>
-						</uui-keyboard-shortcut>
-					</uui-button>
 				</div>
 			</umb-workspace-editor>
 		`;

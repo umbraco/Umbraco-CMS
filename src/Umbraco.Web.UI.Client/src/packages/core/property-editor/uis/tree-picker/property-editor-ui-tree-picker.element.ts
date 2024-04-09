@@ -2,7 +2,7 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbDynamicRootRepository } from '@umbraco-cms/backoffice/dynamic-root';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbInputTreeElement } from '@umbraco-cms/backoffice/tree';
@@ -69,7 +69,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 
 		// TODO: Awaiting the workspace context to have a parent entity ID value. [LK]
 		// e.g. const parentEntityId = this.#workspaceContext?.getParentEntityId();
-		const workspaceContext = await this.getContext(UMB_WORKSPACE_CONTEXT);
+		const workspaceContext = await this.getContext(UMB_ENTITY_WORKSPACE_CONTEXT);
 		const unique = workspaceContext.getUnique();
 		if (unique && this.#dynamicRoot) {
 			const result = await this.#dynamicRootRepository.postDynamicRootQuery(this.#dynamicRoot, unique);

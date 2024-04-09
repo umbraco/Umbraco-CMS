@@ -3,7 +3,24 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { PropertyTypeModelBaseModel } from './PropertyTypeModelBaseModel';
+import type { MemberTypePropertyTypeVisibilityModel } from './MemberTypePropertyTypeVisibilityModel';
+import type { PropertyTypeAppearanceModel } from './PropertyTypeAppearanceModel';
+import type { PropertyTypeValidationModel } from './PropertyTypeValidationModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type UpdateMemberTypePropertyTypeRequestModel = PropertyTypeModelBaseModel;
+export type UpdateMemberTypePropertyTypeRequestModel = {
+    id: string;
+    container?: ReferenceByIdModel | null;
+    sortOrder: number;
+    alias: string;
+    name: string;
+    description?: string | null;
+    dataType: ReferenceByIdModel;
+    variesByCulture: boolean;
+    variesBySegment: boolean;
+    validation: PropertyTypeValidationModel;
+    appearance: PropertyTypeAppearanceModel;
+    isSensitive: boolean;
+    visibility: MemberTypePropertyTypeVisibilityModel;
+};
 

@@ -4,16 +4,16 @@ import { UmbUserDetailRepository } from '../repository/index.js';
 import { UmbUserAvatarRepository } from '../repository/avatar/index.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import { UmbEditableWorkspaceContextBase, UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';
+import type { UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmittableWorkspaceContextBase, UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = UmbUserDetailModel;
 
 export class UmbUserWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbSaveableWorkspaceContextInterface
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
+	implements UmbSubmittableWorkspaceContext
 {
 	public readonly detailRepository: UmbUserDetailRepository = new UmbUserDetailRepository(this);
 	public readonly avatarRepository: UmbUserAvatarRepository = new UmbUserAvatarRepository(this);
@@ -28,9 +28,10 @@ export class UmbUserWorkspaceContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_USER_WORKSPACE_ALIAS);
+
 		this.routes.setRoutes([
 			{
-				path: ':id',
+				path: 'edit/:id',
 				component: UmbUserWorkspaceEditorElement,
 				setup: (component, info) => {
 					const id = info.match.params.id;
@@ -84,7 +85,7 @@ export class UmbUserWorkspaceContext
 		this.#currentData.update({ [propertyName]: value });
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#currentData.value) throw new Error('Data is missing');
 		if (!this.#currentData.value.unique) throw new Error('Unique is missing');
 
@@ -102,8 +103,8 @@ export class UmbUserWorkspaceContext
 			this.#persistedData.setValue(newData);
 			this.#currentData.setValue(newData);
 			this.setIsNew(false);
-			this.workspaceComplete(newData);
 		}
+		return true;
 	}
 
 	// TODO: implement upload progress

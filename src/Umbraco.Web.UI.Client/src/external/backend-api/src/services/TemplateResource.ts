@@ -3,6 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateTemplateRequestModel } from '../models/CreateTemplateRequestModel';
+import type { NamedEntityTreeItemResponseModel } from '../models/NamedEntityTreeItemResponseModel';
+import type { PagedModelTemplateItemResponseModel } from '../models/PagedModelTemplateItemResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { TemplateConfigurationResponseModel } from '../models/TemplateConfigurationResponseModel';
 import type { TemplateItemResponseModel } from '../models/TemplateItemResponseModel';
@@ -32,6 +34,33 @@ export class TemplateResource {
             url: '/umbraco/management/api/v1/item/template',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemTemplateSearch({
+        query,
+        skip,
+        take = 100,
+    }: {
+        query?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedModelTemplateItemResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/template/search',
+            query: {
+                'query': query,
+                'skip': skip,
+                'take': take,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
@@ -185,7 +214,28 @@ export class TemplateResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreeTemplateAncestors({
+        descendantId,
+    }: {
+        descendantId?: string,
+    }): CancelablePromise<Array<NamedEntityTreeItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/template/ancestors',
+            query: {
+                'descendantId': descendantId,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeTemplateChildren({
@@ -212,7 +262,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeTemplateRoot({

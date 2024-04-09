@@ -1,9 +1,9 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../media-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 import './media-workspace-view-edit-properties.element.js';
 @customElement('umb-media-workspace-view-edit-tab')
@@ -22,7 +22,7 @@ export class UmbMediaWorkspaceViewEditTabElement extends UmbLitElement {
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<any>(this);
 
 	@state()
-	_groups: Array<PropertyTypeContainerModelBaseModel> = [];
+	_groups: Array<UmbPropertyTypeContainerModel> = [];
 
 	@state()
 	_hasProperties = false;

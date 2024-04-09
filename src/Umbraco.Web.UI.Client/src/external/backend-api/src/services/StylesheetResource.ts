@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { CreateStylesheetFolderRequestModel } from '../models/CreateStylesheetFolderRequestModel';
 import type { CreateStylesheetRequestModel } from '../models/CreateStylesheetRequestModel';
+import type { FileSystemTreeItemPresentationModel } from '../models/FileSystemTreeItemPresentationModel';
 import type { PagedFileSystemTreeItemPresentationModel } from '../models/PagedFileSystemTreeItemPresentationModel';
 import type { RenameStylesheetRequestModel } from '../models/RenameStylesheetRequestModel';
 import type { StylesheetFolderResponseModel } from '../models/StylesheetFolderResponseModel';
@@ -233,7 +234,28 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreeStylesheetAncestors({
+        descendantPath,
+    }: {
+        descendantPath?: string,
+    }): CancelablePromise<Array<FileSystemTreeItemPresentationModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/stylesheet/ancestors',
+            query: {
+                'descendantPath': descendantPath,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeStylesheetChildren({
@@ -260,7 +282,7 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeStylesheetRoot({
