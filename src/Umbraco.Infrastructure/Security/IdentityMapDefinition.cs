@@ -1,11 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -37,23 +35,6 @@ public class IdentityMapDefinition : IMapDefinition
         _securitySettings = securitySettings.Value;
         _appCaches = appCaches;
         _twoFactorLoginService = twoFactorLoginService;
-    }
-
-    [Obsolete("Use constructor that also takes an IOptions<SecuritySettings>. Scheduled for removal in V14")]
-    public IdentityMapDefinition(
-        ILocalizedTextService textService,
-        IEntityService entityService,
-        IOptions<GlobalSettings> globalSettings,
-        AppCaches appCaches,
-        ITwoFactorLoginService twoFactorLoginService)
-        : this(
-            textService,
-            entityService,
-            globalSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
-            appCaches,
-            twoFactorLoginService)
-    {
     }
 
     public void DefineMaps(IUmbracoMapper mapper)

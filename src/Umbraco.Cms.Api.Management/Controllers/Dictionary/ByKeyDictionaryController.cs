@@ -24,7 +24,7 @@ public class ByKeyDictionaryController : DictionaryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DictionaryItemResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByKey(Guid id)
+    public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IDictionaryItem? dictionary = await _dictionaryItemService.GetAsync(id);
         if (dictionary == null)

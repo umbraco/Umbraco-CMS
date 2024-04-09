@@ -31,7 +31,10 @@ public class RenameScriptController : ScriptControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Rename(string path, RenameScriptRequestModel requestModel)
+    public async Task<IActionResult> Rename(
+        CancellationToken cancellationToken,
+        string path,
+        RenameScriptRequestModel requestModel)
     {
         ScriptRenameModel renameModel = _umbracoMapper.Map<ScriptRenameModel>(requestModel)!;
 

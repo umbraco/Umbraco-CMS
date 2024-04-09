@@ -1,7 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 
@@ -21,12 +19,15 @@ public class TagPropertyIndexValueFactory : JsonPropertyIndexValueFactoryBase<st
         indexingSettings.OnChange(newValue => _indexingSettings = newValue);
     }
 
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 14.")]
-    public TagPropertyIndexValueFactory(IJsonSerializer jsonSerializer)
-        : this(jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
-    {
-
-    }
+    [Obsolete("Use the overload with the 'contentTypeDictionary' parameter instead, scheduled for removal in v15")]
+    protected IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
+        string[] deserializedPropertyValue,
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published,
+        IEnumerable<string> availableCultures)
+        => Handle(deserializedPropertyValue, property, culture, segment, published, availableCultures, new Dictionary<Guid, IContentType>());
 
     protected override IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
         string[] deserializedPropertyValue,
@@ -34,18 +35,8 @@ public class TagPropertyIndexValueFactory : JsonPropertyIndexValueFactoryBase<st
         string? culture,
         string? segment,
         bool published,
-        IEnumerable<string> availableCultures)
-    {
-        yield return new KeyValuePair<string, IEnumerable<object?>>(property.Alias, deserializedPropertyValue);
-    }
-
-    [Obsolete("Use the overload that specifies availableCultures, scheduled for removal in v14")]
-    protected override IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
-        string[] deserializedPropertyValue,
-        IProperty property,
-        string? culture,
-        string? segment,
-        bool published)
+        IEnumerable<string> availableCultures,
+        IDictionary<Guid, IContentType> contentTypeDictionary)
     {
         yield return new KeyValuePair<string, IEnumerable<object?>>(property.Alias, deserializedPropertyValue);
     }

@@ -23,7 +23,9 @@ public class AvailableCompositionDocumentTypeController : DocumentTypeController
     [HttpPost("available-compositions")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<AvailableDocumentTypeCompositionResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> AvailableCompositions(DocumentTypeCompositionRequestModel compositionModel)
+    public async Task<IActionResult> AvailableCompositions(
+        CancellationToken cancellationToken,
+        DocumentTypeCompositionRequestModel compositionModel)
     {
         IEnumerable<ContentTypeAvailableCompositionsResult> availableCompositions = await _contentTypeEditingService.GetAvailableCompositionsAsync(
             compositionModel.Id,

@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Preview;
 public class EndPreviewTests : ManagementApiTest<EndPreviewController>
 {
     protected override Expression<Func<EndPreviewController, object>> MethodSelector =>
-        x => x.End();
+        x => x.End(CancellationToken.None);
 
 
     [Test]
@@ -26,5 +26,4 @@ public class EndPreviewTests : ManagementApiTest<EndPreviewController>
         Assert.IsTrue(doesHeaderExist);
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode,  await response.Content.ReadAsStringAsync());
     }
-
 }

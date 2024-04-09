@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
@@ -27,25 +26,6 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
     private readonly IApiContentNameProvider _apiContentNameProvider;
     private readonly IApiMediaUrlProvider _apiMediaUrlProvider;
     private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
-
-    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
-    public MultiUrlPickerValueConverter(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IProfilingLogger proflog,
-        IJsonSerializer jsonSerializer,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedUrlProvider publishedUrlProvider)
-        : this(
-            publishedSnapshotAccessor,
-            proflog,
-            jsonSerializer,
-            umbracoContextAccessor,
-            publishedUrlProvider,
-            StaticServiceProvider.Instance.GetRequiredService<IApiContentNameProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiMediaUrlProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiContentRouteBuilder>())
-    {
-    }
 
     public MultiUrlPickerValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,

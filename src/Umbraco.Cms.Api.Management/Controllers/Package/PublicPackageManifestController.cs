@@ -25,7 +25,7 @@ public class PublicPackageManifestController : PackageControllerBase
     [HttpGet("manifest/public")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<PackageManifestResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> PublicPackageManifests()
+    public async Task<IActionResult> PublicPackageManifests(CancellationToken cancellationToken)
     {
         PackageManifest[] packageManifests = (await _packageManifestService.GetPublicPackageManifestsAsync()).ToArray();
         return Ok(_umbracoMapper.MapEnumerable<PackageManifest, PackageManifestResponseModel>(packageManifests));

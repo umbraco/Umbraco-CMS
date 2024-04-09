@@ -19,6 +19,10 @@ public class ChildrenMediaRecycleBinController : MediaRecycleBinControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MediaRecycleBinItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<MediaRecycleBinItemResponseModel>>> Children(Guid parentId, int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<MediaRecycleBinItemResponseModel>>> Children(
+        CancellationToken cancellationToken,
+        Guid parentId,
+        int skip = 0,
+        int take = 100)
         => await GetChildren(parentId, skip, take);
 }
