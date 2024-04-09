@@ -7,7 +7,6 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 /**
  * Base class for a tree repository.
@@ -29,7 +28,6 @@ export abstract class UmbTreeRepositoryBase<
 {
 	protected _init: Promise<unknown>;
 	protected _treeStore?: UmbTreeStore<TreeItemType>;
-	protected _localization = new UmbLocalizationController(this._host);
 	#treeSource: UmbTreeDataSource<TreeItemType>;
 
 	/**

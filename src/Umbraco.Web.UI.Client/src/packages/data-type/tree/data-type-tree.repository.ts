@@ -18,7 +18,7 @@ export class UmbDataTypeTreeRepository
 		const data: UmbDataTypeTreeRootModel = {
 			unique: null,
 			entityType: UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
-			name: this._localization.term('treeHeaders_dataTypes'),
+			name: '#treeHeaders_dataTypes',
 			hasChildren: true,
 			isFolder: true,
 		};

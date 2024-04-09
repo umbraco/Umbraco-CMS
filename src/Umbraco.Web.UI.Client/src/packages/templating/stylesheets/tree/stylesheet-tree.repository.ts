@@ -17,7 +17,7 @@ export class UmbStylesheetTreeRepository extends UmbTreeRepositoryBase<
 		const data: UmbStylesheetTreeRootModel = {
 			unique: null,
 			entityType: UMB_STYLESHEET_ROOT_ENTITY_TYPE,
-			name: this._localization.term('treeHeaders_stylesheets'),
+			name: '#treeHeaders_stylesheets',
 			hasChildren: true,
 			isFolder: true,
 		};

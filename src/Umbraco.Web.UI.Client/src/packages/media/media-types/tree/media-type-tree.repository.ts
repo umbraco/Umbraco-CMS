@@ -18,7 +18,7 @@ export class UmbMediaTypeTreeRepository
 		const data: UmbMediaTypeTreeRootModel = {
 			unique: null,
 			entityType: UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE,
-			name: this._localization.term('treeHeaders_mediaTypes'),
+			name: '#treeHeaders_mediaTypes',
 			hasChildren: true,
 			isFolder: true,
 		};

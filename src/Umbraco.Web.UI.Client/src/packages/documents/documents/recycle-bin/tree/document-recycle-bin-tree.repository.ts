@@ -18,7 +18,7 @@ export class UmbDocumentRecycleBinTreeRepository
 		const data = {
 			unique: null,
 			entityType: UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
-			name: this._localization.term('treeHeaders_contentRecycleBin'),
+			name: '#treeHeaders_contentRecycleBin',
 			icon: 'icon-trash',
 			hasChildren: true,
 			isContainer: false,
