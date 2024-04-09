@@ -13,20 +13,26 @@
  */
 
 export interface StringMap {
-  [key: string]: string;
+	[key: string]: string;
 }
 
 /**
  * Represents a window.location like object.
  */
 export interface LocationLike {
-  hash: string;
-  host: string;
-  origin: string;
-  hostname: string;
-  pathname: string;
-  port: string;
-  protocol: string;
-  search: string;
-  assign(url: string): void;
+	hash: string;
+	host: string;
+	origin: string;
+	hostname: string;
+	pathname: string;
+	port: string;
+	protocol: string;
+	search: string;
+	assign(url: string): void;
+}
+
+export interface XhrRequestInit extends RequestInit {
+	url: string;
+	dataType?: string;
+	data?: any;
 }

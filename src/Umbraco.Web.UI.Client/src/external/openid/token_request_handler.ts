@@ -21,8 +21,7 @@ import type { RevokeTokenRequest } from './revoke_token_request.js';
 import type { TokenRequest } from './token_request.js';
 import { TokenError, TokenResponse } from './token_response.js';
 import type { TokenErrorJson, TokenResponseJson } from './token_response.js';
-import { JQueryRequestor } from './xhr.js';
-import type { Requestor } from './xhr.js';
+import { FetchRequestor, type Requestor } from './xhr.js';
 
 /**
  * Represents an interface which can make a token request.
@@ -44,7 +43,7 @@ export interface TokenRequestHandler {
  */
 export class BaseTokenRequestHandler implements TokenRequestHandler {
 	constructor(
-		public readonly requestor: Requestor = new JQueryRequestor(),
+		public readonly requestor: Requestor = new FetchRequestor(),
 		public readonly utils: QueryStringUtils = new BasicQueryStringUtils(),
 	) {}
 

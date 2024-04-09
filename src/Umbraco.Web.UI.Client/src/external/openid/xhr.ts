@@ -14,40 +14,20 @@
  */
 
 import { AppAuthError } from './errors.js';
+import type { XhrRequestInit } from './types.js';
 
 /**
  * An class that abstracts away the ability to make an XMLHttpRequest.
  */
 export abstract class Requestor {
-	abstract xhr<T>(settings: JQueryAjaxSettings): Promise<T>;
-}
-
-/**
- * Uses $.ajax to makes the Ajax requests.
- */
-export class JQueryRequestor extends Requestor {
-	xhr<T>(settings: JQueryAjaxSettings): Promise<T> {
-		// NOTE: using jquery to make XHR's as whatwg-fetch requires
-		// that I target ES6.
-		const xhr = $.ajax(settings);
-		return new Promise<T>((resolve, reject) => {
-			xhr.then(
-				(data, textStatus, jqXhr) => {
-					resolve(data as T);
-				},
-				(jqXhr, textStatus, error) => {
-					reject(new AppAuthError(error));
-				},
-			);
-		});
-	}
+	abstract xhr<T>(settings: unknown): Promise<T>;
 }
 
 /**
  * Uses fetch API to make Ajax requests
  */
 export class FetchRequestor extends Requestor {
-	xhr<T>(settings: JQueryAjaxSettings): Promise<T> {
+	xhr<T>(settings: XhrRequestInit): Promise<T> {
 		if (!settings.url) {
 			return Promise.reject(new AppAuthError('A URL must be provided.'));
 		}
@@ -70,11 +50,7 @@ export class FetchRequestor extends Requestor {
 		// Set the request headers
 		requestInit.headers = {};
 		if (settings.headers) {
-			for (const i in settings.headers) {
-				if (Object.prototype.hasOwnProperty.call(settings.headers, i)) {
-					requestInit.headers[i] = <string>settings.headers[i];
-				}
-			}
+			requestInit.headers = settings.headers;
 		}
 
 		const isJsonDataType = settings.dataType && settings.dataType.toLowerCase() === 'json';
@@ -83,7 +59,7 @@ export class FetchRequestor extends Requestor {
 		// https://github.com/jquery/jquery/blob/e0d941156900a6bff7c098c8ea7290528e468cf8/src/ajax.js#L644
 		// )
 		if (isJsonDataType) {
-			requestInit.headers['Accept'] = 'application/json, text/javascript, */*; q=0.01';
+			(requestInit.headers as any).Accept = 'application/json, text/javascript, */*; q=0.01';
 		}
 
 		return fetch(url.toString(), requestInit).then((response) => {
@@ -98,18 +74,5 @@ export class FetchRequestor extends Requestor {
 				return Promise.reject(new AppAuthError(response.status.toString(), response.statusText));
 			}
 		});
-	}
-}
-
-/**
- * Should be used only in the context of testing. Just uses the underlying
- * Promise to mock the behavior of the Requestor.
- */
-export class TestRequestor extends Requestor {
-	constructor(public promise: Promise<any>) {
-		super();
-	}
-	xhr<T>(settings: JQueryAjaxSettings): Promise<T> {
-		return this.promise; // unsafe cast
 	}
 }

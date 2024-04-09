@@ -14,7 +14,7 @@
  */
 
 import type { Requestor } from './xhr.js';
-import { JQueryRequestor } from './xhr.js';
+import { FetchRequestor } from './xhr.js';
 
 /**
  * Represents AuthorizationServiceConfiguration as a JSON object.
@@ -72,7 +72,7 @@ export class AuthorizationServiceConfiguration {
 	static fetchFromIssuer(openIdIssuerUrl: string, requestor?: Requestor): Promise<AuthorizationServiceConfiguration> {
 		const fullUrl = `${openIdIssuerUrl}/${WELL_KNOWN_PATH}/${OPENID_CONFIGURATION}`;
 
-		const requestorToUse = requestor || new JQueryRequestor();
+		const requestorToUse = requestor || new FetchRequestor();
 
 		return requestorToUse
 			.xhr<AuthorizationServiceConfigurationJson>({ url: fullUrl, dataType: 'json', method: 'GET' })
