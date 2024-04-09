@@ -54,7 +54,7 @@ test.describe('Language tests', () => {
     await umbracoApi.language.update(defaultLanguageIsoCode, defaultLanguageData);
   });
 
-  test('can update manatory language option', async ({umbracoApi, umbracoUi}) => {
+  test('can update mandatory language option', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.language.create(languageName, false, false, isoCode);
     expect(await umbracoApi.language.doesExist(isoCode)).toBeTruthy();
