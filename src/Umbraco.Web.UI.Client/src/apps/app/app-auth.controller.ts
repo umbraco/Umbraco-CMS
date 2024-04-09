@@ -91,7 +91,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 
 		if (availableProviders.length === 1) {
 			// One provider available (most likely the Umbraco provider), so initiate the authorization request to the default provider
-			this.#authContext.makeAuthorizationRequest();
+			this.#authContext.makeAuthorizationRequest(availableProviders[0].forProviderName);
 			return this.#updateState();
 		}
 
