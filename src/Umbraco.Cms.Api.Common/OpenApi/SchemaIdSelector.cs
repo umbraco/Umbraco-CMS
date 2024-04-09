@@ -39,45 +39,7 @@ public class SchemaIdSelector : ISchemaIdSelector
             return name;
         }
 
-        // find all types that implement this type and have an matching attribute
-        var assignableTypesWithAttributeInfo = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(assembly => assembly.FullName?.StartsWith("Umbraco") == true)
-            .SelectMany(assembly => assembly.GetTypes())
-            .Where(t => t.IsAssignableTo(type))
-            .Select(t =>
-            {
-                var attribute = System.Attribute.GetCustomAttributes(t)
-                        .FirstOrDefault(attribute => attribute is ShortGenericSchemaNameAttribute) as
-                    ShortGenericSchemaNameAttribute;
-                return attribute == null
-                    ? new ShortSchemaNameAttributeInfo(t)
-                    : new ShortSchemaNameAttributeInfo(t, attribute.GenericTypes, attribute.SchemaName);
-            })
-            .Where(info => info.GenericTypes != null);
-
-        // We need FirstOrDefault() because through inheritance, the attribute can be on several classes implementing a base
-        var matchingType = assignableTypesWithAttributeInfo
-            .FirstOrDefault(t => t.GenericTypes!.Length == type.GenericTypeArguments.Length
-                                  && t.GenericTypes.Intersect(type.GenericTypeArguments).Count() ==
-                                  type.GenericTypeArguments.Length && t.SchemaName.IsNullOrWhiteSpace() == false);
-
         // use attribute custom name or append the generic type names, ultimately turning i.e. "PagedViewModel<RelationItemViewModel>" into "PagedRelationItem"
-        return matchingType != null
-            ? matchingType.SchemaName!
-            : $"{name}{string.Join(string.Empty, type.GenericTypeArguments.Select(SanitizedTypeName))}";
-    }
-
-    private class ShortSchemaNameAttributeInfo
-    {
-        public Type Type { get; set; }
-        public Type[]? GenericTypes { get; set; }
-        public string? SchemaName { get; set; }
-
-        public ShortSchemaNameAttributeInfo(Type type, Type[]? genericTypes = null, string? schemaName = null)
-        {
-            Type = type;
-            GenericTypes = genericTypes;
-            SchemaName = schemaName;
-        }
+        return $"{name}{string.Join(string.Empty, type.GenericTypeArguments.Select(SanitizedTypeName))}";
     }
 }

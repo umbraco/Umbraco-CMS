@@ -31,7 +31,11 @@ public class AllowedChildrenMediaTypeController : MediaTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AllowedMediaType>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AllowedChildrenByKey(Guid id, int skip = 0, int take = 100)
+    public async Task<IActionResult> AllowedChildrenByKey(
+        CancellationToken cancellationToken,
+        Guid id,
+        int skip = 0,
+        int take = 100)
     {
         Attempt<PagedModel<IMediaType>?, ContentTypeOperationStatus> attempt = await _mediaTypeService.GetAllowedChildrenAsync(id, skip, take);
         if (attempt.Success is false)

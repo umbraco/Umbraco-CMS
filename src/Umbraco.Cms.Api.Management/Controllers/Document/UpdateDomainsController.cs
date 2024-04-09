@@ -28,10 +28,14 @@ public class UpdateDomainsController : DocumentControllerBase
 
     [MapToApiVersion("1.0")]
     [HttpPut("{id:guid}/domains")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Update(Guid id, UpdateDomainsRequestModel updateModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateDomainsRequestModel updateModel)
     {
         DomainsUpdateModel domainsUpdateModel = _umbracoMapper.Map<DomainsUpdateModel>(updateModel)!;
 

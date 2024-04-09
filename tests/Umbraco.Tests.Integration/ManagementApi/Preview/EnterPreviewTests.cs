@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Preview;
 public class EnterPreviewTests : ManagementApiTest<EnterPreviewController>
 {
     protected override Expression<Func<EnterPreviewController, object>> MethodSelector =>
-        x => x.Enter();
+        x => x.Enter(CancellationToken.None);
 
 
     [Test]

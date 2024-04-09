@@ -38,7 +38,8 @@ public class TypeFinderTests
     {
         var typeFinder = new TypeFinder(
             Mock.Of<ILogger<TypeFinder>>(),
-            new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance));
+            new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance),
+            null);
         var typesFound = typeFinder.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
         Assert.AreEqual(2, typesFound.Count());
     }

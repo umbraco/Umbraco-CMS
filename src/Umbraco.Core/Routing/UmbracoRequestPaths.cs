@@ -1,8 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -23,12 +21,6 @@ public class UmbracoRequestPaths
     private readonly string _previewMvcPath;
     private readonly string _surfaceMvcPath;
     private readonly IOptions<UmbracoRequestPathsOptions> _umbracoRequestPathsOptions;
-
-    [Obsolete("Use constructor that takes IOptions<UmbracoRequestPathsOptions> - Will be removed in Umbraco 13")]
-    public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
-        : this(globalSettings, hostingEnvironment, StaticServiceProvider.Instance.GetRequiredService<IOptions<UmbracoRequestPathsOptions>>())
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoRequestPaths" /> class.

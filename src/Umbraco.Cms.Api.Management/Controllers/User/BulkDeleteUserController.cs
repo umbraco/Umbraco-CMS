@@ -34,7 +34,7 @@ public class BulkDeleteUserController : UserControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> DeleteUsers(DeleteUsersRequestModel model)
+    public async Task<IActionResult> DeleteUsers(CancellationToken cancellationToken, DeleteUsersRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

@@ -41,7 +41,10 @@ public class RestoreMediaRecycleBinController : MediaRecycleBinControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Restore(Guid id, MoveMediaRequestModel moveDocumentRequestModel)
+    public async Task<IActionResult> Restore(
+        CancellationToken cancellationToken,
+        Guid id,
+        MoveMediaRequestModel moveDocumentRequestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
