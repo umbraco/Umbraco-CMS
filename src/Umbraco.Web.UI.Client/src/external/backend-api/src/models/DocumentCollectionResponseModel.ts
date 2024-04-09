@@ -3,11 +3,17 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentCollectionResponseModelBaseDocumentValueModelDocumentVariantResponseModel } from './ContentCollectionResponseModelBaseDocumentValueModelDocumentVariantResponseModel';
 import type { DocumentTypeCollectionReferenceResponseModel } from './DocumentTypeCollectionReferenceResponseModel';
+import type { DocumentValueModel } from './DocumentValueModel';
+import type { DocumentVariantResponseModel } from './DocumentVariantResponseModel';
 
-export type DocumentCollectionResponseModel = (ContentCollectionResponseModelBaseDocumentValueModelDocumentVariantResponseModel & {
+export type DocumentCollectionResponseModel = {
+    values: Array<DocumentValueModel>;
+    variants: Array<DocumentVariantResponseModel>;
+    id: string;
+    creator?: string | null;
+    sortOrder: number;
     documentType: DocumentTypeCollectionReferenceResponseModel;
     updater?: string | null;
-});
+};
 

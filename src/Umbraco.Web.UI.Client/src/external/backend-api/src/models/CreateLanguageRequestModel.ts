@@ -3,9 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { LanguageModelBaseModel } from './LanguageModelBaseModel';
-
-export type CreateLanguageRequestModel = (LanguageModelBaseModel & {
+export type CreateLanguageRequestModel = {
+    name: string;
+    isDefault: boolean;
+    isMandatory: boolean;
+    fallbackIsoCode?: string | null;
     isoCode: string;
-});
+};
 

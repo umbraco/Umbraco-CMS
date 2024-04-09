@@ -11,7 +11,7 @@ import { request as __request } from '../core/request';
 export class TagResource {
 
     /**
-     * @returns PagedTagResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTag({

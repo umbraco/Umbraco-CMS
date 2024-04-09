@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ServerConfigurationBaseModel } from './ServerConfigurationBaseModel';
+import type { ServerConfigurationItemResponseModel } from './ServerConfigurationItemResponseModel';
 
-export type ServerTroubleshootingResponseModel = ServerConfigurationBaseModel;
+export type ServerTroubleshootingResponseModel = {
+    items: Array<ServerConfigurationItemResponseModel>;
+};
 

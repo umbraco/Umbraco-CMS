@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
-
-export type MemberTypeItemResponseModel = (NamedItemResponseModelBaseModel & {
+export type MemberTypeItemResponseModel = {
+    id: string;
+    name: string;
     icon?: string | null;
-});
+};
 

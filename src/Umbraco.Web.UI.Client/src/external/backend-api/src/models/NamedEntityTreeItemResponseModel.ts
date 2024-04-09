@@ -3,9 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { EntityTreeItemResponseModel } from './EntityTreeItemResponseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type NamedEntityTreeItemResponseModel = (EntityTreeItemResponseModel & {
+export type NamedEntityTreeItemResponseModel = {
+    hasChildren: boolean;
+    id: string;
+    parent?: ReferenceByIdModel | null;
     name: string;
-});
+};
 

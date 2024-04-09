@@ -3,11 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { UserPresentationBaseModel } from './UserPresentationBaseModel';
-
-export type UpdateUserRequestModel = (UserPresentationBaseModel & {
+export type UpdateUserRequestModel = {
+    email: string;
+    userName: string;
+    name: string;
+    userGroupIds: Array<string>;
     languageIsoCode: string;
     documentStartNodeIds: Array<string>;
     mediaStartNodeIds: Array<string>;
-});
+};
 

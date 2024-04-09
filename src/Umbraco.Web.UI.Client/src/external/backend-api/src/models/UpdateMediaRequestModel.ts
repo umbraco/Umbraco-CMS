@@ -3,7 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { UpdateContentForMediaRequestModel } from './UpdateContentForMediaRequestModel';
+import type { MediaValueModel } from './MediaValueModel';
+import type { MediaVariantRequestModel } from './MediaVariantRequestModel';
 
-export type UpdateMediaRequestModel = UpdateContentForMediaRequestModel;
+export type UpdateMediaRequestModel = {
+    values: Array<MediaValueModel>;
+    variants: Array<MediaVariantRequestModel>;
+};
 

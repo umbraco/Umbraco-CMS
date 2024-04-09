@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeCompositionRequestModelBaseModel } from './ContentTypeCompositionRequestModelBaseModel';
-
-export type MemberTypeCompositionRequestModel = ContentTypeCompositionRequestModelBaseModel;
+export type MemberTypeCompositionRequestModel = {
+    id?: string | null;
+    currentPropertyAliases: Array<string>;
+    currentCompositeIds: Array<string>;
+};
 

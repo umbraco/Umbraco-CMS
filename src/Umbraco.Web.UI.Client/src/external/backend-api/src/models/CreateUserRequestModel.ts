@@ -3,9 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { UserPresentationBaseModel } from './UserPresentationBaseModel';
-
-export type CreateUserRequestModel = (UserPresentationBaseModel & {
+export type CreateUserRequestModel = {
+    email: string;
+    userName: string;
+    name: string;
+    userGroupIds: Array<string>;
     id?: string | null;
-});
+};
 

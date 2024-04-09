@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FileSystemItemViewModelBaseModel } from './FileSystemItemViewModelBaseModel';
-
-export type FileSystemFolderModel = FileSystemItemViewModelBaseModel;
+export type FileSystemFolderModel = {
+    path: string;
+};
 

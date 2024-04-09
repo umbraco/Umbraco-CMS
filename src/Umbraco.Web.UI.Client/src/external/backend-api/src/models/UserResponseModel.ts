@@ -3,10 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { UserPresentationBaseModel } from './UserPresentationBaseModel';
 import type { UserStateModel } from './UserStateModel';
 
-export type UserResponseModel = (UserPresentationBaseModel & {
+export type UserResponseModel = {
+    email: string;
+    userName: string;
+    name: string;
+    userGroupIds: Array<string>;
     id: string;
     languageIsoCode?: string | null;
     documentStartNodeIds: Array<string>;
@@ -20,5 +23,5 @@ export type UserResponseModel = (UserPresentationBaseModel & {
     lastLockoutDate?: string | null;
     lastPasswordChangeDate?: string | null;
     isAdmin: boolean;
-});
+};
 

@@ -3,7 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FileSystemItemResponseModelBaseModel } from './FileSystemItemResponseModelBaseModel';
+import type { FileSystemFolderModel } from './FileSystemFolderModel';
 
-export type StylesheetItemResponseModel = FileSystemItemResponseModelBaseModel;
+export type StylesheetItemResponseModel = {
+    path: string;
+    name: string;
+    parent?: FileSystemFolderModel | null;
+    isFolder: boolean;
+};
 
