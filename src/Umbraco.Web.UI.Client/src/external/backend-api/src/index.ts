@@ -195,6 +195,7 @@ export type { ModelsBuilderResponseModel } from './models/ModelsBuilderResponseM
 export { ModelsModeModel } from './models/ModelsModeModel';
 export type { MoveDataTypeRequestModel } from './models/MoveDataTypeRequestModel';
 export type { MoveDictionaryRequestModel } from './models/MoveDictionaryRequestModel';
+export type { MoveDocumentBlueprintRequestModel } from './models/MoveDocumentBlueprintRequestModel';
 export type { MoveDocumentRequestModel } from './models/MoveDocumentRequestModel';
 export type { MoveDocumentTypeRequestModel } from './models/MoveDocumentTypeRequestModel';
 export type { MoveMediaRequestModel } from './models/MoveMediaRequestModel';

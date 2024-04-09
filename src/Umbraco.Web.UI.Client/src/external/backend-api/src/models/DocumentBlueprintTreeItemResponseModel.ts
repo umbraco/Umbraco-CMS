@@ -11,6 +11,7 @@ export type DocumentBlueprintTreeItemResponseModel = {
     id: string;
     parent?: ReferenceByIdModel | null;
     name: string;
-    documentType: DocumentTypeReferenceResponseModel;
+    isFolder: boolean;
+    documentType?: DocumentTypeReferenceResponseModel | null;
 };
 
