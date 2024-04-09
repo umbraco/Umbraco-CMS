@@ -1,4 +1,4 @@
-import type { UmbDocumentBlueprintDetailModel, UmbDocumentBlueprintVariantModel } from '../../types.js';
+import type { UmbDocumentBlueprintDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
@@ -6,7 +6,7 @@ import type {
 	CreateDocumentRequestModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentBlueprintResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -37,13 +37,10 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		const data: UmbDocumentBlueprintDetailModel = {
 			entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
 			unique: UmbId.new(),
-			urls: [],
-			template: null,
 			documentType: {
 				unique: '',
 				collection: null,
 			},
-			isTrashed: false,
 			values: [],
 			variants: [],
 			...preset,
@@ -80,7 +77,10 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, DocumentResource.getDocumentById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			DocumentBlueprintResource.getDocumentBlueprintById({ id: unique }),
+		);
 
 		if (error || !data) {
 			return { error };
@@ -109,18 +109,10 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 					updateDate: variant.updateDate,
 				};
 			}),
-			urls: data.urls.map((url) => {
-				return {
-					culture: url.culture || null,
-					url: url.url,
-				};
-			}),
-			template: data.template ? { unique: data.template.id } : null,
 			documentType: {
 				unique: data.documentType.id,
 				collection: data.documentType.collection ? { unique: data.documentType.collection.id } : null,
 			},
-			isTrashed: data.isTrashed,
 		};
 
 		return { data: document };
@@ -141,14 +133,14 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
-			template: model.template ? { id: model.template.unique } : null,
+
 			values: model.values,
 			variants: model.variants,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentResource.postDocument({
+			DocumentBlueprintResource.postDocumentBlueprint({
 				requestBody,
 			}),
 		);
@@ -171,14 +163,13 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateDocumentRequestModel = {
-			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
 		};
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentResource.putDocumentById({
+			DocumentBlueprintResource.putDocumentBlueprintById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -201,6 +192,6 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		if (!unique) throw new Error('Unique is missing');
 
 		// TODO: update to delete when implemented
-		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdMoveToRecycleBin({ id: unique }));
+		return tryExecuteAndNotify(this.#host, DocumentBlueprintResource.deleteDocumentBlueprintById({ id: unique }));
 	}
 }

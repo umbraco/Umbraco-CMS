@@ -2,6 +2,7 @@ import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_PICKER_MODAL } from '../modals/index.js';
 import { manifests as createManifests } from './create/manifests.js';
+import { manifests as createBlueprintManifests } from './create-blueprint/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
 import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
@@ -19,19 +20,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			deleteRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			pickerModalAlias: UMB_DOCUMENT_PICKER_MODAL,
-		},
-	},
-	{
-		type: 'entityAction',
-		kind: 'default',
-		alias: 'Umb.EntityAction.Document.CreateBlueprint',
-		name: 'Create Document Blueprint Entity Action',
-		weight: 1000,
-		api: () => import('./create-blueprint.action.js'),
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-		meta: {
-			icon: 'icon-blueprint',
-			label: 'Create Document Blueprint (TBD)',
 		},
 	},
 	{
@@ -116,6 +104,7 @@ const entityActions: Array<ManifestEntityAction> = [
 
 export const manifests = [
 	...createManifests,
+	...createBlueprintManifests,
 	...publicAccessManifests,
 	...cultureAndHostnamesManifests,
 	...sortChildrenOfManifests,
