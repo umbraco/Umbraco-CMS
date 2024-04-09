@@ -85,7 +85,10 @@ export class TokenRequest {
 		// copy over extras
 		if (this.extras) {
 			for (const extra in this.extras) {
-				if (Object.prototype.hasOwnProperty.call(this.extras, extra) && !map.hasOwnProperty(extra)) {
+				if (
+					Object.prototype.hasOwnProperty.call(this.extras, extra) &&
+					!Object.prototype.hasOwnProperty.call(map, extra)
+				) {
 					// check before inserting to requestMap
 					map[extra] = this.extras[extra];
 				}
