@@ -8,12 +8,12 @@ using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
 
-internal sealed class ExamineEntitySearchService : IExamineEntitySearchService
+internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
 {
     private readonly IBackOfficeExamineSearcher _backOfficeExamineSearcher;
     private readonly IEntityService _entityService;
 
-    public ExamineEntitySearchService(IBackOfficeExamineSearcher backOfficeExamineSearcher, IEntityService entityService)
+    public IndexedEntitySearchService(IBackOfficeExamineSearcher backOfficeExamineSearcher, IEntityService entityService)
     {
         _backOfficeExamineSearcher = backOfficeExamineSearcher;
         _entityService = entityService;
