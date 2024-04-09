@@ -58,17 +58,18 @@ export class UmbDocumentUserPermissionCondition
 		if (!this.#entityType) return;
 		if (this.#unique === undefined) return;
 
-		let verbs: Array<string> = [];
+		let verbs: Array<string> = this.#fallbackPermissions;
 
 		if (this.#documentPermissions) {
 			const permissionsForCurrentDocument = this.#documentPermissions.find(
 				(permission) => permission.document.id === this.#unique,
 			);
 			const currentDocumentVerbs = permissionsForCurrentDocument ? permissionsForCurrentDocument.verbs : [];
-			verbs = this.#fallbackPermissions.concat(currentDocumentVerbs);
+			verbs = verbs.concat(currentDocumentVerbs);
 		}
 
-		this.permitted = verbs.includes(this.config.match);
+		const uniqueVerbs = [...new Set(verbs)];
+		this.permitted = this.config.allOf.every((verb) => uniqueVerbs.includes(verb));
 	}
 }
 
@@ -78,9 +79,9 @@ export type UmbDocumentUserPermissionConditionConfig =
 		 *
 		 *
 		 * @example
-		 * "Umb.Document.Create"
+		 * ["Umb.Document.Save", "Umb.Document.Publish"]
 		 */
-		match: string;
+		allOf: Array<string>;
 	};
 
 export const manifest: ManifestCondition = {

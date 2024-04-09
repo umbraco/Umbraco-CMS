@@ -2,7 +2,12 @@ import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_PICKER_MODAL } from '../modals/index.js';
 import {
+	UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT,
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,
+	UMB_USER_PERMISSION_DOCUMENT_DUPLICATE,
+	UMB_USER_PERMISSION_DOCUMENT_MOVE,
+	UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
+	UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
 } from '../user-permissions/constants.js';
@@ -28,7 +33,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
-				match: UMB_USER_PERMISSION_DOCUMENT_DELETE,
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
 			},
 		],
 	},
@@ -47,7 +52,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
-				match: UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT,
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT],
 			},
 		],
 	},
@@ -66,7 +71,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
-				match: UMB_USER_PERMISSION_DOCUMENT_MOVE,
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_MOVE],
 			},
 		],
 	},
@@ -85,7 +90,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
-				match: UMB_USER_PERMISSION_DOCUMENT_DUPLICATE,
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_DUPLICATE],
 			},
 		],
 	},
@@ -104,7 +109,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
-				match: UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
 			},
 		],
 	},
@@ -123,7 +128,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
-				match: UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH],
 			},
 		],
 	},
@@ -142,7 +147,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
-				match: UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS],
 			},
 		],
 	},
@@ -161,7 +166,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
-				match: UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS],
 			},
 		],
 	},

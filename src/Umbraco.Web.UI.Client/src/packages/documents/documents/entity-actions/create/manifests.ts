@@ -18,7 +18,7 @@ const entityActions: Array<ManifestTypes> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
-				match: UMB_USER_PERMISSION_DOCUMENT_CREATE,
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
 			},
 		],
 	},
