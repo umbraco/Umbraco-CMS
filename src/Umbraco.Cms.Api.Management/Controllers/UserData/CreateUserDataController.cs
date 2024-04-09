@@ -19,7 +19,6 @@ public class CreateUserDataController : UserDataControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
 
     public CreateUserDataController(
-        CancellationToken cancellationToken,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserDataService userDataService,
         IUmbracoMapper umbracoMapper)
