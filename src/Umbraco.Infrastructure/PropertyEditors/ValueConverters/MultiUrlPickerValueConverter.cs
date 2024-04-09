@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;

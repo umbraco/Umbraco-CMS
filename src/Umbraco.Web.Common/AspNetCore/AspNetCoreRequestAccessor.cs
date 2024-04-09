@@ -2,14 +2,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.AspNetCore;
 
-public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBeginNotification>, IDisposable
+public class AspNetCoreRequestAccessor : IRequestAccessor, IDisposable
 {
     private readonly ISet<string> _applicationUrls = new HashSet<string>();
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -30,17 +28,6 @@ public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<
         _httpContextAccessor = httpContextAccessor;
         _webRoutingSettings = webRoutingSettings.CurrentValue;
         _onChangeDisposable = webRoutingSettings.OnChange(x => _webRoutingSettings = x);
-    }
-
-    /// <summary>
-    /// <para>
-    /// This is now a NoOp, and is no longer used, instead ApplicationUrlRequestBeginNotificationHandler is used
-    /// </para>
-    /// </summary>
-    [Obsolete("This is no longer used, AspNetCoreRequestAccessor will no longer implement INotificationHandler in V12, see ApplicationUrlRequestBeginNotificationHandler instead.")]
-    public void Handle(UmbracoRequestBeginNotification notification)
-    {
-        // NoOP
     }
 
     /// <inheritdoc />

@@ -1,5 +1,6 @@
 using System.Globalization;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;

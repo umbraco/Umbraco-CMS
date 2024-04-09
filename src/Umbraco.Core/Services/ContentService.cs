@@ -3517,12 +3517,6 @@ public class ContentService : RepositoryService, IContentService
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        // always ensure the blueprint is at the root
-        if (content.ParentId != -1)
-        {
-            content.ParentId = -1;
-        }
-
         content.Blueprint = true;
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
+using StaticServiceProvider = Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 

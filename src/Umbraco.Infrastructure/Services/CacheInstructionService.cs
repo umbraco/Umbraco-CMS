@@ -15,32 +15,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms
 {
-    namespace Core.Services.Implement
-    {
-        [Obsolete("Scheduled for removal in v12")]
-        public class CacheInstructionService : Infrastructure.Services.CacheInstructionService
-        {
-            public CacheInstructionService(
-                ICoreScopeProvider provider,
-                ILoggerFactory loggerFactory,
-                IEventMessagesFactory eventMessagesFactory,
-                ICacheInstructionRepository cacheInstructionRepository,
-                IProfilingLogger profilingLogger,
-                ILogger<Infrastructure.Services.CacheInstructionService> logger,
-                IOptions<GlobalSettings> globalSettings)
-                : base(
-                    provider,
-                    loggerFactory,
-                    eventMessagesFactory,
-                    cacheInstructionRepository,
-                    profilingLogger,
-                    logger,
-                    globalSettings)
-            {
-            }
-        }
-    }
-
     namespace Infrastructure.Services
     {
         /// <summary>
