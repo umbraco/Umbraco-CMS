@@ -7,8 +7,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-// not implementing ContentEditingServiceWithSortingBase - it might be for later as it has Move, Copy, etc.
-// FIXME: Refactor IContentEditingService and IContentBlueprintEditingService - they share logic
 internal sealed class ContentBlueprintEditingService
     : ContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>, IContentBlueprintEditingService
 {
@@ -33,7 +31,6 @@ internal sealed class ContentBlueprintEditingService
         return await Task.FromResult(blueprint);
     }
 
-    // NB: Some of the implementation is copied from <see cref="IContentEditingService.CreateAsync()" />
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentBlueprintCreateModel createModel, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)
@@ -60,7 +57,6 @@ internal sealed class ContentBlueprintEditingService
         return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentCreateResult { Content = blueprint, ValidationResult = result.Result.ValidationResult });
     }
 
-    // NB: Some of the implementation is copied from <see cref="IContentEditingService.CreateAsync()" />
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateFromContentAsync(Guid contentKey, string name, Guid? key, Guid userKey)
     {
         IContent? content = ContentService.GetById(contentKey);
@@ -89,7 +85,6 @@ internal sealed class ContentBlueprintEditingService
         return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentCreateResult { Content = blueprint });
     }
 
-    // NB: Some of the implementation is copied from <see cref="IContentEditingService.UpdateAsync()" />
     public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentBlueprintUpdateModel updateModel, Guid userKey)
     {
         IContent? blueprint = await GetAsync(key);
@@ -137,6 +132,44 @@ internal sealed class ContentBlueprintEditingService
         return Attempt.SucceedWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, blueprint);
     }
 
+    public async Task<Attempt<ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
+    {
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        IContent? toMove = await GetAsync(key);
+        if (toMove is null)
+        {
+            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
+        }
+
+        var parentId = Constants.System.Root;
+        if (containerKey.HasValue && containerKey.Value != Guid.Empty)
+        {
+            EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
+            if (container is null)
+            {
+                return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
+            }
+
+            parentId = container.Id;
+        }
+
+        if (toMove.ParentId == parentId)
+        {
+            return Attempt.Succeed(ContentEditingOperationStatus.Success);
+        }
+
+        // NOTE: as long as the parent ID is correct the document repo takes care of updating the rest of the
+        //       structural node data like path, level, sort orders etc.
+        toMove.ParentId = parentId;
+
+        // Save blueprint
+        await SaveAsync(toMove, userKey);
+
+        scope.Complete();
+
+        return Attempt.Succeed(ContentEditingOperationStatus.Success);
+    }
+
     protected override IContent New(string? name, int parentId, IContentType contentType)
         => new Content(name, parentId, contentType);
 
@@ -175,43 +208,5 @@ internal sealed class ContentBlueprintEditingService
     {
         IEnumerable<IContent> existing = ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
         return existing.Any(c => c.Name == name && c.Id != content.Id) is false;
-    }
-
-    public async Task<Attempt<ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? containerKey, Guid userKey)
-    {
-        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        IContent? toMove = await GetAsync(key);
-        if (toMove is null)
-        {
-            return Attempt.Fail(ContentEditingOperationStatus.NotFound);
-        }
-
-        var parentId = Constants.System.Root;
-        if (containerKey.HasValue && containerKey.Value != Guid.Empty)
-        {
-            EntityContainer? container = await _containerService.GetAsync(containerKey.Value);
-            if (container is null)
-            {
-                return Attempt.Fail(ContentEditingOperationStatus.ParentNotFound);
-            }
-
-            parentId = container.Id;
-        }
-
-        if (toMove.ParentId == parentId)
-        {
-            return Attempt.Succeed(ContentEditingOperationStatus.Success);
-        }
-
-        // NOTE: as long as the parent ID is correct the document repo takes care of updating the rest of the
-        //       structural node data like path, level, sort orders etc.
-        toMove.ParentId = parentId;
-
-        // Save blueprint
-        await SaveAsync(toMove, userKey);
-
-        scope.Complete();
-
-        return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 }
