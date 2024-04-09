@@ -14,7 +14,6 @@ export type SearchItem = {
 	name: string;
 	icon?: string;
 	href: string;
-	parent: string;
 	url?: string;
 };
 export type SearchGroupItem = {
@@ -30,7 +29,20 @@ export class UmbSearchModalElement extends LitElement {
 	private _search = '';
 
 	@state()
-	private _groups: Array<SearchGroupItem> = [];
+	private _searchResults: Array<SearchItem> = [];
+
+	@state()
+	private searchTags: Array<string> = [
+		'Data Type',
+		'Document',
+		'Document Type',
+		'Media',
+		'Media Type',
+		'Member',
+		'Member Type',
+		'Users',
+		'User Group',
+	];
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -44,35 +56,24 @@ export class UmbSearchModalElement extends LitElement {
 		const target = event.target as HTMLInputElement;
 		this._search = target.value;
 
-		this.#updateGroups();
+		this.#updateSearchResults();
 	}
 
 	#onClearSearch() {
 		this._search = '';
 		this._input.value = '';
 		this._input.focus();
-		this.#updateGroups();
+		this.#updateSearchResults();
 	}
 
-	#updateGroups() {
-		const filtered = this.#mockData.filter((item) => {
-			return item.name.toLowerCase().includes(this._search.toLowerCase());
-		});
-
-		const grouped: Array<SearchGroupItem> = filtered.reduce((acc, item) => {
-			const group = acc.find((group) => group.name === item.parent);
-			if (group) {
-				group.items.push(item);
-			} else {
-				acc.push({
-					name: item.parent,
-					items: [item],
-				});
-			}
-			return acc;
-		}, [] as Array<SearchGroupItem>);
-
-		this._groups = grouped;
+	#updateSearchResults() {
+		if (this._search) {
+			this._searchResults = this.#mockApi.getDocuments.filter((item) =>
+				item.name.toLowerCase().includes(this._search.toLowerCase()),
+			);
+		} else {
+			this._searchResults = [];
+		}
 	}
 
 	render() {
@@ -87,31 +88,38 @@ export class UmbSearchModalElement extends LitElement {
 					type="text"
 					placeholder="Search..."
 					autocomplete="off" />
-				<div id="close-icon">
+				<!-- <div id="close-icon">
 					<button @click=${this.#onClearSearch}>clear</button>
-				</div>
+				</div> -->
 			</div>
+
+			${this.#renderSearchTags()}
 			${this._search
-				? html`<div id="main">
-						${this._groups.length > 0
-							? repeat(
-									this._groups,
-									(group) => group.name,
-									(group) => this.#renderGroup(group.name, group.items),
-								)
-							: html`<div id="no-results">Only mock data for now <strong>Search for blog</strong></div>`}
-					</div>`
+				? html`<div id="main">${this._searchResults.length > 0 ? this.#renderResults() : this.#renderNoResults()}</div>`
 				: nothing}
 		`;
 	}
 
-	#renderGroup(name: string, items: Array<SearchItem>) {
-		return html`
-			<div class="group">
-				<div class="group-name">${name}</div>
-				<div class="group-items">${repeat(items, (item) => item.name, this.#renderItem.bind(this))}</div>
-			</div>
-		`;
+	#renderSearchTags() {
+		return html`<div id="search-tags">
+			${repeat(
+				this.searchTags,
+				(provider) => provider,
+				(provider) => html`<div class="search-tag">${provider}</div>`,
+			)}
+		</div> `;
+	}
+
+	#renderResults() {
+		return repeat(
+			this._searchResults,
+			(item) => item.name,
+			(item) => this.#renderItem(item),
+		);
+	}
+
+	#renderNoResults() {
+		return html`<div id="no-results">Only mock data for now <strong>Search for blog</strong></div>`;
 	}
 
 	#renderItem(item: SearchItem) {
@@ -139,63 +147,77 @@ export class UmbSearchModalElement extends LitElement {
 		`;
 	}
 
-	#mockData: Array<SearchItem> = [
-		{
-			name: 'Blog',
-			href: '#',
-			icon: 'icon-thumbnail-list',
-			parent: 'Content',
-			url: '/blog/',
-		},
-		{
-			name: 'Popular blogs',
-			href: '#',
-			icon: 'icon-article',
-			parent: 'Content',
-			url: '/blog/popular-blogs/',
-		},
-		{
-			name: 'How to write a blog',
-			href: '#',
-			icon: 'icon-article',
-			parent: 'Content',
-			url: '/blog/how-to-write-a-blog/',
-		},
-		{
-			name: 'Blog hero',
-			href: '#',
-			icon: 'icon-picture',
-			parent: 'Media',
-		},
-		{
-			name: 'Contact form for blog',
-			href: '#',
-			parent: 'Document Types',
-		},
-		{
-			name: 'Blog',
-			href: '#',
-			parent: 'Document Types',
-		},
-		{
-			name: 'Blog link item',
-			href: '#',
-			parent: 'Document Types',
-		},
-	];
+	#mockApi = {
+		getDocuments: [
+			{
+				name: 'Blog',
+				href: '#',
+				icon: 'icon-thumbnail-list',
+				url: '/blog/',
+			},
+			{
+				name: 'Popular blogs',
+				href: '#',
+				icon: 'icon-article',
+				url: '/blog/popular-blogs/',
+			},
+			{
+				name: 'How to write a blog',
+				href: '#',
+				icon: 'icon-article',
+				url: '/blog/how-to-write-a-blog/',
+			},
+		],
+		getMedia: [
+			{
+				name: 'Blog hero',
+				href: '#',
+				icon: 'icon-picture',
+			},
+		],
+		getDocumentTypes: [
+			{
+				name: 'Contact form for blog',
+				href: '#',
+			},
+			{
+				name: 'Blog',
+				href: '#',
+			},
+			{
+				name: 'Blog link item',
+				href: '#',
+			},
+		],
+	};
 
 	static styles = [
 		UmbTextStyles,
 		css`
+			#search-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: var(--uui-size-space-2);
+				padding: 0 var(--uui-size-space-5);
+				padding-bottom: var(--uui-size-space-2);
+			}
+			.search-tag {
+				padding: var(--uui-size-space-3) var(--uui-size-space-4);
+				background: var(--uui-color-surface-alt);
+				line-height: 1;
+				white-space: nowrap;
+				border-radius: var(--uui-border-radius);
+			}
 			:host {
 				display: flex;
 				flex-direction: column;
-				width: min(500px, 100vw);
+				width: min(600px, 100vw);
 				height: 100%;
-				background-color: var(--uui-color-background);
+				background-color: var(--uui-color-surface);
 				box-sizing: border-box;
 				color: var(--uui-color-text);
 				font-size: 1rem;
+				padding-bottom: var(--uui-size-space-2);
 			}
 			input {
 				all: unset;
@@ -236,31 +258,16 @@ export class UmbSearchModalElement extends LitElement {
 			#main {
 				display: flex;
 				flex-direction: column;
-				padding: 0px var(--uui-size-space-6) var(--uui-size-space-5) var(--uui-size-space-6);
+				/* padding: 0px var(--uui-size-space-6) var(--uui-size-space-5) var(--uui-size-space-6); */
 				height: 100%;
-				border-top: 1px solid var(--uui-color-border);
-			}
-			.group {
-				margin-top: var(--uui-size-space-4);
-			}
-			.group-name {
-				font-weight: 600;
-				margin-bottom: var(--uui-size-space-1);
-			}
-			.group-items {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-3);
 			}
 			.item {
 				background: var(--uui-color-surface);
-				border: 1px solid var(--uui-color-border);
-				padding: var(--uui-size-space-3) var(--uui-size-space-4);
+				padding: var(--uui-size-space-3) var(--uui-size-space-5);
 				border-radius: var(--uui-border-radius);
 				color: var(--uui-color-interactive);
 				display: grid;
 				grid-template-columns: var(--uui-size-space-6) 1fr var(--uui-size-space-5);
-				height: min-content;
 				align-items: center;
 			}
 			.item:hover {
@@ -309,6 +316,7 @@ export class UmbSearchModalElement extends LitElement {
 				width: 100%;
 				margin-top: var(--uui-size-space-5);
 				color: var(--uui-color-text-alt);
+				margin: var(--uui-size-space-5) 0;
 			}
 		`,
 	];
