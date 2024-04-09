@@ -27,7 +27,7 @@ public class ResetPasswordTokenController : SecurityControllerBase
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status404NotFound)]
     [UserPasswordEnsureMinimumResponseTime]
-    public async Task<IActionResult> ResetPasswordToken(ResetPasswordTokenRequestModel model)
+    public async Task<IActionResult> ResetPasswordToken(CancellationToken cancellationToken, ResetPasswordTokenRequestModel model)
     {
         Attempt<PasswordChangedModel, UserOperationStatus> result = await _userService.ResetPasswordAsync(model.User.Id, model.ResetCode, model.Password);
 

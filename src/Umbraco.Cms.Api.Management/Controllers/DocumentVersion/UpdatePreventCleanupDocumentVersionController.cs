@@ -27,7 +27,7 @@ public class UpdatePreventCleanupDocumentVersionController : DocumentVersionCont
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Set(Guid id, bool preventCleanup)
+    public async Task<IActionResult> Set(CancellationToken cancellationToken, Guid id, bool preventCleanup)
     {
         Attempt<ContentVersionOperationStatus> attempt =
             await _contentVersionService.SetPreventCleanupAsync(id, preventCleanup, CurrentUserKey(_backOfficeSecurityAccessor));

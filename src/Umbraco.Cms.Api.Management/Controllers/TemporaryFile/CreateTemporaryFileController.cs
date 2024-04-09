@@ -26,7 +26,9 @@ public class CreateTemporaryFileController : TemporaryFileControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create([FromForm] CreateTemporaryFileRequestModel model)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        [FromForm] CreateTemporaryFileRequestModel model)
     {
         CreateTemporaryFileModel createModel = _umbracoMapper.Map<CreateTemporaryFileRequestModel, CreateTemporaryFileModel>(model)!;
 
