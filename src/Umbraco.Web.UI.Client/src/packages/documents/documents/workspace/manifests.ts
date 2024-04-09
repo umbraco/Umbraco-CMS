@@ -1,4 +1,9 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
+	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
+} from '../user-permissions/index.js';
 import { UmbDocumentSaveAndScheduleWorkspaceAction } from './actions/save-and-schedule.action.js';
 import { UmbDocumentUnpublishWorkspaceAction } from './actions/unpublish.action.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
@@ -101,6 +106,10 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: workspace.alias,
 			},
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
+			},
 		],
 	},
 	{
@@ -119,6 +128,10 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: workspace.alias,
+			},
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
 			},
 		],
 	},
@@ -155,6 +168,12 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 			label: 'Unpublish...',
 			icon: 'icon-globe',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH],
+			},
+		],
 	},
 	{
 		type: 'workspaceActionMenuItem',
@@ -168,6 +187,12 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 			label: 'Publish with descendants...',
 			icon: 'icon-globe',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
+			},
+		],
 	},
 	{
 		type: 'workspaceActionMenuItem',
@@ -181,6 +206,12 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 			label: 'Schedule...',
 			icon: 'icon-globe',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
+			},
+		],
 	},
 ];
 
