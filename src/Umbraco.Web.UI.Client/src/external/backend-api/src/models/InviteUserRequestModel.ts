@@ -3,9 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { CreateUserRequestModel } from './CreateUserRequestModel';
-
-export type InviteUserRequestModel = (CreateUserRequestModel & {
+export type InviteUserRequestModel = {
+    email: string;
+    userName: string;
+    name: string;
+    userGroupIds: Array<string>;
+    id?: string | null;
     message?: string | null;
-});
+};
 

@@ -1,9 +1,8 @@
 import { pagedResult } from '../paged-result.js';
 import type { UmbEntityMockDbBase } from './entity-base.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-export class UmbMockEntityTreeManager<T extends EntityTreeItemResponseModel> {
+export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: string } | null; hasChildren: boolean }> {
 	#db: UmbEntityMockDbBase<T>;
 	#treeItemMapper: (item: T) => any;
 

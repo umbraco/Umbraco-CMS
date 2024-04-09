@@ -3,9 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { UpdateContentForMemberRequestModel } from './UpdateContentForMemberRequestModel';
+import type { MemberValueModel } from './MemberValueModel';
+import type { MemberVariantRequestModel } from './MemberVariantRequestModel';
 
-export type UpdateMemberRequestModel = (UpdateContentForMemberRequestModel & {
+export type UpdateMemberRequestModel = {
+    values: Array<MemberValueModel>;
+    variants: Array<MemberVariantRequestModel>;
     email: string;
     username: string;
     oldPassword?: string | null;
@@ -14,5 +17,5 @@ export type UpdateMemberRequestModel = (UpdateContentForMemberRequestModel & {
     isApproved: boolean;
     isLockedOut: boolean;
     isTwoFactorEnabled: boolean;
-});
+};
 

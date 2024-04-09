@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DomainsPresentationModelBaseModel } from './DomainsPresentationModelBaseModel';
+import type { DomainPresentationModel } from './DomainPresentationModel';
 
-export type UpdateDomainsRequestModel = DomainsPresentationModelBaseModel;
+export type UpdateDomainsRequestModel = {
+    defaultIsoCode?: string | null;
+    domains: Array<DomainPresentationModel>;
+};
 

@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { TrackedReferenceContentTypeModel } from './TrackedReferenceContentTypeModel';
-
-export type TrackedReferenceDocumentTypeModel = TrackedReferenceContentTypeModel;
+export type TrackedReferenceDocumentTypeModel = {
+    icon?: string | null;
+    alias?: string | null;
+    name?: string | null;
+};
 

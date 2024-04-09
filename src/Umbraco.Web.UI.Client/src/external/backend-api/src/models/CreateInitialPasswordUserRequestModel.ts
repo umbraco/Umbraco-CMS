@@ -3,9 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { VerifyInviteUserRequestModel } from './VerifyInviteUserRequestModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type CreateInitialPasswordUserRequestModel = (VerifyInviteUserRequestModel & {
+export type CreateInitialPasswordUserRequestModel = {
+    user: ReferenceByIdModel;
+    token: string;
     password: string;
-});
+};
 

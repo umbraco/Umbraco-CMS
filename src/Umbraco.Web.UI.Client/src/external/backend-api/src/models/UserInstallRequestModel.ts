@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type HealthCheckGroupPresentationBaseModel = {
+export type UserInstallRequestModel = {
     name: string;
+    email: string;
+    password: string;
+    readonly subscribeToNewsletter: boolean;
 };
 

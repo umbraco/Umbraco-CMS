@@ -14,7 +14,7 @@ import { request as __request } from '../core/request';
 export class AuditLogResource {
 
     /**
-     * @returns PagedAuditLogWithUsernameResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getAuditLog({
@@ -44,7 +44,7 @@ export class AuditLogResource {
     }
 
     /**
-     * @returns PagedAuditLogResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getAuditLogById({
@@ -79,7 +79,7 @@ export class AuditLogResource {
     }
 
     /**
-     * @returns PagedAuditLogResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getAuditLogTypeByLogType({

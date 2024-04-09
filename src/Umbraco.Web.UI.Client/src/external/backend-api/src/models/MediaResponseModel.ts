@@ -3,13 +3,17 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentForMediaResponseModel } from './ContentForMediaResponseModel';
 import type { MediaTypeReferenceResponseModel } from './MediaTypeReferenceResponseModel';
 import type { MediaUrlInfoModel } from './MediaUrlInfoModel';
+import type { MediaValueModel } from './MediaValueModel';
+import type { MediaVariantResponseModel } from './MediaVariantResponseModel';
 
-export type MediaResponseModel = (ContentForMediaResponseModel & {
+export type MediaResponseModel = {
+    values: Array<MediaValueModel>;
+    variants: Array<MediaVariantResponseModel>;
+    id: string;
     urls: Array<MediaUrlInfoModel>;
     isTrashed: boolean;
     mediaType: MediaTypeReferenceResponseModel;
-});
+};
 

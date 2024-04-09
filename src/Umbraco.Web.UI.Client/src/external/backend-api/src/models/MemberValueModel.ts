@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ValueModelBaseModel } from './ValueModelBaseModel';
-
-export type MemberValueModel = ValueModelBaseModel;
+export type MemberValueModel = {
+    culture?: string | null;
+    segment?: string | null;
+    alias: string;
+    value?: any;
+};
 

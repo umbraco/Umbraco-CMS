@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class SearcherResource {
 
     /**
-     * @returns PagedSearcherResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getSearcher({
@@ -36,7 +36,7 @@ export class SearcherResource {
     }
 
     /**
-     * @returns PagedSearchResultResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getSearcherBySearcherNameQuery({

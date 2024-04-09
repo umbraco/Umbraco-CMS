@@ -3,10 +3,16 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentCollectionResponseModelBaseMediaValueModelMediaVariantResponseModel } from './ContentCollectionResponseModelBaseMediaValueModelMediaVariantResponseModel';
 import type { MediaTypeCollectionReferenceResponseModel } from './MediaTypeCollectionReferenceResponseModel';
+import type { MediaValueModel } from './MediaValueModel';
+import type { MediaVariantResponseModel } from './MediaVariantResponseModel';
 
-export type MediaCollectionResponseModel = (ContentCollectionResponseModelBaseMediaValueModelMediaVariantResponseModel & {
+export type MediaCollectionResponseModel = {
+    values: Array<MediaValueModel>;
+    variants: Array<MediaVariantResponseModel>;
+    id: string;
+    creator?: string | null;
+    sortOrder: number;
     mediaType: MediaTypeCollectionReferenceResponseModel;
-});
+};
 

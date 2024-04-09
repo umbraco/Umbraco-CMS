@@ -7,13 +7,11 @@ import {
 	UMB_COMPOSITION_PICKER_MODAL,
 	UmbContentTypeContainerStructureHelper,
 	type UmbContentTypeModel,
+	type UmbPropertyTypeContainerModel,
 } from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	CompositionTypeModel,
-	type PropertyTypeContainerModelBaseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import type {
 	ManifestWorkspaceViewContentTypeDesignEditorKind,
@@ -26,7 +24,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-content-type-design-editor')
 export class UmbContentTypeDesignEditorElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	#sorter = new UmbSorterController<PropertyTypeContainerModelBaseModel, UUITabElement>(this, {
+	#sorter = new UmbSorterController<UmbPropertyTypeContainerModel, UUITabElement>(this, {
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-tabs-id'),
 		getUniqueOfModel: (tab) => tab.id,
 		identifier: 'content-type-tabs-sorter',
@@ -96,7 +94,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	_tabs?: Array<PropertyTypeContainerModelBaseModel>;
+	_tabs?: Array<UmbPropertyTypeContainerModel>;
 
 	@state()
 	private _routerPath?: string;
@@ -233,7 +231,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		this._routes = routes;
 	}
 
-	async #requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
+	async #requestRemoveTab(tab: UmbPropertyTypeContainerModel | undefined) {
 		// TODO: Localize this:
 		const modalData: UmbConfirmModalData = {
 			headline: 'Delete tab',
@@ -290,7 +288,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		}, 100);
 	}
 
-	async #tabNameChanged(event: InputEvent, tab: PropertyTypeContainerModelBaseModel) {
+	async #tabNameChanged(event: InputEvent, tab: UmbPropertyTypeContainerModel) {
 		this._activeTabId = tab.id;
 		let newName = (event.target as HTMLInputElement).value;
 
@@ -432,7 +430,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		</uui-tab>`;
 	}
 
-	renderTab(tab: PropertyTypeContainerModelBaseModel) {
+	renderTab(tab: UmbPropertyTypeContainerModel) {
 		const path = this._routerPath + (tab.name ? '/tab/' + encodeFolderName(tab.name) : '/tab');
 		const tabActive = path === this._activePath;
 		const ownedTab = this._tabsStructureHelper.isOwnerChildContainer(tab.id!) ?? false;
@@ -446,7 +444,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		</uui-tab>`;
 	}
 
-	renderTabInner(tab: PropertyTypeContainerModelBaseModel, tabActive: boolean, ownedTab: boolean) {
+	renderTabInner(tab: UmbPropertyTypeContainerModel, tabActive: boolean, ownedTab: boolean) {
 		// TODO: Localize this:
 		if (this._sortModeActive) {
 			return html`<div class="no-edit">
@@ -486,13 +484,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		}
 	}
 
-	#changeOrderNumber(tab: PropertyTypeContainerModelBaseModel, e: UUIInputEvent) {
+	#changeOrderNumber(tab: UmbPropertyTypeContainerModel, e: UUIInputEvent) {
 		if (!e.target.value || !tab.id) return;
 		const sortOrder = Number(e.target.value);
 		this._tabsStructureHelper.partialUpdateContainer(tab.id, { sortOrder });
 	}
 
-	renderDeleteFor(tab: PropertyTypeContainerModelBaseModel) {
+	renderDeleteFor(tab: UmbPropertyTypeContainerModel) {
 		return html`<uui-button
 			label=${this.localize.term('actions_remove')}
 			class="trash"

@@ -3,9 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { VerifyResetPasswordTokenRequestModel } from './VerifyResetPasswordTokenRequestModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type ResetPasswordTokenRequestModel = (VerifyResetPasswordTokenRequestModel & {
+export type ResetPasswordTokenRequestModel = {
+    user: ReferenceByIdModel;
+    resetCode: string;
     password: string;
-});
+};
 

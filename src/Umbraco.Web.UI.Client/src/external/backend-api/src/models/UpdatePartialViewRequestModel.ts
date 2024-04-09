@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FileSystemFileUpdateRequestModelBaseModel } from './FileSystemFileUpdateRequestModelBaseModel';
-
-export type UpdatePartialViewRequestModel = FileSystemFileUpdateRequestModelBaseModel;
+export type UpdatePartialViewRequestModel = {
+    content: string;
+};
 
