@@ -21,43 +21,6 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     private readonly IRequestMemberAccessService _requestMemberAccessService;
     private const string PreviewContentRequestPathPrefix = $"/{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}";
 
-    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
-    public ByRouteContentApiController(
-        IApiPublishedContentCache apiPublishedContentCache,
-        IApiContentResponseBuilder apiContentResponseBuilder,
-        IPublicAccessService publicAccessService,
-        IRequestRoutingService requestRoutingService,
-        IRequestRedirectService requestRedirectService,
-        IRequestPreviewService requestPreviewService)
-        : this(
-            apiPublishedContentCache,
-            apiContentResponseBuilder,
-            requestRoutingService,
-            requestRedirectService,
-            requestPreviewService,
-            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberAccessService>())
-    {
-    }
-
-    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
-    public ByRouteContentApiController(
-        IApiPublishedContentCache apiPublishedContentCache,
-        IApiContentResponseBuilder apiContentResponseBuilder,
-        IPublicAccessService publicAccessService,
-        IRequestRoutingService requestRoutingService,
-        IRequestRedirectService requestRedirectService,
-        IRequestPreviewService requestPreviewService,
-        IRequestMemberAccessService requestMemberAccessService)
-        : this(
-            apiPublishedContentCache,
-            apiContentResponseBuilder,
-            requestRoutingService,
-            requestRedirectService,
-            requestPreviewService,
-            requestMemberAccessService)
-    {
-    }
-
     [Obsolete($"Please use the constructor that accepts {nameof(IApiContentPathResolver)}. Will be removed in V15.")]
     public ByRouteContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
