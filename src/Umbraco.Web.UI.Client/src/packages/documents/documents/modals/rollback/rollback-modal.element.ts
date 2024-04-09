@@ -181,7 +181,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		if (this.availableVariants.length < 2) return nothing;
 		return html`
 			<div id="language-select">
-				<b>Language</b>
+				<b>${this.localize.term('general_language')}</b>
 				<uui-select @change=${this.#onChangeCulture} .options=${this.availableVariants}></uui-select>
 			</div>
 		`;
@@ -203,12 +203,14 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 								<umb-localize-date date="${item.date}" .options=${this.#localizeDateOptions}></umb-localize-date>
 							</p>
 							<p>${item.user}</p>
-							<p>${item.isCurrentlyPublishedVersion ? 'Current published version' : ''}</p>
+							<p>${item.isCurrentlyPublishedVersion ? this.localize.term('rollback_currentPublishedVersion') : ''}</p>
 						</div>
 						<uui-button
 							look="secondary"
 							@click=${(event: Event) => this.#onPreventCleanup(event, item.id, !item.preventCleanup)}>
-							${item.preventCleanup ? 'Enable cleanup' : 'Prevent cleanup'}
+							${item.preventCleanup
+								? this.localize.term('contentTypeEditor_historyCleanupEnableCleanup')
+								: this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}
 						</uui-button>
 					</div>
 				`;
@@ -278,14 +280,18 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		return html`
 			<umb-body-layout headline="Rollback">
 				<div id="main">
-					<uui-box headline="Versions" id="box-left">
+					<uui-box headline=${this.localize.term('rollback_versions')} id="box-left">
 						<div>${this.#renderVersions()}</div>
 					</uui-box>
 					<uui-box headline=${this.currentVersionHeader} id="box-right"> ${this.#renderCurrentVersion()} </uui-box>
 				</div>
 				<umb-footer-layout slot="footer">
-					<uui-button slot="actions" look="secondary" @click=${this.#onCancel}>Cancel</uui-button>
-					<uui-button slot="actions" look="primary" @click=${this.#onRollback}>Rollback</uui-button>
+					<uui-button slot="actions" look="secondary" @click=${this.#onCancel}
+						>${this.localize.term('general_cancel')}</uui-button
+					>
+					<uui-button slot="actions" look="primary" @click=${this.#onRollback}
+						>${this.localize.term('general_cancel')}</uui-button
+					>
 				</umb-footer-layout>
 			</umb-body-layout>
 		`;
