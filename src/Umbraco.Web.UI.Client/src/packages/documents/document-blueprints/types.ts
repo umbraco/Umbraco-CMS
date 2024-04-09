@@ -19,8 +19,8 @@ export interface UmbDocumentBlueprintDetailModel {
 }
 
 export interface UmbDocumentBlueprintVariantModel extends UmbVariantModel {
-	state: UmbDocumentBlueprintVariantState | null;
-	publishDate: string | null;
+	state?: UmbDocumentBlueprintVariantState | null;
+	publishDate?: string | null;
 }
 
 export interface UmbDocumentBlueprintUrlInfoModel {

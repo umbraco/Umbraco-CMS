@@ -1,48 +1,41 @@
 import { UmbDocumentPropertyDataContext } from '../../documents/property-dataset-context/document-property-dataset-context.js';
-import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentBlueprintDetailRepository } from '../repository/index.js';
 import type {
 	UmbDocumentBlueprintDetailModel,
-	UmbDocumentBlueprintValueModel,
 	UmbDocumentBlueprintVariantModel,
 	UmbDocumentBlueprintVariantOptionModel,
 } from '../types.js';
-/* import { umbPickDocumentVariantModal, type UmbDocumentBlueprintVariantPickerModalType } from '../modals/index.js';*/
-import { UMB_DOCUMENT_BLUEPRINT_ROOT_WORKSPACE_ALIAS } from './manifests.js';
-import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	UmbEditableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
-	type UmbVariantableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
 	mergeObservables,
-	jsonStringComparison,
 	UmbArrayState,
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
-import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 type EntityType = UmbDocumentBlueprintDetailModel;
-export class UmbDocumentBlueprintWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbVariantableWorkspaceContextInterface<UmbDocumentBlueprintVariantModel>
-{
+export class UmbDocumentBlueprintWorkspaceContext extends UmbSubmittableWorkspaceContextBase<EntityType> {
 	//
 	public readonly repository = new UmbDocumentBlueprintDetailRepository(this);
 
-	#parent?: { entityType: string; unique: string | null };
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 
 	/**
-	 * The document is the current state/draft version of the document.
 	 */
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
@@ -57,13 +50,12 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
-
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
-	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
+
+	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
-	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.unique || null);
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
@@ -75,6 +67,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	);
 	#varies?: boolean;
 
+	readonly routes = new UmbWorkspaceRouteManager(this);
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	readonly variantOptions = mergeObservables(
@@ -109,12 +102,39 @@ export class UmbDocumentBlueprintWorkspaceContext
 	);
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DOCUMENT_BLUEPRINT_ROOT_WORKSPACE_ALIAS);
+		super(host, 'Umb.Workspace.Media');
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 		this.observe(this.varies, (varies) => (this.#varies = varies));
 
 		this.loadLanguages();
+
+		this.routes.setRoutes([
+			{
+				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique',
+				component: () => import('./document-blueprint-workspace-editor.element.js'),
+				setup: async (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					const documentTypeUnique = info.match.params.documentTypeUnique;
+					this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
+
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
+				path: 'edit/:unique',
+				component: () => import('./document-blueprint-workspace-editor.element.js'),
+				setup: (_component, info) => {
+					const unique = info.match.params.unique;
+					this.load(unique);
+				},
+			},
+		]);
 	}
 
 	resetState() {
@@ -132,31 +152,42 @@ export class UmbDocumentBlueprintWorkspaceContext
 	async load(unique: string) {
 		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
-		const { data } = await this.#getDataPromise;
-		if (!data) return undefined;
+		type GetDataType = Awaited<ReturnType<UmbDocumentBlueprintDetailRepository['requestByUnique']>>;
+		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 
-		this.setIsNew(false);
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-		return data || undefined;
+		if (data) {
+			this.setIsNew(false);
+			this.#persistedData.update(data);
+			this.#currentData.update(data);
+		}
+
+		this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'UmbDocumentBlueprintStoreObserver');
+	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/media');
+		}
 	}
 
 	async create(parent: { entityType: string; unique: string | null }, documentTypeUnique: string) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		this.#getDataPromise = this.repository.createScaffold({
-			documentType: {
-				unique: documentTypeUnique,
-				collection: null,
-			},
+			documentType: { unique: documentTypeUnique, collection: null },
 		});
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
 		this.setIsNew(true);
-		this.#persistedData.setValue(undefined);
+		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 		return data;
+	}
+
+	getCollectionAlias() {
+		return 'Umb.Collection.Media';
 	}
 
 	getData() {
@@ -179,13 +210,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 	getVaries() {
 		return this.#varies;
 	}
-	/*
-	getVariesByCulture() {
-		return this.#variesByCulture;
-	}
-	getVariesBySegment() {
-		return this.#variesBySegment;
-	}*/
 
 	variantById(variantId: UmbVariantId) {
 		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x)));
@@ -206,34 +230,29 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
-		/*
-		const oldVariants = this.#currentData.getValue()?.variants || [];
-		const variants = partialUpdateFrozenArray(
-			oldVariants,
-			{ name },
-			variantId ? (x) => variantId.compare(x) : () => true,
-		);
-		this.#currentData.update({ variants });
-		*/
-		// TODO: We should move this type of logic to the act of saving [NL]
+		// const oldVariants = this.#currentData.getValue()?.variants || [];
+		// const variants = partialUpdateFrozenArray(
+		// 	oldVariants,
+		// 	{ name },
+		// 	variantId ? (x) => variantId.compare(x) : () => true,
+		// );
+		// this.#currentData.update({ variants });
+
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
-	setTemplate(templateUnique: string) {
-		this.#currentData.update({ template: { unique: templateUnique } });
+	name(variantId?: UmbVariantId) {
+		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '');
 	}
 
 	async propertyStructureById(propertyId: string) {
 		return this.structure.propertyStructureById(propertyId);
 	}
 
-	async propertyValueByAlias<PropertyValueType = unknown>(
-		propertyAlias: string,
-		variantId?: UmbVariantId,
-	): Promise<Observable<PropertyValueType | undefined> | undefined> {
+	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
 		return this.#currentData.asObservablePart(
 			(data) =>
-				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
+				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x as any) : true))
 					?.value as PropertyValueType,
 		);
 	}
@@ -245,25 +264,29 @@ export class UmbDocumentBlueprintWorkspaceContext
 	 * @returns The value or undefined if not set or found.
 	 */
 	getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
-		const currentData = this.getData();
+		const currentData = this.#currentData.value;
 		if (currentData) {
 			const newDataSet = currentData.values?.find(
-				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
+				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
 			);
 			return newDataSet?.value as ReturnType;
 		}
 		return undefined;
 	}
-	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
-		variantId ??= UmbVariantId.CreateInvariant();
+	async setPropertyValue<UmbDocumentBlueprintValueModel = unknown>(
+		alias: string,
+		value: UmbDocumentBlueprintValueModel,
+		variantId?: UmbVariantId,
+	) {
+		if (!variantId) throw new Error('VariantId is missing');
 
-		const entry = { ...variantId.toObject(), alias, value } as UmbDocumentBlueprintValueModel<ValueType>;
-		const currentData = this.getData();
+		const entry = { ...variantId.toObject(), alias, value };
+		const currentData = this.#currentData.value;
 		if (currentData) {
 			const values = appendToFrozenArray(
-				currentData.values ?? [],
+				currentData.values || [],
 				entry,
-				(x) => x.alias === alias && variantId!.compare(x),
+				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
 			);
 			this.#currentData.update({ values });
 
@@ -272,7 +295,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 		}
 	}
 
-	#calculateChangedVariants() {
+	/* 	#calculateChangedVariants() {
 		const persisted = this.#persistedData.getValue();
 		const current = this.#currentData.getValue();
 		if (!current) throw new Error('Current data is missing');
@@ -302,7 +325,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 				.filter((x) => x.equal === false)
 				.map((x) => new UmbVariantId(x.culture, x.segment)) ?? []
 		);
-	}
+	} */
 
 	#updateVariantData(variantId: UmbVariantId, update?: Partial<UmbDocumentBlueprintVariantModel>) {
 		const currentData = this.getData();
@@ -314,9 +337,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 			const newVariants = appendToFrozenArray(
 				currentData.variants,
 				{
-					state: null,
 					name: '',
-					publishDate: null,
 					createDate: null,
 					updateDate: null,
 					...variantId.toObject(),
@@ -333,9 +354,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 			// Cause we are invariant, we will just overwrite all variants with this one:
 			const newVariants = [
 				{
-					state: null,
 					name: '',
-					publishDate: null,
 					createDate: null,
 					updateDate: null,
 					...invariantVariantId.toObject(),
@@ -348,113 +367,28 @@ export class UmbDocumentBlueprintWorkspaceContext
 			throw new Error('Varies by culture is missing');
 		}
 	}
-	/*
-	async #runUserFlorFor(type: UmbDocumentBlueprintVariantPickerModalType): Promise<UmbVariantId[]> {
-		const activeVariants = this.splitView.getActiveVariants();
 
-		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
-		// TODO: We need to filter the selected array, so it only contains one of each variantId. [NL]
-		const changedVariantIds = this.#calculateChangedVariants();
-		const selected = activeVariantIds.concat(changedVariantIds);
-		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
-
-		const options = await firstValueFrom(this.variantOptions);
-
-		// If there is only one variant, we don't need to open the modal.
-		if (options.length === 0) {
-			throw new Error('No variants are available');
-		} else if (options.length === 1) {
-			// If only one option we will skip ahead and save the document with the only variant available:
-			const firstVariant = UmbVariantId.Create(options[0]);
-			return this.#performSaveOrCreate([firstVariant]);
-		}
-
-		const selectedVariants = await umbPickDocumentVariantModal(this, { type, options, selected });
-
-		// If no variants are selected, we don't save anything.
-		if (!selectedVariants.length) return [];
-
-		return this.#performSaveOrCreate(selectedVariants);
-	}
-	*/
-
-	#buildSaveData(selectedVariants: Array<UmbVariantId>): UmbDocumentBlueprintDetailModel {
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-		if (!data.unique) throw new Error('Unique is missing');
-		const invariantVariantId = UmbVariantId.CreateInvariant();
-		if (this.#varies === false) {
-			// If we do not vary, we wil just do this for the invariant variant id.
-			selectedVariants = [invariantVariantId];
-		}
-
-		const persistedData = this.#persistedData.getValue();
-
-		const variantIdsToParseForValues = [...selectedVariants];
-		if (this.#varies === true) {
-			// If we vary then We need to include the invariant variant id for invariant values to be saved, as we always want to save the invariant values.
-			variantIdsToParseForValues.push(invariantVariantId);
-		}
-
-		// Combine data and persisted data depending on the selectedVariants. Always use the invariant values from the data.
-		// loops over each entry in values, determine wether the value should be from the data or the persisted data, depending on wether its a selectedVariant or an invariant value.
-		// loops over each entry in variants, determine wether the variant should be from the data or the persisted data, depending on the selectedVariants.
-		return {
-			...data,
-			values: data.values
-				.map((value) => {
-					// Should this value be saved?
-					if (variantIdsToParseForValues.some((x) => x.compare(value))) {
-						return value;
-					} else {
-						// If not we will find the value in the persisted data and use that instead.
-						return persistedData?.values.find(
-							(x) => x.alias === value.alias && x.culture === value.culture && x.segment === value.segment,
-						);
-					}
-				})
-				.filter((x) => x !== undefined) as Array<UmbDocumentBlueprintValueModel<unknown>>,
-			variants: data.variants
-				.map((variant) => {
-					// Should this value be saved?
-					if (selectedVariants.some((x) => x.compare(variant))) {
-						return variant;
-					} else {
-						// If not we will find the value in the persisted data and use that instead.
-						return persistedData?.variants.find((x) => x.culture === variant.culture && x.segment === variant.segment);
-					}
-				})
-				.filter((x) => x !== undefined) as Array<UmbDocumentBlueprintVariantModel>,
-		};
-	}
-
-	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>) {
-		const saveData = this.#buildSaveData(selectedVariants);
+	async #createOrSave() {
+		if (!this.#currentData.value?.unique) throw new Error('Unique is missing');
 
 		if (this.getIsNew()) {
-			if (!this.#parent) throw new Error('Parent is not set');
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
+			const value = this.#currentData.value;
 
-			const { data: create, error } = await this.repository.create(saveData, this.#parent.unique);
-			if (!create || error) {
-				console.error('Error creating document', error);
-				throw new Error('Error creating document');
+			if ((await this.repository.create(value, parent.unique)).data !== undefined) {
+				this.setIsNew(false);
+
+				// TODO: this might not be the right place to alert the tree, but it works for now
+				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+				const event = new UmbRequestReloadTreeItemChildrenEvent({
+					entityType: parent.entityType,
+					unique: parent.unique,
+				});
+				eventContext.dispatchEvent(event);
 			}
-
-			this.setIsNew(false);
-
-			// TODO: this might not be the right place to alert the tree, but it works for now
-			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: this.#parent.entityType,
-				unique: this.#parent.unique,
-			});
-			eventContext.dispatchEvent(event);
 		} else {
-			const { data: save, error } = await this.repository.save(saveData);
-			if (!save || error) {
-				console.error('Error saving document', error);
-				throw new Error('Error saving document');
-			}
+			await this.repository.save(this.#currentData.value);
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
@@ -464,19 +398,14 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 			actionEventContext.dispatchEvent(event);
 		}
-
-		return selectedVariants;
 	}
 
-	async save() {
-		//await this.#runUserFlorFor('save');
+	async submit() {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
-
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-
-		this.workspaceComplete(data);
+		await this.#createOrSave();
+		this.setIsNew(false);
+		return true;
 	}
 
 	async delete() {
@@ -486,17 +415,24 @@ export class UmbDocumentBlueprintWorkspaceContext
 		}
 	}
 
-	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbDocumentPropertyDataContext(host, this as any, variantId);
+	/*
+	concept notes:
+
+	public saveAndPreview() {
+
 	}
+	*/
+	/*
+	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
+		return new UmbDocumentPropertyDataContext(host, this, variantId);
+	}*/
 
 	public destroy(): void {
 		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.structure.destroy();
-		this.#languageRepository.destroy();
 		super.destroy();
 	}
 }
 
-export default UmbDocumentBlueprintWorkspaceContext;
+export { UmbDocumentBlueprintWorkspaceContext as api };

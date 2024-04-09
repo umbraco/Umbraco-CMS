@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-document-blueprint-root-workspace')
 export class UmbDocumentBlueprintRootWorkspaceElement extends UmbLitElement {
 	render() {
-		return html`<umb-workspace-editor alias="Umb.Workspace.DocumentBlueprint.Root" headline="Document Blueprints">
+		return html`<umb-workspace-editor alias="Umb.Workspace.DocumentBlueprint" headline="Document Blueprints">
 			<div id="wrapper">
 				<uui-box>
 					<h2>

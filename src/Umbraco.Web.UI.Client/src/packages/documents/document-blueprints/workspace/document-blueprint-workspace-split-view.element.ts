@@ -42,7 +42,7 @@ export class UmbDocumentBlueprintWorkspaceSplitViewElement extends UmbLitElement
 								view.index + '_' + (view.culture ?? '') + '_' + (view.segment ?? '') + '_' + this._variants!.length,
 							(view) => html`
 								<umb-workspace-split-view
-									alias="Umb.Workspace.Document"
+									alias="Umb.Workspace.DocumentBlueprint"
 									.splitViewIndex=${view.index}
 									.displayNavigation=${view.index === this._variants!.length - 1}></umb-workspace-split-view>
 							`,

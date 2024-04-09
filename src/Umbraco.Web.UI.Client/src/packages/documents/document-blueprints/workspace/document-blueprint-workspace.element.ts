@@ -37,7 +37,7 @@ export class UmbDocumentBlueprintWorkspaceElement extends UmbLitElement {
 			path: 'edit/:unique',
 			component: this.#editorElement,
 			setup: (_component, info) => {
-				this.removeControllerByAlias('isNewRedirectController');
+				this.removeUmbControllerByAlias('isNewRedirectController');
 				const unique = info.match.params.unique;
 				this.#workspaceContext.load(unique);
 			},
