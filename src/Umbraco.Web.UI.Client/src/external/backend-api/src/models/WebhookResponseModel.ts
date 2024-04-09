@@ -4,10 +4,13 @@
 /* eslint-disable */
 
 import type { WebhookEventResponseModel } from './WebhookEventResponseModel';
-import type { WebhookModelBaseModel } from './WebhookModelBaseModel';
 
-export type WebhookResponseModel = (WebhookModelBaseModel & {
+export type WebhookResponseModel = {
+    enabled: boolean;
+    url: string;
+    contentTypeKeys: Array<string>;
+    headers: Record<string, string>;
     id: string;
     events: Array<WebhookEventResponseModel>;
-});
+};
 

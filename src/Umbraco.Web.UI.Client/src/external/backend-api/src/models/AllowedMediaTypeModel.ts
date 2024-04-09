@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { AllowedContentTypeModel } from './AllowedContentTypeModel';
-
-export type AllowedMediaTypeModel = AllowedContentTypeModel;
+export type AllowedMediaTypeModel = {
+    id: string;
+    name: string;
+    description?: string | null;
+    icon?: string | null;
+};
 

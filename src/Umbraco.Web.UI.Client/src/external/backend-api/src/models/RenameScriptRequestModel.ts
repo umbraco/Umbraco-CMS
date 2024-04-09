@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FileSystemRenameRequestModelBaseModel } from './FileSystemRenameRequestModelBaseModel';
-
-export type RenameScriptRequestModel = FileSystemRenameRequestModelBaseModel;
+export type RenameScriptRequestModel = {
+    name: string;
+};
 

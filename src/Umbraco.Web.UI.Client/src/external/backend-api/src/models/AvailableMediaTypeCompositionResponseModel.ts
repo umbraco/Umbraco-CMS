@@ -3,7 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { AvailableContentTypeCompositionResponseModelBaseModel } from './AvailableContentTypeCompositionResponseModelBaseModel';
-
-export type AvailableMediaTypeCompositionResponseModel = AvailableContentTypeCompositionResponseModelBaseModel;
+export type AvailableMediaTypeCompositionResponseModel = {
+    id: string;
+    name: string;
+    icon: string;
+    folderPath: Array<string>;
+    isCompatible: boolean;
+};
 

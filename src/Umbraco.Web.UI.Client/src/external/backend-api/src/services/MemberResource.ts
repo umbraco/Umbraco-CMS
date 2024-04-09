@@ -18,7 +18,7 @@ import { request as __request } from '../core/request';
 export class MemberResource {
 
     /**
-     * @returns PagedMemberResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getFilterMember({
@@ -85,7 +85,7 @@ export class MemberResource {
     }
 
     /**
-     * @returns PagedModelMemberItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemMemberSearch({

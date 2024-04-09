@@ -3,7 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentForDocumentResponseModel } from './ContentForDocumentResponseModel';
+import type { DocumentTypeReferenceResponseModel } from './DocumentTypeReferenceResponseModel';
+import type { DocumentValueModel } from './DocumentValueModel';
+import type { DocumentVariantResponseModel } from './DocumentVariantResponseModel';
 
-export type DocumentBlueprintResponseModel = ContentForDocumentResponseModel;
+export type DocumentBlueprintResponseModel = {
+    values: Array<DocumentValueModel>;
+    variants: Array<DocumentVariantResponseModel>;
+    id: string;
+    documentType: DocumentTypeReferenceResponseModel;
+};
 

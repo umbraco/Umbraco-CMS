@@ -40,7 +40,7 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns PagedModelMemberTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemMemberTypeSearch({
@@ -230,7 +230,7 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMemberTypeRoot({

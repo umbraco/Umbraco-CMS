@@ -3,10 +3,15 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FolderTreeItemResponseModel } from './FolderTreeItemResponseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type DocumentTypeTreeItemResponseModel = (FolderTreeItemResponseModel & {
+export type DocumentTypeTreeItemResponseModel = {
+    hasChildren: boolean;
+    id: string;
+    parent?: ReferenceByIdModel | null;
+    name: string;
+    isFolder: boolean;
     isElement: boolean;
     icon: string;
-});
+};
 
