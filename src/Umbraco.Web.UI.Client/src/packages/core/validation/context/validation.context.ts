@@ -64,6 +64,7 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validator succeeded, this depends on the validators and wether forceSucceed is set.
 	 */
 	async validate(): Promise<boolean> {
+		// TODO: clear server messages here?, well maybe only if we know we will get new server messages? Do the server messages hook into the system like another validator?
 		this.#validationMode = true;
 		const results = await Promise.all(this.#validators.map((v) => v.validate()));
 

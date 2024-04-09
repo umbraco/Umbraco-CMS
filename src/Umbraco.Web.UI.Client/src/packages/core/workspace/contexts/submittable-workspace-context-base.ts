@@ -18,7 +18,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique (instead of the object type)
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
 
-	readonly #validation = new UmbValidationContext(this);
+	public readonly validation = new UmbValidationContext(this);
 
 	#submitPromise: Promise<void> | undefined;
 	#submitResolve: (() => void) | undefined;
@@ -48,17 +48,8 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		});
 	}
 
-	/*
-	protected passValidation() {
-		this.#validation.preventFail();
-	}
-	protected failValidation() {
-		this.#validation.allowFail();
-	}
-	*/
-
 	protected resetState() {
-		this.#validation.reset();
+		this.validation.reset();
 		this.#isNew.setValue(undefined);
 	}
 
@@ -85,7 +76,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			this.#submitResolve = resolve;
 			this.#submitReject = reject;
 		});
-		this.#validation.validate().then(
+		this.validation.validate().then(
 			async () => {
 				onValid().then(this.#completeSubmit, this.#rejectSubmit);
 			},
@@ -125,7 +116,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		this.#resolveSubmit();
 
 		// Calling reset on the validation context here. [NL]
-		this.#validation.reset();
+		this.validation.reset();
 	};
 
 	//abstract getIsDirty(): Promise<boolean>;
