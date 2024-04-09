@@ -1,10 +1,10 @@
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbLitElement } from '../../../lit-element/index.js';
+import { UMB_PROPERTY_CONTEXT } from '../../../property/property/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputMultiUrlElement } from '@umbraco-cms/backoffice/components';
 import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**

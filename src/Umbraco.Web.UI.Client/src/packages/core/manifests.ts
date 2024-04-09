@@ -1,3 +1,4 @@
+import { manifests as authManifests } from './auth/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as contentTypeManifests } from './content-type/manifests.js';
 import { manifests as cultureManifests } from './culture/manifests.js';
@@ -18,6 +19,7 @@ import { manifests as workspaceManifests } from './workspace/manifests.js';
 import type { ManifestTypes, UmbBackofficeManifestKind } from './extension-registry/index.js';
 
 export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+	...authManifests,
 	...extensionManifests,
 	...cultureManifests,
 	...localizationManifests,
