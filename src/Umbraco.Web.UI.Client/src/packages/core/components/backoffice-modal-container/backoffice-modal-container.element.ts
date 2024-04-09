@@ -113,7 +113,6 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 
 			:host([fill-background]) #container::after {
 				background: var(--backdrop-background);
-				opacity: 0.75;
 			}
 		`,
 	];
