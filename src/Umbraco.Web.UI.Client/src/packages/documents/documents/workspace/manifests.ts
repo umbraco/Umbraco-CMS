@@ -16,6 +16,7 @@ import type {
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
+import { UmbDocumentSaveWorkspaceAction } from './actions/save.action.js';
 
 export const UMB_DOCUMENT_WORKSPACE_ALIAS = 'Umb.Workspace.Document';
 
@@ -115,7 +116,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		alias: 'Umb.WorkspaceAction.Document.Save',
 		name: 'Save Document Workspace Action',
 		weight: 80,
-		api: UmbSubmitWorkspaceAction,
+		api: () => import('./actions/save.action.js'),
 		meta: {
 			label: 'Save',
 			look: 'secondary',
@@ -125,10 +126,6 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: workspace.alias,
-			},
-			{
-				alias: 'Umb.Condition.UserPermission.Document',
-				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE],
 			},
 		],
 	},
