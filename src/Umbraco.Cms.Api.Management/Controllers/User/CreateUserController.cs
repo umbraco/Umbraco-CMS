@@ -18,18 +18,15 @@ public class CreateUserController : UserControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _presentationFactory;
-    private readonly IUmbracoMapper _mapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CreateUserController(
         IUserService userService,
         IUserPresentationFactory presentationFactory,
-        IUmbracoMapper mapper,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userService = userService;
         _presentationFactory = presentationFactory;
-        _mapper = mapper;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
