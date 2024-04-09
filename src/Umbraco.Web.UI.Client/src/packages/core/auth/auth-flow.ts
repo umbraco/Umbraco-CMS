@@ -89,6 +89,7 @@ export class UmbAuthFlow {
 	// state
 	readonly #configuration: AuthorizationServiceConfiguration;
 	readonly #redirectUri: string;
+	readonly #postLogoutRedirectUri: string;
 	readonly #clientId: string;
 	readonly #scope: string;
 
@@ -99,10 +100,12 @@ export class UmbAuthFlow {
 	constructor(
 		openIdConnectUrl: string,
 		redirectUri: string,
+		postLogoutRedirectUri: string,
 		clientId = 'umbraco-back-office',
 		scope = 'offline_access',
 	) {
 		this.#redirectUri = redirectUri;
+		this.#postLogoutRedirectUri = postLogoutRedirectUri;
 		this.#clientId = clientId;
 		this.#scope = scope;
 
@@ -283,7 +286,7 @@ export class UmbAuthFlow {
 		// which will redirect the user back to the client
 		// and the client will then try and log in again (if the user is not logged in)
 		// which will redirect the user to the login page
-		location.href = `${this.#configuration.endSessionEndpoint}?post_logout_redirect_uri=${this.#redirectUri}`;
+		location.href = `${this.#configuration.endSessionEndpoint}?post_logout_redirect_uri=${this.#postLogoutRedirectUri}`;
 	}
 
 	/**

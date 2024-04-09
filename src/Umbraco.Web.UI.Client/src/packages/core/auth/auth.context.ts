@@ -26,7 +26,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		this.#serverUrl = serverUrl;
 		this.#backofficePath = backofficePath;
 
-		this.#authFlow = new UmbAuthFlow(serverUrl, this.#getRedirectUrl());
+		this.#authFlow = new UmbAuthFlow(serverUrl, this.getRedirectUrl(), this.getPostLogoutRedirectUrl());
 	}
 
 	/**
@@ -166,7 +166,11 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		return this.isInitialized.pipe(switchMap(() => umbExtensionsRegistry.byType('authProvider')));
 	}
 
-	#getRedirectUrl() {
+	getRedirectUrl() {
 		return `${window.location.origin}${this.#backofficePath}`;
+	}
+
+	getPostLogoutRedirectUrl() {
+		return `${window.location.origin}${this.#backofficePath.endsWith('/') ? this.#backofficePath : this.#backofficePath + '/'}logout`;
 	}
 }

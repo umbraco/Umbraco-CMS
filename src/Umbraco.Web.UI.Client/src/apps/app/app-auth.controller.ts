@@ -65,7 +65,9 @@ export class UmbAppAuthController extends UmbControllerBase {
 		}
 
 		// Save location.href so we can redirect to it after login
-		window.sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, location.href);
+		if (location.href !== this.#authContext.getPostLogoutRedirectUrl()) {
+			window.sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, location.href);
+		}
 
 		// If the user is timed out, we can show the login modal directly
 		if (userLoginState === 'timedOut') {
@@ -90,7 +92,10 @@ export class UmbAppAuthController extends UmbControllerBase {
 			this.#authContext.makeAuthorizationRequest();
 		} else {
 			// Check if any provider is redirecting directly to the provider
-			const redirectProvider = availableProviders.find((provider) => provider.meta?.behavior?.autoRedirect);
+			const redirectProvider =
+				userLoginState === 'loggingIn'
+					? availableProviders.find((provider) => provider.meta?.behavior?.autoRedirect)
+					: undefined;
 
 			if (redirectProvider) {
 				// Redirect directly to the provider

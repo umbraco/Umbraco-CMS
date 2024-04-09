@@ -57,6 +57,13 @@ export class UmbAppElement extends UmbLitElement {
 			guards: [this.#isAuthorizedGuard()],
 		},
 		{
+			path: 'logout',
+			resolve: () => {
+				this.#authContext?.clearTokenStorage();
+				this.#authController.makeAuthorizationRequest('loggedOut');
+			},
+		},
+		{
 			path: '**',
 			component: () => import('../backoffice/backoffice.element.js'),
 			guards: [this.#isAuthorizedGuard()],
