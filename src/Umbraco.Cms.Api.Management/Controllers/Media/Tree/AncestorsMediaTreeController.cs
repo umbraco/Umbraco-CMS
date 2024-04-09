@@ -27,6 +27,8 @@ public class AncestorsMediaTreeController : MediaTreeControllerBase
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MediaTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<MediaTreeItemResponseModel>>> Ancestors(Guid descendantId)
+    public async Task<ActionResult<IEnumerable<MediaTreeItemResponseModel>>> Ancestors(
+        CancellationToken cancellationToken,
+        Guid descendantId)
         => await GetAncestors(descendantId);
 }

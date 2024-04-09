@@ -27,7 +27,10 @@ public class UpdateMemberGroupController : MemberGroupControllerBase
     [ProducesResponseType(typeof(MemberGroupResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateMemberGroupRequestModel model)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateMemberGroupRequestModel model)
     {
         IMemberGroup? current = await _memberGroupService.GetAsync(id);
         if (current is null)
