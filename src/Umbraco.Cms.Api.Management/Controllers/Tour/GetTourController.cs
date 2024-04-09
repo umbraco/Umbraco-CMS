@@ -31,7 +31,7 @@ public class GetTourController : TourControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UserTourStatusesResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetTours()
+    public async Task<IActionResult> GetTours(CancellationToken cancellationToken)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
         Attempt<IEnumerable<UserTourStatus>, TourOperationStatus> toursAttempt = await _tourService.GetAllAsync(currentUserKey);

@@ -30,7 +30,7 @@ public class SetTourController : TourControllerBase
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> SetTour(SetTourStatusRequestModel model)
+    public async Task<IActionResult> SetTour(CancellationToken cancellationToken, SetTourStatusRequestModel model)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
