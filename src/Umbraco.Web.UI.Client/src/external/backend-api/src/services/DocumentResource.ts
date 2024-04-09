@@ -36,7 +36,7 @@ import { request as __request } from '../core/request';
 export class DocumentResource {
 
     /**
-     * @returns PagedDocumentCollectionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getCollectionDocumentById({
@@ -233,7 +233,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns void
+     * @returns string Success
      * @throws ApiError
      */
     public static putDocumentByIdDomains({
@@ -242,7 +242,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: UpdateDomainsRequestModel,
-    }): CancelablePromise<void> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/domains',
@@ -251,6 +251,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -525,7 +526,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedIReferenceResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentByIdReferencedBy({
@@ -554,7 +555,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedReferenceByIdModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentByIdReferencedDescendants({
@@ -641,7 +642,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedReferenceByIdModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDocumentAreReferenced({
@@ -751,7 +752,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedModelDocumentItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemDocumentSearch({
@@ -873,7 +874,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentRecycleBinItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getRecycleBinDocumentChildren({
@@ -900,7 +901,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentRecycleBinItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getRecycleBinDocumentRoot({
@@ -945,7 +946,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDocumentChildren({
@@ -975,7 +976,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDocumentRoot({

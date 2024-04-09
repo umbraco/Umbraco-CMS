@@ -3,9 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { LanguageModelBaseModel } from './LanguageModelBaseModel';
-
-export type LanguageResponseModel = (LanguageModelBaseModel & {
+export type LanguageResponseModel = {
+    name: string;
+    isDefault: boolean;
+    isMandatory: boolean;
+    fallbackIsoCode?: string | null;
     isoCode: string;
-});
+};
 

@@ -40,7 +40,7 @@ import { request as __request } from '../core/request';
 export class UserResource {
 
     /**
-     * @returns PagedUserResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getFilterUser({
@@ -108,7 +108,7 @@ export class UserResource {
     public static postUser({
         requestBody,
     }: {
-        requestBody?: (CreateUserRequestModel | InviteUserRequestModel),
+        requestBody?: CreateUserRequestModel,
     }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -148,7 +148,7 @@ export class UserResource {
     }
 
     /**
-     * @returns PagedUserResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getUser({
@@ -309,7 +309,7 @@ export class UserResource {
         requestBody,
     }: {
         id: string,
-        requestBody?: (ChangePasswordUserRequestModel | ChangePasswordCurrentUserRequestModel),
+        requestBody?: ChangePasswordUserRequestModel,
     }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -791,7 +791,7 @@ export class UserResource {
     public static postUserInviteVerify({
         requestBody,
     }: {
-        requestBody?: (VerifyInviteUserRequestModel | CreateInitialPasswordUserRequestModel),
+        requestBody?: VerifyInviteUserRequestModel,
     }): CancelablePromise<VerifyInviteUserResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',

@@ -2,7 +2,10 @@ import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../../typ
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { CreateDataTypeRequestModel, DataTypeModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	CreateDataTypeRequestModel,
+	UpdateDataTypeRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -119,7 +122,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: DataTypeModelBaseModel = {
+		const requestBody: UpdateDataTypeRequestModel = {
 			name: model.name,
 			editorAlias: model.editorAlias,
 			editorUiAlias: model.editorUiAlias,

@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { HealthCheckModelBaseModel } from './HealthCheckModelBaseModel';
-
-export type HealthCheckModel = (HealthCheckModelBaseModel & {
+export type HealthCheckModel = {
+    id: string;
     name: string;
     description?: string | null;
-});
+};
 

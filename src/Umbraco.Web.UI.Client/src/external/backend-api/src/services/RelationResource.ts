@@ -11,7 +11,7 @@ import { request as __request } from '../core/request';
 export class RelationResource {
 
     /**
-     * @returns PagedRelationResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getRelationTypeById({

@@ -54,7 +54,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns PagedPackageDefinitionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageCreated({
@@ -173,7 +173,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns binary Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageCreatedByIdDownload({
@@ -195,7 +195,32 @@ export class PackageResource {
     }
 
     /**
-     * @returns PagedPackageMigrationStatusResponseModel Success
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getPackageManifest(): CancelablePromise<Array<PackageManifestResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/package/manifest',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getPackageManifestPublic(): CancelablePromise<Array<PackageManifestResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/package/manifest/public',
+        });
+    }
+
+    /**
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageMigrationStatus({

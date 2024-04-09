@@ -36,7 +36,7 @@ export class LanguageResource {
     }
 
     /**
-     * @returns PagedLanguageResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getLanguage({

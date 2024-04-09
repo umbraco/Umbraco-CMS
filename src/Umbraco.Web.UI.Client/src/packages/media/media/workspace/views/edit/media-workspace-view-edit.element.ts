@@ -2,11 +2,11 @@ import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../media-workspace.context-token
 import type { UmbMediaWorkspaceViewEditTabElement } from './media-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-media-workspace-view-edit')
@@ -21,7 +21,7 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	private _tabs?: Array<PropertyTypeContainerModelBaseModel>;
+	private _tabs?: Array<UmbPropertyTypeContainerModel>;
 
 	@state()
 	private _routerPath?: string;

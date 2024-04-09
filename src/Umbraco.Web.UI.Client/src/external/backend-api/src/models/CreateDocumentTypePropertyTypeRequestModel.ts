@@ -3,7 +3,21 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { PropertyTypeModelBaseModel } from './PropertyTypeModelBaseModel';
+import type { PropertyTypeAppearanceModel } from './PropertyTypeAppearanceModel';
+import type { PropertyTypeValidationModel } from './PropertyTypeValidationModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type CreateDocumentTypePropertyTypeRequestModel = PropertyTypeModelBaseModel;
+export type CreateDocumentTypePropertyTypeRequestModel = {
+    id: string;
+    container?: ReferenceByIdModel | null;
+    sortOrder: number;
+    alias: string;
+    name: string;
+    description?: string | null;
+    dataType: ReferenceByIdModel;
+    variesByCulture: boolean;
+    variesBySegment: boolean;
+    validation: PropertyTypeValidationModel;
+    appearance: PropertyTypeAppearanceModel;
+};
 

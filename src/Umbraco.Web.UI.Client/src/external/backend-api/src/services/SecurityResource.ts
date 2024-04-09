@@ -79,7 +79,7 @@ export class SecurityResource {
     public static postSecurityForgotPasswordVerify({
         requestBody,
     }: {
-        requestBody?: (VerifyResetPasswordTokenRequestModel | ResetPasswordTokenRequestModel),
+        requestBody?: VerifyResetPasswordTokenRequestModel,
     }): CancelablePromise<VerifyResetPasswordResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',
