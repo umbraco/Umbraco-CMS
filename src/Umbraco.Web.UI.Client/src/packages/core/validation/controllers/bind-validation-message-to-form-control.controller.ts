@@ -86,9 +86,9 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 		this.#control.checkValidity();
 	}
 
-	validate(): Promise<boolean> {
+	validate(): Promise<void> {
 		//this.#isValid = this.#control.checkValidity();
-		return Promise.resolve(this.#isValid);
+		return this.#isValid ? Promise.resolve() : Promise.reject();
 	}
 
 	/**

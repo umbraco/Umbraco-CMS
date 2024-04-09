@@ -63,23 +63,27 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	 *
 	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validator succeeded, this depends on the validators and wether forceSucceed is set.
 	 */
-	async validate(): Promise<boolean> {
+	async validate(): Promise<void> {
 		// TODO: clear server messages here?, well maybe only if we know we will get new server messages? Do the server messages hook into the system like another validator?
 		this.#validationMode = true;
-		const results = await Promise.all(this.#validators.map((v) => v.validate()));
+
+		const resultsStatus = await Promise.all(this.#validators.map((v) => v.validate())).then(
+			() => Promise.resolve(true),
+			() => Promise.reject(false),
+		);
 
 		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
 		// This enables us to keep client validations though UI is not present anymore — because the client validations got defined as messages. [NL]
-		const isValid = this.messages.getHasAnyMessages() ? false : results.every((r) => r);
+		const isValid = this.messages.getHasAnyMessages() ? false : resultsStatus;
 		this.#isValid = isValid;
 
-		// Focus first invalid element:
-		if (!isValid) {
+		if (isValid === false) {
+			// Focus first invalid element:
 			this.focusFirstInvalidElement();
+			return Promise.reject();
 		}
 
-		//return this.#preventFail ? true : isValid;
-		return isValid;
+		return Promise.resolve();
 	}
 
 	focusFirstInvalidElement(): void {

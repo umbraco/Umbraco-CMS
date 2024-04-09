@@ -4,7 +4,6 @@ import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
 import { UMB_SERVER_MODEL_VALIDATION_CONTEXT } from './server-model-validation.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbServerModelValidationContext
 	extends UmbContextBase<UmbServerModelValidationContext>
@@ -12,7 +11,6 @@ export class UmbServerModelValidationContext
 {
 	#validatePromise?: Promise<boolean>;
 	#validatePromiseResolve?: (valid: boolean) => void;
-	#validatePromiseReject?: () => void;
 
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 	#isValid = true;
@@ -35,24 +33,25 @@ export class UmbServerModelValidationContext
 		});
 	}
 
-	async askServerForValidation(requestPromise: Promise<{ data: string | undefined }>): Promise<void> {
+	async askServerForValidation(requestPromise: Promise<{ data: string | undefined; error: any }>): Promise<void> {
 		this.#context?.messages.removeMessagesByType('server');
 
-		this.#validatePromiseReject?.();
-		this.#validatePromise = new Promise<boolean>((resolve, reject) => {
-			this.#validatePromiseResolve = resolve;
-			this.#validatePromiseReject = reject;
-		});
 		this.#serverFeedback = {};
+		this.#isValid = false;
+		//this.#validatePromiseReject?.();
+		this.#validatePromise = new Promise<boolean>((resolve) => {
+			this.#validatePromiseResolve = resolve;
+		});
 		// Ask the server for validation...
-		const { data } = await tryExecuteAndNotify(this, requestPromise);
+		const { data, error } = await requestPromise;
 
 		console.log('VALIDATE — Got server response:');
-		console.log(data);
+		console.log(data, error);
 
-		this.#validatePromiseResolve?.(true);
+		this.#isValid = false;
+		this.#validatePromiseResolve?.(false);
 		this.#validatePromiseResolve = undefined;
-		this.#validatePromiseReject = undefined;
+		//this.#validatePromise = undefined;
 	}
 
 	addTranslator(translator: UmbValidationMessageTranslator): void {
@@ -71,10 +70,11 @@ export class UmbServerModelValidationContext
 	get isValid(): boolean {
 		return this.#isValid;
 	}
-	validate(): Promise<boolean> {
-		// TODO: Return to this decision once we have a bit more implementation to perspectives against: [NL]
-		// If we dont have a validatePromise, we valid cause then no one has called askServerForValidation(). [NL] (I might change my mind about this one, to then say we are invalid unless we have been validated by the server... )
-		return this.#validatePromise ?? Promise.resolve(true);
+	async validate(): Promise<void> {
+		if (this.#validatePromise) {
+			await this.#validatePromise;
+		}
+		return this.#isValid ? Promise.resolve() : Promise.reject();
 	}
 
 	reset(): void {}

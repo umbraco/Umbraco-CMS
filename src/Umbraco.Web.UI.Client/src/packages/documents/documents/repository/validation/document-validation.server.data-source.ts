@@ -5,7 +5,7 @@ import {
 	type UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A server data source for Document Validation
@@ -44,8 +44,9 @@ export class UmbDocumentValidationServerDataSource {
 			variants: model.variants,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
+		// Maybe use: tryExecuteAndNotify
+		const { data, error } = await tryExecute(
+			//this.#host,
 			DocumentResource.postDocumentValidate({
 				requestBody,
 			}),
@@ -73,8 +74,9 @@ export class UmbDocumentValidationServerDataSource {
 			variants: model.variants,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
+		// Maybe use: tryExecuteAndNotify
+		const { data, error } = await tryExecute(
+			//this.#host,
 			DocumentResource.putDocumentByIdValidate({
 				id: model.unique,
 				requestBody,

@@ -581,6 +581,7 @@ export class UmbDocumentWorkspaceContext
 
 		const saveData = this.#buildSaveData(variantIds);
 
+		// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
 		this.#validationRepository ??= new UmbDocumentValidationRepository(this);
 
 		if (this.getIsNew()) {

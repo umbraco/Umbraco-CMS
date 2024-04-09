@@ -7,7 +7,7 @@ export interface UmbValidator extends EventTarget {
 	/**
 	 * Validate the form, will return a promise that resolves to true if what the Validator represents is valid.
 	 */
-	validate(): Promise<boolean>;
+	validate(): Promise<void>;
 
 	/**
 	 * Reset the validator to its initial state.
