@@ -15,6 +15,12 @@ const entityActions: Array<ManifestTypes> = [
 			icon: 'icon-home',
 			label: 'Culture and Hostnames...',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				match: UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES,
+			},
+		],
 	},
 ];
 

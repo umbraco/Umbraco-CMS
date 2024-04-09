@@ -18,5 +18,11 @@ export const manifests: Array<ManifestTypes> = [
 			sortChildrenOfRepositoryAlias: UMB_SORT_CHILDREN_OF_DOCUMENT_REPOSITORY_ALIAS,
 			treeRepositoryAlias: UMB_DOCUMENT_TREE_REPOSITORY_ALIAS,
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				match: UMB_USER_PERMISSION_DOCUMENT_SORT,
+			},
+		],
 	},
 ];

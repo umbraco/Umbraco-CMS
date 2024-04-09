@@ -15,6 +15,12 @@ const entityActions: Array<ManifestTypes> = [
 			icon: 'icon-lock',
 			label: 'Restrict Public Access...',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				match: UMB_USER_PERMISSION_DOCUMENT_PUBLIC_ACCESS,
+			},
+		],
 	},
 ];
 
