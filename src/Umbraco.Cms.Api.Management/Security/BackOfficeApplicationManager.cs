@@ -2,11 +2,11 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
-using StackExchange.Profiling.Internal;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Security;
 
@@ -110,7 +110,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
             PostLogoutRedirectUris =
             {
                 CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName),
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName.EnsureTrailingSlash() + "logout"),
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName.EnsureEndsWith("/") + "logout"),
             },
             Permissions =
             {
