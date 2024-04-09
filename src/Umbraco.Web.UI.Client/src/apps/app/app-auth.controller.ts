@@ -7,7 +7,9 @@ import {
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { filter, firstValueFrom, skip } from '@umbraco-cms/backoffice/external/rxjs';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { ManifestAuthProvider } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
@@ -69,9 +71,12 @@ export class UmbAppAuthController extends UmbControllerBase {
 			window.sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, location.href);
 		}
 
+		// Figure out which providers are available
+		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders());
+
 		// If the user is timed out, we can show the login modal directly
 		if (userLoginState === 'timedOut') {
-			const selected = await this.#showLoginModal(userLoginState);
+			const selected = await this.#showLoginModal(userLoginState, availableProviders);
 
 			if (!selected) {
 				return false;
@@ -80,9 +85,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 			return this.#updateState();
 		}
 
-		// Figure out which providers are available
-		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders());
-
 		if (availableProviders.length === 0) {
 			throw new Error('[Fatal] No auth providers available');
 		}
@@ -90,32 +92,44 @@ export class UmbAppAuthController extends UmbControllerBase {
 		if (availableProviders.length === 1) {
 			// One provider available (most likely the Umbraco provider), so initiate the authorization request to the default provider
 			this.#authContext.makeAuthorizationRequest();
-		} else {
-			// Check if any provider is redirecting directly to the provider
-			const redirectProvider =
-				userLoginState === 'loggingIn'
-					? availableProviders.find((provider) => provider.meta?.behavior?.autoRedirect)
-					: undefined;
+			return this.#updateState();
+		}
 
-			if (redirectProvider) {
-				// Redirect directly to the provider
-				this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName);
-			} else {
-				// Show the provider selection screen
-				const selected = await this.#showLoginModal(userLoginState);
+		// Check if any provider is redirecting directly to the provider
+		const redirectProvider =
+			userLoginState === 'loggingIn'
+				? availableProviders.find((provider) => provider.meta?.behavior?.autoRedirect)
+				: undefined;
 
-				if (!selected) {
-					return false;
-				}
-			}
+		if (redirectProvider) {
+			// Redirect directly to the provider
+			this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName);
+			return this.#updateState();
+		}
+
+		// Show the provider selection screen
+		const selected = await this.#showLoginModal(userLoginState, availableProviders);
+
+		if (!selected) {
+			return false;
 		}
 
 		return this.#updateState();
 	}
 
-	async #showLoginModal(userLoginState: UmbUserLoginState): Promise<boolean> {
+	async #showLoginModal(
+		userLoginState: UmbUserLoginState,
+		availableProviders: Array<ManifestAuthProvider>,
+	): Promise<boolean> {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
+		}
+
+		// Check if any provider denies local login
+		const denyLocalLogin = availableProviders.some((provider) => provider.meta?.behavior?.denyLocalLogin);
+		if (denyLocalLogin) {
+			// Unregister the Umbraco provider
+			umbExtensionsRegistry.unregister('Umb.AuthProviders.Umbraco');
 		}
 
 		// Show the provider selection screen
