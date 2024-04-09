@@ -3,8 +3,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -22,67 +20,20 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [TagsPropertyEditor]
 [DataEditor(
     Constants.PropertyEditors.Aliases.Tags,
-    "Tags",
-    "tags",
-    Icon = "icon-tags",
     ValueEditorIsReusable = true,
     ValueType = ValueTypes.Text)]
 public class TagsPropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly ITagPropertyIndexValueFactory _tagPropertyIndexValueFactory;
     private readonly IIOHelper _ioHelper;
-    private readonly ILocalizedTextService _localizedTextService;
-    private readonly ManifestValueValidatorCollection _validators;
-
-    // Scheduled for removal in v12
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
-    public TagsPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        ManifestValueValidatorCollection validators,
-        IIOHelper ioHelper,
-        ILocalizedTextService localizedTextService)
-        : this(
-            dataValueEditorFactory,
-            validators,
-            ioHelper,
-            localizedTextService,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(),
-            StaticServiceProvider.Instance.GetRequiredService<ITagPropertyIndexValueFactory>())
-    {
-    }
-
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
-    public TagsPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        ManifestValueValidatorCollection validators,
-        IIOHelper ioHelper,
-        ILocalizedTextService localizedTextService,
-        IEditorConfigurationParser editorConfigurationParser)
-        : this(
-            dataValueEditorFactory,
-            validators,
-            ioHelper,
-            localizedTextService,
-            editorConfigurationParser,
-            StaticServiceProvider.Instance.GetRequiredService<ITagPropertyIndexValueFactory>())
-    {
-
-    }
 
     public TagsPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        ManifestValueValidatorCollection validators,
         IIOHelper ioHelper,
-        ILocalizedTextService localizedTextService,
-        IEditorConfigurationParser editorConfigurationParser,
         ITagPropertyIndexValueFactory tagPropertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
-        _validators = validators;
         _ioHelper = ioHelper;
-        _localizedTextService = localizedTextService;
-        _editorConfigurationParser = editorConfigurationParser;
         _tagPropertyIndexValueFactory = tagPropertyIndexValueFactory;
     }
 
@@ -93,34 +44,56 @@ public class TagsPropertyEditor : DataEditor
         DataValueEditorFactory.Create<TagPropertyValueEditor>(Attribute!);
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new TagConfigurationEditor(_validators, _ioHelper, _localizedTextService, _editorConfigurationParser);
+        new TagConfigurationEditor(_ioHelper);
 
     internal class TagPropertyValueEditor : DataValueEditor, IDataValueTags
     {
+        private readonly IJsonSerializer _jsonSerializer;
         private readonly IDataTypeService _dataTypeService;
 
         public TagPropertyValueEditor(
-            ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
             IDataTypeService dataTypeService)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
+            _jsonSerializer = jsonSerializer;
             _dataTypeService = dataTypeService;
         }
 
         /// <inheritdoc />
         public IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
         {
-            var strValue = value?.ToString();
-            if (string.IsNullOrWhiteSpace(strValue)) return Enumerable.Empty<ITag>();
+            TagConfiguration tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(dataTypeConfiguration) ?? new TagConfiguration();
 
-            var tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(dataTypeConfiguration) ?? new TagConfiguration();
+            var tags = ParseTags(value, tagConfiguration);
+            if (tags.Any() is false)
+            {
+                return Enumerable.Empty<ITag>();
+            }
+
+            return tags.Select(x => new Tag
+            {
+                Group = tagConfiguration.Group,
+                Text = x,
+                LanguageId = languageId,
+            });
+        }
+
+        private string[] ParseTags(object? value, TagConfiguration tagConfiguration)
+        {
+            var strValue = value?.ToString();
+            if (string.IsNullOrWhiteSpace(strValue))
+            {
+                return Array.Empty<string>();
+            }
 
             if (tagConfiguration.Delimiter == default)
+            {
                 tagConfiguration.Delimiter = ',';
+            }
 
             IEnumerable<string> tags;
 
@@ -133,9 +106,9 @@ public class TagsPropertyEditor : DataEditor
                 case TagsStorageType.Json:
                     try
                     {
-                        tags = JsonConvert.DeserializeObject<string[]>(strValue)?.Select(x => x.Trim()) ?? Enumerable.Empty<string>();
+                        tags = _jsonSerializer.Deserialize<string[]>(strValue)?.Select(x => x.Trim()) ?? Enumerable.Empty<string>();
                     }
-                    catch (JsonException)
+                    catch
                     {
                         //cannot parse, malformed
                         tags = Enumerable.Empty<string>();
@@ -147,46 +120,45 @@ public class TagsPropertyEditor : DataEditor
                     throw new NotSupportedException($"Value \"{tagConfiguration.StorageType}\" is not a valid TagsStorageType.");
             }
 
-            return tags.Select(x => new Tag
-            {
-                Group = tagConfiguration.Group,
-                Text = x,
-                LanguageId = languageId,
-            });
+            return tags.ToArray();
         }
-
 
         /// <inheritdoc />
         public override IValueRequiredValidator RequiredValidator => new RequiredJsonValueValidator();
 
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+        {
+            var val = property.GetValue(culture, segment);
+            if (val is null)
+            {
+                return null;
+            }
+
+            IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            TagConfiguration configuration = dataType?.ConfigurationObject as TagConfiguration ?? new TagConfiguration();
+            var tags = ParseTags(val, configuration);
+
+            return tags.Any() ? tags : null;
+        }
+
         /// <inheritdoc />
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            var value = editorValue.Value?.ToString();
-
-            if (string.IsNullOrEmpty(value))
+            if (editorValue.Value is not IEnumerable<string> stringValues)
             {
                 return null;
             }
 
-            var tagConfiguration = editorValue.DataTypeConfiguration as TagConfiguration ?? new TagConfiguration();
+            var trimmedTags = stringValues.Select(s => s.Trim()).Where(s => s.IsNullOrWhiteSpace() == false).ToArray();
+            if (trimmedTags.Any() is false)
+            {
+                return null;
+            }
+
+            TagConfiguration tagConfiguration = editorValue.DataTypeConfiguration as TagConfiguration ?? new TagConfiguration();
             if (tagConfiguration.Delimiter == default)
+            {
                 tagConfiguration.Delimiter = ',';
-
-            string[] trimmedTags = Array.Empty<string>();
-
-            if (editorValue.Value is JArray json)
-            {
-                trimmedTags = json.HasValues ? json.Select(x => x.Value<string>()).OfType<string>().ToArray() : Array.Empty<string>();
-            }
-            else if (string.IsNullOrWhiteSpace(value) == false)
-            {
-                trimmedTags = value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
-            }
-
-            if (trimmedTags.Length == 0)
-            {
-                return null;
             }
 
             switch (tagConfiguration.StorageType)
@@ -195,7 +167,7 @@ public class TagsPropertyEditor : DataEditor
                     return string.Join(tagConfiguration.Delimiter.ToString(), trimmedTags).NullOrWhiteSpaceAsNull();
 
                 case TagsStorageType.Json:
-                    return trimmedTags.Length == 0 ? null : JsonConvert.SerializeObject(trimmedTags);
+                    return trimmedTags.Length == 0 ? null : _jsonSerializer.Serialize(trimmedTags);
             }
 
             return null;

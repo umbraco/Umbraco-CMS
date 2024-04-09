@@ -12,14 +12,11 @@
 
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" />
-    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer"  />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
     <PackageReference Include="Dazinator.Extensions.FileProviders" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" />
     <PackageReference Include="Serilog.AspNetCore" />
-    <PackageReference Include="Smidge.InMemory" />
-    <PackageReference Include="Smidge.Nuglify" />
     <!-- Take top-level depedendency on System.Net.Http, because Dazinator.Extensions.FileProviders depends on a vulnerable version -->
     <PackageReference Include="System.Net.Http" />
     <!-- Take top-level depedendency on System.Text.RegularExpressions, because both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depend on a vulnerable version -->

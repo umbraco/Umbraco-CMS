@@ -45,6 +45,11 @@ public sealed class BlockEditorConverter
             Guid.TryParse(keyo!.ToString(), out key);
         }
 
+        if (key == Guid.Empty)
+        {
+            return null;
+        }
+
         IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _publishedSnapshotAccessor);
         element = _publishedModelFactory.CreateModel(element);
 

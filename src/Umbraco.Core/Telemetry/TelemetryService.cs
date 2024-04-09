@@ -1,7 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
@@ -36,36 +39,37 @@ internal class TelemetryService : ITelemetryService
         _metricsConsentService = metricsConsentService;
     }
 
-    /// <inheritdoc />
+    [Obsolete("Please use GetTelemetryReportDataAsync. Will be removed in V15.")]
     public bool TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData)
     {
-        if (_siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid telemetryId) is false)
-        {
-            telemetryReportData = null;
-            return false;
-        }
-
-        telemetryReportData = new TelemetryReportData
-        {
-            Id = telemetryId,
-            Version = GetVersion(),
-            Packages = GetPackageTelemetry(),
-            Detailed = _usageInformationService.GetDetailed(),
-        };
-        return true;
+        telemetryReportData = GetTelemetryReportDataAsync().GetAwaiter().GetResult();
+        return telemetryReportData != null;
     }
 
-    private string? GetVersion()
+    /// <inheritdoc />
+    public async Task<TelemetryReportData?> GetTelemetryReportDataAsync()
     {
-        if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
+        if (_siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid telemetryId) is false)
         {
             return null;
         }
 
-        return _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
+        return new TelemetryReportData
+        {
+            Id = telemetryId,
+            Version = GetVersion(),
+            Packages = await GetPackageTelemetryAsync(),
+            Detailed = _usageInformationService.GetDetailed(),
+        };
     }
 
-    private IEnumerable<PackageTelemetry>? GetPackageTelemetry()
+    private string? GetVersion() => _metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal
+        ? null
+        : _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
+
+
+
+    private async Task<IEnumerable<PackageTelemetry>?> GetPackageTelemetryAsync()
     {
         if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
         {

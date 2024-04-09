@@ -384,7 +384,7 @@ public static class ContentRepositoryExtensions
 
         var keepProcessing = true;
 
-        if (culture == "*")
+        if (culture == "*" || (content.ContentType.VariesByCulture() is false && culture is null))
         {
             // all cultures
             content.ClearPublishInfos();

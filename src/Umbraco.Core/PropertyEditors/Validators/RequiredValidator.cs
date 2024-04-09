@@ -9,11 +9,15 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 /// </summary>
 public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueValidator
 {
-    private const string ValueCannotBeNull = "Value cannot be null";
-    private const string ValueCannotBeEmpty = "Value cannot be empty";
-    private readonly ILocalizedTextService _textService;
+    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
+    public RequiredValidator(ILocalizedTextService textService)
+        : this()
+    {
+    }
 
-    public RequiredValidator(ILocalizedTextService textService) => _textService = textService;
+    public RequiredValidator()
+    {
+    }
 
     /// <inheritdoc cref="IManifestValueValidator.ValidationName" />
     public string ValidationName => "Required";
@@ -27,9 +31,7 @@ public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueV
     {
         if (value == null)
         {
-            yield return new ValidationResult(
-                _textService?.Localize("validation", "invalidNull") ?? ValueCannotBeNull,
-                new[] { "value" });
+            yield return new ValidationResult(Constants.Validation.ErrorMessages.Properties.Missing, new[] { "value" });
             yield break;
         }
 
@@ -37,8 +39,7 @@ public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueV
         {
             if (value.ToString()?.DetectIsEmptyJson() ?? false)
             {
-                yield return new ValidationResult(
-                    _textService?.Localize("validation", "invalidEmpty") ?? ValueCannotBeEmpty, new[] { "value" });
+                yield return new ValidationResult(Constants.Validation.ErrorMessages.Properties.Empty, new[] { "value" });
             }
 
             yield break;
@@ -46,8 +47,7 @@ public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueV
 
         if (value.ToString().IsNullOrWhiteSpace())
         {
-            yield return new ValidationResult(
-                _textService?.Localize("validation", "invalidEmpty") ?? ValueCannotBeEmpty, new[] { "value" });
+            yield return new ValidationResult(Constants.Validation.ErrorMessages.Properties.Empty, new[] { "value" });
         }
     }
 }

@@ -14,4 +14,7 @@ public static class RelationTypeExtensions
         || relationType.Alias == Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias
         || relationType.Alias == Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias
         || relationType.Alias == Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
+
+    public static bool IsDeletableRelationType(this IRelationType relationType)
+        => relationType.IsSystemRelationType() is false;
 }

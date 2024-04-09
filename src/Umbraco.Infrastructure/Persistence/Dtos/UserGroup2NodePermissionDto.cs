@@ -4,6 +4,7 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
+[Obsolete("Will be removed in Umbraco 18.")]
 [TableName(Constants.DatabaseSchema.Tables.UserGroup2NodePermission)]
 [ExplicitColumns]
 internal class UserGroup2NodePermissionDto

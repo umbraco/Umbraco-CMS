@@ -2,8 +2,16 @@
 
 public static partial class Constants
 {
-    public static class JsonOptionsNames
+    // TODO: move this class to Umbraco.Cms.Core as a partial class
+    public static partial class JsonOptionsNames
     {
-        public const string DeliveryApi = "DeliveryApi";
+        /// <summary>
+        /// Name used for JsonOptions
+        /// </summary>
+        public const string BackOffice = "BackOffice";
+
+        public const string DeliveryApi = "Delivery";
     }
 }
+
+

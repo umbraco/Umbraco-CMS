@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Asp.Versioning;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -15,13 +15,12 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
-using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
+using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Security;
 
 [ApiVersion("1.0")]
-[ApiController]
 [VersionedDeliveryApiRoute(Common.Security.Paths.MemberApi.EndpointTemplate)]
 [ApiExplorerSettings(IgnoreApi = true)]
 public class MemberController : DeliveryApiControllerBase

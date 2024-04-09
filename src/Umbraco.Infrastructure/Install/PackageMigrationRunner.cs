@@ -1,5 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
@@ -12,6 +12,7 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Notifications;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Extensions;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Infrastructure.Install;
 
@@ -49,27 +50,6 @@ public class PackageMigrationRunner
         _packageMigrationPlans = packageMigrationPlans.ToDictionary(x => x.Name);
     }
 
-    [Obsolete("Use constructor that takes ILogger, this will be removed in V13")]
-    public PackageMigrationRunner(
-        IProfilingLogger profilingLogger,
-        ICoreScopeProvider scopeProvider,
-        PendingPackageMigrations pendingPackageMigrations,
-        PackageMigrationPlanCollection packageMigrationPlans,
-        IMigrationPlanExecutor migrationPlanExecutor,
-        IKeyValueService keyValueService,
-        IEventAggregator eventAggregator)
-        : this(
-            profilingLogger,
-            scopeProvider,
-            pendingPackageMigrations,
-            packageMigrationPlans,
-            migrationPlanExecutor,
-            keyValueService,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<PackageMigrationRunner>>())
-    {
-    }
-
     /// <summary>
     ///     Runs all migration plans for a package name if any are pending.
     /// </summary>
@@ -87,6 +67,28 @@ public class PackageMigrationRunner
             .Select(x => x.Name);
 
         return RunPackagePlans(packagePlans);
+    }
+
+    /// <summary>
+    ///     Checks if all executed package migrations succeeded for a package.
+    /// </summary>
+    public async Task<Attempt<bool, PackageMigrationOperationStatus>> RunPendingPackageMigrations(string packageName)
+    {
+        // Check if there are any migrations
+        if (_packageMigrationPlans.ContainsKey(packageName) == false)
+        {
+            return Attempt.FailWithStatus(PackageMigrationOperationStatus.NotFound, false);
+        }
+
+        // Run the migrations
+        IEnumerable<ExecutedMigrationPlan> executedMigrationPlans = RunPackageMigrationsIfPending(packageName);
+
+        if (executedMigrationPlans.Any(plan => plan.Successful == false))
+        {
+            return Attempt.FailWithStatus(PackageMigrationOperationStatus.CancelledByFailedMigration, false);
+        }
+
+        return Attempt.SucceedWithStatus(PackageMigrationOperationStatus.Success, true);
     }
 
     /// <summary>

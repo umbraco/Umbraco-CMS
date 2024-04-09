@@ -137,5 +137,5 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
         new PublishedPropertyType(propertyTypeAlias, dataTypeId, umbraco, variations, _propertyValueConverters, _publishedModelFactory, this);
 
     private PublishedDataType CreatePublishedDataType(IDataType dataType)
-        => new(dataType.Id, dataType.EditorAlias, dataType is DataType d ? d.GetLazyConfiguration() : new Lazy<object?>(() => dataType.Configuration));
+        => new(dataType.Id, dataType.EditorAlias, dataType.EditorUiAlias, dataType is DataType d ? d.GetLazyConfigurationObject() : new Lazy<object?>(() => dataType.ConfigurationObject));
 }

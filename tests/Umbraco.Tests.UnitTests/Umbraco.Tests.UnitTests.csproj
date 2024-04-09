@@ -2,16 +2,54 @@
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.UnitTests</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="NUnit3TestAdapter" />
-    <PackageReference Include="System.Data.Odbc"  />
+    <PackageReference Include="System.Data.Odbc" />
     <PackageReference Include="System.Data.OleDb" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Umbraco.Core\DeliveryApi\NestedContentValueConverterTests.cs" />
+    <Compile Remove="Umbraco.Core\PropertyEditors\NestedContentPropertyComponentTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
+    <Compile Remove="Umbraco.Core\DeliveryApi\NestedContentValueConverterTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
+    <Compile Remove="Umbraco.Core\DeliveryApi\NestedContentValueConverterTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
+    <Compile Remove="Umbraco.Core\DeliveryApi\NestedContentValueConverterTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Umbraco.Core\DeliveryApi\MediaPickerValueConverterTests.cs" />
   </ItemGroup>
 </Project>

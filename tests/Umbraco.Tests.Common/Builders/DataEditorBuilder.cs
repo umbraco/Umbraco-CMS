@@ -65,7 +65,6 @@ public class DataEditorBuilder<TParent>
             Mock.Of<IDataValueEditorFactory>())
         {
             Alias = alias,
-            Name = name,
             DefaultConfiguration = defaultConfiguration,
             ExplicitConfigurationEditor = explicitConfigurationEditor,
             ExplicitValueEditor = explicitValueEditor

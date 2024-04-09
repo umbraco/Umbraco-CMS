@@ -7,4 +7,8 @@ public interface IEntityContainerRepository : IReadRepository<int, EntityContain
     EntityContainer? Get(Guid id);
 
     IEnumerable<EntityContainer> Get(string name, int level);
+
+    bool HasDuplicateName(Guid parentKey, string name);
+
+    bool HasDuplicateName(int parentId, string name);
 }

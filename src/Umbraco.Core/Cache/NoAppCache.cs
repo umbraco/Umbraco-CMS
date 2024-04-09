@@ -32,10 +32,10 @@ public class NoAppCache : IAppPolicyCache, IRequestCache
     public IEnumerable<object> SearchByRegex(string regex) => Enumerable.Empty<object>();
 
     /// <inheritdoc />
-    public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null) => factory();
+    public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false) => factory();
 
     /// <inheritdoc />
-    public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
+    public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false)
     {
     }
 

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Globalization;
 using System.IO.Compression;
 using System.Xml.Linq;
@@ -32,7 +33,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private readonly FileSystems _fileSystems;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILocalizationService _localizationService;
-    private readonly IMacroService _macroService;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IMediaService _mediaService;
     private readonly IMediaTypeService _mediaTypeService;
@@ -56,7 +56,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         IMediaTypeService mediaTypeService,
         IContentService contentService,
         MediaFileManager mediaFileManager,
-        IMacroService macroService,
         IContentTypeService contentTypeService,
         IScopeAccessor scopeAccessor,
         string? mediaFolderPath = null,
@@ -72,7 +71,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         _mediaTypeService = mediaTypeService;
         _contentService = contentService;
         _mediaFileManager = mediaFileManager;
-        _macroService = macroService;
         _contentTypeService = contentTypeService;
         _scopeAccessor = scopeAccessor;
         _xmlParser = new PackageDefinitionXmlParser();
@@ -94,7 +92,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         IMediaTypeService mediaTypeService,
         IContentService contentService,
         MediaFileManager mediaFileManager,
-        IMacroService macroService,
         IContentTypeService contentTypeService,
         string? mediaFolderPath = null,
         string? tempFolderPath = null)
@@ -111,7 +108,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         mediaTypeService,
         contentService,
         mediaFileManager,
-        macroService,
         contentTypeService,
         StaticServiceProvider.Instance.GetRequiredService<IScopeAccessor>(),
         mediaFolderPath,
@@ -133,12 +129,9 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         List<CreatedPackageSchemaDto> xmlSchemas = Database.Fetch<CreatedPackageSchemaDto>(query);
         foreach (CreatedPackageSchemaDto packageSchema in xmlSchemas)
         {
-            var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
+            PackageDefinition? packageDefinition = CreatePackageDefinitionFromSchema(packageSchema);
             if (packageDefinition is not null)
             {
-                packageDefinition.Id = packageSchema.Id;
-                packageDefinition.Name = packageSchema.Name;
-                packageDefinition.PackageId = packageSchema.PackageId;
                 packageDefinitions.Add(packageDefinition);
             }
         }
@@ -152,6 +145,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             .Select<CreatedPackageSchemaDto>()
             .From<CreatedPackageSchemaDto>()
             .Where<CreatedPackageSchemaDto>(x => x.Id == id);
+
         List<CreatedPackageSchemaDto> schemaDtos = Database.Fetch<CreatedPackageSchemaDto>(query);
 
         if (schemaDtos.IsCollectionEmpty())
@@ -159,16 +153,29 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             return null;
         }
 
-        CreatedPackageSchemaDto packageSchema = schemaDtos.First();
-        var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
-        if (packageDefinition is not null)
+        return CreatePackageDefinitionFromSchema(schemaDtos.First());
+    }
+
+    public PackageDefinition? GetByKey(Guid key)
+    {
+        Sql<ISqlContext> query = new Sql<ISqlContext>(Database.SqlContext)
+            .Select<CreatedPackageSchemaDto>()
+            .From<CreatedPackageSchemaDto>()
+            .Where<CreatedPackageSchemaDto>(x => x.PackageId == key);
+
+        if (_scopeAccessor.AmbientScope is null)
         {
-            packageDefinition.Id = packageSchema.Id;
-            packageDefinition.Name = packageSchema.Name;
-            packageDefinition.PackageId = packageSchema.PackageId;
+            return null;
         }
 
-        return packageDefinition;
+        List<CreatedPackageSchemaDto> schemaDtos = _scopeAccessor.AmbientScope.Database.Fetch<CreatedPackageSchemaDto>(query);
+
+        if (schemaDtos.IsCollectionEmpty())
+        {
+            return null;
+        }
+
+        return CreatePackageDefinitionFromSchema(schemaDtos.First());
     }
 
     public void Delete(int id)
@@ -194,7 +201,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             throw new NullReferenceException("PackageDefinition cannot be null when saving");
         }
 
-        if (string.IsNullOrEmpty(definition.Name) || definition.PackagePath == null)
+        if (string.IsNullOrEmpty(definition.Name))
         {
             return false;
         }
@@ -204,6 +211,23 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
 
         if (definition.Id == default)
         {
+            Sql<ISqlContext> query = new Sql<ISqlContext>(Database.SqlContext)
+                    .SelectCount()
+                    .From<CreatedPackageSchemaDto>()
+                    .Where<CreatedPackageSchemaDto>(x => x.Name == definition.Name);
+
+            if (_scopeAccessor.AmbientScope is null)
+            {
+                return false;
+            }
+
+            var exists = _scopeAccessor.AmbientScope.Database.ExecuteScalar<int>(query);
+
+            if (exists > 0)
+            {
+                return false;
+            }
+
             // Create dto from definition
             var dto = new CreatedPackageSchemaDto
             {
@@ -216,6 +240,11 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             // Set the ids, we have to save in database first to get the Id
             Database!.Insert(dto);
             definition.Id = dto.Id;
+        }
+
+        if (definition.PackageId == default)
+        {
+            definition.PackageId = Guid.NewGuid();
         }
 
         // Save snapshot locally, we do this to the updated packagePath
@@ -260,7 +289,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             PackageStylesheets(definition, root);
             PackageStaticFiles(definition.Scripts, root, "Scripts", "Script", _fileSystems.ScriptsFileSystem!);
             PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View", _fileSystems.PartialViewsFileSystem!);
-            PackageMacros(definition, root);
             PackageDictionaryItems(definition, root);
             PackageLanguages(definition, root);
             PackageDataTypes(definition, root);
@@ -495,37 +523,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         }
     }
 
-    private void PackageMacros(PackageDefinition definition, XContainer root)
-    {
-        var packagedMacros = new List<IMacro>();
-        var macros = new XElement("Macros");
-        foreach (var macroId in definition.Macros)
-        {
-            if (!int.TryParse(macroId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
-            {
-                continue;
-            }
-
-            XElement? macroXml = GetMacroXml(outInt, out IMacro? macro);
-            if (macroXml is null)
-            {
-                continue;
-            }
-
-            macros.Add(macroXml);
-            packagedMacros.Add(macro!);
-        }
-
-        root.Add(macros);
-
-        // Get the partial views for macros and package those (exclude views outside of the default directory, e.g. App_Plugins\*\Views)
-        IEnumerable<string> views = packagedMacros
-            .Where(x => x.MacroSource.StartsWith(Constants.SystemDirectories.MacroPartials))
-            .Select(x =>
-                x.MacroSource[Constants.SystemDirectories.MacroPartials.Length..].Replace('/', '\\'));
-        PackageStaticFiles(views, root, "MacroPartialViews", "View", _fileSystems.MacroPartialsFileSystem!);
-    }
-
     private void PackageStylesheets(PackageDefinition definition, XContainer root)
     {
         var stylesheetsXml = new XElement("Stylesheets");
@@ -732,21 +729,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     }
 
     /// <summary>
-    ///     Gets a macros xml node
-    /// </summary>
-    private XElement? GetMacroXml(int macroId, out IMacro? macro)
-    {
-        macro = _macroService.GetById(macroId);
-        if (macro == null)
-        {
-            return null;
-        }
-
-        XElement xml = _serializer.Serialize(macro);
-        return xml;
-    }
-
-    /// <summary>
     ///     Converts a umbraco stylesheet to a package xml node
     /// </summary>
     /// <param name="path">The path of the stylesheet.</param>
@@ -799,5 +781,19 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         {
             mediaTypes.Add(mediaType);
         }
+    }
+
+    private PackageDefinition? CreatePackageDefinitionFromSchema(CreatedPackageSchemaDto packageSchema)
+    {
+        var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
+
+        if (packageDefinition is not null)
+        {
+            packageDefinition.Id = packageSchema.Id;
+            packageDefinition.Name = packageSchema.Name;
+            packageDefinition.PackageId = packageSchema.PackageId;
+        }
+
+        return packageDefinition;
     }
 }

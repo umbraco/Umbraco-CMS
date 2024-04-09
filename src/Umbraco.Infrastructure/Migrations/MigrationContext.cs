@@ -30,7 +30,7 @@ internal class MigrationContext : IMigrationContext
     public MigrationPlan Plan { get; }
 
     /// <inheritdoc />
-    public IUmbracoDatabase Database { get; }
+    public IUmbracoDatabase Database { get; internal set; }
 
     /// <inheritdoc />
     public ISqlContext SqlContext => Database.SqlContext;

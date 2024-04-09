@@ -28,9 +28,9 @@
 
   <!-- Package Validation -->
   <PropertyGroup>
-    <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
-    <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageValidationBaselineVersion>13.0.0</PackageValidationBaselineVersion>
+    <GenerateCompatibilitySuppressionFile>true</GenerateCompatibilitySuppressionFile>
+    <EnablePackageValidation>false</EnablePackageValidation>
+    <PackageValidationBaselineVersion>14.0.0</PackageValidationBaselineVersion>
     <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
     <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
   </PropertyGroup>

@@ -1,13 +1,9 @@
 using System.Globalization;
-using System.Xml.XPath;
-using Serilog.Events;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
-using Umbraco.Cms.Core.Xml;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common;
 
@@ -102,36 +98,6 @@ public class UmbracoHelper
     public async Task<IHtmlEncodedString> RenderTemplateAsync(int contentId, int? altTemplateId = null)
         => await _componentRenderer.RenderTemplateAsync(contentId, altTemplateId);
 
-    #region RenderMacro
-
-    /// <summary>
-    ///     Renders the macro with the specified alias.
-    /// </summary>
-    /// <param name="alias">The alias.</param>
-    /// <returns></returns>
-    public async Task<IHtmlEncodedString> RenderMacroAsync(string alias)
-        => await _componentRenderer.RenderMacroAsync(AssignedContentItem.Id, alias, null);
-
-    /// <summary>
-    ///     Renders the macro with the specified alias, passing in the specified parameters.
-    /// </summary>
-    /// <param name="alias">The alias.</param>
-    /// <param name="parameters">The parameters.</param>
-    /// <returns></returns>
-    public async Task<IHtmlEncodedString> RenderMacroAsync(string alias, object parameters)
-        => await _componentRenderer.RenderMacroAsync(AssignedContentItem.Id, alias, parameters.ToDictionary<object>());
-
-    /// <summary>
-    ///     Renders the macro with the specified alias, passing in the specified parameters.
-    /// </summary>
-    /// <param name="alias">The alias.</param>
-    /// <param name="parameters">The parameters.</param>
-    /// <returns></returns>
-    public async Task<IHtmlEncodedString> RenderMacroAsync(string alias, IDictionary<string, object> parameters)
-        => await _componentRenderer.RenderMacroAsync(AssignedContentItem.Id, alias, parameters);
-
-    #endregion
-
     #region Dictionary
 
     /// <summary>
@@ -175,28 +141,10 @@ public class UmbracoHelper
     ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
     /// </summary>
     /// <param name="key">key of dictionary item</param>
-    /// <param name="altText">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
+    /// <param name="specificCulture">the specific culture on which the result well be back upon</param>
+    /// <param name="defaultValue">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
     /// <returns></returns>
-    [Obsolete("Use GetDictionaryValueOrDefault instead, scheduled for removal in v14.")]
-    public string GetDictionaryValue(string key, string altText)
-    {
-        var dictionaryValue = GetDictionaryValue(key);
-        if (string.IsNullOrWhiteSpace(dictionaryValue))
-        {
-            dictionaryValue = altText;
-        }
-
-        return dictionaryValue;
-    }
-
-        /// <summary>
-        ///     Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
-        /// </summary>
-        /// <param name="key">key of dictionary item</param>
-        /// <param name="specificCulture">the specific culture on which the result well be back upon</param>
-        /// <param name="defaultValue">fall back text if dictionary item is empty - Name altText to match Umbraco.Field</param>
-        /// <returns></returns>
-        public string GetDictionaryValueOrDefault(string key, CultureInfo specificCulture, string defaultValue)
+    public string GetDictionaryValueOrDefault(string key, CultureInfo specificCulture, string defaultValue)
     {
         _cultureDictionary = _cultureDictionaryFactory.CreateDictionary(specificCulture);
         var dictionaryValue = GetDictionaryValue(key);
@@ -225,10 +173,6 @@ public class UmbracoHelper
     public IPublishedContent? Content(object id) => ContentForObject(id);
 
     private IPublishedContent? ContentForObject(object id) => _publishedContentQuery.Content(id);
-
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public IPublishedContent? ContentSingleAtXPath(string xpath, params XPathVariable[] vars) =>
-        _publishedContentQuery.ContentSingleAtXPath(xpath, vars);
 
     /// <summary>
     ///     Gets a content item from the cache.
@@ -338,14 +282,6 @@ public class UmbracoHelper
     /// <returns>The existing contents corresponding to the identifiers.</returns>
     /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
     public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids) => _publishedContentQuery.Content(ids);
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars) =>
-        _publishedContentQuery.ContentAtXPath(xpath, vars);
-
-    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars) =>
-        _publishedContentQuery.ContentAtXPath(xpath, vars);
 
     public IEnumerable<IPublishedContent> ContentAtRoot() => _publishedContentQuery.ContentAtRoot();
 

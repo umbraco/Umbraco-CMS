@@ -1,23 +1,22 @@
-﻿using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
 public static class UmbracoBuilderAuthExtensions
 {
-    private static bool _initialized;
-
     public static IUmbracoBuilder AddUmbracoOpenIddict(this IUmbracoBuilder builder)
     {
-        if (_initialized is false)
+        if (builder.Services.Any(x=>x.ImplementationType == typeof(OpenIddictCleanupJob)) is false)
         {
             ConfigureOpenIddict(builder);
-            _initialized = true;
         }
 
         return builder;
@@ -34,13 +33,17 @@ public static class UmbracoBuilderAuthExtensions
                 // FIXME: swap paths here so member API is first (see comment above)
                 options
                     .SetAuthorizationEndpointUris(
-                        Paths.MemberApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
+                        Paths.MemberApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetTokenEndpointUris(
-                        Paths.MemberApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
+                        Paths.MemberApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetLogoutEndpointUris(
-                        Paths.MemberApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
+                        Paths.MemberApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetRevocationEndpointUris(
-                        Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
+                        Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
 
                 // Enable authorization code flow with PKCE
                 options
@@ -101,6 +104,6 @@ public static class UmbracoBuilderAuthExtensions
                 options.UseDataProtection();
             });
 
-        builder.Services.AddHostedService<OpenIddictCleanup>();
+        builder.Services.AddRecurringBackgroundJob<OpenIddictCleanupJob>();
     }
 }

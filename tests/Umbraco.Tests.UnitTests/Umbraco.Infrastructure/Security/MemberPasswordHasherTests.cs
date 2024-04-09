@@ -104,7 +104,7 @@ public class MemberPasswordHasherTests
 
         var sut = new MemberPasswordHasher(
             new LegacyPasswordSecurity(),
-            new JsonNetSerializer(),
+            new SystemTextJsonSerializer(),
             Options.Create(new LegacyPasswordMigrationSettings { MachineKeyDecryptionKey = decryptionKey }),
             NullLoggerFactory.Instance.CreateLogger<MemberPasswordHasher>());
 

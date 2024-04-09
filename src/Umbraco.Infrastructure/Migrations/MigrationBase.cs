@@ -10,6 +10,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Update;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Migrations;
 

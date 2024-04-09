@@ -19,6 +19,11 @@ public interface IDataType : IUmbracoEntity, IRememberBeingDirty
     string EditorAlias { get; }
 
     /// <summary>
+    ///     Gets the property editor UI alias.
+    /// </summary>
+    string? EditorUiAlias { get; set; }
+
+    /// <summary>
     ///     Gets or sets the database type for the data type values.
     /// </summary>
     /// <remarks>
@@ -28,14 +33,17 @@ public interface IDataType : IUmbracoEntity, IRememberBeingDirty
     ValueStorageType DatabaseType { get; set; }
 
     /// <summary>
-    /// Gets or sets the configuration object.
+    /// Gets or sets the configuration data.
+    /// </summary>
+    IDictionary<string, object> ConfigurationData { get; set; }
+
+    /// <summary>
+    /// Gets an object representation of the configuration data.
     /// </summary>
     /// <remarks>
-    /// <para>The configuration object is serialized to Json and stored into the database.</para>
-    /// <para>The serialized Json is deserialized by the property editor, which by default should
-    /// return a Dictionary{string, object} but could return a typed object e.g. MyEditor.Configuration.</para>
+    /// The object type is dictated by the underlying <see cref="IConfigurationEditor"/> implementation of the <see cref="Editor"/>.
     /// </remarks>
-    object? Configuration { get; set; }
+    object? ConfigurationObject { get; }
 
     /// <summary>
     /// Creates a deep clone of the current entity with its identity/alias reset

@@ -12,20 +12,22 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 /// Used to deserialize json values and clean up any values based on the existence of element types and layout structure
 /// </summary>
-internal class BlockEditorValues
+internal class BlockEditorValues<TValue, TLayout>
+    where TValue : BlockValue<TLayout>, new()
+    where TLayout : class, IBlockLayoutItem, new()
 {
-    private readonly BlockEditorDataConverter _dataConverter;
     private readonly IContentTypeService _contentTypeService;
+    private readonly BlockEditorDataConverter<TValue, TLayout> _dataConverter;
     private readonly ILogger _logger;
 
-    public BlockEditorValues(BlockEditorDataConverter dataConverter, IContentTypeService contentTypeService, ILogger logger)
+    public BlockEditorValues(BlockEditorDataConverter<TValue, TLayout> dataConverter, IContentTypeService contentTypeService, ILogger logger)
     {
         _dataConverter = dataConverter;
         _contentTypeService = contentTypeService;
         _logger = logger;
     }
 
-    public BlockEditorData? DeserializeAndClean(object? propertyValue)
+    public BlockEditorData<TValue, TLayout>? DeserializeAndClean(object? propertyValue)
     {
         var propertyValueAsString = propertyValue?.ToString();
         if (string.IsNullOrWhiteSpace(propertyValueAsString))
@@ -33,17 +35,17 @@ internal class BlockEditorValues
             return null;
         }
 
-        BlockEditorData blockEditorData = _dataConverter.Deserialize(propertyValueAsString);
+        BlockEditorData<TValue, TLayout> blockEditorData = _dataConverter.Deserialize(propertyValueAsString);
         return Clean(blockEditorData);
     }
 
-    public BlockEditorData? ConvertAndClean(BlockValue blockValue)
+    public BlockEditorData<TValue, TLayout>? ConvertAndClean(TValue blockValue)
     {
-        BlockEditorData blockEditorData = _dataConverter.Convert(blockValue);
+        BlockEditorData<TValue, TLayout> blockEditorData = _dataConverter.Convert(blockValue);
         return Clean(blockEditorData);
     }
 
-    private BlockEditorData? Clean(BlockEditorData blockEditorData)
+    private BlockEditorData<TValue, TLayout>? Clean(BlockEditorData<TValue, TLayout> blockEditorData)
     {
         if (blockEditorData.BlockValue.ContentData.Count == 0)
         {

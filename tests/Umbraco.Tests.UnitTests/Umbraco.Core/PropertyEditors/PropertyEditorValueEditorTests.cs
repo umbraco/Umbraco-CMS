@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class PropertyEditorValueEditorTests
 {
-    [TestCase("{prop1: 'val1', prop2: 'val2'}", true)]
+    [TestCase("{\"prop1\": \"val1\", \"prop2\": \"val2\"}", true)]
     [TestCase("{1,2,3,4}", false)]
     [TestCase("[1,2,3,4]", true)]
     [TestCase("hello world", false)]

@@ -63,7 +63,7 @@ public abstract class BaseMapper
 
     protected abstract void DefineMaps();
 
-    // fixme: TSource is used for nothing
+    // TODO: TSource is used for nothing
     protected void DefineMap<TSource, TTarget>(string sourceName, string targetName)
     {
         if (_sqlSyntax == null)

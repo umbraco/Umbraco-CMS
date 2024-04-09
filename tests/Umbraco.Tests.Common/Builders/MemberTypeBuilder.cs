@@ -87,7 +87,7 @@ public class MemberTypeBuilder
             Thumbnail = GetThumbnail(),
             CreatorId = GetCreatorId(),
             Trashed = GetTrashed(),
-            IsContainer = GetIsContainer()
+            ListView = GetListView(),
         };
 
         BuildPropertyGroups(memberType, _propertyGroupBuilders.Select(x => x.Build()));

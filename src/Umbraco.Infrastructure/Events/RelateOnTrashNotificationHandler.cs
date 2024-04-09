@@ -71,7 +71,7 @@ public sealed class RelateOnTrashNotificationHandler :
                 _relationService.Save(relationType);
             }
 
-            foreach (MoveEventInfo<IContent> item in notification.MoveInfoCollection)
+            foreach (MoveToRecycleBinEventInfo<IContent> item in notification.MoveInfoCollection)
             {
                 IList<string> originalPath = item.OriginalPath.ToDelimitedList();
                 var originalParentId = originalPath.Count > 2
@@ -132,7 +132,7 @@ public sealed class RelateOnTrashNotificationHandler :
                 _relationService.Save(relationType);
             }
 
-            foreach (MoveEventInfo<IMedia> item in notification.MoveInfoCollection)
+            foreach (MoveToRecycleBinEventInfo<IMedia> item in notification.MoveInfoCollection)
             {
                 IList<string> originalPath = item.OriginalPath.ToDelimitedList();
                 var originalParentId = originalPath.Count > 2

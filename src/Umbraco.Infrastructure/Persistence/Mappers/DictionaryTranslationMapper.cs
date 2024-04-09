@@ -25,9 +25,6 @@ public sealed class DictionaryTranslationMapper : BaseMapper
             nameof(DictionaryTranslation.Key),
             nameof(LanguageTextDto.UniqueId));
         DefineMap<DictionaryTranslation, LanguageTextDto>(
-            nameof(DictionaryTranslation.Language),
-            nameof(LanguageTextDto.LanguageId));
-        DefineMap<DictionaryTranslation, LanguageTextDto>(
             nameof(DictionaryTranslation.Value),
             nameof(LanguageTextDto.Value));
     }

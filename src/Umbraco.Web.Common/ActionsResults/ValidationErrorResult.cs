@@ -45,18 +45,6 @@ public class ValidationErrorResult : ObjectResult
     {
     }
 
-    /// <summary>
-    ///     Typically this should not be used and just use the ValidationProblem method on the base controller class.
-    /// </summary>
-    /// <param name="errorMessage"></param>
-    /// <returns></returns>
-    public static ValidationErrorResult CreateNotificationValidationErrorResult(string errorMessage)
-    {
-        var notificationModel = new SimpleNotificationModel { Message = errorMessage };
-        notificationModel.AddErrorNotification(errorMessage, string.Empty);
-        return new ValidationErrorResult(notificationModel);
-    }
-
     public override void OnFormatting(ActionContext context)
     {
         base.OnFormatting(context);

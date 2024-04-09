@@ -12,10 +12,9 @@ public static class AppCacheExtensions
         string cacheKey,
         Func<T?> getCacheItem,
         TimeSpan? timeout,
-        bool isSliding = false,
-        string[]? dependentFiles = null)
+        bool isSliding = false)
     {
-        var result = provider.Get(cacheKey, () => getCacheItem(), timeout, isSliding, dependentFiles);
+        var result = provider.Get(cacheKey, () => getCacheItem(), timeout, isSliding);
         return result == null ? default : result.TryConvertTo<T>().Result;
     }
 
@@ -24,9 +23,8 @@ public static class AppCacheExtensions
         string cacheKey,
         Func<T> getCacheItem,
         TimeSpan? timeout = null,
-        bool isSliding = false,
-        string[]? dependentFiles = null) =>
-        provider.Insert(cacheKey, () => getCacheItem(), timeout, isSliding, dependentFiles);
+        bool isSliding = false) =>
+        provider.Insert(cacheKey, () => getCacheItem(), timeout, isSliding);
 
     public static IEnumerable<T?> GetCacheItemsByKeySearch<T>(this IAppCache provider, string keyStartsWith)
     {
@@ -60,5 +58,34 @@ public static class AppCacheExtensions
         }
 
         return result.TryConvertTo<T>().Result;
+    }
+
+    public static async Task<T?> GetCacheItemAsync<T>(
+        this IAppPolicyCache provider,
+        string cacheKey,
+        Func<Task<T?>> getCacheItemAsync,
+        TimeSpan? timeout,
+        bool isSliding = false)
+    {
+        var result = provider.Get(cacheKey);
+
+        if (result == null)
+        {
+            result = await getCacheItemAsync();
+            provider.Insert(cacheKey, () => result, timeout, isSliding);
+        }
+
+        return result == null ? default : result.TryConvertTo<T>().Result;
+    }
+
+    public static async Task InsertCacheItemAsync<T>(
+        this IAppPolicyCache provider,
+        string cacheKey,
+        Func<Task<T>> getCacheItemAsync,
+        TimeSpan? timeout = null,
+        bool isSliding = false)
+    {
+        T value = await getCacheItemAsync();
+        provider.Insert(cacheKey, () => value, timeout, isSliding);
     }
 }

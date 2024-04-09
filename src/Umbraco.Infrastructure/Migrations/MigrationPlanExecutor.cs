@@ -169,7 +169,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             }
             catch (Exception exception)
             {
-                _logger.LogError("Plan failed at step {TargetState}", transition.TargetState);
+                _logger.LogError(exception, "Plan {PlanName} failed at step {TargetState}", plan.Name, transition.TargetState);
+
                 // We have to always return something, so whatever running this has a chance to save the state we got to.
                 return new ExecutedMigrationPlan
                 {

@@ -1,5 +1,7 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
@@ -9,6 +11,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -21,6 +24,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     private readonly IEntityContainerRepository _containerRepository;
     private readonly IEntityRepository _entityRepository;
     private readonly IEventAggregator _eventAggregator;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     protected ContentTypeServiceBase(
         ICoreScopeProvider provider,
@@ -30,7 +34,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         IAuditRepository auditRepository,
         IEntityContainerRepository containerRepository,
         IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         Repository = repository;
@@ -38,6 +43,30 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         _containerRepository = containerRepository;
         _entityRepository = entityRepository;
         _eventAggregator = eventAggregator;
+        _userIdKeyResolver = userIdKeyResolver;
+    }
+
+    [Obsolete("Use the ctor specifying all dependencies instead")]
+    protected ContentTypeServiceBase(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        TRepository repository,
+        IAuditRepository auditRepository,
+        IEntityContainerRepository containerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            auditRepository,
+            containerRepository,
+            entityRepository,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    {
     }
 
     protected TRepository Repository { get; }
@@ -307,6 +336,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return Repository.Get(id);
     }
 
+    /// <inheritdoc />
+    public Task<TItem?> GetAsync(Guid guid) => Task.FromResult(Get(guid));
+
     public IEnumerable<TItem> GetAll(params int[] ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -461,6 +493,12 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Save
 
+    public async Task SaveAsync(TItem item, Guid performingUserKey)
+    {
+        var userId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        Save(item, userId);
+    }
+
     public void Save(TItem? item, int userId = Constants.Security.SuperUserId)
     {
         if (item is null)
@@ -569,6 +607,25 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Delete
 
+    public async Task<ContentTypeOperationStatus> DeleteAsync(Guid key, Guid performingUserKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        int performingUserId = await _userIdKeyResolver.GetAsync(performingUserKey);
+
+        TItem? item = await GetAsync(key);
+
+        if (item is null)
+        {
+            return ContentTypeOperationStatus.NotFound;
+        }
+
+        Delete(item, performingUserId);
+
+        scope.Complete();
+        return ContentTypeOperationStatus.Success;
+    }
+
     public void Delete(TItem item, int userId = Constants.Security.SuperUserId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -600,10 +657,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
 
             // Next find all other document types that have a reference to this content type
-            IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p=>p.Id.Value==item.Id) ?? false);
+            IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes?.Any(p => p.Key == item.Key) ?? false);
             foreach (TItem reference in referenceToAllowedContentTypes)
             {
-                reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Id.Value != item.Id);
+                reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Key != item.Key);
                 var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
                 // Fire change event
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changedRef, eventMessages));
@@ -697,6 +754,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Copy
 
+    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
     public TItem Copy(TItem original, string alias, string name, int parentId = -1)
     {
         TItem? parent = null;
@@ -711,6 +769,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return Copy(original, alias, name, parent);
     }
 
+    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
     public TItem Copy(TItem original, string alias, string name, TItem? parent)
     {
         if (original == null)
@@ -765,6 +824,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return clone;
     }
 
+    [Obsolete("Please use CopyAsync. Will be removed in V16.")]
     public Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -837,10 +897,53 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages, copy);
     }
 
+    public async Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> CopyAsync(Guid key, Guid? containerKey)
+    {
+        TItem? toCopy = await GetAsync(key);
+        if (toCopy is null)
+        {
+            return Attempt.FailWithStatus(ContentTypeStructureOperationStatus.NotFound, toCopy);
+        }
+
+        var containerId = GetContainerOrRootId(containerKey);
+
+        if (containerId is null)
+        {
+            return Attempt.FailWithStatus<TItem?, ContentTypeStructureOperationStatus>(ContentTypeStructureOperationStatus.ContainerNotFound, toCopy);
+        }
+
+        // using obsolete method for version control while it still exists
+        Attempt<OperationResult<MoveOperationStatusType, TItem>?> result = Copy(toCopy, containerId.Value);
+
+        return MapStatusTypeToAttempt(result.Result?.Entity, result.Result?.Result);
+    }
+
+    private int? GetContainerOrRootId(Guid? containerKey)
+    {
+        if (containerKey is null)
+        {
+            return Constants.System.Root;
+        }
+
+        EntityContainer? container = GetContainer(containerKey.Value);
+        return container?.Id;
+    }
+
+    private Attempt<TItem?, ContentTypeStructureOperationStatus> MapStatusTypeToAttempt(TItem? item, MoveOperationStatusType? resultStatus) =>
+        resultStatus switch
+        {
+            MoveOperationStatusType.Success => Attempt.SucceedWithStatus(ContentTypeStructureOperationStatus.Success, item),
+            MoveOperationStatusType.FailedParentNotFound => Attempt.FailWithStatus(ContentTypeStructureOperationStatus.ContainerNotFound, item),
+            MoveOperationStatusType.FailedCancelledByEvent => Attempt.FailWithStatus(ContentTypeStructureOperationStatus.CancelledByNotification, item),
+            MoveOperationStatusType.FailedNotAllowedByPath => Attempt.FailWithStatus(ContentTypeStructureOperationStatus.NotAllowedByPath, item),
+            _ => throw new NotImplementedException($"{nameof(ContentTypeStructureOperationStatus)} does not map to a corresponding {nameof(MoveOperationStatusType)}")
+        };
+
     #endregion
 
     #region Move
 
+    [Obsolete("Please use MoveAsync. Will be removed in V16.")]
     public Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -893,6 +996,85 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages);
     }
 
+    public async Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> MoveAsync(Guid key, Guid? containerKey)
+    {
+        TItem? toMove = await GetAsync(key);
+        if (toMove is null)
+        {
+            return Attempt.FailWithStatus(ContentTypeStructureOperationStatus.NotFound, toMove);
+        }
+
+        var containerId = GetContainerOrRootId(containerKey);
+
+        if (containerId is null)
+        {
+            return Attempt.FailWithStatus<TItem?, ContentTypeStructureOperationStatus>(ContentTypeStructureOperationStatus.ContainerNotFound, toMove);
+        }
+
+        // using obsolete method for version control while it still exists
+        Attempt<OperationResult<MoveOperationStatusType>?> result = Move(toMove, containerId.Value);
+
+        return MapStatusTypeToAttempt(toMove, result.Result?.Result);
+    }
+
+    #endregion
+
+    #region Allowed types
+
+    /// <inheritdoc />
+    public Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        // that one is special because it works across content, media and member types
+        scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+
+        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
+        IEnumerable<TItem> contentTypes = Repository.Get(query).ToArray();
+
+        var pagedModel = new PagedModel<TItem>
+        {
+            Total = contentTypes.Count(),
+            Items = contentTypes.Skip(skip).Take(take)
+        };
+
+        return Task.FromResult(pagedModel);
+    }
+
+    /// <inheritdoc />
+    public Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        TItem? parent = Get(key);
+
+        if (parent?.AllowedContentTypes is null)
+        {
+            return Task.FromResult(Attempt.FailWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, null));
+        }
+
+        PagedModel<TItem> result;
+        if (parent.AllowedContentTypes.Any() is false)
+        {
+            // no content types allowed under parent
+            result = new PagedModel<TItem>
+            {
+                Items = Array.Empty<TItem>(),
+                Total = 0,
+            };
+        }
+        else
+        {
+            TItem[] allowedChildren = GetAll(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
+            result = new PagedModel<TItem>
+            {
+                Items = allowedChildren.Take(take).Skip(skip),
+                Total = allowedChildren.Length,
+            };
+        }
+
+        return Task.FromResult(Attempt.SucceedWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result));
+    }
+
     #endregion
 
     #region Containers
@@ -901,6 +1083,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     protected Guid ContainerObjectType => EntityContainer.GetContainerObjectType(ContainedObjectType);
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -941,6 +1124,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -982,6 +1166,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return OperationResult.Attempt.Succeed(eventMessages);
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public EntityContainer? GetContainer(int containerId)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -990,6 +1175,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return _containerRepository.Get(containerId);
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public EntityContainer? GetContainer(Guid containerId)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -998,6 +1184,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return _containerRepository.Get(containerId);
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1006,6 +1193,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return _containerRepository.GetMany(containerIds);
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public IEnumerable<EntityContainer> GetContainers(TItem item)
     {
         var ancestorIds = item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
@@ -1016,6 +1204,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return GetContainers(ancestorIds);
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public IEnumerable<EntityContainer> GetContainers(string name, int level)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -1024,6 +1213,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return _containerRepository.Get(name, level);
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1063,6 +1253,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         // TODO: Audit trail ?
     }
 
+    [Obsolete($"Please use {nameof(IContentTypeContainerService)} or {nameof(IMediaTypeContainerService)} for all content or media type container operations. Will be removed in V16.")]
     public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1115,6 +1306,4 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     }
 
     #endregion
-
-
 }

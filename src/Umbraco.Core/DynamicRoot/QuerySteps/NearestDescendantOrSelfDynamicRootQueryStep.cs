@@ -13,7 +13,7 @@ public class NearestDescendantOrSelfDynamicRootQueryStep : IDynamicRootQueryStep
         _nodeFilterRepository = nodeFilterRepository;
     }
 
-    protected virtual string SupportedDirectionAlias { get; set; } = "NearestDescendantOrSelf";
+    public virtual string SupportedDirectionAlias { get; set; } = "NearestDescendantOrSelf";
 
     public async Task<Attempt<ICollection<Guid>>> ExecuteAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
     {

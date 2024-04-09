@@ -70,7 +70,13 @@ public class MigrationPlanTests
             Mock.Of<IServerMessenger>(),
             new CacheRefresherCollection(() => Enumerable.Empty<ICacheRefresher>()));
 
-        var executor = new MigrationPlanExecutor(scopeProvider, scopeProvider, loggerFactory, migrationBuilder, databaseFactory, Mock.Of<IPublishedSnapshotService>(), distributedCache);
+        var executor = new MigrationPlanExecutor(
+            scopeProvider,
+            scopeProvider,
+            loggerFactory,
+            migrationBuilder,
+            databaseFactory,
+            Mock.Of<IPublishedSnapshotService>(), distributedCache);
 
         var plan = new MigrationPlan("default")
             .From(string.Empty)

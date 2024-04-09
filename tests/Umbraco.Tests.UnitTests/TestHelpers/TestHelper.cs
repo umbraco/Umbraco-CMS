@@ -159,7 +159,7 @@ public static class TestHelper
     }
 
     // TODO: Move to Assertions or AssertHelper
-    // FIXME: obsolete the dateTimeFormat thing and replace with dateDelta
+    // TODO: obsolete the dateTimeFormat thing and replace with dateDelta
     public static void AssertPropertyValuesAreEqual(
         object actual,
         object expected,

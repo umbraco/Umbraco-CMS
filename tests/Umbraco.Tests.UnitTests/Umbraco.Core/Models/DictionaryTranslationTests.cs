@@ -32,12 +32,7 @@ public class DictionaryTranslationTests
         Assert.AreEqual(clone.Id, item.Id);
         Assert.AreEqual(clone.Key, item.Key);
         Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
-        Assert.AreNotSame(clone.Language, item.Language);
-
-        // This is null because we are ignoring it from cloning due to caching/cloning issues - we don't really want
-        // this entity attached to this item but we're stuck with it for now
-        Assert.IsNull(clone.Language);
-        Assert.AreEqual(clone.LanguageId, item.LanguageId);
+        Assert.AreEqual(clone.LanguageIsoCode, item.LanguageIsoCode);
         Assert.AreEqual(clone.Value, item.Value);
 
         // This double verifies by reflection

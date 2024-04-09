@@ -260,7 +260,7 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
         {
             var templateRepository = CreateRepository(provider);
             var globalSettings = new GlobalSettings();
-            var serializer = new JsonNetSerializer();
+            var serializer = new SystemTextJsonSerializer();
             var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
             var commonRepository =
                 new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches, ShortStringHelper);

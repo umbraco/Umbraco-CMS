@@ -2,16 +2,12 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -21,37 +17,19 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.MultipleTextstring,
-    "Repeatable textstrings",
-    "multipletextbox",
     ValueType = ValueTypes.Text,
-    Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-ordered-list",
     ValueEditorIsReusable = true)]
 public class MultipleTextStringPropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
-
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public MultipleTextStringPropertyEditor(
-        IIOHelper ioHelper,
-        IDataValueEditorFactory dataValueEditorFactory)
-        : this(ioHelper, dataValueEditorFactory, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MultipleTextStringPropertyEditor" /> class.
     /// </summary>
-    public MultipleTextStringPropertyEditor(
-        IIOHelper ioHelper,
-        IDataValueEditorFactory dataValueEditorFactory,
-        IEditorConfigurationParser editorConfigurationParser)
+    public MultipleTextStringPropertyEditor(IIOHelper ioHelper, IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _editorConfigurationParser = editorConfigurationParser;
         SupportsReadOnly = true;
     }
 
@@ -61,7 +39,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new MultipleTextStringConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        new MultipleTextStringConfigurationEditor(_ioHelper);
 
     /// <summary>
     ///     Custom value editor so we can format the value for the editor and the database
@@ -71,23 +49,20 @@ public class MultipleTextStringPropertyEditor : DataEditor
         private static readonly string NewLine = "\n";
         private static readonly string[] NewLineDelimiters = { "\r\n", "\r", "\n" };
 
-        private readonly ILocalizedTextService _localizedTextService;
-
         public MultipleTextStringPropertyValueEditor(
-            ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute) =>
-            _localizedTextService = localizedTextService;
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
+        {
+        }
 
         /// <summary>
         ///     A custom FormatValidator is used as for multiple text strings, each string should individually be checked
         ///     against the configured regular expression, rather than the JSON representing all the strings as a whole.
         /// </summary>
-        public override IValueFormatValidator FormatValidator =>
-            new MultipleTextStringFormatValidator(_localizedTextService);
+        public override IValueFormatValidator FormatValidator => new MultipleTextStringFormatValidator();
 
         /// <summary>
         ///     The value passed in from the editor will be an array of simple objects so we'll need to parse them to get the
@@ -101,7 +76,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
         /// </remarks>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            if (editorValue.Value is not JArray asArray || asArray.HasValues == false)
+            if (editorValue.Value is not IEnumerable<string> value)
             {
                 return null;
             }
@@ -112,61 +87,39 @@ public class MultipleTextStringPropertyEditor : DataEditor
                     $"editorValue.DataTypeConfiguration is {editorValue.DataTypeConfiguration?.GetType()} but must be {typeof(MultipleTextStringConfiguration)}");
             }
 
-            var max = config.Maximum;
+            var max = config.Max;
 
             // The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
-            IEnumerable<string?> array = asArray.OfType<JObject>()
-                .Where(x => x["value"] != null)
-                .Select(x => x["value"]!.Value<string>());
-
             // only allow the max if over 0
             if (max > 0)
             {
-                return string.Join(NewLine, array.Take(max));
+                return string.Join(NewLine, value.Take(max));
             }
 
-            return string.Join(NewLine, array);
+            return string.Join(NewLine, value);
         }
 
-        /// <summary>
-        ///     We are actually passing back an array of simple objects instead of an array of strings because in angular a
-        ///     primitive (string) value
-        ///     cannot have 2 way binding, so to get around that each item in the array needs to be an object with a string.
-        /// </summary>
-        /// <param name="property"></param>
-        /// <param name="culture"></param>
-        /// <param name="segment"></param>
-        /// <returns></returns>
-        /// <remarks>
-        ///     The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
-        /// </remarks>
         public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
-            var val = property.GetValue(culture, segment);
+            var value = property.GetValue(culture, segment);
 
-            return val?.ToString()?.Split(NewLineDelimiters, StringSplitOptions.None).Select(x => JObject.FromObject(new { value = x }))
-                ?? Array.Empty<JObject>();
+            // The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
+            return value is string stringValue
+                ? stringValue.Split(NewLineDelimiters, StringSplitOptions.None)
+                : Array.Empty<string>();
         }
     }
 
     internal class MultipleTextStringFormatValidator : IValueFormatValidator
     {
-        private readonly ILocalizedTextService _localizedTextService;
-
-        public MultipleTextStringFormatValidator(ILocalizedTextService localizedTextService) =>
-            _localizedTextService = localizedTextService;
-
         public IEnumerable<ValidationResult> ValidateFormat(object? value, string valueType, string format)
         {
-            if (value is not JArray asArray)
+            if (value is not IEnumerable<string> textStrings)
             {
                 return Enumerable.Empty<ValidationResult>();
             }
 
-            IEnumerable<string?> textStrings = asArray.OfType<JObject>()
-                .Where(x => x["value"] != null)
-                .Select(x => x["value"]!.Value<string>());
-            var textStringValidator = new RegexValidator(_localizedTextService);
+            var textStringValidator = new RegexValidator();
             foreach (var textString in textStrings)
             {
                 var validationResults = textStringValidator.ValidateFormat(textString, valueType, format).ToList();

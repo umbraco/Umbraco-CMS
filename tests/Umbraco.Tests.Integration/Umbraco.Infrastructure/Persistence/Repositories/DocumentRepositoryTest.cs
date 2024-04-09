@@ -65,7 +65,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
 
     public void CreateTestData()
     {
-        var template = TemplateBuilder.CreateTextPageTemplate();
+        var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
         FileService.SaveTemplate(template);
 
         // Create and Save ContentType "umbTextpage" -> (_contentType.Id)
@@ -824,7 +824,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         ContentTypeService.Save(variantCt);
 
         invariantCt.AllowedContentTypes =
-            new[] { new ContentTypeSort(invariantCt.Id, 0), new ContentTypeSort(variantCt.Id, 1) };
+            new[] { new ContentTypeSort(invariantCt.Key, 0, invariantCt.Alias), new ContentTypeSort(variantCt.Key, 1, variantCt.Alias) };
         ContentTypeService.Save(invariantCt);
 
         // Create content

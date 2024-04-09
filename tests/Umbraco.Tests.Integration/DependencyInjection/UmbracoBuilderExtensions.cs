@@ -18,7 +18,6 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.PublishedCache;
@@ -47,8 +46,6 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUnique(testHelper.MainDom);
 
         builder.Services.AddUnique<IIndexRebuilder, TestBackgroundIndexRebuilder>();
-        builder.Services.AddUnique(factory => Mock.Of<IRuntimeMinifier>());
-
         // we don't want persisted nucache files in tests
         builder.Services.AddTransient(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
 
@@ -140,7 +137,7 @@ public static class UmbracoBuilderExtensions
                 return new LocalizedTextServiceFileSources(
                     loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),
                     appCaches,
-                    mainLangFolder,
+                    currFolder,
                     Array.Empty<LocalizedTextServiceSupplementaryFileSource>(),
                     new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Lang").GetDirectoryContents(string.Empty));
             }),

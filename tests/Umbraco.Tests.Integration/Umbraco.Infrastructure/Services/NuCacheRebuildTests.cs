@@ -35,7 +35,8 @@ public class NuCacheRebuildTests : UmbracoIntegrationTest
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
 
-        ContentService.SaveAndPublish(content);
+        ContentService.Save(content);
+        ContentService.Publish(content, Array.Empty<string>());
         var cachedContent = ContentService.GetById(content.Id);
         var segment = urlSegmentProvider.GetUrlSegment(cachedContent);
 
@@ -69,7 +70,8 @@ public class NuCacheRebuildTests : UmbracoIntegrationTest
 
         Assert.AreEqual("hello", segment);
 
-        ContentService.SaveAndPublish(content);
+        ContentService.Save(content);
+        ContentService.Publish(content, Array.Empty<string>());
         cachedContent = ContentService.GetById(content.Id);
         segment = urlSegmentProvider.GetUrlSegment(cachedContent);
 

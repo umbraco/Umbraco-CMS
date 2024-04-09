@@ -11,9 +11,6 @@ public class LinkDisplay
     [DataMember(Name = "name")]
     public string? Name { get; set; }
 
-    [DataMember(Name = "nodeName")]
-    public string? NodeName { get; set; }
-
     [DataMember(Name = "published")]
     public bool Published { get; set; }
 
@@ -26,9 +23,19 @@ public class LinkDisplay
     [DataMember(Name = "trashed")]
     public bool Trashed { get; set; }
 
-    [DataMember(Name = "udi")]
-    public GuidUdi? Udi { get; set; }
+    [DataMember(Name = "type")]
+    public string? Type { get; set; }
+
+    [DataMember(Name = "unique")]
+    public Guid? Unique { get; set; }
 
     [DataMember(Name = "url")]
     public string? Url { get; set; }
+
+    public static class Types
+    {
+        public const string Document = "document";
+        public const string Media = "media";
+        public const string External = "external";
+    }
 }
