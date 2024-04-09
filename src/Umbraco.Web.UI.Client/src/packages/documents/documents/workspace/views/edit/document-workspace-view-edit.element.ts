@@ -2,11 +2,11 @@ import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context
 import type { UmbDocumentWorkspaceViewEditTabElement } from './document-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-workspace-view-edit')
@@ -21,7 +21,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	private _tabs?: Array<PropertyTypeContainerModelBaseModel>;
+	private _tabs?: Array<UmbPropertyTypeContainerModel>;
 
 	@state()
 	private _routerPath?: string;

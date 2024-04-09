@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FileSystemCreateRequestModelBaseModel } from './FileSystemCreateRequestModelBaseModel';
+import type { FileSystemFolderModel } from './FileSystemFolderModel';
 
-export type CreateScriptFolderRequestModel = FileSystemCreateRequestModelBaseModel;
+export type CreateScriptFolderRequestModel = {
+    name: string;
+    parent?: FileSystemFolderModel | null;
+};
 

@@ -3,10 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
-
-export type DataTypeItemResponseModel = (NamedItemResponseModelBaseModel & {
+export type DataTypeItemResponseModel = {
+    id: string;
+    name: string;
     editorUiAlias?: string | null;
     isDeletable: boolean;
-});
+};
 

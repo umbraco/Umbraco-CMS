@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ValueModelBaseModel } from './ValueModelBaseModel';
-
-export type MediaValueModel = ValueModelBaseModel;
+export type MediaValueModel = {
+    culture?: string | null;
+    segment?: string | null;
+    alias: string;
+    value?: any;
+};
 

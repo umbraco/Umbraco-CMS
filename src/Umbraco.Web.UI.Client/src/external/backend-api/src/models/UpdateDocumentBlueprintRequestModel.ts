@@ -3,7 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { UpdateContentForDocumentRequestModel } from './UpdateContentForDocumentRequestModel';
+import type { DocumentValueModel } from './DocumentValueModel';
+import type { DocumentVariantRequestModel } from './DocumentVariantRequestModel';
 
-export type UpdateDocumentBlueprintRequestModel = UpdateContentForDocumentRequestModel;
+export type UpdateDocumentBlueprintRequestModel = {
+    values: Array<DocumentValueModel>;
+    variants: Array<DocumentVariantRequestModel>;
+};
 

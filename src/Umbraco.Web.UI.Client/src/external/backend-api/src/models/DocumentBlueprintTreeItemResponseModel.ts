@@ -4,9 +4,14 @@
 /* eslint-disable */
 
 import type { DocumentTypeReferenceResponseModel } from './DocumentTypeReferenceResponseModel';
-import type { NamedEntityTreeItemResponseModel } from './NamedEntityTreeItemResponseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type DocumentBlueprintTreeItemResponseModel = (NamedEntityTreeItemResponseModel & {
-    documentType: DocumentTypeReferenceResponseModel;
-});
+export type DocumentBlueprintTreeItemResponseModel = {
+    hasChildren: boolean;
+    id: string;
+    parent?: ReferenceByIdModel | null;
+    name: string;
+    isFolder: boolean;
+    documentType?: DocumentTypeReferenceResponseModel | null;
+};
 

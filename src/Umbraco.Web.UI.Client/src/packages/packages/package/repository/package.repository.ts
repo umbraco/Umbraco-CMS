@@ -1,3 +1,4 @@
+import type { UmbCreatedPackageDefinition, UmbCreatedPackages } from '../../types.js';
 import { UMB_PACKAGE_STORE_TOKEN } from './package.store.js';
 import { UmbPackageServerDataSource } from './sources/package.server.data.js';
 import type { UmbPackageStore } from './package.store.js';
@@ -20,15 +21,70 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#packageSource = new UmbPackageServerDataSource(this);
-		this.#init = new Promise((res) => {
+		this.#init = new Promise((resolve) => {
 			this.consumeContext(UMB_PACKAGE_STORE_TOKEN, (instance) => {
 				this.#packageStore = instance;
 				this.requestConfiguration(instance);
 				this.requestRootItems(instance);
 				this.requestPackageMigrations(instance);
-				res();
+				resolve();
 			});
 		});
+	}
+
+	async getCreatedPackage(unique: string | undefined): Promise<UmbCreatedPackageDefinition> {
+		if (!unique) {
+			return this.#getEmptyCreatedPackage();
+		}
+
+		const { data } = await this.#packageSource.getCreatedPackage(unique);
+
+		if (!data) {
+			return this.#getEmptyCreatedPackage();
+		}
+
+		const { id, ...model } = data;
+		return { unique: id, ...model };
+	}
+
+	async getCreatedPackages({ skip, take }: { skip: number; take: number }): Promise<UmbCreatedPackages | undefined> {
+		const { data } = await this.#packageSource.getCreatedPackages({ skip, take });
+		if (!data) return undefined;
+		return {
+			items: data.items?.map((item) => ({ unique: item.id, name: item.name })),
+			total: data.total,
+		};
+	}
+
+	async getCreatePackageDownload(unique: string): Promise<Blob | undefined> {
+		const { data } = await this.#packageSource.getCreatePackageDownload(unique);
+		return data;
+	}
+
+	#getEmptyCreatedPackage(): UmbCreatedPackageDefinition {
+		return {
+			unique: '',
+			name: '',
+			packagePath: '',
+			contentNodeId: undefined,
+			contentLoadChildNodes: false,
+			mediaIds: [],
+			mediaLoadChildNodes: false,
+			documentTypes: [],
+			mediaTypes: [],
+			dataTypes: [],
+			templates: [],
+			partialViews: [],
+			stylesheets: [],
+			scripts: [],
+			languages: [],
+			dictionaryItems: [],
+		};
+	}
+
+	async deleteCreatedPackage(unique: string) {
+		const { error } = await this.#packageSource.deleteCreatedPackage(unique);
+		return !error;
 	}
 
 	async requestConfiguration(store: UmbPackageStore) {
@@ -97,6 +153,20 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 		if (migrations) {
 			store.appendMigrations(migrations.items);
 		}
+	}
+
+	async saveCreatedPackage(pkg: UmbCreatedPackageDefinition) {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { unique: _, ...model } = pkg;
+		const { data } = await this.#packageSource.saveCreatedPackage(model);
+		return data;
+	}
+
+	async updateCreatedPackage(pkg: UmbCreatedPackageDefinition): Promise<boolean> {
+		const { unique, ...model } = pkg;
+		const { error } = await this.#packageSource.updateCreatedPackage(unique, model);
+		return !error;
+
 	}
 
 	async configuration() {

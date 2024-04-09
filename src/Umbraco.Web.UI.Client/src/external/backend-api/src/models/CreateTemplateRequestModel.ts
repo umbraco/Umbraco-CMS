@@ -3,9 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { TemplateModelBaseModel } from './TemplateModelBaseModel';
-
-export type CreateTemplateRequestModel = (TemplateModelBaseModel & {
+export type CreateTemplateRequestModel = {
+    name: string;
+    alias: string;
+    content?: string | null;
     id?: string | null;
-});
+};
 

@@ -3,7 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
-
-export type MemberGroupItemResponseModel = NamedItemResponseModelBaseModel;
+export type MemberGroupItemResponseModel = {
+    id: string;
+    name: string;
+};
 

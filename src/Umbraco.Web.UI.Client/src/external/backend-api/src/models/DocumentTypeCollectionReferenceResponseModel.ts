@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeCollectionReferenceResponseModelBaseModel } from './ContentTypeCollectionReferenceResponseModelBaseModel';
-
-export type DocumentTypeCollectionReferenceResponseModel = ContentTypeCollectionReferenceResponseModelBaseModel;
+export type DocumentTypeCollectionReferenceResponseModel = {
+    id: string;
+    alias: string;
+    icon: string;
+};
 

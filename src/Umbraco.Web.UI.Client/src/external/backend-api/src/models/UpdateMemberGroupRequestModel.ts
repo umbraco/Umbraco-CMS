@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { MemberGroupPresentationBaseModel } from './MemberGroupPresentationBaseModel';
-
-export type UpdateMemberGroupRequestModel = MemberGroupPresentationBaseModel;
+export type UpdateMemberGroupRequestModel = {
+    name: string;
+};
 
