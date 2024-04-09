@@ -9,6 +9,7 @@ import {
 	UmbDocumentBlueprintDetailRepository,
 } from '@umbraco-cms/backoffice/document-blueprint';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 @customElement('umb-create-blueprint-modal')
 export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<UmbCreateBlueprintModalData, never> {
@@ -40,8 +41,13 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<UmbCreat
 
 	#mapDocumentToBlueprintModel() {
 		if (!this.#document) return;
-		const variants = { ...this.#document?.variants, name: this._blueprintName };
-		const model: UmbDocumentBlueprintDetailModel = { ...this.#document, entityType: 'document-blueprint', variants };
+		const variants = this.#document?.variants.map((variant) => ({ ...variant, name: this._blueprintName }));
+		const model: UmbDocumentBlueprintDetailModel = {
+			...this.#document,
+			entityType: 'document-blueprint',
+			variants,
+			unique: UmbId.new(),
+		};
 
 		return model;
 	}
