@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { TourStatusModel } from './TourStatusModel';
-
-export type SetTourStatusRequestModel = TourStatusModel;
+export type SetTourStatusRequestModel = {
+    alias: string;
+    completed: boolean;
+    disabled: boolean;
+};
 

@@ -1,4 +1,4 @@
-import { UmbModalToken } from '../../../core/modal/token/modal-token.js';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbPickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 import type { UmbTemplateTreeItemModel } from '@umbraco-cms/backoffice/template';
 
@@ -13,6 +13,7 @@ export const UMB_TEMPLATE_PICKER_MODAL = new UmbModalToken<UmbTemplatePickerModa
 			size: 'small',
 		},
 		data: {
+			hideTreeRoot: true,
 			treeAlias: 'Umb.Tree.Template',
 		},
 	},

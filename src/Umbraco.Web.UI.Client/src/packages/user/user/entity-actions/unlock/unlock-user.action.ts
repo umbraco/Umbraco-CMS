@@ -16,17 +16,19 @@ export class UmbUnlockUserEntityAction extends UmbEntityActionBase<never> {
 		const itemRepository = new UmbUserItemRepository(this);
 		const { data } = await itemRepository.requestItems([this.args.unique]);
 
-		if (data) {
-			const item = data[0];
-
-			await umbConfirmModal(this._host, {
-				headline: `Unlock ${item.name}`,
-				content: 'Are you sure you want to unlock this user?',
-				confirmLabel: 'Unlock',
-			});
-
-			const unlockUserRepository = new UmbUnlockUserRepository(this);
-			await unlockUserRepository?.unlock([this.args.unique]);
+		if (!data?.length) {
+			throw new Error('Item not found.');
 		}
+
+		const item = data[0];
+
+		await umbConfirmModal(this._host, {
+			headline: `Unlock ${item.name}`,
+			content: 'Are you sure you want to unlock this user?',
+			confirmLabel: 'Unlock',
+		});
+
+		const unlockUserRepository = new UmbUnlockUserRepository(this);
+		await unlockUserRepository?.unlock([this.args.unique]);
 	}
 }

@@ -26,7 +26,7 @@ import '../src/packages/core/components';
 
 import { manifests as documentManifests } from '../src/packages/documents';
 import { manifests as localizationManifests } from '../src/packages/core/localization/manifests';
-import { UmbNotificationContext } from '../src/packages/core';
+import { UmbNotificationContext } from '../src/packages/core/notification';
 
 // MSW
 startMockServiceWorker({ serviceWorker: { url: (import.meta.env.VITE_BASE_PATH ?? '/') + 'mockServiceWorker.js' } });

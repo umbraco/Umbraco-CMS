@@ -277,7 +277,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modal = modalManager.open(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
-				hideTreeRoot: true,
 				multiple: false,
 				pickableFilter: (template) =>
 					this._allowedTemplates?.find((allowed) => template.unique === allowed.id) ? true : false,

@@ -1,3 +1,4 @@
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
@@ -44,7 +45,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { type Observable, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
@@ -137,6 +138,9 @@ export class UmbDocumentWorkspaceContext
 		},
 	);
 
+	// TODO: this should be set up for all entity workspace contexts in a base class
+	#entityContext = new UmbEntityContext(this);
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
 
@@ -167,6 +171,8 @@ export class UmbDocumentWorkspaceContext
 				component: () => import('./document-workspace-editor.element.js'),
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
+					this.#entityContext.setEntityType(UMB_DOCUMENT_ENTITY_TYPE);
+					this.#entityContext.setUnique(unique);
 					this.load(unique);
 				},
 			},
@@ -516,7 +522,7 @@ export class UmbDocumentWorkspaceContext
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+			const event = new UmbRequestReloadTreeItemChildrenEvent({
 				entityType: parent.entityType,
 				unique: parent.unique,
 			});

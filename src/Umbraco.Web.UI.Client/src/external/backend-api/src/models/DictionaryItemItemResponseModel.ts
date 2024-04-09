@@ -3,7 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
-
-export type DictionaryItemItemResponseModel = NamedItemResponseModelBaseModel;
+export type DictionaryItemItemResponseModel = {
+    id: string;
+    name: string;
+};
 

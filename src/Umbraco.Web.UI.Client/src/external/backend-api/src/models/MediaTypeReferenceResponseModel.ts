@@ -3,7 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeReferenceResponseModelBaseModel } from './ContentTypeReferenceResponseModelBaseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type MediaTypeReferenceResponseModel = ContentTypeReferenceResponseModelBaseModel;
+export type MediaTypeReferenceResponseModel = {
+    id: string;
+    icon: string;
+    collection?: ReferenceByIdModel | null;
+};
 

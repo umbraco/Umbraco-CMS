@@ -1,4 +1,4 @@
-import type { UmbWorkspaceAction } from '../../../../index.js';
+import type { UmbWorkspaceAction } from '../workspace-action.interface.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';

@@ -3,9 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { MemberGroupPresentationBaseModel } from './MemberGroupPresentationBaseModel';
-
-export type CreateMemberGroupRequestModel = (MemberGroupPresentationBaseModel & {
+export type CreateMemberGroupRequestModel = {
+    name: string;
     id?: string | null;
-});
+};
 

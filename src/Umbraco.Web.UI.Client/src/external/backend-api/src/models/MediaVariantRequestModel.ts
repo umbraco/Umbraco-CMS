@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { VariantModelBaseModel } from './VariantModelBaseModel';
-
-export type MediaVariantRequestModel = VariantModelBaseModel;
+export type MediaVariantRequestModel = {
+    culture?: string | null;
+    segment?: string | null;
+    name: string;
+};
 
