@@ -27,17 +27,6 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     private readonly IJsonSerializer _jsonSerializer;
     private readonly BlockListPropertyValueConstructorCache _constructorCache;
 
-    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V14")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
-        : this(proflog, blockConverter, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
-    {
-    }
-
-    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V14")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService)
-        : this(proflog, blockConverter, contentTypeService, StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>())
-    {
-    }
 
     [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V15")]
     public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder)
