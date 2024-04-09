@@ -9,8 +9,8 @@ export class UmbServerModelValidationContext
 	extends UmbContextBase<UmbServerModelValidationContext>
 	implements UmbValidator
 {
-	#validatePromise?: Promise<boolean>;
-	#validatePromiseResolve?: (valid: boolean) => void;
+	#validatePromise?: Promise<void>;
+	#validatePromiseResolve?: () => void;
 
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 	#isValid = true;
@@ -39,7 +39,7 @@ export class UmbServerModelValidationContext
 		this.#serverFeedback = {};
 		this.#isValid = false;
 		//this.#validatePromiseReject?.();
-		this.#validatePromise = new Promise<boolean>((resolve) => {
+		this.#validatePromise = new Promise<void>((resolve) => {
 			this.#validatePromiseResolve = resolve;
 		});
 		// Ask the server for validation...
@@ -48,8 +48,8 @@ export class UmbServerModelValidationContext
 		console.log('VALIDATE — Got server response:');
 		console.log(data, error);
 
-		this.#isValid = false;
-		this.#validatePromiseResolve?.(false);
+		this.#isValid = data ? true : false;
+		this.#validatePromiseResolve?.();
 		this.#validatePromiseResolve = undefined;
 		//this.#validatePromise = undefined;
 	}
