@@ -14,7 +14,6 @@ using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Core.Tour;
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Extensions;
 
@@ -46,7 +45,6 @@ public static partial class UmbracoBuilderExtensions
         builder.EditorValidators().Add(() => builder.TypeLoader.GetTypes<IEditorValidator>());
         builder.HealthChecks().Add(() => builder.TypeLoader.GetTypes<HealthCheck>());
         builder.HealthCheckNotificationMethods().Add(() => builder.TypeLoader.GetTypes<IHealthCheckNotificationMethod>());
-        builder.TourFilters();
         builder.UrlProviders()
             .Append<AliasUrlProvider>()
             .Append<DefaultUrlProvider>();
@@ -132,12 +130,6 @@ public static partial class UmbracoBuilderExtensions
 
     public static HealthCheckNotificationMethodCollectionBuilder HealthCheckNotificationMethods(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<HealthCheckNotificationMethodCollectionBuilder>();
-
-    /// <summary>
-    /// Gets the TourFilters collection builder.
-    /// </summary>
-    public static TourFilterCollectionBuilder TourFilters(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<TourFilterCollectionBuilder>();
 
     /// <summary>
     /// Gets the URL providers collection builder.
