@@ -7,11 +7,10 @@ import type {
 } from './types.js';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeServerDataSourceBaseArgs<
-	ServerTreeItemType extends TreeItemPresentationModel,
+	ServerTreeItemType extends { hasChildren: boolean },
 	ClientTreeItemType extends UmbTreeItemModelBase,
 > {
 	getRootItems: (args: UmbTreeRootItemsRequestArgs) => Promise<UmbPagedModel<ServerTreeItemType>>;
@@ -27,7 +26,7 @@ export interface UmbTreeServerDataSourceBaseArgs<
  * @implements {UmbTreeDataSource}
  */
 export abstract class UmbTreeServerDataSourceBase<
-	ServerTreeItemType extends TreeItemPresentationModel,
+	ServerTreeItemType extends { hasChildren: boolean },
 	ClientTreeItemType extends UmbTreeItemModelBase,
 > implements UmbTreeDataSource<ClientTreeItemType>
 {

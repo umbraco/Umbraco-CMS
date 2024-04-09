@@ -3,10 +3,22 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { PackageModelBaseModel } from './PackageModelBaseModel';
-
-export type PackageDefinitionResponseModel = (PackageModelBaseModel & {
+export type PackageDefinitionResponseModel = {
+    name: string;
+    contentNodeId?: string | null;
+    contentLoadChildNodes: boolean;
+    mediaIds: Array<string>;
+    mediaLoadChildNodes: boolean;
+    documentTypes: Array<string>;
+    mediaTypes: Array<string>;
+    dataTypes: Array<string>;
+    templates: Array<string>;
+    partialViews: Array<string>;
+    stylesheets: Array<string>;
+    scripts: Array<string>;
+    languages: Array<string>;
+    dictionaryItems: Array<string>;
     id: string;
     packagePath: string;
-});
+};
 

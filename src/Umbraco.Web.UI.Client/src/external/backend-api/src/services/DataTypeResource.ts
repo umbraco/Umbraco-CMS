@@ -331,7 +331,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns PagedDataTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getFilterDataType({
@@ -385,7 +385,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns PagedModelDataTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemDataTypeSearch({
@@ -433,7 +433,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns PagedDataTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDataTypeChildren({
@@ -463,7 +463,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns PagedDataTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDataTypeRoot({

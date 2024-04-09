@@ -13,7 +13,7 @@ import { request as __request } from '../core/request';
 export class TelemetryResource {
 
     /**
-     * @returns PagedTelemetryResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTelemetry({

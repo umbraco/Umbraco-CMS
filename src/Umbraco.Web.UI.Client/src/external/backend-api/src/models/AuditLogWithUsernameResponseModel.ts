@@ -3,10 +3,18 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { AuditLogBaseModel } from './AuditLogBaseModel';
+import type { AuditLogEntityModel } from './AuditLogEntityModel';
+import type { AuditTypeModel } from './AuditTypeModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type AuditLogWithUsernameResponseModel = (AuditLogBaseModel & {
+export type AuditLogWithUsernameResponseModel = {
+    user: ReferenceByIdModel;
+    entity?: AuditLogEntityModel | null;
+    timestamp: string;
+    logType: AuditTypeModel;
+    comment?: string | null;
+    parameters?: string | null;
     userName?: string | null;
     userAvatars: Array<string>;
-});
+};
 

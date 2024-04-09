@@ -3,9 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DictionaryItemModelBaseModel } from './DictionaryItemModelBaseModel';
+import type { DictionaryItemTranslationModel } from './DictionaryItemTranslationModel';
 
-export type DictionaryItemResponseModel = (DictionaryItemModelBaseModel & {
+export type DictionaryItemResponseModel = {
+    name: string;
+    translations: Array<DictionaryItemTranslationModel>;
     id: string;
-});
+};
 

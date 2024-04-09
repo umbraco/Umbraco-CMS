@@ -19,7 +19,7 @@ import { request as __request } from '../core/request';
 export class LogViewerResource {
 
     /**
-     * @returns PagedLoggerResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getLogViewerLevel({
@@ -68,7 +68,7 @@ export class LogViewerResource {
     }
 
     /**
-     * @returns PagedLogMessageResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getLogViewerLog({
@@ -107,7 +107,7 @@ export class LogViewerResource {
     }
 
     /**
-     * @returns PagedLogTemplateResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getLogViewerMessageTemplate({
@@ -138,7 +138,7 @@ export class LogViewerResource {
     }
 
     /**
-     * @returns PagedSavedLogSearchResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getLogViewerSavedSearch({

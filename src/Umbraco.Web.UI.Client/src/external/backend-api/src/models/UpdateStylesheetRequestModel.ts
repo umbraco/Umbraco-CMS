@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FileSystemFileUpdateRequestModelBaseModel } from './FileSystemFileUpdateRequestModelBaseModel';
-
-export type UpdateStylesheetRequestModel = FileSystemFileUpdateRequestModelBaseModel;
+export type UpdateStylesheetRequestModel = {
+    content: string;
+};
 
