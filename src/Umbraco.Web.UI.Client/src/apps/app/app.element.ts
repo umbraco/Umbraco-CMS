@@ -1,4 +1,4 @@
-import { onInit } from '../../packages/core/index.js';
+import { onInit } from '../../packages/core/entry-point.js';
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppContext } from './app.context.js';
 import { UmbServerConnection } from './server-connection.js';
@@ -89,7 +89,7 @@ export class UmbAppElement extends UmbLitElement {
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
 		new UmbAppContext(this, { backofficePath: this.backofficePath, serverUrl: this.serverUrl });
 
-		// Register Core extensions
+		// Register Core extensions (this is specifically done here because we need these extensions to be registered before the application is initialized)
 		onInit(this, umbExtensionsRegistry);
 
 		// Register public extensions
