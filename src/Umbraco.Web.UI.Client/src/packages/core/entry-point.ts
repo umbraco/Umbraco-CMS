@@ -5,6 +5,9 @@ import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbExtensionsApiInitializer, type UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
+// TODO temp relative import until modules ship a component sub module
+import './menu/components/index.js';
+
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'store', [host]);

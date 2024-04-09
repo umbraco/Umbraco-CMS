@@ -3,19 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateDictionaryItemRequestModel } from '../models/CreateDictionaryItemRequestModel';
-import type { DataTypeTreeItemResponseModel } from '../models/DataTypeTreeItemResponseModel';
 import type { DictionaryItemItemResponseModel } from '../models/DictionaryItemItemResponseModel';
 import type { DictionaryItemResponseModel } from '../models/DictionaryItemResponseModel';
-import type { DocumentBlueprintTreeItemResponseModel } from '../models/DocumentBlueprintTreeItemResponseModel';
-import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
-import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
 import type { ImportDictionaryRequestModel } from '../models/ImportDictionaryRequestModel';
-import type { MediaTypeTreeItemResponseModel } from '../models/MediaTypeTreeItemResponseModel';
 import type { MoveDictionaryRequestModel } from '../models/MoveDictionaryRequestModel';
 import type { NamedEntityTreeItemResponseModel } from '../models/NamedEntityTreeItemResponseModel';
 import type { PagedDictionaryOverviewResponseModel } from '../models/PagedDictionaryOverviewResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
-import type { RelationTypeTreeItemResponseModel } from '../models/RelationTypeTreeItemResponseModel';
 import type { UpdateDictionaryItemRequestModel } from '../models/UpdateDictionaryItemRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -25,7 +19,7 @@ import { request as __request } from '../core/request';
 export class DictionaryResource {
 
     /**
-     * @returns PagedDictionaryOverviewResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDictionary({
@@ -152,7 +146,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns binary Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getDictionaryByIdExport({
@@ -258,7 +252,7 @@ export class DictionaryResource {
         descendantId,
     }: {
         descendantId?: string,
-    }): CancelablePromise<Array<(NamedEntityTreeItemResponseModel | DataTypeTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel | MediaTypeTreeItemResponseModel | RelationTypeTreeItemResponseModel)>> {
+    }): CancelablePromise<Array<NamedEntityTreeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/dictionary/ancestors',
@@ -272,7 +266,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDictionaryChildren({
@@ -299,7 +293,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeDictionaryRoot({

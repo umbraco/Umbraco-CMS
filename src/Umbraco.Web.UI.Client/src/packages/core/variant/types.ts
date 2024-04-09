@@ -1,6 +1,12 @@
 import type { UmbVariantId } from './variant-id.class.js';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
+
+export interface UmbVariantPropertyValueModel extends UmbPropertyValueData {
+	culture: string | null;
+	segment: string | null;
+}
 
 export interface UmbVariantModel {
 	createDate: string | null;

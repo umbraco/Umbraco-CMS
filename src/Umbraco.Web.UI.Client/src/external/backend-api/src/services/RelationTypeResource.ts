@@ -34,7 +34,7 @@ export class RelationTypeResource {
     }
 
     /**
-     * @returns PagedRelationTypeResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getRelationType({

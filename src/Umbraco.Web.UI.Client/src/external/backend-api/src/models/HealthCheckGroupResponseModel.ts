@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { HealthCheckGroupPresentationBaseModel } from './HealthCheckGroupPresentationBaseModel';
-
-export type HealthCheckGroupResponseModel = HealthCheckGroupPresentationBaseModel;
+export type HealthCheckGroupResponseModel = {
+    name: string;
+};
 

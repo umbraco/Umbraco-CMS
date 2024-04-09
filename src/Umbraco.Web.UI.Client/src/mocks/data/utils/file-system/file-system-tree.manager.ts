@@ -1,5 +1,4 @@
 import type { UmbMockDBBase } from '../mock-db-base.js';
-import { createFileSystemTreeItem } from '../../utils.js';
 import { pagedResult } from '../paged-result.js';
 import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 
@@ -39,3 +38,13 @@ export class UmbMockFileSystemTreeManager<T extends FileSystemTreeItemPresentati
 		return { items: treeItemsHasChildren, total: paged.total };
 	}
 }
+
+export const createFileSystemTreeItem = (item: any): FileSystemTreeItemPresentationModel => {
+	return {
+		path: item.path,
+		parent: item.parent ?? null,
+		name: item.name,
+		hasChildren: item.hasChildren ?? false,
+		isFolder: item.isFolder ?? false,
+	};
+};

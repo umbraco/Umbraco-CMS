@@ -13,7 +13,7 @@ import { request as __request } from '../core/request';
 export class RedirectManagementResource {
 
     /**
-     * @returns PagedRedirectUrlResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getRedirectManagement({
@@ -41,7 +41,7 @@ export class RedirectManagementResource {
     }
 
     /**
-     * @returns PagedRedirectUrlResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getRedirectManagementById({

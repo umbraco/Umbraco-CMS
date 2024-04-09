@@ -4,9 +4,10 @@
 /* eslint-disable */
 
 import type { DocumentVariantStateModel } from './DocumentVariantStateModel';
-import type { VariantItemResponseModelBaseModel } from './VariantItemResponseModelBaseModel';
 
-export type DocumentVariantItemResponseModel = (VariantItemResponseModelBaseModel & {
+export type DocumentVariantItemResponseModel = {
+    name: string;
+    culture?: string | null;
     state: DocumentVariantStateModel;
-});
+};
 

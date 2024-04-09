@@ -255,7 +255,7 @@ export class ScriptResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeScriptChildren({
@@ -282,7 +282,7 @@ export class ScriptResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeScriptRoot({

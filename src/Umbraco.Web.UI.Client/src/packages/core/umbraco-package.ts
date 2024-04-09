@@ -7,6 +7,6 @@ export const extensions: Array<ManifestEntryPoint> = [
 		name: 'Core Entry Point',
 		alias: 'Umb.EntryPoint.Core',
 		type: 'entryPoint',
-		js: () => import('./index.js'),
+		js: () => import('./entry-point.js'),
 	},
 ];

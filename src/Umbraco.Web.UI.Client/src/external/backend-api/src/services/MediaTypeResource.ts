@@ -47,7 +47,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedModelMediaTypeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemMediaTypeSearch({
@@ -170,7 +170,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedAllowedMediaTypeModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMediaTypeByIdAllowedChildren({
@@ -279,7 +279,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedAllowedMediaTypeModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMediaTypeAllowedAtRoot({
@@ -441,7 +441,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedMediaTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMediaTypeChildren({
@@ -471,7 +471,7 @@ export class MediaTypeResource {
     }
 
     /**
-     * @returns PagedMediaTypeTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMediaTypeRoot({

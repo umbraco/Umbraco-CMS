@@ -26,7 +26,7 @@ import { request as __request } from '../core/request';
 export class MediaResource {
 
     /**
-     * @returns PagedMediaCollectionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getCollectionMedia({
@@ -88,7 +88,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedModelMediaItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getItemMediaSearch({
@@ -269,7 +269,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedIReferenceResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMediaByIdReferencedBy({
@@ -298,7 +298,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedReferenceByIdModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMediaByIdReferencedDescendants({
@@ -356,7 +356,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedReferenceByIdModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMediaAreReferenced({
@@ -540,7 +540,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedMediaRecycleBinItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getRecycleBinMediaChildren({
@@ -567,7 +567,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedMediaRecycleBinItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getRecycleBinMediaRoot({
@@ -612,7 +612,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedMediaTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMediaChildren({
@@ -642,7 +642,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedMediaTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMediaRoot({
