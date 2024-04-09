@@ -15,6 +15,10 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isInitialized = new ReplaySubject<boolean>(1);
 	readonly isInitialized = this.#isInitialized.asObservable().pipe(filter((isInitialized) => isInitialized));
 
+	get authRedirect() {
+		return this.#authFlow.authRedirect();
+	}
+
 	#isBypassed = false;
 	#serverUrl;
 	#backofficePath;

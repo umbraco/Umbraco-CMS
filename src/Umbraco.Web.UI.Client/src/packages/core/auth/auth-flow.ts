@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_STORAGE_REDIRECT_URL, UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
 import type { LocationLike, StringMap } from '@umbraco-cms/backoffice/external/openid';
 import {
@@ -30,6 +31,7 @@ import {
 	TokenRequest,
 	TokenResponse,
 } from '@umbraco-cms/backoffice/external/openid';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 const requestor = new FetchRequestor();
 
@@ -39,6 +41,22 @@ const requestor = new FetchRequestor();
 class UmbNoHashQueryStringUtils extends BasicQueryStringUtils {
 	parse(input: LocationLike) {
 		return super.parse(input, false);
+	}
+}
+
+class UmbLocationInterceptor implements LocationLike {
+	public redirect = new UmbStringState(undefined);
+	hash = '';
+	host = '';
+	origin = '';
+	hostname = '';
+	pathname = '';
+	port = '';
+	protocol = '';
+	search = '';
+
+	assign(url: string | URL): void {
+		this.redirect.setValue(url.toString());
 	}
 }
 
@@ -95,6 +113,7 @@ export class UmbAuthFlow {
 	// tokens
 	#refreshToken: string | undefined;
 	#accessTokenResponse: TokenResponse | undefined;
+	#locationInterceptor = new UmbLocationInterceptor();
 
 	constructor(
 		openIdConnectUrl: string,
@@ -119,7 +138,7 @@ export class UmbAuthFlow {
 		this.#authorizationHandler = new RedirectRequestHandler(
 			this.#storageBackend,
 			new UmbNoHashQueryStringUtils(),
-			window.location,
+			this.#locationInterceptor,
 		);
 
 		// set notifier to deliver responses
@@ -149,9 +168,13 @@ export class UmbAuthFlow {
 					sessionStorage.removeItem(UMB_STORAGE_REDIRECT_URL);
 					currentRoute = savedRoute;
 				}
-				history.replaceState(null, '', currentRoute);
+				//history.replaceState(null, '', currentRoute);
 			}
 		});
+	}
+
+	authRedirect() {
+		return this.#locationInterceptor.redirect.asObservable();
 	}
 
 	/**
@@ -193,7 +216,7 @@ export class UmbAuthFlow {
 	 * @param identityProvider The identity provider to use for the authorization request.
 	 * @param usernameHint (Optional) The username to use for the authorization request. It will be provided to the OpenID server as a hint.
 	 */
-	makeAuthorizationRequest(identityProvider: string, usernameHint?: string): void {
+	makeAuthorizationRequest(identityProvider: string, usernameHint?: string) {
 		const extras: StringMap = { prompt: 'consent', access_type: 'offline' };
 
 		// If the identity provider is not 'Umbraco', we will add it to the extras.
@@ -221,6 +244,8 @@ export class UmbAuthFlow {
 		);
 
 		this.#authorizationHandler.performAuthorizationRequest(this.#configuration, request);
+
+		return this.#locationInterceptor.redirect.asObservable();
 	}
 
 	/**

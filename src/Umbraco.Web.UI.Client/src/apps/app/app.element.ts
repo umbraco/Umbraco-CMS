@@ -52,6 +52,17 @@ export class UmbAppElement extends UmbLitElement {
 			component: () => import('../installer/installer.element.js'),
 		},
 		{
+			path: 'oauth_complete',
+			resolve: () => {
+				// Complete oauth
+				console.log('congrats you hit the oauth complete');
+				this.#authContext?.completeAuthorizationRequest();
+
+				// Let the opener know that we are done
+				window.opener?.postMessage('oauth_complete', '*');
+			},
+		},
+		{
 			path: 'upgrade',
 			component: () => import('../upgrader/upgrader.element.js'),
 			guards: [this.#isAuthorizedGuard()],
@@ -152,6 +163,9 @@ export class UmbAppElement extends UmbLitElement {
 		const queryParams = new URLSearchParams(window.location.search);
 		if (queryParams.has('code')) {
 			this.#authContext?.completeAuthorizationRequest();
+
+			// Let the opener know that we are done
+			window.opener?.postMessage('oauth_complete', '*');
 			return;
 		}
 

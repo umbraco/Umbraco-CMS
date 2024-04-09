@@ -85,7 +85,14 @@ export class UmbAppAuthController extends UmbControllerBase {
 			throw new Error('[Fatal] No auth providers available');
 		}
 
-		if (availableProviders.length === 1) {
+		// Show the provider selection screen
+		const selected = await this.#showLoginModal(userLoginState);
+
+		if (!selected) {
+			return false;
+		}
+
+		/*if (availableProviders.length === 1) {
 			// One provider available (most likely the Umbraco provider), so initiate the authorization request to the default provider
 			this.#authContext.makeAuthorizationRequest();
 		} else {
@@ -103,7 +110,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 					return false;
 				}
 			}
-		}
+		}*/
 
 		return this.#updateState();
 	}
@@ -129,11 +136,9 @@ export class UmbAppAuthController extends UmbControllerBase {
 			.onSubmit()
 			.catch(() => undefined);
 
-		if (!selected?.providerName) {
+		if (!selected) {
 			return false;
 		}
-
-		this.#authContext.makeAuthorizationRequest(selected.providerName, selected.loginHint);
 
 		return true;
 	}
