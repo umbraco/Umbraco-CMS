@@ -3,7 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { SavedLogSearchPresenationBaseModel } from './SavedLogSearchPresenationBaseModel';
-
-export type SavedLogSearchResponseModel = SavedLogSearchPresenationBaseModel;
+export type SavedLogSearchResponseModel = {
+    name: string;
+    query: string;
+};
 

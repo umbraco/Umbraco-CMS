@@ -255,7 +255,7 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeStylesheetChildren({
@@ -282,7 +282,7 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns PagedFileSystemTreeItemPresentationModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeStylesheetRoot({

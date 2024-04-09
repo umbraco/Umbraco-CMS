@@ -55,7 +55,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns PagedPackageDefinitionResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageCreated({
@@ -174,7 +174,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns binary Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageCreatedByIdDownload({
@@ -221,7 +221,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns PagedPackageMigrationStatusResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getPackageMigrationStatus({

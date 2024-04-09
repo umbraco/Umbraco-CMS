@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { VariantModelBaseModel } from './VariantModelBaseModel';
-
-export type MemberVariantRequestModel = VariantModelBaseModel;
+export type MemberVariantRequestModel = {
+    culture?: string | null;
+    segment?: string | null;
+    name: string;
+};
 

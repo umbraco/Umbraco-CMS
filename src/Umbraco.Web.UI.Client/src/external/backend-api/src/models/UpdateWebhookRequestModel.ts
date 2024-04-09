@@ -3,9 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { WebhookModelBaseModel } from './WebhookModelBaseModel';
-
-export type UpdateWebhookRequestModel = (WebhookModelBaseModel & {
+export type UpdateWebhookRequestModel = {
+    enabled: boolean;
+    url: string;
+    contentTypeKeys: Array<string>;
+    headers: Record<string, string>;
     events: Array<string>;
-});
+};
 

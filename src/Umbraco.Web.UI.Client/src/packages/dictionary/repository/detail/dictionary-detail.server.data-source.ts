@@ -4,7 +4,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDictionaryItemRequestModel,
-	DictionaryItemModelBaseModel,
+	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DictionaryResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -111,7 +111,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: DictionaryItemModelBaseModel = {
+		const requestBody: UpdateDictionaryItemRequestModel = {
 			name: model.name,
 			translations: model.translations,
 		};

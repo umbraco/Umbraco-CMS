@@ -4,10 +4,9 @@
 /* eslint-disable */
 
 import type { PartialViewSnippetItemResponseModel } from './PartialViewSnippetItemResponseModel';
-import type { PartialViewSnippetResponseModel } from './PartialViewSnippetResponseModel';
 
 export type PagedPartialViewSnippetItemResponseModel = {
     total: number;
-    items: Array<(PartialViewSnippetItemResponseModel | PartialViewSnippetResponseModel)>;
+    items: Array<PartialViewSnippetItemResponseModel>;
 };
 

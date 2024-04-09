@@ -4,9 +4,10 @@
 /* eslint-disable */
 
 import type { DocumentTypeReferenceResponseModel } from './DocumentTypeReferenceResponseModel';
-import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
 
-export type DocumentBlueprintItemResponseModel = (NamedItemResponseModelBaseModel & {
+export type DocumentBlueprintItemResponseModel = {
+    id: string;
+    name: string;
     documentType: DocumentTypeReferenceResponseModel;
-});
+};
 

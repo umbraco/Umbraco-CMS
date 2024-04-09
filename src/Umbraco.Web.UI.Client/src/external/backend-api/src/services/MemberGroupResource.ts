@@ -37,7 +37,7 @@ export class MemberGroupResource {
     }
 
     /**
-     * @returns PagedMemberGroupResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getMemberGroup({
@@ -155,7 +155,7 @@ export class MemberGroupResource {
     }
 
     /**
-     * @returns PagedNamedEntityTreeItemResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
     public static getTreeMemberGroupRoot({

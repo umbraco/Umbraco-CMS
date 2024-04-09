@@ -3,10 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { PublicAccessBaseModel } from './PublicAccessBaseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type PublicAccessRequestModel = (PublicAccessBaseModel & {
+export type PublicAccessRequestModel = {
+    loginDocument: ReferenceByIdModel;
+    errorDocument: ReferenceByIdModel;
     memberUserNames: Array<string>;
     memberGroupNames: Array<string>;
-});
+};
 
