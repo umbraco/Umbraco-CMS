@@ -25,7 +25,9 @@ public class ItemMemberItemController : MemberItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MemberItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<IActionResult> Item(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IMemberEntitySlim> members = _entityService
             .GetAll(UmbracoObjectTypes.Member, ids.ToArray())

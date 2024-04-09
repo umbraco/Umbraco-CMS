@@ -38,7 +38,7 @@ public class BackOfficeLoginController : Controller
     }
 
     // GET
-    public IActionResult Index(BackOfficeLoginModel model)
+    public IActionResult Index(CancellationToken cancellationToken, BackOfficeLoginModel model)
     {
         if (string.IsNullOrEmpty(model.UmbracoUrl))
         {

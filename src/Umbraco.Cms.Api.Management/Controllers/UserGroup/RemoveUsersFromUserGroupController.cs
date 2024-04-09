@@ -33,7 +33,7 @@ public class RemoveUsersFromUserGroupController : UserGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, Guid[] userIds)
+    public async Task<IActionResult> Update(CancellationToken cancellationToken, Guid id, Guid[] userIds)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

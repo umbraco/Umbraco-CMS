@@ -34,6 +34,7 @@ public class FilterMemberFilterController : MemberFilterControllerBase
     [ProducesResponseType(typeof(PagedViewModel<MemberResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Filter(
+        CancellationToken cancellationToken,
         Guid? memberTypeId = null,
         string? memberGroupName = null,
         bool? isApproved = null,
