@@ -62,6 +62,7 @@
 		"./property-action": "./dist-cms/packages/core/property-action/index.js",
 		"./property-editor": "./dist-cms/packages/core/property-editor/index.js",
 		"./property": "./dist-cms/packages/core/property/index.js",
+		"./recycle-bin": "./dist-cms/packages/core/recycle-bin/index.js",
 		"./relation-type": "./dist-cms/packages/relations/relation-types/index.js",
 		"./relations": "./dist-cms/packages/relations/relations/index.js",
 		"./repository": "./dist-cms/packages/core/repository/index.js",

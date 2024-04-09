@@ -1,4 +1,4 @@
-import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../default/default.action.kind.js';
+import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../../entity-action/default/default.action.kind.js';
 import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbBackofficeManifestKind = {
@@ -11,13 +11,13 @@ export const manifest: UmbBackofficeManifestKind = {
 		type: 'entityAction',
 		kind: 'trash',
 		api: () => import('./trash.action.js'),
-		weight: 900,
+		weight: 1150,
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-trash',
-			label: 'Trash',
+			label: 'Trash...',
 			itemRepositoryAlias: '',
-			trashRepositoryAlias: '',
+			recycleBinRepositoryAlias: '',
 		},
 	},
 };
