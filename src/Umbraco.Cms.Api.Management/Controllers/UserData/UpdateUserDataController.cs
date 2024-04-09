@@ -19,6 +19,7 @@ public class UpdateUserDataController : UserDataControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
 
     public UpdateUserDataController(
+        CancellationToken cancellationToken,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserDataService userDataService,
         IUmbracoMapper umbracoMapper)
