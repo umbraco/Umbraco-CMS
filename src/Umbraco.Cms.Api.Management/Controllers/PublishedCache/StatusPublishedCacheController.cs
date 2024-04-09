@@ -16,6 +16,6 @@ public class StatusPublishedCacheController : PublishedCacheControllerBase
     [HttpGet("status")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    public async Task<ActionResult<string>> Status()
+    public async Task<ActionResult<string>> Status(CancellationToken cancellationToken)
         => await Task.FromResult(Ok(_publishedSnapshotStatus.GetStatus()));
 }

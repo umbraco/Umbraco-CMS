@@ -34,7 +34,7 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> BuildModels()
+    public async Task<IActionResult> BuildModels(CancellationToken cancellationToken)
     {
         try
         {

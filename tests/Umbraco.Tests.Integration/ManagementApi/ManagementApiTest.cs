@@ -105,7 +105,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
         // Login to ensure the cookie is set (used in next request)
         var loginResponse = await client.PostAsync(
-            GetManagementApiUrl<BackOfficeController>(x => x.Login(null)), JsonContent.Create(loginModel));
+            GetManagementApiUrl<BackOfficeController>(x => x.Login(CancellationToken.None, null)), JsonContent.Create(loginModel));
 
         Assert.AreEqual(HttpStatusCode.OK, loginResponse.StatusCode, await loginResponse.Content.ReadAsStringAsync());
 
@@ -113,9 +113,9 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         var codeChallange = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
             .TrimEnd("=");
 
-        var authorizeResponse = await client.GetAsync(
-            GetManagementApiUrl<BackOfficeController>(x => x.Authorize()) +
-            $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallange}");
+        var authorizationUrl = GetManagementApiUrl<BackOfficeController>(x => x.Authorize(CancellationToken.None)) +
+                  $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallange}";
+        var authorizeResponse = await client.GetAsync(authorizationUrl);
 
         Assert.AreEqual(HttpStatusCode.Found, authorizeResponse.StatusCode, await authorizeResponse.Content.ReadAsStringAsync());
 

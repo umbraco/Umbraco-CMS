@@ -5,11 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;
@@ -53,22 +53,6 @@ public class IdentityMapDefinition : IMapDefinition
             StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
             appCaches,
             twoFactorLoginService)
-    {
-    }
-
-    [Obsolete("Use constructor that also takes an ITwoFactorLoginService. Scheduled for removal in V12")]
-    public IdentityMapDefinition(
-        ILocalizedTextService textService,
-        IEntityService entityService,
-        IOptions<GlobalSettings> globalSettings,
-        AppCaches appCaches)
-        : this(
-            textService,
-            entityService,
-            globalSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
-            appCaches,
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
     {
     }
 

@@ -25,7 +25,7 @@ public class PublicManifestManifestController : ManifestControllerBase
     [HttpGet("manifest/public")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ManifestResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> PublicManifests()
+    public async Task<IActionResult> PublicManifests(CancellationToken cancellationToken)
     {
         IEnumerable<PackageManifest> packageManifests = await _packageManifestService.GetPublicPackageManifestsAsync();
         return Ok(_umbracoMapper.MapEnumerable<PackageManifest, ManifestResponseModel>(packageManifests));

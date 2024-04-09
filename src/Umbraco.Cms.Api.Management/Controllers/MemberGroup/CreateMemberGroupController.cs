@@ -26,7 +26,7 @@ public class CreateMemberGroupController : MemberGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MemberGroupResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create(CreateMemberGroupRequestModel model)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateMemberGroupRequestModel model)
     {
         IMemberGroup? memberGroup = _mapper.Map<IMemberGroup>(model);
         Attempt<IMemberGroup?, MemberGroupOperationStatus> result = await _memberGroupService.CreateAsync(memberGroup!);

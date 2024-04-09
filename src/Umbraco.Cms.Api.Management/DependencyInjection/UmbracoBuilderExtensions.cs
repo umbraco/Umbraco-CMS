@@ -86,8 +86,8 @@ public static partial class UmbracoBuilderExtensions
                 options.AddFilter(new UmbracoPipelineFilter(
                     "BackOfficeManagementApiFilter",
                     applicationBuilder => applicationBuilder.UseProblemDetailsExceptionHandling(),
-                    applicationBuilder => { },
-                    applicationBuilder => applicationBuilder.UseEndpoints()));
+                    postPipeline: _ => { },
+                    endpoints: applicationBuilder => applicationBuilder.UseEndpoints()));
             });
         }
 

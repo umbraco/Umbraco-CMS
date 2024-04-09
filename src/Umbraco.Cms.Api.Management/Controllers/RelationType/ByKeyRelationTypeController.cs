@@ -24,7 +24,7 @@ public class ByKeyRelationTypeController : RelationTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByKey(Guid id)
+    public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IRelationType? relationType = _relationService.GetRelationTypeById(id);
         if (relationType is null)
