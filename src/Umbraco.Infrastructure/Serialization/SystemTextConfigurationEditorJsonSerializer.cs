@@ -4,11 +4,6 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
-// FIXME: clean up all config editor serializers when we can migrate fully to System.Text.Json
-// - move this implementation to ConfigurationEditorJsonSerializer (delete the old implementation)
-// - use this implementation as the registered singleton (delete ContextualConfigurationEditorJsonSerializer)
-// - reuse the JsonObjectConverter implementation from management API (delete the local implementation - pending V12 branch update)
-
 public class SystemTextConfigurationEditorJsonSerializer : IConfigurationEditorJsonSerializer
 {
     private JsonSerializerOptions _jsonSerializerOptions;

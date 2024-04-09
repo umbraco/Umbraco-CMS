@@ -1,12 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -24,13 +22,6 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
     private IContentValidationService ContentValidationService => GetRequiredService<IContentValidationService>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
-
-    protected override void ConfigureTestServices(IServiceCollection services)
-    {
-        // block list requires System.Text.Json as serializer - currently we still perform fallback to Json.NET in tests
-        services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
-        services.AddSingleton<IConfigurationEditorJsonSerializer, SystemTextConfigurationEditorJsonSerializer>();
-    }
 
     [Test]
     public async Task Can_Validate_Block_List_Nested_In_Block_List()
