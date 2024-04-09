@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Models.Membership;
 /// </summary>
 public class EntityPermission : IEquatable<EntityPermission>
 {
-    public EntityPermission(int groupId, int entityId, string[] assignedPermissions)
+    public EntityPermission(int groupId, int entityId, ISet<string> assignedPermissions)
     {
         UserGroupId = groupId;
         EntityId = entityId;
@@ -13,7 +13,7 @@ public class EntityPermission : IEquatable<EntityPermission>
         IsDefaultPermissions = false;
     }
 
-    public EntityPermission(int groupId, int entityId, string[] assignedPermissions, bool isDefaultPermissions)
+    public EntityPermission(int groupId, int entityId, ISet<string> assignedPermissions, bool isDefaultPermissions)
     {
         UserGroupId = groupId;
         EntityId = entityId;
@@ -28,7 +28,7 @@ public class EntityPermission : IEquatable<EntityPermission>
     /// <summary>
     ///     The assigned permissions for the user/entity combo
     /// </summary>
-    public string[] AssignedPermissions { get; }
+    public ISet<string> AssignedPermissions { get; }
 
     /// <summary>
     ///     True if the permissions assigned to this object are the group's default permissions and not explicitly defined

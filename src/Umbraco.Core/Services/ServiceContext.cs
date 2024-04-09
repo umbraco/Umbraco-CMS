@@ -18,7 +18,6 @@ public class ServiceContext
     private readonly Lazy<IKeyValueService>? _keyValueService;
     private readonly Lazy<ILocalizationService>? _localizationService;
     private readonly Lazy<ILocalizedTextService>? _localizedTextService;
-    private readonly Lazy<IMacroService>? _macroService;
     private readonly Lazy<IMediaService>? _mediaService;
     private readonly Lazy<IMediaTypeService>? _mediaTypeService;
     private readonly Lazy<IMemberGroupService>? _memberGroupService;
@@ -56,7 +55,6 @@ public class ServiceContext
         Lazy<IServerRegistrationService>? serverRegistrationService,
         Lazy<IEntityService>? entityService,
         Lazy<IRelationService>? relationService,
-        Lazy<IMacroService>? macroService,
         Lazy<IMemberTypeService>? memberTypeService,
         Lazy<IMemberGroupService>? memberGroupService,
         Lazy<INotificationService>? notificationService,
@@ -85,7 +83,6 @@ public class ServiceContext
         _serverRegistrationService = serverRegistrationService;
         _entityService = entityService;
         _relationService = relationService;
-        _macroService = macroService;
         _memberTypeService = memberTypeService;
         _memberGroupService = memberGroupService;
         _notificationService = notificationService;
@@ -131,11 +128,6 @@ public class ServiceContext
     ///     Gets the <see cref="ITagService" />
     /// </summary>
     public ITagService? TagService => _tagService?.Value;
-
-    /// <summary>
-    ///     Gets the <see cref="IMacroService" />
-    /// </summary>
-    public IMacroService? MacroService => _macroService?.Value;
 
     /// <summary>
     ///     Gets the <see cref="IEntityService" />
@@ -263,7 +255,6 @@ public class ServiceContext
         ILocalizedTextService? localizedTextService = null,
         IAuditService? auditService = null,
         IDomainService? domainService = null,
-        IMacroService? macroService = null,
         IPublicAccessService? publicAccessService = null,
         IExternalLoginWithKeyService? externalLoginService = null,
         IServerRegistrationService? serverRegistrationService = null,
@@ -297,7 +288,6 @@ public class ServiceContext
             Lazy(serverRegistrationService),
             Lazy(entityService),
             Lazy(relationService),
-            Lazy(macroService),
             Lazy(memberTypeService),
             Lazy(memberGroupService),
             Lazy(notificationService),

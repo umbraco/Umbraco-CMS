@@ -27,21 +27,6 @@ public class LocalizedTextServiceFileSources
 
     private readonly Lazy<Dictionary<CultureInfo, Lazy<XDocument>>> _xmlSources;
 
-    [Obsolete("Use ctor with all params. This will be removed in Umbraco 12")]
-    public LocalizedTextServiceFileSources(
-        ILogger<LocalizedTextServiceFileSources> logger,
-        AppCaches appCaches,
-        DirectoryInfo fileSourceFolder,
-        IEnumerable<LocalizedTextServiceSupplementaryFileSource> supplementFileSources)
-        : this(
-            logger,
-            appCaches,
-            fileSourceFolder,
-            supplementFileSources,
-            new NotFoundDirectoryContents())
-    {
-    }
-
     /// <summary>
     ///     This is used to configure the file sources with the main file sources shipped with Umbraco and also including
     ///     supplemental/plugin based
@@ -162,7 +147,7 @@ public class LocalizedTextServiceFileSources
     ///     Constructor
     /// </summary>
     public LocalizedTextServiceFileSources(ILogger<LocalizedTextServiceFileSources> logger, AppCaches appCaches, DirectoryInfo fileSourceFolder)
-        : this(logger, appCaches, fileSourceFolder, Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>())
+        : this(logger, appCaches, fileSourceFolder, Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>(), new NotFoundDirectoryContents())
     {
     }
 

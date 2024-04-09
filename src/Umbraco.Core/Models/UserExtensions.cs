@@ -25,52 +25,8 @@ public static class UserExtensions
     /// </returns>
     public static string[] GetUserAvatarUrls(this IUser user, IAppCache cache, MediaFileManager mediaFileManager, IImageUrlGenerator imageUrlGenerator)
     {
-        // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.
-        // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception
-        // and the website will not run.
-        // Also, check if the user has explicitly removed all avatars including a Gravatar, this will be possible and the value will be "none"
-        if (user.Avatar == "none" || CryptoConfig.AllowOnlyFipsAlgorithms)
+        if (user.Avatar.IsNullOrWhiteSpace() || user.Avatar == "none")
         {
-            return new string[0];
-        }
-
-        if (user.Avatar.IsNullOrWhiteSpace())
-        {
-            var gravatarHash = user.Email?.GenerateHash<MD5>();
-            var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash + "?d=404";
-
-            // try Gravatar
-            var gravatarAccess = cache.GetCacheItem("UserAvatar" + user.Id, () =>
-            {
-                // Test if we can reach this URL, will fail when there's network or firewall errors
-                var request = (HttpWebRequest)WebRequest.Create(gravatarUrl);
-
-                // Require response within 10 seconds
-                request.Timeout = 10000;
-                try
-                {
-                    using ((HttpWebResponse)request.GetResponse())
-                    {
-                    }
-                }
-                catch (Exception)
-                {
-                    // There was an HTTP or other error, return an null instead
-                    return false;
-                }
-
-                return true;
-            });
-
-            if (gravatarAccess)
-            {
-                return new[]
-                {
-                    gravatarUrl + "&s=30", gravatarUrl + "&s=60", gravatarUrl + "&s=90", gravatarUrl + "&s=150",
-                    gravatarUrl + "&s=300",
-                };
-            }
-
             return new string[0];
         }
 

@@ -99,6 +99,20 @@ namespace Umbraco.Cms.Core.Services
 
         #region Create
 
+        public async Task<PagedModel<IMember>> FilterAsync(
+            MemberFilter memberFilter,
+            string orderBy = "username",
+            Direction orderDirection = Direction.Ascending,
+            int skip = 0,
+            int take = 100)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTypes);
+            scope.ReadLock(Constants.Locks.MemberTree);
+
+            return await _memberRepository.GetPagedByFilterAsync(memberFilter, skip, take, Ordering.By(orderBy, orderDirection));
+        }
+
         /// <summary>
         /// Creates an <see cref="IMember"/> object without persisting it
         /// </summary>
@@ -315,13 +329,17 @@ namespace Umbraco.Cms.Core.Services
         /// and the user id in the membership provider.</remarks>
         /// <param name="id"><see cref="Guid"/> Id</param>
         /// <returns><see cref="IMember"/></returns>
-        public IMember? GetByKey(Guid id)
+        public IMember? GetById(Guid id)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
             IQuery<IMember> query = Query<IMember>().Where(x => x.Key == id);
             return _memberRepository.Get(query)?.FirstOrDefault();
         }
+
+        [Obsolete($"Use {nameof(GetById)}. Will be removed in V15.")]
+        public IMember? GetByKey(Guid id)
+            => GetById(id);
 
         /// <summary>
         /// Gets a list of paged <see cref="IMember"/> objects
@@ -462,6 +480,15 @@ namespace Umbraco.Cms.Core.Services
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
             return _memberRepository.GetMany(ids);
+        }
+
+        /// <inheritdoc />
+        public Task<IEnumerable<IMember>> GetByKeysAsync(params Guid[] ids)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember> query = Query<IMember>().Where(x => ids.Contains(x.Key));
+            return Task.FromResult(_memberRepository.Get(query));
         }
 
         /// <summary>
@@ -736,7 +763,7 @@ namespace Umbraco.Cms.Core.Services
         public void SetLastLogin(string username, DateTime date) => throw new NotImplementedException();
 
         /// <inheritdoc />
-        public void Save(IMember member)
+        public Attempt<OperationResult?> Save(IMember member, int userId = Constants.Security.SuperUserId)
         {
             // trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
@@ -749,7 +776,7 @@ namespace Umbraco.Cms.Core.Services
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
-                return;
+                return OperationResult.Attempt.Cancel(evtMsgs);
             }
 
             if (string.IsNullOrWhiteSpace(member.Name))
@@ -766,10 +793,14 @@ namespace Umbraco.Cms.Core.Services
             Audit(AuditType.Save, 0, member.Id);
 
             scope.Complete();
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
+        public void Save(IMember member)
+            => Save(member, Constants.Security.SuperUserId);
+
         /// <inheritdoc />
-        public void Save(IEnumerable<IMember> members)
+        public Attempt<OperationResult?> Save(IEnumerable<IMember> members, int userId = Constants.Security.SuperUserId)
         {
             IMember[] membersA = members.ToArray();
 
@@ -780,7 +811,7 @@ namespace Umbraco.Cms.Core.Services
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
-                return;
+                return OperationResult.Attempt.Cancel(evtMsgs);
             }
 
             scope.WriteLock(Constants.Locks.MemberTree);
@@ -796,20 +827,22 @@ namespace Umbraco.Cms.Core.Services
 
             scope.Notifications.Publish(new MemberSavedNotification(membersA, evtMsgs).WithStateFrom(savingNotification));
 
-            Audit(AuditType.Save, 0, -1, "Save multiple Members");
+            Audit(AuditType.Save, userId, Constants.System.Root, "Save multiple Members");
 
             scope.Complete();
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
+
+        [Obsolete($"Use the {nameof(Save)} method that yields an Attempt. Will be removed in V15.")]
+        public void Save(IEnumerable<IMember> members)
+            => Save(members, Constants.Security.SuperUserId);
 
         #endregion
 
         #region Delete
 
-        /// <summary>
-        /// Deletes an <see cref="IMember"/>
-        /// </summary>
-        /// <param name="member"><see cref="IMember"/> to Delete</param>
-        public void Delete(IMember member)
+        /// <inheritdoc />
+        public Attempt<OperationResult?> Delete(IMember member, int userId = Constants.Security.SuperUserId)
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -818,7 +851,7 @@ namespace Umbraco.Cms.Core.Services
             if (scope.Notifications.PublishCancelable(deletingNotification))
             {
                 scope.Complete();
-                return;
+                return OperationResult.Attempt.Cancel(evtMsgs);
             }
 
             scope.WriteLock(Constants.Locks.MemberTree);
@@ -826,7 +859,13 @@ namespace Umbraco.Cms.Core.Services
 
             Audit(AuditType.Delete, 0, member.Id);
             scope.Complete();
+
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
+
+        /// <inheritdoc />
+        public void Delete(IMember member)
+            => Delete(member, Constants.Security.SuperUserId);
 
         private void DeleteLocked(ICoreScope scope, IMember member, EventMessages evtMsgs, IDictionary<string, object?>? notificationState = null)
         {
@@ -1013,6 +1052,16 @@ namespace Umbraco.Cms.Core.Services
             scope.Notifications.Publish(new AssignedMemberRolesNotification(memberIds, roleNames));
             scope.Complete();
         }
+
+        #endregion
+
+        #region Others
+
+        // NOTE: at the time of writing we do not have MemberTreeChangeNotification to publish changes as a result of a data integrity
+        //       check. we cannot support this feature until such notification exists.
+        //       see the content or media services for implementation details if this is ever going to be a relevant feature for members.
+        public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
+            => throw new InvalidOperationException("Data integrity checks are not (yet) implemented for members.");
 
         #endregion
 

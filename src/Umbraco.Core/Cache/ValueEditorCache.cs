@@ -30,12 +30,12 @@ public class ValueEditorCache : IValueEditorCache
                     return valueEditor;
                 }
 
-                valueEditor = editor.GetValueEditor(dataType.Configuration);
+                valueEditor = editor.GetValueEditor(dataType.ConfigurationObject);
                 dataEditorCache[dataType.Id] = valueEditor;
                 return valueEditor;
             }
 
-            valueEditor = editor.GetValueEditor(dataType.Configuration);
+            valueEditor = editor.GetValueEditor(dataType.ConfigurationObject);
             _valueEditorCache[editor.Alias] = new Dictionary<int, IDataValueEditor> { [dataType.Id] = valueEditor };
             return valueEditor;
         }

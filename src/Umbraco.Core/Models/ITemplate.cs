@@ -29,5 +29,6 @@ public interface ITemplate : IFile
     ///     Set the mastertemplate
     /// </summary>
     /// <param name="masterTemplate"></param>
+    [Obsolete("MasterTemplate is now calculated from the content. This will be removed in Umbraco 15.")]
     void SetMasterTemplate(ITemplate? masterTemplate);
 }

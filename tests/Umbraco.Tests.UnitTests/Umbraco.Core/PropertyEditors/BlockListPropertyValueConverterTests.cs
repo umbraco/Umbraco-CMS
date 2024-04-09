@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -28,6 +29,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory),
             Mock.Of<IContentTypeService>(),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
+            new SystemTextJsonSerializer(),
             new BlockListPropertyValueConstructorCache());
         return editor;
     }
@@ -155,8 +157,8 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         Assert.AreEqual(0, converted.Count);
 
         json = @"{
-layout: {},
-data: []}";
+""layout"": {},
+""data"": []}";
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
         Assert.IsNotNull(converted);
@@ -165,14 +167,14 @@ data: []}";
         // Even though there is a layout, there is no data, so the conversion will result in zero elements in total
         json = @"
 {
-    layout: {
-        '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
+    ""layout"": {
+        """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
             {
-                'contentUdi': 'umb://element/e7dba547615b4e9ab4ab2a7674845bc9'
+                ""contentUdi"": ""umb://element/e7dba547615b4e9ab4ab2a7674845bc9""
             }
         ]
     },
-    contentData: []
+    ""contentData"": []
 }";
 
         converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
@@ -183,16 +185,16 @@ data: []}";
         // Even though there is a layout and data, the data is invalid (missing required keys) so the conversion will result in zero elements in total
         json = @"
 {
-    layout: {
-        '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
+    ""layout"": {
+        """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
             {
-                'contentUdi': 'umb://element/e7dba547615b4e9ab4ab2a7674845bc9'
+                ""contentUdi"": ""umb://element/e7dba547615b4e9ab4ab2a7674845bc9""
             }
         ]
     },
-        contentData: [
+    ""contentData"": [
         {
-            'udi': 'umb://element/e7dba547615b4e9ab4ab2a7674845bc9'
+            ""udi"": ""umb://element/e7dba547615b4e9ab4ab2a7674845bc9""
         }
     ]
 }";
@@ -205,17 +207,17 @@ data: []}";
         // Everthing is ok except the udi reference in the layout doesn't match the data so it will be empty
         json = @"
 {
-    layout: {
-        '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
+    ""layout"": {
+        """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
             {
-                'contentUdi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
+                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
             }
         ]
     },
-        contentData: [
+    ""contentData"": [
         {
-            'contentTypeKey': '" + ContentKey1 + @"',
-            'key': '1304E1DD-0000-4396-84FE-8A399231CB3D'
+            ""contentTypeKey"": """ + ContentKey1 + @""",
+            ""key"": ""1304E1DD-0000-4396-84FE-8A399231CB3D""
         }
     ]
 }";
@@ -236,17 +238,17 @@ data: []}";
 
         var json = @"
 {
-    layout: {
-        '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
+    ""layout"": {
+        """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
             {
-                'contentUdi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
+                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
             }
         ]
     },
-        contentData: [
+    ""contentData"": [
         {
-            'contentTypeKey': '" + ContentKey1 + @"',
-            'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
+            ""contentTypeKey"": """ + ContentKey1 + @""",
+            ""udi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
         }
     ]
 }";
@@ -273,46 +275,46 @@ data: []}";
 
         var json = @"
 {
-    layout: {
-        '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
+    ""layout"": {
+        """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
             {
-                'contentUdi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D',
-                'settingsUdi': 'umb://element/1F613E26CE274898908A561437AF5100'
+                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D"",
+                ""settingsUdi"": ""umb://element/1F613E26CE274898908A561437AF5100""
             },
             {
-                'contentUdi': 'umb://element/0A4A416E547D464FABCC6F345C17809A',
-                'settingsUdi': 'umb://element/63027539B0DB45E7B70459762D4E83DD'
+                ""contentUdi"": ""umb://element/0A4A416E547D464FABCC6F345C17809A"",
+                ""settingsUdi"": ""umb://element/63027539B0DB45E7B70459762D4E83DD""
             }
         ]
     },
-    contentData: [
+    ""contentData"": [
         {
-            'contentTypeKey': '" + ContentKey1 + @"',
-            'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
+            ""contentTypeKey"": """ + ContentKey1 + @""",
+            ""udi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
         },
         {
-            'contentTypeKey': '" + ContentKey2 + @"',
-            'udi': 'umb://element/E05A034704424AB3A520E048E6197E79'
+            ""contentTypeKey"": """ + ContentKey2 + @""",
+            ""udi"": ""umb://element/E05A034704424AB3A520E048E6197E79""
         },
         {
-            'contentTypeKey': '" + ContentKey2 + @"',
-            'udi': 'umb://element/0A4A416E547D464FABCC6F345C17809A'
+            ""contentTypeKey"": """ + ContentKey2 + @""",
+            ""udi"": ""umb://element/0A4A416E547D464FABCC6F345C17809A""
         }
     ],
-    settingsData: [
+    ""settingsData"": [
         {
-            'contentTypeKey': '" + SettingKey1 + @"',
-            'udi': 'umb://element/63027539B0DB45E7B70459762D4E83DD'
+            ""contentTypeKey"": """ + SettingKey1 + @""",
+            ""udi"": ""umb://element/63027539B0DB45E7B70459762D4E83DD""
         },
         {
-            'contentTypeKey': '" + SettingKey2 + @"',
-            'udi': 'umb://element/1F613E26CE274898908A561437AF5100'
+            ""contentTypeKey"": """ + SettingKey2 + @""",
+            ""udi"": ""umb://element/1F613E26CE274898908A561437AF5100""
         },
         {
-            'contentTypeKey': '" + SettingKey2 + @"',
-            'udi': 'umb://element/BCF4BA3DA40C496C93EC58FAC85F18B9'
+            ""contentTypeKey"": """ + SettingKey2 + @""",
+            ""udi"": ""umb://element/BCF4BA3DA40C496C93EC58FAC85F18B9""
         }
-    ],
+    ]
 }";
 
         var converted =
@@ -359,46 +361,46 @@ data: []}";
 
         var json = @"
 {
-    layout: {
-        '" + Constants.PropertyEditors.Aliases.BlockList + @"': [
+    ""layout"": {
+        """ + Constants.PropertyEditors.Aliases.BlockList + @""": [
             {
-                'contentUdi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D',
-                'settingsUdi': 'umb://element/1F613E26CE274898908A561437AF5100'
+                ""contentUdi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D"",
+                ""settingsUdi"": ""umb://element/1F613E26CE274898908A561437AF5100""
             },
             {
-                'contentUdi': 'umb://element/0A4A416E547D464FABCC6F345C17809A',
-                'settingsUdi': 'umb://element/63027539B0DB45E7B70459762D4E83DD'
+                ""contentUdi"": ""umb://element/0A4A416E547D464FABCC6F345C17809A"",
+                ""settingsUdi"": ""umb://element/63027539B0DB45E7B70459762D4E83DD""
             }
         ]
     },
-    contentData: [
+    ""contentData"": [
         {
-            'contentTypeKey': '" + ContentKey1 + @"',
-            'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
+            ""contentTypeKey"": """ + ContentKey1 + @""",
+            ""udi"": ""umb://element/1304E1DDAC87439684FE8A399231CB3D""
         },
         {
-            'contentTypeKey': '" + ContentKey2 + @"',
-            'udi': 'umb://element/E05A034704424AB3A520E048E6197E79'
+            ""contentTypeKey"": """ + ContentKey2 + @""",
+            ""udi"": ""umb://element/E05A034704424AB3A520E048E6197E79""
         },
         {
-            'contentTypeKey': '" + ContentKey2 + @"',
-            'udi': 'umb://element/0A4A416E547D464FABCC6F345C17809A'
+            ""contentTypeKey"": """ + ContentKey2 + @""",
+            ""udi"": ""umb://element/0A4A416E547D464FABCC6F345C17809A""
         }
     ],
-    settingsData: [
+    ""settingsData"": [
         {
-            'contentTypeKey': '" + SettingKey1 + @"',
-            'udi': 'umb://element/63027539B0DB45E7B70459762D4E83DD'
+            ""contentTypeKey"": """ + SettingKey1 + @""",
+            ""udi"": ""umb://element/63027539B0DB45E7B70459762D4E83DD""
         },
         {
-            'contentTypeKey': '" + SettingKey2 + @"',
-            'udi': 'umb://element/1F613E26CE274898908A561437AF5100'
+            ""contentTypeKey"": """ + SettingKey2 + @""",
+            ""udi"": ""umb://element/1F613E26CE274898908A561437AF5100""
         },
         {
-            'contentTypeKey': '" + SettingKey2 + @"',
-            'udi': 'umb://element/BCF4BA3DA40C496C93EC58FAC85F18B9'
+            ""contentTypeKey"": """ + SettingKey2 + @""",
+            ""udi"": ""umb://element/BCF4BA3DA40C496C93EC58FAC85F18B9""
         }
-    ],
+    ]
 }";
 
         var converted =

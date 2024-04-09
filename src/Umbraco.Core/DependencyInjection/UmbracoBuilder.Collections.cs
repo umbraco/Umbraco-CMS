@@ -1,26 +1,20 @@
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.ContentApps;
-using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DynamicRoot.Origin;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
-using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Tour;
-using Umbraco.Cms.Core.Trees;
-using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Extensions;
 
@@ -40,18 +34,6 @@ public static partial class UmbracoBuilderExtensions
         builder.DataEditors().Add(builder.TypeLoader.GetDataEditors);
         builder.Actions().Add(builder.TypeLoader.GetActions);
 
-        // register known content apps
-        builder.ContentApps()
-            .Append<ListViewContentAppFactory>()
-            .Append<ContentEditorContentAppFactory>()
-            .Append<ContentInfoContentAppFactory>()
-            .Append<ContentTypeDesignContentAppFactory>()
-            .Append<ContentTypeListViewContentAppFactory>()
-            .Append<ContentTypePermissionsContentAppFactory>()
-            .Append<ContentTypeTemplatesContentAppFactory>()
-            .Append<MemberEditorContentAppFactory>()
-            .Append<DictionaryContentAppFactory>();
-
         // all built-in finders in the correct order,
         // devs can then modify this list on application startup
         builder.ContentFinders()
@@ -70,16 +52,6 @@ public static partial class UmbracoBuilderExtensions
             .Append<DefaultUrlProvider>();
         builder.MediaUrlProviders()
             .Append<DefaultMediaUrlProvider>();
-        // register back office sections in the order we want them rendered
-        builder.Sections()
-            .Append<ContentSection>()
-            .Append<MediaSection>()
-            .Append<SettingsSection>()
-            .Append<PackagesSection>()
-            .Append<UsersSection>()
-            .Append<MembersSection>()
-            .Append<FormsSection>()
-            .Append<TranslationSection>();
 
         builder.DynamicRootOriginFinders()
             .Append<ByKeyDynamicRootOriginFinder>()
@@ -95,22 +67,7 @@ public static partial class UmbracoBuilderExtensions
             .Append<FurthestDescendantOrSelfDynamicRootQueryStep>();
 
         builder.Components();
-        // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
-        builder.Dashboards()
-            .Add<ContentDashboard>()
-            .Add<ExamineDashboard>()
-            .Add<FormsDashboard>()
-            .Add<HealthCheckDashboard>()
-            .Add<ManifestDashboard>()
-            .Add<MediaDashboard>()
-            .Add<MembersDashboard>()
-            .Add<ProfilerDashboard>()
-            .Add<PublishedStatusDashboard>()
-            .Add<RedirectUrlDashboard>()
-            .Add<SettingsDashboard>()
-            .Add(builder.TypeLoader.GetTypes<IDashboard>());
         builder.PartialViewSnippets();
-        builder.PartialViewMacroSnippets();
         builder.DataValueReferenceFactories();
         builder.PropertyValueConverters().Append(builder.TypeLoader.GetTypes<IPropertyValueConverter>());
         builder.UrlSegmentProviders().Append<DefaultUrlSegmentProvider>();
@@ -121,7 +78,6 @@ public static partial class UmbracoBuilderExtensions
             .Add<EmailValidator>()
             .Add<IntegerValidator>()
             .Add<DecimalValidator>();
-        builder.ManifestFilters();
         builder.MediaUrlGenerators();
         // register OEmbed providers - no type scanning - all explicit opt-in of adding types, IEmbedProvider is not IDiscoverable
         builder.EmbedProviders()
@@ -139,8 +95,6 @@ public static partial class UmbracoBuilderExtensions
             .Append<Hulu>()
             .Append<Giphy>()
             .Append<LottieFiles>();
-        builder.SearchableTrees().Add(() => builder.TypeLoader.GetTypes<ISearchableTree>());
-        builder.BackOfficeAssets();
         builder.SelectorHandlers().Add(() => builder.TypeLoader.GetTypes<ISelectorHandler>());
         builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
         builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());
@@ -154,13 +108,6 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static ActionCollectionBuilder Actions(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<ActionCollectionBuilder>();
-
-    /// <summary>
-    /// Gets the content apps collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    public static ContentAppFactoryCollectionBuilder ContentApps(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
 
     /// <summary>
     /// Gets the content finders collection builder.
@@ -206,13 +153,6 @@ public static partial class UmbracoBuilderExtensions
     public static MediaUrlProviderCollectionBuilder MediaUrlProviders(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<MediaUrlProviderCollectionBuilder>();
 
-    /// <summary>
-    /// Gets the backoffice sections/applications collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    public static SectionCollectionBuilder Sections(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<SectionCollectionBuilder>();
-
     public static DynamicRootOriginFinderCollectionBuilder DynamicRootOriginFinders(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<DynamicRootOriginFinderCollectionBuilder>();
 
@@ -232,25 +172,11 @@ public static partial class UmbracoBuilderExtensions
         => builder.WithCollectionBuilder<ComponentCollectionBuilder>();
 
     /// <summary>
-    /// Gets the backoffice dashboards collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    public static DashboardCollectionBuilder Dashboards(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<DashboardCollectionBuilder>();
-
-    /// <summary>
     /// Gets the partial view snippets collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
     public static PartialViewSnippetCollectionBuilder PartialViewSnippets(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<PartialViewSnippetCollectionBuilder>();
-
-    /// <summary>
-    /// Gets the partial view macro snippets collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    public static PartialViewMacroSnippetCollectionBuilder PartialViewMacroSnippets(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<PartialViewMacroSnippetCollectionBuilder>();
 
     /// <summary>
     /// Gets the cache refreshers collection builder.
@@ -302,13 +228,6 @@ public static partial class UmbracoBuilderExtensions
         => builder.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
 
     /// <summary>
-    /// Gets the manifest filter collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    public static ManifestFilterCollectionBuilder ManifestFilters(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<ManifestFilterCollectionBuilder>();
-
-    /// <summary>
     /// Gets the content finders collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
@@ -321,18 +240,6 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static EmbedProvidersCollectionBuilder EmbedProviders(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<EmbedProvidersCollectionBuilder>();
-
-    /// <summary>
-    /// Gets the back office searchable tree collection builder
-    /// </summary>
-    public static SearchableTreeCollectionBuilder SearchableTrees(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<SearchableTreeCollectionBuilder>();
-
-    /// <summary>
-    /// Gets the back office custom assets collection builder
-    /// </summary>
-    public static CustomBackOfficeAssetsCollectionBuilder BackOfficeAssets(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<CustomBackOfficeAssetsCollectionBuilder>();
 
     /// <summary>
     /// Gets the Delivery API selector handler collection builder

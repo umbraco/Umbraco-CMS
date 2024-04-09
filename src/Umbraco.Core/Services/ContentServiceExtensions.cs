@@ -17,9 +17,9 @@ public static class ContentServiceExtensions
     #region RTE Anchor values
 
     private static readonly Regex AnchorRegex = new(@"<a id=\\*""(.*?)\\*"">", RegexOptions.Compiled);
-    private static readonly string[] _propertyTypesWithRte = new[] { Constants.PropertyEditors.Aliases.TinyMce, Constants.PropertyEditors.Aliases.BlockList, Constants.PropertyEditors.Aliases.BlockGrid };
+    private static readonly string[] _propertyTypesWithRte = new[] { Constants.PropertyEditors.Aliases.RichText, Constants.PropertyEditors.Aliases.BlockList, Constants.PropertyEditors.Aliases.BlockGrid };
 
-    public static IEnumerable<IContent>? GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
+    public static IEnumerable<IContent> GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
     {
         var guids = new List<GuidUdi>();
         foreach (Udi udi in ids)

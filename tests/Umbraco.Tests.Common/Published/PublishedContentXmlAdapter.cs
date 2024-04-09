@@ -45,7 +45,7 @@ public static class PublishedContentXmlAdapter
     {
         // use the label data type for all data for these tests except in the case
         // where a property is named 'content', in which case use the RTE.
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var labelDataType =
             new DataType(new VoidEditor("Label", Mock.Of<IDataValueEditorFactory>()), serializer) { Id = 3 };
         var rteDataType = new DataType(new VoidEditor("RTE", Mock.Of<IDataValueEditorFactory>()), serializer) { Id = 4 };

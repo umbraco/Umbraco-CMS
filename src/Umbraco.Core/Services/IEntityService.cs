@@ -61,6 +61,28 @@ public interface IEntityService
     bool Exists(Guid key);
 
     /// <summary>
+    ///     Determines whether an entity exists.
+    /// </summary>
+    /// <param name="keys">The unique keys of the entities.</param>
+    bool Exists(IEnumerable<Guid> keys);
+
+    /// <summary>
+    /// Determines whether and entity of a certain object type exists.
+    /// </summary>
+    /// <param name="key">The unique key of the entity.</param>
+    /// <param name="objectType">The object type to look for.</param>
+    /// <returns>True if the entity exists, false if it does not.</returns>
+    bool Exists(Guid key, UmbracoObjectTypes objectType) => throw new NotImplementedException();
+
+    /// <summary>
+    /// Determines whether and entity of a certain object type exists.
+    /// </summary>
+    /// <param name="id">The id of the entity.</param>
+    /// <param name="objectType">The object type to look for.</param>
+    /// <returns>True if the entity exists, false if it does not.</returns>
+    bool Exists(int id, UmbracoObjectTypes objectType) => throw new NotImplementedException();
+
+    /// <summary>
     ///     Gets entities of a given object type.
     /// </summary>
     /// <typeparam name="T">The type used to determine the object type of the entities.</typeparam>
@@ -161,6 +183,11 @@ public interface IEntityService
     /// <param name="objectType">The object type of the children.</param>
     IEnumerable<IEntitySlim> GetChildren(int id, UmbracoObjectTypes objectType);
 
+    IEnumerable<IEntitySlim> GetChildren(Guid? key, UmbracoObjectTypes objectType)
+    {
+        return Array.Empty<IEntitySlim>();
+    }
+
     /// <summary>
     ///     Gets the descendants of an entity.
     /// </summary>
@@ -173,6 +200,53 @@ public interface IEntityService
     /// <param name="id">The identifier of the entity.</param>
     /// <param name="objectType">The object type of the descendants.</param>
     IEnumerable<IEntitySlim> GetDescendants(int id, UmbracoObjectTypes objectType);
+
+    IEnumerable<IEntitySlim> GetPagedChildren(
+        Guid? parentKey,
+        UmbracoObjectTypes childObjectType,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+        => GetPagedChildren(
+            parentKey,
+            new[] { childObjectType },
+            childObjectType,
+            skip,
+            take,
+            out totalRecords,
+            filter,
+            ordering);
+
+    IEnumerable<IEntitySlim> GetPagedChildren(
+        Guid? parentKey,
+        IEnumerable<UmbracoObjectTypes> parentObjectTypes,
+        UmbracoObjectTypes childObjectType,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        totalRecords = 0;
+        return Array.Empty<IEntitySlim>();
+    }
+
+    IEnumerable<IEntitySlim> GetPagedChildren(
+        Guid? parentKey,
+        IEnumerable<UmbracoObjectTypes> parentObjectTypes,
+        IEnumerable<UmbracoObjectTypes> childObjectTypes,
+        int skip,
+        int take,
+        bool trashed,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        totalRecords = 0;
+        return Array.Empty<IEntitySlim>();
+    }
 
     /// <summary>
     ///     Gets children of an entity.
@@ -194,6 +268,22 @@ public interface IEntityService
         UmbracoObjectTypes objectType,
         long pageIndex,
         int pageSize,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        totalRecords = 0;
+        return Array.Empty<IEntitySlim>();
+    }
+
+    /// <summary>
+    ///     Gets children of an entity.
+    /// </summary>
+    IEnumerable<IEntitySlim> GetPagedTrashedChildren(
+        Guid? key,
+        UmbracoObjectTypes objectType,
+        int skip,
+        int take,
         out long totalRecords,
         IQuery<IUmbracoEntity>? filter = null,
         Ordering? ordering = null)

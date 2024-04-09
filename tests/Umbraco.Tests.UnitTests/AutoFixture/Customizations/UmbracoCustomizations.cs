@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
+using Umbraco.Cms.Api.Management.Controllers.Security;
+using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -13,9 +15,6 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Cms.Web.BackOffice.Install;
-using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.AutoFixture.Customizations;
@@ -29,17 +28,13 @@ internal class UmbracoCustomizations : ICustomization
                 (a, b, c) => BackOfficeIdentityUser.CreateNew(new GlobalSettings(), a, b, c)));
 
         fixture
-            .Customize(new ConstructorCustomization(typeof(UsersController), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(InstallController), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(PreviewController), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(MemberController), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(BackOfficeController), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
+            .Customize(new ConstructorCustomization(typeof(BackOfficeDefaultController), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(DatabaseSchemaCreatorFactory), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(BackOfficeServerVariables), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(InstallHelper), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(DatabaseBuilder), new GreedyConstructorQuery()));
+            .Customize(new ConstructorCustomization(typeof(DatabaseBuilder), new GreedyConstructorQuery()))
+            .Customize(new ConstructorCustomization(typeof(ContentVersionService), new GreedyConstructorQuery()));
 
         // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
         fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc =>
@@ -51,14 +46,6 @@ internal class UmbracoCustomizations : ICustomization
 
         fixture.Customize<HostingSettings>(x =>
             x.With(settings => settings.ApplicationVirtualPath, string.Empty));
-
-        fixture.Customize<BackOfficeAreaRoutes>(u => u.FromFactory(
-            () => new BackOfficeAreaRoutes(
-                Options.Create(new GlobalSettings()),
-                Mock.Of<IHostingEnvironment>(x =>
-                    x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
-                Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run),
-                new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>))));
 
         fixture.Customize<PreviewRoutes>(u => u.FromFactory(
             () => new PreviewRoutes(

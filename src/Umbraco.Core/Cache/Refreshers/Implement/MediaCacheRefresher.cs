@@ -73,40 +73,41 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             return;
         }
 
-        _publishedSnapshotService.Notify(payloads, out var anythingChanged);
+        // actions that always need to happen
+        AppCaches.RuntimeCache.ClearByKey(CacheKeys.MediaRecycleBinCacheKey);
+        Attempt<IAppPolicyCache?> mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
 
-        if (anythingChanged)
+        foreach (JsonPayload payload in payloads)
+        {
+            if (payload.ChangeTypes == TreeChangeTypes.Remove)
+            {
+                _idKeyMap.ClearCache(payload.Id);
+            }
+
+            if (!mediaCache.Success)
+            {
+                continue;
+            }
+
+            // repository cache
+            // it *was* done for each pathId but really that does not make sense
+            // only need to do it for the current media
+            mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
+            mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
+
+            // remove those that are in the branch
+            if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
+            {
+                var pathid = "," + payload.Id + ",";
+                mediaCache.Result?.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
+            }
+        }
+
+        _publishedSnapshotService.Notify(payloads, out var hasPublishedDataChanged);
+        // we only need to clear this if the published cache has changed
+        if (hasPublishedDataChanged)
         {
             AppCaches.ClearPartialViewCache();
-            AppCaches.RuntimeCache.ClearByKey(CacheKeys.MediaRecycleBinCacheKey);
-
-            Attempt<IAppPolicyCache?> mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
-
-            foreach (JsonPayload payload in payloads)
-            {
-                if (payload.ChangeTypes == TreeChangeTypes.Remove)
-                {
-                    _idKeyMap.ClearCache(payload.Id);
-                }
-
-                if (!mediaCache.Success)
-                {
-                    continue;
-                }
-
-                // repository cache
-                // it *was* done for each pathId but really that does not make sense
-                // only need to do it for the current media
-                mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
-                mediaCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
-
-                // remove those that are in the branch
-                if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
-                {
-                    var pathid = "," + payload.Id + ",";
-                    mediaCache.Result?.ClearOfType<IMedia>((_, v) => v.Path?.Contains(pathid) ?? false);
-                }
-            }
         }
 
         base.Refresh(payloads);

@@ -123,7 +123,7 @@ public class ContentTypeBuilder
         contentType.Thumbnail = GetThumbnail();
         contentType.CreatorId = GetCreatorId();
         contentType.Trashed = GetTrashed();
-        contentType.IsContainer = GetIsContainer();
+        contentType.ListView = GetListView();
         contentType.IsElement = _isElement ?? false;
         contentType.HistoryCleanup = new HistoryCleanup();
 
@@ -236,7 +236,7 @@ public class ContentTypeBuilder
                 .WithLabelOnTop(true)
                 .Done()
                 .AddPropertyType()
-                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TinyMce)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.RichText)
                 .WithValueStorageType(ValueStorageType.Ntext)
                 .WithAlias(RandomAlias("bodyText", randomizeAliases))
                 .WithName("Body text")
@@ -300,7 +300,7 @@ public class ContentTypeBuilder
             .WithSortOrder(1)
             .Done()
             .AddPropertyType()
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TinyMce)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.RichText)
             .WithValueStorageType(ValueStorageType.Ntext)
             .WithAlias("bodyText")
             .WithName("Body text")
@@ -408,7 +408,7 @@ public class ContentTypeBuilder
             .WithAlias("bodyText")
             .WithName("Body Text")
             .WithDataTypeId(Constants.DataTypes.RichtextEditor)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TinyMce)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.RichText)
             .WithValueStorageType(ValueStorageType.Ntext)
             .WithSortOrder(3)
             .Done()
@@ -507,14 +507,6 @@ public class ContentTypeBuilder
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.ContentPicker)
             .WithValueStorageType(ValueStorageType.Integer)
             .WithSortOrder(16)
-            .Done()
-            .AddPropertyType()
-            .WithAlias("mediaPicker")
-            .WithName("Media Picker")
-            .WithDataTypeId(1048)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.MediaPicker)
-            .WithValueStorageType(ValueStorageType.Integer)
-            .WithSortOrder(17)
             .Done()
             .AddPropertyType()
             .WithAlias("memberPicker")

@@ -1,5 +1,10 @@
+using System.Globalization;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -8,26 +13,42 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.Integer,
-    EditorType.PropertyValue | EditorType.MacroParameter,
-    "Numeric",
-    "integer",
     ValueType = ValueTypes.Integer,
     ValueEditorIsReusable = true)]
 public class IntegerPropertyEditor : DataEditor
 {
-    public IntegerPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory)
-        : base(dataValueEditorFactory) =>
-        SupportsReadOnly = true;
+    public IntegerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
+        : base(dataValueEditorFactory)
+        => SupportsReadOnly = true;
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()
-    {
-        IDataValueEditor editor = base.CreateValueEditor();
-        editor.Validators.Add(new IntegerValidator()); // ensure the value is validated
-        return editor;
-    }
+        => DataValueEditorFactory.Create<IntegerPropertyValueEditor>(Attribute!);
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() => new IntegerConfigurationEditor();
+
+    internal class IntegerPropertyValueEditor : DataValueEditor
+    {
+        public IntegerPropertyValueEditor(
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
+            => Validators.Add(new IntegerValidator());
+
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+            => TryParsePropertyValue(property.GetValue(culture, segment));
+
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+            => TryParsePropertyValue(editorValue.Value);
+
+        private int? TryParsePropertyValue(object? value)
+            => value is int integerValue
+                ? integerValue
+                : int.TryParse(value?.ToString(), CultureInfo.InvariantCulture, out var parsedIntegerValue)
+                    ? parsedIntegerValue
+                    : null;
+    }
 }

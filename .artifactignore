@@ -1,3 +1,4 @@
 **/*
 !tests/Umbraco.Tests.Integration/bin/**
 !tests/Umbraco.Tests.UnitTests/bin/**
+**/node_modules

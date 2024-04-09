@@ -26,7 +26,6 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddNuCache(this IUmbracoBuilder builder)
     {
-        // register the NuCache database data source
         builder.Services.TryAddSingleton<INuCacheContentRepository, NuCacheContentRepository>();
         builder.Services.TryAddSingleton<INuCacheContentService, NuCacheContentService>();
         builder.Services.TryAddSingleton<PublishedSnapshotServiceEventHandler>();
@@ -36,6 +35,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.TryAddTransient(factory => new PublishedSnapshotServiceOptions());
         builder.SetPublishedSnapshotService<PublishedSnapshotService>();
         builder.Services.TryAddSingleton<IPublishedSnapshotStatus, PublishedSnapshotStatus>();
+        builder.Services.TryAddTransient<IReservedFieldNamesService, ReservedFieldNamesService>();
 
         // replace this service since we want to improve the content/media
         // mapping lookups if we are using nucache.

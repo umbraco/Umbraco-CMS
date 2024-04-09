@@ -1,14 +1,14 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
@@ -16,18 +16,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class BlockEditorComponentTests
 {
-    private readonly JsonSerializerSettings _serializerSettings = new()
-    {
-        Formatting = Formatting.None,
-        NullValueHandling = NullValueHandling.Ignore,
-    };
-
     private const string ContentGuid1 = "036ce82586a64dfba2d523a99ed80f58";
     private const string ContentGuid2 = "48288c21a38a40ef82deb3eda90a58f6";
     private const string SettingsGuid1 = "ffd35c4e2eea4900abfa5611b67b2492";
     private const string SubContentGuid1 = "4c44ce6b3a5c4f5f8f15e3dc24819a9e";
     private const string SubContentGuid2 = "a062c06d6b0b44ac892b35d90309c7f8";
     private const string SubSettingsGuid1 = "4d998d980ffa4eee8afdc23c4abd6d29";
+
+    private readonly IJsonSerializer _jsonSerializer = new SystemTextJsonSerializer();
 
     [Test]
     public void Cannot_Have_Null_Udi()
@@ -52,11 +48,11 @@ public class BlockEditorComponentTests
         var component = new BlockListPropertyNotificationHandler(Mock.Of<ILogger<BlockListPropertyNotificationHandler>>());
         var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
 
+        Assert.AreEqual(3, guidMap.Count);
         var expected = ReplaceGuids(json, guidMap);
-        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
-        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
-        Console.WriteLine(expectedJson);
-        Console.WriteLine(resultJson);
+        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockListValue>(expected));
+        var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
+        Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
     }
 
@@ -74,7 +70,7 @@ public class BlockEditorComponentTests
 
         // we need to ensure the escaped json is consistent with how it will be re-escaped after parsing
         // and this is how to do that, the result will also include quotes around it.
-        var innerJsonEscaped = JsonConvert.ToString(innerJson);
+        var innerJsonEscaped = Escape(innerJson);
 
         // get the json with the subFeatures as escaped
         var json = GetBlockListJson(innerJsonEscaped);
@@ -83,12 +79,12 @@ public class BlockEditorComponentTests
         var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
 
         // the expected result is that the subFeatures data remains escaped
+        Assert.AreEqual(6, guidMap.Count);
         var expected = ReplaceGuids(GetBlockListJson(innerJsonEscaped), guidMap);
 
-        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
-        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
-        Console.WriteLine(expectedJson);
-        Console.WriteLine(resultJson);
+        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockListValue>(expected));
+        var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
+        Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
     }
 
@@ -111,11 +107,11 @@ public class BlockEditorComponentTests
         var component = new BlockListPropertyNotificationHandler(Mock.Of<ILogger<BlockListPropertyNotificationHandler>>());
         var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
 
+        Assert.AreEqual(6, guidMap.Count);
         var expected = ReplaceGuids(GetBlockListJson(innerJson), guidMap);
-        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
-        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
-        Console.WriteLine(expectedJson);
-        Console.WriteLine(resultJson);
+        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockListValue>(expected));
+        var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
+        Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
     }
 
@@ -133,7 +129,7 @@ public class BlockEditorComponentTests
 
         // we need to ensure the escaped json is consistent with how it will be re-escaped after parsing
         // and this is how to do that, the result will also include quotes around it.
-        var innerJsonEscaped = JsonConvert.ToString(innerJson);
+        var innerJsonEscaped = Escape(innerJson);
 
         // Complex editor such as the grid
         var complexEditorJsonEscaped = GetGridJson(innerJsonEscaped);
@@ -144,13 +140,12 @@ public class BlockEditorComponentTests
         var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
 
         // the expected result is that the subFeatures remains escaped
-        Assert.True(guidMap.Any());
+        Assert.AreEqual(6, guidMap.Count);
         var expected = ReplaceGuids(GetBlockListJson(GetGridJson(innerJsonEscaped)), guidMap);
 
-        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
-        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
-        Console.WriteLine(expectedJson);
-        Console.WriteLine(resultJson);
+        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockListValue>(expected));
+        var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
+        Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
     }
 
@@ -168,7 +163,7 @@ public class BlockEditorComponentTests
 
         // we need to ensure the escaped json is consistent with how it will be re-escaped after parsing
         // and this is how to do that, the result will also include quotes around it.
-        var innerJsonEscaped = JsonConvert.ToString(innerJson);
+        var innerJsonEscaped = Escape(innerJson);
 
         var json = GetBlockGridJson(innerJsonEscaped);
 
@@ -176,13 +171,12 @@ public class BlockEditorComponentTests
         var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
 
         // the expected result is that the subFeatures remains escaped
-        Assert.True(guidMap.Any());
+        Assert.AreEqual(13, guidMap.Count);
         var expected = ReplaceGuids(GetBlockGridJson(innerJsonEscaped), guidMap);
 
-        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
-        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
-        Console.WriteLine(expectedJson);
-        Console.WriteLine(resultJson);
+        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockGridValue>(expected));
+        var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(result));
+        Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
     }
 
@@ -204,13 +198,12 @@ public class BlockEditorComponentTests
         var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
 
         // the expected result is that the subFeatures remains unescaped
-        Assert.True(guidMap.Any());
+        Assert.AreEqual(13, guidMap.Count);
         var expected = ReplaceGuids(GetBlockGridJson(innerJson), guidMap);
 
-        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
-        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
-        Console.WriteLine(expectedJson);
-        Console.WriteLine(resultJson);
+        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockGridValue>(expected));
+        var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(result));
+        Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
     }
 
@@ -238,13 +231,12 @@ public class BlockEditorComponentTests
         var result = component.ReplaceBlockEditorUdis(json, GuidFactory);
 
         // the expected result is that the subFeatures remains unaltered - the UDIs within should still exist
-        Assert.True(guidMap.Any());
+        Assert.AreEqual(10, guidMap.Count);
         var expected = ReplaceGuids(GetBlockGridJson(innerJson), guidMap);
 
-        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
-        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
-        Console.WriteLine(expectedJson);
-        Console.WriteLine(resultJson);
+        var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockGridValue>(expected));
+        var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(result));
+        Assert.IsNotEmpty(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
 
         Assert.True(result.Contains("umb://element/eb459ab17259495b90a3d2f6bb299826"));
@@ -294,7 +286,7 @@ public class BlockEditorComponentTests
             ""udi"": ""umb://element/" + settingsGuid1 + @""",
             ""featureName"": ""Setting 1"",
             ""featureDetails"": ""Setting 2""
-        },
+        }
     ]
 }";
 
@@ -471,4 +463,6 @@ public class BlockEditorComponentTests
 
         return json;
     }
+
+    private string Escape(string json) => $"\"{System.Web.HttpUtility.JavaScriptStringEncode(json)}\"";
 }

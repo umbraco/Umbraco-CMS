@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
@@ -10,18 +11,9 @@ public class SchemaIdSelector : ISchemaIdSelector
 
     protected string UmbracoSchemaId(Type type)
     {
-        string SanitizedTypeName(Type t) => t.Name
-            // first grab the "non generic" part of any generic type name (i.e. "PagedViewModel`1" becomes "PagedViewModel")
-            .Split('`').First()
-            // then remove the "ViewModel" postfix from type names
-            .TrimEnd("ViewModel");
-
         var name = SanitizedTypeName(type);
-        if (type.IsGenericType)
-        {
-            // append the generic type names, ultimately turning i.e. "PagedViewModel<RelationItemViewModel>" into "PagedRelationItem"
-            name = $"{name}{string.Join(string.Empty, type.GenericTypeArguments.Select(SanitizedTypeName))}";
-        }
+
+        name = HandleGenerics(name, type);
 
         if (name.EndsWith("Model") == false)
         {
@@ -32,5 +24,22 @@ public class SchemaIdSelector : ISchemaIdSelector
 
         // make absolutely sure we don't pass any invalid named by removing all non-word chars
         return Regex.Replace(name, @"[^\w]", string.Empty);
+    }
+
+    private string SanitizedTypeName(Type t) => t.Name
+        // first grab the "non generic" part of any generic type name (i.e. "PagedViewModel`1" becomes "PagedViewModel")
+        .Split('`').First()
+        // then remove the "ViewModel" postfix from type names
+        .TrimEnd("ViewModel");
+
+    private string HandleGenerics(string name, Type type)
+    {
+        if (!type.IsGenericType)
+        {
+            return name;
+        }
+
+        // use attribute custom name or append the generic type names, ultimately turning i.e. "PagedViewModel<RelationItemViewModel>" into "PagedRelationItem"
+        return $"{name}{string.Join(string.Empty, type.GenericTypeArguments.Select(SanitizedTypeName))}";
     }
 }

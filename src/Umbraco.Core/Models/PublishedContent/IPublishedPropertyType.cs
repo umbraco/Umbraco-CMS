@@ -32,6 +32,11 @@ public interface IPublishedPropertyType
     string EditorAlias { get; }
 
     /// <summary>
+    ///     Gets the property editor UI alias.
+    /// </summary>
+    string EditorUiAlias { get; }
+
+    /// <summary>
     ///     Gets a value indicating whether the property is a user content property.
     /// </summary>
     /// <remarks>
@@ -117,20 +122,6 @@ public interface IPublishedPropertyType
     object? ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 
     /// <summary>
-    ///     Converts the intermediate value into the XPath value.
-    /// </summary>
-    /// <param name="owner">The published element owning the property.</param>
-    /// <param name="referenceCacheLevel">The reference cache level.</param>
-    /// <param name="inter">The intermediate value.</param>
-    /// <param name="preview">A value indicating whether content should be considered draft.</param>
-    /// <returns>The XPath value.</returns>
-    /// <remarks>
-    ///     <para>The XPath value can be either a string or an XPathNavigator.</para>
-    /// </remarks>
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
-
-    /// <summary>
     ///     Converts the intermediate value into the object value for Delivery API representation.
     /// </summary>
     /// <param name="owner">The published element owning the property.</param>
@@ -140,8 +131,4 @@ public interface IPublishedPropertyType
     /// <param name="expanding">A value indicating whether the property value should be expanded.</param>
     /// <returns>The object value.</returns>
     object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding);
-
-    [Obsolete($"Use the {nameof(ConvertInterToDeliveryApiObject)} that supports property expansion. Will be removed in V14.")]
-    object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-        => ConvertInterToDeliveryApiObject(owner, referenceCacheLevel, inter, preview, false);
 }

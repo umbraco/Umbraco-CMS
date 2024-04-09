@@ -1,6 +1,5 @@
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install.Models;
-using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
 
@@ -19,23 +18,6 @@ public static class DatabaseProviderMetadataExtensions
     /// </returns>
     public static IEnumerable<IDatabaseProviderMetadata> GetAvailable(this IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata, bool onlyQuickInstall = false)
         => databaseProviderMetadata.Where(x => (!onlyQuickInstall || x.SupportsQuickInstall) && x.IsAvailable).OrderBy(x => x.SortOrder);
-
-    /// <summary>
-    /// Determines whether a database can be created for the specified provider name while ignoring the value of <see cref="GlobalSettings.InstallMissingDatabase" />.
-    /// </summary>
-    /// <param name="databaseProviderMetadata">The database provider metadata.</param>
-    /// <param name="providerName">The name of the provider.</param>
-    /// <returns>
-    ///   <c>true</c> if a database can be created for the specified provider name; otherwise, <c>false</c>.
-    /// </returns>
-    [Obsolete("Use CanForceCreateDatabase that takes an IUmbracoDatabaseFactory. Scheduled for removal in Umbraco 13.")]
-    public static bool CanForceCreateDatabase(this IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata, string? providerName)
-    {
-        return databaseProviderMetadata
-            .FirstOrDefault(x =>
-                string.Equals(x.ProviderName, providerName, StringComparison.InvariantCultureIgnoreCase))
-            ?.ForceCreateDatabase == true;
-    }
 
     /// <summary>
     /// Determines whether a database can be created for the specified provider name while ignoring the value of <see cref="GlobalSettings.InstallMissingDatabase" />.

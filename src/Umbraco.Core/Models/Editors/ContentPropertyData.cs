@@ -34,9 +34,4 @@ public class ContentPropertyData
     ///     Gets or sets the unique identifier of the property type.
     /// </summary>
     public Guid PropertyTypeKey { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the uploaded files.
-    /// </summary>
-    public ContentPropertyFile[]? Files { get; set; }
 }

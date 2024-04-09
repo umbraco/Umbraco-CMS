@@ -8,11 +8,14 @@
       <DependentUpon>appsettings-schema.json</DependentUpon>
     </Content>
   </ItemGroup>
-  
+
   <!-- Copy JSON schema files into the project directory -->
   <Target Name="CopyUmbracoJsonSchemaFiles" BeforeTargets="Build">
     <Message Text="Copying JSON schema files into project directory: @(UmbracoJsonSchemaFiles->'%(Filename)%(Extension)')" Importance="high" />
     <Copy SourceFiles="@(UmbracoJsonSchemaFiles)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
+
+    <Message Text="Copying JSON schema files into project directory: @(UmbracoPackageSchemaFiles->'%(Filename)%(Extension)')" Importance="high" />
+    <Copy SourceFiles="@(UmbracoPackageSchemaFiles)" DestinationFolder="$(MSBuildProjectDirectory)" SkipUnchangedFiles="true" />
   </Target>
 
   <!-- Add references to the JSON schema in the project directory -->

@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -32,6 +33,13 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     TItem? Get(Guid key);
 
     /// <summary>
+    /// Gets a content type.
+    /// </summary>
+    /// <param name="guid">The key of the content type.</param>
+    /// <returns>The found content type, null if none was found.</returns>
+    Task<TItem?> GetAsync(Guid guid);
+
+    /// <summary>
     ///     Gets a content type.
     /// </summary>
     TItem? Get(string alias);
@@ -61,9 +69,23 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
 
     void Save(TItem? item, int userId = Constants.Security.SuperUserId);
 
+    Task SaveAsync(TItem item, Guid performingUserKey)
+    {
+        Save(item);
+        return Task.CompletedTask;
+    }
+
     void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId);
 
     void Delete(TItem item, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    /// Deletes an item
+    /// </summary>
+    /// <param name="key">The item to delete.</param>
+    /// <param name="performingUserKey"></param>
+    /// <returns></returns>
+    Task<ContentTypeOperationStatus> DeleteAsync(Guid key, Guid performingUserKey);
 
     void Delete(IEnumerable<TItem> item, int userId = Constants.Security.SuperUserId);
 
@@ -102,11 +124,31 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
 
     Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);
 
+    [Obsolete("Please use MoveAsync. Will be removed in V16.")]
     Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId);
 
+    [Obsolete("Please use CopyAsync. Will be removed in V16.")]
     Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId);
 
+    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
     TItem Copy(TItem original, string alias, string name, int parentId = -1);
 
+    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
     TItem Copy(TItem original, string alias, string name, TItem parent);
+
+    Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> CopyAsync(Guid key, Guid? containerKey);
+
+    Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> MoveAsync(Guid key, Guid? containerKey);
+
+    /// <summary>
+    /// Returns all the content type allowed as root.
+    /// </summary>
+    /// <returns></returns>
+    Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take);
+
+    /// <summary>
+    /// Returns all content types allowed as children for a given content type key.
+    /// </summary>
+    /// <returns></returns>
+    Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take);
 }

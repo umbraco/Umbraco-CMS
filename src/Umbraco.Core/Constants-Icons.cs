@@ -55,11 +55,6 @@ public static partial class Constants
         public const string ListView = "icon-thumbnail-list";
 
         /// <summary>
-        ///     System macro icon.
-        /// </summary>
-        public const string Macro = "icon-settings-alt";
-
-        /// <summary>
         ///     System media file icon.
         /// </summary>
         public const string MediaFile = "icon-document";

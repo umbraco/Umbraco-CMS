@@ -34,7 +34,7 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
     public virtual void CreateTestData()
     {
         // NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
-        var template = TemplateBuilder.CreateTextPageTemplate();
+        var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
         FileService.SaveTemplate(template);
 
         // Create and Save ContentType "umbTextpage" -> 1051 (template), 1052 (content type)
