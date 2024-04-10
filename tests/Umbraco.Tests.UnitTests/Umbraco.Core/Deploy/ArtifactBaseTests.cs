@@ -1,10 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Deploy;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Deploy;
 
@@ -17,7 +18,14 @@ public class ArtifactBaseTests
         var udi = new GuidUdi("test", Guid.Parse("3382d5433b5749d08919bc9961422a1f"));
         var artifact = new TestArtifact(udi, new List<ArtifactDependency>()) { Name = "Test Name", Alias = "testAlias" };
 
-        var serialized = JsonConvert.SerializeObject(artifact);
+        var serialized = JsonSerializer.Serialize(artifact, new JsonSerializerOptions()
+        {
+            Converters =
+            {
+                new JsonUdiConverter(),
+                new JsonGuidUdiConverter()
+            }
+        });
 
         var expected =
             "{\"Udi\":\"umb://test/3382d5433b5749d08919bc9961422a1f\",\"Dependencies\":[],\"Checksum\":\"test checksum value\",\"Name\":\"Test Name\",\"Alias\":\"testAlias\"}";

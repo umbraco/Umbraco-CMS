@@ -1,7 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -47,6 +48,10 @@ public class LanguageTests
     {
         var item = _builder.Build();
 
-        Assert.DoesNotThrow(() => JsonConvert.SerializeObject(item));
+        Assert.DoesNotThrow(() => JsonSerializer.Serialize(item, new JsonSerializerOptions()
+        {
+            // Ignore CultureInfo reference
+            ReferenceHandler = ReferenceHandler.IgnoreCycles
+        }));
     }
 }
