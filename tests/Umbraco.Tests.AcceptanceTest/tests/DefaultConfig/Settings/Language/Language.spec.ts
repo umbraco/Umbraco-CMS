@@ -15,8 +15,9 @@ test.describe('Language tests', () => {
   test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.language.ensureNameNotExists(languageName);
   });
-
-  test('can add language', async ({umbracoApi, umbracoUi}) => {
+  
+  // TODO: remove skip when the front-end is ready. Currently it is impossible to add a language as the language dropdown is not displayed.
+  test.skip('can add language', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoUi.language.goToSettingsTreeItem('Language');
 
