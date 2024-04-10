@@ -834,6 +834,7 @@ export default {
 		submit: 'Indsend',
 		type: 'Type',
 		typeToSearch: 'Skriv for at søge...',
+		unknownUser: 'Ukendt bruger',
 		under: 'under',
 		up: 'Op',
 		update: 'Opdatér',
