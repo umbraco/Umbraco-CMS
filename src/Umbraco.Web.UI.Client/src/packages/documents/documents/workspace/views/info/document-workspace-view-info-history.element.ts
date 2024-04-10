@@ -17,6 +17,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 @customElement('umb-document-workspace-view-info-history')
 export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
@@ -94,11 +95,10 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManagerContext.open(this, UMB_ROLLBACK_MODAL, {});
 
-		if (!modalContext) return;
-
-		modalContext.onSubmit().then(() => {
-			console.log('Rollback modal submitted');
-		});
+		await modalContext.onSubmit();
+		// TODO: This notification won't actually show at the moment because we perform a full page reload after rollback. However, when we can do it without a full page reload, this should be used.
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notificationContext.peek('positive', { data: { message: this.localize.term('rollback_documentRolledBack') } });
 	};
 
 	render() {
@@ -111,7 +111,6 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 						slot="actions"
 						@click=${this.#onRollbackModalOpen}>
 						<uui-icon name="icon-undo"></uui-icon>
-						<umb-localize key="actions_rollback"></umb-localize>
 					</uui-button>
 				</div>
 				${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}

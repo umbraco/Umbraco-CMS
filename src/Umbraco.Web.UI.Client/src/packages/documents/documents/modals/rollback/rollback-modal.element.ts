@@ -98,7 +98,8 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		data?.items.forEach((item: any) => {
 			tempItems.push({
 				date: item.versionDate,
-				user: userItems?.find((user) => user.unique === item.user.id)?.name || 'Unknown user',
+				user:
+					userItems?.find((user) => user.unique === item.user.id)?.name || this.localize.term('general_unknownUser'),
 				isCurrentlyPublishedVersion: item.isCurrentPublishedVersion,
 				id: item.id,
 				preventCleanup: item.preventCleanup,
@@ -286,12 +287,16 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 					<uui-box headline=${this.currentVersionHeader} id="box-right"> ${this.#renderCurrentVersion()} </uui-box>
 				</div>
 				<umb-footer-layout slot="footer">
-					<uui-button slot="actions" look="secondary" @click=${this.#onCancel}
-						>${this.localize.term('general_cancel')}</uui-button
-					>
-					<uui-button slot="actions" look="primary" @click=${this.#onRollback}
-						>${this.localize.term('general_cancel')}</uui-button
-					>
+					<uui-button
+						slot="actions"
+						look="secondary"
+						@click=${this.#onCancel}
+						label=${this.localize.term('general_cancel')}></uui-button>
+					<uui-button
+						slot="actions"
+						look="primary"
+						@click=${this.#onRollback}
+						label=${this.localize.term('actions_rollback')}></uui-button>
 				</umb-footer-layout>
 			</umb-body-layout>
 		`;

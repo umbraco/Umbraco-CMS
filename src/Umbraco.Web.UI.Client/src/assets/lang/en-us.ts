@@ -842,6 +842,7 @@ export default {
 		type: 'Type',
 		typeName: 'Type Name',
 		typeToSearch: 'Type to search...',
+		unknownUser: 'Unknown user',
 		under: 'under',
 		up: 'Up',
 		update: 'Update',
