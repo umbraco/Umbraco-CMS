@@ -393,7 +393,6 @@ export const UmbFormControlMixin = <
 		public checkValidity() {
 			this.pristine = false;
 			this._runValidators();
-			console.log('form control checkValidity', this.#validity.valid, this.#validity);
 
 			for (const key in this.#formCtrlElements) {
 				if (this.#formCtrlElements[key].checkValidity() === false) {
