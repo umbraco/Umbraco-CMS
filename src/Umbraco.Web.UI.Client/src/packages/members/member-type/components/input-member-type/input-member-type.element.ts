@@ -1,9 +1,10 @@
 import { UmbMemberTypePickerContext } from './input-member-type.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { MemberTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import type { UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-input-member-type')
 export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -70,7 +71,7 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 	}
 
 	@state()
-	private _items?: Array<MemberTypeItemResponseModel>;
+	private _items?: Array<UmbUniqueTreeItemModel>;
 
 	#pickerContext = new UmbMemberTypePickerContext(this);
 
@@ -113,7 +114,7 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 			<uui-ref-list
 				>${repeat(
 					this._items,
-					(item) => item.id,
+					(item) => item.unique,
 					(item) => this.#renderItem(item),
 				)}</uui-ref-list
 			>
@@ -133,14 +134,14 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 		`;
 	}
 
-	#renderItem(item: MemberTypeItemResponseModel) {
-		if (!item.id) return;
+	#renderItem(item: UmbUniqueTreeItemModel) {
+		if (!item.unique) return;
 		return html`
 			<uui-ref-node-document-type name=${ifDefined(item.name)}>
 				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
 					<uui-button
-						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
+						@click=${() => this.#pickerContext.requestRemoveItem(item.unique!)}
 						label="Remove Member Type ${item.name}"
 						>${this.localize.term('general_remove')}</uui-button
 					>
@@ -149,7 +150,7 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 		`;
 	}
 
-	#renderIcon(item: MemberTypeItemResponseModel) {
+	#renderIcon(item: UmbUniqueTreeItemModel) {
 		if (!item.icon) return;
 		return html`<umb-icon slot="icon" name=${item.icon}></umb-icon>`;
 	}
