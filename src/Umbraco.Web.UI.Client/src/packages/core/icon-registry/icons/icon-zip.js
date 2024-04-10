@@ -1,4 +1,6 @@
-export default `<svg
+export default `<!-- @license lucide-static v0.367.0 - ISC -->
+<svg
+  class="lucide lucide-file-archive"
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
   fill="none"
@@ -7,8 +9,8 @@ export default `<svg
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M4 22V4c0-.5.2-1 .6-1.4C5 2.2 5.5 2 6 2h8.5L20 7.5V20c0 .5-.2 1-.6 1.4-.4.4-.9.6-1.4.6h-2" />
-  <polyline points="14 2 14 8 20 8" />
+  <path d="M16 22h2a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v18" />
+  <path d="M14 2v4a2 2 0 0 0 2 2h4" />
   <circle cx="10" cy="20" r="2" />
   <path d="M10 7V6" />
   <path d="M10 12v-1" />
