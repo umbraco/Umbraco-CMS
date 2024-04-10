@@ -2,12 +2,12 @@ import { UmbDataTypeMoveServerDataSource } from './data-type-move.server.data-so
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbMoveDataSource, UmbMoveRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbMoveToDataSource, UmbMoveToRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
-export class UmbMoveDataTypeRepository extends UmbRepositoryBase implements UmbMoveRepository {
+export class UmbMoveDataTypeRepository extends UmbRepositoryBase implements UmbMoveToRepository {
 	#init: Promise<unknown>;
-	#moveSource: UmbMoveDataSource;
+	#moveSource: UmbMoveToDataSource;
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHost) {
@@ -21,7 +21,7 @@ export class UmbMoveDataTypeRepository extends UmbRepositoryBase implements UmbM
 		]);
 	}
 
-	async move(unique: string, targetUnique: string | null) {
+	async requestMove(unique: string, targetUnique: string | null) {
 		await this.#init;
 		const { error } = await this.#moveSource.move(unique, targetUnique);
 
