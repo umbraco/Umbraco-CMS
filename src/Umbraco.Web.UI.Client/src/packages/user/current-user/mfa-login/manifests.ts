@@ -11,7 +11,7 @@ export const userProfileApps: Array<ManifestCurrentUserActionDefaultKind> = [
 		api: UmbConfigureMfaProvidersApi,
 		meta: {
 			label: '#user_configureTwoFactor',
-			icon: 'lock',
+			icon: 'icon-rectangle-ellipsis',
 			look: 'secondary',
 		},
 		conditions: [
