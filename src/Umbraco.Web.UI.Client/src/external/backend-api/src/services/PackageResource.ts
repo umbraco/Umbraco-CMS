@@ -5,7 +5,6 @@
 import type { CreatePackageRequestModel } from '../models/CreatePackageRequestModel';
 import type { PackageConfigurationResponseModel } from '../models/PackageConfigurationResponseModel';
 import type { PackageDefinitionResponseModel } from '../models/PackageDefinitionResponseModel';
-import type { PackageManifestResponseModel } from '../models/PackageManifestResponseModel';
 import type { PagedPackageDefinitionResponseModel } from '../models/PagedPackageDefinitionResponseModel';
 import type { PagedPackageMigrationStatusResponseModel } from '../models/PagedPackageMigrationStatusResponseModel';
 import type { UpdatePackageRequestModel } from '../models/UpdatePackageRequestModel';
@@ -192,31 +191,6 @@ export class PackageResource {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getPackageManifest(): CancelablePromise<Array<PackageManifestResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/package/manifest',
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getPackageManifestPublic(): CancelablePromise<Array<PackageManifestResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/package/manifest/public',
         });
     }
 

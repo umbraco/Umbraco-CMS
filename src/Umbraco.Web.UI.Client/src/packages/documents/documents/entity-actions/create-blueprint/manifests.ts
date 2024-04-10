@@ -12,7 +12,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-blueprint',
-			label: 'Create Content Template',
+			label: '#actions_createblueprint',
 		},
 	},
 ];

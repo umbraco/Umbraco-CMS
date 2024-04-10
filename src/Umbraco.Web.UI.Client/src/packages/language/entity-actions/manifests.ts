@@ -25,7 +25,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_LANGUAGE_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create',
+			label: '#actions_create',
 		},
 	},
 ];

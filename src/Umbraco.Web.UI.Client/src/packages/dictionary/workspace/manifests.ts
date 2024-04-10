@@ -25,7 +25,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/workspace-view-dictionary-editor.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Edit',
+			label: '#general_edit',
 			pathname: 'edit',
 			icon: 'edit',
 		},
@@ -47,7 +47,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		weight: 90,
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},

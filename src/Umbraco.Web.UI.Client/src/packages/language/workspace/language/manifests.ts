@@ -24,7 +24,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/language-details-workspace-view.element.js'),
 		weight: 90,
 		meta: {
-			label: 'Details',
+			label: '#general_details',
 			pathname: 'details',
 			icon: 'edit',
 		},
@@ -47,7 +47,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		meta: {
 			look: 'primary',
 			color: 'positive',
-			label: 'Save',
+			label: '#buttons_save',
 		},
 		conditions: [
 			{

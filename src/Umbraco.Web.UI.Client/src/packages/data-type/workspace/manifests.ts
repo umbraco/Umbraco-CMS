@@ -26,7 +26,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/details/data-type-details-workspace-view.element.js'),
 		weight: 90,
 		meta: {
-			label: 'Details',
+			label: '#general_details',
 			pathname: 'details',
 			icon: 'edit',
 		},
@@ -44,7 +44,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/info/workspace-view-data-type-info.element.js'),
 		weight: 90,
 		meta: {
-			label: 'Info',
+			label: '#general_info',
 			pathname: 'info',
 			icon: 'info',
 		},
@@ -65,7 +65,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		name: 'Save Data Type Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},

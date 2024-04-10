@@ -27,7 +27,7 @@ export const manifests: Array<ManifestTypes> = [
 		js: () => import('./examine-management-dashboard/dashboard-examine-management.element.js'),
 		weight: 400,
 		meta: {
-			label: 'Examine Management',
+			label: '#dashboardTabs_settingsExamine',
 			pathname: 'examine-management',
 		},
 		conditions: [
