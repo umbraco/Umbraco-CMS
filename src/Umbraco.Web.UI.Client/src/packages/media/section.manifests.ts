@@ -9,7 +9,7 @@ const section: ManifestSection = {
 	name: 'Media Section',
 	weight: 500,
 	meta: {
-		label: 'Media',
+		label: '#sections_media',
 		pathname: 'media',
 	},
 	conditions: [

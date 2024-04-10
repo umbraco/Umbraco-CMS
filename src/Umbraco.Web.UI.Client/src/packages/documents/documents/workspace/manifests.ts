@@ -52,7 +52,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		element: () => import('./views/edit/document-workspace-view-edit.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Content',
+			label: '#general_content',
 			pathname: 'content',
 			icon: 'document',
 		},
@@ -70,7 +70,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		element: () => import('./views/info/document-workspace-view-info.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Info',
+			label: '#general_info',
 			pathname: 'info',
 			icon: 'info',
 		},
@@ -92,7 +92,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		weight: 70,
 		api: () => import('./actions/save-and-publish.action.js'),
 		meta: {
-			label: 'Save And Publish',
+			label: '#buttons_saveAndPublish',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -111,7 +111,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		weight: 80,
 		api: () => import('./actions/save.action.js'),
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'secondary',
 			color: 'positive',
 		},
@@ -151,7 +151,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		api: () => import('./actions/unpublish.action.js'),
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Unpublish...',
+			label: '#actions_unpublish',
 			icon: 'icon-globe',
 		},
 		conditions: [
@@ -170,7 +170,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		api: () => import('./actions/publish-with-descendants.action.js'),
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Publish with descendants...',
+			label: '#buttons_publishDescendants',
 			icon: 'icon-globe',
 		},
 		conditions: [
@@ -189,7 +189,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		api: () => import('./actions/save-and-schedule.action.js'),
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Schedule...',
+			label: '#buttons_schedulePublish',
 			icon: 'icon-globe',
 		},
 		conditions: [

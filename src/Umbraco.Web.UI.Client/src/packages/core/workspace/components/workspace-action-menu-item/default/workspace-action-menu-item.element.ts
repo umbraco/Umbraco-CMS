@@ -48,7 +48,9 @@ export class UmbWorkspaceActionMenuItemElement<
 	render() {
 		return html`
 			<uui-menu-item
-				label=${ifDefined(this.manifest?.meta.label)}
+				label=${ifDefined(
+					this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name,
+				)}
 				href=${ifDefined(this._href)}
 				@click-label=${this.#onClickLabel}
 				@click=${this.#onClick}>

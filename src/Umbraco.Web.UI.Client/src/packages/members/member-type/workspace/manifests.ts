@@ -25,7 +25,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		alias: 'Umb.WorkspaceView.MemberType.Design',
 		name: 'Member Type Workspace Design View',
 		meta: {
-			label: 'Design',
+			label: '#general_design',
 			pathname: 'design',
 			icon: 'icon-member-dashed-line',
 		},
@@ -46,7 +46,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		name: 'Save Member Type Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},

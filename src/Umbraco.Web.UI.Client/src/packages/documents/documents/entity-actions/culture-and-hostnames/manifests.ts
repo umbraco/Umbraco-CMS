@@ -14,7 +14,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-home',
-			label: 'Culture and Hostnames...',
+			label: '#actions_assigndomain',
 		},
 		conditions: [
 			{

@@ -44,7 +44,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/edit/media-workspace-view-edit.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Media',
+			label: '#general_details',
 			pathname: 'media',
 			icon: 'icon-picture',
 		},
@@ -62,7 +62,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/info/media-workspace-view-info.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Info',
+			label: '#general_info',
 			pathname: 'info',
 			icon: 'info',
 		},
@@ -83,7 +83,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		name: 'Save Media Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},

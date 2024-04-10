@@ -26,7 +26,7 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 		alias: 'Umb.WorkspaceView.MediaType.Design',
 		name: 'Media Type Workspace Design View',
 		meta: {
-			label: 'Design',
+			label: '#general_design',
 			pathname: 'design',
 			icon: 'icon-document-dashed-line',
 		},
@@ -44,7 +44,7 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 		js: () => import('./views/structure/media-type-workspace-view-structure.element.js'),
 		weight: 800,
 		meta: {
-			label: 'Structure',
+			label: '#contentTypeEditor_structure',
 			pathname: 'structure',
 			icon: 'icon-mindmap',
 		},
@@ -65,7 +65,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		name: 'Save Media Type Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},

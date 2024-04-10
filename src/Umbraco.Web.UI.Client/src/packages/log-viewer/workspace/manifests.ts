@@ -44,7 +44,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		element: () => import('./views/search/index.js'),
 		weight: 200,
 		meta: {
-			label: 'Search',
+			label: '#general_search',
 			pathname: 'search',
 			icon: 'icon-search',
 		},

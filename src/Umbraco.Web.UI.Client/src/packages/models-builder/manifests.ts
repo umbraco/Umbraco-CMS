@@ -6,7 +6,7 @@ export const manifests = [
 		element: () => import('./models-builder-dashboard.element.js'),
 		weight: 300,
 		meta: {
-			label: 'Models Builder',
+			label: '#dashboardTabs_settingsModelsBuilder',
 			pathname: 'models-builder',
 		},
 		conditions: [
