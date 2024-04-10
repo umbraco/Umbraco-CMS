@@ -117,11 +117,11 @@ test.describe('Partial View tests', () => {
   test('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
     //Arrange
     const propertyAliasValue = 'UpdateDate';
-    const isAscending = false;
+    const isAscending = true;
     const expectedCode = 'Umbraco.ContentAtRoot().FirstOrDefault()\r\n' +
     '    .Children()\r\n' +
     '    .Where(x => x.IsVisible())\r\n' +
-    '    .OrderByDescending(x => x.' + propertyAliasValue + ')';
+    '    .OrderBy(x => x.' + propertyAliasValue + ')';
     const expectedTemplateContent = '\r\n' +
       '@{\r\n' +
       '\tvar selection = ' + expectedCode + ';\r\n' +
@@ -142,8 +142,6 @@ test.describe('Partial View tests', () => {
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    // Wait for the partial view to open
-    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.partialView.addQueryBuilderWithOrderByStatement(propertyAliasValue, isAscending);
     // Verify that the code is shown
     await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);
