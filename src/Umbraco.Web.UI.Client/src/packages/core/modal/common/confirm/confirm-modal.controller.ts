@@ -22,7 +22,6 @@ export class UmbConfirmModalController extends UmbControllerBase {
 		// This is a one time off, so we can destroy our selfs.
 		this.destroy();
 
-		// Map back into UmbVariantId instances:
 		return;
 	}
 }

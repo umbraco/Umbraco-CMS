@@ -12,6 +12,7 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
 
+	readonly unique = this.#currentUser.asObservablePart((user) => user?.unique);
 	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode);
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
