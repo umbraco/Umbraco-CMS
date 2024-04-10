@@ -1,8 +1,8 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Namotion.Reflection;
+using NJsonSchema;
 using NJsonSchema.Generation;
-using NJsonSchema.NewtonsoftJson.Generation;
 
 /// <inheritdoc />
 public class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
@@ -11,28 +11,41 @@ public class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
     /// Initializes a new instance of the <see cref="UmbracoJsonSchemaGenerator" /> class.
     /// </summary>
     public UmbracoJsonSchemaGenerator()
-        : base(new NewtonsoftJsonSchemaGeneratorSettings()
+        : base(new SystemTextJsonSchemaGeneratorSettings()
         {
             AlwaysAllowAdditionalObjectProperties = true,
-            DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull,
             FlattenInheritanceHierarchy = true,
             IgnoreObsoleteProperties = true,
-            SerializerSettings = new JsonSerializerSettings()
+            ReflectionService = new UmbracoSystemTextJsonReflectionService(),
+            SerializerOptions = new JsonSerializerOptions()
             {
-                ContractResolver = new WritablePropertiesOnlyResolver()
-            }
+                Converters =
+                {
+                    new JsonStringEnumConverter()
+                },
+                WriteIndented = true,
+            },
         })
-    {
-
-
-        ((NewtonsoftJsonSchemaGeneratorSettings)Settings).SerializerSettings.Converters.Add(new StringEnumConverter());
-    }
+    { }
 
     /// <inheritdoc />
-    private class WritablePropertiesOnlyResolver : DefaultContractResolver
+    private class UmbracoSystemTextJsonReflectionService : SystemTextJsonReflectionService
     {
         /// <inheritdoc />
-        protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
-            => base.CreateProperties(type, memberSerialization).Where(p => p.Writable).ToList();
+        public override void GenerateProperties(JsonSchema schema, ContextualType contextualType, SystemTextJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
+        {
+            base.GenerateProperties(schema, contextualType, settings, schemaGenerator, schemaResolver);
+
+            // Remove read-only properties
+            foreach (ContextualPropertyInfo property in contextualType.Properties)
+            {
+                if (property.CanWrite is false)
+                {
+                    string propertyName = GetPropertyName(property, settings);
+
+                    schema.Properties.Remove(propertyName);
+                }
+            }
+        }
     }
 }
