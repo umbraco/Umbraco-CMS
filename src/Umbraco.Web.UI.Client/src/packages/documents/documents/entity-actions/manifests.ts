@@ -1,6 +1,16 @@
 import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_PICKER_MODAL } from '../modals/index.js';
+import {
+	UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT,
+	UMB_USER_PERMISSION_DOCUMENT_DELETE,
+	UMB_USER_PERMISSION_DOCUMENT_DUPLICATE,
+	UMB_USER_PERMISSION_DOCUMENT_MOVE,
+	UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
+	UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
+	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
+	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
+} from '../user-permissions/constants.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
@@ -18,6 +28,12 @@ const entityActions: Array<ManifestEntityAction> = [
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -31,6 +47,12 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'icon-blueprint',
 			label: '#actions_createblueprint',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT],
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -44,6 +66,12 @@ const entityActions: Array<ManifestEntityAction> = [
 			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			pickerModelAlias: UMB_DOCUMENT_PICKER_MODAL,
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_MOVE],
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -57,6 +85,12 @@ const entityActions: Array<ManifestEntityAction> = [
 			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			pickerModal: UMB_DOCUMENT_PICKER_MODAL,
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_DUPLICATE],
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -70,6 +104,12 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'icon-globe',
 			label: '#actions_publish',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -83,6 +123,12 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'icon-globe',
 			label: '#actions_unpublish',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH],
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -96,6 +142,12 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'icon-name-badge',
 			label: '#actions_setPermissions',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS],
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -109,6 +161,12 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'icon-megaphone',
 			label: '#actions_notify',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS],
+			},
+		],
 	},
 ];
 
