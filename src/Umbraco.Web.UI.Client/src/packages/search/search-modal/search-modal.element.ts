@@ -44,6 +44,9 @@ export class UmbSearchModalElement extends LitElement {
 		'User Group',
 	];
 
+	@state()
+	private _activeSearchTag = 'Document';
+
 	connectedCallback() {
 		super.connectedCallback();
 
@@ -104,8 +107,9 @@ export class UmbSearchModalElement extends LitElement {
 		return html`<div id="search-tags">
 			${repeat(
 				this.searchTags,
-				(provider) => provider,
-				(provider) => html`<div class="search-tag">${provider}</div>`,
+				(searchTag) => searchTag,
+				(provider) =>
+					html`<div class="search-tag ${this._activeSearchTag === provider ? 'active' : ''}">${provider}</div>`,
 			)}
 		</div> `;
 	}
@@ -207,6 +211,16 @@ export class UmbSearchModalElement extends LitElement {
 				line-height: 1;
 				white-space: nowrap;
 				border-radius: var(--uui-border-radius);
+				color: var(--uui-color-interactive);
+				cursor: pointer;
+			}
+			.search-tag:hover {
+				background: var(--uui-color-surface-emphasis);
+				color: var(--uui-color-interactive-emphasis);
+			}
+			.search-tag.active {
+				background: var(--uui-color-surface-emphasis);
+				color: var(--uui-color-interactive-emphasis);
 			}
 			:host {
 				display: flex;
