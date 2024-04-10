@@ -194,8 +194,10 @@ test.describe('Template tests', () => {
 
   test('can insert sections - render child template into a template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
+    const sectionType = 'Render child template';
+    const insertedContent = '@RenderBody()';
     await umbracoApi.template.createDefaultTemplate(templateName);
-    const templateContent = '@RenderBody()@using Umbraco.Cms.Web.Common.PublishedModels;\r\n' +
+    const templateContent = insertedContent + '@using Umbraco.Cms.Web.Common.PublishedModels;\r\n' +
       '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n' +
       '@{\r\n' +
       '\tLayout = null;\r\n' +
@@ -203,8 +205,53 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-    await umbracoUi.template.clickSectionsButton();
-    await umbracoUi.template.clickSubmitButton();
+    await umbracoUi.template.insertSection(sectionType);
+    await umbracoUi.template.clickSaveButton();
+
+    // Assert
+    await umbracoUi.template.isSuccessNotificationVisible();
+    const templateData = await umbracoApi.template.getByName(templateName);
+    expect(templateData.content).toBe(templateContent);
+  });
+
+  test('can insert sections - render a named section into a template', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const sectionType = 'Render a named section';
+    const sectionName = 'TestSectionName';
+    const insertedContent = '@RenderSection("' + sectionName + '", false)';
+    await umbracoApi.template.createDefaultTemplate(templateName);
+    const templateContent = insertedContent + '@using Umbraco.Cms.Web.Common.PublishedModels;\r\n' +
+      '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n' +
+      '@{\r\n' +
+      '\tLayout = null;\r\n' +
+      '}';
+
+    // Act
+    await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.template.insertSection(sectionType, sectionName);
+    await umbracoUi.template.clickSaveButton();
+
+    // Assert
+    await umbracoUi.template.isSuccessNotificationVisible();
+    const templateData = await umbracoApi.template.getByName(templateName);
+    expect(templateData.content).toBe(templateContent);
+  });
+
+  test('can insert sections - define a named section into a template', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const sectionType = 'Define a named section';
+    const sectionName = 'TestSectionName';
+    const insertedContent = '@section ' + sectionName + '\n{\n\n\n\n}';
+    await umbracoApi.template.createDefaultTemplate(templateName);
+    const templateContent = insertedContent + '@using Umbraco.Cms.Web.Common.PublishedModels;\r\n' +
+      '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n' +
+      '@{\r\n' +
+      '\tLayout = null;\r\n' +
+      '}';
+
+    // Act
+    await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.template.insertSection(sectionType, sectionName);
     await umbracoUi.template.clickSaveButton();
 
     // Assert
