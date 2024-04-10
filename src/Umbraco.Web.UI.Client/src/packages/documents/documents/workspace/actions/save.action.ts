@@ -1,13 +1,12 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../document-workspace.context-token.js';
 import {
-	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
+	UMB_USER_PERMISSION_DOCUMENT_CREATE,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../../user-permissions/constants.js';
 import { UmbDocumentUserPermissionCondition } from '../../user-permissions/document-user-permission.condition.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
-export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceActionBase {
+export class UmbDocumentSaveWorkspaceAction extends UmbSubmitWorkspaceAction {
 	constructor(host: UmbControllerHost, args: any) {
 		super(host, args);
 
@@ -15,22 +14,21 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 		 will first be triggered when the condition is changed to permitted */
 		this.disable();
 
+		// TODO: this check is not sufficient. It will show the save button if a use
+		// has only create options. The best solution would be to split the two buttons into two separate actions
+		// with a condition on isNew to show/hide them
+		// The server will throw a permission error if this scenario happens
 		const condition = new UmbDocumentUserPermissionCondition(host, {
 			host,
 			config: {
 				alias: 'Umb.Condition.UserPermission.Document',
-				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
+				oneOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_UPDATE],
 			},
 			onChange: () => {
 				condition.permitted ? this.enable() : this.disable();
 			},
 		});
 	}
-
-	async execute() {
-		const workspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT);
-		return workspaceContext.saveAndPublish();
-	}
 }
 
-export { UmbDocumentSaveAndPublishWorkspaceAction as api };
+export { UmbDocumentSaveWorkspaceAction as api };
