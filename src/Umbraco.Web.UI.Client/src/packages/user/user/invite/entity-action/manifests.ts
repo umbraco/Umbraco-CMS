@@ -14,7 +14,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-message',
-			label: 'Resend Invite',
+			label: '#actions_resendInvite',
 		},
 		conditions: [
 			{

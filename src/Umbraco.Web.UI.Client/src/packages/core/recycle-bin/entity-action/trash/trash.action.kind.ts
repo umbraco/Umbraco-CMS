@@ -15,7 +15,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-trash',
-			label: 'Trash...',
+			label: '#actions_trash',
 			itemRepositoryAlias: '',
 			recycleBinRepositoryAlias: '',
 		},

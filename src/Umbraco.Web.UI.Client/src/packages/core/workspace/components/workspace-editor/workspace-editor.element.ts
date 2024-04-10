@@ -110,11 +110,11 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 								(view) => view.alias,
 								(view) => html`
 									<uui-tab
-										.label="${view.meta.label || view.name}"
+										.label="${view.meta.label ? this.localize.string(view.meta.label) : view.name}"
 										href="${this._routerPath}/view/${view.meta.pathname}"
 										?active="${'view/' + view.meta.pathname === this._activePath}">
 										<umb-icon slot="icon" name="${view.meta.icon}"></umb-icon>
-										${view.meta.label || view.name}
+										${view.meta.label ? this.localize.string(view.meta.label) : view.name}
 									</uui-tab>
 								`,
 							)}

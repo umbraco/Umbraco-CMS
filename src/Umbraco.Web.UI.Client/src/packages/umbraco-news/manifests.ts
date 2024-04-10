@@ -7,7 +7,7 @@ export const dashboard: ManifestDashboard = {
 	js: () => import('./umbraco-news-dashboard.element.js'),
 	weight: 20,
 	meta: {
-		label: 'Welcome',
+		label: '#dashboardTabs_contentIntro',
 	},
 	conditions: [
 		{

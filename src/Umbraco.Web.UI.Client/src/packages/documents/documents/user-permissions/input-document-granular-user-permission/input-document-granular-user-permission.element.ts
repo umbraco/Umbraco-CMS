@@ -218,14 +218,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends FormControlMi
 			)
 			.map((m) => {
 				const manifest = m as ManifestEntityUserPermission;
-
-				if (manifest.meta.labelKey) {
-					return this.localize.term(manifest.meta.labelKey);
-				} else if (manifest.meta.label) {
-					return manifest.meta.label;
-				} else {
-					return manifest.name;
-				}
+				return manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
 			})
 			.join(', ');
 	}

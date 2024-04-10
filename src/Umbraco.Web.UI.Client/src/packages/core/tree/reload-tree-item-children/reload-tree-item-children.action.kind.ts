@@ -15,7 +15,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-refresh',
-			label: 'Reload children',
+			label: '#actions_refreshNode',
 		},
 	},
 };

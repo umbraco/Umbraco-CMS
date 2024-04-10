@@ -19,7 +19,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/relation-type-detail-workspace-view.element.js'),
 		weight: 20,
 		meta: {
-			label: 'Details',
+			label: '#general_details',
 			pathname: 'details',
 			icon: 'icon-trafic',
 		},
