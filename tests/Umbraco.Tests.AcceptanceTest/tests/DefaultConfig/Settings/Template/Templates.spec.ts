@@ -3,6 +3,7 @@ import {expect} from "@playwright/test";
 
 test.describe('Template tests', () => {
   const templateName = 'TestTemplate';
+  const defaultTemplateContent = '@using Umbraco.Cms.Web.Common.PublishedModels;\r\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n@{\r\n\tLayout = null;\r\n}';
 
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
     await umbracoApi.template.ensureNameNotExists(templateName);
@@ -28,12 +29,8 @@ test.describe('Template tests', () => {
 
   test('can update content of a template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const updatedTemplateContent = '@using Umbraco.Cms.Web.Common.PublishedModels;\r\n' +
-      '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n' +
-      '@{\r\n' +
-      '\tLayout = null;\r\n' +
-      '}\r\n' +
-      '<p>AcceptanceTests</p>';
+    const updatedTemplateContent =
+      defaultTemplateContent + '\r\n' + '<p>AcceptanceTests</p>';
 
     await umbracoApi.template.createDefaultTemplate(templateName);
 
@@ -134,7 +131,7 @@ test.describe('Template tests', () => {
       '\t\t</li>\r\n' +
       '\t}\r\n' +
       '</ul>\r\n' +
-      '\r\n@using Umbraco.Cms.Web.Common.PublishedModels;\r\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n@{\r\n\tLayout = null;\r\n}';
+      '\r\n' + defaultTemplateContent;
 
       await umbracoApi.template.createDefaultTemplate(templateName);
 
@@ -174,7 +171,7 @@ test.describe('Template tests', () => {
       '\t\t</li>\r\n' +
       '\t}\r\n' +
       '</ul>\r\n' +
-      '\r\n@using Umbraco.Cms.Web.Common.PublishedModels;\r\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n@{\r\n\tLayout = null;\r\n}';
+      '\r\n' + defaultTemplateContent;
 
       await umbracoApi.template.createDefaultTemplate(templateName);
 
@@ -197,11 +194,7 @@ test.describe('Template tests', () => {
     const sectionType = 'Render child template';
     const insertedContent = '@RenderBody()';
     await umbracoApi.template.createDefaultTemplate(templateName);
-    const templateContent = insertedContent + '@using Umbraco.Cms.Web.Common.PublishedModels;\r\n' +
-      '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n' +
-      '@{\r\n' +
-      '\tLayout = null;\r\n' +
-      '}';
+    const templateContent = insertedContent + defaultTemplateContent;
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
@@ -220,11 +213,7 @@ test.describe('Template tests', () => {
     const sectionName = 'TestSectionName';
     const insertedContent = '@RenderSection("' + sectionName + '", false)';
     await umbracoApi.template.createDefaultTemplate(templateName);
-    const templateContent = insertedContent + '@using Umbraco.Cms.Web.Common.PublishedModels;\r\n' +
-      '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n' +
-      '@{\r\n' +
-      '\tLayout = null;\r\n' +
-      '}';
+    const templateContent = insertedContent + defaultTemplateContent;
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
@@ -241,13 +230,9 @@ test.describe('Template tests', () => {
     // Arrange
     const sectionType = 'Define a named section';
     const sectionName = 'TestSectionName';
-    const insertedContent = '@section ' + sectionName + '\n{\n\n\n\n}';
+    const insertedContent = '@section ' + sectionName + '\r\n{\r\n\r\n\r\n\r\n}';
     await umbracoApi.template.createDefaultTemplate(templateName);
-    const templateContent = insertedContent + '@using Umbraco.Cms.Web.Common.PublishedModels;\r\n' +
-      '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n' +
-      '@{\r\n' +
-      '\tLayout = null;\r\n' +
-      '}';
+    const templateContent = insertedContent + defaultTemplateContent;
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
@@ -267,11 +252,7 @@ test.describe('Template tests', () => {
     const dictionaryName = 'TestDictionary';
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.create(dictionaryName);
-    const templateContent = '@Umbraco.GetDictionaryValue("TestDictionary")@using Umbraco.Cms.Web.Common.PublishedModels;\r\n' +
-      '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n' +
-      '@{\r\n' +
-      '\tLayout = null;\r\n' +
-      '}';
+    const templateContent = '@Umbraco.GetDictionaryValue("TestDictionary")' + defaultTemplateContent;
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
