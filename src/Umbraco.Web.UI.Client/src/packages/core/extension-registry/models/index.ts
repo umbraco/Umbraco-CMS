@@ -2,6 +2,7 @@ import type { ManifestAuthProvider } from './auth-provider.model.js';
 import type { ManifestBlockEditorCustomView } from './block-editor-custom-view.model.js';
 import type { ManifestCollection } from './collection.models.js';
 import type { ManifestCollectionView } from './collection-view.model.js';
+import type { ManifestCurrentUserAction, ManifestCurrentUserActionDefaultKind } from './current-user-action.model.js';
 import type { ManifestDashboard } from './dashboard.model.js';
 import type { ManifestDashboardCollection } from './dashboard-collection.model.js';
 import type {
@@ -72,6 +73,7 @@ export type * from './block-editor-custom-view.model.js';
 export type * from './collection.models.js';
 export type * from './collection-action.model.js';
 export type * from './collection-view.model.js';
+export type * from './current-user-action.model.js';
 export type * from './dashboard-collection.model.js';
 export type * from './dashboard.model.js';
 export type * from './dynamic-root.model.js';
@@ -143,6 +145,8 @@ export type ManifestTypes =
 	| ManifestCollection
 	| ManifestCollectionView
 	| ManifestCollectionAction
+	| ManifestCurrentUserAction
+	| ManifestCurrentUserActionDefaultKind
 	| ManifestCondition
 	| ManifestDashboard
 	| ManifestDashboardCollection

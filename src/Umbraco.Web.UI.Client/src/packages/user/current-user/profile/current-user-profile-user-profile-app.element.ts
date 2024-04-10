@@ -1,7 +1,8 @@
-import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_CHANGE_PASSWORD_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-current-user-profile-user-profile-app')
 export class UmbCurrentUserProfileUserProfileAppElement extends UmbLitElement {
@@ -59,9 +60,22 @@ export class UmbCurrentUserProfileUserProfileAppElement extends UmbLitElement {
 				<uui-button look="primary" label=${this.localize.term('general_changePassword')} @click=${this.#changePassword}>
 					${this.localize.term('general_changePassword')}
 				</uui-button>
+				<umb-extension-with-api-slot id="actions" type="currentUserAction"></umb-extension-with-api-slot>
 			</uui-box>
 		`;
 	}
+
+	static styles = [
+		UmbTextStyles,
+		css`
+			#actions {
+				display: flex;
+				flex-wrap: wrap;
+				flex-direction: row;
+				gap: var(--uui-size-space-2);
+			}
+		`,
+	];
 }
 
 export default UmbCurrentUserProfileUserProfileAppElement;
