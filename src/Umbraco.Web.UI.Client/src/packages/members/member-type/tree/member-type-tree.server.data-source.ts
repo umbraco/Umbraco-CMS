@@ -3,7 +3,7 @@ import type { UmbMemberTypeTreeItemModel } from './types.js';
 import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MemberTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -33,7 +33,7 @@ export class UmbMemberTypeTreeServerDataSource extends UmbTreeServerDataSourceBa
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	MemberTypeResource.getTreeMemberTypeRoot({ skip: args.skip, take: args.take });
+	MemberTypeService.getTreeMemberTypeRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parentUnique === null) {

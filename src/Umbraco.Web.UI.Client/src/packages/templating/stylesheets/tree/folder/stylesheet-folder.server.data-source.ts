@@ -1,7 +1,7 @@
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
 import type { CreateStylesheetFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { StylesheetResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -38,7 +38,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.getStylesheetFolderByPath({
+			StylesheetService.getStylesheetFolderByPath({
 				path: encodeURIComponent(path),
 			}),
 		);
@@ -75,7 +75,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.postStylesheetFolder({
+			StylesheetService.postStylesheetFolder({
 				requestBody,
 			}),
 		);
@@ -103,7 +103,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 
 		return tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.deleteStylesheetFolderByPath({
+			StylesheetService.deleteStylesheetFolderByPath({
 				path: encodeURIComponent(path),
 			}),
 		);

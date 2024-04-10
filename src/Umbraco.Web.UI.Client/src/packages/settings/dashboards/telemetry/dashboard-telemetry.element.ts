@@ -1,7 +1,7 @@
 import { css, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import type { TelemetryResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { TelemetryLevelModel, TelemetryResource, ApiError } from '@umbraco-cms/backoffice/external/backend-api';
+import { TelemetryLevelModel, TelemetryService, ApiError } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -26,10 +26,10 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	}
 
 	private async _setup() {
-		const telemetryLevels = await tryExecuteAndNotify(this, TelemetryResource.getTelemetry({ skip: 0, take: 3 }));
+		const telemetryLevels = await tryExecuteAndNotify(this, TelemetryService.getTelemetry({ skip: 0, take: 3 }));
 		this._telemetryLevels = telemetryLevels.data?.items ?? [];
 
-		const telemetryLevel = await tryExecuteAndNotify(this, TelemetryResource.getTelemetryLevel());
+		const telemetryLevel = await tryExecuteAndNotify(this, TelemetryService.getTelemetryLevel());
 		this._telemetryFormData = telemetryLevel.data?.telemetryLevel ?? TelemetryLevelModel.BASIC;
 	}
 
@@ -40,7 +40,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 
 		const { error } = await tryExecuteAndNotify(
 			this,
-			TelemetryResource.postTelemetryLevel({
+			TelemetryService.postTelemetryLevel({
 				requestBody: { telemetryLevel: this._telemetryFormData },
 			}),
 		);

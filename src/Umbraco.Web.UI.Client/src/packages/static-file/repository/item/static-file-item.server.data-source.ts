@@ -1,7 +1,7 @@
 import type { UmbStaticFileItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { StaticFileItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { StaticFileResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { StaticFileService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -28,7 +28,7 @@ export class UmbStaticFileItemServerDataSource extends UmbItemServerDataSourceBa
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => StaticFileResource.getItemStaticFile({ path: uniques });
+const getItems = (uniques: Array<string>) => StaticFileService.getItemStaticFile({ path: uniques });
 
 const mapper = (item: StaticFileItemResponseModel): UmbStaticFileItemModel => {
 	return {

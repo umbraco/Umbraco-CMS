@@ -5,7 +5,7 @@ import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { CreateMemberGroupRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MemberGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A data source for the Member Group that fetches data from the server
@@ -52,7 +52,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			MemberGroupResource.getMemberGroupById({ id: unique }),
+			MemberGroupService.getMemberGroupById({ id: unique }),
 		);
 
 		if (error || !data) {
@@ -84,7 +84,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			MemberGroupResource.postMemberGroup({
+			MemberGroupService.postMemberGroup({
 				requestBody,
 			}),
 		);
@@ -114,7 +114,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 		/*
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			MemberGroupResource.putMemberGroupById({
+			MemberGroupService.putMemberGroupById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -147,7 +147,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 		return tryExecuteAndNotify(
 			this.#host,
-			MemberGroupResource.deleteMemberGroupById({
+			MemberGroupService.deleteMemberGroupById({
 				id: unique,
 			}),
 		);

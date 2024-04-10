@@ -1,5 +1,5 @@
 import type { UmbMfaProviderConfigurationCallback, UmbMfaProviderConfigurationElementProps } from '../types.js';
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import { css, customElement, html, property, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { isApiError, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -63,7 +63,7 @@ export class UmbMfaProviderDefaultElement extends UmbLitElement implements UmbMf
 		}
 		const { data: _data } = await tryExecuteAndNotify(
 			this,
-			UserResource.getUserCurrent2FaByProviderName({ providerName: this.providerName }),
+			UserService.getUserCurrent2FaByProviderName({ providerName: this.providerName }),
 		);
 		const data: any = _data;
 		if (!data) {

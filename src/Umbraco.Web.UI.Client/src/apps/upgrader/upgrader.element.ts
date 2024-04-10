@@ -1,6 +1,6 @@
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UpgradeResource, ApiError } from '@umbraco-cms/backoffice/external/backend-api';
+import { UpgradeService, ApiError } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -43,7 +43,7 @@ export class UmbUpgraderElement extends UmbLitElement {
 	private async _setup() {
 		this.fetching = true;
 
-		const { data, error } = await tryExecute(UpgradeResource.getUpgradeSettings());
+		const { data, error } = await tryExecute(UpgradeService.getUpgradeSettings());
 
 		if (data) {
 			this.upgradeSettings = data;
@@ -59,7 +59,7 @@ export class UmbUpgraderElement extends UmbLitElement {
 		this.errorMessage = '';
 		this.upgrading = true;
 
-		const { error } = await tryExecute(UpgradeResource.postUpgradeAuthorize());
+		const { error } = await tryExecute(UpgradeService.postUpgradeAuthorize());
 
 		if (error) {
 			this.errorMessage =

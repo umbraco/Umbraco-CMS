@@ -3,7 +3,7 @@ import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { CreateUserRequestModel, UpdateUserRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -65,7 +65,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getUserById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserService.getUserById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -115,7 +115,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			UserResource.postUser({
+			UserService.postUser({
 				requestBody,
 			}),
 		);
@@ -149,7 +149,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			UserResource.putUserById({
+			UserService.putUserById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -173,7 +173,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.deleteUserById({
+			UserService.deleteUserById({
 				id: unique,
 			}),
 		);
