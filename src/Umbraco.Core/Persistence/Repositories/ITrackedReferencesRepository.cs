@@ -68,8 +68,7 @@ public interface ITrackedReferencesRepository
         long skip,
         long take,
         bool filterMustBeIsDependency,
-        out long totalRecords) =>
-        throw new NotImplementedException();
+        out long totalRecords);
 
     [Obsolete("Use overload that takes key instead of id. This will be removed in Umbraco 15.")]
     IEnumerable<RelationItemModel> GetPagedRelationsForItem(
@@ -77,8 +76,7 @@ public interface ITrackedReferencesRepository
         long skip,
         long take,
         bool filterMustBeIsDependency,
-        out long totalRecords) =>
-        throw new NotImplementedException();
+        out long totalRecords);
 
     /// <summary>
     ///     Gets a page of items used in any kind of relation from selected integer ids.
