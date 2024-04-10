@@ -4,7 +4,7 @@ export const dashboard: ManifestDashboard = {
 	type: 'dashboard',
 	alias: 'Umb.Dashboard.UmbracoNews',
 	name: 'Umbraco News Dashboard',
-	js: () => import('./umbraco-news-dashboard.element.js'),
+	element: () => import('./umbraco-news-dashboard.element.js'),
 	weight: 20,
 	meta: {
 		label: '#dashboardTabs_contentIntro',
