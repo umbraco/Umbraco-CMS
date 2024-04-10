@@ -72,7 +72,7 @@ public class MultiNodeTreePickerTests
         var value = new GuidUdi(Constants.UdiEntityType.Document, Guid.NewGuid());
         var editorValue = $"[{{\"type\" :\"{value.EntityType}\",\"unique\":\"{value.Guid}\"}}]";
         var fromEditor =
-            FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new DefaultJsonSerializer()) as string;
+            FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new SystemTextJsonSerializer()) as string;
         Assert.AreEqual(value.ToString(), fromEditor);
     }
 
@@ -89,7 +89,7 @@ public class MultiNodeTreePickerTests
         var editorValue =
             $"[{{\"type\" :\"{values[0].EntityType}\",\"unique\":\"{values[0].Guid}\"}},{{\"type\" :\"{values[1].EntityType}\",\"unique\":\"{values[1].Guid}\"}},{{\"type\" :\"{values[2].EntityType}\",\"unique\":\"{values[2].Guid}\"}}]";
 
-        var fromEditor = FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new DefaultJsonSerializer()) as string;
+        var fromEditor = FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new SystemTextJsonSerializer()) as string;
         Assert.AreEqual(string.Join(",", values.Select(v => v.ToString())), fromEditor);
     }
 
@@ -106,7 +106,7 @@ public class MultiNodeTreePickerTests
         var editorValue =
             $"[{{\"type\" :\"{expectedValues[0].EntityType}\",\"unique\":\"{expectedValues[0].Guid}\"}},{{\"type\" :\"{expectedValues[1].EntityType}\",\"unique\":\"{expectedValues[1].Guid}\"}},{{\"type\" :\"{expectedValues[2].EntityType}\",\"unique\":\"{expectedValues[2].Guid}\"}}]";
 
-        var fromEditor = FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new DefaultJsonSerializer()) as string;
+        var fromEditor = FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new SystemTextJsonSerializer()) as string;
         Assert.AreEqual(string.Join(",", expectedValues.Select(v => v.ToString())), fromEditor);
     }
 
@@ -123,7 +123,7 @@ public class MultiNodeTreePickerTests
             $"[{{\"type\" :\"{values[0].EntityType}\",\"unique\":\"{values[0].Guid}\"}},{{\"invalidProperty\" :\"nonsenseValue\",\"otherWeirdProperty\":\"definitelyNotAGuid\"}},{{\"type\" :\"{values[1].EntityType}\",\"unique\":\"{values[1].Guid}\"}}]";
 
         Assert.Catch<System.Text.Json.JsonException>(() =>
-            FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new DefaultJsonSerializer()));
+            FromEditor(JsonNode.Parse(editorValue), jsonSerializer: new SystemTextJsonSerializer()));
     }
 
     [Test]

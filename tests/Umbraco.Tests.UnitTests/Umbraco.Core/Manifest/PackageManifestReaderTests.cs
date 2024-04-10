@@ -31,7 +31,7 @@ public class PackageManifestReaderTests
         fileProviderFactoryMock.Setup(m => m.Create()).Returns(_fileProviderMock.Object);
 
         _loggerMock = new Mock<ILogger<AppPluginsPackageManifestReader>>();
-        _reader = new AppPluginsPackageManifestReader(fileProviderFactoryMock.Object, new DefaultJsonSerializer(), _loggerMock.Object);
+        _reader = new AppPluginsPackageManifestReader(fileProviderFactoryMock.Object, new SystemTextJsonSerializer(), _loggerMock.Object);
     }
 
     [Test]

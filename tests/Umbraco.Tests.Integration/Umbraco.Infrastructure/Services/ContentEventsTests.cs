@@ -2089,7 +2089,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public class LocalServerMessenger : ServerMessengerBase
         {
             public LocalServerMessenger()
-                : base(false, new DefaultJsonSerializer())
+                : base(false, new SystemTextJsonSerializer())
             {
             }
 

@@ -386,7 +386,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
         var apiMediaWithCropsBuilder = new ApiMediaWithCropsBuilder(mediaBuilder, publishedValueFallback);
 
-        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, publishedValueFallback, new DefaultJsonSerializer(), apiMediaWithCropsBuilder);
+        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, publishedValueFallback, new SystemTextJsonSerializer(), apiMediaWithCropsBuilder);
         var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker3, new MediaPicker3Configuration());
 
         return new PublishedElementPropertyBase(mediaPickerPropertyType, parent, false, PropertyCacheLevel.None, new GuidUdi(Constants.UdiEntityType.Media, pickedMediaKey).ToString());
@@ -394,7 +394,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
     internal PublishedElementPropertyBase CreateMediaPicker3Property(IPublishedElement parent, Guid pickedMediaKey, string propertyTypeAlias, IApiMediaBuilder mediaBuilder)
     {
-        var serializer = new DefaultJsonSerializer();
+        var serializer = new SystemTextJsonSerializer();
         var value = serializer.Serialize(new[]
         {
             new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
@@ -406,7 +406,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
         var apiMediaWithCropsBuilder = new ApiMediaWithCropsBuilder(mediaBuilder, publishedValueFallback);
 
-        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, publishedValueFallback, new DefaultJsonSerializer(), apiMediaWithCropsBuilder);
+        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, publishedValueFallback, new SystemTextJsonSerializer(), apiMediaWithCropsBuilder);
         var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker3, new MediaPicker3Configuration());
 
         return new PublishedElementPropertyBase(mediaPickerPropertyType, parent, false, PropertyCacheLevel.None, value);

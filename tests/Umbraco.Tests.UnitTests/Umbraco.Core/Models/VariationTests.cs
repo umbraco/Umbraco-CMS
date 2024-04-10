@@ -631,14 +631,14 @@ public class VariationTests
             => x.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()) == new TextOnlyValueEditor(
                 attribute,
                 Mock.Of<IShortStringHelper>(),
-                new DefaultJsonSerializer(),
+                new SystemTextJsonSerializer(),
                 Mock.Of<IIOHelper>()));
 
         var textBoxEditor = new TextboxPropertyEditor(
             dataValueEditorFactory,
             ioHelper);
 
-        var serializer = new DefaultConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
 
         var mockDataTypeService = new Mock<IDataTypeService>();
         Mock.Get(dataTypeService).Setup(x => x.GetDataType(It.Is<int>(y => y == Constants.DataTypes.Textbox)))

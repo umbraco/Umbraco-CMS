@@ -36,7 +36,7 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
         var editor = new BlockGridPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
             new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory),
-            new DefaultJsonSerializer(),
+            new SystemTextJsonSerializer(),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
             new BlockGridPropertyValueConstructorCache());
         return editor;

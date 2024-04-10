@@ -172,7 +172,7 @@ public class RichTextPropertyEditorHelperTests
         Assert.AreEqual(0, value.Blocks.SettingsData.Count);
     }
 
-    private IJsonSerializer JsonSerializer() => new DefaultJsonSerializer();
+    private IJsonSerializer JsonSerializer() => new SystemTextJsonSerializer();
 
     private ILogger Logger() => Mock.Of<ILogger>();
 }

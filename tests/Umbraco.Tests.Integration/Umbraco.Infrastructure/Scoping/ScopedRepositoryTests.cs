@@ -329,7 +329,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
     public class LocalServerMessenger : ServerMessengerBase
     {
         public LocalServerMessenger()
-            : base(false, new DefaultJsonSerializer())
+            : base(false, new SystemTextJsonSerializer())
         {
         }
 

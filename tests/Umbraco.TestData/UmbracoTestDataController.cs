@@ -299,7 +299,7 @@ public class UmbracoTestDataController : SurfaceController
             throw new InvalidOperationException($"No {editorAlias} editor found");
         }
 
-        var serializer = new DefaultConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
 
         dt = new DataType(editor, serializer)
         {

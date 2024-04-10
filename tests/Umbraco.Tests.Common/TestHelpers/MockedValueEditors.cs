@@ -17,7 +17,7 @@ public class MockedValueEditors
 
         return new DataValueEditor(
             Mock.Of<IShortStringHelper>(),
-            new DefaultJsonSerializer(),
+            new SystemTextJsonSerializer(),
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute(name) { ValueType = valueType });
     }
