@@ -1,6 +1,6 @@
 export default `<!-- @license lucide-static v0.367.0 - ISC -->
 <svg
-  class="lucide lucide-flask-conical"
+  class="lucide lucide-rectangle-ellipsis"
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
   fill="none"
@@ -9,8 +9,9 @@ export default `<!-- @license lucide-static v0.367.0 - ISC -->
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2" />
-  <path d="M8.5 2h7" />
-  <path d="M7 16h10" />
+  <rect width="20" height="12" x="2" y="6" rx="2" />
+  <path d="M12 12h.01" />
+  <path d="M17 12h.01" />
+  <path d="M7 12h.01" />
 </svg>
 `;
