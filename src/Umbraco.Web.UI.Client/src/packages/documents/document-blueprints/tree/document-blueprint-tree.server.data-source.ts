@@ -1,6 +1,10 @@
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentBlueprintTreeItemModel } from './types.js';
-import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type {
 	DocumentBlueprintTreeItemResponseModel,
@@ -28,6 +32,7 @@ export class UmbDocumentBlueprintTreeServerDataSource extends UmbTreeServerDataS
 		super(host, {
 			getRootItems,
 			getChildrenOf,
+			getAncestorsOf,
 			mapper,
 		});
 	}
@@ -49,6 +54,10 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		});
 		*/
 	}
+};
+
+const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
+	throw new Error('Not implemented');
 };
 
 const mapper = (item: DocumentBlueprintTreeItemResponseModel): UmbDocumentBlueprintTreeItemModel => {

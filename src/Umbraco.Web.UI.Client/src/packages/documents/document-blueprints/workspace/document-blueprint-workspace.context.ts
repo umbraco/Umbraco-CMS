@@ -1,4 +1,3 @@
-import { UmbDocumentPropertyDataContext } from '../../documents/property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentBlueprintDetailRepository } from '../repository/index.js';
 import type {
@@ -6,31 +5,39 @@ import type {
 	UmbDocumentBlueprintVariantModel,
 	UmbDocumentBlueprintVariantOptionModel,
 } from '../types.js';
-import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import {
-	UmbSubmittableWorkspaceContextBase,
-	UmbWorkspaceIsNewRedirectController,
-	UmbWorkspaceRouteManager,
-	UmbWorkspaceSplitViewManager,
-} from '@umbraco-cms/backoffice/workspace';
+import { UmbDocumentPropertyDataContext } from '../../documents/property-dataset-context/document-property-dataset-context.js';
 import {
 	appendToFrozenArray,
 	mergeObservables,
 	UmbArrayState,
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import {
+	UmbSubmittableWorkspaceContextBase,
+	UmbWorkspaceIsNewRedirectController,
+	UmbWorkspaceRouteManager,
+	UmbWorkspaceSplitViewManager,
+} from '@umbraco-cms/backoffice/workspace';
+import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import type { UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
 
 type EntityType = UmbDocumentBlueprintDetailModel;
-export class UmbDocumentBlueprintWorkspaceContext extends UmbSubmittableWorkspaceContextBase<EntityType> {
+
+export class UmbDocumentBlueprintWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
+	implements UmbRoutableWorkspaceContext
+{
 	//
-	public readonly repository = new UmbDocumentBlueprintDetailRepository(this);
+	readonly repository = new UmbDocumentBlueprintDetailRepository(this);
 
 	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
@@ -38,24 +45,20 @@ export class UmbDocumentBlueprintWorkspaceContext extends UmbSubmittableWorkspac
 	/**
 	 */
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
+
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
-	#getDataPromise?: Promise<any>;
+
 	// TODo: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public readonly languages = this.#languages.asObservable();
 
-	public isLoaded() {
-		return this.#getDataPromise;
-	}
-
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
-	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 
-	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
+	//readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
@@ -102,7 +105,7 @@ export class UmbDocumentBlueprintWorkspaceContext extends UmbSubmittableWorkspac
 	);
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.Media');
+		super(host, 'Umb.Workspace.DocumentBlueprint');
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 		this.observe(this.varies, (varies) => (this.#varies = varies));
@@ -127,9 +130,14 @@ export class UmbDocumentBlueprintWorkspaceContext extends UmbSubmittableWorkspac
 				},
 			},
 			{
+				path: 'edit/null',
+				component: () => import('./document-blueprint-root-workspace.element.js'),
+			},
+			{
 				path: 'edit/:unique',
 				component: () => import('./document-blueprint-workspace-editor.element.js'),
 				setup: (_component, info) => {
+					this.removeUmbControllerByAlias('isNewRedirectController');
 					const unique = info.match.params.unique;
 					this.load(unique);
 				},
@@ -151,9 +159,8 @@ export class UmbDocumentBlueprintWorkspaceContext extends UmbSubmittableWorkspac
 
 	async load(unique: string) {
 		this.resetState();
-		this.#getDataPromise = this.repository.requestByUnique(unique);
-		type GetDataType = Awaited<ReturnType<UmbDocumentBlueprintDetailRepository['requestByUnique']>>;
-		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
+
+		const { data, asObservable } = await this.repository.requestByUnique(unique);
 
 		if (data) {
 			this.setIsNew(false);
@@ -161,33 +168,32 @@ export class UmbDocumentBlueprintWorkspaceContext extends UmbSubmittableWorkspac
 			this.#currentData.update(data);
 		}
 
-		this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'UmbDocumentBlueprintStoreObserver');
+		if (asObservable) {
+			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'UmbDocumentBlueprintStoreObserver');
+		}
 	}
 
 	#onStoreChange(entity: EntityType | undefined) {
 		if (!entity) {
 			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
-			history.pushState(null, '', 'section/media');
+			history.pushState(null, '', 'section/document-blueprint');
 		}
 	}
 
 	async create(parent: { entityType: string; unique: string | null }, documentTypeUnique: string) {
 		this.resetState();
 		this.#parent.setValue(parent);
-		this.#getDataPromise = this.repository.createScaffold({
+
+		const { data } = await this.repository.createScaffold({
 			documentType: { unique: documentTypeUnique, collection: null },
 		});
-		const { data } = await this.#getDataPromise;
+
 		if (!data) return undefined;
 
 		this.setIsNew(true);
 		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 		return data;
-	}
-
-	getCollectionAlias() {
-		return 'Umb.Collection.Media';
 	}
 
 	getData() {
@@ -422,10 +428,12 @@ export class UmbDocumentBlueprintWorkspaceContext extends UmbSubmittableWorkspac
 
 	}
 	*/
-	/*
+
 	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbDocumentPropertyDataContext(host, this, variantId);
-	}*/
+		// TODO: [LK] Temporary workaround/hack to get the workspace to load.
+		const docCxt = new UmbDocumentWorkspaceContext(host);
+		return new UmbDocumentPropertyDataContext(host, docCxt, variantId);
+	}
 
 	public destroy(): void {
 		this.#persistedData.destroy();

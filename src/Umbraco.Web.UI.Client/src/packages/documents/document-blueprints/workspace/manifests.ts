@@ -6,9 +6,10 @@ export const UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS = 'Umb.Workspace.DocumentBlu
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS,
 	name: 'Document Blueprint Workspace',
-	js: () => import('./document-blueprint-workspace.element.js'),
+	api: () => import('./document-blueprint-workspace.context.js'),
 	meta: {
 		entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
 	},
