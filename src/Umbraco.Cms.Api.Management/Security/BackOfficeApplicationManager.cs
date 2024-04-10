@@ -64,7 +64,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                     {
                         CallbackUrlFor(backOfficeUrl, "/umbraco/swagger/oauth2-redirect.html")
                     },
-                    Type = OpenIddictConstants.ClientTypes.Public,
+                    ClientType = OpenIddictConstants.ClientTypes.Public,
                     Permissions =
                     {
                         OpenIddictConstants.Permissions.Endpoints.Authorization,
@@ -84,7 +84,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                     {
                         new Uri("https://oauth.pstmn.io/v1/callback"), new Uri("https://oauth.pstmn.io/v1/browser-callback")
                     },
-                    Type = OpenIddictConstants.ClientTypes.Public,
+                    ClientType = OpenIddictConstants.ClientTypes.Public,
                     Permissions =
                     {
                         OpenIddictConstants.Permissions.Endpoints.Authorization,
@@ -106,7 +106,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
             {
                 CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName),
             },
-            Type = OpenIddictConstants.ClientTypes.Public,
+            ClientType = OpenIddictConstants.ClientTypes.Public,
             PostLogoutRedirectUris =
             {
                 CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName),

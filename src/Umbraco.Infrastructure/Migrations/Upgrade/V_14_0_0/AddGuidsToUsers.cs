@@ -45,6 +45,10 @@ internal class AddGuidsToUsers : UnscopedMigrationBase
     {
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<UserDto>(columns, NewColumnName);
+
+        var nodeDtoTrashedIndex = $"IX_umbracoUser_userKey";
+        CreateIndex<UserDto>(nodeDtoTrashedIndex);
+
         List<NewUserDto>? userDtos = Database.Fetch<NewUserDto>();
         if (userDtos is null)
         {
