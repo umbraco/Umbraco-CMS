@@ -2500,13 +2500,13 @@ export default {
 	contentTemplatesDashboard: {
 		whatHeadline: 'What are Content Blueprints?',
 		whatDescription:
-			'Content Blueprinta are pre-defined content that can be selected when creating a new\n      content node.\n    ',
+			'Content Blueprints are pre-defined content that can be selected when creating a new content node.',
 		createHeadline: 'How do I create a Content Blueprint?',
 		createDescription:
-			'\n            <p>There are two ways to create a Content Blueprint:</p>\n            <ul>\n                <li>Right-click a content node and select "Create Content Blueprint" to create a new Content Blueprint.</li>\n                <li>Right-click the Content Blueprints tree in the Settings section and select the Document Type you want to create a Content Blueprint for.</li>\n            </ul>\n            <p>Once given a name, editors can start using the Content Blueprint as a foundation for their new page.</p>\n        ',
+			'<p>There are two ways to create a Content Blueprint:</p><ul><li>Right-click a content node and select "Create Content Blueprint" to create a new Content Blueprint.</li><li>Right-click the Content Blueprints tree in the Settings section and select the Document Type you want to create a Content Blueprint for.</li></ul><p>Once given a name, editors can start using the Content Blueprint as a foundation for their new page.</p>',
 		manageHeadline: 'How do I manage Content Blueprints?',
 		manageDescription:
-			'You can edit and delete Content Blueprints from the "Content Blueprints" tree in the\n      Settings section. Expand the Document Type which the Content Blueprint is based on and click it to edit or delete\n      it.\n    ',
+			'You can edit and delete Content Blueprints from the "Content Blueprints" tree in the Settings section. Expand the Document Type which the Content Blueprint is based on and click it to edit or delete it.',
 	},
 	preview: {
 		endLabel: 'End',

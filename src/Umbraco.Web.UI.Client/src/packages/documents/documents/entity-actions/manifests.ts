@@ -2,7 +2,6 @@ import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_ITEM_REPOSITORY_ALIA
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_PICKER_MODAL } from '../modals/index.js';
 import {
-	UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT,
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,
 	UMB_USER_PERMISSION_DOCUMENT_DUPLICATE,
 	UMB_USER_PERMISSION_DOCUMENT_MOVE,
@@ -12,6 +11,7 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
 } from '../user-permissions/constants.js';
 import { manifests as createManifests } from './create/manifests.js';
+import { manifests as createBlueprintManifests } from './create-blueprint/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
 import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
@@ -32,25 +32,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
-			},
-		],
-	},
-	{
-		type: 'entityAction',
-		kind: 'default',
-		alias: 'Umb.EntityAction.Document.CreateBlueprint',
-		name: 'Create Document Blueprint Entity Action',
-		weight: 1000,
-		api: () => import('./create-blueprint.action.js'),
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-		meta: {
-			icon: 'icon-blueprint',
-			label: '#actions_createblueprint',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.UserPermission.Document',
-				allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT],
 			},
 		],
 	},
@@ -172,6 +153,7 @@ const entityActions: Array<ManifestEntityAction> = [
 
 export const manifests = [
 	...createManifests,
+	...createBlueprintManifests,
 	...publicAccessManifests,
 	...cultureAndHostnamesManifests,
 	...sortChildrenOfManifests,
