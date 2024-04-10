@@ -153,6 +153,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	}
 
 	#observeExtensions(): void {
+		// We want to be attached before we start observing extensions, cause first at this point we know that we got the right properties. [NL]
 		if (!this.#attached) return;
 		this.#extensionsController?.destroy();
 		if (this.#type) {
