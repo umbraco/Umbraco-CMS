@@ -1,15 +1,12 @@
 ﻿using Asp.Versioning;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Security;
-using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.DenyLocalLoginIfConfigured)]
 // FIXME: Add requiring password reset token policy when its implemented
 public class ConfigurationSecurityController : SecurityControllerBase
 {
@@ -21,7 +18,7 @@ public class ConfigurationSecurityController : SecurityControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(SecurityConfigurationResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Configuration()
+    public async Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         var viewModel = new SecurityConfigurationResponseModel
         {

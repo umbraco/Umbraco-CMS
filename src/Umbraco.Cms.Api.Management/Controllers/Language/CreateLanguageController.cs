@@ -14,7 +14,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessLanguages)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
 public class CreateLanguageController : LanguageControllerBase
 {
     private readonly ILanguageService _languageService;
@@ -36,7 +36,9 @@ public class CreateLanguageController : LanguageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create(CreateLanguageRequestModel createLanguageRequestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        CreateLanguageRequestModel createLanguageRequestModel)
     {
         ILanguage created = _umbracoMapper.Map<ILanguage>(createLanguageRequestModel)!;
 

@@ -7,10 +7,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("log-viewer")]
 [ApiExplorerSettings(GroupName = "Log Viewer")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessSettings)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
 public abstract class LogViewerControllerBase : ManagementApiControllerBase
 {
     protected IActionResult LogViewerOperationStatusResult(LogViewerOperationStatus status) =>

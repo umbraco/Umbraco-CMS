@@ -334,6 +334,7 @@
     <key alias="variantSendForApprovalNotAllowed">Send for approval is not allowed</key>
     <key alias="variantScheduleNotAllowed">Schedule is not allowed</key>
     <key alias="variantUnpublishNotAllowed">Unpublish is not allowed</key>
+    <key alias="selectAllVariants">Select all variants</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Create a new Content Template from <em>%0%</em>]]></key>

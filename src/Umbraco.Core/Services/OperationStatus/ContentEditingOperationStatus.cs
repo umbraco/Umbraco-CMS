@@ -18,5 +18,7 @@ public enum ContentEditingOperationStatus
     SortingInvalid,
     PropertyValidationError,
     InvalidCulture,
-    Unknown
+    DuplicateKey,
+    DuplicateName,
+    Unknown,
 }

@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -38,6 +39,7 @@ public partial class PartialViewSnippetCollectionBuilder : LazyCollectionBuilder
     private string CleanUpSnippetContent(string content)
     {
         const string partialViewHeader = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage";
+        content = content.EnsureNativeLineEndings();
 
         // Strip the @inherits if it's there
         Regex headerMatch = HeaderRegex();

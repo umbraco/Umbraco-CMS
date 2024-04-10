@@ -73,4 +73,55 @@ public class EnsureUniqueValuesValidatorTest
                 null);
         Assert.AreEqual(2, result.Count());
     }
+
+    [Test]
+    public void Handles_Null()
+    {
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
+        var result =
+            validator.Validate(
+                null,
+                null,
+                null);
+        Assert.AreEqual(0, result.Count());
+    }
+
+    [Test]
+    public void Handles_IEnumerable_Of_String()
+    {
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
+        IEnumerable<string> value = new[] { "one", "two", "three" };
+        var result =
+            validator.Validate(
+                value,
+                null,
+                null);
+        Assert.AreEqual(0, result.Count());
+    }
+
+    [Test]
+    public void Handles_Array_Of_String()
+    {
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
+        string[] value = { "one", "two", "three" };
+        var result =
+            validator.Validate(
+                value,
+                null,
+                null);
+        Assert.AreEqual(0, result.Count());
+    }
+
+    [Test]
+    public void Handles_List_Of_String()
+    {
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
+        var value = new List<string> { "one", "two", "three" };
+        var result =
+            validator.Validate(
+                value,
+                null,
+                null);
+        Assert.AreEqual(0, result.Count());
+    }
 }

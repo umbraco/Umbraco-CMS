@@ -274,14 +274,14 @@ internal class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
             new NodeDto
             {
-                NodeId = -20,
+                NodeId = Constants.System.RecycleBinContent,
                 Trashed = false,
                 ParentId = -1,
                 UserId = -1,
                 Level = 0,
                 Path = "-1,-20",
                 SortOrder = 0,
-                UniqueId = new Guid("0F582A79-1E41-4CF0-BFA0-76340651891A"),
+                UniqueId = Constants.System.RecycleBinContentKey,
                 Text = "Recycle Bin",
                 NodeObjectType = Constants.ObjectTypes.ContentRecycleBin,
                 CreateDate = DateTime.Now,
@@ -289,14 +289,14 @@ internal class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
             new NodeDto
             {
-                NodeId = -21,
+                NodeId = Constants.System.RecycleBinMedia,
                 Trashed = false,
                 ParentId = -1,
                 UserId = -1,
                 Level = 0,
                 Path = "-1,-21",
                 SortOrder = 0,
-                UniqueId = new Guid("BF7C7CBC-952F-4518-97A2-69E9C7B33842"),
+                UniqueId = Constants.System.RecycleBinMediaKey,
                 Text = "Recycle Bin",
                 NodeObjectType = Constants.ObjectTypes.MediaRecycleBin,
                 CreateDate = DateTime.Now,
@@ -771,44 +771,7 @@ internal class DatabaseDataCreator
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
-        ConditionalInsert(
-            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
-            Constants.DataTypes.Guids.MediaPicker,
-            new NodeDto
-            {
-                NodeId = 1048,
-                Trashed = false,
-                ParentId = -1,
-                UserId = -1,
-                Level = 1,
-                Path = "-1,1048",
-                SortOrder = 2,
-                UniqueId = Constants.DataTypes.Guids.MediaPickerGuid,
-                Text = "Media Picker (legacy)",
-                NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
-            },
-            Constants.DatabaseSchema.Tables.Node,
-            "id");
-        ConditionalInsert(
-            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
-            Constants.DataTypes.Guids.MultipleMediaPicker,
-            new NodeDto
-            {
-                NodeId = 1049,
-                Trashed = false,
-                ParentId = -1,
-                UserId = -1,
-                Level = 1,
-                Path = "-1,1049",
-                SortOrder = 2,
-                UniqueId = Constants.DataTypes.Guids.MultipleMediaPickerGuid,
-                Text = "Multiple Media Picker (legacy)",
-                NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
-            },
-            Constants.DatabaseSchema.Tables.Node,
-            "id");
+
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
             Constants.DataTypes.Guids.RelatedLinks,
@@ -2352,6 +2315,14 @@ internal class DatabaseDataCreator
         var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
         var stateValueKey = upgrader.StateValueKey;
         var finalState = upgrader.Plan.FinalState;
+
+        _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false,
+            new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });
+
+
+        upgrader = new Upgrader(new UmbracoPremigrationPlan());
+        stateValueKey = upgrader.StateValueKey;
+        finalState = upgrader.Plan.FinalState;
 
         _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false,
             new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });

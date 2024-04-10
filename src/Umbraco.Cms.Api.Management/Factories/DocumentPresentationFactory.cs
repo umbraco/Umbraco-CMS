@@ -1,6 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
@@ -16,29 +15,24 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal sealed class DocumentPresentationFactory
-    : ContentPresentationFactoryBase<IContentType, IContentTypeService>, IDocumentPresentationFactory
+internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IDocumentUrlFactory _documentUrlFactory;
-    private readonly IFileService _fileService;
-    private readonly IContentTypeService _contentTypeService;
+    private readonly ITemplateService _templateService;
     private readonly IPublicAccessService _publicAccessService;
     private readonly TimeProvider _timeProvider;
 
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IDocumentUrlFactory documentUrlFactory,
-        IFileService fileService,
-        IContentTypeService contentTypeService,
+        ITemplateService templateService,
         IPublicAccessService publicAccessService,
         TimeProvider timeProvider)
-        : base(contentTypeService, umbracoMapper)
     {
         _umbracoMapper = umbracoMapper;
         _documentUrlFactory = documentUrlFactory;
-        _fileService = fileService;
-        _contentTypeService = contentTypeService;
+        _templateService = templateService;
         _publicAccessService = publicAccessService;
         _timeProvider = timeProvider;
     }
@@ -50,7 +44,7 @@ internal sealed class DocumentPresentationFactory
         responseModel.Urls = await _documentUrlFactory.CreateUrlsAsync(content);
 
         Guid? templateKey = content.TemplateId.HasValue
-            ? _fileService.GetTemplate(content.TemplateId.Value)?.Key
+            ? _templateService.GetAsync(content.TemplateId.Value).Result?.Key
             : null;
 
         responseModel.Template = templateKey.HasValue
@@ -70,26 +64,23 @@ internal sealed class DocumentPresentationFactory
 
         responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
 
-        IContentType? contentType = _contentTypeService.Get(entity.ContentTypeAlias);
-        if (contentType is not null)
-        {
-            responseModel.DocumentType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(contentType)!;
-        }
+        responseModel.DocumentType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
         return responseModel;
     }
 
-    public DocumentBlueprintResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity)
+    public DocumentBlueprintItemResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity)
     {
-        var responseModel = new DocumentBlueprintResponseModel()
+        var responseModel = new DocumentBlueprintItemResponseModel
         {
             Id = entity.Key,
+            Name = entity.Name ?? string.Empty,
         };
 
-        IContentType? contentType = _contentTypeService.Get(entity.ContentTypeAlias);
-        responseModel.Name = contentType?.Name ?? entity.Name ?? string.Empty;
+        responseModel.DocumentType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
+
         return responseModel;
     }
 
@@ -118,7 +109,7 @@ internal sealed class DocumentPresentationFactory
     }
 
     public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity)
-        => CreateContentTypeReferenceResponseModel<DocumentTypeReferenceResponseModel>(entity);
+        => _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 
     public Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel)
     {

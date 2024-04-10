@@ -187,19 +187,6 @@ public class ContentSettings
     public string PreviewBadge { get; set; } = StaticDefaultPreviewBadge;
 
     /// <summary>
-    ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
-    /// </summary>
-    [DefaultValue(StaticDisallowedUploadFiles)]
-    [Obsolete("Please use DisAllowedUploadedFileExtensions instead, scheduled for removal in V13")]
-    public IEnumerable<string> DisallowedUploadFiles { get; set; } = StaticDisallowedUploadFiles.Split(',');
-
-    /// <summary>
-    ///     Gets or sets a value for the collection of file extensions that are allowed for upload.
-    /// </summary>
-    [Obsolete("Please use AllowedUploadedFileExtensions instead, scheduled for removal in V13")]
-    public IEnumerable<string> AllowedUploadFiles { get; set; } = Array.Empty<string>();
-
-    /// <summary>
     ///     Gets or sets a value indicating whether deprecated property editors should be shown.
     /// </summary>
     [DefaultValue(StaticShowDeprecatedPropertyEditors)]

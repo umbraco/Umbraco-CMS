@@ -36,7 +36,7 @@ public class MemberApplicationManager : OpenIdDictApplicationManagerBase, IMembe
         {
             DisplayName = "Umbraco member access",
             ClientId = Constants.OAuthClientIds.Member,
-            Type = OpenIddictConstants.ClientTypes.Public,
+            ClientType = OpenIddictConstants.ClientTypes.Public,
             Permissions =
             {
                 OpenIddictConstants.Permissions.Endpoints.Authorization,

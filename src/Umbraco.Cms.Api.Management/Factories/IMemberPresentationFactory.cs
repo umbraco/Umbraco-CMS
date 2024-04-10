@@ -4,14 +4,15 @@ using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IMemberPresentationFactory
 {
-    Task<MemberResponseModel> CreateResponseModelAsync(IMember member);
+    Task<MemberResponseModel> CreateResponseModelAsync(IMember member, IUser currentUser);
 
-    Task<IEnumerable<MemberResponseModel>> CreateMultipleAsync(IEnumerable<IMember> members);
+    Task<IEnumerable<MemberResponseModel>> CreateMultipleAsync(IEnumerable<IMember> members, IUser currentUser);
 
     MemberItemResponseModel CreateItemResponseModel(IMemberEntitySlim entity);
 

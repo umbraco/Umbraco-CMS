@@ -15,7 +15,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessWebhooks)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
 public class UpdateWebhookController : WebhookControllerBase
 {
     private readonly IWebhookService _webhookService;
@@ -34,7 +34,10 @@ public class UpdateWebhookController : WebhookControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update(Guid id, UpdateWebhookRequestModel updateWebhookRequestModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateWebhookRequestModel updateWebhookRequestModel)
     {
         IWebhook? current = await _webhookService.GetAsync(id);
         if (current is null)

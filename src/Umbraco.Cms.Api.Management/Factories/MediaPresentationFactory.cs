@@ -1,34 +1,23 @@
-﻿using Microsoft.Extensions.Options;
-using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal sealed class MediaPresentationFactory
-    : ContentPresentationFactoryBase<IMediaType, IMediaTypeService>, IMediaPresentationFactory
+internal sealed class MediaPresentationFactory : IMediaPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly IMediaTypeService _mediaTypeService;
     private readonly IMediaUrlFactory _mediaUrlFactory;
 
     public MediaPresentationFactory(
         IUmbracoMapper umbracoMapper,
-        IMediaTypeService mediaTypeService,
         IMediaUrlFactory mediaUrlFactory)
-        : base(mediaTypeService, umbracoMapper)
     {
         _umbracoMapper = umbracoMapper;
-        _mediaTypeService = mediaTypeService;
         _mediaUrlFactory = mediaUrlFactory;
     }
 
@@ -49,11 +38,7 @@ internal sealed class MediaPresentationFactory
             IsTrashed = entity.Trashed
         };
 
-        IMediaType? mediaType = _mediaTypeService.Get(entity.ContentTypeAlias);
-        if (mediaType is not null)
-        {
-            responseModel.MediaType = _umbracoMapper.Map<MediaTypeReferenceResponseModel>(mediaType)!;
-        }
+        responseModel.MediaType = _umbracoMapper.Map<MediaTypeReferenceResponseModel>(entity)!;
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
@@ -71,5 +56,5 @@ internal sealed class MediaPresentationFactory
         };
 
     public MediaTypeReferenceResponseModel CreateMediaTypeReferenceResponseModel(IMediaEntitySlim entity)
-        => CreateContentTypeReferenceResponseModel<MediaTypeReferenceResponseModel>(entity);
+        => _umbracoMapper.Map<MediaTypeReferenceResponseModel>(entity)!;
 }

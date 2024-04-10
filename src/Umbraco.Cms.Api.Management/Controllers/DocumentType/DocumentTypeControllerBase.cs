@@ -8,10 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
-[ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DocumentType)]
 [ApiExplorerSettings(GroupName = "Document Type")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)
@@ -45,6 +44,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Invalid container name")
                     .WithDetail("One or more container names are invalid")
                     .Build()),
+                ContentTypeOperationStatus.InvalidContainerType => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid container type")
+                    .WithDetail("One or more container types are invalid")
+                    .Build()),
                 ContentTypeOperationStatus.MissingContainer => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Missing container")
                     .WithDetail("One or more containers or properties are listed as parents to containers that are not defined.")
@@ -74,6 +77,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                         .WithTitle("Duplicate property type alias")
                         .WithDetail("One or more property type aliases are already in use, all property type aliases must be unique.")
                         .Build()),
+                ContentTypeOperationStatus.NotAllowed => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Operation not permitted")
+                    .WithDetail("The attempted operation was not permitted, likely due to a permission/configuration mismatch with the operation.")
+                    .Build()),
                 _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
             });
 

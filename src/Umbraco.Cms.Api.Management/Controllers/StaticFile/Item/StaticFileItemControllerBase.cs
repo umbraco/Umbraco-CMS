@@ -4,7 +4,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Item;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/static-file")]
 [ApiExplorerSettings(GroupName = "Static File")]
 public class StaticFileItemControllerBase : ManagementApiControllerBase
