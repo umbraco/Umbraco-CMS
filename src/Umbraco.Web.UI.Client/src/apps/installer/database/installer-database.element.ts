@@ -170,7 +170,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 				if (error) {
 					this._validationErrorMessage = `The server could not validate the database connection. Details: ${
-						error instanceof ApiError ? error.body.detail : error.message
+						error instanceof ApiError ? (error.body as any).detail : error.message
 					}`;
 					this._installButton.state = 'failed';
 					return;
@@ -195,10 +195,10 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 		this._installerContext.nextStep();
 
-		const { error } = await tryExecute(
+		const { error: _error } = await tryExecute(
 			InstallResource.postInstallSetup({ requestBody: this._installerContext.getData() }),
 		);
-
+		const error = _error as ProblemDetails | undefined;
 		if (error) {
 			this._handleRejected(error);
 		} else {

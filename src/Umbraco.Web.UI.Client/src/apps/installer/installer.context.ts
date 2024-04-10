@@ -119,7 +119,8 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	private async _loadInstallerSettings() {
-		const { data, error } = await tryExecute(InstallResource.getInstallSettings());
+		const { data, error: _error } = await tryExecute(InstallResource.getInstallSettings());
+		const error: any = _error;
 		if (data) {
 			this._settings.setValue(data);
 		} else if (error) {
