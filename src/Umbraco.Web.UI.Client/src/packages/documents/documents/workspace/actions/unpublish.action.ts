@@ -7,3 +7,5 @@ export class UmbDocumentUnpublishWorkspaceAction extends UmbWorkspaceActionBase 
 		return workspaceContext.unpublish();
 	}
 }
+
+export { UmbDocumentUnpublishWorkspaceAction as api };

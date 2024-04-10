@@ -7,7 +7,6 @@ import { manifests as createManifests } from './create/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
-	...createManifests,
 	{
 		type: 'entityAction',
 		kind: 'delete',

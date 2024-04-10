@@ -5,7 +5,7 @@ import type {
 	DictionaryItemItemResponseModel,
 	DictionaryItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DictionaryResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -32,7 +32,7 @@ export class UmbDictionaryItemServerDataSource extends UmbItemServerDataSourceBa
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DictionaryResource.getItemDictionary({ id: uniques });
+const getItems = (uniques: Array<string>) => DictionaryService.getItemDictionary({ id: uniques });
 
 const mapper = (item: DictionaryItemItemResponseModel): UmbDictionaryItemModel => {
 	return {

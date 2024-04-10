@@ -1,7 +1,7 @@
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMediaRecycleBinTreeItemModel } from './types.js';
 import type { MediaRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MediaResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -37,14 +37,14 @@ export class UmbMediaRecycleBinTreeServerDataSource extends UmbTreeServerDataSou
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	MediaResource.getRecycleBinMediaRoot({ skip: args.skip, take: args.take });
+	MediaService.getRecycleBinMediaRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parentUnique === null) {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return MediaResource.getRecycleBinMediaChildren({
+		return MediaService.getRecycleBinMediaChildren({
 			parentId: args.parentUnique,
 			skip: args.skip,
 			take: args.take,
@@ -54,7 +54,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	MediaResource.getTreeMediaAncestors({
+	MediaService.getTreeMediaAncestors({
 		descendantId: args.descendantUnique,
 	});
 

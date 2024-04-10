@@ -1,5 +1,5 @@
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../types.js';
-import { DirectionModel, DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DirectionModel, DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { DocumentCollectionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
@@ -28,7 +28,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 			take: query.take ?? 100,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, DocumentResource.getCollectionDocumentById(params));
+		const { data, error } = await tryExecuteAndNotify(this.#host, DocumentService.getCollectionDocumentById(params));
 
 		if (data) {
 			const items = data.items.map((item: DocumentCollectionResponseModel) => {
@@ -46,7 +46,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					updateDate: new Date(variant.updateDate),
 					updater: item.updater,
 					values: item.values.map((item) => {
-						return { alias: item.alias, value: item.value };
+						return { alias: item.alias, value: item.value as string };
 					}),
 				};
 				return model;

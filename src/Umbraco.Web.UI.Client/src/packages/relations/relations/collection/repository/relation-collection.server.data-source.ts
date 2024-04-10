@@ -2,7 +2,7 @@ import type { UmbRelationCollectionFilterModel } from '../types.js';
 import type { UmbRelationDetailModel } from '../../types.js';
 import { UMB_RELATION_ENTITY_TYPE } from '../../entity.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
-import { RelationResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { RelationService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -37,7 +37,7 @@ export class UmbRelationCollectionServerDataSource implements UmbCollectionDataS
 			id: filter.relationType.unique,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, RelationResource.getRelationTypeById(requestBody));
+		const { data, error } = await tryExecuteAndNotify(this.#host, RelationService.getRelationTypeById(requestBody));
 
 		if (data) {
 			const items = data.items.map((item) => {

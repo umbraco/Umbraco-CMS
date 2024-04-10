@@ -37,4 +37,20 @@ export abstract class UmbWorkspaceActionBase<ArgsMetaType = never>
 	public execute(): Promise<void> {
 		return Promise.resolve();
 	}
+
+	/**
+	 * Disables the action.
+	 * @memberof UmbWorkspaceActionBase
+	 */
+	public disable(): void {
+		this._isDisabled.setValue(true);
+	}
+
+	/**
+	 * Enables the action.
+	 * @memberof UmbWorkspaceActionBase
+	 */
+	public enable(): void {
+		this._isDisabled.setValue(false);
+	}
 }

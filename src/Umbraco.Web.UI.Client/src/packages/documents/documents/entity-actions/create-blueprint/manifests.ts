@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT } from '../../user-permissions/constants.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -14,6 +15,12 @@ const entityActions: Array<ManifestTypes> = [
 			icon: 'icon-blueprint',
 			label: '#actions_createblueprint',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT],
+			},
+		],
 	},
 ];
 
