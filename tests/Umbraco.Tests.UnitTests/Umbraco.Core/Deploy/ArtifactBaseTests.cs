@@ -20,7 +20,7 @@ public class ArtifactBaseTests
         var serialized = JsonConvert.SerializeObject(artifact);
 
         var expected =
-            "{\"Udi\":\"umb://test/3382d5433b5749d08919bc9961422a1f\",\"Dependencies\":[],\"Name\":\"Test Name\",\"Alias\":\"testAlias\"}";
+            "{\"Udi\":\"umb://test/3382d5433b5749d08919bc9961422a1f\",\"Dependencies\":[],\"Checksum\":\"test checksum value\",\"Name\":\"Test Name\",\"Alias\":\"testAlias\"}";
         Assert.AreEqual(expected, serialized);
     }
 

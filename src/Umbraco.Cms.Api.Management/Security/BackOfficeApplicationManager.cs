@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Security;
 
@@ -63,7 +64,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                     {
                         CallbackUrlFor(backOfficeUrl, "/umbraco/swagger/oauth2-redirect.html")
                     },
-                    Type = OpenIddictConstants.ClientTypes.Public,
+                    ClientType = OpenIddictConstants.ClientTypes.Public,
                     Permissions =
                     {
                         OpenIddictConstants.Permissions.Endpoints.Authorization,
@@ -83,7 +84,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                     {
                         new Uri("https://oauth.pstmn.io/v1/callback"), new Uri("https://oauth.pstmn.io/v1/browser-callback")
                     },
-                    Type = OpenIddictConstants.ClientTypes.Public,
+                    ClientType = OpenIddictConstants.ClientTypes.Public,
                     Permissions =
                     {
                         OpenIddictConstants.Permissions.Endpoints.Authorization,
@@ -103,14 +104,13 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
             ClientId = Constants.OAuthClientIds.BackOffice,
             RedirectUris =
             {
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName)
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName),
             },
-            Type = OpenIddictConstants.ClientTypes.Public,
+            ClientType = OpenIddictConstants.ClientTypes.Public,
             PostLogoutRedirectUris =
             {
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName + "/login"),
-                // FIXME: remove when we no longer use Umbraco.Web.UI project
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName)
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName),
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName.EnsureEndsWith("/") + "logout"),
             },
             Permissions =
             {

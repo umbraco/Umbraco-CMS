@@ -54,8 +54,8 @@ public static partial class UmbracoBuilderExtensions
                 .AddLogViewer()
                 .AddUsers()
                 .AddUserGroups()
-                .AddTours()
                 .AddPackages()
+                .AddManifests()
                 .AddEntities()
                 .AddScripts()
                 .AddPartialViews()
@@ -66,7 +66,8 @@ public static partial class UmbracoBuilderExtensions
                 .AddWebhooks()
                 .AddPreview()
                 .AddPasswordConfiguration()
-                .AddSupplemenataryLocalizedTextFileSources();
+                .AddSupplemenataryLocalizedTextFileSources()
+                .AddUserData();
 
             services
                 .ConfigureOptions<ConfigureApiBehaviorOptions>()
@@ -85,8 +86,8 @@ public static partial class UmbracoBuilderExtensions
                 options.AddFilter(new UmbracoPipelineFilter(
                     "BackOfficeManagementApiFilter",
                     applicationBuilder => applicationBuilder.UseProblemDetailsExceptionHandling(),
-                    applicationBuilder => { },
-                    applicationBuilder => applicationBuilder.UseEndpoints()));
+                    postPipeline: _ => { },
+                    endpoints: applicationBuilder => applicationBuilder.UseEndpoints()));
             });
         }
 

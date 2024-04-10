@@ -36,7 +36,7 @@ public class CreateDocumentBlueprintController : DocumentBlueprintControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateDocumentBlueprintRequestModel requestModel)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, CreateDocumentBlueprintRequestModel requestModel)
     {
         ContentBlueprintCreateModel model = _blueprintEditingPresentationFactory.MapCreateModel(requestModel);
 
