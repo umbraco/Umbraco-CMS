@@ -10,7 +10,6 @@ import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event'
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { c } from 'node_modules/msw/lib/glossary-de6278a9.js';
 
 @customElement('umb-input-document-granular-user-permission')
 export class UmbInputDocumentGranularUserPermissionElement extends FormControlMixin(UmbLitElement) {
