@@ -1,4 +1,4 @@
-import type { ApiRequestOptions } from './ApiRequestOptions.js';
+import type { ApiRequestOptions } from './ApiRequestOptions';
 
 type Headers = Record<string, string>;
 type Middleware<T> = (value: T) => T | Promise<T>;

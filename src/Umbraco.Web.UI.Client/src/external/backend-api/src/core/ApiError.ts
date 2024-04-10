@@ -1,5 +1,5 @@
-import type { ApiRequestOptions } from './ApiRequestOptions.js';
-import type { ApiResult } from './ApiResult.js';
+import type { ApiRequestOptions } from './ApiRequestOptions';
+import type { ApiResult } from './ApiResult';
 
 export class ApiError extends Error {
 	public readonly url: string;
