@@ -39,5 +39,5 @@ public interface IDataTypeConfigurationConnector
     /// <returns>
     /// The data type configuration.
     /// </returns>
-    object? FromArtifact(IDataType dataType, string? configuration, IContextCache contextCache);
+    IDictionary<string, object> FromArtifact(IDataType dataType, string? configuration, IContextCache contextCache);
 }
