@@ -43,6 +43,6 @@ public class MediaUrlFactory : IMediaUrlFactory
             })
             .ToArray();
 
-    public IEnumerable<MediaUrlInfoResourceSet> CreateUrlSets(IEnumerable<IMedia> mediaItems) =>
-        mediaItems.Select(media => new MediaUrlInfoResourceSet(media.Key, CreateUrls(media))).ToArray();
+    public IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems) =>
+        mediaItems.Select(media => new MediaUrlInfoResponseModel(media.Key, CreateUrls(media))).ToArray();
 }

@@ -1,8 +1,8 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
-public sealed class DocumentUrlInfoResourceSet
+public sealed class DocumentUrlInfoResponseModel
 {
-    public DocumentUrlInfoResourceSet(Guid id, IEnumerable<DocumentUrlInfo> urlInfos)
+    public DocumentUrlInfoResponseModel(Guid id, IEnumerable<DocumentUrlInfo> urlInfos)
     {
         Id = id;
         UrlInfos = urlInfos;

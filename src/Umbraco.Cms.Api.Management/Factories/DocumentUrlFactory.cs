@@ -65,14 +65,14 @@ public class DocumentUrlFactory : IDocumentUrlFactory
             .ToArray();
     }
 
-    public async Task<IEnumerable<DocumentUrlInfoResourceSet>> CreateUrlSetsAsync(IEnumerable<IContent> contentItems)
+    public async Task<IEnumerable<DocumentUrlInfoResponseModel>> CreateUrlSetsAsync(IEnumerable<IContent> contentItems)
     {
-        var documentUrlInfoResourceSets = new List<DocumentUrlInfoResourceSet>();
+        var documentUrlInfoResourceSets = new List<DocumentUrlInfoResponseModel>();
 
         foreach (IContent content in contentItems)
         {
             IEnumerable<DocumentUrlInfo> urls = await CreateUrlsAsync(content);
-            documentUrlInfoResourceSets.Add(new DocumentUrlInfoResourceSet(content.Key, urls));
+            documentUrlInfoResourceSets.Add(new DocumentUrlInfoResponseModel(content.Key, urls));
         }
 
         return documentUrlInfoResourceSets;

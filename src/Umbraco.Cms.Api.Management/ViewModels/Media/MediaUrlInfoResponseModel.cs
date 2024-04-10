@@ -1,8 +1,8 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Media;
 
-public sealed class MediaUrlInfoResourceSet
+public sealed class MediaUrlInfoResponseModel
 {
-    public MediaUrlInfoResourceSet(Guid id, IEnumerable<MediaUrlInfo> urlInfos)
+    public MediaUrlInfoResponseModel(Guid id, IEnumerable<MediaUrlInfo> urlInfos)
     {
         Id = id;
         UrlInfos = urlInfos;

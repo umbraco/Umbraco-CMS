@@ -6,5 +6,5 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public interface IMediaUrlFactory
 {
     IEnumerable<MediaUrlInfo> CreateUrls(IMedia media);
-    IEnumerable<MediaUrlInfoResourceSet> CreateUrlSets(IEnumerable<IMedia> mediaItems);
+    IEnumerable<MediaUrlInfoResponseModel> CreateUrlSets(IEnumerable<IMedia> mediaItems);
 }

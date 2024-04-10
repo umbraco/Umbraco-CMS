@@ -25,7 +25,7 @@ public class DocumentUrlController : DocumentControllerBase
 
     [MapToApiVersion("1.0")]
     [HttpGet("urls")]
-    [ProducesResponseType(typeof(IEnumerable<DocumentUrlInfoResourceSet>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<DocumentUrlInfoResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> GetUrls([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IContent> items = _contentService.GetByIds(ids);
