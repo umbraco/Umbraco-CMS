@@ -1,16 +1,21 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
-import type { UmbDocumentWorkspaceViewEditTabElement } from './document-workspace-view-edit-tab.element.js';
+import type { UmbContentWorkspaceViewEditTabElement } from './content-editor-tab.element.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbContentTypeModel,
+	UmbContentTypeStructureManager,
+	UmbPropertyTypeContainerModel,
+} from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import './content-editor-tab.element.js';
 
-@customElement('umb-document-workspace-view-edit')
-export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
+@customElement('umb-content-workspace-view-edit')
+export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	//@state()
 	//private _hasRootProperties = false;
 
@@ -29,9 +34,9 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 	@state()
 	private _activePath = '';
 
-	private _workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+	#structureManager?: UmbContentTypeStructureManager<UmbContentTypeModel>;
 
-	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<any>(this);
+	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	constructor() {
 		super();
@@ -49,18 +54,18 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._workspaceContext = workspaceContext;
+		this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#structureManager = workspaceContext.structure;
 			this._tabsStructureHelper.setStructureManager(workspaceContext.structure);
 			this._observeRootGroups();
 		});
 	}
 
 	private _observeRootGroups() {
-		if (!this._workspaceContext) return;
+		if (!this.#structureManager) return;
 
 		this.observe(
-			this._workspaceContext.structure.hasRootContainers('Group'),
+			this.#structureManager.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
 				this._createRoutes();
@@ -70,7 +75,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 	}
 
 	private _createRoutes() {
-		if (!this._tabs || !this._workspaceContext) return;
+		if (!this._tabs || !this.#structureManager) return;
 		const routes: UmbRoute[] = [];
 
 		if (this._tabs.length > 0) {
@@ -78,9 +83,9 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 				const tabName = tab.name ?? '';
 				routes.push({
 					path: `tab/${encodeFolderName(tabName).toString()}`,
-					component: () => import('./document-workspace-view-edit-tab.element.js'),
+					component: () => import('./content-editor-tab.element.js'),
 					setup: (component) => {
-						(component as UmbDocumentWorkspaceViewEditTabElement).containerId = tab.id;
+						(component as UmbContentWorkspaceViewEditTabElement).containerId = tab.id;
 					},
 				});
 			});
@@ -89,9 +94,9 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 		if (this._hasRootGroups) {
 			routes.push({
 				path: '',
-				component: () => import('./document-workspace-view-edit-tab.element.js'),
+				component: () => import('./content-editor-tab.element.js'),
 				setup: (component) => {
-					(component as UmbDocumentWorkspaceViewEditTabElement).containerId = null;
+					(component as UmbContentWorkspaceViewEditTabElement).containerId = null;
 				},
 			});
 		}
@@ -166,10 +171,10 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 	];
 }
 
-export default UmbDocumentWorkspaceViewEditElement;
+export default UmbContentWorkspaceViewEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-workspace-view-edit': UmbDocumentWorkspaceViewEditElement;
+		'umb-content-workspace-view-edit': UmbContentWorkspaceViewEditElement;
 	}
 }

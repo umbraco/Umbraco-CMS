@@ -1,14 +1,17 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbContentTypeModel,
+	UmbContentTypeStructureManager,
+	UmbPropertyTypeModel,
+} from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import { UmbDataPathValueFilter } from '@umbraco-cms/backoffice/validation';
+import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
-@customElement('umb-document-workspace-view-edit-properties')
-export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
+@customElement('umb-content-workspace-view-edit-properties')
+export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	@property({ type: String, attribute: 'container-id', reflect: false })
 	public get containerId(): string | null | undefined {
 		return this.#propertyStructureHelper.getContainerId();
@@ -17,7 +20,7 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		this.#propertyStructureHelper.setContainerId(value);
 	}
 
-	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbDocumentTypeDetailModel>(this);
+	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
 	_propertyStructure?: Array<UmbPropertyTypeModel>;
@@ -25,8 +28,11 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#propertyStructureHelper.setStructureManager(workspaceContext.structure);
+		this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#propertyStructureHelper.setStructureManager(
+				// Assuming its the same content model type that we are working with here... [NL]
+				workspaceContext.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
+			);
 		});
 		this.observe(
 			this.#propertyStructureHelper.propertyStructure,
@@ -64,10 +70,10 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 	];
 }
 
-export default UmbDocumentWorkspaceViewEditPropertiesElement;
+export default UmbContentWorkspaceViewEditPropertiesElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-workspace-view-edit-properties': UmbDocumentWorkspaceViewEditPropertiesElement;
+		'umb-content-workspace-view-edit-properties': UmbContentWorkspaceViewEditPropertiesElement;
 	}
 }

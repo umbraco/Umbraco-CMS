@@ -47,10 +47,9 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 	{
 		type: 'workspaceView',
+		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.Document.Edit',
 		name: 'Document Workspace Edit View',
-		element: () => import('./views/edit/document-workspace-view-edit.element.js'),
-		weight: 200,
 		meta: {
 			label: 'Content',
 			pathname: 'content',

@@ -26,7 +26,9 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
  * - {@link UmbContentTypePropertyStructureHelper} for managing the structure of properties, optional of another container or root.
  * - {@link UmbContentTypeContainerStructureHelper} for managing the structure of containers, optional of another container or root.
  */
-export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> extends UmbControllerBase {
+export class UmbContentTypeStructureManager<
+	T extends UmbContentTypeModel = UmbContentTypeModel,
+> extends UmbControllerBase {
 	#init!: Promise<unknown>;
 
 	#repository: UmbDetailRepository<T>;

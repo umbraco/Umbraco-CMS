@@ -24,6 +24,7 @@
 		"./code-editor": "./dist-cms/packages/templating/code-editor/index.js",
 		"./collection": "./dist-cms/packages/core/collection/index.js",
 		"./components": "./dist-cms/packages/core/components/index.js",
+		"./content": "./dist-cms/packages/core/content/index.js",
 		"./content-type": "./dist-cms/packages/core/content-type/index.js",
 		"./culture": "./dist-cms/packages/core/culture/index.js",
 		"./current-user": "./dist-cms/packages/user/current-user/index.js",
