@@ -1,12 +1,28 @@
+import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{
-		type: 'modal',
-		alias: 'Umb.Modal.DocumentBlueprintCreateOptions',
-		name: 'Document Blueprint Create Options Modal',
-		js: () => import('./modal/document-blueprint-create-options-modal.element.js'),
+		type: 'entityAction',
+		kind: 'default',
+		alias: 'Umb.EntityAction.DocumentBlueprint.Create',
+		name: 'Document Blueprint Options Create Entity Action',
+		api: () => import('./create.action.js'),
+		forEntityTypes: [UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE],
+		meta: {
+			icon: 'icon-add',
+			label: 'Create Content Template',
+		},
 	},
 ];
 
-export const manifests = [...entityActions];
+const manifestModals: Array<ManifestTypes> = [
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.DocumentBlueprintOptionsCreate',
+		name: 'Document Blueprint Options Create Modal',
+		js: () => import('./modal/document-blueprint-options-create-modal.element.js'),
+	},
+];
+
+export const manifests = [...entityActions, ...manifestModals];
