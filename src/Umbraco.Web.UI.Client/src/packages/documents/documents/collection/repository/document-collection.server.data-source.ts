@@ -46,7 +46,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					updateDate: new Date(variant.updateDate),
 					updater: item.updater,
 					values: item.values.map((item) => {
-						return { alias: item.alias, value: item.value };
+						return { alias: item.alias, value: item.value as string };
 					}),
 				};
 				return model;

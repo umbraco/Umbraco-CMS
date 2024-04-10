@@ -4,6 +4,7 @@ import type { UmbTreeRepository } from './tree-repository.interface.js';
 import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
 import type { UmbTreeAncestorsOfRequestArgs } from './types.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -55,7 +56,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	abstract requestTreeRoot(): Promise<{ data?: TreeRootType; error?: Error }>;
+	abstract requestTreeRoot(): Promise<{ data?: TreeRootType; error?: ProblemDetails }>;
 
 	/**
 	 * Requests root items of a tree
@@ -65,8 +66,8 @@ export abstract class UmbTreeRepositoryBase<
 	async requestRootTreeItems(args: any) {
 		await this._init;
 
-		const { data, error } = await this._treeSource.getRootItems(args);
-
+		const { data, error: _error } = await this._treeSource.getRootItems(args);
+		const error: any = _error;
 		if (data) {
 			this._treeStore!.appendItems(data.items);
 		}
@@ -84,8 +85,8 @@ export abstract class UmbTreeRepositoryBase<
 		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 		await this._init;
 
-		const { data, error } = await this._treeSource.getChildrenOf(args);
-
+		const { data, error: _error } = await this._treeSource.getChildrenOf(args);
+		const error: any = _error;
 		if (data) {
 			this._treeStore!.appendItems(data.items);
 		}
@@ -103,8 +104,8 @@ export abstract class UmbTreeRepositoryBase<
 		if (args.descendantUnique === undefined) throw new Error('Descendant unique is missing');
 		await this._init;
 
-		const { data, error } = await this._treeSource.getAncestorsOf(args);
-
+		const { data, error: _error } = await this._treeSource.getAncestorsOf(args);
+		const error: any = _error;
 		// TODO: implement observable for ancestor items in the store
 		return { data, error };
 	}
