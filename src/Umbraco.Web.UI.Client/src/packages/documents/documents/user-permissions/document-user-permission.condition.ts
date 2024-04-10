@@ -82,19 +82,40 @@ export class UmbDocumentUserPermissionCondition
 	}
 
 	#check(verbs: Array<string>) {
-		this.permitted = this.config.allOf.every((verb) => verbs.includes(verb));
+		/* we default to true se we don't require both allOf and oneOf to be defined
+		 but they can be combined for more complex scenarios */
+		let allOfPermitted = true;
+		let oneOfPermitted = true;
+
+		if (this.config.allOf?.length) {
+			allOfPermitted = this.config.allOf.every((verb) => verbs.includes(verb));
+		}
+
+		if (this.config.oneOf?.length) {
+			oneOfPermitted = this.config.oneOf.some((verb) => verbs.includes(verb));
+		}
+
+		this.permitted = allOfPermitted && oneOfPermitted;
 	}
 }
 
 export type UmbDocumentUserPermissionConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.UserPermission.Document'> & {
 		/**
-		 *
+		 * The user must have all of the permissions in this array for the condition to be met.
 		 *
 		 * @example
 		 * ["Umb.Document.Save", "Umb.Document.Publish"]
 		 */
-		allOf: Array<string>;
+		allOf?: Array<string>;
+
+		/**
+		 * The user must have at least one of the permissions in this array for the condition to be met.
+		 *
+		 * @example
+		 * ["Umb.Document.Save", "Umb.Document.Publish"]
+		 */
+		oneOf?: Array<string>;
 	};
 
 export const manifest: ManifestCondition = {
