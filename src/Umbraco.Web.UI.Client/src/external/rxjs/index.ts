@@ -17,4 +17,5 @@ export {
 	switchMap,
 	filter,
 	startWith,
+	skip,
 } from 'rxjs';

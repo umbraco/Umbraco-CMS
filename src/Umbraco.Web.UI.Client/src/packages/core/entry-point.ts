@@ -1,3 +1,4 @@
+import { UMB_AUTH_CONTEXT } from './auth/auth.context.token.js';
 import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerElement } from './components/index.js';
 import { UmbActionEventContext } from './action/action-event.context.js';
 import { manifests as coreManifests } from './manifests.js';
@@ -17,12 +18,17 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	extensionRegistry.registerMany(coreManifests);
 
 	const notificationContainerElement = new UmbBackofficeNotificationContainerElement();
-	host.appendChild(notificationContainerElement);
+	host.shadowRoot?.appendChild(notificationContainerElement);
 
 	const modalContainerElement = new UmbBackofficeModalContainerElement();
-	host.appendChild(modalContainerElement);
+	host.shadowRoot?.appendChild(modalContainerElement);
 
 	new UmbNotificationContext(host);
 	new UmbModalManagerContext(host);
 	new UmbActionEventContext(host);
+
+	host.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+		// Initialize the auth context to let the app context know that the core module is ready
+		authContext.setInitialized();
+	});
 };

@@ -25,7 +25,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		name: 'Save User Group Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},

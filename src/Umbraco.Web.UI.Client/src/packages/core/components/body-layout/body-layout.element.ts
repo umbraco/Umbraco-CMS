@@ -134,7 +134,7 @@ export class UmbBodyLayoutElement extends LitElement {
 		css`
 			:host {
 				display: flex;
-				background-color: var(--uui-color-background);
+				background-color: var(--umb-body-layout-color-background, var(--uui-color-background));
 				width: 100%;
 				height: 100%;
 				flex-direction: column;

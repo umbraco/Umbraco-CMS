@@ -10,7 +10,7 @@ export const manifests: Array<ManifestTypes> = [
 		name: 'Save Block Type Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Submit',
+			label: '#general_submit',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -38,7 +38,7 @@ export const manifests: Array<ManifestTypes> = [
 		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Content',
+			label: '#general_content',
 			pathname: 'content',
 			icon: 'icon-document',
 			blockElementManagerName: 'content',
@@ -63,7 +63,7 @@ export const manifests: Array<ManifestTypes> = [
 		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Settings',
+			label: '#general_settings',
 			pathname: 'settings',
 			icon: 'icon-settings',
 			blockElementManagerName: 'settings',

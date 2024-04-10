@@ -9,8 +9,6 @@ export interface ManifestEntityUserPermission extends ManifestBase {
 export interface MetaEntityUserPermission {
 	verbs: Array<string>;
 	label?: string;
-	labelKey?: string;
 	description?: string;
-	descriptionKey?: string;
 	group?: string;
 }

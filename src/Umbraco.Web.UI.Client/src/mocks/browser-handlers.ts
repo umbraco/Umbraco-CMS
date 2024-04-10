@@ -92,11 +92,11 @@ switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {
 
 switch (import.meta.env.VITE_UMBRACO_EXTENSION_MOCKS) {
 	case 'on':
-		handlers.push(manifestsHandlers.manifestDevelopmentHandler);
+		handlers.push(...manifestsHandlers.manifestDevelopmentHandlers);
 		break;
 
 	default:
-		handlers.push(manifestsHandlers.manifestEmptyHandler);
+		handlers.push(...manifestsHandlers.manifestEmptyHandlers);
 }
 
 export { handlers };
