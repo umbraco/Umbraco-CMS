@@ -49,8 +49,6 @@ internal class UmbracoCmsSchema
 
         public SecuritySettings Security { get; set; } = null!;
 
-        public TourSettings Tours { get; set; } = null!;
-
         public TypeFinderSettings TypeFinder { get; set; } = null!;
 
         public WebRoutingSettings WebRouting { get; set; } = null!;
