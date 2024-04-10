@@ -158,7 +158,8 @@
 		"generate:tsconfig": "node ./devops/tsconfig/index.js",
 		"generate:manifest": "node ./devops/build/create-umbraco-package.js",
 		"package:validate": "node ./devops/package/validate-exports.js",
-		"generate:ui-api-docs": "typedoc --options typedoc.config.js"
+		"generate:ui-api-docs": "typedoc --options typedoc.config.js",
+		"openapi-ts": "openapi-ts --input https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v14/dev/src/Umbraco.Cms.Api.Management/OpenApi.json --output src/external/backend-api/src --debug true --enums typescript --lint true --postfixServices Resource --schemas false"
 	},
 	"engines": {
 		"node": ">=20.9 <21",
@@ -182,6 +183,7 @@
 	},
 	"devDependencies": {
 		"@babel/core": "^7.24.3",
+		"@hey-api/openapi-ts": "^0.37.3",
 		"@mdx-js/react": "^3.0.0",
 		"@open-wc/testing": "^4.0.0",
 		"@playwright/test": "^1.41.1",
