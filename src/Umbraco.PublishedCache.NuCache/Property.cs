@@ -241,15 +241,14 @@ internal class Property : PublishedPropertyBase
         }
 
         var k = new CompositeStringStringKey(culture, segment);
-        if (!_sourceValues.TryGetValue(k, out SourceInterValue? vvalue))
-        {
-            _sourceValues[k] = vvalue = new SourceInterValue
+
+        SourceInterValue vvalue = _sourceValues.GetOrAdd(k, _ =>
+            new SourceInterValue
             {
                 Culture = culture,
                 Segment = segment,
                 SourceValue = GetSourceValue(culture, segment),
-            };
-        }
+            });
 
         if (vvalue.InterInitialized)
         {
@@ -382,10 +381,8 @@ internal class Property : PublishedPropertyBase
             }
 
             var k = new CompositeStringStringKey(culture, segment);
-            if (!_values.TryGetValue(k, out CacheValue? value))
-            {
-                _values[k] = value = new CacheValue();
-            }
+
+            CacheValue value = _values.GetOrAdd(k, _ => new CacheValue());
 
             return value;
         }
