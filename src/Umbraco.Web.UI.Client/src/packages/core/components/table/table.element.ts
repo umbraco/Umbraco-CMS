@@ -187,7 +187,7 @@ export class UmbTableElement extends LitElement {
 	private _renderSortingUI(column: UmbTableColumn) {
 		return html`
 			<button
-				style="padding: var(--uui-size-4) var(--uui-size-5);"
+				style="padding: var(--uui-size-5) var(--uui-size-1);"
 				@click="${() => this._handleOrderingChange(column)}">
 				<span style="text-align:${column.align ?? 'left'};">${column.name}</span>
 				<uui-symbol-sort ?active=${this.orderingColumn === column.alias} ?descending=${this.orderingDesc}>
@@ -228,16 +228,17 @@ export class UmbTableElement extends LitElement {
 		if (this.config.hideIcon && !this.config.allowSelection) return;
 
 		return html`<uui-table-cell>
-			${when(!this.config.hideIcon, () => html`<uui-icon name=${ifDefined(item.icon ?? undefined)}></uui-icon>`)}
+			${when(!this.config.hideIcon, () => html`<umb-icon name="${ifDefined(item.icon ?? undefined)}"></umb-icon>`)}
 			${when(
 				this.config.allowSelection,
-				() =>
-					html` <uui-checkbox
+				() => html`
+					<uui-checkbox
 						label="Select Row"
 						@click=${(e: PointerEvent) => e.stopPropagation()}
 						@change=${(event: Event) => this._handleRowCheckboxChange(event, item)}
 						?checked="${this._isSelected(item.id)}">
-					</uui-checkbox>`,
+					</uui-checkbox>
+				`,
 			)}
 		</uui-table-cell>`;
 	}
@@ -286,10 +287,10 @@ export class UmbTableElement extends LitElement {
 				display: none;
 			}
 
-			uui-table-row[selectable]:focus uui-icon,
-			uui-table-row[selectable]:focus-within uui-icon,
-			uui-table-row[selectable]:hover uui-icon,
-			uui-table-row[select-only] uui-icon {
+			uui-table-row[selectable]:focus umb-icon,
+			uui-table-row[selectable]:focus-within umb-icon,
+			uui-table-row[selectable]:hover umb-icon,
+			uui-table-row[select-only] umb-icon {
 				display: none;
 			}
 
@@ -323,7 +324,7 @@ export class UmbTableElement extends LitElement {
 				flex: 1 0 auto;
 			}
 
-			uui-table-cell uui-icon {
+			uui-table-cell umb-icon {
 				vertical-align: top;
 			}
 		`,
