@@ -55,6 +55,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddUsers()
                 .AddUserGroups()
                 .AddPackages()
+                .AddManifests()
                 .AddEntities()
                 .AddScripts()
                 .AddPartialViews()
