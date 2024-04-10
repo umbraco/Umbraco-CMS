@@ -1,5 +1,5 @@
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { ManifestResource, PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
 	CreatePackageRequestModel,
 	UpdatePackageRequestModel,
@@ -34,7 +34,7 @@ export class UmbPackageServerDataSource {
 	 * @memberof UmbPackageServerDataSource
 	 */
 	getRootItems() {
-		return tryExecuteAndNotify(this.host, PackageResource.getPackageManifest());
+		return tryExecuteAndNotify(this.host, ManifestResource.getManifestManifest());
 	}
 
 	/**

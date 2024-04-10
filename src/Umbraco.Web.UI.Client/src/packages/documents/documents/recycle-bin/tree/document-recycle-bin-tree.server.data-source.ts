@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDocumentRecycleBinTreeItemModel } from './types.js';
 import type { DocumentRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
@@ -61,9 +62,25 @@ const mapper = (item: DocumentRecycleBinItemResponseModel): UmbDocumentRecycleBi
 	return {
 		unique: item.id,
 		parentUnique: item.parent ? item.parent.id : null,
-		entityType: 'document-recycle-bin',
+		entityType: UMB_DOCUMENT_ENTITY_TYPE,
+		noAccess: false,
+		isTrashed: true,
 		hasChildren: item.hasChildren,
-		isFolder: false,
+		isProtected: false,
+		documentType: {
+			unique: item.documentType.id,
+			icon: item.documentType.icon,
+			collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
+		},
+		variants: item.variants.map((variant) => {
+			return {
+				name: variant.name,
+				culture: variant.culture || null,
+				segment: null, // TODO: add segment to the backend API?
+				state: variant.state,
+			};
+		}),
 		name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
+		isFolder: false,
 	};
 };
