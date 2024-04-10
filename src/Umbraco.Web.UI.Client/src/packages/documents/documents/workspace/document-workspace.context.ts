@@ -1,4 +1,3 @@
-import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
@@ -20,6 +19,7 @@ import { UmbDocumentPublishingRepository } from '../repository/publishing/index.
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/document-validation.repository.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
@@ -49,7 +49,10 @@ import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/t
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
-import { UmbServerModelValidationContext } from '@umbraco-cms/backoffice/validation';
+import {
+	UmbServerModelValidationContext,
+	UmbVariantValuesValidationMessageTranslator,
+} from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -78,6 +81,7 @@ export class UmbDocumentWorkspaceContext
 	public readonly languages = this.#languages.asObservable();
 
 	#serverValidation = new UmbServerModelValidationContext(this);
+	#serverValidationValuesTranslator = new UmbVariantValuesValidationMessageTranslator(this, this.#serverValidation);
 	#validationRepository?: UmbDocumentValidationRepository;
 
 	public isLoaded() {
@@ -587,9 +591,12 @@ export class UmbDocumentWorkspaceContext
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
-			this.#serverValidation.askServerForValidation(this.#validationRepository.validateCreate(saveData, parent.unique));
+			this.#serverValidation.askServerForValidation(
+				saveData,
+				this.#validationRepository.validateCreate(saveData, parent.unique),
+			);
 		} else {
-			this.#serverValidation.askServerForValidation(this.#validationRepository.validateSave(saveData));
+			this.#serverValidation.askServerForValidation(saveData, this.#validationRepository.validateSave(saveData));
 		}
 
 		// TODO: Only validate the specified selection.. [NL]

@@ -103,6 +103,12 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 			});
 		}
 
+		// Find the routes who are removed:
+		//const removedRoutes = this._routes.filter((route) => !routes.find((r) => r.path === route.path));
+
+		// Find the routes who are new:
+		//const newRoutes = routes.filter((route) => !this._routes.find((r) => r.path === route.path));
+
 		this._routes = routes;
 	}
 

@@ -1,9 +1,11 @@
-import type { UmbValidationMessageTranslator } from '../interfaces/validation-message-translator.interface.js';
+import type { UmbValidationMessageTranslator } from '../translators/validation-message-translator.interface.js';
 import type { UmbValidator } from '../interfaces/validator.interface.js';
 import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
 import { UMB_SERVER_MODEL_VALIDATION_CONTEXT } from './server-model-validation.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+
+type ServerFeedbackEntry = { path: string; messages: Array<string> };
 
 export class UmbServerModelValidationContext
 	extends UmbContextBase<UmbServerModelValidationContext>
@@ -15,10 +17,14 @@ export class UmbServerModelValidationContext
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 	#isValid = true;
 
+	#data: any;
+	getData(): any {
+		return this.#data;
+	}
 	#translators: Array<UmbValidationMessageTranslator> = [];
 
 	// Hold server feedback...
-	#serverFeedback: Record<string, Array<string>> = {};
+	#serverFeedback: Array<ServerFeedbackEntry> = [];
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_SERVER_MODEL_VALIDATION_CONTEXT);
@@ -33,26 +39,73 @@ export class UmbServerModelValidationContext
 		});
 	}
 
-	async askServerForValidation(requestPromise: Promise<{ data: string | undefined; error: any }>): Promise<void> {
+	async askServerForValidation(
+		data: any,
+		requestPromise: Promise<{ data: string | undefined; error: any }>,
+	): Promise<void> {
 		this.#context?.messages.removeMessagesByType('server');
 
-		this.#serverFeedback = {};
+		this.#serverFeedback = [];
 		this.#isValid = false;
 		//this.#validatePromiseReject?.();
 		this.#validatePromise = new Promise<void>((resolve) => {
 			this.#validatePromiseResolve = resolve;
 		});
+
 		// Ask the server for validation...
-		const { data, error } = await requestPromise;
+		//const { data: feedback, error } = await requestPromise;
+		await requestPromise;
 
-		console.log('VALIDATE — Got server response:');
-		console.log(data, error);
+		//console.log('VALIDATE — Got server response:');
+		//console.log(data, error);
 
-		this.#isValid = data ? true : false;
+		this.#data = data;
+
+		const fixedData = {
+			type: 'Error',
+			title: 'Validation failed',
+			status: 400,
+			detail: 'One or more properties did not pass validation',
+			operationStatus: 'PropertyValidationError',
+			errors: {
+				'$.values[0].value': ['#validation.invalidPattern'],
+			} as Record<string, Array<string>>,
+			missingProperties: [],
+		};
+
+		Object.keys(fixedData.errors).forEach((path) => {
+			this.#serverFeedback.push({ path, messages: fixedData.errors[path] });
+		});
+
+		//this.#isValid = data ? true : false;
+		this.#isValid = false;
 		this.#validatePromiseResolve?.();
 		this.#validatePromiseResolve = undefined;
 		//this.#validatePromise = undefined;
+
+		this.#serverFeedback = this.#serverFeedback.flatMap(this.#executeTranslatorsOnFeedback);
 	}
+
+	#executeTranslatorsOnFeedback = (feedback: ServerFeedbackEntry) => {
+		console.log('transaltion for ', feedback.path);
+		return this.#translators.flatMap((translator) => {
+			if (translator.match(feedback.path)) {
+				const newPath = translator.translate(feedback.path);
+
+				// TODO: I might need to restructure this part for adjusting existing feedback with a part-translation.
+				// Detect if some part is unhandled?
+				// If so only make a partial translation on the feedback, add a message for the handled part.
+				// then return [ of the partial translated feedback, and the partial handled part. ];
+
+				//  TODO:Check if there was any temporary messages base on this path, like if it was partial-translated at one point..
+
+				this.#context?.messages.addMessages('server', newPath, feedback.messages);
+				// by not returning anything this feedback gets removed from server feedback..
+				return [];
+			}
+			return feedback;
+		});
+	};
 
 	addTranslator(translator: UmbValidationMessageTranslator): void {
 		if (this.#translators.indexOf(translator) === -1) {
