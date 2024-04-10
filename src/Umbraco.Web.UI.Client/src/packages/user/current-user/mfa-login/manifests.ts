@@ -1,16 +1,24 @@
-import type { ManifestUserProfileApp } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbConfigureMfaProvidersApi } from './configure-mfa-providers-action.js';
+import type { ManifestCurrentUserActionDefaultKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const userProfileApps: Array<ManifestUserProfileApp> = [
+export const userProfileApps: Array<ManifestCurrentUserActionDefaultKind> = [
 	{
-		type: 'userProfileApp',
-		alias: 'Umb.UserProfileApp.CurrentUser.MfaLoginProviders',
-		name: 'MFA Login Providers User Profile App',
-		element: () => import('./mfa-providers-user-profile-app.element.js'),
+		type: 'currentUserAction',
+		kind: 'default',
+		alias: 'Umb.CurrentUser.App.MfaLoginProviders',
+		name: 'MFA Login Providers Current User App',
 		weight: 800,
+		api: UmbConfigureMfaProvidersApi,
 		meta: {
-			label: 'Two-Factor Authentication',
-			pathname: 'mfa-providers',
+			label: '#user_configureTwoFactor',
+			icon: 'lock',
+			look: 'secondary',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.User.AllowMfaAction',
+			},
+		],
 	},
 ];
 export const manifests = [...userProfileApps];

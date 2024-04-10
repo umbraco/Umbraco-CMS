@@ -6,8 +6,8 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
-@customElement('umb-mfa-providers-user-profile-app')
-export class UmbMfaProvidersUserProfileAppElement extends UmbLitElement {
+@customElement('umb-mfa-providers-current-user-app')
+export class UmbMfaProvidersCurrentUserAppElement extends UmbLitElement {
 	@state()
 	_hasProviders = false;
 
@@ -26,11 +26,14 @@ export class UmbMfaProvidersUserProfileAppElement extends UmbLitElement {
 		}
 
 		return html`
-			<uui-box .headline=${this.localize.term('member_2fa')}>
-				<uui-button type="button" look="primary" @click=${this.#onClick}>
-					<umb-localize key="user_configureTwoFactor">Configure Two Factor</umb-localize>
-				</uui-button>
-			</uui-box>
+			<uui-button
+				type="button"
+				look="primary"
+				label="${this.localize.term('user_configureTwoFactor')}"
+				@click=${this.#onClick}>
+				<uui-icon name="icon-rectangle-ellipsis"></uui-icon>
+				<umb-localize key="user_configureTwoFactor">Configure Two Factor</umb-localize>
+			</uui-button>
 		`;
 	}
 
@@ -42,10 +45,10 @@ export class UmbMfaProvidersUserProfileAppElement extends UmbLitElement {
 	static styles = [UmbTextStyles];
 }
 
-export default UmbMfaProvidersUserProfileAppElement;
+export default UmbMfaProvidersCurrentUserAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-mfa-providers-user-profile-app': UmbMfaProvidersUserProfileAppElement;
+		'umb-mfa-providers-current-user-app': UmbMfaProvidersCurrentUserAppElement;
 	}
 }
