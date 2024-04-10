@@ -15,7 +15,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-documents',
-			label: 'Duplicate to...',
+			label: '#actions_copy',
 			itemRepositoryAlias: '',
 			duplicateRepositoryAlias: '',
 			pickerModal: '',

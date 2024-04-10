@@ -7,7 +7,7 @@ export const manifests = [
 		js: () => import('./dashboard-health-check.element.js'),
 		weight: 102,
 		meta: {
-			label: 'Health Check',
+			label: '#dashboardTabs_settingsHealthCheck',
 			pathname: 'health-check',
 		},
 		conditions: [

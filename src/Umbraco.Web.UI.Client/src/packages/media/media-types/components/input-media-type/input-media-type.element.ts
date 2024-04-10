@@ -89,7 +89,7 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
@@ -124,7 +124,7 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 		if (this.max === 1 && this.selection.length >= this.max) return;
 		return html`
 			<uui-button
-				id="add-button"
+				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
 				label="${this.localize.term('general_choose')}"></uui-button>
@@ -152,7 +152,7 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 
 	static styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 		`,

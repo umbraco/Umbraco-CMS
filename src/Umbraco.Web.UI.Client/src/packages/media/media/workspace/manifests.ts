@@ -1,4 +1,4 @@
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
@@ -19,12 +19,32 @@ const workspace: ManifestWorkspaces = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		kind: 'collection',
+		alias: 'Umb.WorkspaceView.Media.Collection',
+		name: 'Media Workspace Collection View',
+		meta: {
+			label: 'Collection',
+			pathname: 'collection',
+			icon: 'icon-grid',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+			{
+				alias: 'Umb.Condition.WorkspaceHasCollection',
+			},
+		],
+	},
+	{
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Media.Edit',
 		name: 'Media Workspace Edit View',
 		js: () => import('./views/edit/media-workspace-view-edit.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Media',
+			label: '#general_details',
 			pathname: 'media',
 			icon: 'icon-picture',
 		},
@@ -42,7 +62,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/info/media-workspace-view-info.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Info',
+			label: '#general_info',
 			pathname: 'info',
 			icon: 'info',
 		},
@@ -61,9 +81,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Media.Save',
 		name: 'Save Media Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},

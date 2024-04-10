@@ -66,16 +66,16 @@ The simplest approach is to copy over the HTML from the old backoffice into a ne
 
 **Controller**
 
-The old AngularJS controllers will have to be converted into modern TypeScript and will have to use our new services and stores. We try to abstract as much away as possible, and mostly you will have to make API calls and let the rest of the system handle things like error handling and so on. In the case of this dashboard, we only have a few GET and POST requests. Looking at the new Management API, we find the PublishedCacheResource, which is the new API controller to serve data to the dashboard.
+The old AngularJS controllers will have to be converted into modern TypeScript and will have to use our new services and stores. We try to abstract as much away as possible, and mostly you will have to make API calls and let the rest of the system handle things like error handling and so on. In the case of this dashboard, we only have a few GET and POST requests. Looking at the new Management API, we find the PublishedCacheService, which is the new API controller to serve data to the dashboard.
 
-To make the first button work, which simply just requests a new status from the server, we must make a call to `PublishedCacheResource.getPublishedCacheStatus()`. An additional thing here is to wrap that in a friendly function called `tryExecuteAndNotify`, which is something we make available to developers to automatically handle the responses coming from the server and additionally use the Notifications to notify of any errors:
+To make the first button work, which simply just requests a new status from the server, we must make a call to `PublishedCacheService.getPublishedCacheStatus()`. An additional thing here is to wrap that in a friendly function called `tryExecuteAndNotify`, which is something we make available to developers to automatically handle the responses coming from the server and additionally use the Notifications to notify of any errors:
 
 ```typescript
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PublishedCacheResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { PublishedCacheService } from '@umbraco-cms/backoffice/external/backend-api';
 
 private _getStatus() {
-  const { data: status } = await tryExecuteAndNotify(this, PublishedCacheResource.getPublishedCacheStatus());
+  const { data: status } = await tryExecuteAndNotify(this, PublishedCacheService.getPublishedCacheStatus());
 
   if (status) {
     // we now have the status

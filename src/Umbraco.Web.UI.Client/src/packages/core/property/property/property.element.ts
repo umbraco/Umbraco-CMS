@@ -1,15 +1,15 @@
+import { umbExtensionsRegistry, type ManifestPropertyEditorUi } from '../../extension-registry/index.js';
 import { UmbPropertyContext } from './property.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorConfig,
 } from '@umbraco-cms/backoffice/property-editor';
+import { UmbFormControlValidator } from '@umbraco-cms/backoffice/validation';
 
 /**
  *  @element umb-property
@@ -116,6 +116,7 @@ export class UmbPropertyElement extends UmbLitElement {
 
 	#propertyContext = new UmbPropertyContext(this);
 
+	#validator?: UmbFormControlValidator;
 	#valueObserver?: UmbObserverController<unknown>;
 	#configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
 
@@ -185,15 +186,20 @@ export class UmbPropertyElement extends UmbLitElement {
 				// No need for a controller alias, as the clean is handled via the observer prop:
 				this.#valueObserver = this.observe(this.#propertyContext.value, (value) => {
 					//this._value = value;// This was not used currently [NL]
-					if (this._element) {
-						this._element.value = value;
-					}
+					this._element!.value = value;
 				});
 				this.#configObserver = this.observe(this.#propertyContext.config, (config) => {
-					if (this._element && config) {
-						this._element.config = config;
+					if (config) {
+						this._element!.config = config;
 					}
 				});
+
+				if (this.#validator) {
+					this.#validator.destroy();
+				}
+				if ('checkValidity' in this._element) {
+					this.#validator = new UmbFormControlValidator(this, this._element as any);
+				}
 			}
 
 			this.requestUpdate('element', oldElement);

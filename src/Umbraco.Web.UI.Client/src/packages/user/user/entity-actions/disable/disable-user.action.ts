@@ -16,18 +16,20 @@ export class UmbDisableUserEntityAction extends UmbEntityActionBase<never> {
 		const itemRepository = new UmbUserItemRepository(this);
 		const { data } = await itemRepository.requestItems([this.args.unique]);
 
-		if (data) {
-			const item = data[0];
-
-			await umbConfirmModal(this._host, {
-				headline: `Disable ${item.name}`,
-				content: 'Are you sure you want to disable this user?',
-				color: 'danger',
-				confirmLabel: 'Disable',
-			});
-
-			const disableUserRepository = new UmbDisableUserRepository(this);
-			await disableUserRepository.disable([this.args.unique]);
+		if (!data?.length) {
+			throw new Error('Item not found.');
 		}
+
+		const item = data[0];
+
+		await umbConfirmModal(this._host, {
+			headline: `Disable ${item.name}`,
+			content: 'Are you sure you want to disable this user?',
+			color: 'danger',
+			confirmLabel: 'Disable',
+		});
+
+		const disableUserRepository = new UmbDisableUserRepository(this);
+		await disableUserRepository.disable([this.args.unique]);
 	}
 }

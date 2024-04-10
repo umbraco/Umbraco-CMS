@@ -4,7 +4,7 @@ import type { UmbDocumentTypeDetailModel } from '../types.js';
 import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
@@ -18,12 +18,12 @@ import type {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbContentTypeWorkspaceContext<EntityType>, UmbRoutableWorkspaceContext
 {
 	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
@@ -104,7 +104,7 @@ export class UmbDocumentTypeWorkspaceContext
 				path: 'edit/:id',
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
-					this.removeControllerByAlias('isNewRedirectController');
+					this.removeUmbControllerByAlias('isNewRedirectController');
 					const id = info.match.params.id;
 					this.load(id);
 				},
@@ -218,7 +218,7 @@ export class UmbDocumentTypeWorkspaceContext
 	/**
 	 * Save or creates the document type, based on wether its a new one or existing.
 	 */
-	async save() {
+	async submit() {
 		const data = this.getData();
 		if (data === undefined) throw new Error('Cannot save, no data');
 
@@ -229,7 +229,7 @@ export class UmbDocumentTypeWorkspaceContext
 			if ((await this.structure.create(parent.unique)) === true) {
 				// TODO: this might not be the right place to alert the tree, but it works for now
 				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+				const event = new UmbRequestReloadTreeItemChildrenEvent({
 					entityType: parent.entityType,
 					unique: parent.unique,
 				});
@@ -250,7 +250,7 @@ export class UmbDocumentTypeWorkspaceContext
 		}
 
 		this.setIsNew(false);
-		this.workspaceComplete(data);
+		return true;
 	}
 
 	public destroy(): void {

@@ -21,4 +21,5 @@ export class UmbReloadTreeItemChildrenEntityAction extends UmbEntityActionBase<M
 		);
 	}
 }
-export default UmbReloadTreeItemChildrenEntityAction;
+
+export { UmbReloadTreeItemChildrenEntityAction as api };

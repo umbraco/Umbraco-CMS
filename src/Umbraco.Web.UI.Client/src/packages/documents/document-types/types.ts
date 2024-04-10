@@ -1,13 +1,18 @@
 import type { UmbDocumentTypeEntityType } from './entity.js';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
-import type { ContentTypeCleanupBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbDocumentTypeDetailModel extends UmbContentTypeModel {
 	entityType: UmbDocumentTypeEntityType;
 	allowedTemplates: Array<{ id: string }>;
 	defaultTemplate: { id: string } | null;
-	cleanup: ContentTypeCleanupBaseModel;
+	cleanup: UmbDocumentTypeCleanupModel;
 }
+
+export type UmbDocumentTypeCleanupModel = {
+	preventCleanup: boolean;
+	keepAllVersionsNewerThanDays?: number | null;
+	keepLatestVersionPerDayForDays?: number | null;
+};
 
 export interface UmbDocumentTypeCompositionRequestModel {
 	unique: string;

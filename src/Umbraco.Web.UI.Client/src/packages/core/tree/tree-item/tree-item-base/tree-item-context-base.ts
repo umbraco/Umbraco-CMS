@@ -1,7 +1,7 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import { UMB_DEFAULT_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/default-tree.context.js';
 import type { UmbTreeItemModelBase } from '../../types.js';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '../../reload-tree-item-children/index.js';
+import { UmbRequestReloadTreeItemChildrenEvent } from '../../reload-tree-item-children/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
@@ -12,9 +12,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
-import { UmbChangeEvent, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
 	x: TreeItemType,
@@ -40,7 +41,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	#hasChildren = new UmbBooleanState(false);
 	hasChildren = this.#hasChildren.asObservable();
-	#hasChildrenInitValueFlag = false;
 
 	#isLoading = new UmbBooleanState(false);
 	isLoading = this.#isLoading.asObservable();
@@ -150,8 +150,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.#observeIsSelectable();
 		this.#observeIsSelected();
 		this.#observeSectionPath();
-		this.#hasChildrenInitValueFlag = false;
-		this.#observeHasChildren();
 	}
 
 	public async loadChildren() {
@@ -170,6 +168,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		if (data) {
 			this.#childItems.setValue(data.items);
+			this.#hasChildren.setValue(data.total > 0);
 			this.pagination.setTotalItems(data.total);
 		}
 
@@ -208,13 +207,11 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
-			this.#hasChildrenInitValueFlag = false;
-			this.#observeHasChildren();
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
 			this.#actionEventContext?.removeEventListener(
-				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				UmbRequestReloadTreeItemChildrenEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 
@@ -226,7 +223,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			this.#actionEventContext = instance;
 
 			this.#actionEventContext.addEventListener(
-				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				UmbRequestReloadTreeItemChildrenEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 
@@ -298,28 +295,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		);
 	}
 
-	async #observeHasChildren() {
-		if (!this.treeContext || !this.unique) return;
-
-		const repository = this.treeContext.getRepository();
-		if (!repository) return;
-
-		// TODO: use createObservablePart, to prevent unnesecary changes.
-		const hasChildrenObservable = (await repository.treeItemsOf(this.unique)).pipe(
-			map((children) => children.length > 0),
-		);
-
-		// observe if any children will be added runtime to a tree item. Nested items/folders etc.
-		this.observe(hasChildrenObservable, (hasChildren) => {
-			/* we need to skip the first value, because it will also return false until a child is in the store
-			we therefor rely on the value from the tree item itself */
-			if (this.#hasChildrenInitValueFlag === true) {
-				this.#hasChildren.setValue(hasChildren);
-			}
-			this.#hasChildrenInitValueFlag = true;
-		});
-	}
-
 	#onReloadRequest = (event: UmbEntityActionEvent) => {
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
@@ -377,7 +352,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	destroy(): void {
 		this.#actionEventContext?.removeEventListener(
-			UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+			UmbRequestReloadTreeItemChildrenEvent.TYPE,
 			this.#onReloadRequest as EventListener,
 		);
 		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);

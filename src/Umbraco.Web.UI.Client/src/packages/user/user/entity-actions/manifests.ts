@@ -4,6 +4,7 @@ import { UmbDisableUserEntityAction } from './disable/disable-user.action.js';
 import { UmbEnableUserEntityAction } from './enable/enable-user.action.js';
 import { UmbChangeUserPasswordEntityAction } from './change-password/change-user-password.action.js';
 import { UmbUnlockUserEntityAction } from './unlock/unlock-user.action.js';
+import { UmbMfaUserEntityAction } from './mfa/mfa-user.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -33,7 +34,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-check',
-			label: 'Enable',
+			label: '#actions_enable',
 		},
 		conditions: [
 			{
@@ -51,7 +52,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-block',
-			label: 'Disable',
+			label: '#actions_disable',
 		},
 		conditions: [
 			{
@@ -69,7 +70,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-key',
-			label: 'Change Password',
+			label: '#user_changePassword',
 		},
 	},
 	{
@@ -82,11 +83,29 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-unlocked',
-			label: 'Unlock',
+			label: '#actions_unlock',
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.User.AllowUnlockAction',
+			},
+		],
+	},
+	{
+		type: 'entityAction',
+		kind: 'default',
+		alias: 'Umb.EntityAction.User.ConfigureMfa',
+		name: 'Configure MFA Entity Action',
+		weight: 500,
+		api: UmbMfaUserEntityAction,
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
+		meta: {
+			icon: 'icon-settings',
+			label: '#user_configureMfa',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.User.AllowMfaAction',
 			},
 		],
 	},

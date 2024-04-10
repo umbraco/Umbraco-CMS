@@ -6,7 +6,7 @@ import type {
 	CreateDocumentTypeRequestModel,
 	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
@@ -76,7 +76,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentTypeResource.getDocumentTypeById({ id: unique }),
+			DocumentTypeService.getDocumentTypeById({ id: unique }),
 		);
 
 		if (error || !data) {
@@ -190,7 +190,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentTypeResource.postDocumentType({
+			DocumentTypeService.postDocumentType({
 				requestBody,
 			}),
 		);
@@ -257,7 +257,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentTypeResource.putDocumentTypeById({
+			DocumentTypeService.putDocumentTypeById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -281,7 +281,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DocumentTypeResource.deleteDocumentTypeById({
+			DocumentTypeService.deleteDocumentTypeById({
 				id: unique,
 			}),
 		);

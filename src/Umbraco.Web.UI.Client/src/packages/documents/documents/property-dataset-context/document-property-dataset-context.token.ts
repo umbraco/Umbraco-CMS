@@ -10,4 +10,4 @@ export const IsDocumentPropertyDatasetContext = (
 export const UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT = new UmbContextToken<
 	UmbPropertyDatasetContext,
 	UmbDocumentPropertyDataContext
->('UmbVariantContext', undefined, IsDocumentPropertyDatasetContext);
+>('UmbPropertyDatasetContext', undefined, IsDocumentPropertyDatasetContext);

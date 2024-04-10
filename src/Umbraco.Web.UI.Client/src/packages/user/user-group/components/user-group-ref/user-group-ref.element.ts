@@ -34,13 +34,13 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 				'userPermissionLabels',
 			);
 		} else {
-			this.removeControllerByAlias('userPermissionLabels');
+			this.removeUmbControllerByAlias('userPermissionLabels');
 		}
 	}
 
 	#setUserPermissionLabels(manifests: Array<ManifestEntityUserPermission>) {
 		this.#userPermissionLabels = manifests.map((manifest) =>
-			manifest.meta.labelKey ? this.localize.term(manifest.meta.labelKey) : manifest.meta.label ?? '',
+			manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name,
 		);
 	}
 

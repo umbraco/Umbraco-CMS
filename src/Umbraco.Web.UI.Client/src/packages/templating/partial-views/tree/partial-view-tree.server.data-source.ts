@@ -8,7 +8,7 @@ import type {
 } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -38,7 +38,7 @@ export class UmbPartialViewTreeServerDataSource extends UmbTreeServerDataSourceB
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	PartialViewResource.getTreePartialViewRoot({ skip: args.skip, take: args.take });
+	PartialViewService.getTreePartialViewRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parentUnique);
@@ -47,8 +47,10 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return PartialViewResource.getTreePartialViewChildren({
+		return PartialViewService.getTreePartialViewChildren({
 			parentPath,
+			skip: args.skip,
+			take: args.take,
 		});
 	}
 };
@@ -58,7 +60,7 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
 	if (!descendantPath) throw new Error('Descendant path is not available');
 
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	return PartialViewResource.getTreePartialViewAncestors({
+	return PartialViewService.getTreePartialViewAncestors({
 		descendantPath,
 	});
 };

@@ -4,23 +4,23 @@ import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import { UmbPartialViewWorkspaceEditorElement } from './partial-view-workspace-editor.element.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbRoutableWorkspaceContext, UmbSaveableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbRoutableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 export class UmbPartialViewWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbPartialViewDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<UmbPartialViewDetailModel>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbPartialViewDetailRepository(this);
 
@@ -32,7 +32,6 @@ export class UmbPartialViewWorkspaceContext
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly content = this.#data.asObservablePart((data) => data?.content);
-	readonly path = this.#data.asObservablePart((data) => data?.path);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
@@ -122,10 +121,21 @@ export class UmbPartialViewWorkspaceContext
 
 	async load(unique: string) {
 		this.resetState();
-		const { data } = await this.repository.requestByUnique(unique);
+		const { data, asObservable } = await this.repository.requestByUnique(unique);
+
 		if (data) {
 			this.setIsNew(false);
 			this.#data.setValue(data);
+
+			this.observe(asObservable(), (data) => this.onDetailStoreChanges(data), 'umbDetailStoreObserver');
+		}
+	}
+
+	onDetailStoreChanges(data: UmbPartialViewDetailModel | undefined) {
+		// Data is removed from the store
+		// TODO: revisit. We need to handle what should happen when the data is removed from the store
+		if (data === undefined) {
+			this.#data.setValue(undefined);
 		}
 	}
 
@@ -147,7 +157,7 @@ export class UmbPartialViewWorkspaceContext
 		}
 	}
 
-	public async save() {
+	public async submit() {
 		if (!this.#data.value) throw new Error('Data is missing');
 
 		let newData = undefined;
@@ -159,7 +169,7 @@ export class UmbPartialViewWorkspaceContext
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+			const event = new UmbRequestReloadTreeItemChildrenEvent({
 				entityType: parent.entityType,
 				unique: parent.unique,
 			});
@@ -183,8 +193,8 @@ export class UmbPartialViewWorkspaceContext
 		if (newData) {
 			this.#data.setValue(newData);
 			this.setIsNew(false);
-			this.workspaceComplete(newData);
 		}
+		return true;
 	}
 
 	public destroy(): void {
@@ -195,7 +205,7 @@ export class UmbPartialViewWorkspaceContext
 	#getSnippet(snippetId: string) {
 		return tryExecuteAndNotify(
 			this,
-			PartialViewResource.getPartialViewSnippetById({
+			PartialViewService.getPartialViewSnippetById({
 				id: snippetId,
 			}),
 		);

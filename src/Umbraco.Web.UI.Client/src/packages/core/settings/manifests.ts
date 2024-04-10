@@ -9,7 +9,7 @@ export const manifests = [
 		name: 'Settings Section',
 		weight: 400,
 		meta: {
-			label: 'Settings',
+			label: '#sections_settings',
 			pathname: 'settings',
 		},
 		conditions: [

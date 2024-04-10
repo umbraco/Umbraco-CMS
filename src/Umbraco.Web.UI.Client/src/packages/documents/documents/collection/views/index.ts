@@ -4,6 +4,8 @@ export { UMB_DOCUMENT_GRID_COLLECTION_VIEW_ALIAS, UMB_DOCUMENT_TABLE_COLLECTION_
 
 export function getPropertyValueByAlias(sortOrder: number, item: UmbDocumentCollectionItemModel, alias: string) {
 	switch (alias) {
+		case 'contentTypeAlias':
+			return item.contentTypeAlias;
 		case 'createDate':
 			return item.createDate.toLocaleString();
 		case 'creator':

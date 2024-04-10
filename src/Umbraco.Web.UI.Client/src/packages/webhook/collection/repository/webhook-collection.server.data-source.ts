@@ -1,7 +1,7 @@
 import type { UmbWebhookCollectionFilterModel } from '../types.js';
 import type { UmbWebhookDetailModel } from '../../types.js';
 import { UMB_WEBHOOK_ENTITY_TYPE } from '../../entity.js';
-import { WebhookResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -30,7 +30,7 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 	 * @memberof UmbWebhookCollectionServerDataSource
 	 */
 	async getCollection(_filter: UmbWebhookCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookResource.getWebhookItem({}));
+		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookService.getWebhookItem({}));
 
 		if (data) {
 			const items = data.map((item) => {

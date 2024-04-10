@@ -1,4 +1,4 @@
-import { TemporaryFileResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { TemporaryFileService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -30,7 +30,7 @@ export class UmbTemporaryFileServerDataSource {
 	async create(id: string, file: File) {
 		return tryExecuteAndNotify(
 			this.#host,
-			TemporaryFileResource.postTemporaryFile({
+			TemporaryFileService.postTemporaryFile({
 				formData: {
 					Id: id,
 					File: file,
@@ -47,7 +47,7 @@ export class UmbTemporaryFileServerDataSource {
 	 */
 	read(id: string) {
 		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, TemporaryFileResource.getTemporaryFileById({ id }));
+		return tryExecuteAndNotify(this.#host, TemporaryFileService.getTemporaryFileById({ id }));
 	}
 
 	/**
@@ -58,6 +58,6 @@ export class UmbTemporaryFileServerDataSource {
 	 */
 	delete(id: string) {
 		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, TemporaryFileResource.deleteTemporaryFileById({ id }));
+		return tryExecuteAndNotify(this.#host, TemporaryFileService.deleteTemporaryFileById({ id }));
 	}
 }

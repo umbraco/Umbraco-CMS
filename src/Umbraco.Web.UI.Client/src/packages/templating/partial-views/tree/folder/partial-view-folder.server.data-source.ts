@@ -1,7 +1,7 @@
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
 import type { CreatePartialViewFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -38,7 +38,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			PartialViewResource.getPartialViewFolderByPath({
+			PartialViewService.getPartialViewFolderByPath({
 				path: encodeURIComponent(path),
 			}),
 		);
@@ -75,7 +75,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			PartialViewResource.postPartialViewFolder({
+			PartialViewService.postPartialViewFolder({
 				requestBody,
 			}),
 		);
@@ -103,7 +103,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 
 		return tryExecuteAndNotify(
 			this.#host,
-			PartialViewResource.deletePartialViewFolderByPath({
+			PartialViewService.deletePartialViewFolderByPath({
 				path: encodeURIComponent(path),
 			}),
 		);

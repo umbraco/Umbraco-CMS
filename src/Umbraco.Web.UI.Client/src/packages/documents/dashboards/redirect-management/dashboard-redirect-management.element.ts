@@ -3,7 +3,7 @@ import { css, html, nothing, customElement, state, query, property } from '@umbr
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { RedirectUrlResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { RedirectManagementResource, RedirectStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { RedirectManagementService, RedirectStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -43,7 +43,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	async #getTrackerStatus() {
-		const { data } = await tryExecuteAndNotify(this, RedirectManagementResource.getRedirectManagementStatus());
+		const { data } = await tryExecuteAndNotify(this, RedirectManagementService.getRedirectManagementStatus());
 		if (data && data.status) this._trackerEnabled = data.status === RedirectStatusModel.ENABLED ? true : false;
 	}
 
@@ -52,7 +52,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		const skip = this.page * this.itemsPerPage - this.itemsPerPage;
 		const { data } = await tryExecuteAndNotify(
 			this,
-			RedirectManagementResource.getRedirectManagement({ filter, take: this.itemsPerPage, skip }),
+			RedirectManagementService.getRedirectManagement({ filter, take: this.itemsPerPage, skip }),
 		);
 		if (!data) return;
 
@@ -89,7 +89,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		this.#redirectDelete(data.id!);
 	}
 	async #redirectDelete(id: string) {
-		const { error } = await tryExecuteAndNotify(this, RedirectManagementResource.deleteRedirectManagementById({ id }));
+		const { error } = await tryExecuteAndNotify(this, RedirectManagementService.deleteRedirectManagementById({ id }));
 		if (error) return;
 
 		this._redirectData = this._redirectData?.filter((x) => x.id !== id);
@@ -129,7 +129,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		const status = this._trackerEnabled ? RedirectStatusModel.DISABLED : RedirectStatusModel.ENABLED;
 		const { error } = await tryExecuteAndNotify(
 			this,
-			RedirectManagementResource.postRedirectManagementStatus({ status }),
+			RedirectManagementService.postRedirectManagementStatus({ status }),
 		);
 		if (error) return;
 		this._trackerEnabled = !this._trackerEnabled;
@@ -173,10 +173,10 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			${this._redirectData?.length
 				? html`<uui-box id="redirect-wrapper" style="--uui-box-default-padding:0">
 						${this._trackerEnabled ? '' : html`<div id="grey-out"></div>`} ${this.#renderTable()}
-				  </uui-box>`
+					</uui-box>`
 				: this._filter !== undefined
-				? this.#renderZeroResults()
-				: this.#renderNoRedirects()}
+					? this.#renderZeroResults()
+					: this.#renderNoRedirects()}
 			${this.#renderPagination()}`;
 	}
 

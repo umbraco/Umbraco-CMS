@@ -117,7 +117,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
 				.hasChildren=${this._hasChildren}
-				label="${ifDefined(this._item?.name)}"
+				label="${ifDefined(this.localize.string(this._item?.name || ''))}"
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
 				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>

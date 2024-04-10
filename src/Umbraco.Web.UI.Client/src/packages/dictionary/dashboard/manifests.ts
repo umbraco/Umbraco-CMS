@@ -8,7 +8,7 @@ const dashboards: Array<ManifestDashboard> = [
 		name: 'Dictionary Overview Dashboard',
 		element: () => import('./dictionary-overview-dashboard.element.js'),
 		meta: {
-			label: 'Dictionary overview',
+			label: '#dictionaryItem_overviewTitle',
 			pathname: '',
 		},
 		conditions: [

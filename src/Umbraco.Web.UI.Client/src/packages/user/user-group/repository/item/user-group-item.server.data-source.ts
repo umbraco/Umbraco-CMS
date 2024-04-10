@@ -1,6 +1,6 @@
 import type { UmbUserGroupItemModel } from './types.js';
 import type { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UserGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -28,7 +28,7 @@ export class UmbUserGroupItemServerDataSource extends UmbItemServerDataSourceBas
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => UserGroupResource.getItemUserGroup({ id: uniques });
+const getItems = (uniques: Array<string>) => UserGroupService.getItemUserGroup({ id: uniques });
 
 const mapper = (item: UserGroupItemResponseModel): UmbUserGroupItemModel => {
 	return {

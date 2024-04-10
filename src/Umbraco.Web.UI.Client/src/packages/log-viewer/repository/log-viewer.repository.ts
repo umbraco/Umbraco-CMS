@@ -6,13 +6,9 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type {
 	DirectionModel,
 	LogLevelModel,
-	SavedLogSearchPresenationBaseModel,
+	SavedLogSearchResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-// Move to documentation / JSdoc
-/* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
-// element -> context -> repository -> (store) -> data source
-// All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
 export class UmbLogViewerRepository {
 	#host: UmbControllerHost;
 	#searchDataSource: UmbLogSearchesServerDataSource;
@@ -36,7 +32,7 @@ export class UmbLogViewerRepository {
 		return this.#searchDataSource.getAllSavedSearches({ skip, take });
 	}
 
-	async saveSearch({ name, query }: SavedLogSearchPresenationBaseModel) {
+	async saveSearch({ name, query }: SavedLogSearchResponseModel) {
 		await this.#init;
 		this.#searchDataSource.postLogViewerSavedSearch({ name, query });
 	}

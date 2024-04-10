@@ -1,10 +1,10 @@
 import { UmbValidationInvalidEvent } from '../events/validation-invalid.event.js';
 import { UmbValidationValidEvent } from '../events/validation-valid.event.js';
-import { UmbValidityState } from './validity-state.class.js';
 import { property, type LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 
-type NativeFormControlElement = HTMLInputElement | HTMLTextAreaElement; // Eventually use a specific interface or list multiple options like appending these types: ... | HTMLTextAreaElement | HTMLSelectElement
+type UmbNativeFormControlElement = Pick<HTMLInputElement, 'validity' | 'checkValidity' | 'validationMessage'> &
+	HTMLElement; // Eventually use a specific interface or list multiple options like appending these types: ... | HTMLTextAreaElement | HTMLSelectElement
 
 /* FlagTypes type options originate from:
  * https://developer.mozilla.org/en-US/docs/Web/API/ValidityState
@@ -31,7 +31,9 @@ interface Validator {
 }
 
 export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> extends HTMLElement {
-	formAssociated: boolean;
+	//static formAssociated: boolean;
+	getFormElement(): HTMLElement | undefined | null; // allows for null as it makes it simpler to just implement a querySelector as that might return null. [NL]
+	focusFirstInvalidElement(): void;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
 	formResetCallback(): void;
@@ -53,11 +55,12 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 {
 	protected _internals: ElementInternals;
 	protected _runValidators(): void;
-	protected abstract getFormElement(): HTMLElement | undefined;
 	protected addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
-	protected addFormControlElement(element: NativeFormControlElement): void;
+	protected addFormControlElement(element: UmbNativeFormControlElement): void;
 
-	formAssociated: boolean;
+	//static formAssociated: boolean;
+	getFormElement(): HTMLElement | undefined | null;
+	focusFirstInvalidElement(): void;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
 	formResetCallback(): void;
@@ -113,7 +116,8 @@ export const UmbFormControlMixin = <
 		}
 
 		// Validation
-		private _validityState = new UmbValidityState();
+		//private _validityState = new UmbValidityState();
+		#validity: any = {};
 
 		/**
 		 * Determines wether the form control has been touched or interacted with, this determines wether the validation-status of this form control should be made visible.
@@ -128,7 +132,7 @@ export const UmbFormControlMixin = <
 		protected _internals: ElementInternals;
 		#form: HTMLFormElement | null = null;
 		#validators: Validator[] = [];
-		#formCtrlElements: NativeFormControlElement[] = [];
+		#formCtrlElements: UmbNativeFormControlElement[] = [];
 
 		constructor(...args: any[]) {
 			super(...args);
@@ -143,11 +147,30 @@ export const UmbFormControlMixin = <
 		/**
 		 * Get internal form element.
 		 * This has to be implemented to provide a FormControl Element of choice for the given context. The element is used as anchor for validation-messages.
-		 * @abstract
 		 * @method getFormElement
+		 * @returns {HTMLElement | undefined | null}
+		 */
+		getFormElement(): HTMLElement | undefined | null {
+			return this.#formCtrlElements.find((el) => el.validity.valid === false);
+		}
+
+		/**
+		 * Focus first element that is invalid.
+		 * @method focusFirstInvalidElement
 		 * @returns {HTMLElement | undefined}
 		 */
-		protected abstract getFormElement(): HTMLElement | undefined;
+		focusFirstInvalidElement() {
+			const firstInvalid = this.#formCtrlElements.find((el) => el.validity.valid === false);
+			if (firstInvalid) {
+				if ('focusFirstInvalidElement' in firstInvalid) {
+					(firstInvalid as any).focusFirstInvalidElement();
+				} else {
+					firstInvalid.focus();
+				}
+			} else {
+				this.focus();
+			}
+		}
 
 		disconnectedCallback(): void {
 			super.disconnectedCallback();
@@ -194,9 +217,9 @@ export const UmbFormControlMixin = <
 		/**
 		 * @method addFormControlElement
 		 * @description Important notice if adding a native form control then ensure that its value and thereby validity is updated when value is changed from the outside.
-		 * @param element {NativeFormControlElement} - element to validate and include as part of this form association.
+		 * @param element {UmbNativeFormControlElement} - element to validate and include as part of this form association.
 		 */
-		protected addFormControlElement(element: NativeFormControlElement) {
+		protected addFormControlElement(element: UmbNativeFormControlElement) {
 			this.#formCtrlElements.push(element);
 			element.addEventListener(UmbValidationInvalidEvent.TYPE, () => {
 				this._runValidators();
@@ -204,6 +227,11 @@ export const UmbFormControlMixin = <
 			element.addEventListener(UmbValidationValidEvent.TYPE, () => {
 				this._runValidators();
 			});
+			// If we are in validationMode/'touched'/not-pristine then we need to validate this newly added control. [NL]
+			if (this.pristine === false) {
+				// I thin we could just execute validators for the new control, but now lets just run al of it again. [NL]
+				this._runValidators();
+			}
 		}
 
 		/**
@@ -214,15 +242,16 @@ export const UmbFormControlMixin = <
 		 * Such are mainly properties that are not declared as a Lit state and or Lit property.
 		 */
 		protected _runValidators() {
-			this._validityState = new UmbValidityState();
+			//this._validityState = new UmbValidityState();
+			this.#validity = {};
 
-			// Loop through inner native form controls to adapt their validityState.
+			// Loop through inner native form controls to adapt their validityState. [NL]
 			this.#formCtrlElements.forEach((formCtrlEl) => {
 				let key: keyof ValidityState;
 				for (key in formCtrlEl.validity) {
 					if (key !== 'valid' && formCtrlEl.validity[key]) {
-						this._validityState[key] = true;
-						this._internals.setValidity(this._validityState, formCtrlEl.validationMessage, formCtrlEl);
+						this.#validity[key] = true;
+						this._internals.setValidity(this.#validity, formCtrlEl.validationMessage, formCtrlEl);
 					}
 				}
 			});
@@ -230,15 +259,15 @@ export const UmbFormControlMixin = <
 			// Loop through custom validators, currently its intentional to have them overwritten native validity. but might need to be reconsidered (This current way enables to overwrite with custom messages) [NL]
 			this.#validators.forEach((validator) => {
 				if (validator.checkMethod()) {
-					this._validityState[validator.flagKey] = true;
-					this._internals.setValidity(this._validityState, validator.getMessageMethod(), this.getFormElement());
+					this.#validity[validator.flagKey] = true;
+					this._internals.setValidity(this.#validity, validator.getMessageMethod(), this.getFormElement() ?? undefined);
 				}
 			});
 
-			const hasError = Object.values(this._validityState).includes(true);
+			const hasError = Object.values(this.#validity).includes(true);
 
 			// https://developer.mozilla.org/en-US/docs/Web/API/ValidityState#valid
-			this._validityState.valid = !hasError;
+			this.#validity.valid = !hasError;
 
 			if (hasError) {
 				this.dispatchEvent(new UmbValidationInvalidEvent());
@@ -281,6 +310,8 @@ export const UmbFormControlMixin = <
 		}
 
 		public checkValidity() {
+			this.pristine = false;
+
 			for (const key in this.#formCtrlElements) {
 				if (this.#formCtrlElements[key].checkValidity() === false) {
 					return false;
@@ -292,7 +323,7 @@ export const UmbFormControlMixin = <
 
 		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/validity
 		public get validity(): ValidityState {
-			return this._validityState;
+			return this.#validity;
 		}
 
 		get validationMessage() {

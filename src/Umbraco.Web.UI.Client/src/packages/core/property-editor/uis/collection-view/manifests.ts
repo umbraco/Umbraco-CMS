@@ -1,6 +1,6 @@
 import { manifest as bulkActionPermissions } from './config/bulk-action-permissions/manifests.js';
-import { manifest as columnConfiguration } from './config/column-configuration/manifests.js';
-import { manifest as layoutConfiguration } from './config/layout-configuration/manifests.js';
+import { manifest as columnConfiguration } from './config/column/manifests.js';
+import { manifest as layoutConfiguration } from './config/layout/manifests.js';
 import { manifest as orderBy } from './config/order-by/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 

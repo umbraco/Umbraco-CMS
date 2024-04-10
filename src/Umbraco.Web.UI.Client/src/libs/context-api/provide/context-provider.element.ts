@@ -1,7 +1,7 @@
+import type { UmbContextToken } from '../token/index.js';
 import { UmbContextProviderController } from './context-provider.controller.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbContextToken } from '../token/index.js';
 
 /**
  * Provides a value to the context down the DOM tree.

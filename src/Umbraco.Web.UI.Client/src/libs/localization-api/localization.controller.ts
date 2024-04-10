@@ -51,7 +51,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
 		this.#hostEl = host.getHostElement() as HTMLElement;
-		this.#host.addController(this);
+		this.#host.addUmbController(this);
 	}
 
 	hostConnected(): void {
@@ -63,7 +63,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	}
 
 	destroy(): void {
-		this.#host?.removeController(this);
+		this.#host?.removeUmbController(this);
 		this.#hostEl = undefined as any;
 		this.#usedKeys.length = 0;
 	}
@@ -158,5 +158,22 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	/** Outputs a localized time in relative format. */
 	relativeTime(value: number, unit: Intl.RelativeTimeFormatUnit, options?: Intl.RelativeTimeFormatOptions): string {
 		return new Intl.RelativeTimeFormat(this.lang(), options).format(value, unit);
+	}
+
+	string(text: string): string {
+		// find all words starting with #
+		const regex = /#\w+/g;
+
+		const localizedText = text.replace(regex, (match: string) => {
+			const key = match.slice(1);
+			// TODO: find solution to pass dynamic string to term
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			const localized = this.term(key);
+			// we didn't find a localized string, so we return the original string with the #
+			return localized === key ? match : localized;
+		});
+
+		return localizedText;
 	}
 }
