@@ -208,10 +208,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 						</div>
 						<uui-button
 							look="secondary"
-							@click=${(event: Event) => this.#onPreventCleanup(event, item.id, !item.preventCleanup)}>
-							${item.preventCleanup
+							@click=${(event: Event) => this.#onPreventCleanup(event, item.id, !item.preventCleanup)}
+							label=${item.preventCleanup
 								? this.localize.term('contentTypeEditor_historyCleanupEnableCleanup')
-								: this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}
+								: this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}>
 						</uui-button>
 					</div>
 				`;
