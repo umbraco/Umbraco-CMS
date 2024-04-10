@@ -2,8 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -79,7 +78,7 @@ public class MemberTests
     {
         var member = BuildMember();
 
-        var json = JsonConvert.SerializeObject(member);
+        var json = JsonSerializer.Serialize(member);
         Debug.Print(json);
     }
 

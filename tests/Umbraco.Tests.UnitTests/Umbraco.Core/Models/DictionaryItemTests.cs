@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -57,7 +57,7 @@ public class DictionaryItemTests
             .WithRandomTranslations(2)
             .Build();
 
-        Assert.DoesNotThrow(() => JsonConvert.SerializeObject(item));
+        Assert.DoesNotThrow(() => JsonSerializer.Serialize(item));
     }
 
     [TestCase("en-AU", "en-AU value")]
