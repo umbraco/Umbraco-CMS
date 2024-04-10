@@ -33,7 +33,7 @@ export class UmbDocumentUserPermissionCondition
 				(currentUser) => {
 					this.#documentPermissions = currentUser?.permissions?.filter(isDocumentUserPermission) || [];
 					this.#fallbackPermissions = currentUser?.fallbackPermissions || [];
-					this.#isAllowed();
+					this.#checkPermissions();
 				},
 				'umbUserPermissionConditionObserver',
 			);
@@ -47,14 +47,14 @@ export class UmbDocumentUserPermissionCondition
 				([entityType, unique]) => {
 					this.#entityType = entityType;
 					this.#unique = unique;
-					this.#isAllowed();
+					this.#checkPermissions();
 				},
 				'umbUserPermissionEntityContextObserver',
 			);
 		});
 	}
 
-	#isAllowed() {
+	#checkPermissions() {
 		if (!this.#entityType) return;
 		if (this.#unique === undefined) return;
 
@@ -66,6 +66,8 @@ export class UmbDocumentUserPermissionCondition
 			return;
 		}
 
+		/* If there are document permission we check if there are permissions for the current document
+		 If there aren't we use the fallback permissions */
 		if (hasDocumentPermissions) {
 			const permissionsForCurrentDocument = this.#documentPermissions.find(
 				(permission) => permission.document.id === this.#unique,
@@ -77,6 +79,7 @@ export class UmbDocumentUserPermissionCondition
 				return;
 			}
 
+			// we found permissions for the current document - check them
 			this.#check(permissionsForCurrentDocument.verbs);
 		}
 	}
@@ -87,12 +90,20 @@ export class UmbDocumentUserPermissionCondition
 		let allOfPermitted = true;
 		let oneOfPermitted = true;
 
+		// check if all of the verbs are present
 		if (this.config.allOf?.length) {
 			allOfPermitted = this.config.allOf.every((verb) => verbs.includes(verb));
 		}
 
+		// check if at least one of the verbs is present
 		if (this.config.oneOf?.length) {
 			oneOfPermitted = this.config.oneOf.some((verb) => verbs.includes(verb));
+		}
+
+		// if neither allOf or oneOf is defined we default to false
+		if (!allOfPermitted && !oneOfPermitted) {
+			allOfPermitted = false;
+			oneOfPermitted = false;
 		}
 
 		this.permitted = allOfPermitted && oneOfPermitted;
