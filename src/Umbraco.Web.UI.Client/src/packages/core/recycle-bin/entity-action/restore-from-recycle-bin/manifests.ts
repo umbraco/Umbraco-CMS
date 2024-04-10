@@ -6,6 +6,6 @@ export const manifests = [
 		type: 'modal',
 		alias: 'Umb.Modal.RecycleBin.Restore',
 		name: 'Restore From Recycle Bin Modal',
-		js: () => import('./modal/restore-from-recycle-bin-modal.element.js'),
+		element: () => import('./modal/restore-from-recycle-bin-modal.element.js'),
 	},
 ];

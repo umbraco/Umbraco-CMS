@@ -5,6 +5,6 @@ export const manifests: Array<ManifestGlobalContext> = [
 		type: 'globalContext',
 		alias: 'Umb.GlobalContext.AppLanguage',
 		name: 'App Language Context',
-		js: () => import('./app-language.context.js'),
+		api: () => import('./app-language.context.js'),
 	},
 ];

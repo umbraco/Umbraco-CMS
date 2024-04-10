@@ -7,7 +7,7 @@ const tableCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
 	alias: UMB_EXTENSION_TABLE_COLLECTION_VIEW_ALIAS,
 	name: 'Extension Table Collection View',
-	js: () => import('./table/extension-table-collection-view.element.js'),
+	element: () => import('./table/extension-table-collection-view.element.js'),
 	meta: {
 		label: 'Table',
 		icon: 'icon-list',
