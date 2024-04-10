@@ -153,6 +153,8 @@ test.describe('Template tests', () => {
     // Act
     await umbracoUi.template.goToTemplate(templateName);
     await umbracoUi.template.insertDictionaryByName(dictionaryName);
+    // TODO: Remove later
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.clickSaveButton();
 
     // Assert
