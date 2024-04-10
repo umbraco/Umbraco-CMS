@@ -37,6 +37,7 @@ internal class UmbracoCmsSchema
         public ImagingSettings Imaging { get; set; } = null!;
 
         public IndexCreatorSettings Examine { get; set; } = null!;
+
         public IndexingSettings Indexing { get; set; } = null!;
 
         public LoggingSettings Logging { get; set; } = null!;
