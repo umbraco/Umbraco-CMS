@@ -15,22 +15,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class TrackedReferencesServiceTests : UmbracoIntegrationTest
 {
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+    private IContentService ContentService => GetRequiredService<IContentService>();
 
-    protected IContentService ContentService => GetRequiredService<IContentService>();
-    protected IRelationService RelationService => GetRequiredService<IRelationService>();
+    private Content Root1 { get; set; }
 
+    private Content Root2 { get; set; }
 
-    protected Content Root1 { get; private set; }
-    protected Content Root2 { get; private set; }
-
-    protected IContentType ContentType { get; private set; }
+    private IContentType ContentType { get; set; }
 
     [SetUp]
     public void Setup() => CreateTestData();
 
-    public virtual void CreateTestData()
+    protected virtual void CreateTestData()
     {
         ContentType = new ContentTypeBuilder()
             .WithName("Page")
@@ -57,18 +55,16 @@ public class TrackedReferencesServiceTests : UmbracoIntegrationTest
             .WithName("Root 2")
             .WithPropertyValues(new
             {
-                contentPicker = Udi.Create(Constants.UdiEntityType.Document , Root1.Key) // contentPicker is the alias of the property type
+                contentPicker = Udi.Create(Constants.UdiEntityType.Document, Root1.Key) // contentPicker is the alias of the property type
             })
             .Build();
 
         ContentService.Save(Root2);
         ContentService.Publish(Root2, ["*"]);
-
-        var x = RelationService.GetAllRelations();
     }
 
     [Test]
-    public async Task Get_Pages_That_References_This()
+    public async Task Get_Pages_That_Reference_This()
     {
         var sut = GetRequiredService<ITrackedReferencesService>();
 
@@ -76,7 +72,6 @@ public class TrackedReferencesServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-
             Assert.AreEqual(1, actual.Total);
             var item = actual.Items.FirstOrDefault();
             Assert.AreEqual(Root2.ContentType.Alias, item?.ContentTypeAlias);
@@ -85,7 +80,7 @@ public class TrackedReferencesServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Do_not_return_references_if_items_is_not_referenced()
+    public async Task Does_not_return_references_if_item_is_not_referenced()
     {
         var sut = GetRequiredService<ITrackedReferencesService>();
 
@@ -93,5 +88,4 @@ public class TrackedReferencesServiceTests : UmbracoIntegrationTest
 
         Assert.AreEqual(0, actual.Total);
     }
-
 }
