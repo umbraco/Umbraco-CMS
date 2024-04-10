@@ -15,7 +15,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-enter',
-			label: 'Move to (TBD)...',
+			label: '#actions_move',
 			itemRepositoryAlias: '',
 			moveRepositoryAlias: '',
 			pickerModal: '',

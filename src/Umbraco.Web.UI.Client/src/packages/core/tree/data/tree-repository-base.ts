@@ -28,7 +28,7 @@ export abstract class UmbTreeRepositoryBase<
 {
 	protected _init: Promise<unknown>;
 	protected _treeStore?: UmbTreeStore<TreeItemType>;
-	#treeSource: UmbTreeDataSource<TreeItemType>;
+	protected _treeSource: UmbTreeDataSource<TreeItemType>;
 
 	/**
 	 * Creates an instance of UmbTreeRepositoryBase.
@@ -43,7 +43,7 @@ export abstract class UmbTreeRepositoryBase<
 		treeStoreContextAlias: string | UmbContextToken<any, any>,
 	) {
 		super(host);
-		this.#treeSource = new treeSourceConstructor(this);
+		this._treeSource = new treeSourceConstructor(this);
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
 			this._treeStore = instance;
@@ -65,7 +65,7 @@ export abstract class UmbTreeRepositoryBase<
 	async requestRootTreeItems(args: any) {
 		await this._init;
 
-		const { data, error } = await this.#treeSource.getRootItems(args);
+		const { data, error } = await this._treeSource.getRootItems(args);
 
 		if (data) {
 			this._treeStore!.appendItems(data.items);
@@ -84,7 +84,7 @@ export abstract class UmbTreeRepositoryBase<
 		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 		await this._init;
 
-		const { data, error } = await this.#treeSource.getChildrenOf(args);
+		const { data, error } = await this._treeSource.getChildrenOf(args);
 
 		if (data) {
 			this._treeStore!.appendItems(data.items);
@@ -103,7 +103,7 @@ export abstract class UmbTreeRepositoryBase<
 		if (args.descendantUnique === undefined) throw new Error('Descendant unique is missing');
 		await this._init;
 
-		const { data, error } = await this.#treeSource.getAncestorsOf(args);
+		const { data, error } = await this._treeSource.getAncestorsOf(args);
 
 		// TODO: implement observable for ancestor items in the store
 		return { data, error };

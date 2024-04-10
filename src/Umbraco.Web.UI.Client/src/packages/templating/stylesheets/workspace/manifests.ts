@@ -26,7 +26,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/code-editor/stylesheet-code-editor-workspace-view.element.js'),
 		weight: 700,
 		meta: {
-			label: 'Code',
+			label: '#stylesheet_tabCode',
 			pathname: 'code',
 			icon: 'icon-brackets',
 		},
@@ -44,7 +44,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/rich-text-rule/stylesheet-rich-text-rule-workspace-view.element.js'),
 		weight: 800,
 		meta: {
-			label: 'Rich Text Editor',
+			label: '#stylesheet_tabRule',
 			pathname: 'rich-text-editor',
 			icon: 'icon-font',
 		},
@@ -64,7 +64,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		name: 'Save Stylesheet Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},

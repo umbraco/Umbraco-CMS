@@ -32,6 +32,7 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 	public readonly data: ModalPreset;
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
+	public readonly backdropBackground?: string;
 	public readonly router: IRouterSlot | null = null;
 	public readonly alias: string | UmbModalToken<ModalPreset, ModalValue>;
 
@@ -51,10 +52,12 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 		if (this.alias instanceof UmbModalToken) {
 			this.type = this.alias.getDefaultModal()?.type || this.type;
 			this.size = this.alias.getDefaultModal()?.size || this.size;
+			this.backdropBackground = this.alias.getDefaultModal()?.backdropBackground || this.backdropBackground;
 		}
 
 		this.type = args.modal?.type || this.type;
 		this.size = args.modal?.size || this.size;
+		this.backdropBackground = args.modal?.backdropBackground || this.backdropBackground;
 
 		const defaultData = this.alias instanceof UmbModalToken ? this.alias.getDefaultData() : undefined;
 		this.data = Object.freeze({ ...defaultData, ...args.data } as ModalPreset);

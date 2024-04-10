@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_PICKER_MODAL } from '../modals/index.js';
 import { manifests as createManifests } from './create/manifests.js';
@@ -13,12 +13,10 @@ const entityActions: Array<ManifestEntityAction> = [
 		kind: 'delete',
 		alias: 'Umb.EntityAction.Document.Delete',
 		name: 'Delete Document Entity Action',
-		weight: 1100,
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			deleteRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			pickerModalAlias: UMB_DOCUMENT_PICKER_MODAL,
+			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+			detailRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 		},
 	},
 	{
@@ -31,7 +29,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-blueprint',
-			label: 'Create Document Blueprint (TBD)',
+			label: '#actions_createblueprint',
 		},
 	},
 	{
@@ -70,7 +68,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-globe',
-			label: 'Publish',
+			label: '#actions_publish',
 		},
 	},
 	{
@@ -83,7 +81,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-globe',
-			label: 'Unpublish...',
+			label: '#actions_unpublish',
 		},
 	},
 	{
@@ -96,7 +94,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		api: () => import('./permissions.action.js'),
 		meta: {
 			icon: 'icon-name-badge',
-			label: 'Permissions...',
+			label: '#actions_setPermissions',
 		},
 	},
 	{
@@ -109,7 +107,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		api: () => import('./permissions.action.js'),
 		meta: {
 			icon: 'icon-megaphone',
-			label: 'Notifications...',
+			label: '#actions_notify',
 		},
 	},
 ];

@@ -8,7 +8,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		element: () => import('./media-section-view.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Media',
+			label: '#general_media',
 			pathname: 'media',
 			icon: 'icon-user',
 		},

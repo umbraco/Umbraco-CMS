@@ -9,7 +9,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./settings.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Settings',
+			label: '#general_settings',
 			pathname: 'settings',
 			icon: 'icon-settings',
 		},

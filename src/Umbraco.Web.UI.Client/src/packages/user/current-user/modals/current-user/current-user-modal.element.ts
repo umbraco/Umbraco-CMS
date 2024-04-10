@@ -1,12 +1,12 @@
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.js';
 import type { UmbCurrentUserModel } from '../../types.js';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-current-user-modal')
 export class UmbCurrentUserModalElement extends UmbLitElement {
@@ -15,6 +15,9 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 	@state()
 	private _currentUser?: UmbCurrentUserModel;
+
+	@state()
+	private _logOutButtonState?: UUIButtonState;
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
@@ -50,7 +53,9 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 	private async _logout() {
 		if (!this.#authContext) return;
-		this.#authContext.signOut();
+		this._logOutButtonState = 'waiting';
+		await this.#authContext.signOut();
+		this._logOutButtonState = 'success';
 	}
 
 	render() {
@@ -65,6 +70,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 					</uui-button>
 					<uui-button
 						@click=${this._logout}
+						.state=${this._logOutButtonState}
 						look="primary"
 						color="danger"
 						.label=${this.localize.term('general_logout')}>

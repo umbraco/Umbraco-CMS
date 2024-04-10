@@ -14,7 +14,6 @@ import './components/index.js';
 const CORE_PACKAGES = [
 	import('../../packages/audit-log/umbraco-package.js'),
 	import('../../packages/block/umbraco-package.js'),
-	import('../../packages/core/umbraco-package.js'),
 	import('../../packages/data-type/umbraco-package.js'),
 	import('../../packages/dictionary/umbraco-package.js'),
 	import('../../packages/documents/umbraco-package.js'),
@@ -45,7 +44,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 	/**
 	 * Backoffice extension registry.
 	 * This enables to register and unregister extensions via DevTools, or just via querying this element via the DOM.
-	 * @type {UmbExtensionsRegistry}
 	 */
 	public extensionRegistry = umbExtensionsRegistry;
 
@@ -53,9 +51,11 @@ export class UmbBackofficeElement extends UmbLitElement {
 		super();
 
 		new UmbBackofficeContext(this);
+
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerAllExtensions();
+
+		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions();
 
 		// So far local packages are this simple to registerer, so no need for a manager to do that:
 		CORE_PACKAGES.forEach(async (packageImport) => {
