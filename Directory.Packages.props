@@ -6,7 +6,7 @@
   <!-- Global packages (private, build-time packages for all projects) -->
   <ItemGroup>
     <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.6.133" />
-    <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.507" />
+    <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <GlobalPackageReference Include="Umbraco.Code" Version="2.1.0" />
     <GlobalPackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.2.0" />
   </ItemGroup>
