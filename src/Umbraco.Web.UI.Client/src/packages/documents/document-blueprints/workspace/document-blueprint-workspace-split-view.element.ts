@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from './manifests.js';
 import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT } from './document-blueprint-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -14,6 +15,7 @@ export class UmbDocumentBlueprintWorkspaceSplitViewElement extends UmbLitElement
 
 	constructor() {
 		super();
+		console.log('split view');
 
 		// TODO: Refactor: use a split view workspace context token:
 		this.consumeContext(UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT, (context) => {
@@ -42,14 +44,14 @@ export class UmbDocumentBlueprintWorkspaceSplitViewElement extends UmbLitElement
 								view.index + '_' + (view.culture ?? '') + '_' + (view.segment ?? '') + '_' + this._variants!.length,
 							(view) => html`
 								<umb-workspace-split-view
-									alias="Umb.Workspace.DocumentBlueprint"
+									alias=${UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS}
 									.splitViewIndex=${view.index}
 									.displayNavigation=${view.index === this._variants!.length - 1}></umb-workspace-split-view>
 							`,
 						)}
 					</div>
 
-					<umb-workspace-footer alias="Umb.Workspace.DocumentBlueprint"></umb-workspace-footer>`
+					<umb-workspace-footer alias=${UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS}></umb-workspace-footer>`
 			: nothing;
 	}
 
