@@ -61,7 +61,7 @@ const mapper = (item: DocumentBlueprintTreeItemResponseModel): UmbDocumentBluepr
 	return {
 		unique: item.id,
 		parentUnique: item.parent?.id || null,
-		name: item.name,
+		name: (item as any).variants?.[0].name  ?? item.name,
 		entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
 		isFolder: false,
 		hasChildren: item.hasChildren,
