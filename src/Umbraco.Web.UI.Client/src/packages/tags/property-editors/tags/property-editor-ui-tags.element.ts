@@ -56,7 +56,7 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 
 	render() {
 		return html`<umb-tags-input
-			group="${ifDefined(this._group)}"
+			group=${ifDefined(this._group)}
 			.culture=${this._culture}
 			.items=${this.value}
 			@change=${this.#onChange}></umb-tags-input>`;
