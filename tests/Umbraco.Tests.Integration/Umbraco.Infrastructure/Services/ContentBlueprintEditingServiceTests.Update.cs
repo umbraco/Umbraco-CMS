@@ -149,4 +149,40 @@ public partial class ContentBlueprintEditingServiceTests
         });
         Assert.IsNull(updateResult.Result.Content);
     }
+
+    [Test]
+    public async Task Can_Update_Blueprint_In_A_Folder()
+    {
+        var containerKey = Guid.NewGuid();
+        var container = (await ContentBlueprintContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey)).Result;
+
+        var blueprintKey = Guid.NewGuid();
+        await ContentBlueprintEditingService.CreateAsync(SimpleContentBlueprintCreateModel(blueprintKey, containerKey), Constants.Security.SuperUserKey);
+
+        await ContentBlueprintEditingService.UpdateAsync(blueprintKey, SimpleContentBlueprintUpdateModel(), Constants.Security.SuperUserKey);
+
+        var blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
+        Assert.NotNull(blueprint);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(container.Id, blueprint.ParentId);
+            Assert.AreEqual($"{container.Path},{blueprint.Id}", blueprint.Path);
+        });
+
+        var result = GetBlueprintChildren(containerKey);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, result.Length);
+            Assert.AreEqual(blueprintKey, result.First().Key);
+        });
+
+        blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
+        Assert.IsNotNull(blueprint);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Blueprint #1 updated", blueprint.Name);
+            Assert.AreEqual("The title value updated", blueprint.GetValue<string>("title"));
+            Assert.AreEqual("The author value updated", blueprint.GetValue<string>("author"));
+        });
+    }
 }

@@ -24,7 +24,9 @@ public class ByIdController : PartialViewControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PartialViewSnippetResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetById(string id)
+    public async Task<IActionResult> GetById(
+        CancellationToken cancellationToken,
+        string id)
     {
         PartialViewSnippet? snippet = await _partialViewService.GetSnippetAsync(id);
         return snippet is not null

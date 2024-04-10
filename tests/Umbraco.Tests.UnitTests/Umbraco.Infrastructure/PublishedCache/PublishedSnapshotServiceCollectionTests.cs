@@ -1312,8 +1312,8 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         InitializedCache(GetInvariantKits(), _contentTypes);
         var snapshot = GetPublishedSnapshot();
 
-        var items = snapshot.Content.GetByXPath("/root/itype").ToArray();
-        Assert.AreEqual(items.Count(), items.Count());
+        var items = snapshot.Content.GetAtRoot().Where(x => x.ContentType.Alias == "itype").ToArray();
+        Assert.AreEqual(items.Length, items.Length);
     }
 
     private void AssertLinkedNode(ContentNode node, int parent, int prevSibling, int nextSibling, int firstChild, int lastChild)
