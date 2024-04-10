@@ -14,6 +14,10 @@ export class UmbDocumentSaveWorkspaceAction extends UmbSubmitWorkspaceAction {
 		 will first be triggered when the condition is changed to permitted */
 		this.disable();
 
+		// TODO: this check is not sufficient. It will show the save button if a use
+		// has only create options. The best solution would be to split the two buttons into two separate actions
+		// with a condition on isNew to show/hide them
+		// The server will throw a permission error if this scenario happens
 		const condition = new UmbDocumentUserPermissionCondition(host, {
 			host,
 			config: {
