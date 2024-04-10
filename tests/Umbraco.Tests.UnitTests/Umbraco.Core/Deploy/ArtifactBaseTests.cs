@@ -23,7 +23,6 @@ public class ArtifactBaseTests
             Converters =
             {
                 new JsonUdiConverter(),
-                new JsonGuidUdiConverter()
             }
         });
 
