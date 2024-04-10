@@ -22,7 +22,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		name: 'Save Partial View',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},

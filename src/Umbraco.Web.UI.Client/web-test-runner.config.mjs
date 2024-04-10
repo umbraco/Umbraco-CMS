@@ -22,7 +22,6 @@ export default {
 		reporters: ['lcovonly', 'text-summary'],
 	},
 	plugins: [
-		esbuildPlugin({ ts: true, tsconfig: './tsconfig.json', target: 'auto', json: true }),
 		importMapsPlugin({
 			inject: {
 				importMap: createImportMap({
@@ -35,8 +34,9 @@ export default {
 			},
 		}),
 		commonjs({
-			include: ['node_modules/**', 'src/external/**'],
+			include: ['node_modules/base64-js/**/*', 'node_modules/tinymce/**/*']
 		}),
+		esbuildPlugin({ ts: true, tsconfig: './tsconfig.json', target: 'auto', json: true }),
 	],
 	testRunnerHtml: (testFramework, devMode) =>
 		`<html lang="en-us">

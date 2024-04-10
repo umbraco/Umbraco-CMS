@@ -1,18 +1,17 @@
-export {
-	BaseTokenRequestHandler,
-	BasicQueryStringUtils,
-	FetchRequestor,
-	LocalStorageBackend,
-	RedirectRequestHandler,
-	RevokeTokenRequest,
-} from '@openid/appauth';
-export { AuthorizationRequest } from '@openid/appauth/built/authorization_request';
-export { AuthorizationNotifier } from '@openid/appauth/built/authorization_request_handler';
-export { AuthorizationServiceConfiguration } from '@openid/appauth/built/authorization_service_configuration';
-export {
-	GRANT_TYPE_AUTHORIZATION_CODE,
-	GRANT_TYPE_REFRESH_TOKEN,
-	TokenRequest,
-} from '@openid/appauth/built/token_request';
-export { TokenResponse } from '@openid/appauth/built/token_response';
-export type { LocationLike, StringMap } from '@openid/appauth/built/types';
+export * from './authorization_request.js';
+export * from './authorization_request_handler.js';
+export * from './authorization_response.js';
+export * from './authorization_service_configuration.js';
+export * from './crypto_utils.js';
+export * from './errors.js';
+export * from './flags.js';
+export * from './logger.js';
+export * from './query_string_utils.js';
+export * from './redirect_based_handler.js';
+export * from './revoke_token_request.js';
+export * from './storage.js';
+export * from './token_request.js';
+export * from './token_request_handler.js';
+export * from './token_response.js';
+export type * from './types.js';
+export * from './xhr.js';

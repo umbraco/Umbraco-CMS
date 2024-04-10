@@ -1,3 +1,4 @@
+import { loadManifestApi } from '../../../../libs/extension-api/functions/load-manifest-api.function.js';
 import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
@@ -6,7 +7,6 @@ import type { TinyMcePluginArguments, UmbTinyMcePluginBase } from './tiny-mce-pl
 import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { EditorEvent, Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
-import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';

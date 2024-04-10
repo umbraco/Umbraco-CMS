@@ -6,7 +6,7 @@ const section: ManifestSection = {
 	name: 'Members Section',
 	weight: 300,
 	meta: {
-		label: 'Members',
+		label: '#sections_member',
 		pathname: 'member-management',
 	},
 	conditions: [

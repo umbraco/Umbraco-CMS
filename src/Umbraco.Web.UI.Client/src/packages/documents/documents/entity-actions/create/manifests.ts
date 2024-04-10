@@ -13,7 +13,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create...',
+			label: '#actions_create',
 		},
 		conditions: [
 			{

@@ -10,7 +10,7 @@ const section: ManifestSection = {
 	name: 'Dictionary Section',
 	weight: 100,
 	meta: {
-		label: 'Dictionary',
+		label: '#sections_translation',
 		pathname: 'dictionary',
 	},
 	conditions: [
