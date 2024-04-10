@@ -5,14 +5,14 @@ using Umbraco.Cms.Core.Serialization;
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
 /// <inheritdoc />
-public sealed class DefaultConfigurationEditorJsonSerializer : IConfigurationEditorJsonSerializer
+public sealed class SystemTextConfigurationEditorJsonSerializer : IConfigurationEditorJsonSerializer
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultConfigurationEditorJsonSerializer" /> class.
+    /// Initializes a new instance of the <see cref="SystemTextConfigurationEditorJsonSerializer" /> class.
     /// </summary>
-    public DefaultConfigurationEditorJsonSerializer()
+    public SystemTextConfigurationEditorJsonSerializer()
         => _jsonSerializerOptions = new JsonSerializerOptions()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,

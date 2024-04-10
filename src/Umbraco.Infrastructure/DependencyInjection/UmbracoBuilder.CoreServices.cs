@@ -119,8 +119,8 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
-        builder.Services.AddSingleton<IJsonSerializer, DefaultJsonSerializer>();
-        builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, DefaultConfigurationEditorJsonSerializer>();
+        builder.Services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
+        builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, SystemTextConfigurationEditorJsonSerializer>();
 
         // register database builder
         // *not* a singleton, don't want to keep it around
