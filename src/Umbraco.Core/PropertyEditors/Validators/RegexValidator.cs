@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 /// <summary>
 ///     A validator that validates that the value against a regular expression.
 /// </summary>
-public sealed class RegexValidator : IValueFormatValidator, IManifestValueValidator
+public sealed class RegexValidator : IValueFormatValidator, IValueValidator
 {
     private string _regex;
 
@@ -73,9 +73,6 @@ public sealed class RegexValidator : IValueFormatValidator, IManifestValueValida
             _regex = value;
         }
     }
-
-    /// <inheritdoc cref="IManifestValueValidator.ValidationName" />
-    public string ValidationName => "Regex";
 
     /// <inheritdoc cref="IValueValidator.Validate" />
     public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
