@@ -37,6 +37,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 
 				const model: UmbDocumentCollectionItemModel = {
 					unique: item.id,
+					entityType: 'document',
 					contentTypeAlias: item.documentType.alias,
 					createDate: new Date(variant.createDate),
 					creator: item.creator,
