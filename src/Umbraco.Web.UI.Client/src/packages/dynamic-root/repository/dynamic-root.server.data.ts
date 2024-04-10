@@ -1,4 +1,4 @@
-import { DynamicRootResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DynamicRootService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { DynamicRootRequestModel, DynamicRootResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -19,7 +19,7 @@ export class UmbDynamicRootServerDataSource {
 			query: args.query,
 		};
 
-		const { data } = await tryExecuteAndNotify(this.#host, DynamicRootResource.postDynamicRootQuery({ requestBody }));
+		const { data } = await tryExecuteAndNotify(this.#host, DynamicRootService.postDynamicRootQuery({ requestBody }));
 
 		return data;
 	}

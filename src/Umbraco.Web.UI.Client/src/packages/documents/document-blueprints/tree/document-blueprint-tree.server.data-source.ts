@@ -10,7 +10,7 @@ import type {
 	DocumentBlueprintTreeItemResponseModel,
 	DocumentTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentBlueprintResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -40,7 +40,7 @@ export class UmbDocumentBlueprintTreeServerDataSource extends UmbTreeServerDataS
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentBlueprintResource.getTreeDocumentBlueprintRoot({ skip: args.skip, take: args.take });
+	DocumentBlueprintService.getTreeDocumentBlueprintRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parentUnique === null) {
@@ -49,7 +49,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		throw new Error('Not implemented');
 		/*
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentBlueprintResource.getTreeDocumentBlueprintChildren({
+		return DocumentBlueprintService.getTreeDocumentBlueprintChildren({
 			parentId: args.parentUnique,
 		});
 		*/

@@ -1,0 +1,1 @@
+export { diffWords } from 'diff';

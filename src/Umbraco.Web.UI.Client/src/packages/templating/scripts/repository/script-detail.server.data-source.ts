@@ -5,7 +5,7 @@ import {
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
 import type { CreateScriptRequestModel, UpdateScriptRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { ScriptResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { ScriptService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -45,7 +45,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			ScriptResource.postScript({
+			ScriptService.postScript({
 				requestBody,
 			}),
 		);
@@ -67,7 +67,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			ScriptResource.getScriptByPath({ path: encodeURIComponent(path) }),
+			ScriptService.getScriptByPath({ path: encodeURIComponent(path) }),
 		);
 
 		if (error || !data) {
@@ -96,7 +96,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			ScriptResource.putScriptByPath({
+			ScriptService.putScriptByPath({
 				path: encodeURIComponent(path),
 				requestBody,
 			}),
@@ -117,7 +117,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 		return tryExecuteAndNotify(
 			this.#host,
-			ScriptResource.deleteScriptByPath({
+			ScriptService.deleteScriptByPath({
 				path: encodeURIComponent(path),
 			}),
 		);

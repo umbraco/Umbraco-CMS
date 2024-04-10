@@ -46,7 +46,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 		if (value === this.#type) return;
 		this.#type = value;
 		if (this.#attached) {
-			this._observeExtensions();
+			this.#observeExtensions();
 		}
 	}
 	#type?: string | string[] | undefined;
@@ -68,7 +68,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 		if (value === this.#filter) return;
 		this.#filter = value;
 		if (this.#attached) {
-			this._observeExtensions();
+			this.#observeExtensions();
 		}
 	}
 	#filter: (manifest: any) => boolean = () => true;
@@ -107,8 +107,9 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 		return this.#constructorArgs;
 	}
 	set apiArgs(newVal: Array<unknown> | UmbApiConstructorArgumentsMethodType<any> | undefined) {
-		// TODO, compare changes since last time. only reset the ones that changed. This might be better done by the controller is self:
+		if (newVal === this.#constructorArgs) return;
 		this.#constructorArgs = newVal;
+		this.#observeExtensions();
 	}
 	#constructorArgs?: Array<unknown> | UmbApiConstructorArgumentsMethodType<any> = [];
 
@@ -146,11 +147,11 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this._observeExtensions();
+		this.#observeExtensions();
 		this.#attached = true;
 	}
 
-	private _observeExtensions(): void {
+	#observeExtensions(): void {
 		this.#extensionsController?.destroy();
 		if (this.#type) {
 			this.#extensionsController = new UmbExtensionsElementAndApiInitializer(

@@ -30,7 +30,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		const validationLimit = config?.getByAlias('validationLimit');
 		if (!validationLimit) return;
 
-		const minMax: Record<string, number> = validationLimit.value;
+		const minMax: Record<string, number> = validationLimit.value as any;
 
 		this._limitMin = minMax.min ?? 0;
 		this._limitMax = minMax.max ?? Infinity;

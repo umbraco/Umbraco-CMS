@@ -8,7 +8,7 @@ import type {
 	CreatePartialViewRequestModel,
 	UpdatePartialViewRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -48,7 +48,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			PartialViewResource.postPartialView({
+			PartialViewService.postPartialView({
 				requestBody,
 			}),
 		);
@@ -70,7 +70,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			PartialViewResource.getPartialViewByPath({ path: encodeURIComponent(path) }),
+			PartialViewService.getPartialViewByPath({ path: encodeURIComponent(path) }),
 		);
 
 		if (error || !data) {
@@ -99,7 +99,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			PartialViewResource.putPartialViewByPath({
+			PartialViewService.putPartialViewByPath({
 				path: encodeURIComponent(path),
 				requestBody,
 			}),
@@ -120,7 +120,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 
 		return tryExecuteAndNotify(
 			this.#host,
-			PartialViewResource.deletePartialViewByPath({
+			PartialViewService.deletePartialViewByPath({
 				path: encodeURIComponent(path),
 			}),
 		);

@@ -6,7 +6,7 @@ import type {
 	CreateDocumentRequestModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentBlueprintResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -79,7 +79,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentBlueprintResource.getDocumentBlueprintById({ id: unique }),
+			DocumentBlueprintService.getDocumentBlueprintById({ id: unique }),
 		);
 
 		if (error || !data) {
@@ -140,7 +140,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentBlueprintResource.postDocumentBlueprint({
+			DocumentBlueprintService.postDocumentBlueprint({
 				requestBody,
 			}),
 		);
@@ -169,7 +169,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentBlueprintResource.putDocumentBlueprintById({
+			DocumentBlueprintService.putDocumentBlueprintById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -192,6 +192,6 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		if (!unique) throw new Error('Unique is missing');
 
 		// TODO: update to delete when implemented
-		return tryExecuteAndNotify(this.#host, DocumentBlueprintResource.deleteDocumentBlueprintById({ id: unique }));
+		return tryExecuteAndNotify(this.#host, DocumentBlueprintService.deleteDocumentBlueprintById({ id: unique }));
 	}
 }

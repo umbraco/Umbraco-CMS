@@ -39,7 +39,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 	private _renderError(error: ProblemDetails) {
 		return html`
 			<p>Description: ${error.title}</p>
-			${error.errors ? this._renderErrors(error.errors) : nothing}
+			${error.errors ? this._renderErrors(error.errors as any) : nothing}
 			<hr />
 			<h3>Details:</h3>
 			<p id="error-message" data-test="error-message">${error.detail ?? 'Unknown error'}</p>

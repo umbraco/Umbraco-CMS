@@ -1,5 +1,5 @@
 // import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
-// import { DocumentBlueprintResource } from '@umbraco-cms/backoffice/external/backend-api';
+// import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 // import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 // import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -32,7 +32,7 @@
 
 // 		const { data, error } = await tryExecuteAndNotify(
 // 			this.#host,
-// 			DocumentBlueprintResource.getDocumentBlueprintFolderById({
+// 			DocumentBlueprintService.getDocumentBlueprintFolderById({
 // 				id: unique,
 // 			}),
 // 		);
@@ -67,7 +67,7 @@
 
 // 		const { error } = await tryExecuteAndNotify(
 // 			this.#host,
-// 			DocumentBlueprintResource.postDocumentBlueprintFolder({
+// 			DocumentBlueprintService.postDocumentBlueprintFolder({
 // 				requestBody,
 // 			}),
 // 		);
@@ -91,7 +91,7 @@
 
 // 		const { error } = await tryExecuteAndNotify(
 // 			this.#host,
-// 			DocumentBlueprintResource.putDocumentBlueprintFolderById({
+// 			DocumentBlueprintService.putDocumentBlueprintFolderById({
 // 				id: args.unique,
 // 				requestBody: { name: args.name },
 // 			}),
@@ -114,7 +114,7 @@
 // 		if (!unique) throw new Error('Unique is missing');
 // 		return tryExecuteAndNotify(
 // 			this.#host,
-// 			DocumentBlueprintResource.deleteDocumentBlueprintFolderById({
+// 			DocumentBlueprintService.deleteDocumentBlueprintFolderById({
 // 				id: unique,
 // 			}),
 // 		);

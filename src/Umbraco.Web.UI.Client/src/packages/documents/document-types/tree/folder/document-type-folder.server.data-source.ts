@@ -1,5 +1,5 @@
 import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
-import { DocumentTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -32,7 +32,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentTypeResource.getDocumentTypeFolderById({
+			DocumentTypeService.getDocumentTypeFolderById({
 				id: unique,
 			}),
 		);
@@ -67,7 +67,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentTypeResource.postDocumentTypeFolder({
+			DocumentTypeService.postDocumentTypeFolder({
 				requestBody,
 			}),
 		);
@@ -91,7 +91,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentTypeResource.putDocumentTypeFolderById({
+			DocumentTypeService.putDocumentTypeFolderById({
 				id: args.unique,
 				requestBody: { name: args.name },
 			}),
@@ -114,7 +114,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecuteAndNotify(
 			this.#host,
-			DocumentTypeResource.deleteDocumentTypeFolderById({
+			DocumentTypeService.deleteDocumentTypeFolderById({
 				id: unique,
 			}),
 		);

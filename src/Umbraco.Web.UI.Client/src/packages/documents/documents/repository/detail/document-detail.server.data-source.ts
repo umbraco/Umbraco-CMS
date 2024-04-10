@@ -6,7 +6,7 @@ import type {
 	CreateDocumentRequestModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -80,7 +80,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, DocumentResource.getDocumentById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, DocumentService.getDocumentById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -148,7 +148,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentResource.postDocument({
+			DocumentService.postDocument({
 				requestBody,
 			}),
 		);
@@ -178,7 +178,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			DocumentResource.putDocumentById({
+			DocumentService.putDocumentById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -199,6 +199,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.deleteDocumentById({ id: unique }));
+		return tryExecuteAndNotify(this.#host, DocumentService.deleteDocumentById({ id: unique }));
 	}
 }

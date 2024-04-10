@@ -1,9 +1,9 @@
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDocumentBlueprintItemModel } from './types.js';
-import type { CancelablePromise, DocumentItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentBlueprintResource, DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
+import type { CancelablePromise, DocumentItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for Document Blueprint items that fetches data from the server
@@ -30,7 +30,7 @@ export class UmbDocumentBlueprintItemServerDataSource extends UmbItemServerDataS
 
 /* eslint-disable local-rules/no-direct-api-import */
 const getItems = (uniques: Array<string>) =>
-	DocumentBlueprintResource.getItemDocumentBlueprint({ id: uniques }) as unknown as CancelablePromise<
+	DocumentBlueprintService.getItemDocumentBlueprint({ id: uniques }) as unknown as CancelablePromise<
 		DocumentItemResponseModel[]
 	>;
 
