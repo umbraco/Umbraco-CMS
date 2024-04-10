@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core;
+
 namespace Umbraco.Cms.Api.Common.Security;
 
 public static class Paths
@@ -14,7 +16,7 @@ public static class Paths
 
         public static readonly string RevokeEndpoint = EndpointPath($"{EndpointTemplate}/revoke");
 
-        private static string EndpointPath(string relativePath) => $"/umbraco/management/api/v1/{relativePath}";
+        private static string EndpointPath(string relativePath) => $"/umbraco{Constants.Web.ManagementApiPath}v1/{relativePath}";
     }
 
     public static class MemberApi
