@@ -1,14 +1,14 @@
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbMoveDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbMoveToDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for Data Type items that fetches data from the server
  * @export
  * @class UmbDataTypeMoveServerDataSource
  */
-export class UmbDataTypeMoveServerDataSource implements UmbMoveDataSource {
+export class UmbDataTypeMoveServerDataSource implements UmbMoveToDataSource {
 	#host: UmbControllerHost;
 
 	/**
@@ -27,16 +27,16 @@ export class UmbDataTypeMoveServerDataSource implements UmbMoveDataSource {
 	 * @return {*}
 	 * @memberof UmbDataTypeMoveServerDataSource
 	 */
-	async move(unique: string, targetUnique: string | null) {
-		if (!unique) throw new Error('Unique is missing');
-		if (targetUnique === undefined) throw new Error('Target unique is missing');
+	async move(args: UmbMoveToRequestArgs) {
+		if (!args.unique) throw new Error('Unique is missing');
+		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeService.putDataTypeByIdMove({
-				id: unique,
+				id: args.unique,
 				requestBody: {
-					target: targetUnique ? { id: targetUnique } : null,
+					target: args.destination.unique ? { id: args.destination.unique } : null,
 				},
 			}),
 		);

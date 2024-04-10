@@ -1,6 +1,6 @@
 import { UmbEntityActionBase } from '../../entity-action-base.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbMoveRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbMoveToRepository } from '@umbraco-cms/backoffice/repository';
 import type { MetaEntityActionMoveToKind } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -15,10 +15,13 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
 
-		const moveRepository = await createExtensionApiByAlias<UmbMoveRepository>(this, this.args.meta.moveRepositoryAlias);
+		const moveRepository = await createExtensionApiByAlias<UmbMoveToRepository>(
+			this,
+			this.args.meta.moveRepositoryAlias,
+		);
 		if (!moveRepository) throw new Error('Move Repository is not available');
 
-		await moveRepository.move(this.args.unique, destinationUnique);
+		await moveRepository.requestMove({ unique: this.args.unique, destination: { unique: destinationUnique } });
 		// TODO: refresh tree
 	}
 }
