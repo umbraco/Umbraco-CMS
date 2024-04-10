@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDocumentRecycleBinTreeItemModel } from './types.js';
 import type { DocumentRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -37,14 +37,14 @@ export class UmbDocumentRecycleBinTreeServerDataSource extends UmbTreeServerData
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentResource.getRecycleBinDocumentRoot({ skip: args.skip, take: args.take });
+	DocumentService.getRecycleBinDocumentRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parentUnique === null) {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentResource.getRecycleBinDocumentChildren({
+		return DocumentService.getRecycleBinDocumentChildren({
 			parentId: args.parentUnique,
 			skip: args.skip,
 			take: args.take,
@@ -54,7 +54,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentResource.getTreeDocumentAncestors({
+	DocumentService.getTreeDocumentAncestors({
 		descendantId: args.descendantUnique,
 	});
 

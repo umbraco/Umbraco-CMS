@@ -1,5 +1,5 @@
 import type { ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DictionaryResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -28,7 +28,7 @@ export class UmbDictionaryImportServerDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DictionaryResource.postDictionaryImport({
+			DictionaryService.postDictionaryImport({
 				requestBody,
 			}),
 		);

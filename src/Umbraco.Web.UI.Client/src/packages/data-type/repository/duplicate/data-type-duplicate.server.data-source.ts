@@ -1,4 +1,4 @@
-import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbDuplicateDataSource } from '@umbraco-cms/backoffice/repository';
@@ -32,7 +32,7 @@ export class UmbDataTypeDuplicateServerDataSource implements UmbDuplicateDataSou
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.postDataTypeByIdCopy({
+			DataTypeService.postDataTypeByIdCopy({
 				id: unique,
 				requestBody: {
 					target: targetUnique ? { id: targetUnique } : null,

@@ -1,6 +1,6 @@
 import type { ManifestBase } from '../types/index.js';
 import { isManifestBaseType } from '../type-guards/index.js';
-import { OpenAPI, ManifestResource, type ManifestResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { OpenAPI, ManifestService, type ManifestResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -22,7 +22,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	 * @remark Users must have the BACKOFFICE_ACCESS permission to access this method.
 	 */
 	public async registerAllExtensions() {
-		const { data: packages } = await tryExecuteAndNotify(this, ManifestResource.getManifestManifest());
+		const { data: packages } = await tryExecuteAndNotify(this, ManifestService.getManifestManifest());
 		if (packages) {
 			await this.#loadServerPackages(packages);
 		}
@@ -34,7 +34,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	 * @remark Users must have the BACKOFFICE_ACCESS permission to access this method.
 	 */
 	public async registerPrivateExtensions() {
-		const { data: packages } = await tryExecuteAndNotify(this, ManifestResource.getManifestManifestPrivate());
+		const { data: packages } = await tryExecuteAndNotify(this, ManifestService.getManifestManifestPrivate());
 		if (packages) {
 			await this.#loadServerPackages(packages);
 		}
@@ -46,7 +46,7 @@ export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	 * @remark Any user can access this method without any permissions.
 	 */
 	public async registerPublicExtensions() {
-		const { data: packages } = await tryExecuteAndNotify(this, ManifestResource.getManifestManifestPublic());
+		const { data: packages } = await tryExecuteAndNotify(this, ManifestService.getManifestManifestPublic());
 		if (packages) {
 			await this.#loadServerPackages(packages);
 		}

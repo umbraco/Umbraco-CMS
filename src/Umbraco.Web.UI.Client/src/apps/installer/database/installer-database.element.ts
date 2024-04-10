@@ -9,7 +9,7 @@ import type {
 	DatabaseSettingsPresentationModel,
 	ProblemDetails,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { ApiError, InstallResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { ApiError, InstallService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
@@ -165,7 +165,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				};
 
 				const { error } = await tryExecute(
-					InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails }),
+					InstallService.postInstallValidateDatabase({ requestBody: databaseDetails }),
 				);
 
 				if (error) {
@@ -196,7 +196,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		this._installerContext.nextStep();
 
 		const { error: _error } = await tryExecute(
-			InstallResource.postInstallSetup({ requestBody: this._installerContext.getData() }),
+			InstallService.postInstallSetup({ requestBody: this._installerContext.getData() }),
 		);
 		const error = _error as ProblemDetails | undefined;
 		if (error) {

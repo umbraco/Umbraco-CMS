@@ -1,9 +1,9 @@
-import type { CancelablePromise } from './core/CancelablePromise.js';
-import { OpenAPI } from './core/OpenAPI.js';
-import { request as __request } from './core/request.js';
-import type { AuditLogData, CultureData, DataTypeData, DictionaryData, DocumentBlueprintData, DocumentTypeData, DocumentVersionData, DocumentData, DynamicRootData, HealthCheckData, HelpData, IndexerData, InstallData, LanguageData, LogViewerData, ManifestData, MediaTypeData, MediaData, MemberGroupData, MemberTypeData, MemberData, ModelsBuilderData, ObjectTypesData, PackageData, PartialViewData, PreviewData, ProfilingData, PropertyTypeData, PublishedCacheData, RedirectManagementData, RelationTypeData, RelationData, ScriptData, SearcherData, SecurityData, ServerData, StaticFileData, StylesheetData, TagData, TelemetryData, TemplateData, TemporaryFileData, UpgradeData, UserDataData, UserGroupData, UserData, WebhookData } from './models.js';
+import type { CancelablePromise } from './core/CancelablePromise';
+import { OpenAPI } from './core/OpenAPI';
+import { request as __request } from './core/request';
+import type { AuditLogData, CultureData, DataTypeData, DictionaryData, DocumentBlueprintData, DocumentTypeData, DocumentVersionData, DocumentData, DynamicRootData, HealthCheckData, HelpData, IndexerData, InstallData, LanguageData, LogViewerData, ManifestData, MediaTypeData, MediaData, MemberGroupData, MemberTypeData, MemberData, ModelsBuilderData, ObjectTypesData, PackageData, PartialViewData, PreviewData, ProfilingData, PropertyTypeData, PublishedCacheData, RedirectManagementData, RelationTypeData, RelationData, ScriptData, SearcherData, SecurityData, ServerData, StaticFileData, StylesheetData, TagData, TelemetryData, TemplateData, TemporaryFileData, UpgradeData, UserDataData, UserGroupData, UserData, WebhookData } from './models';
 
-export class AuditLogResource {
+export class AuditLogService {
 
 	/**
 	 * @returns unknown Success
@@ -86,7 +86,7 @@ take
 
 }
 
-export class CultureResource {
+export class CultureService {
 
 	/**
 	 * @returns unknown Success
@@ -112,7 +112,7 @@ take
 
 }
 
-export class DataTypeResource {
+export class DataTypeService {
 
 	/**
 	 * @returns string Created
@@ -556,7 +556,7 @@ foldersOnly
 
 }
 
-export class DictionaryResource {
+export class DictionaryService {
 
 	/**
 	 * @returns unknown Success
@@ -845,7 +845,7 @@ take
 
 }
 
-export class DocumentBlueprintResource {
+export class DocumentBlueprintService {
 
 	/**
 	 * @returns string Created
@@ -1158,7 +1158,7 @@ foldersOnly
 
 }
 
-export class DocumentTypeResource {
+export class DocumentTypeService {
 
 	/**
 	 * @returns string Created
@@ -1626,7 +1626,7 @@ foldersOnly
 
 }
 
-export class DocumentVersionResource {
+export class DocumentVersionService {
 
 	/**
 	 * @returns unknown Success
@@ -1735,7 +1735,7 @@ culture
 
 }
 
-export class DocumentResource {
+export class DocumentService {
 
 	/**
 	 * @returns unknown Success
@@ -2652,7 +2652,7 @@ dataTypeId
 
 }
 
-export class DynamicRootResource {
+export class DynamicRootService {
 
 	/**
 	 * @returns unknown Success
@@ -2691,7 +2691,7 @@ export class DynamicRootResource {
 
 }
 
-export class HealthCheckResource {
+export class HealthCheckService {
 
 	/**
 	 * @returns unknown Success
@@ -2782,7 +2782,7 @@ take
 
 }
 
-export class HelpResource {
+export class HelpService {
 
 	/**
 	 * @returns unknown Success
@@ -2812,7 +2812,7 @@ baseUrl
 
 }
 
-export class IndexerResource {
+export class IndexerService {
 
 	/**
 	 * @returns unknown Success
@@ -2885,7 +2885,7 @@ take
 
 }
 
-export class InstallResource {
+export class InstallService {
 
 	/**
 	 * @returns unknown Success
@@ -2946,7 +2946,7 @@ export class InstallResource {
 
 }
 
-export class LanguageResource {
+export class LanguageService {
 
 	/**
 	 * @returns unknown Success
@@ -3089,7 +3089,7 @@ requestBody
 
 }
 
-export class LogViewerResource {
+export class LogViewerService {
 
 	/**
 	 * @returns unknown Success
@@ -3302,7 +3302,7 @@ endDate
 
 }
 
-export class ManifestResource {
+export class ManifestService {
 
 	/**
 	 * @returns unknown Success
@@ -3348,7 +3348,7 @@ export class ManifestResource {
 
 }
 
-export class MediaTypeResource {
+export class MediaTypeService {
 
 	/**
 	 * @returns unknown Success
@@ -3801,7 +3801,7 @@ foldersOnly
 
 }
 
-export class MediaResource {
+export class MediaService {
 
 	/**
 	 * @returns unknown Success
@@ -4404,7 +4404,7 @@ dataTypeId
 
 }
 
-export class MemberGroupResource {
+export class MemberGroupService {
 
 	/**
 	 * @returns unknown Success
@@ -4566,7 +4566,7 @@ take
 
 }
 
-export class MemberTypeResource {
+export class MemberTypeService {
 
 	/**
 	 * @returns unknown Success
@@ -4798,7 +4798,7 @@ take
 
 }
 
-export class MemberResource {
+export class MemberService {
 
 	/**
 	 * @returns unknown Success
@@ -5037,7 +5037,7 @@ requestBody
 
 }
 
-export class ModelsBuilderResource {
+export class ModelsBuilderService {
 
 	/**
 	 * @returns string Success
@@ -5088,7 +5088,7 @@ export class ModelsBuilderResource {
 
 }
 
-export class ObjectTypesResource {
+export class ObjectTypesService {
 
 	/**
 	 * @returns unknown Success
@@ -5114,7 +5114,7 @@ take
 
 }
 
-export class PackageResource {
+export class PackageService {
 
 	/**
 	 * @returns string Success
@@ -5317,7 +5317,7 @@ take
 
 }
 
-export class PartialViewResource {
+export class PartialViewService {
 
 	/**
 	 * @returns unknown Success
@@ -5644,7 +5644,7 @@ take
 
 }
 
-export class PreviewResource {
+export class PreviewService {
 
 	/**
 	 * @returns string Success
@@ -5680,7 +5680,7 @@ export class PreviewResource {
 
 }
 
-export class ProfilingResource {
+export class ProfilingService {
 
 	/**
 	 * @returns unknown Success
@@ -5720,7 +5720,7 @@ export class ProfilingResource {
 
 }
 
-export class PropertyTypeResource {
+export class PropertyTypeService {
 
 	/**
 	 * @returns boolean Success
@@ -5747,7 +5747,7 @@ propertyAlias
 
 }
 
-export class PublishedCacheResource {
+export class PublishedCacheService {
 
 	/**
 	 * @returns string Success
@@ -5814,7 +5814,7 @@ export class PublishedCacheResource {
 
 }
 
-export class RedirectManagementResource {
+export class RedirectManagementService {
 
 	/**
 	 * @returns unknown Success
@@ -5927,7 +5927,7 @@ take
 
 }
 
-export class RelationTypeResource {
+export class RelationTypeService {
 
 	/**
 	 * @returns unknown Success
@@ -5996,7 +5996,7 @@ take
 
 }
 
-export class RelationResource {
+export class RelationService {
 
 	/**
 	 * @returns unknown Success
@@ -6027,7 +6027,7 @@ take
 
 }
 
-export class ScriptResource {
+export class ScriptService {
 
 	/**
 	 * @returns unknown Success
@@ -6310,7 +6310,7 @@ take
 
 }
 
-export class SearcherResource {
+export class SearcherService {
 
 	/**
 	 * @returns unknown Success
@@ -6364,7 +6364,7 @@ take
 
 }
 
-export class SecurityResource {
+export class SecurityService {
 
 	/**
 	 * @returns unknown Success
@@ -6449,7 +6449,7 @@ export class SecurityResource {
 
 }
 
-export class ServerResource {
+export class ServerService {
 
 	/**
 	 * @returns unknown Success
@@ -6513,7 +6513,7 @@ export class ServerResource {
 
 }
 
-export class StaticFileResource {
+export class StaticFileService {
 
 	/**
 	 * @returns unknown Success
@@ -6604,7 +6604,7 @@ take
 
 }
 
-export class StylesheetResource {
+export class StylesheetService {
 
 	/**
 	 * @returns unknown Success
@@ -6887,7 +6887,7 @@ take
 
 }
 
-export class TagResource {
+export class TagService {
 
 	/**
 	 * @returns unknown Success
@@ -6916,7 +6916,7 @@ take
 
 }
 
-export class TelemetryResource {
+export class TelemetryService {
 
 	/**
 	 * @returns unknown Success
@@ -6979,7 +6979,7 @@ take
 
 }
 
-export class TemplateResource {
+export class TemplateService {
 
 	/**
 	 * @returns unknown Success
@@ -7239,7 +7239,7 @@ take
 
 }
 
-export class TemporaryFileResource {
+export class TemporaryFileService {
 
 	/**
 	 * @returns string Created
@@ -7327,7 +7327,7 @@ export class TemporaryFileResource {
 
 }
 
-export class UpgradeResource {
+export class UpgradeService {
 
 	/**
 	 * @returns string Success
@@ -7365,7 +7365,7 @@ export class UpgradeResource {
 
 }
 
-export class UserDataResource {
+export class UserDataService {
 
 	/**
 	 * @returns string Created
@@ -7461,7 +7461,7 @@ take
 
 }
 
-export class UserGroupResource {
+export class UserGroupService {
 
 	/**
 	 * @returns unknown Success
@@ -7680,7 +7680,7 @@ requestBody
 
 }
 
-export class UserResource {
+export class UserService {
 
 	/**
 	 * @returns unknown Success
@@ -8479,7 +8479,7 @@ requestBody
 
 }
 
-export class WebhookResource {
+export class WebhookService {
 
 	/**
 	 * @returns unknown Success

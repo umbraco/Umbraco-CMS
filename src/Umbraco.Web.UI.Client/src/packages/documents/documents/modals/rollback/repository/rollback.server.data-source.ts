@@ -1,5 +1,5 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { DocumentVersionResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentVersionService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -26,7 +26,7 @@ export class UmbRollbackServerDataSource {
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	getVersionsByDocumentId(id: string, culture?: string) {
-		return tryExecuteAndNotify(this.#host, DocumentVersionResource.getDocumentVersion({ documentId: id, culture }));
+		return tryExecuteAndNotify(this.#host, DocumentVersionService.getDocumentVersion({ documentId: id, culture }));
 	}
 
 	/**
@@ -35,20 +35,20 @@ export class UmbRollbackServerDataSource {
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	getVersionById(versionId: string) {
-		return tryExecuteAndNotify(this.#host, DocumentVersionResource.getDocumentVersionById({ id: versionId }));
+		return tryExecuteAndNotify(this.#host, DocumentVersionService.getDocumentVersionById({ id: versionId }));
 	}
 
 	setPreventCleanup(versionId: string, preventCleanup: boolean) {
 		return tryExecuteAndNotify(
 			this.#host,
-			DocumentVersionResource.putDocumentVersionByIdPreventCleanup({ id: versionId, preventCleanup }),
+			DocumentVersionService.putDocumentVersionByIdPreventCleanup({ id: versionId, preventCleanup }),
 		);
 	}
 
 	rollback(versionId: string, culture?: string) {
 		return tryExecuteAndNotify(
 			this.#host,
-			DocumentVersionResource.postDocumentVersionByIdRollback({ id: versionId, culture }),
+			DocumentVersionService.postDocumentVersionByIdRollback({ id: versionId, culture }),
 		);
 	}
 }

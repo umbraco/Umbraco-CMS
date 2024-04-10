@@ -1,4 +1,4 @@
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -29,7 +29,7 @@ export class UmbUserMfaServerDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.getUserById2Fa({
+			UserService.getUserById2Fa({
 				id: unique,
 			}),
 		);
@@ -46,7 +46,7 @@ export class UmbUserMfaServerDataSource {
 		if (!providerName) throw new Error('Provider is missing');
 
 		return tryExecute(
-			UserResource.deleteUserById2FaByProviderName({
+			UserService.deleteUserById2FaByProviderName({
 				id: unique,
 				providerName,
 			}),
