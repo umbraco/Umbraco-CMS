@@ -6,10 +6,7 @@ import type {
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import type {
-	DocumentBlueprintTreeItemResponseModel,
-	DocumentTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+import type { DocumentBlueprintTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentBlueprintResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -61,12 +58,10 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
 };
 
 const mapper = (item: DocumentBlueprintTreeItemResponseModel): UmbDocumentBlueprintTreeItemModel => {
-	//TODO remove temp hack when api endpoints are fixed
-	const hack = item as Partial<DocumentTreeItemResponseModel>;
 	return {
 		unique: item.id,
 		parentUnique: item.parent?.id || null,
-		name: hack?.variants?.[0].name ?? '',
+		name: item.name,
 		entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
 		isFolder: false,
 		hasChildren: item.hasChildren,
