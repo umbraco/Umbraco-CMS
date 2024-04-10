@@ -125,16 +125,16 @@ export interface MetaEntityActionDuplicateKind extends MetaEntityActionDefaultKi
 	pickerModal: UmbModalToken | string;
 }
 
-// MOVE
+// MOVE TO
 export interface ManifestEntityActionMoveToKind extends ManifestEntityAction<MetaEntityActionMoveToKind> {
 	type: 'entityAction';
 	kind: 'moveTo';
 }
 
 export interface MetaEntityActionMoveToKind extends MetaEntityActionDefaultKind {
-	moveRepositoryAlias: string;
-	itemRepositoryAlias: string;
-	pickerModal: UmbModalToken | string;
+	moveToRepositoryAlias: string;
+	treeRepositoryAlias: string;
+	treePickerModal: UmbModalToken | string;
 }
 
 // FOLDER

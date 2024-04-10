@@ -10,14 +10,14 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, this.args.meta.pickerModal) as any; // TODO: make generic picker interface with selection
+		const modalContext = modalManager.open(this, this.args.meta.treePickerModal) as any; // TODO: make generic picker interface with selection
 		const value = await modalContext.onSubmit();
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
 
 		const moveRepository = await createExtensionApiByAlias<UmbMoveToRepository>(
 			this,
-			this.args.meta.moveRepositoryAlias,
+			this.args.meta.moveToRepositoryAlias,
 		);
 		if (!moveRepository) throw new Error('Move Repository is not available');
 
