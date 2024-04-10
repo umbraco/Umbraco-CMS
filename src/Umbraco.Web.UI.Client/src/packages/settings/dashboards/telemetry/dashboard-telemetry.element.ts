@@ -47,7 +47,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 
 		if (error) {
 			this._buttonState = 'failed';
-			this._errorMessage = error instanceof ApiError ? error.body.detail : error.message;
+			this._errorMessage = error instanceof ApiError ? (error.body as any).detail : error.message;
 			return;
 		}
 

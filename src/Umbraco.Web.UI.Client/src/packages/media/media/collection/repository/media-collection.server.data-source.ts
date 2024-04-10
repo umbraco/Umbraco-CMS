@@ -38,7 +38,7 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 					name: variant.name,
 					updateDate: new Date(variant.updateDate),
 					values: item.values.map((item) => {
-						return { alias: item.alias, value: item.value };
+						return { alias: item.alias, value: item.value as string };
 					}),
 				};
 				return model;
