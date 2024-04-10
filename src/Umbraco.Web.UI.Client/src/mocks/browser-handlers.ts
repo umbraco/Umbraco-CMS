@@ -36,6 +36,7 @@ import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as userHandlers } from './handlers/user/index.js';
 import * as manifestsHandlers from './handlers/manifests.handlers.js';
 import * as serverHandlers from './handlers/server.handlers.js';
+import { handlers as documentBlueprintHandlers } from './handlers/document-blueprint/index.js';
 
 const handlers = [
 	...auditLogHandlers,
@@ -74,6 +75,7 @@ const handlers = [
 	...upgradeHandlers,
 	...userGroupsHandlers,
 	...userHandlers,
+	...documentBlueprintHandlers,
 	serverHandlers.serverInformationHandler,
 ];
 
