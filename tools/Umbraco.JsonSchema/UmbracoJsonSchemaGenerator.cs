@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
+using NJsonSchema.NewtonsoftJson.Generation;
 
 /// <inheritdoc />
 public class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
@@ -10,7 +11,7 @@ public class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
     /// Initializes a new instance of the <see cref="UmbracoJsonSchemaGenerator" /> class.
     /// </summary>
     public UmbracoJsonSchemaGenerator()
-        : base(new JsonSchemaGeneratorSettings()
+        : base(new NewtonsoftJsonSchemaGeneratorSettings()
         {
             AlwaysAllowAdditionalObjectProperties = true,
             DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull,
@@ -22,7 +23,9 @@ public class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
             }
         })
     {
-        Settings.SerializerSettings.Converters.Add(new StringEnumConverter());
+
+
+        ((NewtonsoftJsonSchemaGeneratorSettings)Settings).SerializerSettings.Converters.Add(new StringEnumConverter());
     }
 
     /// <inheritdoc />
