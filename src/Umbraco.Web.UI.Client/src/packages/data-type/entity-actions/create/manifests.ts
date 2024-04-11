@@ -20,7 +20,7 @@ const entityActions: Array<ManifestTypes> = [
 		type: 'modal',
 		alias: 'Umb.Modal.DataTypeCreateOptions',
 		name: 'Data Type Create Options Modal',
-		js: () => import('./modal/data-type-create-options-modal.element.js'),
+		element: () => import('./modal/data-type-create-options-modal.element.js'),
 	},
 ];
 

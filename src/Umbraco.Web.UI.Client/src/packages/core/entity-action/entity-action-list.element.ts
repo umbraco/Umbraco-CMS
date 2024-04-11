@@ -1,5 +1,5 @@
-import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityActionArgs } from './types.js';
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestEntityAction, MetaEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -17,9 +17,9 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		this.#generateApiArgs();
 		this.requestUpdate('_props');
 		// Update filter:
-		const oldValue = this._filter;
+		//const oldValue = this._filter;
 		this._filter = (extension: ManifestEntityAction<MetaEntityAction>) => extension.forEntityTypes.includes(value);
-		this.requestUpdate('_filter', oldValue);
+		//this.requestUpdate('_filter', oldValue);
 	}
 
 	@state()

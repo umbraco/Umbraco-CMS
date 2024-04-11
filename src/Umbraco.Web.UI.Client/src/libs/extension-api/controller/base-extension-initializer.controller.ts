@@ -176,6 +176,12 @@ export abstract class UmbBaseExtensionInitializer<
 			configsOfThisType.map((conditionConfig) => this.#createConditionController(conditionManifest, conditionConfig)),
 		);
 
+		// If we got destroyed in the mean time, then we don't need to continue:
+		if (!this.#extensionRegistry) {
+			newConditionControllers.forEach((controller) => controller?.destroy());
+			return;
+		}
+
 		const oldLength = this.#conditionControllers.length;
 
 		newConditionControllers

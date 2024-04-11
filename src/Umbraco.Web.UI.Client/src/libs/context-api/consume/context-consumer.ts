@@ -170,6 +170,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 
 	public destroy(): void {
 		this.hostDisconnected();
+		this._host = undefined as any;
 		this.#callback = undefined;
 		this.#promise = undefined;
 		this.#promiseResolver = undefined;

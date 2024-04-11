@@ -186,6 +186,7 @@ export abstract class UmbBaseExtensionsInitializer<
 	hostDisconnected(): void {
 		super.hostDisconnected();
 		if (this.#changeDebounce) {
+			cancelAnimationFrame(this.#changeDebounce);
 			this.#notifyChange();
 		}
 	}

@@ -23,7 +23,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DataType.Edit',
 		name: 'Data Type Workspace Edit View',
-		js: () => import('./views/details/data-type-details-workspace-view.element.js'),
+		element: () => import('./views/details/data-type-details-workspace-view.element.js'),
 		weight: 90,
 		meta: {
 			label: '#general_details',
@@ -41,7 +41,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DataType.Info',
 		name: 'Data Type Workspace Info View',
-		js: () => import('./views/info/workspace-view-data-type-info.element.js'),
+		element: () => import('./views/info/workspace-view-data-type-info.element.js'),
 		weight: 90,
 		meta: {
 			label: '#general_info',

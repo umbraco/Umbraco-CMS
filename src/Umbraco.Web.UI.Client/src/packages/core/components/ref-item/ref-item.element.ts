@@ -1,4 +1,4 @@
-import { html, customElement, css, property, when, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css, property, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UUIRefElement, UUIRefEvent, UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 
