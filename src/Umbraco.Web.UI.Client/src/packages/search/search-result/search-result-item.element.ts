@@ -12,14 +12,12 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 	render() {
 		if (!this.item) return nothing;
 
-		const url = 'url/goes/here';
-
 		return html`
 			<a href="#" class="item">
 				<span class="item-icon">
 					${this.item.icon ? html`<umb-icon name="${this.item.icon}"></umb-icon>` : this.#renderHashTag()}
 				</span>
-				<span class="item-name"> ${this.item.name} ${url ? html`<span class="item-url">${url}</span>` : nothing} </span>
+				<span class="item-name"> ${this.item.name} </span>
 				<span class="item-symbol">></span>
 			</a>
 		`;
@@ -69,11 +67,6 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 			.item-icon,
 			.item-symbol {
 				opacity: 0.4;
-			}
-			.item-url {
-				font-size: 0.8rem;
-				line-height: 1.2;
-				font-weight: 100;
 			}
 			.item-name {
 				display: flex;
