@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
@@ -85,7 +86,7 @@ public static class HtmlHelperRenderExtensions
             var htmlBadge =
                 string.Format(
                     contentSettings.PreviewBadge,
-                    hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath),
+                    hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath),
                     WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
                     umbracoContext.PublishedRequest?.PublishedContent?.Id);
             return new HtmlString(htmlBadge);

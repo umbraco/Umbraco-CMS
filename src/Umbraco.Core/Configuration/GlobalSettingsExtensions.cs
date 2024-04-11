@@ -6,7 +6,6 @@ namespace Umbraco.Extensions;
 
 public static class GlobalSettingsExtensions
 {
-    private static string? _mvcArea;
     private static string? _backOfficePath;
 
     /// <summary>
@@ -15,16 +14,9 @@ public static class GlobalSettingsExtensions
     /// <param name="globalSettings"></param>
     /// <param name="hostingEnvironment"></param>
     /// <returns></returns>
+    [Obsolete("The UmbracoPath setting is removed, manually resolve Constants.System.DefaultUmbracoPath to an absolute path instead. This method will be removed in a future version.")]
     public static string GetBackOfficePath(this GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
-    {
-        if (_backOfficePath != null)
-        {
-            return _backOfficePath;
-        }
-
-        _backOfficePath = hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
-        return _backOfficePath;
-    }
+        => _backOfficePath ??= hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
 
     /// <summary>
     ///     This returns the string of the MVC Area route.
@@ -38,38 +30,7 @@ public static class GlobalSettingsExtensions
     ///     with something
     ///     like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
     /// </remarks>
+    [Obsolete("The UmbracoPath setting is removed, manually resolve Constants.System.DefaultUmbracoPath to an area name instead. This method will be removed in a future version.")]
     public static string GetUmbracoMvcArea(this GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
-    {
-        if (_mvcArea != null)
-        {
-            return _mvcArea;
-        }
-
-        _mvcArea = globalSettings.GetUmbracoMvcAreaNoCache(hostingEnvironment);
-
-        return _mvcArea;
-    }
-
-    internal static string GetUmbracoMvcAreaNoCache(
-        this GlobalSettings globalSettings,
-        IHostingEnvironment hostingEnvironment)
-    {
-        var path = string.IsNullOrEmpty(globalSettings.UmbracoPath)
-            ? string.Empty
-            : hostingEnvironment.ToAbsolute(globalSettings.UmbracoPath);
-
-        if (path.IsNullOrWhiteSpace())
-        {
-            throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");
-        }
-
-        // beware of TrimStart, see U4-2518
-        if (path.StartsWith(hostingEnvironment.ApplicationVirtualPath))
-        {
-            path = path[hostingEnvironment.ApplicationVirtualPath.Length..];
-        }
-
-        return path.TrimStart(Constants.CharArrays.Tilde).TrimStart(Constants.CharArrays.ForwardSlash).Replace('/', '-')
-            .Trim().ToLower();
-    }
+        => Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash);
 }

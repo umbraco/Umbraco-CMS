@@ -140,7 +140,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
                     markupToInject =
                         string.Format(
                             ContentSettings.PreviewBadge,
-                            HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoPath),
+                            HostingEnvironment.ToAbsolute(Core.Constants.System.DefaultUmbracoPath),
                             Context.Request.GetEncodedUrl(),
                             UmbracoContext.PublishedRequest?.PublishedContent?.Id);
                 }

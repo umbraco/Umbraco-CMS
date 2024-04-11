@@ -3,7 +3,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
-using static Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.Common.AspNetCore;
 
@@ -34,7 +33,7 @@ public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
 
                 _getAbsoluteUrl = WebPath.Combine(
                     _hostingEnvironment.ApplicationMainUrl.ToString(),
-                    _globalSettings.CurrentValue.UmbracoPath.TrimStart(CharArrays.TildeForwardSlash));
+                    Core.Constants.System.DefaultUmbracoPath.TrimStart(Core.Constants.CharArrays.TildeForwardSlash));
             }
 
             return _getAbsoluteUrl;

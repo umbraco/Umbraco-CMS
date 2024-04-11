@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -107,7 +108,6 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     private static ILocalizedTextService GetLocalizedTextService(IServiceProvider factory)
     {
-        var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
         var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
         var appCaches = factory.GetRequiredService<AppCaches>();
 
@@ -121,7 +121,7 @@ public static class UmbracoBuilderExtensions
                 var currFolder = new DirectoryInfo(srcFolder);
 
                 var uiProject = currFolder.GetDirectories("Umbraco.Web.UI", SearchOption.TopDirectoryOnly).First();
-                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, globalSettings.Value.UmbracoPath.TrimStart("~/"), "config", "lang"));
+                var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash), "config", "lang"));
 
                 return new LocalizedTextServiceFileSources(
                     loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),
