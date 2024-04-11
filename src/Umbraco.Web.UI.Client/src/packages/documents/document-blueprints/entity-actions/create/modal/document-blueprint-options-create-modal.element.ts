@@ -1,43 +1,24 @@
 import type {
-	UmbDocumentBlueprintCreateOptionsModalData,
-	UmbDocumentBlueprintCreateOptionsModalValue,
+	UmbDocumentBlueprintOptionsCreateModalData,
+	UmbDocumentBlueprintOptionsCreateModalValue,
 } from './index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { type UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 
-@customElement('umb-document-blueprint-create-options-modal')
-export class UmbDocumentBlueprintCreateOptionsModalElement extends UmbModalBaseElement<
-	UmbDocumentBlueprintCreateOptionsModalData,
-	UmbDocumentBlueprintCreateOptionsModalValue
+@customElement('umb-document-blueprint-options-create-modal')
+export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseElement<
+	UmbDocumentBlueprintOptionsCreateModalData,
+	UmbDocumentBlueprintOptionsCreateModalValue
 > {
-	@state()
-	private _documentTypes?: Array<DocumentTypeResponseModel>;
-
-	#documentTypeRepository = new UmbDocumentTypeStructureRepository(this);
-
-	connectedCallback(): void {
-		super.connectedCallback();
-	}
-
-	async #fetchTypes() {
-		//const something = await this.#documentTypeRepository.
-	}
-
-	#onNavigate() {
-		this._submitModal();
-	}
-
 	#onSelected(event: UmbSelectedEvent) {
 		event.stopPropagation();
 		const element = event.target as UmbTreeElement;
 		this.value = { documentTypeUnique: element.getSelection()[0] };
 		this.modalContext?.dispatchEvent(new UmbSelectionChangeEvent());
-		this.#onNavigate();
+		this._submitModal();
 	}
 
 	render() {
@@ -71,10 +52,10 @@ export class UmbDocumentBlueprintCreateOptionsModalElement extends UmbModalBaseE
 	];
 }
 
-export default UmbDocumentBlueprintCreateOptionsModalElement;
+export default UmbDocumentBlueprintOptionsCreateModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-blueprint-create-options-modal': UmbDocumentBlueprintCreateOptionsModalElement;
+		'umb-document-blueprint-create-options-modal': UmbDocumentBlueprintOptionsCreateModalElement;
 	}
 }

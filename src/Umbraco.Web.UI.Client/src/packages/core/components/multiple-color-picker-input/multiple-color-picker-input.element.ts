@@ -9,7 +9,7 @@ import {
 	property,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -21,7 +21,7 @@ import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
  * @element umb-multiple-color-picker-input
  */
 @customElement('umb-multiple-color-picker-input')
-export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController(this, {
 		getUniqueOfElement: (element: UmbMultipleColorPickerItemInputElement) => {
 			return element.value.toString();

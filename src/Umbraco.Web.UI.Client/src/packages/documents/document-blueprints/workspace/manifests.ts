@@ -1,6 +1,10 @@
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type { ManifestWorkspace, ManifestWorkspaceActions } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	ManifestWorkspace,
+	ManifestWorkspaceActions,
+	ManifestWorkspaceView,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS = 'Umb.Workspace.DocumentBlueprint';
 
@@ -14,6 +18,27 @@ const workspace: ManifestWorkspace = {
 		entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
 	},
 };
+
+const workspaceViews: Array<ManifestWorkspaceView> = [
+	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.DocumentBlueprint.Edit',
+		name: 'Document Blueprint Workspace Edit View',
+		element: () => import('./views/edit/document-blueprint-workspace-view-edit.element.js'),
+		weight: 200,
+		meta: {
+			label: '#general_content',
+			pathname: 'content',
+			icon: 'document',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
+	},
+];
 
 const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
@@ -37,4 +62,4 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions];

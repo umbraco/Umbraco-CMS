@@ -2,14 +2,14 @@ import type { UmbStylesheetRule } from '../../types.js';
 import { UMB_STYLESHEET_RULE_SETTINGS_MODAL } from './stylesheet-rule-settings-modal.token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, repeat, property } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // TODO: add sorting when we have a generic sorting component/functionality for ref lists
 
 @customElement('umb-stylesheet-rule-input')
-export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbStylesheetRuleInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ type: Array, attribute: false })
 	rules: UmbStylesheetRule[] = [];
 
