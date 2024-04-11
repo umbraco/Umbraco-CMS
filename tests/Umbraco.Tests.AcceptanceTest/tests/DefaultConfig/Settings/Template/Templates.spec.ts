@@ -252,6 +252,29 @@ test.describe('Template tests', () => {
     const dictionaryName = 'TestDictionary';
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.create(dictionaryName);
+    const templateContent = '@Umbraco.GetDictionaryValue("' + dictionaryName + '")' + defaultTemplateContent;
+
+    // Act
+    await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.template.insertDictionaryByName(dictionaryName);
+    await umbracoUi.template.clickSaveButton();
+
+    // Assert
+    await umbracoUi.template.isSuccessNotificationVisible();
+    const templateData = await umbracoApi.template.getByName(templateName);
+    expect(templateData.content).toBe(templateContent);
+
+    // Clean
+    await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
+  });
+
+  test('can insert value into a template', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const templateAlias = AliasHelper.toAlias(templateName);
+    await umbracoApi.template.create(templateName, templateAlias, '');
+    const dictionaryName = 'TestDictionary';
+    await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
+    await umbracoApi.dictionary.create(dictionaryName);
     const templateContent = '@Umbraco.GetDictionaryValue("TestDictionary")' + defaultTemplateContent;
 
     // Act
