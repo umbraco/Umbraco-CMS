@@ -1,16 +1,12 @@
-using System.Collections.Generic;
-using System.Linq;
 using Bogus;
 using Examine;
 using Lucene.Net.Util;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;

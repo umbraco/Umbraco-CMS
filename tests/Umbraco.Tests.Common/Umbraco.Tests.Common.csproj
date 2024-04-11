@@ -13,7 +13,6 @@
     <PackageReference Include="Moq" />
     <PackageReference Include="AutoFixture.NUnit3" />
     <PackageReference Include="NUnit" />
-    <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
 
   <ItemGroup>
