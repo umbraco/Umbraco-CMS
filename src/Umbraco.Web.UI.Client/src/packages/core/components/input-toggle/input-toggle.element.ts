@@ -1,10 +1,10 @@
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-input-toggle')
-export class UmbInputToggleElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, '') {
 	_checked = false;
 	@property({ type: Boolean })
 	public set checked(toggle: boolean) {

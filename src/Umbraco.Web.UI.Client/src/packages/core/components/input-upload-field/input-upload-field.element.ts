@@ -13,7 +13,7 @@ import {
 	state,
 	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -22,7 +22,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 @customElement('umb-input-upload-field')
-export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElement, '') {
 	private _keys: Array<string> = [];
 	/**
 	 * @description Keys to the files that belong to this upload field.

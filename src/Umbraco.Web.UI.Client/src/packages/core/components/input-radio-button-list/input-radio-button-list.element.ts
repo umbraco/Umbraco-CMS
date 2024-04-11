@@ -1,11 +1,11 @@
 import { css, html, nothing, repeat, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-radio-button-list')
-export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#value: string = '';
 
 	@property()

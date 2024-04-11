@@ -1,5 +1,5 @@
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -11,7 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 // TODO: This should extends the UUICardElement, and the visual look of this should be like the UserCard or similarly.
 // TOOD: Consider if this should be select in the 'persisted'-select style when it is selected as a default. (But its should not use the runtime-selection style)
 @customElement('umb-template-card')
-export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
+export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ type: String })
 	name = '';
 

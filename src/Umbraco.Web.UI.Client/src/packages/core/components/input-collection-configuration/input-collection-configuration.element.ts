@@ -1,5 +1,5 @@
 import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
@@ -13,7 +13,7 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/mod
 import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-input-collection-configuration')
-export class UmbInputCollectionConfigurationElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputCollectionConfigurationElement extends UUIFormControlMixin(UmbLitElement, {}) {
 	protected getFormElement() {
 		return undefined;
 	}

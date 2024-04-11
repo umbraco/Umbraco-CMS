@@ -1,12 +1,12 @@
 import type { UmbDataTypeItemModel } from '../../repository/item/types.js';
 import { UmbDataTypePickerContext } from './data-type-input.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-data-type-input')
-export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
