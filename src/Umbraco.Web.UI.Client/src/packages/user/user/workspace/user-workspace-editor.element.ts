@@ -81,7 +81,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRightColumn() {
-		if (!this._user || !this.#workspaceContext) return nothing;
+		if (!this._user) return nothing;
 
 		return html`
 			<umb-user-workspace-avatar></umb-user-workspace-avatar>
