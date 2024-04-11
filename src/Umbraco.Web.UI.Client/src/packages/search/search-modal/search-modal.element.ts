@@ -32,9 +32,6 @@ export class UmbSearchModalElement extends UmbLitElement {
 		alias: string;
 	};
 
-	/**
-	 *
-	 */
 	constructor() {
 		super();
 
@@ -55,8 +52,12 @@ export class UmbSearchModalElement extends UmbLitElement {
 		super.connectedCallback();
 
 		requestAnimationFrame(() => {
-			this._input.focus();
+			this.#focusInput();
 		});
+	}
+
+	#focusInput() {
+		this._input.focus();
 	}
 
 	#onSearchChange(event: InputEvent) {
@@ -72,6 +73,8 @@ export class UmbSearchModalElement extends UmbLitElement {
 			api,
 			alias: searchProvider.alias,
 		};
+
+		this.#focusInput();
 	}
 
 	async #updateSearchResults() {
