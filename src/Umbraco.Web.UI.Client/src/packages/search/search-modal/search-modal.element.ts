@@ -79,6 +79,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		};
 
 		this.#focusInput();
+		this.#updateSearchResults();
 	}
 
 	async #updateSearchResults() {
