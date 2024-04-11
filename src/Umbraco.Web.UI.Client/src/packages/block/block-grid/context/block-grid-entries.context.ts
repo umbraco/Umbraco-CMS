@@ -7,6 +7,7 @@ import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-ma
 import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 
 export class UmbBlockGridEntriesContext
 	extends UmbBlockEntriesContext<
@@ -27,12 +28,14 @@ export class UmbBlockGridEntriesContext
 
 	#areaType?: UmbBlockGridTypeAreaType;
 
-	//#parentUnique?: string;
+	#parentUnique?: string | null;
 	#areaKey?: string | null;
 
 	setParentUnique(contentUdi: string | null) {
-		this._workspaceModal.setUniquePathValue('parentUnique', contentUdi ?? 'null');
-		this.#catalogueModal.setUniquePathValue('parentUnique', contentUdi ?? 'null');
+		this.#parentUnique = contentUdi;
+		// Notice pathFolderName can be removed when we have switched to use a proper GUID/ID/KEY. [NL]
+		this._workspaceModal.setUniquePathValue('parentUnique', pathFolderName(contentUdi ?? 'null'));
+		this.#catalogueModal.setUniquePathValue('parentUnique', pathFolderName(contentUdi ?? 'null'));
 	}
 
 	setAreaKey(areaKey: string | null) {
@@ -62,7 +65,7 @@ export class UmbBlockGridEntriesContext
 
 		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockGridEntry) => {
 			this.#parentEntry = blockGridEntry;
-			this.#gotBlockParentEntry(); // is not used at this point.
+			this.#gotBlockParentEntry(); // is not used at this point. [NL]
 		}).asPromise();
 
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
@@ -77,6 +80,7 @@ export class UmbBlockGridEntriesContext
 						blockGroups: this._manager?.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
 						blockOriginData: { index: index },
+						// TODO: Include AreaKey and ParentUnique in the blockOriginData object. [NL]
 					},
 				};
 			})
@@ -107,10 +111,6 @@ export class UmbBlockGridEntriesContext
 			'observePropertyAlias',
 		);
 	}
-
-	/*#gotBlockParentEntry() {
-		if (!this.#parentEntry) return;
-	}*/
 
 	#gotAreaKey() {
 		if (this.#areaKey === undefined) return;
