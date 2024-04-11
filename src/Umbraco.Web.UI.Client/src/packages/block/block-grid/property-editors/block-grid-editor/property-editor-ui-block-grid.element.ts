@@ -76,17 +76,26 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		// TODO: Prevent initial notification from these observes:
 		this.observe(this.#context.layouts, (layouts) => {
 			this._value = { ...this._value, layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS]: layouts } };
-			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+			this.#fireChangeEvent();
 		});
 		this.observe(this.#context.contents, (contents) => {
 			this._value = { ...this._value, contentData: contents };
-			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+			this.#fireChangeEvent();
 		});
 		this.observe(this.#context.settings, (settings) => {
 			this._value = { ...this._value, settingsData: settings };
-			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+			this.#fireChangeEvent();
 		});
 	}
+
+	#debounceChangeEvent?: boolean;
+	#fireChangeEvent = async () => {
+		if (this.#debounceChangeEvent) return;
+		this.#debounceChangeEvent = true;
+		await Promise.resolve();
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.#debounceChangeEvent = false;
+	};
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
