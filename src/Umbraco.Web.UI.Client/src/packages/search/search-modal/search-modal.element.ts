@@ -1,3 +1,4 @@
+import type { UmbSearchResultItemModel } from '../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, repeat, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestSearchResultItem } from '@umbraco-cms/backoffice/extension-registry';
@@ -7,13 +8,6 @@ import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-c
 
 import '../search-result/search-result-item.element.js';
 
-export type SearchItem = {
-	entityType: string;
-};
-export type SearchGroupItem = {
-	name: string;
-	items: Array<SearchItem>;
-};
 @customElement('umb-search-modal')
 export class UmbSearchModalElement extends UmbLitElement {
 	@query('input')
@@ -23,7 +17,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 	private _search = '';
 
 	@state()
-	private _searchResults: Array<SearchItem> = [];
+	private _searchResults: Array<UmbSearchResultItemModel> = [];
 
 	@state()
 	private searchTags: Array<string> = [
@@ -94,20 +88,9 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 	async #updateSearchResults() {
 		if (this._search) {
-			const { data, error } = await this.#currentProvider.search({
-				query: this._search,
-			});
-
-			console.log('data', data);
-
+			const { data } = await this.#currentProvider.search({ query: this._search });
 			if (!data) return;
-
 			this._searchResults = data.items;
-
-			console.log('reults', this._searchResults);
-			// this._searchResults = this.#mockApi.getDocuments.filter((item) =>
-			// 	item.name.toLowerCase().includes(this._search.toLowerCase()),
-			// );
 		} else {
 			this._searchResults = [];
 		}
@@ -135,7 +118,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	#renderSearchTags() {
-		return html`<div id="search-tags">
+		return html`<div id="search-providers">
 			${repeat(
 				this._searchProviders,
 				(searchProvider) => searchProvider,
@@ -143,7 +126,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 					html`<button
 						@click=${() => this.#onSearchTagClick(searchProvider)}
 						@keydown=${() => ''}
-						class="search-tag ${this._activeSearchTag === searchProvider.alias ? 'active' : ''}">
+						class="search-provider ${this._activeSearchTag === searchProvider.alias ? 'active' : ''}">
 						${searchProvider.name}
 					</button>`,
 			)}
@@ -153,16 +136,12 @@ export class UmbSearchModalElement extends UmbLitElement {
 	#renderResults() {
 		return repeat(
 			this._searchResults,
-			(item) => item.name,
-			(item) => this.#renderItem(item),
+			(item) => item.unique,
+			(item) => this.#renderResultItem(item),
 		);
 	}
 
-	#renderNoResults() {
-		return html`<div id="no-results">Only mock data for now <strong>Search for blog</strong></div>`;
-	}
-
-	#renderItem(item: SearchItem) {
+	#renderResultItem(item: UmbSearchResultItemModel) {
 		return html`
 			<umb-extension-slot
 				type="searchResultItem"
@@ -170,85 +149,23 @@ export class UmbSearchModalElement extends UmbLitElement {
 				.filter=${(manifest: ManifestSearchResultItem) => manifest.forEntityTypes.includes(item.entityType)}
 				default-element="umb-search-result-item"></umb-extension-slot>
 		`;
-		return html`
-			<a href="${item.href}" class="item">
-				<span class="item-icon">
-					${item.icon ? html`<umb-icon name="${item.icon}"></umb-icon>` : this.#renderHashTag()}
-				</span>
-				<span class="item-name">
-					${item.name} ${item.url ? html`<span class="item-url">${item.url}</span>` : nothing}
-				</span>
-				<span class="item-symbol">></span>
-			</a>
-		`;
 	}
 
-	#renderHashTag() {
-		return html`
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-				<path fill="none" d="M0 0h24v24H0z" />
-				<path
-					fill="currentColor"
-					d="M7.784 14l.42-4H4V8h4.415l.525-5h2.011l-.525 5h3.989l.525-5h2.011l-.525 5H20v2h-3.784l-.42 4H20v2h-4.415l-.525 5h-2.011l.525-5H9.585l-.525 5H7.049l.525-5H4v-2h3.784zm2.011 0h3.99l.42-4h-3.99l-.42 4z" />
-			</svg>
-		`;
+	#renderNoResults() {
+		return html`<div id="no-results">Only mock data for now <strong>Search for blog</strong></div>`;
 	}
-
-	#mockApi = {
-		getDocuments: [
-			{
-				name: 'Blog',
-				href: '#',
-				icon: 'icon-thumbnail-list',
-				url: '/blog/',
-			},
-			{
-				name: 'Popular blogs',
-				href: '#',
-				icon: 'icon-article',
-				url: '/blog/popular-blogs/',
-			},
-			{
-				name: 'How to write a blog',
-				href: '#',
-				icon: 'icon-article',
-				url: '/blog/how-to-write-a-blog/',
-			},
-		],
-		getMedia: [
-			{
-				name: 'Blog hero',
-				href: '#',
-				icon: 'icon-picture',
-			},
-		],
-		getDocumentTypes: [
-			{
-				name: 'Contact form for blog',
-				href: '#',
-			},
-			{
-				name: 'Blog',
-				href: '#',
-			},
-			{
-				name: 'Blog link item',
-				href: '#',
-			},
-		],
-	};
 
 	static styles = [
 		UmbTextStyles,
 		css`
-			#search-tags {
+			#search-providers {
 				display: flex;
 				flex-wrap: wrap;
 				gap: var(--uui-size-space-2);
 				padding: 0 var(--uui-size-space-5);
 				padding-bottom: var(--uui-size-space-2);
 			}
-			.search-tag {
+			.search-provider {
 				padding: var(--uui-size-space-3) var(--uui-size-space-4);
 				background: var(--uui-color-surface-alt);
 				line-height: 1;
@@ -258,11 +175,11 @@ export class UmbSearchModalElement extends UmbLitElement {
 				cursor: pointer;
 				border: 2px solid transparent;
 			}
-			.search-tag:hover {
+			.search-provider:hover {
 				background: var(--uui-color-surface-emphasis);
 				color: var(--uui-color-interactive-emphasis);
 			}
-			.search-tag.active {
+			.search-provider.active {
 				background: var(--uui-color-surface-emphasis);
 				color: var(--uui-color-interactive-emphasis);
 				border-color: var(--uui-color-focus);
@@ -304,52 +221,6 @@ export class UmbSearchModalElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				height: 100%;
-			}
-			.item {
-				background: var(--uui-color-surface);
-				padding: var(--uui-size-space-3) var(--uui-size-space-5);
-				border-radius: var(--uui-border-radius);
-				color: var(--uui-color-interactive);
-				display: grid;
-				grid-template-columns: var(--uui-size-space-6) 1fr var(--uui-size-space-5);
-				align-items: center;
-			}
-			.item:hover {
-				background-color: var(--uui-color-surface-emphasis);
-				color: var(--uui-color-interactive-emphasis);
-			}
-			.item:hover .item-symbol {
-				font-weight: unset;
-				opacity: 1;
-			}
-			.item-icon {
-				margin-bottom: auto;
-				margin-top: 5px;
-			}
-			.item-icon,
-			.item-symbol {
-				opacity: 0.4;
-			}
-			.item-url {
-				font-size: 0.8rem;
-				line-height: 1.2;
-				font-weight: 100;
-			}
-			.item-name {
-				display: flex;
-				flex-direction: column;
-			}
-			.item-icon > * {
-				height: 1rem;
-				display: flex;
-				width: min-content;
-			}
-			.item-symbol {
-				font-weight: 100;
-			}
-			a {
-				text-decoration: none;
-				color: inherit;
 			}
 			#no-results {
 				display: flex;
