@@ -76,11 +76,12 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
 
         endpoints.MapControllerRoute(
             "catch-all-sections-to-client",
-            new StringBuilder(_umbracoPathSegment).Append("/section/{**slug}").ToString(),
+            new StringBuilder(_umbracoPathSegment).Append("/{**slug}").ToString(),
             new
             {
                 Controller = ControllerExtensions.GetControllerName<BackOfficeDefaultController>(),
-                Action = nameof(BackOfficeDefaultController.Index)
-            });
+                Action = nameof(BackOfficeDefaultController.Index),
+            },
+            constraints: new { slug = @"^(section.*|upgrade|install|logout)$" });
     }
 }

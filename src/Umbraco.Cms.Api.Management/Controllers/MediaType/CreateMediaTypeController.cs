@@ -34,7 +34,9 @@ public class CreateMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateMediaTypeRequestModel requestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        CreateMediaTypeRequestModel requestModel)
     {
         MediaTypeCreateModel model = _mediaTypeEditingPresentationFactory.MapCreateModel(requestModel);
         Attempt<IMediaType?, ContentTypeOperationStatus> result = await _mediaTypeEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));

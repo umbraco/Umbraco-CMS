@@ -17,6 +17,6 @@ public class AncestorsDataTypeTreeController : DataTypeTreeControllerBase
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DataTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<DataTypeTreeItemResponseModel>>> Ancestors(Guid descendantId)
+    public async Task<ActionResult<IEnumerable<DataTypeTreeItemResponseModel>>> Ancestors(CancellationToken cancellationToken, Guid descendantId)
         => await GetAncestors(descendantId);
 }

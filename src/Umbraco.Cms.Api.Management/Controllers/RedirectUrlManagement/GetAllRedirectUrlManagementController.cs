@@ -27,7 +27,11 @@ public class GetAllRedirectUrlManagementController : RedirectUrlManagementContro
     [HttpGet]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<RedirectUrlResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> GetAll(string? filter, int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> GetAll(
+        CancellationToken cancellationToken,
+        string? filter,
+        int skip = 0,
+        int take = 100)
     {
         long total;
         IEnumerable<IRedirectUrl> redirects = filter is null

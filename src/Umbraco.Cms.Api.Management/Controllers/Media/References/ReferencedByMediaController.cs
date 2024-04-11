@@ -32,6 +32,7 @@ public class ReferencedByMediaController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IReferenceResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<IReferenceResponseModel>>> ReferencedBy(
+        CancellationToken cancellationToken,
         Guid id,
         int skip = 0,
         int take = 20)

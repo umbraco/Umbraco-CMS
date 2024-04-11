@@ -25,7 +25,7 @@ public class CreateSavedSearchLogViewerController : SavedSearchLogViewerControll
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create(SavedLogSearchRequestModel savedSearch)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken, SavedLogSearchRequestModel savedSearch)
     {
         Attempt<ILogViewerQuery?, LogViewerOperationStatus> result =
             await _logViewerService.AddSavedLogQueryAsync(savedSearch.Name, savedSearch.Query);

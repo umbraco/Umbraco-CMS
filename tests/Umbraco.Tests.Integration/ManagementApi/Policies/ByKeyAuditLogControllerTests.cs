@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Policies;
 public class ByKeyAuditLogControllerTests : ManagementApiTest<ByKeyAuditLogController>
 {
     protected override Expression<Func<ByKeyAuditLogController, object>> MethodSelector =>
-        x => x.ByKey(Constants.Security.SuperUserKey, Direction.Ascending, null, 0, 100);
+        x => x.ByKey(CancellationToken.None, Constants.Security.SuperUserKey, Direction.Ascending, null, 0, 100);
 
     [Test]
     public virtual async Task As_Admin_I_Have_Access()

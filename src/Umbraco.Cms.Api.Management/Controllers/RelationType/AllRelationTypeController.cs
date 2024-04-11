@@ -26,7 +26,10 @@ public class AllRelationTypeController : RelationTypeControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationTypeResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<RelationTypeResponseModel>>> Get(int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<RelationTypeResponseModel>>> Get(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100)
     {
         PagedModel<IRelationType> allRelationTypes = await _relationService.GetPagedRelationTypesAsync(skip, take);
 

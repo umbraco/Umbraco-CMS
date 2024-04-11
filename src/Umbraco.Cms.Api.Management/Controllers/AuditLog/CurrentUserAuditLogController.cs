@@ -32,7 +32,7 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AuditLogWithUsernameResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CurrentUser(Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
+    public async Task<IActionResult> CurrentUser(CancellationToken cancellationToken, Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
         IUser user = CurrentUser(_backOfficeSecurityAccessor);
         PagedModel<IAuditItem> result = await _auditService.GetPagedItemsByUserAsync(

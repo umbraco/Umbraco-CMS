@@ -19,6 +19,8 @@ public static partial class Constants
 
         public static readonly Guid MediaTypeContainer = new(Strings.MediaTypeContainer);
 
+        public static readonly Guid DocumentBlueprintContainer = new(Strings.DocumentBlueprintContainer);
+
         public static readonly Guid DataType = new(Strings.DataType);
 
         public static readonly Guid Document = new(Strings.Document);
@@ -72,6 +74,8 @@ public static partial class Constants
             public const string DocumentTypeContainer = "2F7A2769-6B0B-4468-90DD-AF42D64F7F16";
 
             public const string MediaTypeContainer = "42AEF799-B288-4744-9B10-BE144B73CDC4";
+
+            public const string DocumentBlueprintContainer = "A7EFF71B-FA69-4552-93FC-038F7DEEE453";
 
             public const string ContentItem = "10E2B09F-C28B-476D-B77A-AA686435E44A";
 

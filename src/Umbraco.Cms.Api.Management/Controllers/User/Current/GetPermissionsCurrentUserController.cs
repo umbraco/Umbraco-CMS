@@ -32,7 +32,9 @@ public class GetPermissionsCurrentUserController : CurrentUserControllerBase
     [HttpGet("permissions")]
     [ProducesResponseType(typeof(UserPermissionsResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetPermissions([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<IActionResult> GetPermissions(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissionsAttempt = await _userService.GetPermissionsAsync(CurrentUserKey(_backOfficeSecurityAccessor), ids.ToArray());
 
