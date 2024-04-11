@@ -37,6 +37,7 @@ internal class UmbracoCmsSchema
         public ImagingSettings Imaging { get; set; } = null!;
 
         public IndexCreatorSettings Examine { get; set; } = null!;
+
         public IndexingSettings Indexing { get; set; } = null!;
 
         public LoggingSettings Logging { get; set; } = null!;
@@ -48,8 +49,6 @@ internal class UmbracoCmsSchema
         public RuntimeSettings Runtime { get; set; } = null!;
 
         public SecuritySettings Security { get; set; } = null!;
-
-        public TourSettings Tours { get; set; } = null!;
 
         public TypeFinderSettings TypeFinder { get; set; } = null!;
 

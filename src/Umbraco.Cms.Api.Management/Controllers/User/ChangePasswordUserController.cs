@@ -37,7 +37,10 @@ public class ChangePasswordUserController : UserControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ChangePassword(Guid id, ChangePasswordUserRequestModel model)
+    public async Task<IActionResult> ChangePassword(
+        CancellationToken cancellationToken,
+        Guid id,
+        ChangePasswordUserRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

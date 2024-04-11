@@ -23,7 +23,9 @@ public class AvailableCompositionMemberTypeController : MemberTypeControllerBase
     [HttpPost("available-compositions")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<AvailableMemberTypeCompositionResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> AvailableCompositions(MemberTypeCompositionRequestModel compositionModel)
+    public async Task<IActionResult> AvailableCompositions(
+        CancellationToken cancellationToken,
+        MemberTypeCompositionRequestModel compositionModel)
     {
         IEnumerable<ContentTypeAvailableCompositionsResult> availableCompositions = await _memberTypeEditingService.GetAvailableCompositionsAsync(
             compositionModel.Id,

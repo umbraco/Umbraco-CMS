@@ -1,9 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -12,11 +10,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 public class MemberGroupPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IMemberGroupService _memberGroupService;
-
-    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
-    public MemberGroupPickerValueConverter() : this(StaticServiceProvider.Instance.GetRequiredService<IMemberGroupService>())
-    {
-    }
 
     public MemberGroupPickerValueConverter(IMemberGroupService memberGroupService) => _memberGroupService = memberGroupService;
 

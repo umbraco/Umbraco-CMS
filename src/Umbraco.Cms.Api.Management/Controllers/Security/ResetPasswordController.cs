@@ -26,7 +26,7 @@ public class ResetPasswordController : SecurityControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [UserPasswordEnsureMinimumResponseTime]
-    public async Task<IActionResult> RequestPasswordReset(ResetPasswordRequestModel model)
+    public async Task<IActionResult> RequestPasswordReset(CancellationToken cancellationToken, ResetPasswordRequestModel model)
     {
         Attempt<UserOperationStatus> result = await _userService.SendResetPasswordEmailAsync(model.Email);
 

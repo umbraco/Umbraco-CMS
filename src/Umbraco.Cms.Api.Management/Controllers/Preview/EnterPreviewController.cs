@@ -15,7 +15,7 @@ public class EnterPreviewController : PreviewControllerBase
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult Enter()
+    public IActionResult Enter(CancellationToken cancellationToken)
     {
         _previewService.EnterPreview();
         return Ok();

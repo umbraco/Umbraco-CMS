@@ -22,9 +22,10 @@ public class
 }
 
 [ApiExplorerSettings(IgnoreApi=true)]
-[Route("/umbraco/login")]
+[Route(LoginPath)]
 public class BackOfficeLoginController : Controller
 {
+    public const string LoginPath = "/umbraco/login";
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly GlobalSettings _globalSettings;
 
@@ -37,7 +38,7 @@ public class BackOfficeLoginController : Controller
     }
 
     // GET
-    public IActionResult Index(BackOfficeLoginModel model)
+    public IActionResult Index(CancellationToken cancellationToken, BackOfficeLoginModel model)
     {
         if (string.IsNullOrEmpty(model.UmbracoUrl))
         {

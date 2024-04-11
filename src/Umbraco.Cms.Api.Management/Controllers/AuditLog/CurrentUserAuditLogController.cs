@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -33,10 +32,9 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AuditLogWithUsernameResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CurrentUser(Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
+    public async Task<IActionResult> CurrentUser(CancellationToken cancellationToken, Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
         IUser user = CurrentUser(_backOfficeSecurityAccessor);
-
         PagedModel<IAuditItem> result = await _auditService.GetPagedItemsByUserAsync(
             user.Key,
             skip,

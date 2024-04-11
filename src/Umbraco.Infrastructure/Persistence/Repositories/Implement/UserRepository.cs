@@ -761,8 +761,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             {"updateDate", "UpdateDate"},
             {"avatar", "Avatar"},
             {"emailConfirmedDate", "EmailConfirmedDate"},
-            {"invitedDate", "InvitedDate"},
-            {"tourData", "TourData"}
+            {"invitedDate", "InvitedDate"}
         };
 
         // create list of properties that have changed

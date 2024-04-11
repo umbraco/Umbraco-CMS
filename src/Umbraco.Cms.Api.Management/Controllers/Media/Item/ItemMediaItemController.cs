@@ -25,7 +25,9 @@ public class ItemMediaItemController : MediaItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MediaItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<ActionResult> Item(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IMediaEntitySlim> media = _entityService
             .GetAll(UmbracoObjectTypes.Media, ids.ToArray())

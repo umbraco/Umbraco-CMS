@@ -24,7 +24,7 @@ public class DomainsController : DocumentControllerBase
     [HttpGet("{id:guid}/domains")]
     [ProducesResponseType(typeof(DomainsResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Domains(Guid id)
+    public async Task<IActionResult> Domains(CancellationToken cancellationToken, Guid id)
     {
         IDomain[] assignedDomains = (await _domainService.GetAssignedDomainsAsync(id, true))
             .OrderBy(d => d.SortOrder)

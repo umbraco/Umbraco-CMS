@@ -29,7 +29,9 @@ public class CreatePartialViewFolderController : PartialViewFolderControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreatePartialViewFolderRequestModel requestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        CreatePartialViewFolderRequestModel requestModel)
     {
         PartialViewFolderCreateModel createModel = _mapper.Map<PartialViewFolderCreateModel>(requestModel)!;
         Attempt<PartialViewFolderModel?, PartialViewFolderOperationStatus> result = await _partialViewFolderService.CreateAsync(createModel);

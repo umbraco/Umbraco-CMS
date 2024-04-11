@@ -2,8 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -178,7 +177,7 @@ public class ContentTypeTests
         // Arrange
         var contentType = BuildContentType();
 
-        var json = JsonConvert.SerializeObject(contentType);
+        var json = JsonSerializer.Serialize(contentType);
         Debug.Print(json);
     }
 
@@ -241,7 +240,7 @@ public class ContentTypeTests
         // Arrange
         var contentType = BuildMediaType();
 
-        var json = JsonConvert.SerializeObject(contentType);
+        var json = JsonSerializer.Serialize(contentType);
         Debug.Print(json);
     }
 
@@ -304,7 +303,7 @@ public class ContentTypeTests
         // Arrange
         var contentType = BuildMemberType();
 
-        var json = JsonConvert.SerializeObject(contentType);
+        var json = JsonSerializer.Serialize(contentType);
         Debug.Print(json);
     }
 
