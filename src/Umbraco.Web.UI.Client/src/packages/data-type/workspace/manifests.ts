@@ -1,4 +1,3 @@
-import { UmbInvalidateWorkspaceAction } from './test-workspace-action.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
@@ -69,24 +68,6 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
-			},
-		],
-	},
-	{
-		type: 'workspaceAction',
-		kind: 'default',
-		alias: 'Umb.WorkspaceAction.DataType.Test',
-		name: 'TEST VALIDATION SYSTEM',
-		api: UmbInvalidateWorkspaceAction,
-		meta: {
-			label: 'Invalidate',
-			look: 'primary',
-			color: 'danger',
 		},
 		conditions: [
 			{
