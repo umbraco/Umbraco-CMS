@@ -20,29 +20,17 @@ export class UmbSearchModalElement extends UmbLitElement {
 	private _searchResults: Array<UmbSearchResultItemModel> = [];
 
 	@state()
-	private searchTags: Array<string> = [
-		'Data Type',
-		'Document',
-		'Document Type',
-		'Media',
-		'Media Type',
-		'Member',
-		'Member Type',
-		'Users',
-		'User Group',
-	];
-
-	@state()
-	private _activeSearchTag = 'Document';
-
-	@state()
 	private _searchProviders: Array<{
 		name: string;
 		providerPromise: any;
 		alias: string;
 	}> = [];
 
-	#currentProvider: any;
+	@state()
+	_currentProvider?: {
+		api: any;
+		alias: string;
+	};
 
 	/**
 	 *
@@ -79,16 +67,16 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	async #onSearchTagClick(searchProvider: any) {
-		console.log(searchProvider);
 		const api = await searchProvider.providerPromise;
-
-		this.#currentProvider = api;
-		this._activeSearchTag = searchProvider.alias;
+		this._currentProvider = {
+			api,
+			alias: searchProvider.alias,
+		};
 	}
 
 	async #updateSearchResults() {
-		if (this._search) {
-			const { data } = await this.#currentProvider.search({ query: this._search });
+		if (this._search && this._currentProvider) {
+			const { data } = await this._currentProvider.api.search({ query: this._search });
 			if (!data) return;
 			this._searchResults = data.items;
 		} else {
@@ -126,7 +114,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 					html`<button
 						@click=${() => this.#onSearchTagClick(searchProvider)}
 						@keydown=${() => ''}
-						class="search-provider ${this._activeSearchTag === searchProvider.alias ? 'active' : ''}">
+						class="search-provider ${this._currentProvider?.alias === searchProvider.alias ? 'active' : ''}">
 						${searchProvider.name}
 					</button>`,
 			)}
@@ -152,7 +140,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	#renderNoResults() {
-		return html`<div id="no-results">Only mock data for now <strong>Search for blog</strong></div>`;
+		return html`<div id="no-results">No results found</div>`;
 	}
 
 	static styles = [
