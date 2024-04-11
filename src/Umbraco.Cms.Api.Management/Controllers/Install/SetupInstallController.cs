@@ -28,7 +28,7 @@ public class SetupInstallController : InstallControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Setup(InstallRequestModel installData)
+    public async Task<IActionResult> Setup(CancellationToken cancellationToken, InstallRequestModel installData)
     {
         InstallData data = _mapper.Map<InstallData>(installData)!;
         Attempt<InstallationResult?, InstallOperationStatus> result = await _installService.InstallAsync(data);

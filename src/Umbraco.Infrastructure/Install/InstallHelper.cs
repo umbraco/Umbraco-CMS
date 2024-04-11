@@ -1,18 +1,14 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
-using Umbraco.Cms.Infrastructure.Persistence;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Infrastructure.Install
@@ -51,58 +47,6 @@ namespace Umbraco.Cms.Infrastructure.Install
             _umbracoDatabaseFactory = umbracoDatabaseFactory;
             _fireAndForgetRunner = fireAndForgetRunner;
             _databaseProviderMetadata = databaseProviderMetadata;
-        }
-
-        [Obsolete("Please use constructor that takes an IEnumerable<IDatabaseProviderMetadata> instead, scheduled for removal in Umbraco 12")]
-        public InstallHelper(
-            DatabaseBuilder databaseBuilder,
-            ILogger<InstallHelper> logger,
-            IUmbracoVersion umbracoVersion,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
-            IInstallationService installationService,
-            ICookieManager cookieManager,
-            IUserAgentProvider userAgentProvider,
-            IUmbracoDatabaseFactory umbracoDatabaseFactory,
-            IFireAndForgetRunner fireAndForgetRunner)
-            : this(
-                databaseBuilder,
-                logger,
-                umbracoVersion,
-                connectionStrings,
-                installationService,
-                cookieManager,
-                userAgentProvider,
-                umbracoDatabaseFactory,
-                fireAndForgetRunner,
-                StaticServiceProvider.Instance.GetRequiredService<IEnumerable<IDatabaseProviderMetadata>>()
-                )
-        {
-
-        }
-
-        [Obsolete("Please use constructor that takes an IFireAndForgetRunner and IEnumerable<IDatabaseProviderMetadata> instead, scheduled for removal in Umbraco 12")]
-        public InstallHelper(
-            DatabaseBuilder databaseBuilder,
-            ILogger<InstallHelper> logger,
-            IUmbracoVersion umbracoVersion,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
-            IInstallationService installationService,
-            ICookieManager cookieManager,
-            IUserAgentProvider userAgentProvider,
-            IUmbracoDatabaseFactory umbracoDatabaseFactory)
-            : this(
-                databaseBuilder,
-                logger,
-                umbracoVersion,
-                connectionStrings,
-                installationService,
-                cookieManager,
-                userAgentProvider,
-                umbracoDatabaseFactory,
-                StaticServiceProvider.Instance.GetRequiredService<IFireAndForgetRunner>(),
-                StaticServiceProvider.Instance.GetRequiredService<IEnumerable<IDatabaseProviderMetadata>>())
-        {
-
         }
 
         public async Task SetInstallStatusAsync(bool isCompleted, string errorMsg)

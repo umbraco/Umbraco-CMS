@@ -114,7 +114,7 @@ public class DeliveryApiTests
         => $"{name.ToLowerInvariant().Replace(" ", "-")}{(culture.IsNullOrWhiteSpace() ? string.Empty : $"-{culture}")}";
 
     protected ApiContentRouteBuilder CreateContentRouteBuilder(
-        IPublishedUrlProvider publishedUrlProvider,
+        IApiContentPathProvider contentPathProvider,
         IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor? variationContextAccessor = null,
         IPublishedSnapshotAccessor? publishedSnapshotAccessor = null,
@@ -129,7 +129,7 @@ public class DeliveryApiTests
         }
 
         return new ApiContentRouteBuilder(
-            publishedUrlProvider,
+            contentPathProvider,
             globalSettings,
             variationContextAccessor ?? Mock.Of<IVariationContextAccessor>(),
             publishedSnapshotAccessor ?? Mock.Of<IPublishedSnapshotAccessor>(),

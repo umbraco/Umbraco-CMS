@@ -77,7 +77,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
     // Umbraco.Code.MapAll
     private void Map(IContentEntitySlim source, DocumentTypeReferenceResponseModel target, MapperContext context)
     {
-        target.Id = source.Key;
+        target.Id = source.ContentTypeKey;
         target.Icon = source.ContentTypeIcon ?? string.Empty;
         target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListViewKey);
     }
@@ -85,7 +85,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
     // Umbraco.Code.MapAll
     private void Map(IDocumentEntitySlim source, DocumentTypeReferenceResponseModel target, MapperContext context)
     {
-        target.Id = source.Key;
+        target.Id = source.ContentTypeKey;
         target.Icon = source.ContentTypeIcon ?? string.Empty;
         target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListViewKey);
     }

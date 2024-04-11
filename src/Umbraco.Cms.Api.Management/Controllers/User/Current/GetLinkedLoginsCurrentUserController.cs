@@ -30,7 +30,7 @@ public class GetLinkedLoginsCurrentUserController : CurrentUserControllerBase
     [MapToApiVersion("1.0")]
     [HttpGet("logins")]
     [ProducesResponseType(typeof(LinkedLoginsRequestModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetLinkedLogins()
+    public async Task<IActionResult> GetLinkedLogins(CancellationToken cancellationToken)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
 

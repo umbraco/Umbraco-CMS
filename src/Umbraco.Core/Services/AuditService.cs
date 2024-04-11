@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
@@ -37,24 +38,6 @@ public sealed class AuditService : RepositoryService, IAuditService
         _userService = userService;
         _entityRepository = entityRepository;
         _isAvailable = new Lazy<bool>(DetermineIsAvailable);
-    }
-
-    [Obsolete("Use constructor that also takes IUserService & IEntityRepository instead, scheduled for removal in v13")]
-    public AuditService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository,
-        IAuditEntryRepository auditEntryRepository)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            auditRepository,
-            auditEntryRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IEntityRepository>())
-    {
     }
 
     public void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null)
@@ -235,11 +218,7 @@ public sealed class AuditService : RepositoryService, IAuditService
 
             using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
-                var user = await _userService.GetAsync(entityKey);
-                if (user is null)
-                {
-                    throw new ArgumentNullException($"Could not find user with key {entityKey}");
-                }
+                IUser user = await _userService.GetRequiredUserAsync(entityKey);
 
                 IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == user.Id);
                 IQuery<IAuditItem>? customFilter = sinceDate.HasValue ? Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;

@@ -276,13 +276,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IUserGroupService, UserGroupService>();
             Services.AddUnique<IUserPermissionService, UserPermissionService>();
             Services.AddUnique<IUserService, UserService>();
-            Services.AddUnique<ITourService, TourService>();
             Services.AddUnique<IWebProfilerService, WebProfilerService>();
             Services.AddUnique<ILocalizationService, LocalizationService>();
             Services.AddUnique<IDictionaryItemService, DictionaryItemService>();
             Services.AddUnique<IDataTypeContainerService, DataTypeContainerService>();
             Services.AddUnique<IContentTypeContainerService, ContentTypeContainerService>();
             Services.AddUnique<IMediaTypeContainerService, MediaTypeContainerService>();
+            Services.AddUnique<IContentBlueprintContainerService, ContentBlueprintContainerService>();
             Services.AddUnique<IIsoCodeValidator, IsoCodeValidator>();
             Services.AddUnique<ILanguageService, LanguageService>();
             Services.AddUnique<IMemberGroupService, MemberGroupService>();
@@ -294,6 +294,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentPermissionService, ContentPermissionService>();
             Services.AddUnique<IDictionaryPermissionService, DictionaryPermissionService>();
             Services.AddUnique<IContentService, ContentService>();
+            Services.AddUnique<IContentBlueprintEditingService, ContentBlueprintEditingService>();
             Services.AddUnique<IContentEditingService, ContentEditingService>();
             Services.AddUnique<IContentPublishingService, ContentPublishingService>();
             Services.AddUnique<IContentValidationService, ContentValidationService>();

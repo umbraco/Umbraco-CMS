@@ -38,7 +38,10 @@ public class UpdateDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateDocumentTypeRequestModel requestModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateDocumentTypeRequestModel requestModel)
     {
         IContentType? contentType = await _contentTypeService.GetAsync(id);
         if (contentType is null)

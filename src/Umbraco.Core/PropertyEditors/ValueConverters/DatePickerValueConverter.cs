@@ -1,4 +1,3 @@
-using System.Xml;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
@@ -18,24 +17,6 @@ public class DatePickerValueConverter : PropertyValueConverterBase
 
     public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         => ParseDateTimeValue(source);
-
-    // default ConvertSourceToObject just returns source ie a DateTime value
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override object? ConvertIntermediateToXPath(
-        IPublishedElement owner,
-        IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel,
-        object? inter,
-        bool preview)
-    {
-        // source should come from ConvertSource and be a DateTime already
-        if (inter is null)
-        {
-            return null;
-        }
-
-        return XmlConvert.ToString((DateTime)inter, XmlDateTimeSerializationMode.Unspecified);
-    }
 
     internal static DateTime ParseDateTimeValue(object? source)
     {

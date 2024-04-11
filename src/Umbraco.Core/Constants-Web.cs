@@ -62,6 +62,11 @@ public static partial class Constants
             public const string BackOfficeLoginArea = "UmbracoLogin"; // Used for area routes of non-api controllers for login
         }
 
+        /// <summary>
+        ///     The "base" path to the Management API
+        /// </summary>
+        public const string ManagementApiPath = "/management/api/";
+
         public static class Routing
         {
             public const string ControllerToken = "controller";

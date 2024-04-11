@@ -23,7 +23,9 @@ public class ItemsWebhookEntityController : WebhookEntityControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<WebhookItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Items([FromQuery(Name = "ids")] HashSet<Guid> ids)
+    public async Task<ActionResult> Items(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "ids")] HashSet<Guid> ids)
     {
         IEnumerable<IWebhook?> webhooks = await _webhookService.GetMultipleAsync(ids);
         List<WebhookItemResponseModel> entityResponseModels = _mapper.MapEnumerable<IWebhook?, WebhookItemResponseModel>(webhooks);

@@ -21,7 +21,7 @@ public class CopyMemberTypeController : MemberTypeControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Copy(Guid id)
+    public async Task<IActionResult> Copy(CancellationToken cancellationToken, Guid id)
     {
         Attempt<IMemberType?, ContentTypeStructureOperationStatus> result = await _memberTypeService.CopyAsync(id, containerKey: null);
 

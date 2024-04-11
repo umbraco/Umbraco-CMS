@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using StaticServiceProvider = Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -18,17 +17,13 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public abstract class BlockListPropertyEditorBase : DataEditor
 {
-
     private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
     private readonly IJsonSerializer _jsonSerializer;
-
-
 
     [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 15.")]
     protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
         : this(dataValueEditorFactory,blockValuePropertyIndexValueFactory, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
     {
-
     }
 
     protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory, IJsonSerializer jsonSerializer)

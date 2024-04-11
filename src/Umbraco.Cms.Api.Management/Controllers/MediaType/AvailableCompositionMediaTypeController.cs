@@ -23,7 +23,9 @@ public class AvailableCompositionMediaTypeController : MediaTypeControllerBase
     [HttpPost("available-compositions")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<AvailableMediaTypeCompositionResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> AvailableCompositions(MediaTypeCompositionRequestModel compositionModel)
+    public async Task<IActionResult> AvailableCompositions(
+        CancellationToken cancellationToken,
+        MediaTypeCompositionRequestModel compositionModel)
     {
         IEnumerable<ContentTypeAvailableCompositionsResult> availableCompositions = await _mediaTypeEditingService.GetAvailableCompositionsAsync(
             compositionModel.Id,
