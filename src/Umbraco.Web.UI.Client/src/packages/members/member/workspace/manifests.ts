@@ -1,5 +1,5 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
@@ -25,9 +25,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Member.Save',
 		name: 'Save Member Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -48,7 +48,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/content/member-workspace-view-content.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Content',
+			label: '#general_details',
 			pathname: 'content',
 			icon: 'icon-document',
 		},

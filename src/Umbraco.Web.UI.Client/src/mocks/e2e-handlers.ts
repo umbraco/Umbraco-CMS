@@ -16,12 +16,11 @@ import { handlers as languageHandlers } from './handlers/language/index.js';
 import { handlers as redirectManagementHandlers } from './handlers/redirect-management.handlers.js';
 import { handlers as packageHandlers } from './handlers/package.handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
-import { handlers as trackedReferenceHandlers } from './handlers/tracked-reference.handlers.js';
 
 export const handlers = [
 	serverHandlers.serverRunningHandler,
 	serverHandlers.serverInformationHandler,
-	manifestsHandlers.manifestEmptyHandler,
+	...manifestsHandlers.manifestEmptyHandlers,
 	...auditLogHandlers,
 	...installHandlers,
 	...upgradeHandlers,
@@ -38,5 +37,4 @@ export const handlers = [
 	...redirectManagementHandlers,
 	...packageHandlers,
 	...configHandlers,
-	...trackedReferenceHandlers,
 ];

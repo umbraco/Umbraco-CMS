@@ -1,12 +1,14 @@
+import type { ManifestAuthProvider } from './auth-provider.model.js';
 import type { ManifestBlockEditorCustomView } from './block-editor-custom-view.model.js';
 import type { ManifestCollection } from './collection.models.js';
 import type { ManifestCollectionView } from './collection-view.model.js';
+import type { ManifestCurrentUserAction, ManifestCurrentUserActionDefaultKind } from './current-user-action.model.js';
 import type { ManifestDashboard } from './dashboard.model.js';
 import type { ManifestDashboardCollection } from './dashboard-collection.model.js';
 import type {
 	ManifestEntityAction,
 	ManifestEntityActionDeleteKind,
-	ManifestEntityActionRenameKind,
+	ManifestEntityActionRenameServerFileKind,
 	ManifestEntityActionReloadTreeItemChildrenKind,
 	ManifestEntityActionDuplicateKind,
 	ManifestEntityActionMoveKind,
@@ -15,6 +17,9 @@ import type {
 	ManifestEntityActionDeleteFolderKind,
 	ManifestEntityActionDefaultKind,
 	ManifestEntityActionTrashKind,
+	ManifestEntityActionRestoreFromRecycleBinKind,
+	ManifestEntityActionEmptyRecycleBinKind,
+	ManifestEntityActionSortChildrenOfKind,
 } from './entity-action.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.model.js';
@@ -43,7 +48,11 @@ import type { ManifestWorkspace, ManifestWorkspaceRoutableKind } from './workspa
 import type { ManifestWorkspaceAction, ManifestWorkspaceActionDefaultKind } from './workspace-action.model.js';
 import type { ManifestWorkspaceActionMenuItem } from './workspace-action-menu-item.model.js';
 import type { ManifestWorkspaceContext } from './workspace-context.model.js';
-import type { ManifestWorkspaceFooterApp } from './workspace-footer-app.model.js';
+import type {
+	ManifestWorkspaceFooterApp,
+	ManifestWorkspaceFooterAppMenuBreadcrumbKind,
+	ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind,
+} from './workspace-footer-app.model.js';
 import type {
 	ManifestWorkspaceView,
 	ManifestWorkspaceViewContentTypeDesignEditorKind,
@@ -51,6 +60,7 @@ import type {
 import type { ManifestEntityUserPermission } from './entity-user-permission.model.js';
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestCollectionAction } from './collection-action.model.js';
+import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
 import type {
 	ManifestBase,
 	ManifestBundle,
@@ -58,10 +68,12 @@ import type {
 	ManifestEntryPoint,
 } from '@umbraco-cms/backoffice/extension-api';
 
+export type * from './auth-provider.model.js';
 export type * from './block-editor-custom-view.model.js';
 export type * from './collection.models.js';
 export type * from './collection-action.model.js';
 export type * from './collection-view.model.js';
+export type * from './current-user-action.model.js';
 export type * from './dashboard-collection.model.js';
 export type * from './dashboard.model.js';
 export type * from './dynamic-root.model.js';
@@ -74,6 +86,7 @@ export type * from './health-check.model.js';
 export type * from './localization.model.js';
 export type * from './menu-item.model.js';
 export type * from './menu.model.js';
+export type * from './mfa-login-provider.model.js';
 export type * from './modal.model.js';
 export type * from './package-view.model.js';
 export type * from './property-action.model.js';
@@ -99,31 +112,42 @@ export type * from './workspace.model.js';
 
 export type ManifestEntityActions =
 	| ManifestEntityAction
-	| ManifestEntityActionDefaultKind
-	| ManifestEntityActionDeleteKind
-	| ManifestEntityActionRenameKind
-	| ManifestEntityActionReloadTreeItemChildrenKind
-	| ManifestEntityActionDuplicateKind
-	| ManifestEntityActionMoveKind
 	| ManifestEntityActionCreateFolderKind
-	| ManifestEntityActionUpdateFolderKind
+	| ManifestEntityActionDefaultKind
 	| ManifestEntityActionDeleteFolderKind
-	| ManifestEntityActionTrashKind;
+	| ManifestEntityActionDeleteKind
+	| ManifestEntityActionDuplicateKind
+	| ManifestEntityActionEmptyRecycleBinKind
+	| ManifestEntityActionMoveKind
+	| ManifestEntityActionReloadTreeItemChildrenKind
+	| ManifestEntityActionRenameServerFileKind
+	| ManifestEntityActionRestoreFromRecycleBinKind
+	| ManifestEntityActionSortChildrenOfKind
+	| ManifestEntityActionTrashKind
+	| ManifestEntityActionUpdateFolderKind;
+
+export type ManifestWorkspaceFooterApps =
+	| ManifestWorkspaceFooterApp
+	| ManifestWorkspaceFooterAppMenuBreadcrumbKind
+	| ManifestWorkspaceFooterAppVariantMenuBreadcrumbKind;
 
 export type ManifestPropertyActions = ManifestPropertyAction | ManifestPropertyActionDefaultKind;
 
 export type ManifestWorkspaceActions = ManifestWorkspaceAction | ManifestWorkspaceActionDefaultKind;
 
-export type ManifestWorkspaces = ManifestWorkspace | ManifestWorkspaceRoutableKind;
+export type ManifestWorkspaces = ManifestWorkspace | ManifestWorkspaceRoutableKind | ManifestWorkspaceRoutableKind;
 export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceViewContentTypeDesignEditorKind;
 
 export type ManifestTypes =
+	| ManifestAuthProvider
 	| ManifestBundle<ManifestTypes>
-	| ManifestCondition
 	| ManifestBlockEditorCustomView
 	| ManifestCollection
 	| ManifestCollectionView
 	| ManifestCollectionAction
+	| ManifestCurrentUserAction
+	| ManifestCurrentUserActionDefaultKind
+	| ManifestCondition
 	| ManifestDashboard
 	| ManifestDashboardCollection
 	| ManifestDynamicRootOrigin
@@ -140,6 +164,7 @@ export type ManifestTypes =
 	| ManifestMenu
 	| ManifestMenuItem
 	| ManifestMenuItemTreeKind
+	| ManifestMfaLoginProvider
 	| ManifestModal
 	| ManifestPackageView
 	| ManifestPropertyActions
@@ -158,11 +183,11 @@ export type ManifestTypes =
 	| ManifestTreeItem
 	| ManifestTreeStore
 	| ManifestUserProfileApp
-	| ManifestWorkspaces
-	| ManifestWorkspaceActions
 	| ManifestWorkspaceActionMenuItem
+	| ManifestWorkspaceActions
 	| ManifestWorkspaceContext
-	| ManifestWorkspaceFooterApp
+	| ManifestWorkspaceFooterApps
+	| ManifestWorkspaces
 	| ManifestWorkspaceViews
 	| ManifestEntityUserPermission
 	| ManifestGranularUserPermission

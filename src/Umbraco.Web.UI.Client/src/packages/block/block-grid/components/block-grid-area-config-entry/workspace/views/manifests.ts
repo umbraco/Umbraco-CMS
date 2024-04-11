@@ -6,10 +6,10 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.BlockGridAreaType.Settings',
 		name: 'Block Grid Area Type Workspace Settings View',
-		js: () => import('./block-grid-area-type-workspace-view-settings.element.js'),
+		js: () => import('./settings.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Settings',
+			label: '#general_settings',
 			pathname: 'settings',
 			icon: 'icon-settings',
 		},

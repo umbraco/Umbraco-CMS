@@ -1,12 +1,12 @@
 import type { UmbDataTypeItemModel } from '../../repository/item/types.js';
 import { UmbDataTypePickerContext } from './data-type-input.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-data-type-input')
-export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -53,11 +53,12 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
+	@property({ type: Array })
+	public set selection(ids: Array<string> | undefined) {
+		this.#pickerContext.setSelection(ids ?? []);
 	}
-	public set selection(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+	public get selection(): Array<string> | undefined {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property()
@@ -66,7 +67,7 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 		this.selection = splitStringToArray(idsString);
 	}
 	public get value(): string {
-		return this.selection.join(',');
+		return this.selection?.join(',') ?? '';
 	}
 
 	@state()
@@ -89,7 +90,7 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
@@ -100,9 +101,11 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	render() {
 		return html`
 			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open"
-				>Add</uui-button
-			>
+			<uui-button
+				id="add-button"
+				look="placeholder"
+				@click=${() => this.#pickerContext.openPicker({ hideTreeRoot: true })}
+				label=${this.localize.term('general_choose')}></uui-button>
 		`;
 	}
 
@@ -113,9 +116,7 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
-						label="Remove Data Type ${item.name}"
-						>Remove</uui-button
-					>
+						label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node-data-type>
 		`;

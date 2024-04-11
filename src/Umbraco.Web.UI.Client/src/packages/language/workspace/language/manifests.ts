@@ -1,4 +1,4 @@
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
@@ -24,7 +24,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/language-details-workspace-view.element.js'),
 		weight: 90,
 		meta: {
-			label: 'Details',
+			label: '#general_details',
 			pathname: 'details',
 			icon: 'edit',
 		},
@@ -43,11 +43,11 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Language.Save',
 		name: 'Save Language Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
 			look: 'primary',
 			color: 'positive',
-			label: 'Save',
+			label: '#buttons_save',
 		},
 		conditions: [
 			{

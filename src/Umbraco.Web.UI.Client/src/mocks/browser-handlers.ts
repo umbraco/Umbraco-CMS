@@ -31,13 +31,12 @@ import { handlers as stylesheetHandlers } from './handlers/stylesheet/index.js';
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
 import { handlers as telemetryHandlers } from './handlers/telemetry.handlers.js';
 import { handlers as templateHandlers } from './handlers/template/index.js';
-import { handlers as trackedReferenceHandlers } from './handlers/tracked-reference.handlers.js';
 import { handlers as upgradeHandlers } from './handlers/upgrade.handlers.js';
 import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as userHandlers } from './handlers/user/index.js';
-import { relationHandlers, relationTypeHandlers } from './handlers/relations/index.js';
 import * as manifestsHandlers from './handlers/manifests.handlers.js';
 import * as serverHandlers from './handlers/server.handlers.js';
+import { handlers as documentBlueprintHandlers } from './handlers/document-blueprint/index.js';
 
 const handlers = [
 	...auditLogHandlers,
@@ -66,8 +65,6 @@ const handlers = [
 	...profilingHandlers,
 	...publishedStatusHandlers,
 	...redirectManagementHandlers,
-	...relationHandlers,
-	...relationTypeHandlers,
 	...rteEmbedHandlers,
 	...scriptHandlers,
 	...staticFileHandlers,
@@ -75,10 +72,10 @@ const handlers = [
 	...tagHandlers,
 	...telemetryHandlers,
 	...templateHandlers,
-	...trackedReferenceHandlers,
 	...upgradeHandlers,
 	...userGroupsHandlers,
 	...userHandlers,
+	...documentBlueprintHandlers,
 	serverHandlers.serverInformationHandler,
 ];
 
@@ -95,11 +92,11 @@ switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {
 
 switch (import.meta.env.VITE_UMBRACO_EXTENSION_MOCKS) {
 	case 'on':
-		handlers.push(manifestsHandlers.manifestDevelopmentHandler);
+		handlers.push(...manifestsHandlers.manifestDevelopmentHandlers);
 		break;
 
 	default:
-		handlers.push(manifestsHandlers.manifestEmptyHandler);
+		handlers.push(...manifestsHandlers.manifestEmptyHandlers);
 }
 
 export { handlers };

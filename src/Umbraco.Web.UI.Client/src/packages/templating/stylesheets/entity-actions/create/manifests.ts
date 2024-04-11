@@ -13,7 +13,7 @@ export const manifests: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_STYLESHEET_ROOT_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create...',
+			label: '#actions_create',
 		},
 	},
 	{

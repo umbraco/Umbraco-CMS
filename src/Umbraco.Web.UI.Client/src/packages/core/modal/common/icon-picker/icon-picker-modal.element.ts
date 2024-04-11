@@ -70,16 +70,16 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					${this.renderSearchbar()}
 					<hr />
 					<uui-color-swatches
-						.value="${this._modalValue?.color ?? ''}"
+						.value=${this._currentAlias}
 						label="Color switcher for icons"
-						@change="${this.#onColorChange}">
+						@change=${this.#onColorChange}>
 						${
 							// TODO: Missing translation for the color aliases.
 							this._colorList.map(
 								(color) => html`
 									<uui-color-swatch
-										label="${color.alias}"
-										title="${color.alias}"
+										label=${color.alias}
+										title=${color.alias}
 										value=${color.alias}
 										style="--uui-swatch-color: var(${color.varName})"></uui-color-swatch>
 								`,

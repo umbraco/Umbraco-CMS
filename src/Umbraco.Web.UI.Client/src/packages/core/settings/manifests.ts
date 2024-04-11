@@ -9,7 +9,7 @@ export const manifests = [
 		name: 'Settings Section',
 		weight: 400,
 		meta: {
-			label: 'Settings',
+			label: '#sections_settings',
 			pathname: 'settings',
 		},
 		conditions: [
@@ -51,28 +51,6 @@ export const manifests = [
 		kind: 'menu',
 		alias: 'Umb.SectionSidebarMenu.AdvancedSettings',
 		name: 'Advanced Settings Sidebar Menu',
-		weight: 100,
-		meta: {
-			label: 'Advanced',
-			menu: 'Umb.Menu.AdvancedSettings',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.SectionAlias',
-				match: UMB_SETTINGS_SECTION_ALIAS,
-			},
-		],
-	},
-	{
-		type: 'menu',
-		alias: 'Umb.Menu.AdvancedSettings',
-		name: 'Advanced Settings Menu',
-	},
-	{
-		type: 'sectionSidebarApp',
-		kind: 'menu',
-		alias: 'Umb.SectionSidebarMenu.AdvancedSettings',
-		name: 'Advanced Settings Section Sidebar Menu',
 		weight: 100,
 		meta: {
 			label: 'Advanced',

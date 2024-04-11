@@ -6,7 +6,7 @@ import type {
 	CreateTemplateRequestModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { TemplateResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { TemplateService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -60,7 +60,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, TemplateResource.getTemplateById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, TemplateService.getTemplateById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -98,7 +98,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			TemplateResource.postTemplate({
+			TemplateService.postTemplate({
 				requestBody,
 			}),
 		);
@@ -128,7 +128,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			TemplateResource.putTemplateById({
+			TemplateService.putTemplateById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -152,7 +152,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 		return tryExecuteAndNotify(
 			this.#host,
-			TemplateResource.deleteTemplateById({
+			TemplateService.deleteTemplateById({
 				id: unique,
 			}),
 		);

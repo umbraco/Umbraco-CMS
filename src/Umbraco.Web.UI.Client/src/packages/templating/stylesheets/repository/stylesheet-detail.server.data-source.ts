@@ -8,7 +8,7 @@ import type {
 	CreateStylesheetRequestModel,
 	UpdateStylesheetRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { StylesheetResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -25,7 +25,6 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const data: UmbStylesheetDetailModel = {
 			entityType: UMB_STYLESHEET_ENTITY_TYPE,
 			unique: '',
-			path: '',
 			name: '',
 			content: '',
 			...preset,
@@ -49,7 +48,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.postStylesheet({
+			StylesheetService.postStylesheet({
 				requestBody,
 			}),
 		);
@@ -71,7 +70,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.getStylesheetByPath({ path: encodeURIComponent(path) }),
+			StylesheetService.getStylesheetByPath({ path: encodeURIComponent(path) }),
 		);
 
 		if (error || !data) {
@@ -81,7 +80,6 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const stylesheet: UmbStylesheetDetailModel = {
 			entityType: UMB_STYLESHEET_ENTITY_TYPE,
 			unique: this.#serverFilePathUniqueSerializer.toUnique(data.path),
-			path: data.path,
 			name: data.name,
 			content: data.content,
 		};
@@ -101,7 +99,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.putStylesheetByPath({
+			StylesheetService.putStylesheetByPath({
 				path: encodeURIComponent(path),
 				requestBody,
 			}),
@@ -122,7 +120,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 
 		return tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.deleteStylesheetByPath({
+			StylesheetService.deleteStylesheetByPath({
 				path: encodeURIComponent(path),
 			}),
 		);

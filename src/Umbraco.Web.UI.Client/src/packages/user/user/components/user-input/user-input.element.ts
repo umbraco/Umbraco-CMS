@@ -1,12 +1,12 @@
 import type { UmbUserItemModel } from '../../repository/index.js';
 import { UmbUserPickerContext } from './user-input.context.js';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-user-input')
-export class UmbUserInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	// TODO: [LK] Add sorting!
 
 	/**
@@ -93,7 +93,7 @@ export class UmbUserInputElement extends FormControlMixin(UmbLitElement) {
 
 		this.observe(
 			this.#pickerContext.selection,
-			(selection) => (super.value = selection.join(',')),
+			(selection) => (this.value = selection.join(',')),
 			'umbUserInputSelectionObserver',
 		);
 		this.observe(

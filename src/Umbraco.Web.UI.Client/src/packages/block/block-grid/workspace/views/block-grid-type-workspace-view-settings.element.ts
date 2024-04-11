@@ -48,7 +48,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 					if (Array.isArray(value) && value.length > 0) {
 						this._showSizeOptions = true;
 					}
-					this.removeControllerByAlias('_observeColumnSpanOptions');
+					this.removeUmbControllerByAlias('_observeColumnSpanOptions');
 				},
 				'observeColumnSpanOptions',
 			);
@@ -107,7 +107,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 			<uui-box headline=${this.localize.term('blockEditor_headlineAllowance')}>
 				<umb-property
 					label=${this.localize.term('blockEditor_allowBlockInRoot')}
-					alias="allowInRoot"
+					alias="allowAtRoot"
 					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
 
 				<umb-property

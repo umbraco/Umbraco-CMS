@@ -1,6 +1,7 @@
+import { manifest as actionDefaultKindManifest } from './action/default.kind.js';
 import { manifests as modalManifests } from './modals/manifests.js';
-import { manifests as externalLoginProviderManifests } from './external-login/manifests.js';
 import { manifests as historyManifests } from './history/manifests.js';
+import { manifests as mfaLoginProviderManifests } from './mfa-login/manifests.js';
 import { manifests as profileManifests } from './profile/manifests.js';
 import { manifests as themeManifests } from './theme/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
@@ -28,9 +29,10 @@ export const headerApps: Array<ManifestTypes> = [
 ];
 
 export const manifests = [
-	...externalLoginProviderManifests,
+	actionDefaultKindManifest,
 	...headerApps,
 	...historyManifests,
+	...mfaLoginProviderManifests,
 	...modalManifests,
 	...profileManifests,
 	...repositoryManifests,

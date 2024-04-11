@@ -399,11 +399,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{
 				alias: 'items',
-				value: {
-					0: { sortOrder: 1, value: 'First Option' },
-					1: { sortOrder: 2, value: 'Second Option' },
-					2: { sortOrder: 3, value: 'I Am the third Option' },
-				},
+				value: ['First Option', 'Second Option', 'I Am the third Option'],
 			},
 		],
 	},
@@ -519,11 +515,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: {
-					0: { sortOrder: 1, value: 'First Option' },
-					1: { sortOrder: 2, value: 'Second Option' },
-					2: { sortOrder: 3, value: 'I Am the third Option' },
-				},
+				value: ['First Option', 'Second Option', 'I Am the third Option'],
 			},
 		],
 	},
@@ -540,11 +532,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [
 			{
 				alias: 'items',
-				value: {
-					0: { sortOrder: 1, value: 'First Option' },
-					1: { sortOrder: 2, value: 'Second Option' },
-					2: { sortOrder: 3, value: 'I Am the third Option' },
-				},
+				value: ['First Option', 'Second Option', 'I Am the third Option'],
 			},
 		],
 	},

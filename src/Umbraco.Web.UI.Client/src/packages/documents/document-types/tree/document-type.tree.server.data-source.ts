@@ -1,9 +1,13 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentTypeTreeItemModel } from './types.js';
-import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -25,6 +29,7 @@ export class UmbDocumentTypeTreeServerDataSource extends UmbTreeServerDataSource
 		super(host, {
 			getRootItems,
 			getChildrenOf,
+			getAncestorsOf,
 			mapper,
 		});
 	}
@@ -32,20 +37,26 @@ export class UmbDocumentTypeTreeServerDataSource extends UmbTreeServerDataSource
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentTypeResource.getTreeDocumentTypeRoot({ skip: args.skip, take: args.take });
+	DocumentTypeService.getTreeDocumentTypeRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parentUnique === null) {
 		return getRootItems({ skip: args.skip, take: args.take });
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentTypeResource.getTreeDocumentTypeChildren({
+		return DocumentTypeService.getTreeDocumentTypeChildren({
 			parentId: args.parentUnique,
 			skip: args.skip,
 			take: args.take,
 		});
 	}
 };
+
+const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	DocumentTypeService.getTreeDocumentTypeAncestors({
+		descendantId: args.descendantUnique,
+	});
 
 const mapper = (item: DocumentTypeTreeItemResponseModel): UmbDocumentTypeTreeItemModel => {
 	return {

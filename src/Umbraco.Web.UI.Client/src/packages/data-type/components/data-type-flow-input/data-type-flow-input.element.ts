@@ -1,7 +1,7 @@
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../index.js';
 import { UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '../../modals/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -15,7 +15,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
  * @fires focus - when the input gains focus
  */
 @customElement('umb-data-type-flow-input')
-export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputDataTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
 	protected getFormElement() {
 		return undefined;
 	}

@@ -2,8 +2,8 @@ import { UmbLanguageDetailRepository } from '../../repository/index.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UmbLanguageWorkspaceEditorElement } from './language-workspace-editor.element.js';
 import {
-	type UmbSaveableWorkspaceContext,
-	UmbSaveableWorkspaceContextBase,
+	type UmbSubmittableWorkspaceContext,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceIsNewRedirectController,
 	type UmbRoutableWorkspaceContext,
@@ -12,14 +12,16 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbLanguageWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<UmbLanguageDetailModel>
-	implements UmbSaveableWorkspaceContext, UmbRoutableWorkspaceContext
+	extends UmbSubmittableWorkspaceContextBase<UmbLanguageDetailModel>
+	implements UmbSubmittableWorkspaceContext, UmbRoutableWorkspaceContext
 {
 	public readonly repository: UmbLanguageDetailRepository = new UmbLanguageDetailRepository(this);
 
 	#data = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
-	readonly unique = this.#data.asObservablePart((x) => x?.unique);
+
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
+	readonly name = this.#data.asObservablePart((data) => data?.name);
 
 	// TODO: this is a temp solution to bubble validation errors to the UI
 	#validationErrors = new UmbObjectState<any | undefined>(undefined);
@@ -48,7 +50,7 @@ export class UmbLanguageWorkspaceContext
 				path: 'edit/:unique',
 				component: UmbLanguageWorkspaceEditorElement,
 				setup: (_component, info) => {
-					this.removeControllerByAlias('isNewRedirectController');
+					this.removeUmbControllerByAlias('isNewRedirectController');
 					this.load(info.match.params.unique);
 				},
 			},
@@ -111,7 +113,7 @@ export class UmbLanguageWorkspaceContext
 		this.#data.update({ fallbackIsoCode: unique });
 	}
 
-	async save() {
+	async submit() {
 		const newData = this.getData();
 		if (!newData) return;
 
@@ -119,11 +121,16 @@ export class UmbLanguageWorkspaceContext
 			const { data } = await this.repository.create(newData);
 			if (data) {
 				this.setIsNew(false);
+				return true;
 			}
 		} else {
-			await this.repository.save(newData);
+			const { data } = await this.repository.save(newData);
+			if (data) {
+				return true;
+			}
 			// TODO: Show validation errors as warnings?
 		}
+		return false;
 	}
 
 	destroy(): void {

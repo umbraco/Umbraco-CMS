@@ -56,6 +56,7 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 	): UmbCollectionConfiguration {
 		return {
 			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
+			layouts: config?.getValueByAlias('layouts'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
 			pageSize: Number(config?.getValueByAlias('pageSize')) ?? 50,

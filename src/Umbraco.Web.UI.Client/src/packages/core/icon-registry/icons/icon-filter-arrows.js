@@ -1,1 +1,18 @@
-export default `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M115.777 178.399l77.85-61.421-77.85-61.418v37.128H48.656v48.574h67.121zm0 192.336H48.656v48.57h67.121v37.135l77.85-61.421-77.85-61.416zm347.567-114.737l-77.848-61.417v37.133h-48.75v48.567h48.75v37.14zM51.875 231.714h161.521v48.567H51.875zM243.859 55.56h62.58v400.881h-62.58z"/></svg>`;
+export default `<!-- @license lucide-static v0.367.0 - ISC -->
+<svg
+  class="lucide lucide-arrow-down-a-z"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m3 16 4 4 4-4" />
+  <path d="M7 20V4" />
+  <path d="M20 8h-5" />
+  <path d="M15 10V6.5a2.5 2.5 0 0 1 5 0V10" />
+  <path d="M15 14h5l-5 6h5" />
+</svg>
+`;

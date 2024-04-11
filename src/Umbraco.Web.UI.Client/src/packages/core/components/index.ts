@@ -18,6 +18,7 @@ export * from './input-color/index.js';
 export * from './input-content-type-property/index.js';
 export * from './input-date/index.js';
 export * from './input-dropdown/index.js';
+export * from './input-entity/index.js';
 export * from './input-eye-dropper/index.js';
 export * from './input-list-base/index.js';
 export * from './input-manifest/index.js';

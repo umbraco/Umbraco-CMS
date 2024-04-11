@@ -5,7 +5,7 @@ import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
 import { UmbMemberTypeDetailRepository } from '@umbraco-cms/backoffice/member-type';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
@@ -26,7 +26,7 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 type EntityType = UmbMemberDetailModel;
 export class UmbMemberWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbVariantDatasetWorkspaceContext<UmbMemberVariantModel>, UmbRoutableWorkspaceContext
 {
 	public readonly repository = new UmbMemberDetailRepository(this);
@@ -46,7 +46,6 @@ export class UmbMemberWorkspaceContext
 
 	readonly data = this.#currentData.asObservable();
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
-	readonly name = this.#currentData.asObservablePart((data) => data?.variants[0].name);
 	readonly createDate = this.#currentData.asObservablePart((data) => data?.variants[0].createDate);
 	readonly updateDate = this.#currentData.asObservablePart((data) => data?.variants[0].updateDate);
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.memberType.unique);
@@ -230,6 +229,10 @@ export class UmbMemberWorkspaceContext
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
+	name(variantId?: UmbVariantId) {
+		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '');
+	}
+
 	async propertyStructureById(propertyId: string) {
 		return this.structure.propertyStructureById(propertyId);
 	}
@@ -323,7 +326,7 @@ export class UmbMemberWorkspaceContext
 		}
 	}
 
-	async save() {
+	async submit() {
 		if (!this.#currentData.value) throw new Error('Data is missing');
 		if (!this.#currentData.value.unique) throw new Error('Unique is missing');
 
@@ -341,8 +344,8 @@ export class UmbMemberWorkspaceContext
 			this.#persistedData.setValue(newData);
 			this.#currentData.setValue(newData);
 			this.setIsNew(false);
-			this.workspaceComplete(newData);
 		}
+		return true;
 	}
 
 	async delete() {

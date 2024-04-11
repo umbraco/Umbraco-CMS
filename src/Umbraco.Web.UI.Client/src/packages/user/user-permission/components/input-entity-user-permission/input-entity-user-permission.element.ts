@@ -5,10 +5,10 @@ import { html, customElement, property, state, nothing, ifDefined } from '@umbra
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbUserPermissionVerbElement } from '@umbraco-cms/backoffice/user';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-entity-user-permission')
-export class UmbInputEntityUserPermissionElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputEntityUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType(): string {
 		return this._entityType;
@@ -94,10 +94,8 @@ export class UmbInputEntityUserPermissionElement extends FormControlMixin(UmbLit
 
 	#renderPermission(manifest: ManifestEntityUserPermission) {
 		return html` <umb-input-user-permission-verb
-			label=${ifDefined(manifest.meta.labelKey ? this.localize.term(manifest.meta.labelKey) : manifest.meta.label)}
-			description=${ifDefined(
-				manifest.meta.descriptionKey ? this.localize.term(manifest.meta.descriptionKey) : manifest.meta.description,
-			)}
+			label=${ifDefined(manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name)}
+			description=${ifDefined(manifest.meta.description ? this.localize.string(manifest.meta.description) : undefined)}
 			?allowed=${this.#isAllowed(manifest.meta.verbs)}
 			@change=${(event: UmbChangeEvent) =>
 				this.#onChangeUserPermission(event, manifest.meta.verbs)}></umb-input-user-permission-verb>`;

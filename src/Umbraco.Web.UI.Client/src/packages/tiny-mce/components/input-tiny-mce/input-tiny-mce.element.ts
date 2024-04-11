@@ -1,12 +1,12 @@
+import { loadManifestApi } from '../../../../libs/extension-api/functions/load-manifest-api.function.js';
 import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import type { TinyMcePluginArguments, UmbTinyMcePluginBase } from './tiny-mce-plugin.js';
 import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { EditorEvent, Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
-import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
@@ -44,7 +44,7 @@ async function onResize(
 }
 
 @customElement('umb-input-tiny-mce')
-export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
 
@@ -138,7 +138,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		const stylesheetResponses = await Promise.all(promises);
 
 		stylesheetResponses.forEach(({ data }) => {
-			if (!data) return;
+			if (!data?.content) return;
+
 			const rulesFromContent = this.#umbStylesheetRuleManager.extractRules(data.content);
 
 			rulesFromContent.forEach((rule) => {
@@ -194,8 +195,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// create an object by merging the configuration onto the fallback config
 		const configurationOptions: RawEditorOptions = {
 			...defaultFallbackConfig,
-			height: dimensions?.height,
-			width: dimensions?.width,
+			height: dimensions?.height || undefined,
+			width: dimensions?.width || undefined,
 			content_css: stylesheets,
 			style_formats: styleFormats,
 		};
@@ -207,10 +208,12 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			}
 		}
 
-		// set the configured toolbar if any
+		// set the configured toolbar if any, otherwise false
 		const toolbar = this.configuration?.getValueByAlias<string[]>('toolbar');
-		if (toolbar) {
-			configurationOptions.toolbar = toolbar.join(' ');
+		if (toolbar && toolbar.length) {
+			configurationOptions.toolbar = toolbar?.join(' ');
+		} else {
+			configurationOptions.toolbar = false;
 		}
 
 		// set the configured inline mode
@@ -221,7 +224,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 		// set the maximum image size
 		const maxImageSize = this.configuration?.getValueByAlias<number>('maxImageSize');
-		if (maxImageSize !== undefined) {
+		if (maxImageSize) {
 			configurationOptions.maxImageSize = maxImageSize;
 		}
 
@@ -332,7 +335,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				}
 			});
 		});
-
 		editor.on('init', () => editor.setContent(this.value?.toString() ?? ''));
 	}
 

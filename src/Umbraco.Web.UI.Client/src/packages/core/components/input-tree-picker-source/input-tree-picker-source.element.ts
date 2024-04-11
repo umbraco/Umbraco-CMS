@@ -1,7 +1,7 @@
 import type { UmbInputDocumentRootPickerElement } from '@umbraco-cms/backoffice/document';
 import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -26,7 +26,7 @@ export type UmbTreePickerDynamicRootQueryStep = {
 };
 
 @customElement('umb-input-tree-picker-source')
-export class UmbInputTreePickerSourceElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputTreePickerSourceElement extends UUIFormControlMixin(UmbLitElement, '') {
 	protected getFormElement() {
 		return undefined;
 	}
@@ -89,7 +89,7 @@ export class UmbInputTreePickerSourceElement extends FormControlMixin(UmbLitElem
 	#onDocumentRootChange(event: CustomEvent) {
 		switch (this.type) {
 			case 'content':
-				this.dynamicRoot = (event.target as UmbInputDocumentRootPickerElement).data;
+				this.dynamicRoot = (event?.target as unknown as UmbInputDocumentRootPickerElement).data;
 
 				// HACK: Workaround consolidating the old content-picker and dynamic-root. [LK:2024-01-24]
 				if (this.dynamicRoot?.originAlias === 'ByKey') {

@@ -129,7 +129,6 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#openMasterTemplatePicker() {
 		const modalContext = this.#modalContext?.open(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
-				hideTreeRoot: true,
 				pickableFilter: (item) => {
 					return item.unique !== null && item.unique !== this.#templateWorkspaceContext?.getUnique();
 				},

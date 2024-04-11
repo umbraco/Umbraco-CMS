@@ -11,7 +11,7 @@ const dashboards: Array<ManifestDashboard> = [
 		js: () => import('./published-status/dashboard-published-status.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Published Status',
+			label: '#dashboardTabs_settingsPublishedStatus',
 			pathname: 'published-status',
 		},
 		conditions: [
@@ -29,7 +29,7 @@ const dashboards: Array<ManifestDashboard> = [
 		js: () => import('./performance-profiling/dashboard-performance-profiling.element.js'),
 		weight: 101,
 		meta: {
-			label: 'Profiling',
+			label: '#dashboardTabs_settingsProfiler',
 			pathname: 'profiling',
 		},
 		conditions: [

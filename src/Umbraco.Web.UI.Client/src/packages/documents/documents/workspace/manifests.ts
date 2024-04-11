@@ -1,9 +1,9 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import { UmbDocumentSaveAndScheduleWorkspaceAction } from './actions/save-and-schedule.action.js';
-import { UmbDocumentUnpublishWorkspaceAction } from './actions/unpublish.action.js';
-import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
-import { UmbDocumentPublishWithDescendantsWorkspaceAction } from './actions/publish-with-descendants.action.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
+	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
+} from '../user-permissions/index.js';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
@@ -27,12 +27,11 @@ const workspace: ManifestWorkspaces = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		kind: 'collection',
 		alias: 'Umb.WorkspaceView.Document.Collection',
 		name: 'Document Workspace Collection View',
-		element: () => import('./views/collection/document-workspace-view-collection.element.js'),
-		weight: 300,
 		meta: {
-			label: 'Documents',
+			label: 'Collection',
 			pathname: 'collection',
 			icon: 'icon-grid',
 		},
@@ -53,7 +52,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		element: () => import('./views/edit/document-workspace-view-edit.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Content',
+			label: '#general_content',
 			pathname: 'content',
 			icon: 'document',
 		},
@@ -71,7 +70,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		element: () => import('./views/info/document-workspace-view-info.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Info',
+			label: '#general_info',
 			pathname: 'info',
 			icon: 'info',
 		},
@@ -91,9 +90,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		name: 'Save And Publish Document Workspace Action',
 		weight: 70,
-		api: UmbDocumentSaveAndPublishWorkspaceAction,
+		api: () => import('./actions/save-and-publish.action.js'),
 		meta: {
-			label: 'Save And Publish',
+			label: '#buttons_saveAndPublish',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -110,9 +109,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		alias: 'Umb.WorkspaceAction.Document.Save',
 		name: 'Save Document Workspace Action',
 		weight: 80,
-		api: UmbSaveWorkspaceAction,
+		api: () => import('./actions/save.action.js'),
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'secondary',
 			color: 'positive',
 		},
@@ -123,13 +122,13 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			},
 		],
 	},
-	/*
 	{
 		type: 'workspaceAction',
+		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPreview',
 		name: 'Save And Preview Document Workspace Action',
 		weight: 90,
-		api: UmbDocumentSaveAndPreviewWorkspaceAction,
+		api: () => import('./actions/save-and-preview.action.js'),
 		meta: {
 			label: 'Save And Preview',
 		},
@@ -140,7 +139,6 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			},
 		],
 	},
-	*/
 ];
 
 const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
@@ -150,12 +148,18 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		alias: 'Umb.Document.WorkspaceActionMenuItem.Unpublish',
 		name: 'Unpublish',
 		weight: 0,
-		api: UmbDocumentUnpublishWorkspaceAction,
+		api: () => import('./actions/unpublish.action.js'),
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Unpublish...',
+			label: '#actions_unpublish',
 			icon: 'icon-globe',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH],
+			},
+		],
 	},
 	{
 		type: 'workspaceActionMenuItem',
@@ -163,12 +167,18 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		alias: 'Umb.Document.WorkspaceActionMenuItem.PublishWithDescendants',
 		name: 'Publish with descendants',
 		weight: 10,
-		api: UmbDocumentPublishWithDescendantsWorkspaceAction,
+		api: () => import('./actions/publish-with-descendants.action.js'),
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Publish with descendants...',
+			label: '#buttons_publishDescendants',
 			icon: 'icon-globe',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
+			},
+		],
 	},
 	{
 		type: 'workspaceActionMenuItem',
@@ -176,12 +186,18 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		alias: 'Umb.Document.WorkspaceActionMenuItem.SchedulePublishing',
 		name: 'Schedule publishing',
 		weight: 20,
-		api: UmbDocumentSaveAndScheduleWorkspaceAction,
+		api: () => import('./actions/save-and-schedule.action.js'),
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Schedule...',
+			label: '#buttons_schedulePublish',
 			icon: 'icon-globe',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
+			},
+		],
 	},
 ];
 

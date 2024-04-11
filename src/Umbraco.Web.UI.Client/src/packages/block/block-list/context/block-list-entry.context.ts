@@ -36,7 +36,7 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 				'observeInlineEditingMode',
 			);
 		} else {
-			this.removeControllerByAlias('observeInlineEditingMode');
+			this.removeUmbControllerByAlias('observeInlineEditingMode');
 		}
 	}
 

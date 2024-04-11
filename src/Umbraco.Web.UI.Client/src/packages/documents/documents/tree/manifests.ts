@@ -42,7 +42,15 @@ const treeItem: ManifestTreeItem = {
 	name: 'Document Tree Item',
 	element: () => import('./tree-item/document-tree-item.element.js'),
 	api: UmbDocumentTreeItemContext,
-	forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
+	forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem, ...reloadTreeItemChildrenManifests];
+const rootTreeItem: ManifestTreeItem = {
+	type: 'treeItem',
+	kind: 'default',
+	alias: 'Umb.TreeItem.Document.Root',
+	name: 'Document Tree Item',
+	forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE],
+};
+
+export const manifests = [...reloadTreeItemChildrenManifests, tree, treeItem, rootTreeItem, treeRepository, treeStore];

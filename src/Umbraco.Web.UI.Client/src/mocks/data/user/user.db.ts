@@ -4,7 +4,7 @@ import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
 import type { UmbMockUserModel } from './user.data.js';
-import { data } from './user.data.js';
+import { data, mfaLoginProviders } from './user.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	CreateUserRequestModel,
@@ -61,6 +61,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			name: firstUser.name,
 			email: firstUser.email,
 			userName: firstUser.email,
+			hasAccessToSensitiveData: true,
 			avatarUrls: [],
 			hasAccessToAllLanguages: true,
 			languageIsoCode: firstUser.languageIsoCode,
@@ -70,7 +71,32 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			fallbackPermissions: [],
 			permissions,
 			allowedSections,
+			isAdmin: firstUser.isAdmin,
 		};
+	}
+
+	getMfaLoginProviders() {
+		return mfaLoginProviders;
+	}
+
+	enableMfaProvider(providerName: string) {
+		const provider = mfaLoginProviders.find((x) => x.providerName === providerName);
+		if (provider) {
+			provider.isEnabledOnUser = true;
+			return true;
+		}
+
+		return false;
+	}
+
+	disableMfaProvider(providerName: string) {
+		const provider = mfaLoginProviders.find((x) => x.providerName === providerName);
+		if (provider) {
+			provider.isEnabledOnUser = false;
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -178,6 +204,7 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		lastLoginDate: null,
 		lastLockoutDate: null,
 		lastPasswordChangeDate: null,
+		isAdmin: item.userGroupIds.includes(umbUserGroupMockDb.getAll()[0].id),
 	};
 };
 
@@ -199,6 +226,7 @@ const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
 		lastLoginDate: item.lastLoginDate,
 		lastLockoutDate: item.lastLockoutDate,
 		lastPasswordChangeDate: item.lastPasswordChangeDate,
+		isAdmin: item.isAdmin,
 	};
 };
 

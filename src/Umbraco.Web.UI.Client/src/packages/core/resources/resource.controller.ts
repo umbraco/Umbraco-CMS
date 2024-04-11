@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { UMB_AUTH_CONTEXT } from '../auth/index.js';
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -11,6 +12,8 @@ export class UmbResourceController extends UmbControllerBase {
 
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
+	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+
 	constructor(host: UmbControllerHost, promise: Promise<any>, alias?: string) {
 		super(host, alias);
 
@@ -18,6 +21,10 @@ export class UmbResourceController extends UmbControllerBase {
 
 		new UmbContextConsumerController(host, UMB_NOTIFICATION_CONTEXT, (_instance) => {
 			this.#notificationContext = _instance;
+		});
+
+		new UmbContextConsumerController(host, UMB_AUTH_CONTEXT, (_instance) => {
+			this.#authContext = _instance;
 		});
 	}
 
@@ -50,8 +57,8 @@ export class UmbResourceController extends UmbControllerBase {
 	 * If the executor function throws an error, then show the details in a notification.
 	 */
 	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<UmbDataSourceResponse<T>> {
-		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
-
+		const { data, error: _error } = await UmbResourceController.tryExecute<T>(this.#promise);
+		const error: any = _error;
 		if (error) {
 			/**
 			 * Determine if we want to show a notification or just log the error to the console.
@@ -78,21 +85,21 @@ export class UmbResourceController extends UmbControllerBase {
 
 				// Go through the error status codes and act accordingly
 				switch (error.status ?? 0) {
-					case 401:
-						// Unauthorized
-						console.log('Unauthorized');
-
-						// TODO: Do not remove the token here but instead let whatever is listening to the event decide what to do
-						localStorage.removeItem('umb:userAuthTokenResponse');
-
-						// TODO: Show a modal dialog to login either by bubbling an event to UmbAppElement or by showing a modal directly
-						this.#notificationContext?.peek('warning', {
-							data: {
-								headline: 'Session Expired',
-								message: 'Your session has expired. Please refresh the page.',
-							},
-						});
+					case 401: {
+						// See if we can get the UmbAuthContext and let it know the user is timed out
+						if (this.#authContext) {
+							this.#authContext.timeOut();
+						} else {
+							// If we can't get the auth context, show a notification
+							this.#notificationContext?.peek('warning', {
+								data: {
+									headline: 'Session Expired',
+									message: 'Your session has expired. Please refresh the page.',
+								},
+							});
+						}
 						break;
+					}
 					case 500:
 						// Server Error
 

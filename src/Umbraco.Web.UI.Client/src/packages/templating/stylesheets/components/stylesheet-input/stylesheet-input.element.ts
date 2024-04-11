@@ -1,12 +1,12 @@
 import type { UmbStylesheetItemModel } from '../../types.js';
 import { UmbStylesheetPickerContext } from './stylesheet-input.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-stylesheet-input')
-export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -53,11 +53,12 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
+	@property({ type: Array })
+	public set selection(ids: Array<string> | undefined) {
+		this.#pickerContext.setSelection(ids ?? []);
 	}
-	public set selection(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+	public get selection(): Array<string> | undefined {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property()
@@ -89,7 +90,7 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 

@@ -1,5 +1,5 @@
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
@@ -9,7 +9,7 @@ import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-input-tree')
-export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputTreeElement extends UUIFormControlMixin(UmbLitElement, '') {
 	protected getFormElement() {
 		return undefined;
 	}

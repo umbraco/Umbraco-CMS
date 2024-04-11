@@ -1,5 +1,5 @@
 import { UMB_BLOCK_WORKSPACE_ALIAS } from './index.js';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
@@ -8,9 +8,9 @@ export const manifests: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Block.Save',
 		name: 'Save Block Type Workspace Action',
-		api: UmbSaveWorkspaceAction,
+		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Submit',
+			label: '#general_submit',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -38,7 +38,7 @@ export const manifests: Array<ManifestTypes> = [
 		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Content',
+			label: '#general_content',
 			pathname: 'content',
 			icon: 'icon-document',
 			blockElementManagerName: 'content',
@@ -63,7 +63,7 @@ export const manifests: Array<ManifestTypes> = [
 		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Settings',
+			label: '#general_settings',
 			pathname: 'settings',
 			icon: 'icon-settings',
 			blockElementManagerName: 'settings',

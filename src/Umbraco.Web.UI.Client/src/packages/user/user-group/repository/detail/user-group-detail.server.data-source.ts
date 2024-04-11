@@ -4,7 +4,7 @@ import type {
 	CreateUserGroupRequestModel,
 	UpdateUserGroupRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { UserGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -64,7 +64,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserGroupResource.getUserGroupById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserGroupService.getUserGroupById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -117,7 +117,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			UserGroupResource.postUserGroup({
+			UserGroupService.postUserGroup({
 				requestBody,
 			}),
 		);
@@ -155,7 +155,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			UserGroupResource.putUserGroupById({
+			UserGroupService.putUserGroupById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -179,7 +179,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserGroupResource.deleteUserGroupById({
+			UserGroupService.deleteUserGroupById({
 				id: unique,
 			}),
 		);

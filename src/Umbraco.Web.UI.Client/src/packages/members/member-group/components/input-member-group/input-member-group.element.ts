@@ -1,7 +1,7 @@
 import type { UmbMemberGroupItemModel } from '../../repository/index.js';
 import { UmbMemberPickerContext } from './input-member-group.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { MemberItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -21,7 +21,7 @@ const SORTER_CONFIG: UmbSorterConfig<string> = {
 };
 
 @customElement('umb-input-member-group')
-export class UmbInputMemberGroupElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputMemberGroupElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController(this, {
 		...SORTER_CONFIG,
 		onChange: ({ model }) => {
@@ -122,7 +122,7 @@ export class UmbInputMemberGroupElement extends FormControlMixin(UmbLitElement) 
 				this._editMemberGroupPath = routeBuilder({});
 			});
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => {
 			this._items = selectedItems;
 		});

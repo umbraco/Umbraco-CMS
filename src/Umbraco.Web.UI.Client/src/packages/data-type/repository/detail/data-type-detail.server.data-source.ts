@@ -2,8 +2,11 @@ import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../../typ
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { CreateDataTypeRequestModel, DataTypeModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	CreateDataTypeRequestModel,
+	UpdateDataTypeRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -54,7 +57,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, DataTypeResource.getDataTypeById({ id: unique }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, DataTypeService.getDataTypeById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -96,7 +99,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.postDataType({
+			DataTypeService.postDataType({
 				requestBody,
 			}),
 		);
@@ -119,7 +122,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: DataTypeModelBaseModel = {
+		const requestBody: UpdateDataTypeRequestModel = {
 			name: model.name,
 			editorAlias: model.editorAlias,
 			editorUiAlias: model.editorUiAlias,
@@ -128,7 +131,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.putDataTypeById({
+			DataTypeService.putDataTypeById({
 				id: model.unique,
 				requestBody,
 			}),
@@ -152,7 +155,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.deleteDataTypeById({
+			DataTypeService.deleteDataTypeById({
 				id: unique,
 			}),
 		);

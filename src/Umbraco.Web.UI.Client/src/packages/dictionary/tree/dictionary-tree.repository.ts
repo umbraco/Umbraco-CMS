@@ -18,7 +18,7 @@ export class UmbDictionaryTreeRepository
 		const data: UmbDictionaryTreeRootModel = {
 			unique: null,
 			entityType: UMB_DICTIONARY_ROOT_ENTITY_TYPE,
-			name: 'Dictionary',
+			name: '#treeHeaders_dictionary',
 			hasChildren: true,
 			isFolder: true,
 		};

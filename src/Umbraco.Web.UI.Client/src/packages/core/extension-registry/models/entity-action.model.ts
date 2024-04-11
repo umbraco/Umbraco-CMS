@@ -2,7 +2,7 @@ import type { ConditionTypes } from '../conditions/types.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
 /**
  * An action to perform on an entity
@@ -63,24 +63,50 @@ export interface ManifestEntityActionTrashKind extends ManifestEntityAction<Meta
 }
 
 export interface MetaEntityActionTrashKind extends MetaEntityActionDefaultKind {
-	trashRepositoryAlias: string;
+	recycleBinRepositoryAlias: string;
 	itemRepositoryAlias: string;
 }
 
-// RENAME
-export interface ManifestEntityActionRenameKind extends ManifestEntityAction<MetaEntityActionRenameKind> {
+// RESTORE FROM RECYCLE BIN
+
+export interface ManifestEntityActionRestoreFromRecycleBinKind
+	extends ManifestEntityAction<MetaEntityActionRestoreFromRecycleBinKind> {
 	type: 'entityAction';
-	kind: 'rename';
+	kind: 'restoreFromRecycleBin';
 }
 
-export interface MetaEntityActionRenameKind extends MetaEntityActionDefaultKind {
+export interface MetaEntityActionRestoreFromRecycleBinKind extends MetaEntityActionDefaultKind {
+	recycleBinRepositoryAlias: string;
+	itemRepositoryAlias: string;
+	pickerModal: UmbModalToken<UmbPickerModalData<any>, UmbPickerModalValue> | string;
+}
+
+// EMPTY RECYCLE BIN
+export interface ManifestEntityActionEmptyRecycleBinKind
+	extends ManifestEntityAction<MetaEntityActionEmptyRecycleBinKind> {
+	type: 'entityAction';
+	kind: 'emptyRecycleBin';
+}
+
+export interface MetaEntityActionEmptyRecycleBinKind extends MetaEntityActionDefaultKind {
+	recycleBinRepositoryAlias: string;
+}
+
+// RENAME
+export interface ManifestEntityActionRenameServerFileKind
+	extends ManifestEntityAction<MetaEntityActionRenameServerFileKind> {
+	type: 'entityAction';
+	kind: 'renameServerFile';
+}
+
+export interface MetaEntityActionRenameServerFileKind extends MetaEntityActionDefaultKind {
 	renameRepositoryAlias: string;
 	itemRepositoryAlias: string;
 }
 
 // RELOAD TREE ITEM CHILDREN
 export interface ManifestEntityActionReloadTreeItemChildrenKind
-	extends ManifestEntityAction<MetaEntityActionRenameKind> {
+	extends ManifestEntityAction<MetaEntityActionRenameServerFileKind> {
 	type: 'entityAction';
 	kind: 'reloadTreeItemChildren';
 }
@@ -129,4 +155,16 @@ export interface ManifestEntityActionDeleteFolderKind extends ManifestEntityActi
 
 export interface MetaEntityActionFolderKind extends MetaEntityActionDefaultKind {
 	folderRepositoryAlias: string;
+}
+
+// SORT CHILDREN OF
+export interface ManifestEntityActionSortChildrenOfKind
+	extends ManifestEntityAction<MetaEntityActionSortChildrenOfKind> {
+	type: 'entityAction';
+	kind: 'sortChildrenOf';
+}
+
+export interface MetaEntityActionSortChildrenOfKind extends MetaEntityActionDefaultKind {
+	sortChildrenOfRepositoryAlias: string;
+	treeRepositoryAlias: string;
 }

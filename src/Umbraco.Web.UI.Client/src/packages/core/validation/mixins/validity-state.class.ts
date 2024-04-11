@@ -1,15 +1,18 @@
+/*
+NOt used currently [NL]
 type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 export class UmbValidityState implements Writeable<ValidityState> {
-	badInput: boolean = false;
-	customError: boolean = false;
-	patternMismatch: boolean = false;
-	rangeOverflow: boolean = false;
-	rangeUnderflow: boolean = false;
-	stepMismatch: boolean = false;
-	tooLong: boolean = false;
-	tooShort: boolean = false;
-	typeMismatch: boolean = false;
-	valid: boolean = false;
-	valueMissing: boolean = false;
+	badInput: boolean = true;
+	customError: boolean = true;
+	patternMismatch: boolean = true;
+	rangeOverflow: boolean = true;
+	rangeUnderflow: boolean = true;
+	stepMismatch: boolean = true;
+	tooLong: boolean = true;
+	tooShort: boolean = true;
+	typeMismatch: boolean = true;
+	valid: boolean = true;
+	valueMissing: boolean = true;
 }
+*/

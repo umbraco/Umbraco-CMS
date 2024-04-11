@@ -1,5 +1,5 @@
 import { html, customElement, property, map, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
@@ -10,7 +10,7 @@ import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui
  * @element umb-input-color
  */
 @customElement('umb-input-color')
-export class UmbInputColorElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputColorElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ type: Boolean })
 	showLabels = false;
 

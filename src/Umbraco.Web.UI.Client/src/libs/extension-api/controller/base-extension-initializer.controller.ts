@@ -105,7 +105,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (this.#conditionControllers === undefined || this.#conditionControllers.length === 0) return;
 		this.#conditionControllers.forEach((controller) => controller.destroy());
 		this.#conditionControllers = [];
-		this.removeControllerByAlias('_observeConditions');
+		this.removeUmbControllerByAlias('_observeConditions');
 	}
 
 	#gotManifest() {
@@ -149,7 +149,7 @@ export abstract class UmbBaseExtensionInitializer<
 				'_observeConditions',
 			);
 		} else {
-			this.removeControllerByAlias('_observeConditions');
+			this.removeUmbControllerByAlias('_observeConditions');
 		}
 
 		if (noChangeInConditions) {
@@ -175,6 +175,12 @@ export abstract class UmbBaseExtensionInitializer<
 		const newConditionControllers = await Promise.all(
 			configsOfThisType.map((conditionConfig) => this.#createConditionController(conditionManifest, conditionConfig)),
 		);
+
+		// If we got destroyed in the mean time, then we don't need to continue:
+		if (!this.#extensionRegistry) {
+			newConditionControllers.forEach((controller) => controller?.destroy());
+			return;
+		}
 
 		const oldLength = this.#conditionControllers.length;
 

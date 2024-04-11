@@ -4,7 +4,7 @@ import type { UmbDocumentTypeDetailModel } from '../types.js';
 import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	UmbSaveableWorkspaceContextBase,
+	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
@@ -18,12 +18,12 @@ import type {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
-	extends UmbSaveableWorkspaceContextBase<EntityType>
+	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements UmbContentTypeWorkspaceContext<EntityType>, UmbRoutableWorkspaceContext
 {
 	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
@@ -31,7 +31,9 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly repository = new UmbDocumentTypeDetailRepository(this);
 	// Data/Draft is located in structure manager
 
-	#parent?: { entityType: string; unique: string | null };
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
@@ -63,6 +65,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 		// General for content types:
 		//this.data = this.structure.ownerContentType;
+
 		this.unique = this.structure.ownerContentTypeObservablePart((data) => data?.unique);
 		this.name = this.structure.ownerContentTypeObservablePart((data) => data?.name);
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
@@ -101,7 +104,7 @@ export class UmbDocumentTypeWorkspaceContext
 				path: 'edit/:id',
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
-					this.removeControllerByAlias('isNewRedirectController');
+					this.removeUmbControllerByAlias('isNewRedirectController');
 					const id = info.match.params.id;
 					this.load(id);
 				},
@@ -182,7 +185,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		const { data } = await this.structure.createScaffold();
 		if (!data) return undefined;
 
@@ -215,19 +218,20 @@ export class UmbDocumentTypeWorkspaceContext
 	/**
 	 * Save or creates the document type, based on wether its a new one or existing.
 	 */
-	async save() {
+	async submit() {
 		const data = this.getData();
 		if (data === undefined) throw new Error('Cannot save, no data');
 
 		if (this.getIsNew()) {
-			if (!this.#parent) throw new Error('Parent is not set');
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
 
-			if ((await this.structure.create(this.#parent.unique)) === true) {
+			if ((await this.structure.create(parent.unique)) === true) {
 				// TODO: this might not be the right place to alert the tree, but it works for now
 				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-					entityType: this.#parent.entityType,
-					unique: this.#parent.unique,
+				const event = new UmbRequestReloadTreeItemChildrenEvent({
+					entityType: parent.entityType,
+					unique: parent.unique,
 				});
 				eventContext.dispatchEvent(event);
 
@@ -246,7 +250,7 @@ export class UmbDocumentTypeWorkspaceContext
 		}
 
 		this.setIsNew(false);
-		this.workspaceComplete(data);
+		return true;
 	}
 
 	public destroy(): void {

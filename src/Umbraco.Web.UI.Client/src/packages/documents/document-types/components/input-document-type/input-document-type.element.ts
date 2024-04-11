@@ -10,13 +10,13 @@ import {
 	repeat,
 	nothing,
 } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-input-document-type')
-export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
 	/**
 	 * Limits to only select Element Types
 	 * @type {boolean}
@@ -121,7 +121,7 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 

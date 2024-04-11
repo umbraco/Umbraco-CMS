@@ -1,4 +1,4 @@
-import type { TemporaryFileQueueItem } from '../../temporary-file/temporary-file-manager.class.js';
+import type { UmbTemporaryFileModel } from '../../temporary-file/temporary-file-manager.class.js';
 import { UmbTemporaryFileManager } from '../../temporary-file/temporary-file-manager.class.js';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '../../property/property-dataset/property-dataset-context.token.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -13,7 +13,7 @@ import {
 	state,
 	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -22,7 +22,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 @customElement('umb-input-upload-field')
-export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElement, '') {
 	private _keys: Array<string> = [];
 	/**
 	 * @description Keys to the files that belong to this upload field.
@@ -60,7 +60,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	_files: Array<{
 		path: string;
 		unique: string;
-		queueItem?: TemporaryFileQueueItem;
+		queueItem?: UmbTemporaryFileModel;
 		file?: File;
 	}> = [];
 
@@ -93,8 +93,8 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 			this.#serverUrl = instance.getServerUrl();
 		}).asPromise();
 
-		this.observe(this.#manager.isReady, (value) => (this.error = !value));
 		this.observe(this.#manager.queue, (value) => {
+			this.error = !value.length;
 			this._files = this._files.map((file) => {
 				const queueItem = value.find((item) => item.unique === file.unique);
 				if (queueItem) {
@@ -144,7 +144,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 
 	#setFiles(files: File[]) {
 		const items = files.map(
-			(file): TemporaryFileQueueItem => ({
+			(file): UmbTemporaryFileModel => ({
 				unique: UmbId.new(),
 				file,
 				status: 'waiting',
@@ -216,7 +216,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		);
 	}
 
-	#renderFile(file: { path: string; unique: string; queueItem?: TemporaryFileQueueItem; file?: File }) {
+	#renderFile(file: { path: string; unique: string; queueItem?: UmbTemporaryFileModel; file?: File }) {
 		// TODO: Get the mime type from the server and use that to determine the file type.
 		const type = this.#getFileTypeFromPath(file.path);
 

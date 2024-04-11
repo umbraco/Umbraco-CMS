@@ -1,8 +1,12 @@
 import type { UmbDataTypeTreeItemModel } from './types.js';
-import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+	UmbTreeAncestorsOfRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { DataTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { type ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -27,6 +31,7 @@ export class UmbDataTypeTreeServerDataSource extends UmbTreeServerDataSourceBase
 		super(host, {
 			getRootItems,
 			getChildrenOf,
+			getAncestorsOf,
 			mapper,
 		});
 		umbExtensionsRegistry
@@ -40,7 +45,7 @@ export class UmbDataTypeTreeServerDataSource extends UmbTreeServerDataSourceBase
 
 const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	return DataTypeResource.getTreeDataTypeRoot({ skip: args.skip, take: args.take });
+	return DataTypeService.getTreeDataTypeRoot({ skip: args.skip, take: args.take });
 };
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
@@ -48,11 +53,19 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DataTypeResource.getTreeDataTypeChildren({
+		return DataTypeService.getTreeDataTypeChildren({
 			parentId: args.parentUnique,
+			skip: args.skip,
+			take: args.take,
 		});
 	}
 };
+
+const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	DataTypeService.getTreeDataTypeAncestors({
+		descendantId: args.descendantUnique,
+	});
 
 const mapper = (item: DataTypeTreeItemResponseModel): UmbDataTypeTreeItemModel => {
 	return {
