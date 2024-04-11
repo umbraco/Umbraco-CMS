@@ -1,11 +1,11 @@
-import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
+import type { UmbSearchResultItemModel } from '../types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-const elementName = 'umb-document-search-result-item';
+const elementName = 'umb-search-result-item';
 @customElement(elementName)
-export class UmbDocumentSearchResultItemElement extends UmbLitElement {
+export class UmbSearchResultItemElement extends UmbLitElement {
 	@property({ type: Object })
 	item?: UmbSearchResultItemModel;
 
@@ -27,10 +27,10 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 	];
 }
 
-export { UmbDocumentSearchResultItemElement as element };
+export { UmbSearchResultItemElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDocumentSearchResultItemElement;
+		[elementName]: UmbSearchResultItemElement;
 	}
 }

@@ -5,7 +5,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
-import './search-result-item.element.js';
+import '../search-result/search-result-item.element.js';
 
 export type SearchItem = {
 	entityType: string;
