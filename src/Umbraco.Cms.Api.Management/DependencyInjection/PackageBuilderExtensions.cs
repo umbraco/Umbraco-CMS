@@ -14,8 +14,7 @@ internal static class PackageBuilderExtensions
 
         builder
             .WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<PackageViewModelMapDefinition>()
-            .Add<PackageManifestViewModelMapDefinition>();
+            .Add<PackageViewModelMapDefinition>();
 
         return builder;
     }

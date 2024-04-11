@@ -2299,6 +2299,14 @@ internal class DatabaseDataCreator
 
         _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false,
             new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });
+
+
+        upgrader = new Upgrader(new UmbracoPremigrationPlan());
+        stateValueKey = upgrader.StateValueKey;
+        finalState = upgrader.Plan.FinalState;
+
+        _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false,
+            new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });
     }
 
     private void CreateLogViewerQueryData()

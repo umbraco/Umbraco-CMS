@@ -88,7 +88,7 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
                 .WithTitle($"The {contentType} is not trashed")
                 .WithDetail($"The {contentType} needs to be trashed for the parent-before-recycled relation to be created.")
                 .Build()),
-            RecycleBinQueryResultType.NoParentRecycleRelation => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+            RecycleBinQueryResultType.NoParentRecycleRelation => NotFound(problemDetailsBuilder
                 .WithTitle("The parent relation could not be found")
                 .WithDetail($"The relation between the parent and the {contentType} that should have been created when the {contentType} was deleted could not be found.")
                 .Build()),

@@ -19,20 +19,20 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IDocumentUrlFactory _documentUrlFactory;
-    private readonly IFileService _fileService;
+    private readonly ITemplateService _templateService;
     private readonly IPublicAccessService _publicAccessService;
     private readonly TimeProvider _timeProvider;
 
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IDocumentUrlFactory documentUrlFactory,
-        IFileService fileService,
+        ITemplateService templateService,
         IPublicAccessService publicAccessService,
         TimeProvider timeProvider)
     {
         _umbracoMapper = umbracoMapper;
         _documentUrlFactory = documentUrlFactory;
-        _fileService = fileService;
+        _templateService = templateService;
         _publicAccessService = publicAccessService;
         _timeProvider = timeProvider;
     }
@@ -41,10 +41,10 @@ internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
     {
         DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
 
-        responseModel.Urls = await _documentUrlFactory.GetUrlsAsync(content);
+        responseModel.Urls = await _documentUrlFactory.CreateUrlsAsync(content);
 
         Guid? templateKey = content.TemplateId.HasValue
-            ? _fileService.GetTemplate(content.TemplateId.Value)?.Key
+            ? _templateService.GetAsync(content.TemplateId.Value).Result?.Key
             : null;
 
         responseModel.Template = templateKey.HasValue

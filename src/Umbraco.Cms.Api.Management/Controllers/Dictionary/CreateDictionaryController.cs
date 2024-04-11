@@ -41,11 +41,13 @@ public class CreateDictionaryController : DictionaryControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Create(CreateDictionaryItemRequestModel createDictionaryItemRequestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        CreateDictionaryItemRequestModel createDictionaryItemRequestModel)
     {
         IDictionaryItem created = await _dictionaryPresentationFactory.MapCreateModelToDictionaryItemAsync(createDictionaryItemRequestModel);
 
-        AuthorizationResult authorizationResult  = await _authorizationService.AuthorizeResourceAsync(
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             new DictionaryPermissionResource(createDictionaryItemRequestModel.Translations.Select(t => t.IsoCode)),
             AuthorizationPolicies.DictionaryPermissionByResource);

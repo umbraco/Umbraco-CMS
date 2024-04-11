@@ -30,7 +30,9 @@ public class ImportDictionaryController : DictionaryControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Import(ImportDictionaryRequestModel importDictionaryRequestModel)
+    public async Task<IActionResult> Import(
+        CancellationToken cancellationToken,
+        ImportDictionaryRequestModel importDictionaryRequestModel)
     {
         Attempt<IDictionaryItem?, DictionaryImportOperationStatus> result = await _dictionaryItemImportService
             .ImportDictionaryItemFromUdtFileAsync(

@@ -38,7 +38,9 @@ public class CreateCreatedPackageController : CreatedPackageControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create(CreatePackageRequestModel createPackageRequestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        CreatePackageRequestModel createPackageRequestModel)
     {
         PackageDefinition packageDefinition = _packagePresentationFactory.CreatePackageDefinition(createPackageRequestModel);
 

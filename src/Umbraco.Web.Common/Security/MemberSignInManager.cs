@@ -68,53 +68,6 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     {
     }
 
-    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]
-    public MemberSignInManager(
-        UserManager<MemberIdentityUser> memberManager,
-        IHttpContextAccessor contextAccessor,
-        IUserClaimsPrincipalFactory<MemberIdentityUser> claimsFactory,
-        IOptions<IdentityOptions> optionsAccessor,
-        ILogger<SignInManager<MemberIdentityUser>> logger,
-        IAuthenticationSchemeProvider schemes,
-        IUserConfirmation<MemberIdentityUser> confirmation,
-        IMemberExternalLoginProviders memberExternalLoginProviders,
-        IEventAggregator eventAggregator)
-        : this(
-            memberManager,
-            contextAccessor,
-            claimsFactory,
-            optionsAccessor,
-            logger,
-            schemes,
-            confirmation,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberExternalLoginProviders>(),
-            StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
-    {
-    }
-
-    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]
-    public MemberSignInManager(
-        UserManager<MemberIdentityUser> memberManager,
-        IHttpContextAccessor contextAccessor,
-        IUserClaimsPrincipalFactory<MemberIdentityUser> claimsFactory,
-        IOptions<IdentityOptions> optionsAccessor,
-        ILogger<SignInManager<MemberIdentityUser>> logger,
-        IAuthenticationSchemeProvider schemes,
-        IUserConfirmation<MemberIdentityUser> confirmation)
-        : this(
-            memberManager,
-            contextAccessor,
-            claimsFactory,
-            optionsAccessor,
-            logger,
-            schemes,
-            confirmation,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberExternalLoginProviders>(),
-            StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
-    {
-    }
-
     // use default scheme for members
     protected override string AuthenticationType => IdentityConstants.ApplicationScheme;
 

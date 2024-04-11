@@ -20,7 +20,7 @@ public class CultureVariation
 
     [DataMember(Order = 2)]
     [JsonPropertyName("dt")]
-    [JsonConverter(typeof(ForceUtcDateTimeConverter))]
+    [JsonConverter(typeof(JsonUniversalDateTimeConverter))]
     public DateTime Date { get; set; }
 
     [DataMember(Order = 3)]
@@ -38,7 +38,7 @@ public class CultureVariation
 
     [IgnoreDataMember]
     [JsonPropertyName("date")]
-    [JsonConverter(typeof(ForceUtcDateTimeConverter))]
+    [JsonConverter(typeof(JsonUniversalDateTimeConverter))]
     private DateTime LegacyDate { set => Date = value; }
 
     [IgnoreDataMember]

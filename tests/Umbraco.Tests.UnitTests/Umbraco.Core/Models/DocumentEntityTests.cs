@@ -2,7 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
-using Newtonsoft.Json;
+using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -38,7 +38,7 @@ public class DocumentEntityTests
             .Done()
             .Build();
 
-        var json = JsonConvert.SerializeObject(item);
+        var json = JsonSerializer.Serialize(item);
         Debug.Print(json);
     }
 }

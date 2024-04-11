@@ -62,6 +62,7 @@ public class UmbracoPlan : MigrationPlan
         To<V_13_0_0.ChangeWebhookRequestObjectColumnToNvarcharMax>("{F74CDA0C-7AAA-48C8-94C6-C6EC3C06F599}");
         To<V_13_0_0.ChangeWebhookUrlColumnsToNvarcharMax>("{21C42760-5109-4C03-AB4F-7EA53577D1F5}");
         To<V_13_0_0.AddExceptionOccured>("{6158F3A3-4902-4201-835E-1ED7F810B2D8}");
+        To<V_13_3_0.AlignUpgradedDatabase>("{985AF2BA-69D3-4DBA-95E0-AD3FA7459FA7}");
 
         // To 14.0.0
         To<V_14_0_0.AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
@@ -75,5 +76,7 @@ public class UmbracoPlan : MigrationPlan
         To<V_14_0_0.MigrateDataTypeConfigurations>("{1539A010-2EB5-4163-8518-4AE2AA98AFC6}");
         To<V_14_0_0.MigrateCharPermissionsToStrings>("{C567DE81-DF92-4B99-BEA8-CD34EF99DA5D}");
         To<V_14_0_0.DeleteMacroTables>("{0D82C836-96DD-480D-A924-7964E458BD34}");
+        To<V_14_0_0.MoveDocumentBlueprintsToFolders>("{1A0FBC8A-6FC6-456C-805C-B94816B2E570}");
+        To<V_14_0_0.MigrateTours>("{302DE171-6D83-4B6B-B3C0-AC8808A16CA1}");
     }
 }

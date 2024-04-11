@@ -15,7 +15,7 @@ public class EndPreviewController : PreviewControllerBase
     [HttpDelete]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult End()
+    public IActionResult End(CancellationToken cancellationToken)
     {
         _previewService.EndPreview();
         return Ok();

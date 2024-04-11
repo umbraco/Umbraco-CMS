@@ -802,4 +802,28 @@ public partial class ContentTypeEditingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidInheritance, result.Status);
     }
+
+    [TestCase("something")]
+    [TestCase("tab")]
+    [TestCase("group")]
+    public async Task Cannot_Update_Container_Types_To_Unknown_Types(string containerType)
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        var container = ContentTypePropertyContainerModel("One");
+        createModel.Containers = new[] { container };
+
+        var property = ContentTypePropertyTypeModel("Test Property", "testProperty", containerKey: container.Key);
+        createModel.Properties = new[] { property };
+
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        container.Type = containerType;
+        updateModel.Containers = new[] { container };
+        updateModel.Properties = new[] { property };
+
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidContainerType, result.Status);
+    }
 }

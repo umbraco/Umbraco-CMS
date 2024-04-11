@@ -30,7 +30,7 @@ public class ByKeyMemberController : MemberControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MemberResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByKey(Guid id)
+    public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         IMember? member = await _memberEditingService.GetAsync(id);
         if (member == null)

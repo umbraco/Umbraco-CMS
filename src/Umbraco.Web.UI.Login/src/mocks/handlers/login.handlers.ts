@@ -1,11 +1,11 @@
 import { umbLoginData } from '../data/login.data.js';
 import { delay, http, type HttpHandler, HttpResponse } from "msw";
-import type { PackageManifestResponseModel } from "@umbraco-cms/backoffice/external/backend-api";
+import type { ManifestResponseModel } from "@umbraco-cms/backoffice/external/backend-api";
 
 export const handlers: HttpHandler[] = [
-  http.get<any, Array<PackageManifestResponseModel>>('umbraco/management/api/v1/package/manifest/public', async () => {
+  http.get<any, Array<ManifestResponseModel>>('umbraco/management/api/v1/package/manifest/public', async () => {
     await delay();
-    return HttpResponse.json<Array<PackageManifestResponseModel>>([
+    return HttpResponse.json<Array<ManifestResponseModel>>([
       {
         name: 'Test Package',
         version: '1.0.0',

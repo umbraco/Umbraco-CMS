@@ -31,7 +31,9 @@ public class CreateWebhookController : WebhookControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateWebhookRequestModel createWebhookRequestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        CreateWebhookRequestModel createWebhookRequestModel)
     {
         IWebhook created = _umbracoMapper.Map<IWebhook>(createWebhookRequestModel)!;
 
