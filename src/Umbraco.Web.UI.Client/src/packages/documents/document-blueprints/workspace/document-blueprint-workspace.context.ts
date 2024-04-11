@@ -1,3 +1,4 @@
+import { UmbDocumentBlueprintPropertyDataContext } from '../property-dataset-context/document-blueprint-property-dataset-context.js';
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentBlueprintDetailRepository } from '../repository/index.js';
 import type {
@@ -5,7 +6,7 @@ import type {
 	UmbDocumentBlueprintVariantModel,
 	UmbDocumentBlueprintVariantOptionModel,
 } from '../types.js';
-import { UmbDocumentPropertyDataContext } from '../../documents/property-dataset-context/document-property-dataset-context.js';
+import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from './manifests.js';
 import {
 	appendToFrozenArray,
 	mergeObservables,
@@ -28,7 +29,6 @@ import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/var
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
 
 type EntityType = UmbDocumentBlueprintDetailModel;
 
@@ -47,11 +47,15 @@ export class UmbDocumentBlueprintWorkspaceContext
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
-
-	// TODo: Optimize this so it uses either a App Language Context? [NL]
+	#getDataPromise?: Promise<any>;
+	// TODO: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public readonly languages = this.#languages.asObservable();
+
+	public isLoaded() {
+		return this.#getDataPromise;
+	}
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
@@ -105,7 +109,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	);
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.DocumentBlueprint');
+		super(host, UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS);
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 		this.observe(this.varies, (varies) => (this.#varies = varies));
@@ -159,7 +163,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 	async load(unique: string) {
 		this.resetState();
-
+		this.#getDataPromise = this.repository.requestByUnique(unique);
 		const { data, asObservable } = await this.repository.requestByUnique(unique);
 
 		if (data) {
@@ -429,10 +433,14 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 	*/
 
-	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
+	/*public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
 		// TODO: [LK] Temporary workaround/hack to get the workspace to load.
 		const docCxt = new UmbDocumentWorkspaceContext(host);
 		return new UmbDocumentPropertyDataContext(host, docCxt, variantId);
+	}*/
+
+	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
+		return new UmbDocumentBlueprintPropertyDataContext(host, this, variantId);
 	}
 
 	public destroy(): void {

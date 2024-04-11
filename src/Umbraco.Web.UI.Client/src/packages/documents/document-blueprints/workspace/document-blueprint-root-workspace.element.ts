@@ -1,10 +1,11 @@
+import { UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS } from './manifests.js';
 import { html, customElement, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-document-blueprint-root-workspace')
 export class UmbDocumentBlueprintRootWorkspaceElement extends UmbLitElement {
 	render() {
-		return html`<umb-workspace-editor alias="Umb.Workspace.DocumentBlueprint" headline="Document Blueprints">
+		return html`<umb-workspace-editor alias=${UMB_DOCUMENT_BLUEPRINT_WORKSPACE_ALIAS} headline="Document Blueprints">
 			<div id="wrapper">
 				<uui-box>
 					<h2>
