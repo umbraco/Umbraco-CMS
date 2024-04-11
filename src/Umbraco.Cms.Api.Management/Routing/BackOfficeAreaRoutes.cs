@@ -60,7 +60,7 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
 
         endpoints.MapControllerRoute(
             "catch-all-sections-to-client",
-            new StringBuilder(Constants.System.UmbracoPathSegment).Append("/{**slug}").ToString(),
+$"{Constants.System.UmbracoPathSegment)}/{{**slug}}"),
             new
             {
                 Controller = ControllerExtensions.GetControllerName<BackOfficeDefaultController>(),
