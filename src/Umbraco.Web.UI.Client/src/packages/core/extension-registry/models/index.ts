@@ -61,6 +61,7 @@ import type { ManifestEntityUserPermission } from './entity-user-permission.mode
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestCollectionAction } from './collection-action.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
+import type { ManifestSearchProvider } from './search-provider.model.js';
 import type {
 	ManifestBase,
 	ManifestBundle,
@@ -70,15 +71,16 @@ import type {
 
 export type * from './auth-provider.model.js';
 export type * from './block-editor-custom-view.model.js';
-export type * from './collection.models.js';
 export type * from './collection-action.model.js';
 export type * from './collection-view.model.js';
+export type * from './collection.models.js';
 export type * from './current-user-action.model.js';
 export type * from './dashboard-collection.model.js';
 export type * from './dashboard.model.js';
 export type * from './dynamic-root.model.js';
 export type * from './entity-action.model.js';
 export type * from './entity-bulk-action.model.js';
+export type * from './entity-user-permission.model.js';
 export type * from './external-login-provider.model.js';
 export type * from './global-context.model.js';
 export type * from './header-app.model.js';
@@ -92,6 +94,7 @@ export type * from './package-view.model.js';
 export type * from './property-action.model.js';
 export type * from './property-editor.model.js';
 export type * from './repository.model.js';
+export type * from './search-provider.model.js';
 export type * from './section-sidebar-app.model.js';
 export type * from './section-view.model.js';
 export type * from './section.model.js';
@@ -101,10 +104,9 @@ export type * from './tinymce-plugin.model.js';
 export type * from './tree-item.model.js';
 export type * from './tree.model.js';
 export type * from './user-granular-permission.model.js';
-export type * from './entity-user-permission.model.js';
 export type * from './user-profile-app.model.js';
-export type * from './workspace-action.model.js';
 export type * from './workspace-action-menu-item.model.js';
+export type * from './workspace-action.model.js';
 export type * from './workspace-context.model.js';
 export type * from './workspace-footer-app.model.js';
 export type * from './workspace-view.model.js';
@@ -140,27 +142,30 @@ export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceVi
 
 export type ManifestTypes =
 	| ManifestAuthProvider
-	| ManifestBundle<ManifestTypes>
 	| ManifestBlockEditorCustomView
+	| ManifestBundle<ManifestTypes>
 	| ManifestCollection
-	| ManifestCollectionView
 	| ManifestCollectionAction
+	| ManifestCollectionView
+	| ManifestCondition
 	| ManifestCurrentUserAction
 	| ManifestCurrentUserActionDefaultKind
-	| ManifestCondition
 	| ManifestDashboard
 	| ManifestDashboardCollection
 	| ManifestDynamicRootOrigin
 	| ManifestDynamicRootQueryStep
 	| ManifestEntityActions
 	| ManifestEntityBulkAction
+	| ManifestEntityUserPermission
 	| ManifestEntryPoint
 	| ManifestExternalLoginProvider
 	| ManifestGlobalContext
+	| ManifestGranularUserPermission
 	| ManifestHeaderApp
 	| ManifestHeaderAppButtonKind
 	| ManifestHealthCheck
 	| ManifestItemStore
+	| ManifestLocalization
 	| ManifestMenu
 	| ManifestMenuItem
 	| ManifestMenuItemTreeKind
@@ -171,6 +176,7 @@ export type ManifestTypes =
 	| ManifestPropertyEditorSchema
 	| ManifestPropertyEditorUi
 	| ManifestRepository
+	| ManifestSearchProvider
 	| ManifestSection
 	| ManifestSectionSidebarApp
 	| ManifestSectionSidebarAppMenuKind
@@ -178,7 +184,6 @@ export type ManifestTypes =
 	| ManifestStore
 	| ManifestTheme
 	| ManifestTinyMcePlugin
-	| ManifestLocalization
 	| ManifestTree
 	| ManifestTreeItem
 	| ManifestTreeStore
@@ -189,6 +194,4 @@ export type ManifestTypes =
 	| ManifestWorkspaceFooterApps
 	| ManifestWorkspaces
 	| ManifestWorkspaceViews
-	| ManifestEntityUserPermission
-	| ManifestGranularUserPermission
 	| ManifestBase;
