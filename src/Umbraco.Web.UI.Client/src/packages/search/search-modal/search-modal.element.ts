@@ -9,6 +9,9 @@ import {
 	query,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
+import { ManifestSearchProvider, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 export type SearchItem = {
 	name: string;
@@ -21,7 +24,7 @@ export type SearchGroupItem = {
 	items: Array<SearchItem>;
 };
 @customElement('umb-search-modal')
-export class UmbSearchModalElement extends LitElement {
+export class UmbSearchModalElement extends UmbLitElement {
 	@query('input')
 	private _input!: HTMLInputElement;
 
@@ -46,6 +49,21 @@ export class UmbSearchModalElement extends LitElement {
 
 	@state()
 	private _activeSearchTag = 'Document';
+
+	/**
+	 *
+	 */
+	constructor() {
+		super();
+
+		this.#observeViews();
+	}
+
+	#observeViews() {
+		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'searchProvider', null, (providers) => {
+			this.searchTags = providers.map((provider) => provider.manifest.meta?.label || provider.manifest.name);
+		});
+	}
 
 	connectedCallback() {
 		super.connectedCallback();
