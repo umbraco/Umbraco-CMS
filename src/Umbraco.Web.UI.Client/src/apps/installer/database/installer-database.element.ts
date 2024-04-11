@@ -9,7 +9,7 @@ import type {
 	DatabaseSettingsPresentationModel,
 	ProblemDetails,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { ApiError, InstallResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { ApiError, InstallService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
@@ -165,12 +165,12 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				};
 
 				const { error } = await tryExecute(
-					InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails }),
+					InstallService.postInstallValidateDatabase({ requestBody: databaseDetails }),
 				);
 
 				if (error) {
 					this._validationErrorMessage = `The server could not validate the database connection. Details: ${
-						error instanceof ApiError ? error.body.detail : error.message
+						error instanceof ApiError ? (error.body as any).detail : error.message
 					}`;
 					this._installButton.state = 'failed';
 					return;
@@ -195,10 +195,10 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 		this._installerContext.nextStep();
 
-		const { error } = await tryExecute(
-			InstallResource.postInstallSetup({ requestBody: this._installerContext.getData() }),
+		const { error: _error } = await tryExecute(
+			InstallService.postInstallSetup({ requestBody: this._installerContext.getData() }),
 		);
-
+		const error = _error as ProblemDetails | undefined;
 		if (error) {
 			this._handleRejected(error);
 		} else {

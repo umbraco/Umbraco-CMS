@@ -8,7 +8,7 @@ const section: ManifestSection = {
 	name: 'Packages Section',
 	weight: 200,
 	meta: {
-		label: 'Packages',
+		label: '#sections_packages',
 		pathname: 'packages',
 	},
 	conditions: [
@@ -45,7 +45,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		element: () => import('./views/installed/installed-packages-section-view.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Installed',
+			label: '#packager_installed',
 			pathname: 'installed',
 			icon: 'icon-box',
 		},
@@ -63,7 +63,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		element: () => import('./views/created/created-packages-section-view.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Created',
+			label: '#packager_created',
 			pathname: 'created',
 			icon: 'icon-files',
 		},

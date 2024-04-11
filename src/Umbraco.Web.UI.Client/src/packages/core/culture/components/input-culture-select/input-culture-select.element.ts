@@ -57,7 +57,9 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 		event.stopPropagation();
 		const target = event.composedPath()[0] as UUIComboboxElement;
 		this._value = target.value;
-		const culture = this._cultures.find((culture) => culture.name === this._value);
+		const culture = this._cultures.find(
+			(culture) => culture.name.toLowerCase() === (this._value as string).toLowerCase(),
+		);
 		this.selectedCultureName = culture?.englishName;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -69,7 +71,7 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 	}
 
 	get #fromAvailableCultures() {
-		return this._cultures.find((culture) => culture.name === this.value);
+		return this._cultures.find((culture) => culture.name.toLowerCase() === (this.value as string).toLowerCase());
 	}
 
 	render() {
@@ -94,7 +96,7 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 								)}
 							</uui-combobox-list>
 						</uui-combobox>
-				  `}
+					`}
 		`;
 	}
 }

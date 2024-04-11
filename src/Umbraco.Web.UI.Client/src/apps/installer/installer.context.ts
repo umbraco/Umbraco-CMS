@@ -4,7 +4,7 @@ import type {
 	ProblemDetails,
 	InstallRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { InstallResource, TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { InstallService, TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
@@ -119,7 +119,8 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	private async _loadInstallerSettings() {
-		const { data, error } = await tryExecute(InstallResource.getInstallSettings());
+		const { data, error: _error } = await tryExecute(InstallService.getInstallSettings());
+		const error: any = _error;
 		if (data) {
 			this._settings.setValue(data);
 		} else if (error) {

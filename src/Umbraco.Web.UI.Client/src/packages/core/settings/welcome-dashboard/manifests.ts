@@ -6,7 +6,7 @@ export const manifests = [
 		element: () => import('./settings-welcome-dashboard.element.js'),
 		weight: 500,
 		meta: {
-			label: 'Welcome',
+			label: '#dashboardTabs_settingsWelcome',
 			pathname: 'welcome',
 		},
 		conditions: [

@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -37,14 +37,14 @@ export class UmbDocumentTreeServerDataSource extends UmbTreeServerDataSourceBase
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentResource.getTreeDocumentRoot({ skip: args.skip, take: args.take });
+	DocumentService.getTreeDocumentRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parentUnique === null) {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentResource.getTreeDocumentChildren({
+		return DocumentService.getTreeDocumentChildren({
 			parentId: args.parentUnique,
 			skip: args.skip,
 			take: args.take,
@@ -54,7 +54,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentResource.getTreeDocumentAncestors({
+	DocumentService.getTreeDocumentAncestors({
 		descendantId: args.descendantUnique,
 	});
 

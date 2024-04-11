@@ -1,4 +1,6 @@
-export default `<svg
+export default `<!-- @license lucide-static v0.367.0 - ISC -->
+<svg
+  class="lucide lucide-square-library"
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
   fill="none"

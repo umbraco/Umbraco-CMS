@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES } from '../../user-permissions/index.js';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -13,8 +14,14 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-home',
-			label: 'Culture and Hostnames...',
+			label: '#actions_assigndomain',
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.UserPermission.Document',
+				allOf: [UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES],
+			},
+		],
 	},
 ];
 

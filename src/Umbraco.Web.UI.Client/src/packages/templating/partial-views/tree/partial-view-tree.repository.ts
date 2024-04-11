@@ -18,7 +18,7 @@ export class UmbPartialViewTreeRepository
 		const data: UmbPartialViewTreeRootModel = {
 			unique: null,
 			entityType: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
-			name: 'Partial Views',
+			name: '#treeHeaders_partialViews',
 			hasChildren: true,
 			isFolder: true,
 		};

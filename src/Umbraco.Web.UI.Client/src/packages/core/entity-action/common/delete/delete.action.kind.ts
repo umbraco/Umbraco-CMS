@@ -11,11 +11,11 @@ export const manifest: UmbBackofficeManifestKind = {
 		type: 'entityAction',
 		kind: 'delete',
 		api: () => import('./delete.action.js'),
-		weight: 900,
+		weight: 1100,
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-trash',
-			label: 'Delete...',
+			label: '#actions_delete',
 			itemRepositoryAlias: '',
 			detailRepositoryAlias: '',
 		},

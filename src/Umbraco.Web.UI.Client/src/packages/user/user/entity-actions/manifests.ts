@@ -34,7 +34,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-check',
-			label: 'Enable',
+			label: '#actions_enable',
 		},
 		conditions: [
 			{
@@ -52,7 +52,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-block',
-			label: 'Disable',
+			label: '#actions_disable',
 		},
 		conditions: [
 			{
@@ -70,7 +70,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-key',
-			label: 'Change Password',
+			label: '#user_changePassword',
 		},
 	},
 	{
@@ -83,7 +83,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-unlocked',
-			label: 'Unlock',
+			label: '#actions_unlock',
 		},
 		conditions: [
 			{
@@ -101,7 +101,7 @@ const entityActions: Array<ManifestTypes> = [
 		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-settings',
-			label: 'Configure Two-Factor',
+			label: '#user_configureMfa',
 		},
 		conditions: [
 			{
