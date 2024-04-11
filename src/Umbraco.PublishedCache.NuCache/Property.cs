@@ -33,6 +33,7 @@ internal class Property : PublishedPropertyBase
     private object? _interValue;
 
     // the variant source and inter values
+    private readonly object _locko = new();
     private ConcurrentDictionary<CompositeStringStringKey, SourceInterValue>? _sourceValues;
 
     private string? _valuesCacheKey;
@@ -66,12 +67,9 @@ internal class Property : PublishedPropertyBase
                 }
                 else
                 {
-                    if (_sourceValues == null)
-                    {
-                        _sourceValues = InitializeConcurrentDictionary<CompositeStringStringKey, SourceInterValue>();
-                    }
+                    EnsureSourceValuesInitialized();
 
-                    _sourceValues[new CompositeStringStringKey(sourceValue.Culture, sourceValue.Segment)]
+                    _sourceValues![new CompositeStringStringKey(sourceValue.Culture, sourceValue.Segment)]
                         = new SourceInterValue
                         {
                             Culture = sourceValue.Culture,
@@ -235,13 +233,10 @@ internal class Property : PublishedPropertyBase
             return _interValue;
         }
 
-        if (_sourceValues == null)
-        {
-            _sourceValues = InitializeConcurrentDictionary<CompositeStringStringKey, SourceInterValue>();
-        }
+        EnsureSourceValuesInitialized();
 
         var k = new CompositeStringStringKey(culture, segment);
-        if (!_sourceValues.TryGetValue(k, out SourceInterValue? vvalue))
+        if (!_sourceValues!.TryGetValue(k, out SourceInterValue? vvalue))
         {
             _sourceValues[k] = vvalue = new SourceInterValue
             {
@@ -367,6 +362,7 @@ internal class Property : PublishedPropertyBase
 
     private class CacheValues : CacheValue
     {
+        private readonly object _locko = new();
         private ConcurrentDictionary<CompositeStringStringKey, CacheValue>? _values;
 
         public CacheValue For(string? culture, string? segment)
@@ -378,7 +374,10 @@ internal class Property : PublishedPropertyBase
 
             if (_values == null)
             {
-                _values = InitializeConcurrentDictionary<CompositeStringStringKey, CacheValue>();
+                lock (_locko)
+                {
+                    _values ??= InitializeConcurrentDictionary<CompositeStringStringKey, CacheValue>();
+                }
             }
 
             var k = new CompositeStringStringKey(culture, segment);
@@ -418,6 +417,19 @@ internal class Property : PublishedPropertyBase
     private static ConcurrentDictionary<TKey, TValue> InitializeConcurrentDictionary<TKey, TValue>()
         where TKey : notnull
         => new(-1, 5);
+
+    private void EnsureSourceValuesInitialized()
+    {
+        if (_sourceValues is not null)
+        {
+            return;
+        }
+
+        lock (_locko)
+        {
+            _sourceValues ??= InitializeConcurrentDictionary<CompositeStringStringKey, SourceInterValue>();
+        }
+    }
 
     #endregion
 }
