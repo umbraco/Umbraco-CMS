@@ -37,7 +37,7 @@ export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> exten
 	addValidation: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
 	removeValidation: (obj: UmbFormControlValidationConfig) => void;
 	//static formAssociated: boolean;
-	getFormElement(): HTMLElement | undefined | null; // allows for null as it makes it simpler to just implement a querySelector as that might return null. [NL]
+	//protected getFormElement(): HTMLElement | undefined | null; // allows for null as it makes it simpler to just implement a querySelector as that might return null. [NL]
 	focusFirstInvalidElement(): void;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
@@ -61,7 +61,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 	protected addFormControlElement(element: UmbNativeFormControlElement): void;
 
 	//static formAssociated: boolean;
-	getFormElement(): HTMLElement | undefined | null;
+	protected getFormElement(): HTMLElement | undefined | null;
 	focusFirstInvalidElement(): void;
 	get value(): ValueType | DefaultValueType;
 	set value(newValue: ValueType | DefaultValueType);
@@ -160,7 +160,7 @@ export const UmbFormControlMixin = <
 		 * @method getFormElement
 		 * @returns {HTMLElement | undefined | null}
 		 */
-		getFormElement(): HTMLElement | undefined | null {
+		protected getFormElement(): HTMLElement | undefined | null {
 			return this.#formCtrlElements.find((el) => el.validity.valid === false);
 		}
 
