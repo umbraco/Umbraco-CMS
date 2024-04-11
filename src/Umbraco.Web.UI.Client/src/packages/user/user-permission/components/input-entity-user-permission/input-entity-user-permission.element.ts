@@ -5,10 +5,10 @@ import { html, customElement, property, state, nothing, ifDefined } from '@umbra
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbUserPermissionVerbElement } from '@umbraco-cms/backoffice/user';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-entity-user-permission')
-export class UmbInputEntityUserPermissionElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputEntityUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType(): string {
 		return this._entityType;

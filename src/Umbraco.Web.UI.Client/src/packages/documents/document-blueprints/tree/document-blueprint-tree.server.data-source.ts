@@ -1,17 +1,14 @@
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentBlueprintTreeItemModel } from './types.js';
+import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
+import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { DocumentBlueprintTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
-import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import type {
-	DocumentBlueprintTreeItemResponseModel,
-	DocumentTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for a data type tree that fetches data from the server
@@ -61,12 +58,10 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
 };
 
 const mapper = (item: DocumentBlueprintTreeItemResponseModel): UmbDocumentBlueprintTreeItemModel => {
-	//TODO remove temp hack when api endpoints are fixed
-	const hack = item as Partial<DocumentTreeItemResponseModel>;
 	return {
 		unique: item.id,
 		parentUnique: item.parent?.id || null,
-		name: hack?.variants?.[0].name ?? '',
+		name: (item as any).variants?.[0].name  ?? item.name,
 		entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
 		isFolder: false,
 		hasChildren: item.hasChildren,
