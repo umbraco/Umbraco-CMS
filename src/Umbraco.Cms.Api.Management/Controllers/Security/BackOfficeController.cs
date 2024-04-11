@@ -253,7 +253,6 @@ public class BackOfficeController : SecurityControllerBase
     private async Task<IActionResult> SignInBackOfficeUser(BackOfficeIdentityUser backOfficeUser, OpenIddictRequest request)
     {
         ClaimsPrincipal backOfficePrincipal = await _backOfficeSignInManager.CreateUserPrincipalAsync(backOfficeUser);
-        backOfficePrincipal.SetClaim(OpenIddictConstants.Claims.Subject, backOfficeUser.Key.ToString());
 
         Claim[] backOfficeClaims = backOfficePrincipal.Claims.ToArray();
         foreach (Claim backOfficeClaim in backOfficeClaims)

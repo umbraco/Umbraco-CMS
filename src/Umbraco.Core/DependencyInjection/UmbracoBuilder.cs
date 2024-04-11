@@ -254,7 +254,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<IPublishedModelFactory>(factory => factory.CreateDefaultPublishedModelFactory());
 
             Services
+                .AddNotificationAsyncHandler<MemberGroupSavingNotification, PublicAccessHandler>()
                 .AddNotificationHandler<MemberGroupSavedNotification, PublicAccessHandler>()
+                .AddNotificationAsyncHandler<MemberGroupDeletingNotification, PublicAccessHandler>()
                 .AddNotificationHandler<MemberGroupDeletedNotification, PublicAccessHandler>();
 
             Services.AddSingleton<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>();
@@ -276,7 +278,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IUserGroupService, UserGroupService>();
             Services.AddUnique<IUserPermissionService, UserPermissionService>();
             Services.AddUnique<IUserService, UserService>();
-            Services.AddUnique<ITourService, TourService>();
             Services.AddUnique<IWebProfilerService, WebProfilerService>();
             Services.AddUnique<ILocalizationService, LocalizationService>();
             Services.AddUnique<IDictionaryItemService, DictionaryItemService>();

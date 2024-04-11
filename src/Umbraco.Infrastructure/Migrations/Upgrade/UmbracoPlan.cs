@@ -77,5 +77,6 @@ public class UmbracoPlan : MigrationPlan
         To<V_14_0_0.MigrateCharPermissionsToStrings>("{C567DE81-DF92-4B99-BEA8-CD34EF99DA5D}");
         To<V_14_0_0.DeleteMacroTables>("{0D82C836-96DD-480D-A924-7964E458BD34}");
         To<V_14_0_0.MoveDocumentBlueprintsToFolders>("{1A0FBC8A-6FC6-456C-805C-B94816B2E570}");
+        To<V_14_0_0.MigrateTours>("{302DE171-6D83-4B6B-B3C0-AC8808A16CA1}");
     }
 }
