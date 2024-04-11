@@ -3,7 +3,7 @@ import type { UmbPagedModel, UmbRepositoryResponse } from '@umbraco-cms/backoffi
 
 export type UmbSearchResultItemModel = {
 	entityType: string;
-	icon?: string;
+	icon?: string | null;
 	name: string;
 	unique: string;
 };
