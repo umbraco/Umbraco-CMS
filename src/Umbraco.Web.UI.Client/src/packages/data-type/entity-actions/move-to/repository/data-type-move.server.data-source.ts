@@ -4,7 +4,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbMoveToDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/repository';
 
 /**
- * A data source for Data Type items that fetches data from the server
+ * Move Data Type Server Data Source
  * @export
  * @class UmbDataTypeMoveServerDataSource
  */
