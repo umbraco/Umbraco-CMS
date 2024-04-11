@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_BLUEPRINT_CREATE_OPTIONS_MODAL } from './modal/index.js';
+import { UMB_DOCUMENT_BLUEPRINT_OPTIONS_CREATE_MODAL } from './modal/index.js';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -12,7 +12,7 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<never> {
 
 	async execute() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_DOCUMENT_BLUEPRINT_CREATE_OPTIONS_MODAL, {
+		const modalContext = modalManager.open(this, UMB_DOCUMENT_BLUEPRINT_OPTIONS_CREATE_MODAL, {
 			data: {
 				parent: {
 					unique: this.args.unique,
@@ -24,10 +24,11 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<never> {
 		await modalContext.onSubmit().catch(() => undefined);
 
 		const documentTypeUnique = modalContext.getValue().documentTypeUnique;
+		if (!documentTypeUnique) return;
 
-		const url = `section/settings/workspace/${UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE}/create/parent/${this.args.entityType}/${
-			documentTypeUnique || 'null'
-		}`;
+		const url = `section/settings/workspace/${UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE}/create/parent/${this.args.unique ?? 'null'}/${documentTypeUnique}`;
 		history.pushState(null, '', url);
 	}
 }
+
+export default UmbCreateEntityAction;
