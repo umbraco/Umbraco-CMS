@@ -15,14 +15,14 @@ public class ContentCacheDataModel
     // dont serialize empty properties
     [DataMember(Order = 0)]
     [JsonPropertyName("pd")]
-    [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<PropertyData[]>))]
-    [MessagePackFormatter(typeof(MessagePackAutoInterningStringKeyCaseInsensitiveDictionaryFormatter<PropertyData[]>))]
+    [JsonConverter(typeof(JsonDictionaryStringInternIgnoreCaseConverter<PropertyData[]>))]
+    [MessagePackFormatter(typeof(MessagePackDictionaryStringInternIgnoreCaseFormatter<PropertyData[]>))]
     public Dictionary<string, PropertyData[]>? PropertyData { get; set; }
 
     [DataMember(Order = 1)]
     [JsonPropertyName("cd")]
-    [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<CultureVariation>))]
-    [MessagePackFormatter(typeof(MessagePackAutoInterningStringKeyCaseInsensitiveDictionaryFormatter<CultureVariation>))]
+    [JsonConverter(typeof(JsonDictionaryStringInternIgnoreCaseConverter<CultureVariation>))]
+    [MessagePackFormatter(typeof(MessagePackDictionaryStringInternIgnoreCaseFormatter<CultureVariation>))]
     public Dictionary<string, CultureVariation>? CultureData { get; set; }
 
     [DataMember(Order = 2)]
@@ -32,12 +32,12 @@ public class ContentCacheDataModel
     // Legacy properties used to deserialize existing nucache db entries
     [IgnoreDataMember]
     [JsonPropertyName("properties")]
-    [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<PropertyData[]>))]
+    [JsonConverter(typeof(JsonDictionaryStringIgnoreCaseConverter<PropertyData[]>))]
     private Dictionary<string, PropertyData[]> LegacyPropertyData { set => PropertyData = value; }
 
     [IgnoreDataMember]
     [JsonPropertyName("cultureData")]
-    [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<CultureVariation>))]
+    [JsonConverter(typeof(JsonDictionaryStringIgnoreCaseConverter<CultureVariation>))]
     private Dictionary<string, CultureVariation> LegacyCultureData { set => CultureData = value; }
 
     [IgnoreDataMember]

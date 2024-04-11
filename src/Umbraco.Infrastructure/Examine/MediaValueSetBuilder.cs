@@ -1,5 +1,4 @@
 using Examine;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -38,24 +37,6 @@ public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
         _contentSettings = contentSettings.Value;
     }
 
-    [Obsolete("Use non-obsolete ctor, scheduled for removal in v14")]
-    public MediaValueSetBuilder(
-        PropertyEditorCollection propertyEditors,
-        UrlSegmentProviderCollection urlSegmentProviders,
-        MediaUrlGeneratorCollection mediaUrlGenerators,
-        IUserService userService,
-        IShortStringHelper shortStringHelper,
-        IOptions<ContentSettings> contentSettings)
-        : this(propertyEditors,
-            urlSegmentProviders,
-            mediaUrlGenerators,
-            userService,
-            shortStringHelper,
-            contentSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
-    {
-
-    }
     /// <inheritdoc />
     public override IEnumerable<ValueSet> GetValueSets(params IMedia[] media)
     {
