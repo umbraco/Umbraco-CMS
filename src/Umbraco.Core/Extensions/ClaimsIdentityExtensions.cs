@@ -217,10 +217,10 @@ public static class ClaimsIdentityExtensions
         }
 
         // This is the id that 'identity' uses to check for the user id
-        if (identity.HasClaim(x => x.Type == "sub") == false)
+        if (identity.HasClaim(x => x.Type == Constants.Security.OpenIdDictSubClaimType) == false)
         {
             identity.AddClaim(new Claim(
-                "sub",
+                Constants.Security.OpenIdDictSubClaimType,
                 userKey.ToString(),
                 ClaimValueTypes.String,
                 AuthenticationType,
