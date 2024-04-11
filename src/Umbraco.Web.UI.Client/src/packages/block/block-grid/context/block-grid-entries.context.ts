@@ -81,6 +81,7 @@ export class UmbBlockGridEntriesContext
 				};
 			})
 			.observeRouteBuilder((routeBuilder) => {
+				// TODO: Does it make any sense that this is a state? Check usage and confirm. [NL]
 				this._catalogueRouteBuilderState.setValue(routeBuilder);
 			});
 	}
