@@ -46,15 +46,11 @@ public static class UmbracoBuilderExtensions
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, SqliteFactory.Instance);
 
-        // Remove this registration in Umbraco 12
-        DbProviderFactories.UnregisterFactory(Constants.ProviderNameLegacy);
-        DbProviderFactories.RegisterFactory(Constants.ProviderNameLegacy, SqliteFactory.Instance);
-
         // Prevent accidental creation of SQLite database files
         builder.Services.PostConfigureAll<ConnectionStrings>(options =>
         {
             // Skip empty connection string and other providers
-            if (!options.IsConnectionStringConfigured() || (options.ProviderName != Constants.ProviderName && options.ProviderName != Constants.ProviderNameLegacy))
+            if (!options.IsConnectionStringConfigured() || options.ProviderName != Constants.ProviderName)
             {
                 return;
             }

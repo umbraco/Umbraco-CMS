@@ -142,6 +142,10 @@ public static class UdiGetterExtensions
         {
             entityType = Constants.UdiEntityType.MediaTypeContainer;
         }
+        else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentBlueprint)
+        {
+            entityType = Constants.UdiEntityType.DocumentBlueprintContainer;
+        }
         else
         {
             throw new NotSupportedException(string.Format("Contained object type {0} is not supported.", entity.ContainedObjectType));

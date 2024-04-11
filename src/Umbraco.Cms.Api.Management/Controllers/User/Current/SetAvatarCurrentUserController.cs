@@ -34,7 +34,7 @@ public class SetAvatarCurrentUserController : CurrentUserControllerBase
     [HttpPost("avatar")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> SetAvatar(SetAvatarRequestModel model)
+    public async Task<IActionResult> SetAvatar(CancellationToken cancellationToken, SetAvatarRequestModel model)
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
 

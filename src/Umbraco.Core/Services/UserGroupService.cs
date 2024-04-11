@@ -24,6 +24,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     private readonly IUserGroupPermissionService _userGroupPermissionService;
     private readonly IEntityService _entityService;
     private readonly IUserService _userService;
+    private readonly ILogger<UserGroupService> _logger;
 
     public UserGroupService(
         ICoreScopeProvider provider,
@@ -32,13 +33,15 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IUserGroupRepository userGroupRepository,
         IUserGroupPermissionService userGroupPermissionService,
         IEntityService entityService,
-        IUserService userService)
+        IUserService userService,
+        ILogger<UserGroupService> logger)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userGroupRepository = userGroupRepository;
         _userGroupPermissionService = userGroupPermissionService;
         _entityService = entityService;
         _userService = userService;
+        _logger = logger;
     }
 
     /// <inheritdoc/>
@@ -262,9 +265,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             await _userGroupPermissionService.AuthorizeCreateAsync(performingUser, userGroup);
         if (isAuthorized != UserGroupAuthorizationStatus.Success)
         {
-            // Convert from UserGroupAuthorizationStatus to UserGroupOperationStatus
-            UserGroupOperationStatus operationStatus = isAuthorized.ToUserGroupOperationStatus();
-            return Attempt.FailWithStatus(operationStatus, userGroup);
+            _logger.LogInformation("The performing user is not allowed to create the user group. The authorization status returned was: {AuthorizationStatus}", isAuthorized);
+            return Attempt.FailWithStatus(UserGroupOperationStatus.Unauthorized, userGroup);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -342,9 +344,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             await _userGroupPermissionService.AuthorizeUpdateAsync(performingUser, userGroup);
         if (isAuthorized != UserGroupAuthorizationStatus.Success)
         {
-            // Convert from UserGroupAuthorizationStatus to UserGroupOperationStatus
-            UserGroupOperationStatus operationStatus = isAuthorized.ToUserGroupOperationStatus();
-            return Attempt.FailWithStatus(operationStatus, userGroup);
+            _logger.LogInformation("The performing user is not allowed to update the user group. The authorization status returned was: {AuthorizationStatus}", isAuthorized);
+            return Attempt.FailWithStatus(UserGroupOperationStatus.Unauthorized, userGroup);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();

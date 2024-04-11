@@ -222,10 +222,8 @@ public class RichTextPropertyEditor : DataEditor
                 return null;
             }
 
-            var parseAndSaveBase64Images = _pastedImages.FindAndPersistEmbeddedImages(
-                richTextEditorValue.Markup, mediaParentId, userKey);
             var parseAndSavedTempImages = _pastedImages
-                .FindAndPersistPastedTempImagesAsync(parseAndSaveBase64Images, mediaParentId, userKey)
+                .FindAndPersistPastedTempImagesAsync(richTextEditorValue.Markup, mediaParentId, userKey)
                 .GetAwaiter()
                 .GetResult();
             var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);

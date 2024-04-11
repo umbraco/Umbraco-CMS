@@ -12,10 +12,13 @@ using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
@@ -34,27 +37,31 @@ public class BackOfficeController : SecurityControllerBase
     private readonly IBackOfficeUserManager _backOfficeUserManager;
     private readonly IOptions<SecuritySettings> _securitySettings;
     private readonly ILogger<BackOfficeController> _logger;
+    private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
+    private readonly IUserTwoFactorLoginService _userTwoFactorLoginService;
 
     public BackOfficeController(
         IHttpContextAccessor httpContextAccessor,
         IBackOfficeSignInManager backOfficeSignInManager,
         IBackOfficeUserManager backOfficeUserManager,
         IOptions<SecuritySettings> securitySettings,
-        ILogger<BackOfficeController> logger)
+        ILogger<BackOfficeController> logger,
+        IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
+        IUserTwoFactorLoginService userTwoFactorLoginService)
     {
         _httpContextAccessor = httpContextAccessor;
         _backOfficeSignInManager = backOfficeSignInManager;
         _backOfficeUserManager = backOfficeUserManager;
         _securitySettings = securitySettings;
         _logger = logger;
+        _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
+        _userTwoFactorLoginService = userTwoFactorLoginService;
     }
 
-    // FIXME: this is a temporary solution to get the new backoffice auth rolling.
-    //        once the old backoffice auth is no longer necessary, clean this up and merge with 2FA handling etc.
     [HttpPost("login")]
     [MapToApiVersion("1.0")]
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
-    public async Task<IActionResult> Login(LoginRequestModel model)
+    public async Task<IActionResult> Login(CancellationToken cancellationToken, LoginRequestModel model)
     {
         var validated = await _backOfficeUserManager.ValidateCredentialsAsync(model.Username, model.Password);
         if (validated is false)
@@ -81,10 +88,14 @@ public class BackOfficeController : SecurityControllerBase
         }
         if(result.RequiresTwoFactor)
         {
-            return StatusCode(StatusCodes.Status402PaymentRequired, new ProblemDetailsBuilder()
-                .WithTitle("2FA Required")
-                .WithDetail("The user is protected by 2FA. Please continue the login process and verify a 2FA code.")
-                .Build());
+            string? twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(model.Username);
+            BackOfficeIdentityUser? attemptingUser = await _backOfficeUserManager.FindByNameAsync(model.Username);
+            IEnumerable<string> enabledProviders = (await _userTwoFactorLoginService.GetProviderNamesAsync(attemptingUser!.Key)).Result.Where(x=>x.IsEnabledOnUser).Select(x=>x.ProviderName);
+            return StatusCode(StatusCodes.Status402PaymentRequired, new RequiresTwoFactorResponseModel()
+            {
+                TwoFactorLoginView = twofactorView,
+                EnabledTwoFactorProviderNames = enabledProviders
+            });
         }
         return Ok();
     }
@@ -92,7 +103,7 @@ public class BackOfficeController : SecurityControllerBase
     [AllowAnonymous]
     [HttpPost("verify-2fa")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> Verify2FACode(Verify2FACodeModel model)
+    public async Task<IActionResult> Verify2FACode(CancellationToken cancellationToken, Verify2FACodeModel model)
     {
         if (ModelState.IsValid == false)
         {
@@ -133,17 +144,10 @@ public class BackOfficeController : SecurityControllerBase
             .Build());
     }
 
-    public class LoginRequestModel
-    {
-        public required string Username { get; init; }
-
-        public required string Password { get; init; }
-    }
-
     [AllowAnonymous]
     [HttpGet("authorize")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> Authorize()
+    public async Task<IActionResult> Authorize(CancellationToken cancellationToken)
     {
         HttpContext context = _httpContextAccessor.GetRequiredHttpContext();
         OpenIddictRequest? request = context.GetOpenIddictServerRequest();
@@ -166,7 +170,7 @@ public class BackOfficeController : SecurityControllerBase
     [AllowAnonymous]
     [HttpGet("signout")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> Signout()
+    public async Task<IActionResult> Signout(CancellationToken cancellationToken)
     {
         var userName = await GetUserNameFromAuthCookie();
 

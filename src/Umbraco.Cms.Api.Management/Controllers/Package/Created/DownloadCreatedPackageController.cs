@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
@@ -26,7 +27,7 @@ public class DownloadCreatedPackageController : CreatedPackageControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Download(Guid id)
+    public async Task<IActionResult> Download(CancellationToken cancellationToken, Guid id)
     {
         PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(id);
 
@@ -50,11 +51,15 @@ public class DownloadCreatedPackageController : CreatedPackageControllerBase
             DispositionType = DispositionTypeNames.Attachment
         };
 
-        Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+        Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
+
+        var mediaType = fileName.InvariantEndsWith(".zip")
+            ? MediaTypeNames.Application.Zip
+            : MediaTypeNames.Text.Xml;
 
         var result = new FileStreamResult(
             fileStream,
-            new MediaTypeHeaderValue(MediaTypeNames.Application.Octet) { Charset = encoding.WebName });
+            new MediaTypeHeaderValue(mediaType) { Charset = encoding.WebName });
 
         return result;
     }

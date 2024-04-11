@@ -30,7 +30,6 @@ public static class UmbracoBuilderAuthExtensions
             {
                 // Enable the authorization and token endpoints.
                 // - important: member endpoints MUST be added before backoffice endpoints to ensure that auto-discovery works for members
-                // FIXME: swap paths here so member API is first (see comment above)
                 options
                     .SetAuthorizationEndpointUris(
                         Paths.MemberApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
