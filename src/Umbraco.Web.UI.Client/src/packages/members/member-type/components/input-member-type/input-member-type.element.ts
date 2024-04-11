@@ -1,12 +1,12 @@
 import { UmbMemberTypePickerContext } from './input-member-type.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { MemberTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-member-type')
-export class UmbInputMemberTypeElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}

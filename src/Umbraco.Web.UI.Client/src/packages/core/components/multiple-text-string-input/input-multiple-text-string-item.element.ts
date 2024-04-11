@@ -1,6 +1,6 @@
 import { css, html, nothing, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  * @element umb-input-multiple-text-string-item
  */
 @customElement('umb-input-multiple-text-string-item')
-export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputMultipleTextStringItemElement extends UUIFormControlMixin(UmbLitElement, '') {
 	/**
 	 * Disables the input
 	 * @type {boolean}
@@ -101,7 +101,7 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 						?disabled=${this.disabled}
 						compact>
 						<uui-icon name="icon-trash"></uui-icon>
-				  </uui-button>`}
+					</uui-button>`}
 		`;
 	}
 

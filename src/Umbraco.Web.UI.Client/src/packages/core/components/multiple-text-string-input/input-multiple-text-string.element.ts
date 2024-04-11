@@ -1,6 +1,6 @@
 import type { UmbInputMultipleTextStringItemElement } from './input-multiple-text-string-item.element.js';
 import { css, html, nothing, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -10,7 +10,7 @@ import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/even
  * @element umb-input-multiple-text-string
  */
 @customElement('umb-input-multiple-text-string')
-export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputMultipleTextStringElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController(this, {
 		getUniqueOfElement: (element) => {
 			return element.getAttribute('data-sort-entry-id');
