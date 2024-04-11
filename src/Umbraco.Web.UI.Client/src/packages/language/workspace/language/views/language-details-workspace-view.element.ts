@@ -10,6 +10,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import '@umbraco-cms/backoffice/culture';
 
 @customElement('umb-language-details-workspace-view')
 export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
