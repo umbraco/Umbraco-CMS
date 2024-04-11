@@ -7,54 +7,38 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Web.Mvc;
-using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Routing;
 
 /// <summary>
-///     Creates routes for the back office area
+/// Creates routes for the back office area.
 /// </summary>
 public sealed class BackOfficeAreaRoutes : IAreaRoutes
 {
-    private readonly GlobalSettings _globalSettings;
-    private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IRuntimeState _runtimeState;
-    private readonly string _umbracoPathSegment;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
+    /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
     /// </summary>
-    public BackOfficeAreaRoutes(
-        IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment,
-        IRuntimeState runtimeState)
-    {
-        _globalSettings = globalSettings.Value;
-        _hostingEnvironment = hostingEnvironment;
-        _runtimeState = runtimeState;
-        _umbracoPathSegment = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment);
-    }
+    public BackOfficeAreaRoutes(IRuntimeState runtimeState)
+        => _runtimeState = runtimeState;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
+    /// </summary>
+    [Obsolete("The globalSettings and hostingEnvironment parameters are not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
+    public BackOfficeAreaRoutes(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IRuntimeState runtimeState)
+        : this(runtimeState)
+    { }
 
     /// <inheritdoc />
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {
-
-
-        switch (_runtimeState.Level)
+        if (_runtimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Run)
         {
-            case RuntimeLevel.Install:
-            case RuntimeLevel.Upgrade:
-            case RuntimeLevel.Run:
-
-                MapMinimalBackOffice(endpoints);
-                break;
-            case RuntimeLevel.BootFailed:
-            case RuntimeLevel.Unknown:
-            case RuntimeLevel.Boot:
-                break;
+            MapMinimalBackOffice(endpoints);
         }
     }
 
@@ -64,7 +48,7 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
     private void MapMinimalBackOffice(IEndpointRouteBuilder endpoints)
     {
         endpoints.MapUmbracoRoute<BackOfficeDefaultController>(
-            _umbracoPathSegment,
+            Constants.System.UmbracoPathSegment,
             null!,
             string.Empty,
             "Index",
@@ -76,7 +60,7 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
 
         endpoints.MapControllerRoute(
             "catch-all-sections-to-client",
-            new StringBuilder(_umbracoPathSegment).Append("/{**slug}").ToString(),
+            new StringBuilder(Constants.System.UmbracoPathSegment).Append("/{**slug}").ToString(),
             new
             {
                 Controller = ControllerExtensions.GetControllerName<BackOfficeDefaultController>(),

@@ -10,28 +10,27 @@ namespace Umbraco.Cms.Core.Routing;
 /// </summary>
 public class UmbracoRequestPaths
 {
-    private readonly string _apiMvcPath;
     private readonly string _appPath;
-    private readonly string _backOfficeMvcPath;
     private readonly string _backOfficePath;
-    private readonly string _managementApiPath;
     private readonly string _defaultUmbPath;
     private readonly string _defaultUmbPathWithSlash;
-    private readonly string _installPath;
+    private readonly string _backOfficeMvcPath;
     private readonly string _previewMvcPath;
     private readonly string _surfaceMvcPath;
+    private readonly string _apiMvcPath;
+    private readonly string _managementApiPath;
+    private readonly string _installPath;
     private readonly IOptions<UmbracoRequestPathsOptions> _umbracoRequestPathsOptions;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbracoRequestPaths" /> class.
+    /// Initializes a new instance of the <see cref="UmbracoRequestPaths" /> class.
     /// </summary>
-    public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IOptions<UmbracoRequestPathsOptions> umbracoRequestPathsOptions)
+    public UmbracoRequestPaths(IHostingEnvironment hostingEnvironment, IOptions<UmbracoRequestPathsOptions> umbracoRequestPathsOptions)
     {
         _appPath = hostingEnvironment.ApplicationVirtualPath;
         _backOfficePath = hostingEnvironment.GetBackOfficePath().EnsureStartsWith('/').TrimStart(_appPath).EnsureStartsWith('/');
 
-        string mvcArea = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
-
+        const string mvcArea = Constants.System.UmbracoPathSegment;
         _defaultUmbPath = "/" + mvcArea;
         _defaultUmbPathWithSlash = "/" + mvcArea + "/";
         _backOfficeMvcPath = "/" + mvcArea + "/BackOffice/";
@@ -40,8 +39,14 @@ public class UmbracoRequestPaths
         _apiMvcPath = "/" + mvcArea + "/Api/";
         _managementApiPath = "/" + mvcArea + Constants.Web.ManagementApiPath;
         _installPath = hostingEnvironment.ToAbsolute(Constants.SystemDirectories.Install);
+
         _umbracoRequestPathsOptions = umbracoRequestPathsOptions;
     }
+
+    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
+    public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IOptions<UmbracoRequestPathsOptions> umbracoRequestPathsOptions)
+        : this(hostingEnvironment, umbracoRequestPathsOptions)
+    { }
 
     /// <summary>
     ///     Checks if the current uri is a back office request

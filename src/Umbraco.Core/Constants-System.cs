@@ -78,7 +78,16 @@ public static partial class Constants
         public const string UmbracoDefaultDatabaseName = "Umbraco";
 
         public const string UmbracoConnectionName = "umbracoDbDSN";
-        public const string DefaultUmbracoPath = "~/umbraco";
+
+        /// <summary>
+        /// The Umbraco path segment.
+        /// </summary>
+        public const string UmbracoPathSegment = "umbraco";
+
+        /// <summary>
+        /// The default Umbraco virtual path.
+        /// </summary>
+        public const string DefaultUmbracoPath = "~/" + UmbracoPathSegment;
 
         /// <summary>
         /// The DataDirectory name.

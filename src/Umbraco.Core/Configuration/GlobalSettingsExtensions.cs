@@ -28,7 +28,7 @@ public static class GlobalSettingsExtensions
     ///     with something
     ///     like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
     /// </remarks>
-    [Obsolete("The UmbracoPath setting is removed, manually resolve Constants.System.DefaultUmbracoPath to an area name instead. This method will be removed in a future version.")]
+    [Obsolete("The UmbracoPath setting is removed, use Constants.System.UmbracoPathSegment as area name instead. This method will be removed in a future version.")]
     public static string GetUmbracoMvcArea(this GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
-        => Constants.System.DefaultUmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash);
+        => Constants.System.UmbracoPathSegment;
 }

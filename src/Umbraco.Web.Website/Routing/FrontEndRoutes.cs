@@ -19,40 +19,28 @@ public sealed class FrontEndRoutes : IAreaRoutes
 {
     private readonly IRuntimeState _runtimeState;
     private readonly SurfaceControllerTypeCollection _surfaceControllerTypeCollection;
-    private readonly string _umbracoPathSegment;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="FrontEndRoutes" /> class.
+    /// Initializes a new instance of the <see cref="FrontEndRoutes" /> class.
     /// </summary>
-    public FrontEndRoutes(
-        IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment,
-        IRuntimeState runtimeState,
-        SurfaceControllerTypeCollection surfaceControllerTypeCollection)
+    public FrontEndRoutes(IRuntimeState runtimeState, SurfaceControllerTypeCollection surfaceControllerTypeCollection)
     {
         _runtimeState = runtimeState;
         _surfaceControllerTypeCollection = surfaceControllerTypeCollection;
-        _umbracoPathSegment = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
     }
+
+    [Obsolete("The globalSettings and hostingEnvironment parameters are not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
+    public FrontEndRoutes(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IRuntimeState runtimeState, SurfaceControllerTypeCollection surfaceControllerTypeCollection)
+        : this(runtimeState, surfaceControllerTypeCollection)
+    { }
 
     /// <inheritdoc />
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {
-        switch (_runtimeState.Level)
+        if (_runtimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Run)
         {
-            case RuntimeLevel.Install:
-            case RuntimeLevel.Upgrade:
-            case RuntimeLevel.Run:
-
-                AutoRouteSurfaceControllers(endpoints);
-                break;
-            case RuntimeLevel.BootFailed:
-            case RuntimeLevel.Unknown:
-            case RuntimeLevel.Boot:
-                break;
+            AutoRouteSurfaceControllers(endpoints);
         }
-
-
     }
 
     /// <summary>
@@ -67,7 +55,7 @@ public sealed class FrontEndRoutes : IAreaRoutes
 
             endpoints.MapUmbracoSurfaceRoute(
                 meta.ControllerType,
-                _umbracoPathSegment,
+                Constants.System.UmbracoPathSegment,
                 meta.AreaName);
         }
     }
