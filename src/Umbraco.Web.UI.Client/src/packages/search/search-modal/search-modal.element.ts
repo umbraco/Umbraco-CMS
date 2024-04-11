@@ -45,6 +45,10 @@ export class UmbSearchModalElement extends UmbLitElement {
 				providerPromise: createExtensionApi(this, provider.manifest),
 				alias: provider.alias,
 			}));
+
+			if (this._searchProviders.length > 0) {
+				this.#setCurrentProvider(this._searchProviders[0]);
+			}
 		});
 	}
 
@@ -67,7 +71,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		this.#updateSearchResults();
 	}
 
-	async #onSearchTagClick(searchProvider: any) {
+	async #setCurrentProvider(searchProvider: any) {
 		const api = await searchProvider.providerPromise;
 		this._currentProvider = {
 			api,
@@ -115,7 +119,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 				(searchProvider) => searchProvider,
 				(searchProvider) =>
 					html`<button
-						@click=${() => this.#onSearchTagClick(searchProvider)}
+						@click=${() => this.#setCurrentProvider(searchProvider)}
 						@keydown=${() => ''}
 						class="search-provider ${this._currentProvider?.alias === searchProvider.alias ? 'active' : ''}">
 						${searchProvider.name}
