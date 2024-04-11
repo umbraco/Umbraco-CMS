@@ -1,1 +1,1 @@
-export { type UmbSearchResultItemModel } from './types.js';
+export type { UmbSearchResultItemModel, UmbSearchRequestArgs } from './types.js';

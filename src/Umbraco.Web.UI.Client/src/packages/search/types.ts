@@ -4,3 +4,7 @@ export type UmbSearchResultItemModel = {
 	name: string;
 	unique: string;
 };
+
+export type UmbSearchRequestArgs = {
+	query: string;
+};

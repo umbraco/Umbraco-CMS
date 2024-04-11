@@ -1,8 +1,8 @@
-import type { UmbSearchRequestArgs } from './types.js';
+import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 
 /**
  * A data source for the Rollback that fetches data from the server

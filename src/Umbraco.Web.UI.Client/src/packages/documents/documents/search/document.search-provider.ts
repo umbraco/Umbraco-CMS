@@ -1,5 +1,5 @@
+import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UmbDocumentSearchRepository } from './document-search.repository.js';
-import type { UmbSearchRequestArgs } from './types.js';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
