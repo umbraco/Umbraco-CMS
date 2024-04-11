@@ -4,6 +4,7 @@ import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
 import { UMB_SERVER_MODEL_VALIDATION_CONTEXT } from './server-model-validation.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { ApiError, CancelError } from '@umbraco-cms/backoffice/external/backend-api';
 
 type ServerFeedbackEntry = { path: string; messages: Array<string> };
 
@@ -40,8 +41,8 @@ export class UmbServerModelValidationContext
 	}
 
 	async askServerForValidation(
-		data: any,
-		requestPromise: Promise<{ data: string | undefined; error: any }>,
+		data: unknown,
+		requestPromise: Promise<{ data: unknown; error: ApiError | CancelError | undefined }>,
 	): Promise<void> {
 		this.#context?.messages.removeMessagesByType('server');
 
@@ -59,8 +60,9 @@ export class UmbServerModelValidationContext
 		//console.log('VALIDATE — Got server response:');
 		//console.log(data, error);
 
+		// Store this state of the data for translator look ups:
 		this.#data = data;
-
+		/*
 		const fixedData = {
 			type: 'Error',
 			title: 'Validation failed',
@@ -75,10 +77,11 @@ export class UmbServerModelValidationContext
 
 		Object.keys(fixedData.errors).forEach((path) => {
 			this.#serverFeedback.push({ path, messages: fixedData.errors[path] });
-		});
+		});*/
 
 		//this.#isValid = data ? true : false;
-		this.#isValid = false;
+		//this.#isValid = false;
+		this.#isValid = true;
 		this.#validatePromiseResolve?.();
 		this.#validatePromiseResolve = undefined;
 		//this.#validatePromise = undefined;
@@ -87,7 +90,6 @@ export class UmbServerModelValidationContext
 	}
 
 	#executeTranslatorsOnFeedback = (feedback: ServerFeedbackEntry) => {
-		console.log('transaltion for ', feedback.path);
 		return this.#translators.flatMap((translator) => {
 			if (translator.match(feedback.path)) {
 				const newPath = translator.translate(feedback.path);

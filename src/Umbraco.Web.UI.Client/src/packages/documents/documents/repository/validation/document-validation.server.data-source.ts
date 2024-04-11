@@ -1,7 +1,7 @@
 import type { UmbDocumentDetailModel } from '../../types.js';
 import {
 	type CreateDocumentRequestModel,
-	DocumentResource,
+	DocumentService,
 	type UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -14,7 +14,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
  * @implements {DocumentTreeDataSource}
  */
 export class UmbDocumentValidationServerDataSource {
-	#host: UmbControllerHost;
+	//#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbDocumentPublishingServerDataSource.
@@ -22,7 +22,7 @@ export class UmbDocumentValidationServerDataSource {
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
+		//this.#host = host;
 	}
 
 	/**
@@ -47,7 +47,7 @@ export class UmbDocumentValidationServerDataSource {
 		// Maybe use: tryExecuteAndNotify
 		const { data, error } = await tryExecute(
 			//this.#host,
-			DocumentResource.postDocumentValidate({
+			DocumentService.postDocumentValidate({
 				requestBody,
 			}),
 		);
@@ -77,7 +77,7 @@ export class UmbDocumentValidationServerDataSource {
 		// Maybe use: tryExecuteAndNotify
 		const { data, error } = await tryExecute(
 			//this.#host,
-			DocumentResource.putDocumentByIdValidate({
+			DocumentService.putDocumentByIdValidate({
 				id: model.unique,
 				requestBody,
 			}),

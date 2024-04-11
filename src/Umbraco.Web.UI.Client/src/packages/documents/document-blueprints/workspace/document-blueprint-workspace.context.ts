@@ -414,8 +414,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		await this.#createOrSave();
-		this.setIsNew(false);
-		return true;
 	}
 
 	async delete() {
