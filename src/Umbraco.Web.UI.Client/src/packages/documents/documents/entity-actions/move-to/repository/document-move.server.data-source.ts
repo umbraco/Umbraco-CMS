@@ -27,7 +27,7 @@ export class UmbMoveDocumentServerDataSource implements UmbMoveToDataSource {
 	 * @return {*}
 	 * @memberof UmbMoveDocumentServerDataSource
 	 */
-	async move(args: UmbMoveToRequestArgs) {
+	async moveTo(args: UmbMoveToRequestArgs) {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 

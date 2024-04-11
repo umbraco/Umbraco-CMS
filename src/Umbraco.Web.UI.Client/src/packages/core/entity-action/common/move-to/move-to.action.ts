@@ -1,10 +1,10 @@
 import { UmbEntityActionBase } from '../../entity-action-base.js';
+import { UmbRequestReloadStructureForEntityEvent } from '../../request-reload-structure-for-entity.event.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbMoveToRepository } from '@umbraco-cms/backoffice/repository';
 import type { MetaEntityActionMoveToKind } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadStructureForEntityEvent } from '../../request-reload-structure-for-entity.event.js';
 
 export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionMoveToKind> {
 	async execute() {
@@ -23,7 +23,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		);
 		if (!moveRepository) throw new Error('Move Repository is not available');
 
-		await moveRepository.requestMove({ unique: this.args.unique, destination: { unique: destinationUnique } });
+		await moveRepository.requestMoveTo({ unique: this.args.unique, destination: { unique: destinationUnique } });
 
 		this.#reloadMenu();
 	}

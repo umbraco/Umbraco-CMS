@@ -6,8 +6,8 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 export class UmbMoveDocumentRepository extends UmbRepositoryBase implements UmbMoveToRepository {
 	#moveSource = new UmbMoveDocumentServerDataSource(this);
 
-	async requestMove(args: UmbMoveToRequestArgs) {
-		const { error } = await this.#moveSource.move(args);
+	async requestMoveTo(args: UmbMoveToRequestArgs) {
+		const { error } = await this.#moveSource.moveTo(args);
 
 		if (!error) {
 			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
