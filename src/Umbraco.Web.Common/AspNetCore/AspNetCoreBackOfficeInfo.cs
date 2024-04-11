@@ -8,17 +8,16 @@ namespace Umbraco.Cms.Web.Common.AspNetCore;
 
 public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
 {
-    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
     private string? _getAbsoluteUrl;
 
-    public AspNetCoreBackOfficeInfo(
-        IOptionsMonitor<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnviroment)
-    {
-        _globalSettings = globalSettings;
-        _hostingEnvironment = hostingEnviroment;
-    }
+    public AspNetCoreBackOfficeInfo(IHostingEnvironment hostingEnviroment)
+        => _hostingEnvironment = hostingEnviroment;
+
+    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
+    public AspNetCoreBackOfficeInfo(IOptionsMonitor<GlobalSettings> globalSettings, IHostingEnvironment hostingEnviroment)
+        : this(hostingEnviroment)
+    { }
 
     public string GetAbsoluteUrl
     {

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 
@@ -42,7 +41,7 @@ public class BackOfficeLoginController : Controller
     {
         if (string.IsNullOrEmpty(model.UmbracoUrl))
         {
-            model.UmbracoUrl = _hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
+            model.UmbracoUrl = _hostingEnvironment.GetBackOfficePath();
         }
 
         if (string.IsNullOrEmpty(model.ReturnUrl))

@@ -1,9 +1,8 @@
-@using Umbraco.Cms.Core
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Routing
 @inject IHostingEnvironment HostingEnvironment
 @{
-    var backOfficePath = HostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
+    var backOfficePath = HostingEnvironment.GetBackOfficePath();
 }
 <!doctype html>
 <html class="no-js" lang="en">

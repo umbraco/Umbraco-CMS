@@ -17,14 +17,16 @@ internal sealed class ConfigureMiniProfilerOptions : IConfigureOptions<MiniProfi
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly string _backOfficePath;
 
-    public ConfigureMiniProfilerOptions(
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment)
+    public ConfigureMiniProfilerOptions(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IHostingEnvironment hostingEnvironment)
     {
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _backOfficePath = hostingEnvironment.ToAbsolute(Core.Constants.System.DefaultUmbracoPath);
+        _backOfficePath = hostingEnvironment.GetBackOfficePath();
     }
+
+    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
+    public ConfigureMiniProfilerOptions(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+        : this(backOfficeSecurityAccessor, hostingEnvironment)
+    { }
 
     public void Configure(MiniProfilerOptions options)
     {

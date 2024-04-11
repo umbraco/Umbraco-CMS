@@ -6,17 +6,15 @@ namespace Umbraco.Extensions;
 
 public static class GlobalSettingsExtensions
 {
-    private static string? _backOfficePath;
-
     /// <summary>
     ///     Returns the absolute path for the Umbraco back office
     /// </summary>
     /// <param name="globalSettings"></param>
     /// <param name="hostingEnvironment"></param>
     /// <returns></returns>
-    [Obsolete("The UmbracoPath setting is removed, manually resolve Constants.System.DefaultUmbracoPath to an absolute path instead. This method will be removed in a future version.")]
+    [Obsolete("The UmbracoPath setting is removed, use IHostingEnvironment.GetBackOfficePath() instead. This method will be removed in a future version.")]
     public static string GetBackOfficePath(this GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
-        => _backOfficePath ??= hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
+        => hostingEnvironment.GetBackOfficePath();
 
     /// <summary>
     ///     This returns the string of the MVC Area route.

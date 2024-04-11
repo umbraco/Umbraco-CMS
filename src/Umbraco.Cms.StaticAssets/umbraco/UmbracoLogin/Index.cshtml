@@ -2,7 +2,6 @@
 @using Microsoft.Extensions.Options;
 @using Umbraco.Cms.Api.Management.Extensions
 @using Umbraco.Cms.Api.Management.Security
-@using Umbraco.Cms.Core
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Logging
@@ -22,7 +21,7 @@
 @inject IJsonSerializer JsonSerializer
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
-    var backOfficePath = HostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
+    var backOfficePath = HostingEnvironment.GetBackOfficePath();
     var loginLogoImage = ContentSettings.Value.LoginLogoImage;
     var loginLogoImageAlternative = ContentSettings.Value.LoginLogoImageAlternative;
     var loginBackgroundImage = ContentSettings.Value.LoginBackgroundImage;

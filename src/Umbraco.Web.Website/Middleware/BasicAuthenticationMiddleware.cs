@@ -27,13 +27,21 @@ public class BasicAuthenticationMiddleware : IMiddleware
     public BasicAuthenticationMiddleware(
         IRuntimeState runtimeState,
         IBasicAuthService basicAuthService,
-        IOptionsMonitor<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment)
     {
         _runtimeState = runtimeState;
         _basicAuthService = basicAuthService;
-        _backOfficePath = hostingEnvironment.ToAbsolute(Core.Constants.System.DefaultUmbracoPath);
+        _backOfficePath = hostingEnvironment.GetBackOfficePath();
     }
+
+    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
+    public BasicAuthenticationMiddleware(
+        IRuntimeState runtimeState,
+        IBasicAuthService basicAuthService,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IHostingEnvironment hostingEnvironment)
+        : this(runtimeState, basicAuthService, hostingEnvironment)
+    { }
 
     /// <inheritdoc />
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)

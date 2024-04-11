@@ -12,14 +12,16 @@ public class UmbracoBackOfficePathGenerator : IBackOfficePathGenerator
     private string? _backofficeAssetsPath;
     private string? _backOfficeVirtualDirectory;
 
-    public UmbracoBackOfficePathGenerator(
-        IHostingEnvironment hostingEnvironment,
-        IUmbracoVersion umbracoVersion,
-        IOptions<GlobalSettings> globalSettings)
+    public UmbracoBackOfficePathGenerator(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion)
     {
-        BackOfficePath = hostingEnvironment.ToAbsolute(Core.Constants.System.DefaultUmbracoPath);
+        BackOfficePath = hostingEnvironment.GetBackOfficePath();
         BackOfficeCacheBustHash = UrlHelperExtensions.GetCacheBustHash(hostingEnvironment, umbracoVersion);
     }
+
+    [Obsolete("The globalSettings parameter is not required anymore, use the other constructor instead. This constructor will be removed in a future version.")]
+    public UmbracoBackOfficePathGenerator(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion, IOptions<GlobalSettings> globalSettings)
+        : this(hostingEnvironment, umbracoVersion)
+    { }
 
     /// <inheritdoc />
     public string BackOfficePath { get; }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -140,7 +141,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
                     markupToInject =
                         string.Format(
                             ContentSettings.PreviewBadge,
-                            HostingEnvironment.ToAbsolute(Core.Constants.System.DefaultUmbracoPath),
+                            HostingEnvironment.GetBackOfficePath(),
                             Context.Request.GetEncodedUrl(),
                             UmbracoContext.PublishedRequest?.PublishedContent?.Id);
                 }

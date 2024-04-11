@@ -7,7 +7,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -44,10 +44,10 @@ public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
     }
 
     protected virtual string SwaggerRouteTemplate(IApplicationBuilder applicationBuilder)
-        => $"{GetUmbracoPath(applicationBuilder).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger/{{documentName}}/swagger.json";
+        => $"{GetBackOfficePath(applicationBuilder).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger/{{documentName}}/swagger.json";
 
     protected virtual string SwaggerUiRoutePrefix(IApplicationBuilder applicationBuilder)
-        => $"{GetUmbracoPath(applicationBuilder).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger";
+        => $"{GetBackOfficePath(applicationBuilder).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger";
 
     protected virtual void SwaggerUiConfiguration(
         SwaggerUIOptions swaggerUiOptions,
@@ -66,10 +66,6 @@ public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
         swaggerUiOptions.OAuthUsePkce();
     }
 
-    private string GetUmbracoPath(IApplicationBuilder applicationBuilder)
-    {
-        IHostingEnvironment hostingEnvironment = applicationBuilder.ApplicationServices.GetRequiredService<IHostingEnvironment>();
-
-        return hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
-    }
+    private string GetBackOfficePath(IApplicationBuilder applicationBuilder)
+        => applicationBuilder.ApplicationServices.GetRequiredService<IHostingEnvironment>().GetBackOfficePath();
 }

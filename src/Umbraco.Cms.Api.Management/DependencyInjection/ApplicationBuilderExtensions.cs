@@ -6,9 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
@@ -20,8 +19,7 @@ internal static class ApplicationBuilderExtensions
         => applicationBuilder.UseWhen(
             httpContext =>
             {
-                IHostingEnvironment hostingEnvironment = httpContext.RequestServices.GetRequiredService<IHostingEnvironment>();
-                var backOfficePath = hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
+                var backOfficePath = httpContext.RequestServices.GetRequiredService<IHostingEnvironment>().GetBackOfficePath();
 
                 // Only use the API exception handler when we are requesting an API
                 return httpContext.Request.Path.Value?.StartsWith($"{backOfficePath}{Constants.Web.ManagementApiPath}") ?? false;
@@ -54,8 +52,7 @@ internal static class ApplicationBuilderExtensions
 
         applicationBuilder.UseEndpoints(endpoints =>
         {
-            IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
-            var backOfficePath = hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
+            var backOfficePath = provider.GetRequiredService<IHostingEnvironment>().GetBackOfficePath();
 
             // Maps attribute routed controllers.
             endpoints.MapControllers();

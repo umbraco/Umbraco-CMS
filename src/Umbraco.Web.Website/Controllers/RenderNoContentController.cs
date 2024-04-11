@@ -50,7 +50,7 @@ public class RenderNoContentController : Controller
             return Redirect("~/");
         }
 
-        var model = new NoNodesViewModel { UmbracoPath = _hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath) };
+        var model = new NoNodesViewModel { UmbracoPath = _hostingEnvironment.GetBackOfficePath() };
 
         return View(_globalSettings.NoNodesViewPath, model);
     }
