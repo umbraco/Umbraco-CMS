@@ -62,11 +62,8 @@ export class UmbSearchModalElement extends LitElement {
 		this.#updateSearchResults();
 	}
 
-	#onClearSearch() {
-		this._search = '';
-		this._input.value = '';
-		this._input.focus();
-		this.#updateSearchResults();
+	#onSearchTagClick(tag: string) {
+		this._activeSearchTag = tag;
 	}
 
 	#updateSearchResults() {
@@ -91,9 +88,6 @@ export class UmbSearchModalElement extends LitElement {
 					type="text"
 					placeholder="Search..."
 					autocomplete="off" />
-				<!-- <div id="close-icon">
-					<button @click=${this.#onClearSearch}>clear</button>
-				</div> -->
 			</div>
 
 			${this.#renderSearchTags()}
@@ -108,8 +102,13 @@ export class UmbSearchModalElement extends LitElement {
 			${repeat(
 				this.searchTags,
 				(searchTag) => searchTag,
-				(provider) =>
-					html`<div class="search-tag ${this._activeSearchTag === provider ? 'active' : ''}">${provider}</div>`,
+				(searchTag) =>
+					html`<button
+						@click=${() => this.#onSearchTagClick(searchTag)}
+						@keydown=${() => ''}
+						class="search-tag ${this._activeSearchTag === searchTag ? 'active' : ''}">
+						${searchTag}
+					</button>`,
 			)}
 		</div> `;
 	}
@@ -213,6 +212,7 @@ export class UmbSearchModalElement extends LitElement {
 				border-radius: var(--uui-border-radius);
 				color: var(--uui-color-interactive);
 				cursor: pointer;
+				border: 2px solid transparent;
 			}
 			.search-tag:hover {
 				background: var(--uui-color-surface-emphasis);
@@ -221,6 +221,7 @@ export class UmbSearchModalElement extends LitElement {
 			.search-tag.active {
 				background: var(--uui-color-surface-emphasis);
 				color: var(--uui-color-interactive-emphasis);
+				border-color: var(--uui-color-focus);
 			}
 			:host {
 				display: flex;
@@ -238,31 +239,17 @@ export class UmbSearchModalElement extends LitElement {
 				height: 100%;
 				width: 100%;
 			}
-			#search-icon,
-			#close-icon {
+			button {
+				font-family: unset;
+				font-size: unset;
+				cursor: pointer;
+			}
+			#search-icon {
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				aspect-ratio: 1;
 				height: 100%;
-			}
-			#close-icon {
-				padding: 0 var(--uui-size-space-4);
-			}
-			#close-icon > button {
-				background: var(--uui-color-surface-alt);
-				border: 1px solid var(--uui-color-border);
-				padding: 3px 6px 4px 6px;
-				line-height: 1;
-				border-radius: 3px;
-				color: var(--uui-color-text-alt);
-				font-weight: 800;
-				font-size: 12px;
-				cursor: pointer;
-			}
-			#close-icon > button:hover {
-				border-color: var(--uui-color-focus);
-				color: var(--uui-color-focus);
 			}
 			#top {
 				background-color: var(--uui-color-surface);
@@ -272,7 +259,6 @@ export class UmbSearchModalElement extends LitElement {
 			#main {
 				display: flex;
 				flex-direction: column;
-				/* padding: 0px var(--uui-size-space-6) var(--uui-size-space-5) var(--uui-size-space-6); */
 				height: 100%;
 			}
 			.item {
