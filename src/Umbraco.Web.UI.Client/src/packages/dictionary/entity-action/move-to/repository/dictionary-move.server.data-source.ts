@@ -6,15 +6,15 @@ import type { UmbMoveToDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/bac
 /**
  * Move Dictionary Server Data Source
  * @export
- * @class UmbDictionaryMoveServerDataSource
+ * @class UmbMoveDictionaryServerDataSource
  */
-export class UmbDictionaryMoveServerDataSource implements UmbMoveToDataSource {
+export class UmbMoveDictionaryServerDataSource implements UmbMoveToDataSource {
 	#host: UmbControllerHost;
 
 	/**
-	 * Creates an instance of UmbDictionaryMoveServerDataSource.
+	 * Creates an instance of UmbMoveDictionaryServerDataSource.
 	 * @param {UmbControllerHost} host
-	 * @memberof UmbDictionaryMoveServerDataSource
+	 * @memberof UmbMoveDictionaryServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -25,7 +25,7 @@ export class UmbDictionaryMoveServerDataSource implements UmbMoveToDataSource {
 	 * @param {string} unique
 	 * @param {(string | null)} targetUnique
 	 * @return {*}
-	 * @memberof UmbDictionaryMoveServerDataSource
+	 * @memberof UmbMoveDictionaryServerDataSource
 	 */
 	async move(args: UmbMoveToRequestArgs) {
 		if (!args.unique) throw new Error('Unique is missing');

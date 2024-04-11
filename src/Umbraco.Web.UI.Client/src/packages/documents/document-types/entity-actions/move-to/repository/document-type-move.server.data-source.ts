@@ -6,15 +6,15 @@ import type { UmbMoveToDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/bac
 /**
  * Move DocumentType Server Data Source
  * @export
- * @class UmbDocumentTypeMoveServerDataSource
+ * @class UmbMoveDocumentTypeServerDataSource
  */
-export class UmbDocumentTypeMoveServerDataSource implements UmbMoveToDataSource {
+export class UmbMoveDocumentTypeServerDataSource implements UmbMoveToDataSource {
 	#host: UmbControllerHost;
 
 	/**
-	 * Creates an instance of UmbDocumentTypeMoveServerDataSource.
+	 * Creates an instance of UmbMoveDocumentTypeServerDataSource.
 	 * @param {UmbControllerHost} host
-	 * @memberof UmbDocumentTypeMoveServerDataSource
+	 * @memberof UmbMoveDocumentTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -25,7 +25,7 @@ export class UmbDocumentTypeMoveServerDataSource implements UmbMoveToDataSource 
 	 * @param {string} unique
 	 * @param {(string | null)} targetUnique
 	 * @return {*}
-	 * @memberof UmbDocumentTypeMoveServerDataSource
+	 * @memberof UmbMoveDocumentTypeServerDataSource
 	 */
 	async move(args: UmbMoveToRequestArgs) {
 		if (!args.unique) throw new Error('Unique is missing');

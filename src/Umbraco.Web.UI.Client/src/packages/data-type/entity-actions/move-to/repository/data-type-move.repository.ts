@@ -1,10 +1,10 @@
-import { UmbDataTypeMoveServerDataSource } from './data-type-move.server.data-source.js';
+import { UmbMoveDataTypeServerDataSource } from './data-type-move.server.data-source.js';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbMoveToRepository, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/repository';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 export class UmbMoveDataTypeRepository extends UmbRepositoryBase implements UmbMoveToRepository {
-	#moveSource = new UmbDataTypeMoveServerDataSource(this);
+	#moveSource = new UmbMoveDataTypeServerDataSource(this);
 
 	async requestMove(args: UmbMoveToRequestArgs) {
 		const { error } = await this.#moveSource.move(args);
