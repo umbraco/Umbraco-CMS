@@ -834,6 +834,7 @@ export default {
 		submit: 'Indsend',
 		type: 'Type',
 		typeToSearch: 'Skriv for at søge...',
+		unknownUser: 'Ukendt bruger',
 		under: 'under',
 		up: 'Op',
 		update: 'Opdatér',
@@ -1012,6 +1013,18 @@ export default {
 	lockout: {
 		lockoutWillOccur: 'Du har været inaktiv, og du vil blive logget ud om',
 		renewSession: 'Forny for at gemme dine ændringer',
+	},
+	login: {
+		greeting0: 'Velkommen',
+		greeting1: 'Velkommen',
+		greeting2: 'Velkommen',
+		greeting3: 'Velkommen',
+		greeting4: 'Velkommen',
+		greeting5: 'Velkommen',
+		greeting6: 'Velkommen',
+		instruction: 'Log ind på Umbraco',
+		signInWith: 'Log ind med {0}',
+		timeout: 'Du er blevet logget ud på grund af inaktivitet, vil du logge ind igen?',
 	},
 	main: {
 		dashboard: 'Skrivebord',

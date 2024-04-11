@@ -1,4 +1,6 @@
-export default `<svg
+export default `<!-- @license lucide-static v0.367.0 - ISC -->
+<svg
+  class="lucide lucide-message-circle"
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
   fill="none"
@@ -7,6 +9,6 @@ export default `<svg
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
+  <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
 </svg>
 `;

@@ -1,6 +1,6 @@
 export * from './conditions/index.js';
-export * from './interfaces/index.js';
-export * from './models/index.js';
+export type * from './interfaces/index.js';
+export type * from './models/index.js';
 export * from './registry.js';
 export * from './utils/index.js';
 

@@ -1,4 +1,4 @@
-import { ObjectTypesResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { ObjectTypesService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -14,7 +14,7 @@ export class UmbObjectTypeRepository extends UmbControllerBase implements UmbApi
 	}
 
 	async #read() {
-		return tryExecuteAndNotify(this.#host, ObjectTypesResource.getObjectTypes({}));
+		return tryExecuteAndNotify(this.#host, ObjectTypesService.getObjectTypes({}));
 	}
 
 	async read() {

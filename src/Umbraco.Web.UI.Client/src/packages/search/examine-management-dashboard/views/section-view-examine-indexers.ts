@@ -2,7 +2,7 @@ import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { IndexResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { HealthStatusModel, IndexerResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthStatusModel, IndexerService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -31,7 +31,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	private async _getIndexData() {
 		const { data } = await tryExecuteAndNotify(
 			this,
-			IndexerResource.getIndexerByIndexName({ indexName: this.indexName }),
+			IndexerService.getIndexerByIndexName({ indexName: this.indexName }),
 		);
 		this._indexData = data;
 
@@ -62,7 +62,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		this._buttonState = 'waiting';
 		const { error } = await tryExecuteAndNotify(
 			this,
-			IndexerResource.postIndexerByIndexNameRebuild({ indexName: this.indexName }),
+			IndexerService.postIndexerByIndexNameRebuild({ indexName: this.indexName }),
 		);
 		if (error) {
 			this._buttonState = 'failed';
@@ -123,7 +123,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 								<uui-table-cell style="width:0; font-weight: bold;"> ${entry[0]} </uui-table-cell>
 								<uui-table-cell clip-text> ${entry[1]} </uui-table-cell>
 							</uui-table-row>`;
-					  })
+						})
 					: ''}
 			</uui-table>
 		</uui-box>`;

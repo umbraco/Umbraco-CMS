@@ -2,7 +2,7 @@ import type { UmbDashboardHealthCheckGroupElement } from './views/health-check-g
 import { UmbHealthCheckDashboardContext, UMB_HEALTHCHECK_DASHBOARD_CONTEXT } from './health-check-dashboard.context.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { HealthCheckGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthCheckService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extension-registry';
@@ -43,7 +43,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 	}
 
 	#registerHealthChecks = async () => {
-		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.getHealthCheckGroup({ skip: 0, take: 9999 }));
+		const { data } = await tryExecuteAndNotify(this, HealthCheckService.getHealthCheckGroup({ skip: 0, take: 9999 }));
 		if (!data) return;
 		const manifests = this.#createManifests(data.items);
 		this.#register(manifests);

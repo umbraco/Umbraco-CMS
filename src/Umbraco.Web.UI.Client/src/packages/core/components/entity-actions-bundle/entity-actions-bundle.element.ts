@@ -1,3 +1,4 @@
+import { UmbEntityContext } from '../../entity/entity.context.js';
 import type { UmbEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -6,7 +7,7 @@ import { UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestEntityActionDefaultKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-entity-actions-bundle')
 export class UmbEntityActionsBundleElement extends UmbLitElement {
@@ -30,6 +31,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	#sectionSidebarContext?: UmbSectionSidebarContext;
 
+	#entityContext = new UmbEntityContext(this);
+
 	constructor() {
 		super();
 
@@ -40,24 +43,33 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('entityType') && _changedProperties.has('unique')) {
+			this.#entityContext.setEntityType(this.entityType);
+			this.#entityContext.setUnique(this.unique);
 			this.#observeEntityActions();
 		}
 	}
 
 	#observeEntityActions() {
-		this.observe(
-			umbExtensionsRegistry.byTypeAndFilter('entityAction', (ext) => ext.forEntityTypes.includes(this.entityType!)),
+		new UmbExtensionsManifestInitializer(
+			this,
+			umbExtensionsRegistry,
+			'entityAction',
+			(ext) => ext.forEntityTypes.includes(this.entityType!),
 			async (actions) => {
 				this._numberOfActions = actions.length;
 				this._firstActionManifest =
-					this._numberOfActions > 0 ? (actions[0] as ManifestEntityActionDefaultKind) : undefined;
-				if (!this._firstActionManifest) return;
-				this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
-					{ unique: this.unique, entityType: this.entityType, meta: this._firstActionManifest.meta },
-				]);
+					this._numberOfActions > 0 ? (actions[0].manifest as ManifestEntityActionDefaultKind) : undefined;
+				this.#createFirstActionApi();
 			},
 			'umbEntityActionsObserver',
 		);
+	}
+
+	async #createFirstActionApi() {
+		if (!this._firstActionManifest) return;
+		this._firstActionApi = await createExtensionApi(this, this._firstActionManifest, [
+			{ unique: this.unique, entityType: this.entityType, meta: this._firstActionManifest.meta },
+		]);
 	}
 
 	#openContextMenu() {
@@ -73,7 +85,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	render() {
 		if (this._numberOfActions === 0) return nothing;
-		return html`<uui-action-bar slot="actions"> ${this.#renderFirstAction()} ${this.#renderMore()} </uui-action-bar>`;
+		return html`<uui-action-bar slot="actions">${this.#renderMore()} ${this.#renderFirstAction()} </uui-action-bar>`;
 	}
 
 	#renderMore() {

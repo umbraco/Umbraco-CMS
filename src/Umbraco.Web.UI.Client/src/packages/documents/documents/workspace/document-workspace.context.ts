@@ -166,8 +166,6 @@ export class UmbDocumentWorkspaceContext
 				component: () => import('./document-workspace-editor.element.js'),
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
-					this.#entityContext.setEntityType(UMB_DOCUMENT_ENTITY_TYPE);
-					this.#entityContext.setUnique(unique);
 					this.load(unique);
 				},
 			},
@@ -193,6 +191,8 @@ export class UmbDocumentWorkspaceContext
 		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 
 		if (data) {
+			this.#entityContext.setEntityType(UMB_DOCUMENT_ENTITY_TYPE);
+			this.#entityContext.setUnique(unique);
 			this.setIsNew(false);
 			this.#persistedData.setValue(data);
 			this.#currentData.setValue(data);
@@ -220,6 +220,8 @@ export class UmbDocumentWorkspaceContext
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
+		this.#entityContext.setEntityType(UMB_DOCUMENT_ENTITY_TYPE);
+		this.#entityContext.setUnique(data.unique);
 		this.setIsNew(true);
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(data);

@@ -1,9 +1,8 @@
+import { umbExtensionsRegistry, type ManifestPropertyEditorUi } from '../../extension-registry/index.js';
 import { UmbPropertyContext } from './property.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
@@ -224,12 +223,12 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	private _renderPropertyActionMenu() {
-		return html`${this._propertyEditorUiAlias
+		return this._propertyEditorUiAlias
 			? html`<umb-property-action-menu
 					slot="action-menu"
 					id="action-menu"
 					.propertyEditorUiAlias=${this._propertyEditorUiAlias}></umb-property-action-menu>`
-			: ''}`;
+			: nothing;
 	}
 
 	static styles = [

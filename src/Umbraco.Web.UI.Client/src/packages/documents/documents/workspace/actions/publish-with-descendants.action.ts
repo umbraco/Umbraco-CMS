@@ -7,3 +7,5 @@ export class UmbDocumentPublishWithDescendantsWorkspaceAction extends UmbWorkspa
 		return workspaceContext.publishWithDescendants();
 	}
 }
+
+export { UmbDocumentPublishWithDescendantsWorkspaceAction as api };

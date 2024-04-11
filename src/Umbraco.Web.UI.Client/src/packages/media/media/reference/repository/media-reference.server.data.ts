@@ -1,5 +1,5 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { MediaResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -26,6 +26,6 @@ export class UmbMediaReferenceServerDataSource {
 	 * @memberof UmbMediaReferenceServerDataSource
 	 */
 	async getReferencedBy(id: string, skip = 0, take = 20) {
-		return await tryExecuteAndNotify(this.#host, MediaResource.getMediaByIdReferencedBy({ id, skip, take }));
+		return await tryExecuteAndNotify(this.#host, MediaService.getMediaByIdReferencedBy({ id, skip, take }));
 	}
 }

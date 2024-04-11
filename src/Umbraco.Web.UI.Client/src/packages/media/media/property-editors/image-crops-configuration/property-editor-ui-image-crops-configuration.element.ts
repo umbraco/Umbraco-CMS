@@ -106,7 +106,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		return html`
 			<uui-form>
 				<form @submit=${this.#onSubmit}>
-				<div class="input">
+					<div class="input">
 						<uui-label for="label">Label</uui-label>
 						<uui-input label="Label" id="label" name="label" type="text" autocomplete="false" value=""></uui-input>
 					</div>
@@ -139,8 +139,14 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 							<span><strong>${item.label}</strong> <em>(${item.alias})</em></span>
 							<span class="crop-size">(${item.width} x ${item.height}px)</span>
 							<div class="crop-actions">
-								<uui-button label="Edit" @click=${() => this.#onEdit(item)}>Edit</uui-button>
-								<uui-button label="Remove" color="danger" @click=${() => this.#onRemove(item.alias)}>Remove</uui-button>
+								<uui-button
+									label=${this.localize.term('general_edit')}
+									color="default"
+									@click=${() => this.#onEdit(item)}></uui-button>
+								<uui-button
+									label=${this.localize.term('general_remove')}
+									color="danger"
+									@click=${() => this.#onRemove(item.alias)}></uui-button>
 							</div>
 						</div>
 					`,

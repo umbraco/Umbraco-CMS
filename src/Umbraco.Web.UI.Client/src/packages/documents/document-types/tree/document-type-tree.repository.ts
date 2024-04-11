@@ -18,7 +18,7 @@ export class UmbDocumentTypeTreeRepository
 		const data: UmbDocumentTypeTreeRootModel = {
 			unique: null,
 			entityType: UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
-			name: 'Document Types',
+			name: '#treeHeaders_documentTypes',
 			hasChildren: true,
 			isFolder: true,
 		};

@@ -2,7 +2,7 @@ import type { ConditionTypes } from '../conditions/types.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
 /**
  * An action to perform on an entity
@@ -63,8 +63,33 @@ export interface ManifestEntityActionTrashKind extends ManifestEntityAction<Meta
 }
 
 export interface MetaEntityActionTrashKind extends MetaEntityActionDefaultKind {
-	trashRepositoryAlias: string;
+	recycleBinRepositoryAlias: string;
 	itemRepositoryAlias: string;
+}
+
+// RESTORE FROM RECYCLE BIN
+
+export interface ManifestEntityActionRestoreFromRecycleBinKind
+	extends ManifestEntityAction<MetaEntityActionRestoreFromRecycleBinKind> {
+	type: 'entityAction';
+	kind: 'restoreFromRecycleBin';
+}
+
+export interface MetaEntityActionRestoreFromRecycleBinKind extends MetaEntityActionDefaultKind {
+	recycleBinRepositoryAlias: string;
+	itemRepositoryAlias: string;
+	pickerModal: UmbModalToken<UmbPickerModalData<any>, UmbPickerModalValue> | string;
+}
+
+// EMPTY RECYCLE BIN
+export interface ManifestEntityActionEmptyRecycleBinKind
+	extends ManifestEntityAction<MetaEntityActionEmptyRecycleBinKind> {
+	type: 'entityAction';
+	kind: 'emptyRecycleBin';
+}
+
+export interface MetaEntityActionEmptyRecycleBinKind extends MetaEntityActionDefaultKind {
+	recycleBinRepositoryAlias: string;
 }
 
 // RENAME

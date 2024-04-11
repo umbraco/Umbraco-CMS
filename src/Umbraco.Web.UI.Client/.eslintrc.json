@@ -1,5 +1,5 @@
 {
-	"ignorePatterns": ["vite.*.ts"],
+	"ignorePatterns": ["vite.*.ts", "src/external/**/*.ts"],
 	"root": true,
 	"plugins": ["import", "eslint-plugin-local-rules"],
 	"parserOptions": {

@@ -9,7 +9,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./block-list-type-workspace-view.element.js'),
 		weight: 1000,
 		meta: {
-			label: 'Settings',
+			label: '#blockEditor_tabBlockSettings',
 			pathname: 'settings',
 			icon: 'icon-settings',
 		},

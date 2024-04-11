@@ -1,6 +1,6 @@
 import type { UmbWorkspaceAction } from '../workspace-action.interface.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
@@ -117,7 +117,9 @@ export class UmbWorkspaceActionElement<
 					@click=${this._onClick}
 					look=${this.#manifest?.meta.look || 'default'}
 					color=${this.#manifest?.meta.color || 'default'}
-					label=${this.#manifest?.meta.label || ''}
+					label=${ifDefined(
+						this.#manifest?.meta.label ? this.localize.string(this.#manifest.meta.label) : this.#manifest?.name,
+					)}
 					.disabled=${this._isDisabled}
 					.state=${this._buttonState}></uui-button>
 				<umb-workspace-action-menu

@@ -12,7 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -205,7 +205,7 @@ export class UmbPartialViewWorkspaceContext
 	#getSnippet(snippetId: string) {
 		return tryExecuteAndNotify(
 			this,
-			PartialViewResource.getPartialViewSnippetById({
+			PartialViewService.getPartialViewSnippetById({
 				id: snippetId,
 			}),
 		);

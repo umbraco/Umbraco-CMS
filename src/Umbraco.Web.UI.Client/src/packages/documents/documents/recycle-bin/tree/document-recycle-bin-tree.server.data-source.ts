@@ -1,6 +1,7 @@
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDocumentRecycleBinTreeItemModel } from './types.js';
 import type { DocumentRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -36,14 +37,14 @@ export class UmbDocumentRecycleBinTreeServerDataSource extends UmbTreeServerData
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentResource.getRecycleBinDocumentRoot({ skip: args.skip, take: args.take });
+	DocumentService.getRecycleBinDocumentRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parentUnique === null) {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentResource.getRecycleBinDocumentChildren({
+		return DocumentService.getRecycleBinDocumentChildren({
 			parentId: args.parentUnique,
 			skip: args.skip,
 			take: args.take,
@@ -53,7 +54,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentResource.getTreeDocumentAncestors({
+	DocumentService.getTreeDocumentAncestors({
 		descendantId: args.descendantUnique,
 	});
 
@@ -61,9 +62,25 @@ const mapper = (item: DocumentRecycleBinItemResponseModel): UmbDocumentRecycleBi
 	return {
 		unique: item.id,
 		parentUnique: item.parent ? item.parent.id : null,
-		entityType: 'document-recycle-bin',
+		entityType: UMB_DOCUMENT_ENTITY_TYPE,
+		noAccess: false,
+		isTrashed: true,
 		hasChildren: item.hasChildren,
-		isFolder: false,
+		isProtected: false,
+		documentType: {
+			unique: item.documentType.id,
+			icon: item.documentType.icon,
+			collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
+		},
+		variants: item.variants.map((variant) => {
+			return {
+				name: variant.name,
+				culture: variant.culture || null,
+				segment: null, // TODO: add segment to the backend API?
+				state: variant.state,
+			};
+		}),
 		name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
+		isFolder: false,
 	};
 };

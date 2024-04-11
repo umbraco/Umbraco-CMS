@@ -1,6 +1,8 @@
+import type { ManifestAuthProvider } from './auth-provider.model.js';
 import type { ManifestBlockEditorCustomView } from './block-editor-custom-view.model.js';
 import type { ManifestCollection } from './collection.models.js';
 import type { ManifestCollectionView } from './collection-view.model.js';
+import type { ManifestCurrentUserAction, ManifestCurrentUserActionDefaultKind } from './current-user-action.model.js';
 import type { ManifestDashboard } from './dashboard.model.js';
 import type { ManifestDashboardCollection } from './dashboard-collection.model.js';
 import type {
@@ -15,6 +17,8 @@ import type {
 	ManifestEntityActionDeleteFolderKind,
 	ManifestEntityActionDefaultKind,
 	ManifestEntityActionTrashKind,
+	ManifestEntityActionRestoreFromRecycleBinKind,
+	ManifestEntityActionEmptyRecycleBinKind,
 	ManifestEntityActionSortChildrenOfKind,
 } from './entity-action.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
@@ -64,10 +68,12 @@ import type {
 	ManifestEntryPoint,
 } from '@umbraco-cms/backoffice/extension-api';
 
+export type * from './auth-provider.model.js';
 export type * from './block-editor-custom-view.model.js';
 export type * from './collection.models.js';
 export type * from './collection-action.model.js';
 export type * from './collection-view.model.js';
+export type * from './current-user-action.model.js';
 export type * from './dashboard-collection.model.js';
 export type * from './dashboard.model.js';
 export type * from './dynamic-root.model.js';
@@ -111,9 +117,11 @@ export type ManifestEntityActions =
 	| ManifestEntityActionDeleteFolderKind
 	| ManifestEntityActionDeleteKind
 	| ManifestEntityActionDuplicateKind
+	| ManifestEntityActionEmptyRecycleBinKind
 	| ManifestEntityActionMoveKind
 	| ManifestEntityActionReloadTreeItemChildrenKind
 	| ManifestEntityActionRenameServerFileKind
+	| ManifestEntityActionRestoreFromRecycleBinKind
 	| ManifestEntityActionSortChildrenOfKind
 	| ManifestEntityActionTrashKind
 	| ManifestEntityActionUpdateFolderKind;
@@ -131,12 +139,15 @@ export type ManifestWorkspaces = ManifestWorkspace | ManifestWorkspaceRoutableKi
 export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceViewContentTypeDesignEditorKind;
 
 export type ManifestTypes =
+	| ManifestAuthProvider
 	| ManifestBundle<ManifestTypes>
-	| ManifestCondition
 	| ManifestBlockEditorCustomView
 	| ManifestCollection
 	| ManifestCollectionView
 	| ManifestCollectionAction
+	| ManifestCurrentUserAction
+	| ManifestCurrentUserActionDefaultKind
+	| ManifestCondition
 	| ManifestDashboard
 	| ManifestDashboardCollection
 	| ManifestDynamicRootOrigin
