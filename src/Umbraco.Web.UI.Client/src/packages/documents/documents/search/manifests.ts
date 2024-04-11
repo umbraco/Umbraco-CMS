@@ -11,4 +11,13 @@ export const manifests: Array<ManifestTypes> = [
 			label: 'Documents',
 		},
 	},
+	{
+		name: 'Document Search Result Item ',
+		alias: 'Umb.SearchResultItem.Document',
+		type: 'searchResultItem',
+		element: () => import('./document-search-result-item.element.js'),
+		meta: {
+			label: 'Documents',
+		},
+	},
 ];

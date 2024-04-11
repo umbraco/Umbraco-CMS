@@ -11,7 +11,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { ManifestSearchProvider, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 export type SearchItem = {
 	name: string;
@@ -50,6 +50,15 @@ export class UmbSearchModalElement extends UmbLitElement {
 	@state()
 	private _activeSearchTag = 'Document';
 
+	@state()
+	private _searchProviders: Array<{
+		name: string;
+		providerPromise: any;
+		alias: string;
+	}> = [];
+
+	#currentProvider: any;
+
 	/**
 	 *
 	 */
@@ -60,8 +69,12 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	#observeViews() {
-		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'searchProvider', null, (providers) => {
-			this.searchTags = providers.map((provider) => provider.manifest.meta?.label || provider.manifest.name);
+		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'searchProvider', null, (providers) => {
+			this._searchProviders = providers.map((provider) => ({
+				name: provider.manifest.meta?.label || provider.manifest.name,
+				providerPromise: createExtensionApi(this, provider.manifest),
+				alias: provider.alias,
+			}));
 		});
 	}
 
@@ -80,15 +93,24 @@ export class UmbSearchModalElement extends UmbLitElement {
 		this.#updateSearchResults();
 	}
 
-	#onSearchTagClick(tag: string) {
-		this._activeSearchTag = tag;
+	async #onSearchTagClick(searchProvider: any) {
+		console.log(searchProvider);
+		const api = await searchProvider.providerPromise;
+
+		this.#currentProvider = api;
+		this._activeSearchTag = searchProvider.alias;
 	}
 
 	#updateSearchResults() {
 		if (this._search) {
-			this._searchResults = this.#mockApi.getDocuments.filter((item) =>
-				item.name.toLowerCase().includes(this._search.toLowerCase()),
-			);
+			const { data, error } = this.#currentProvider.search({
+				query: this._search,
+			});
+
+			console.log(data, error);
+			// this._searchResults = this.#mockApi.getDocuments.filter((item) =>
+			// 	item.name.toLowerCase().includes(this._search.toLowerCase()),
+			// );
 		} else {
 			this._searchResults = [];
 		}
@@ -118,14 +140,14 @@ export class UmbSearchModalElement extends UmbLitElement {
 	#renderSearchTags() {
 		return html`<div id="search-tags">
 			${repeat(
-				this.searchTags,
-				(searchTag) => searchTag,
-				(searchTag) =>
+				this._searchProviders,
+				(searchProvider) => searchProvider,
+				(searchProvider) =>
 					html`<button
-						@click=${() => this.#onSearchTagClick(searchTag)}
+						@click=${() => this.#onSearchTagClick(searchProvider)}
 						@keydown=${() => ''}
-						class="search-tag ${this._activeSearchTag === searchTag ? 'active' : ''}">
-						${searchTag}
+						class="search-tag ${this._activeSearchTag === searchProvider.alias ? 'active' : ''}">
+						${searchProvider.name}
 					</button>`,
 			)}
 		</div> `;
