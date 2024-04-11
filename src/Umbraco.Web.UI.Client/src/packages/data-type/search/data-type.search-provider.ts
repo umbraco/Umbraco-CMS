@@ -1,8 +1,14 @@
 import type { UmbSearchProvider, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbDataTypeItemModel } from '../index.js';
 import { UmbDataTypeSearchRepository } from './data-type-search.repository.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbDataTypeSearchProvider extends UmbControllerBase implements UmbSearchProvider {
+export interface UmbDataTypeSearchItemModel extends UmbDataTypeItemModel {}
+
+export class UmbDataTypeSearchProvider
+	extends UmbControllerBase
+	implements UmbSearchProvider<UmbDataTypeSearchItemModel>
+{
 	#repository = new UmbDataTypeSearchRepository(this);
 
 	async search(args: UmbSearchRequestArgs) {
@@ -10,7 +16,7 @@ export class UmbDataTypeSearchProvider extends UmbControllerBase implements UmbS
 	}
 
 	destroy(): void {
-		throw new Error('Method not implemented.');
+		this.#repository.destroy();
 	}
 }
 

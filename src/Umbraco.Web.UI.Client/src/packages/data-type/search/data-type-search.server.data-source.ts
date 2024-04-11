@@ -1,5 +1,6 @@
-import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
+import type { UmbDataTypeSearchItemModel } from './data-type.search-provider.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -10,7 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDataTypeSearchServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDataTypeSearchServerDataSource {
+export class UmbDataTypeSearchServerDataSource implements UmbSearchDataSource<UmbDataTypeSearchItemModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -36,7 +37,7 @@ export class UmbDataTypeSearchServerDataSource {
 		);
 
 		if (data) {
-			const mappedItems = data.items.map((item) => {
+			const mappedItems: Array<UmbDataTypeSearchItemModel> = data.items.map((item) => {
 				return {
 					entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 					unique: item.id,

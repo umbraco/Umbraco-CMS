@@ -1,10 +1,10 @@
-import type { UmbSearchProvider } from '@umbraco-cms/backoffice/search';
+import type { UmbSearchProvider, UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * Represents an search provider that can be used to search.
  */
-export interface ManifestSearchProvider extends ManifestApi<UmbSearchProvider> {
+export interface ManifestSearchProvider extends ManifestApi<UmbSearchProvider<UmbSearchResultItemModel>> {
 	type: 'searchProvider';
 
 	meta?: MetaSearchProvider;

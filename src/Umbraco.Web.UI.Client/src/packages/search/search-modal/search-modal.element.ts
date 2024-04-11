@@ -10,7 +10,7 @@ import '../search-result/search-result-item.element.js';
 
 type SearchProvider = {
 	name: string;
-	api: UmbSearchProvider;
+	api: UmbSearchProvider<UmbSearchResultItemModel>;
 	alias: string;
 };
 
@@ -39,10 +39,10 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 	#observeViews() {
 		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'searchProvider', null, async (providers) => {
-			const searchProviders: SearchProvider[] = [];
+			const searchProviders: Array<SearchProvider> = [];
 
 			for (const provider of providers) {
-				const api = await createExtensionApi<UmbSearchProvider>(this, provider.manifest);
+				const api = await createExtensionApi<UmbSearchProvider<UmbSearchResultItemModel>>(this, provider.manifest);
 				if (api) {
 					searchProviders.push({
 						name: provider.manifest.meta?.label || provider.manifest.name,
@@ -79,7 +79,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		this.#updateSearchResults();
 	}
 
-	async #setCurrentProvider(searchProvider: SearchProvider) {
+	#setCurrentProvider(searchProvider: SearchProvider) {
 		this._currentProvider = searchProvider;
 
 		this.#focusInput();
