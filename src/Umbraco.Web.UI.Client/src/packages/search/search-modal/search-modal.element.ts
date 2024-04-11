@@ -1,23 +1,14 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	css,
-	html,
-	LitElement,
-	nothing,
-	repeat,
-	customElement,
-	query,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
-import { ManifestSearchProvider, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { css, html, nothing, repeat, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import type { ManifestSearchResultItem } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
+import './search-result-item.element.js';
+
 export type SearchItem = {
-	name: string;
-	icon?: string;
-	href: string;
-	url?: string;
+	entityType: string;
 };
 export type SearchGroupItem = {
 	name: string;
@@ -101,13 +92,19 @@ export class UmbSearchModalElement extends UmbLitElement {
 		this._activeSearchTag = searchProvider.alias;
 	}
 
-	#updateSearchResults() {
+	async #updateSearchResults() {
 		if (this._search) {
-			const { data, error } = this.#currentProvider.search({
+			const { data, error } = await this.#currentProvider.search({
 				query: this._search,
 			});
 
-			console.log(data, error);
+			console.log('data', data);
+
+			if (!data) return;
+
+			this._searchResults = data.items;
+
+			console.log('reults', this._searchResults);
 			// this._searchResults = this.#mockApi.getDocuments.filter((item) =>
 			// 	item.name.toLowerCase().includes(this._search.toLowerCase()),
 			// );
@@ -166,6 +163,13 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	#renderItem(item: SearchItem) {
+		return html`
+			<umb-extension-slot
+				type="searchResultItem"
+				.props=${{ item }}
+				.filter=${(manifest: ManifestSearchResultItem) => manifest.forEntityTypes.includes(item.entityType)}
+				default-element="umb-search-result-item"></umb-extension-slot>
+		`;
 		return html`
 			<a href="${item.href}" class="item">
 				<span class="item-icon">

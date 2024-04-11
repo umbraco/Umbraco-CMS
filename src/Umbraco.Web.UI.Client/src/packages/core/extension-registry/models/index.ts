@@ -62,6 +62,7 @@ import type { ManifestGranularUserPermission } from './user-granular-permission.
 import type { ManifestCollectionAction } from './collection-action.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
 import type { ManifestSearchProvider } from './search-provider.model.js';
+import type { ManifestSearchResultItem } from './search-result-item.model.js';
 import type {
 	ManifestBase,
 	ManifestBundle,
@@ -95,6 +96,7 @@ export type * from './property-action.model.js';
 export type * from './property-editor.model.js';
 export type * from './repository.model.js';
 export type * from './search-provider.model.js';
+export type * from './search-result-item.model.js';
 export type * from './section-sidebar-app.model.js';
 export type * from './section-view.model.js';
 export type * from './section.model.js';
@@ -177,6 +179,7 @@ export type ManifestTypes =
 	| ManifestPropertyEditorUi
 	| ManifestRepository
 	| ManifestSearchProvider
+	| ManifestSearchResultItem
 	| ManifestSection
 	| ManifestSectionSidebarApp
 	| ManifestSectionSidebarAppMenuKind

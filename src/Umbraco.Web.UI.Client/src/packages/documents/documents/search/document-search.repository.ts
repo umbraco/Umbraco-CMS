@@ -1,4 +1,4 @@
-import { UmbDocumentSearchServerDataSource } from './rollback.server.data-source.js';
+import { UmbDocumentSearchServerDataSource } from './document-search.server.data-source.js';
 import type { UmbSearchRequestArgs } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -13,7 +13,7 @@ export class UmbDocumentSearchRepository extends UmbControllerBase implements Um
 		this.#dataSource = new UmbDocumentSearchServerDataSource(this);
 	}
 
-	async search(args: UmbSearchRequestArgs) {
-		return await this.#dataSource.search(args);
+	search(args: UmbSearchRequestArgs) {
+		return this.#dataSource.search(args);
 	}
 }

@@ -2,6 +2,7 @@ import type { UmbSearchRequestArgs } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 
 /**
  * A data source for the Rollback that fetches data from the server
@@ -26,12 +27,40 @@ export class UmbDocumentSearchServerDataSource {
 	 * @return {*}
 	 * @memberof UmbDocumentSearchServerDataSource
 	 */
-	search(args: UmbSearchRequestArgs) {
-		return tryExecuteAndNotify(
+	async search(args: UmbSearchRequestArgs) {
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentService.getItemDocumentSearch({
 				query: args.query,
 			}),
 		);
+
+		if (data) {
+			const mappedItems = data.items.map((item) => {
+				return {
+					entityType: UMB_DOCUMENT_ENTITY_TYPE,
+					unique: item.id,
+					isTrashed: item.isTrashed,
+					isProtected: item.isProtected,
+					documentType: {
+						unique: item.documentType.id,
+						icon: item.documentType.icon,
+						collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
+					},
+					variants: item.variants.map((variant) => {
+						return {
+							culture: variant.culture || null,
+							name: variant.name,
+							state: variant.state,
+						};
+					}),
+					name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
+				};
+			});
+
+			return { data: { items: mappedItems, total: data.total } };
+		}
+
+		return { error };
 	}
 }

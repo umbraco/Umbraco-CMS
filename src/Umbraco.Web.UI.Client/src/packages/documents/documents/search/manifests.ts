@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
@@ -16,8 +17,6 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.SearchResultItem.Document',
 		type: 'searchResultItem',
 		element: () => import('./document-search-result-item.element.js'),
-		meta: {
-			label: 'Documents',
-		},
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 	},
 ];
