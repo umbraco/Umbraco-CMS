@@ -8,7 +8,6 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" VersionOverride="2.9.1" />
     <PackageReference Include="NJsonSchema" VersionOverride="11.0.0" />
-    <PackageReference Include="NJsonSchema.NewtonsoftJson" VersionOverride="11.0.0" />
   </ItemGroup>
 
   <ItemGroup>
