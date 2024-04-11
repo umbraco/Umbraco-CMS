@@ -4,7 +4,6 @@ import { UMB_DOCUMENT_PICKER_MODAL } from '../modals/index.js';
 import {
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,
 	UMB_USER_PERMISSION_DOCUMENT_DUPLICATE,
-	UMB_USER_PERMISSION_DOCUMENT_MOVE,
 	UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
 	UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
@@ -15,8 +14,8 @@ import { manifests as createBlueprintManifests } from './create-blueprint/manife
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
 import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
+import { manifests as moveManifests } from './move-to/manifests.js';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_DOCUMENT_TREE_REPOSITORY_ALIAS } from '../tree/index.js';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -33,25 +32,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
-			},
-		],
-	},
-	{
-		type: 'entityAction',
-		kind: 'moveTo',
-		alias: 'Umb.EntityAction.Document.MoveTo',
-		name: 'Move Document Entity Action ',
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-		weight: 900,
-		meta: {
-			moveToRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			treeRepositoryAlias: UMB_DOCUMENT_TREE_REPOSITORY_ALIAS,
-			treePickerModelAlias: UMB_DOCUMENT_PICKER_MODAL,
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.UserPermission.Document',
-				allOf: [UMB_USER_PERMISSION_DOCUMENT_MOVE],
 			},
 		],
 	},
@@ -158,5 +138,6 @@ export const manifests = [
 	...publicAccessManifests,
 	...cultureAndHostnamesManifests,
 	...sortChildrenOfManifests,
+	...moveManifests,
 	...entityActions,
 ];
