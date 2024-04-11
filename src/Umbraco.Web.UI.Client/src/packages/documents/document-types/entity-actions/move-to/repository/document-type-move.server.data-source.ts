@@ -1,0 +1,44 @@
+import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbMoveToDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/repository';
+
+/**
+ * Move DocumentType Server Data Source
+ * @export
+ * @class UmbDocumentTypeMoveServerDataSource
+ */
+export class UmbDocumentTypeMoveServerDataSource implements UmbMoveToDataSource {
+	#host: UmbControllerHost;
+
+	/**
+	 * Creates an instance of UmbDocumentTypeMoveServerDataSource.
+	 * @param {UmbControllerHost} host
+	 * @memberof UmbDocumentTypeMoveServerDataSource
+	 */
+	constructor(host: UmbControllerHost) {
+		this.#host = host;
+	}
+
+	/**
+	 * Move an item for the given id to the target unique
+	 * @param {string} unique
+	 * @param {(string | null)} targetUnique
+	 * @return {*}
+	 * @memberof UmbDocumentTypeMoveServerDataSource
+	 */
+	async move(args: UmbMoveToRequestArgs) {
+		if (!args.unique) throw new Error('Unique is missing');
+		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
+
+		return tryExecuteAndNotify(
+			this.#host,
+			DocumentTypeService.putDocumentTypeByIdMove({
+				id: args.unique,
+				requestBody: {
+					target: args.destination.unique ? { id: args.destination.unique } : null,
+				},
+			}),
+		);
+	}
+}
