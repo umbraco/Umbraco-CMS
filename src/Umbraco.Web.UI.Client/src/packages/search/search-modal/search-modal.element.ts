@@ -1,4 +1,4 @@
-import type { UmbSearchResultItemModel } from '../types.js';
+import type { UmbSearchProvider, UmbSearchResultItemModel } from '../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, repeat, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestSearchResultItem } from '@umbraco-cms/backoffice/extension-registry';
@@ -7,6 +7,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 import '../search-result/search-result-item.element.js';
+
+type SearchProvider = {
+	name: string;
+	api: UmbSearchProvider;
+	alias: string;
+};
 
 @customElement('umb-search-modal')
 export class UmbSearchModalElement extends UmbLitElement {
@@ -20,17 +26,10 @@ export class UmbSearchModalElement extends UmbLitElement {
 	private _searchResults: Array<UmbSearchResultItemModel> = [];
 
 	@state()
-	private _searchProviders: Array<{
-		name: string;
-		providerPromise: any;
-		alias: string;
-	}> = [];
+	private _searchProviders: Array<SearchProvider> = [];
 
 	@state()
-	_currentProvider?: {
-		api: any;
-		alias: string;
-	};
+	_currentProvider?: SearchProvider;
 
 	constructor() {
 		super();
@@ -39,15 +38,24 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	#observeViews() {
-		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'searchProvider', null, (providers) => {
-			this._searchProviders = providers.map((provider) => ({
-				name: provider.manifest.meta?.label || provider.manifest.name,
-				providerPromise: createExtensionApi(this, provider.manifest),
-				alias: provider.alias,
-			}));
+		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'searchProvider', null, async (providers) => {
+			const searchProviders: SearchProvider[] = [];
+
+			for (const provider of providers) {
+				const api = await createExtensionApi<UmbSearchProvider>(this, provider.manifest);
+				if (api) {
+					searchProviders.push({
+						name: provider.manifest.meta?.label || provider.manifest.name,
+						api,
+						alias: provider.alias,
+					});
+				}
+			}
+
+			this._searchProviders = searchProviders;
 
 			if (this._searchProviders.length > 0) {
-				this.#setCurrentProvider(this._searchProviders[0]);
+				this._currentProvider = this._searchProviders[0];
 			}
 		});
 	}
@@ -71,19 +79,15 @@ export class UmbSearchModalElement extends UmbLitElement {
 		this.#updateSearchResults();
 	}
 
-	async #setCurrentProvider(searchProvider: any) {
-		const api = await searchProvider.providerPromise;
-		this._currentProvider = {
-			api,
-			alias: searchProvider.alias,
-		};
+	async #setCurrentProvider(searchProvider: SearchProvider) {
+		this._currentProvider = searchProvider;
 
 		this.#focusInput();
 		this.#updateSearchResults();
 	}
 
 	async #updateSearchResults() {
-		if (this._search && this._currentProvider) {
+		if (this._search && this._currentProvider?.api) {
 			const { data } = await this._currentProvider.api.search({ query: this._search });
 			if (!data) return;
 			this._searchResults = data.items;

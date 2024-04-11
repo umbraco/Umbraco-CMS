@@ -1,9 +1,8 @@
-import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbSearchProvider, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UmbDataTypeSearchRepository } from './data-type-search.repository.js';
-import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbDataTypeSearchProvider extends UmbControllerBase implements UmbApi {
+export class UmbDataTypeSearchProvider extends UmbControllerBase implements UmbSearchProvider {
 	#repository = new UmbDataTypeSearchRepository(this);
 
 	async search(args: UmbSearchRequestArgs) {
