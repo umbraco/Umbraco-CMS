@@ -355,6 +355,10 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			UmbRequestReloadTreeItemChildrenEvent.TYPE,
 			this.#onReloadRequest as EventListener,
 		);
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureRequest as unknown as EventListener,
+		);
 		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
 		super.destroy();
 	}
