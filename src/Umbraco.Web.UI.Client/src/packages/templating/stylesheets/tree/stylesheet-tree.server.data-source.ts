@@ -2,7 +2,7 @@ import { UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '.
 import type { UmbStylesheetTreeItemModel } from './types.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { StylesheetResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -38,7 +38,7 @@ export class UmbStylesheetTreeServerDataSource extends UmbTreeServerDataSourceBa
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	StylesheetResource.getTreeStylesheetRoot({ skip: args.skip, take: args.take });
+	StylesheetService.getTreeStylesheetRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parentUnique);
@@ -47,7 +47,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return StylesheetResource.getTreeStylesheetChildren({
+		return StylesheetService.getTreeStylesheetChildren({
 			parentPath,
 			skip: args.skip,
 			take: args.take,
@@ -60,7 +60,7 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
 	if (!descendantPath) throw new Error('Descendant path is not available');
 
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	return StylesheetResource.getTreeStylesheetAncestors({
+	return StylesheetService.getTreeStylesheetAncestors({
 		descendantPath,
 	});
 };

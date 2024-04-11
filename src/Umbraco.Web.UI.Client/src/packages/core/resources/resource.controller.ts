@@ -57,8 +57,8 @@ export class UmbResourceController extends UmbControllerBase {
 	 * If the executor function throws an error, then show the details in a notification.
 	 */
 	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<UmbDataSourceResponse<T>> {
-		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
-
+		const { data, error: _error } = await UmbResourceController.tryExecute<T>(this.#promise);
+		const error: any = _error;
 		if (error) {
 			/**
 			 * Determine if we want to show a notification or just log the error to the console.

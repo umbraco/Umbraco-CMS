@@ -2,7 +2,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_EXAMINE_FIELDS_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { SearchResultResponseModel, FieldPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { SearcherResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -46,7 +46,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 		const { data } = await tryExecuteAndNotify(
 			this,
-			SearcherResource.getSearcherBySearcherNameQuery({
+			SearcherService.getSearcherBySearcherNameQuery({
 				searcherName: this.searcherName,
 				term: this._searchInput.value,
 				take: 100,
@@ -73,10 +73,10 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 				this._exposedFields = this._exposedFields
 					? this._exposedFields.filter((field) => {
 							return { name: field.name, exposed: field.exposed };
-					  })
+						})
 					: newFieldNames?.map((name) => {
 							return { name, exposed: false };
-					  });
+						});
 			}
 		});
 	}
@@ -194,7 +194,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 								>x</uui-button
 							>
 						</div>
-				  </uui-table-head-cell>`
+					</uui-table-head-cell>`
 				: html``;
 		})}`;
 	}

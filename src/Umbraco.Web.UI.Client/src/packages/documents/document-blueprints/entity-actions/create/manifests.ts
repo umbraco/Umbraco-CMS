@@ -7,6 +7,7 @@ const entityActions: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.DocumentBlueprint.Create',
 		name: 'Document Blueprint Options Create Entity Action',
+		weight: 1200,
 		api: () => import('./create.action.js'),
 		forEntityTypes: [UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE],
 		meta: {
@@ -21,7 +22,7 @@ const manifestModals: Array<ManifestTypes> = [
 		type: 'modal',
 		alias: 'Umb.Modal.DocumentBlueprintOptionsCreate',
 		name: 'Document Blueprint Options Create Modal',
-		js: () => import('./modal/document-blueprint-options-create-modal.element.js'),
+		element: () => import('./modal/document-blueprint-options-create-modal.element.js'),
 	},
 ];
 

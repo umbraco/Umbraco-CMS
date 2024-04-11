@@ -1,4 +1,4 @@
-import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbMoveDataSource } from '@umbraco-cms/backoffice/repository';
@@ -33,7 +33,7 @@ export class UmbDataTypeMoveServerDataSource implements UmbMoveDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.putDataTypeByIdMove({
+			DataTypeService.putDataTypeByIdMove({
 				id: unique,
 				requestBody: {
 					target: targetUnique ? { id: targetUnique } : null,

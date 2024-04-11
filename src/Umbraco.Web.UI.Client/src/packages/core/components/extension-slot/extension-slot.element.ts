@@ -43,9 +43,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	public set type(value: string | string[] | undefined) {
 		if (value === this.#type) return;
 		this.#type = value;
-		if (this.#attached) {
-			this._observeExtensions();
-		}
+		this.#observeExtensions();
 	}
 	#type?: string | string[] | undefined;
 
@@ -65,9 +63,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	public set filter(value: (manifest: any) => boolean) {
 		if (value === this.#filter) return;
 		this.#filter = value;
-		if (this.#attached) {
-			this._observeExtensions();
-		}
+		this.#observeExtensions();
 	}
 	#filter: (manifest: any) => boolean = () => true;
 
@@ -100,11 +96,17 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this._observeExtensions();
 		this.#attached = true;
+		this.#observeExtensions();
+	}
+	disconnectedCallback(): void {
+		this.#attached = false;
+		this.#extensionsController?.destroy();
+		super.disconnectedCallback();
 	}
 
-	private _observeExtensions(): void {
+	#observeExtensions(): void {
+		if (!this.#attached) return;
 		this.#extensionsController?.destroy();
 		if (this.#type) {
 			this.#extensionsController = new UmbExtensionsElementInitializer(
@@ -128,7 +130,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 					this._permitted,
 					(ext) => ext.alias,
 					(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component),
-			  )
+				)
 			: html`<slot></slot>`;
 	}
 

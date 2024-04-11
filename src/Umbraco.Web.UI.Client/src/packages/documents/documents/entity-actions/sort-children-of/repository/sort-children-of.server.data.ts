@@ -1,5 +1,5 @@
 import type { UmbSortChildrenOfArgs } from './types.js';
-import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -33,7 +33,7 @@ export class UmbSortChildrenOfDocumentServerDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DocumentResource.putDocumentSort({
+			DocumentService.putDocumentSort({
 				requestBody: {
 					parent: args.unique ? { id: args.unique } : null,
 					sorting: sortingMapping,

@@ -66,7 +66,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends FormControlMi
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#addGranularPermission() {
+	async #addGranularPermission() {
 		this.#documentPickerModalContext = this.#modalManagerContext?.open(this, UMB_DOCUMENT_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
@@ -83,17 +83,24 @@ export class UmbInputDocumentGranularUserPermissionElement extends FormControlMi
 			if (!unique) return;
 
 			const documentItem = await this.#requestDocumentItem(unique);
-			const result = await this.#selectEntityUserPermissionsForDocument(documentItem);
-			this.#documentPickerModalContext?.reject();
 
-			const permissionItem: UmbDocumentUserPermissionModel = {
-				$type: 'DocumentPermissionPresentationModel',
-				document: { id: unique },
-				verbs: result,
-			};
+			this.#selectEntityUserPermissionsForDocument(documentItem).then(
+				(result) => {
+					this.#documentPickerModalContext?.reject();
 
-			this.permissions = [...this._permissions, permissionItem];
-			this.dispatchEvent(new UmbChangeEvent());
+					const permissionItem: UmbDocumentUserPermissionModel = {
+						$type: 'DocumentPermissionPresentationModel',
+						document: { id: unique },
+						verbs: result,
+					};
+
+					this.permissions = [...this._permissions, permissionItem];
+					this.dispatchEvent(new UmbChangeEvent());
+				},
+				() => {
+					this.#documentPickerModalContext?.reject();
+				},
+			);
 		});
 	}
 
@@ -127,7 +134,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends FormControlMi
 			const value = await this.#entityUserPermissionModalContext?.onSubmit();
 			return value?.allowedVerbs;
 		} catch (error) {
-			return allowedVerbs;
+			throw new Error();
 		}
 	}
 

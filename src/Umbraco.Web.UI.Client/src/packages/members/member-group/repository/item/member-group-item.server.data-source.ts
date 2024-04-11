@@ -2,7 +2,7 @@ import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMemberGroupItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { MemberGroupItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { MemberGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -29,7 +29,7 @@ export class UmbMemberGroupItemServerDataSource extends UmbItemServerDataSourceB
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => MemberGroupResource.getItemMemberGroup({ id: uniques });
+const getItems = (uniques: Array<string>) => MemberGroupService.getItemMemberGroup({ id: uniques });
 
 const mapper = (item: MemberGroupItemResponseModel): UmbMemberGroupItemModel => {
 	return {

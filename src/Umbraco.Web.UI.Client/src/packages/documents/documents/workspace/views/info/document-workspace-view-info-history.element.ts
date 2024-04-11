@@ -1,3 +1,4 @@
+import { UMB_ROLLBACK_MODAL } from '../../../modals/rollback/index.js';
 import { HistoryTagStyleAndText, TimeOptions } from './utils.js';
 import { UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
 import {
@@ -15,6 +16,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 @customElement('umb-document-workspace-view-info-history')
 export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
@@ -88,6 +91,16 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		this.#getLogs();
 	}
 
+	#onRollbackModalOpen = async () => {
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManagerContext.open(this, UMB_ROLLBACK_MODAL, {});
+
+		await modalContext.onSubmit();
+		// TODO: This notification won't actually show at the moment because we perform a full page reload after rollback. However, when we can do it without a full page reload, this should be used.
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notificationContext.peek('positive', { data: { message: this.localize.term('rollback_documentRolledBack') } });
+	};
+
 	render() {
 		return html`<uui-box>
 				<div id="rollback" slot="header">
@@ -96,9 +109,8 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 						label=${this.localize.term('actions_rollback')}
 						look="secondary"
 						slot="actions"
-						@click=${() => alert('TODO: Rollback Modal')}>
+						@click=${this.#onRollbackModalOpen}>
 						<uui-icon name="icon-undo"></uui-icon>
-						<umb-localize key="actions_rollback"></umb-localize>
 					</uui-button>
 				</div>
 				${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
