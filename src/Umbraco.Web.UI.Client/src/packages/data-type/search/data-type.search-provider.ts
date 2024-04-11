@@ -1,12 +1,13 @@
+import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import { UmbDataTypeSearchRepository } from './data-type-search.repository.js';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbDataTypeSearchProvider implements UmbApi {
-	constructor() {
-		console.log('UmbDataTypeSearchProvider hello world');
-	}
+export class UmbDataTypeSearchProvider extends UmbControllerBase implements UmbApi {
+	#repository = new UmbDataTypeSearchRepository(this);
 
-	search(): void {
-		alert('search');
+	async search(args: UmbSearchRequestArgs) {
+		return this.#repository.search(args);
 	}
 
 	destroy(): void {
