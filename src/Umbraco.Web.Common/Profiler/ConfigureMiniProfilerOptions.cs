@@ -23,7 +23,7 @@ internal sealed class ConfigureMiniProfilerOptions : IConfigureOptions<MiniProfi
         IHostingEnvironment hostingEnvironment)
     {
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+        _backOfficePath = hostingEnvironment.ToAbsolute(Core.Constants.System.DefaultUmbracoPath);
     }
 
     public void Configure(MiniProfilerOptions options)

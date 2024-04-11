@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -20,14 +20,11 @@ internal static class ApplicationBuilderExtensions
         => applicationBuilder.UseWhen(
             httpContext =>
             {
-                GlobalSettings settings = httpContext.RequestServices
-                    .GetRequiredService<IOptions<GlobalSettings>>().Value;
-                IHostingEnvironment hostingEnvironment =
-                    httpContext.RequestServices.GetRequiredService<IHostingEnvironment>();
-                var officePath = settings.GetBackOfficePath(hostingEnvironment);
+                IHostingEnvironment hostingEnvironment = httpContext.RequestServices.GetRequiredService<IHostingEnvironment>();
+                var backOfficePath = hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
 
                 // Only use the API exception handler when we are requesting an API
-                return httpContext.Request.Path.Value?.StartsWith($"{officePath}{Constants.Web.ManagementApiPath}") ?? false;
+                return httpContext.Request.Path.Value?.StartsWith($"{backOfficePath}{Constants.Web.ManagementApiPath}") ?? false;
             },
             innerBuilder =>
             {
@@ -57,14 +54,14 @@ internal static class ApplicationBuilderExtensions
 
         applicationBuilder.UseEndpoints(endpoints =>
         {
-            GlobalSettings settings = provider.GetRequiredService<IOptions<GlobalSettings>>().Value;
             IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
-            var officePath = settings.GetBackOfficePath(hostingEnvironment);
+            var backOfficePath = hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
+
             // Maps attribute routed controllers.
             endpoints.MapControllers();
 
             // Serve contract
-            endpoints.MapGet($"{officePath}{Constants.Web.ManagementApiPath}openapi.json", async context =>
+            endpoints.MapGet($"{backOfficePath}{Constants.Web.ManagementApiPath}openapi.json", async context =>
             {
                 await context.Response.SendFileAsync(new EmbeddedFileProvider(typeof(ManagementApiComposer).Assembly).GetFileInfo("OpenApi.json"));
             });

@@ -28,9 +28,7 @@ public class UmbracoRequestPaths
     public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IOptions<UmbracoRequestPathsOptions> umbracoRequestPathsOptions)
     {
         _appPath = hostingEnvironment.ApplicationVirtualPath;
-
-        _backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment)
-            .EnsureStartsWith('/').TrimStart(_appPath).EnsureStartsWith('/');
+        _backOfficePath = hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath).EnsureStartsWith('/').TrimStart(_appPath).EnsureStartsWith('/');
 
         string mvcArea = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
 

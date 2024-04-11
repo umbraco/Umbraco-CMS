@@ -68,9 +68,8 @@ public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
 
     private string GetUmbracoPath(IApplicationBuilder applicationBuilder)
     {
-        GlobalSettings settings = applicationBuilder.ApplicationServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
         IHostingEnvironment hostingEnvironment = applicationBuilder.ApplicationServices.GetRequiredService<IHostingEnvironment>();
 
-        return settings.GetBackOfficePath(hostingEnvironment);
+        return hostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
     }
 }

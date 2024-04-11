@@ -32,8 +32,7 @@ public class BasicAuthenticationMiddleware : IMiddleware
     {
         _runtimeState = runtimeState;
         _basicAuthService = basicAuthService;
-
-        _backOfficePath = globalSettings.CurrentValue.GetBackOfficePath(hostingEnvironment);
+        _backOfficePath = hostingEnvironment.ToAbsolute(Core.Constants.System.DefaultUmbracoPath);
     }
 
     /// <inheritdoc />

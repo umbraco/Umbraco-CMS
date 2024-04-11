@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Install;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
@@ -40,10 +41,10 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
     public async Task Validate_OpenApi_Contract_is_implemented()
     {
         string[] keysToIgnore = { "servers", "x-generator" };
-        var officePath = GlobalSettings.GetBackOfficePath(HostingEnvironment);
+        var backOfficePath = HostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
 
-        var urlToContract = $"{officePath}/management/api/openapi.json";
-        var swaggerPath = $"{officePath}/swagger/management/swagger.json";
+        var urlToContract = $"{backOfficePath}/management/api/openapi.json";
+        var swaggerPath = $"{backOfficePath}/swagger/management/swagger.json";
         var apiContract = JsonNode.Parse(await Client.GetStringAsync(urlToContract)).AsObject();
 
         var generatedJsonString = await Client.GetStringAsync(swaggerPath);

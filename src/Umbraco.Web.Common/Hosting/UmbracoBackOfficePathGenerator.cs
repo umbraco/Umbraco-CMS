@@ -17,7 +17,7 @@ public class UmbracoBackOfficePathGenerator : IBackOfficePathGenerator
         IUmbracoVersion umbracoVersion,
         IOptions<GlobalSettings> globalSettings)
     {
-        BackOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+        BackOfficePath = hostingEnvironment.ToAbsolute(Core.Constants.System.DefaultUmbracoPath);
         BackOfficeCacheBustHash = UrlHelperExtensions.GetCacheBustHash(hostingEnvironment, umbracoVersion);
     }
 

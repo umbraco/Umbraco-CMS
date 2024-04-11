@@ -1,8 +1,8 @@
 @using System.Globalization
-@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.Extensions.Options;
 @using Umbraco.Cms.Api.Management.Extensions
 @using Umbraco.Cms.Api.Management.Security
+@using Umbraco.Cms.Core
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
 @using Umbraco.Cms.Core.Logging
@@ -15,7 +15,6 @@
 @inject IOptions<SecuritySettings> SecuritySettings
 @inject IEmailSender EmailSender
 @inject IHostingEnvironment HostingEnvironment
-@inject IOptions<GlobalSettings> GlobalSettings
 @inject IProfilerHtml ProfilerHtml
 @inject IBackOfficeExternalLoginProviders ExternalLogins
 @inject IBackOfficePathGenerator BackOfficePathGenerator
@@ -23,7 +22,7 @@
 @inject IJsonSerializer JsonSerializer
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
-    var backOfficePath = GlobalSettings.Value.GetBackOfficePath(HostingEnvironment);
+    var backOfficePath = HostingEnvironment.ToAbsolute(Constants.System.DefaultUmbracoPath);
     var loginLogoImage = ContentSettings.Value.LoginLogoImage;
     var loginLogoImageAlternative = ContentSettings.Value.LoginLogoImageAlternative;
     var loginBackgroundImage = ContentSettings.Value.LoginBackgroundImage;
@@ -38,7 +37,7 @@
 <html lang="@CultureInfo.CurrentCulture.Name.ToLowerInvariant()">
 <head>
     <meta charset="UTF-8"/>
-    <base href="@backOfficePath.EnsureEndsWith('/')"/>
+    <base href="@backOfficePath.EnsureEndsWith('/')" />
     <link rel="icon" type="image/svg+xml" href="~/umbraco/login/favicon.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
