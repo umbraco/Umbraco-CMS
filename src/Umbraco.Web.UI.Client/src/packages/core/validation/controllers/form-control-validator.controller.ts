@@ -96,8 +96,6 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 	}
 
 	destroy(): void {
-		console.log('destroy form control validator.  GOOD THIS SHOULD HAPPEN.');
-
 		if (this.#control) {
 			this.#control.removeEventListener(UmbValidationInvalidEvent.TYPE, this.#setInvalid);
 			this.#control.removeEventListener(UmbValidationValidEvent.TYPE, this.#setValid);
