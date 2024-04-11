@@ -32,10 +32,6 @@ public class DocumentEntityTests
             .WithContentTypeThumbnail("thumb")
             .WithHasChildren(true)
             .WithPublished(true)
-            .AddAdditionalData()
-            .WithKeyValue("test1", 3)
-            .WithKeyValue("test2", "value")
-            .Done()
             .Build();
 
         var json = JsonSerializer.Serialize(item);
