@@ -1,9 +1,7 @@
-import {
-	DocumentBlueprintService,
-	type CreateDocumentBlueprintFromDocumentRequestModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { CreateDocumentBlueprintFromDocumentRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the Document Create Blueprint that fetches data from the server

@@ -82,7 +82,7 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 	{
 		type: 'entityBulkAction',
 		kind: 'default',
-		alias: 'Umb.EntityBulkAction.Document.Move',
+		alias: 'Umb.EntityBulkAction.Document.MoveTo',
 		name: 'Move Document Entity Bulk Action',
 		weight: 20,
 		api: UmbMoveDocumentEntityBulkAction,

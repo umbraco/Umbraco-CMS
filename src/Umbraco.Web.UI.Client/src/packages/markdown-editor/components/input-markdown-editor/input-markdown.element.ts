@@ -8,13 +8,10 @@ import { UUIFormControlMixin, type UUIModalSidebarSize } from '@umbraco-cms/back
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_LINK_PICKER_MODAL,
-	UMB_MEDIA_TREE_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_LINK_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 
 /**
  * @element umb-input-markdown

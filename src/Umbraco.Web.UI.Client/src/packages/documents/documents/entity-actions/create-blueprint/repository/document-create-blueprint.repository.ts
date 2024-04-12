@@ -1,9 +1,9 @@
 import { UmbDocumentCreateBlueprintServerDataSource } from './document-create-blueprint.server.data-source.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { CreateDocumentBlueprintFromDocumentRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentCreateBlueprintRepository extends UmbControllerBase implements UmbApi {
 	#dataSource = new UmbDocumentCreateBlueprintServerDataSource(this);
@@ -21,8 +21,12 @@ export class UmbDocumentCreateBlueprintRepository extends UmbControllerBase impl
 	async create(requestBody: CreateDocumentBlueprintFromDocumentRequestModel) {
 		const { data, error } = await this.#dataSource.create(requestBody);
 		if (!error) {
+			const notification = { data: { message: `Document Blueprint created` } };
+			this.#notificationContext!.peek('positive', notification);
+
 			return { data };
 		}
+
 		return { error };
 	}
 }
