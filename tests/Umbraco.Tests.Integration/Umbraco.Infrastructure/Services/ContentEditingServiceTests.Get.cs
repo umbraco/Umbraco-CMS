@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public partial class ContentEditingServiceTests
 {
     [TestCase(true)]
-    [TestCase(true)]
+    [TestCase(false)]
     public async Task Can_Get(bool variant)
     {
         var content = await (variant ? CreateVariantContent() : CreateInvariantContent());
