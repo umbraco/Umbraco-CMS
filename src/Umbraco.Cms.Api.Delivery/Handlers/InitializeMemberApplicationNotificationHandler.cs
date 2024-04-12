@@ -66,7 +66,7 @@ internal sealed class InitializeMemberApplicationNotificationHandler : INotifica
             cancellationToken);
     }
 
-    private bool ValidateRedirectUrls(Uri[] redirectUrls)
+    private bool ValidateRedirectUrls(IEnumerable<Uri> redirectUrls)
     {
         if (redirectUrls.Any() is false)
         {

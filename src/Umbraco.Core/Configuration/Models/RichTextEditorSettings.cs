@@ -12,12 +12,12 @@ public class RichTextEditorSettings
 
     internal const string StaticInvalidElements = "font";
 
-    private static readonly string[] Default_plugins =
+    private static readonly ISet<string> Default_plugins = new HashSet<string>()
     {
         "anchor", "charmap", "table", "lists", "advlist", "autolink", "directionality", "searchreplace",
     };
 
-    private static readonly RichTextEditorCommand[] Default_commands =
+    private static readonly ISet<RichTextEditorCommand> Default_commands = new HashSet<RichTextEditorCommand>()
     {
         new RichTextEditorCommand
         {
@@ -121,12 +121,12 @@ public class RichTextEditorSettings
     ///     HTML RichText Editor TinyMCE Commands.
     /// </summary>
     /// WB-TODO Custom Array of objects
-    public RichTextEditorCommand[] Commands { get; set; } = Default_commands;
+    public ISet<RichTextEditorCommand> Commands { get; set; } = Default_commands;
 
     /// <summary>
     ///     HTML RichText Editor TinyMCE Plugins.
     /// </summary>
-    public string[] Plugins { get; set; } = Default_plugins;
+    public ISet<string> Plugins { get; set; } = Default_plugins;
 
     /// <summary>
     ///     HTML RichText Editor TinyMCE Custom Config.

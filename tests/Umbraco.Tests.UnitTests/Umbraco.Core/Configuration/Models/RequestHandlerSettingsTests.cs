@@ -11,17 +11,18 @@ public class RequestHandlerSettingsTests
     [Test]
     public void Given_CharCollection_With_DefaultEnabled_MergesCollection()
     {
-        var userCollection = new CharItem[]
+        var settings = new RequestHandlerSettings
         {
-            new() { Char = "test", Replacement = "replace" },
-            new() { Char = "test2", Replacement = "replace2" },
+            UserDefinedCharCollection =
+            {
+                new() { Char = "test", Replacement = "replace" },
+                new() { Char = "test2", Replacement = "replace2" },
+            }
         };
-
-        var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection };
         var actual = settings.GetCharReplacements().ToList();
 
         var expectedCollection = RequestHandlerSettings.DefaultCharCollection.ToList();
-        expectedCollection.AddRange(userCollection);
+        expectedCollection.AddRange(settings.UserDefinedCharCollection);
 
         Assert.AreEqual(expectedCollection.Count, actual.Count);
         Assert.That(actual, Is.EquivalentTo(expectedCollection));
@@ -30,33 +31,32 @@ public class RequestHandlerSettingsTests
     [Test]
     public void Given_CharCollection_With_DefaultDisabled_ReturnsUserCollection()
     {
-        var userCollection = new CharItem[]
-        {
-            new() { Char = "test", Replacement = "replace" },
-            new() { Char = "test2", Replacement = "replace2" },
-        };
-
         var settings = new RequestHandlerSettings
         {
-            UserDefinedCharCollection = userCollection,
+            UserDefinedCharCollection =
+            {
+                new() { Char = "test", Replacement = "replace" },
+                new() { Char = "test2", Replacement = "replace2" },
+            },
             EnableDefaultCharReplacements = false,
         };
         var actual = settings.GetCharReplacements().ToList();
 
-        Assert.AreEqual(userCollection.Length, actual.Count);
-        Assert.That(actual, Is.EquivalentTo(userCollection));
+        Assert.AreEqual(settings.UserDefinedCharCollection.Count, actual.Count);
+        Assert.That(actual, Is.EquivalentTo(settings.UserDefinedCharCollection));
     }
 
     [Test]
     public void Given_CharCollection_That_OverridesDefaultValues_ReturnsReplacements()
     {
-        var userCollection = new CharItem[]
+        var settings = new RequestHandlerSettings
         {
-            new() { Char = "%", Replacement = "percent" },
-            new() { Char = ".", Replacement = "dot" },
+            UserDefinedCharCollection =
+            {
+                new() { Char = "%", Replacement = "percent" },
+                new() { Char = ".", Replacement = "dot" },
+            }
         };
-
-        var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection };
         var actual = settings.GetCharReplacements().ToList();
 
         Assert.AreEqual(RequestHandlerSettings.DefaultCharCollection.Length, actual.Count);
@@ -70,14 +70,15 @@ public class RequestHandlerSettingsTests
     [Test]
     public void Given_CharCollection_That_OverridesDefaultValues_And_ContainsNew_ReturnsMergedWithReplacements()
     {
-        var userCollection = new CharItem[]
+        var settings = new RequestHandlerSettings
         {
-            new() { Char = "%", Replacement = "percent" },
-            new() { Char = ".", Replacement = "dot" },
-            new() { Char = "new", Replacement = "new" },
+            UserDefinedCharCollection =
+            {
+                new() { Char = "%", Replacement = "percent" },
+                new() { Char = ".", Replacement = "dot" },
+                new() { Char = "new", Replacement = "new" },
+            }
         };
-
-        var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection };
         var actual = settings.GetCharReplacements().ToList();
 
         // Add 1 to the length, because we're expecting to only add one new one
