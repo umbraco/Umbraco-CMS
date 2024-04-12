@@ -132,7 +132,7 @@ export interface ManifestEntityActionMoveToKind extends ManifestEntityAction<Met
 }
 
 export interface MetaEntityActionMoveToKind extends MetaEntityActionDefaultKind {
-	moveToRepositoryAlias: string;
+	moveRepositoryAlias: string;
 	treeRepositoryAlias: string;
 	treePickerModal: UmbModalToken | string;
 }

@@ -9,12 +9,12 @@ const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		kind: 'moveTo',
-		alias: 'Umb.EntityAction.Dictionary.Move',
+		alias: 'Umb.EntityAction.Dictionary.MoveTo',
 		name: 'Move Dictionary Entity Action',
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {
 			treeRepositoryAlias: UMB_DICTIONARY_TREE_REPOSITORY_ALIAS,
-			moveToRepositoryAlias: UMB_MOVE_DICTIONARY_REPOSITORY_ALIAS,
+			moveRepositoryAlias: UMB_MOVE_DICTIONARY_REPOSITORY_ALIAS,
 			treePickerModal: UMB_DICTIONARY_PICKER_MODAL,
 		},
 	},
