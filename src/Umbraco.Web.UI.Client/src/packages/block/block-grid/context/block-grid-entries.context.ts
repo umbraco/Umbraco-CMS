@@ -79,8 +79,7 @@ export class UmbBlockGridEntriesContext
 						blocks: this.#retrieveAllowedElementTypes(),
 						blockGroups: this._manager?.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
-						blockOriginData: { index: index },
-						// TODO: Include AreaKey and ParentUnique in the blockOriginData object. [NL]
+						blockOriginData: { index: index, areaKey: this.#areaKey, parentUnique: this.#parentUnique },
 					},
 				};
 			})
