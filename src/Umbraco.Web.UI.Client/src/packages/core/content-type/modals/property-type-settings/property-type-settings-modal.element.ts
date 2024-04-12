@@ -227,12 +227,12 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 									<!-- TODO: Align styling across this and the property of document type workspace editor, or consider if this can go away for a different UX flow -->
 									<uui-input
 										id="name-input"
-										${umbFocus()}
 										name="name"
 										label="property name (TODO: Localize)"
 										@input=${this.#onNameChange}
 										.value=${this.value.name}
-										placeholder="Enter a name...">
+										placeholder="Enter a name..."
+										${umbFocus()}>
 										<!-- TODO: validation for bad characters -->
 									</uui-input>
 									<uui-input
