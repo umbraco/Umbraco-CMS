@@ -1,9 +1,5 @@
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
-import {
-	UMB_MEDIA_TYPE_TREE_REPOSITORY_ALIAS,
-	UMB_MEDIA_TYPE_PICKER_MODAL,
-	UMB_MEDIA_TYPE_TREE_ALIAS,
-} from '../../tree/index.js';
+import { UMB_MEDIA_TYPE_TREE_REPOSITORY_ALIAS, UMB_MEDIA_TYPE_TREE_ALIAS } from '../../tree/index.js';
 import { UMB_MOVE_MEDIA_TYPE_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
