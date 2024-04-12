@@ -7,9 +7,3 @@ export interface UmbPickerModalData<ItemType> {
 export interface UmbPickerModalValue {
 	selection: Array<string | null>;
 }
-
-export interface UmbTreePickerModalData<TreeItemType> extends UmbPickerModalData<TreeItemType> {
-	treeAlias?: string;
-}
-
-export interface UmbTreePickerModalValue extends UmbPickerModalValue {}

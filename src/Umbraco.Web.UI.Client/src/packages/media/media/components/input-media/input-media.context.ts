@@ -1,7 +1,7 @@
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbMediaItemModel } from '../../repository/item/types.js';
+import { UMB_MEDIA_TREE_PICKER_MODAL } from '../../tree/index.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
-import { UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbMediaPickerContext extends UmbPickerInputContext<UmbMediaItemModel> {

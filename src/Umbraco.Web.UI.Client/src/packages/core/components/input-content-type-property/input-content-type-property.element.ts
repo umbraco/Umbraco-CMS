@@ -2,10 +2,10 @@ import { html, customElement, property, css } from '@umbraco-cms/backoffice/exte
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbMediaTypeDetailRepository } from '@umbraco-cms/backoffice/media-type';
+import { UmbMediaTypeDetailRepository, UMB_MEDIA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/media-type';
 import { UMB_DOCUMENT_TYPE_PICKER_MODAL, UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { UMB_MEMBER_TYPE_PICKER_MODAL, UmbMemberTypeDetailRepository } from '@umbraco-cms/backoffice/member-type';
-import { UMB_ITEM_PICKER_MODAL, UMB_MEDIA_TYPE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_ITEM_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbItemPickerModel, UmbModalToken, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
@@ -45,13 +45,43 @@ export class UmbInputContentTypePropertyElement extends UUIFormControlMixin(UmbL
 			pickableFilter: (docType) => !docType.isElement,
 			repository: () => new UmbDocumentTypeDetailRepository(this),
 			systemProperties: [
-				{ label: this.localize.term('content_documentType'), description: 'contentTypeAlias', value: 'contentTypeAlias', icon: 'icon-settings' },
-				{ label: this.localize.term('content_createDate'), description: 'createDate', value: 'createDate', icon: 'icon-settings' },
+				{
+					label: this.localize.term('content_documentType'),
+					description: 'contentTypeAlias',
+					value: 'contentTypeAlias',
+					icon: 'icon-settings',
+				},
+				{
+					label: this.localize.term('content_createDate'),
+					description: 'createDate',
+					value: 'createDate',
+					icon: 'icon-settings',
+				},
 				{ label: this.localize.term('content_createBy'), description: 'owner', value: 'owner', icon: 'icon-settings' },
-				{ label: this.localize.term('content_isPublished'), description: 'published', value: 'published', icon: 'icon-settings' },
-				{ label: this.localize.term('general_sort'), description: 'sortOrder', value: 'sortOrder', icon: 'icon-settings' },
-				{ label: this.localize.term('content_updateDate'), description: 'updateDate', value: 'updateDate', icon: 'icon-settings' },
-				{ label: this.localize.term('content_updatedBy'), description: 'updater', value: 'updater', icon: 'icon-settings' },
+				{
+					label: this.localize.term('content_isPublished'),
+					description: 'published',
+					value: 'published',
+					icon: 'icon-settings',
+				},
+				{
+					label: this.localize.term('general_sort'),
+					description: 'sortOrder',
+					value: 'sortOrder',
+					icon: 'icon-settings',
+				},
+				{
+					label: this.localize.term('content_updateDate'),
+					description: 'updateDate',
+					value: 'updateDate',
+					icon: 'icon-settings',
+				},
+				{
+					label: this.localize.term('content_updatedBy'),
+					description: 'updater',
+					value: 'updater',
+					icon: 'icon-settings',
+				},
 			],
 		},
 		elementTypes: {
@@ -82,12 +112,37 @@ export class UmbInputContentTypePropertyElement extends UUIFormControlMixin(UmbL
 			pickerModal: () => UMB_MEDIA_TYPE_PICKER_MODAL,
 			repository: () => new UmbMediaTypeDetailRepository(this),
 			systemProperties: [
-				{ label: this.localize.term('content_documentType'), description: 'contentTypeAlias', value: 'contentTypeAlias', icon: 'icon-settings' },
-				{ label: this.localize.term('content_createDate'), description: 'createDate', value: 'createDate', icon: 'icon-settings' },
+				{
+					label: this.localize.term('content_documentType'),
+					description: 'contentTypeAlias',
+					value: 'contentTypeAlias',
+					icon: 'icon-settings',
+				},
+				{
+					label: this.localize.term('content_createDate'),
+					description: 'createDate',
+					value: 'createDate',
+					icon: 'icon-settings',
+				},
 				{ label: this.localize.term('content_createBy'), description: 'owner', value: 'owner', icon: 'icon-settings' },
-				{ label: this.localize.term('general_sort'), description: 'sortOrder', value: 'sortOrder', icon: 'icon-settings' },
-				{ label: this.localize.term('content_updateDate'), description: 'updateDate', value: 'updateDate', icon: 'icon-settings' },
-				{ label: this.localize.term('content_updatedBy'), description: 'updater', value: 'updater', icon: 'icon-settings' },
+				{
+					label: this.localize.term('general_sort'),
+					description: 'sortOrder',
+					value: 'sortOrder',
+					icon: 'icon-settings',
+				},
+				{
+					label: this.localize.term('content_updateDate'),
+					description: 'updateDate',
+					value: 'updateDate',
+					icon: 'icon-settings',
+				},
+				{
+					label: this.localize.term('content_updatedBy'),
+					description: 'updater',
+					value: 'updater',
+					icon: 'icon-settings',
+				},
 			],
 		},
 		memberTypes: {
@@ -100,11 +155,31 @@ export class UmbInputContentTypePropertyElement extends UUIFormControlMixin(UmbL
 			pickerModal: () => UMB_MEMBER_TYPE_PICKER_MODAL,
 			repository: () => new UmbMemberTypeDetailRepository(this),
 			systemProperties: [
-				{ label: this.localize.term('content_documentType'), description: 'contentTypeAlias', value: 'contentTypeAlias', icon: 'icon-settings' },
-				{ label: this.localize.term('content_createDate'), description: 'createDate', value: 'createDate', icon: 'icon-settings' },
+				{
+					label: this.localize.term('content_documentType'),
+					description: 'contentTypeAlias',
+					value: 'contentTypeAlias',
+					icon: 'icon-settings',
+				},
+				{
+					label: this.localize.term('content_createDate'),
+					description: 'createDate',
+					value: 'createDate',
+					icon: 'icon-settings',
+				},
 				{ label: this.localize.term('general_email'), description: 'email', value: 'email', icon: 'icon-settings' },
-				{ label: this.localize.term('content_updateDate'), description: 'updateDate', value: 'updateDate', icon: 'icon-settings' },
-				{ label: this.localize.term('general_username'), description: 'username', value: 'username', icon: 'icon-settings' },
+				{
+					label: this.localize.term('content_updateDate'),
+					description: 'updateDate',
+					value: 'updateDate',
+					icon: 'icon-settings',
+				},
+				{
+					label: this.localize.term('general_username'),
+					description: 'username',
+					value: 'username',
+					icon: 'icon-settings',
+				},
 			],
 		},
 	};

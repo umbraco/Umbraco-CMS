@@ -1,6 +1,6 @@
 import type { UmbTreeSelectionConfiguration } from '../types.js';
+import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal.token.js';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbTreePickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbDeselectedEvent, UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement, UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
@@ -8,7 +8,7 @@ import type { UmbTreeElement, UmbTreeItemModelBase } from '@umbraco-cms/backoffi
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
 	UmbTreePickerModalData<TreeItemType>,
-	UmbPickerModalValue
+	UmbTreePickerModalValue
 > {
 	@state()
 	_selectionConfiguration: UmbTreeSelectionConfiguration = {
