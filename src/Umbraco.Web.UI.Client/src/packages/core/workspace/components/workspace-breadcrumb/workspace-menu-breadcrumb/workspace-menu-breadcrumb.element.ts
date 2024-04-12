@@ -1,4 +1,4 @@
-import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, ifDefined, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -72,10 +72,11 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-breadcrumbs>
-				${this._structure?.map(
+				${map(
+					this._structure,
 					(structureItem) =>
-						html`<uui-breadcrumb-item href="${ifDefined(this.#getHref(structureItem))}"
-							>${structureItem.name}</uui-breadcrumb-item
+						html`<uui-breadcrumb-item href=${ifDefined(this.#getHref(structureItem))}
+							>${this.localize.string(structureItem.name)}</uui-breadcrumb-item
 						>`,
 				)}
 				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
