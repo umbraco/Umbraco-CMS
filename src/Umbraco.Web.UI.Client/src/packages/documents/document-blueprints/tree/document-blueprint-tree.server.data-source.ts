@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentBlueprintTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -43,27 +43,25 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parentUnique === null) {
 		return getRootItems(args);
 	} else {
-		throw new Error('Not implemented');
-		/*
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentBlueprintService.getTreeDocumentBlueprintChildren({
 			parentId: args.parentUnique,
 		});
-		*/
 	}
 };
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
 	throw new Error('Not implemented');
+	/** TODO: Implement when endpoint becomes available... */
 };
 
 const mapper = (item: DocumentBlueprintTreeItemResponseModel): UmbDocumentBlueprintTreeItemModel => {
 	return {
 		unique: item.id,
 		parentUnique: item.parent?.id || null,
-		name: (item as any).variants?.[0].name  ?? item.name,
-		entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
-		isFolder: false,
+		name: (item as any).variants?.[0].name ?? item.name,
+		entityType: item.isFolder ? UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE : UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
+		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
 	};
 };
