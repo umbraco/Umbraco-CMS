@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '../../modals/document-type-picker-modal.token.js';
 import { UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS } from '../../tree/index.js';
+import { UMB_DOCUMENT_TYPE_TREE_ALIAS } from '../../tree/manifests.js';
 import { UMB_MOVE_DOCUMENT_TYPE_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
@@ -15,7 +15,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			treeRepositoryAlias: UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS,
 			moveRepositoryAlias: UMB_MOVE_DOCUMENT_TYPE_REPOSITORY_ALIAS,
-			treePickerModal: UMB_DOCUMENT_TYPE_PICKER_MODAL,
+			treeAlias: UMB_DOCUMENT_TYPE_TREE_ALIAS,
 		},
 	},
 ];

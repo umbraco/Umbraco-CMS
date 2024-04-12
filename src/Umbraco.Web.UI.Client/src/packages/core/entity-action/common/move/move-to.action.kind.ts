@@ -18,7 +18,7 @@ export const manifest: UmbBackofficeManifestKind = {
 			label: '#actions_move',
 			treeRepositoryAlias: '',
 			moveRepositoryAlias: '',
-			treePickerModal: '',
+			treeAlias: '',
 		},
 	},
 };

@@ -5,6 +5,7 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { MetaEntityActionMoveToKind } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UMB_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/tree';
 
 export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionMoveToKind> {
 	async execute() {
@@ -12,7 +13,9 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, this.args.meta.treePickerModal) as any; // TODO: make generic picker interface with selection
+		const modalContext = modalManager.open(this, UMB_TREE_PICKER_MODAL, {
+			data: { treeAlias: this.args.meta.treeAlias },
+		}) as any; // TODO: make generic picker interface with selection
 		const value = await modalContext.onSubmit();
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
