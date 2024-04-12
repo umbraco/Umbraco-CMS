@@ -16,6 +16,9 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 		this.#initTreeItem();
 	}
 
+	@property({ type: Boolean, attribute: false })
+	hideActions: boolean = false;
+
 	@state()
 	private _isActive = false;
 
@@ -162,6 +165,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	}
 
 	#renderActions() {
+		if (this.hideActions) return;
 		return this.#treeItemContext && this._item
 			? html`<umb-entity-actions-bundle
 					slot="actions"
@@ -178,7 +182,10 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 				? repeat(
 						this._childItems,
 						(item, index) => item.name + '___' + index,
-						(item) => html`<umb-tree-item .entityType=${item.entityType} .props=${{ item }}></umb-tree-item>`,
+						(item) =>
+							html`<umb-tree-item
+								.entityType=${item.entityType}
+								.props=${{ hideActions: this.hideActions, item }}></umb-tree-item>`,
 					)
 				: ''}
 		`;
