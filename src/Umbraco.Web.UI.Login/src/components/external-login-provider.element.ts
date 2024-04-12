@@ -73,7 +73,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
   @property({attribute: 'external-login-url'})
   set externalLoginUrl(value: string) {
     const tempUrl = new URL(value, window.location.origin);
-    const searchParams = new URLSearchParams(tempUrl.search);
+    const searchParams = new URLSearchParams(window.location.search);
     tempUrl.searchParams.append('redirectUrl', decodeURIComponent(searchParams.get('returnPath') ?? ''));
     this.#externalLoginUrl = tempUrl.pathname + tempUrl.search;
   }
