@@ -2,7 +2,7 @@ import { UMB_MEDIA_RECYCLE_BIN_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_MEDIA_TREE_PICKER_MODAL } from '../../tree/index.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [

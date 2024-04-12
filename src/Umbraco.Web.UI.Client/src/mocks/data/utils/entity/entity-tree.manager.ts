@@ -49,7 +49,7 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 		const movedItems = items.map((item) => {
 			return {
 				...item,
-				parentId: destinationId,
+				parent: destinationId ? { id: destinationId } : null,
 			};
 		});
 

@@ -1,12 +1,16 @@
-import { UmbModalToken } from './modal-token.js';
-import type { UmbPickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import {
+	type UmbTreePickerModalValue,
+	type UmbTreePickerModalData,
+	UMB_TREE_PICKER_MODAL_ALIAS,
+} from '@umbraco-cms/backoffice/tree';
 import type { UmbMediaTreeItemModel } from '@umbraco-cms/backoffice/media';
 
 export type UmbMediaTreePickerModalData = UmbTreePickerModalData<UmbMediaTreeItemModel>;
-export type UmbMediaTreePickerModalValue = UmbPickerModalValue;
+export type UmbMediaTreePickerModalValue = UmbTreePickerModalValue;
 
 export const UMB_MEDIA_TREE_PICKER_MODAL = new UmbModalToken<UmbMediaTreePickerModalData, UmbMediaTreePickerModalValue>(
-	'Umb.Modal.TreePicker',
+	UMB_TREE_PICKER_MODAL_ALIAS,
 	{
 		modal: {
 			type: 'sidebar',
