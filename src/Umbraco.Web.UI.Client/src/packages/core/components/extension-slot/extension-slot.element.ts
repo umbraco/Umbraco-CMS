@@ -102,6 +102,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	disconnectedCallback(): void {
 		this.#attached = false;
 		this.#extensionsController?.destroy();
+		this.#extensionsController = undefined;
 		super.disconnectedCallback();
 	}
 
