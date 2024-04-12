@@ -13,7 +13,7 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this, UMB_DUPLICATE_MODAL) as any;
+		const modal = modalManager.open(this, UMB_DUPLICATE_MODAL);
 		debugger;
 
 		/*

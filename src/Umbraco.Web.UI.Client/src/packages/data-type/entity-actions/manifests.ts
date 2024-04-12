@@ -3,7 +3,6 @@ import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/inde
 import { UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/item/manifests.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
-import { manifests as duplicateManifests } from './duplicate/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -20,4 +19,4 @@ const entityActions: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...entityActions, ...createManifests, ...moveManifests, ...duplicateManifests];
+export const manifests = [...entityActions, ...createManifests, ...moveManifests];
