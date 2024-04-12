@@ -8,12 +8,12 @@ const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		kind: 'moveTo',
-		alias: 'Umb.EntityAction.Media.Move',
+		alias: 'Umb.EntityAction.Media.MoveTo',
 		name: 'Move Media Entity Action',
 		forEntityTypes: [UMB_MEDIA_ENTITY_TYPE],
 		meta: {
 			treeRepositoryAlias: UMB_MEDIA_TREE_REPOSITORY_ALIAS,
-			moveToRepositoryAlias: UMB_MOVE_MEDIA_REPOSITORY_ALIAS,
+			moveRepositoryAlias: UMB_MOVE_MEDIA_REPOSITORY_ALIAS,
 			treePickerModal: UMB_MEDIA_TREE_PICKER_MODAL,
 		},
 	},

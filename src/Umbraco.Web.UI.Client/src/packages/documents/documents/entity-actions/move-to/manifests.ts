@@ -10,12 +10,12 @@ const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		kind: 'moveTo',
-		alias: 'Umb.EntityAction.Document.Move',
+		alias: 'Umb.EntityAction.Document.MoveTo',
 		name: 'Move Document Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			treeRepositoryAlias: UMB_DOCUMENT_TREE_REPOSITORY_ALIAS,
-			moveToRepositoryAlias: UMB_MOVE_DOCUMENT_REPOSITORY_ALIAS,
+			moveRepositoryAlias: UMB_MOVE_DOCUMENT_REPOSITORY_ALIAS,
 			treePickerModal: UMB_DOCUMENT_PICKER_MODAL,
 		},
 		conditions: [
