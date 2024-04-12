@@ -4,7 +4,7 @@ import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
-import type { UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-input-entity')
 export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -66,7 +66,7 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 	}
 
 	@state()
-	private _items?: Array<UmbUniqueTreeItemModel>;
+	private _items?: Array<UmbUniqueItemModel>;
 
 	constructor() {
 		super();
@@ -142,7 +142,7 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 		`;
 	}
 
-	#renderItem(item: UmbUniqueTreeItemModel) {
+	#renderItem(item: UmbUniqueItemModel) {
 		if (!item.unique) return;
 		const icon = this.getIcon?.(item) ?? item.icon ?? '';
 		return html`
