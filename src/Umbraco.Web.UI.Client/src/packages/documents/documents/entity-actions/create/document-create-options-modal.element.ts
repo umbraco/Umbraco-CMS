@@ -3,13 +3,17 @@ import type {
 	UmbDocumentCreateOptionsModalData,
 	UmbDocumentCreateOptionsModalValue,
 } from './document-create-options-modal.token.js';
-import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, state, ifDefined, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbDocumentTypeStructureRepository,
 	type UmbAllowedDocumentTypeModel,
 } from '@umbraco-cms/backoffice/document-type';
+import {
+	type UmbDocumentBlueprintItemModel,
+	UmbDocumentBlueprintItemRepository,
+} from '@umbraco-cms/backoffice/document-blueprint';
 
 @customElement('umb-document-create-options-modal')
 export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
@@ -18,12 +22,20 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 > {
 	#documentTypeStructureRepository = new UmbDocumentTypeStructureRepository(this);
 	#documentItemRepository = new UmbDocumentItemRepository(this);
+	#documentBlueprintItemRepository = new UmbDocumentBlueprintItemRepository(this);
+
+	#documentTypeUnique = '';
+	#documentTypeIcon = '';
 
 	@state()
 	private _allowedDocumentTypes: UmbAllowedDocumentTypeModel[] = [];
 
 	@state()
-	private _headline: string = 'Create';
+	private _headline: string =
+		`${this.localize.term('create_createUnder')} ${this.localize.term('actionCategories_content')}`;
+
+	@state()
+	private _availableBlueprints: Array<UmbDocumentBlueprintItemModel> = [];
 
 	async firstUpdated() {
 		const parentUnique = this.data?.parent.unique;
@@ -50,40 +62,99 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		const { data } = await this.#documentItemRepository.requestItems([parentUnique]);
 		if (data) {
 			// TODO: we need to get the correct variant context here
-			this._headline = `Create at ${data[0].variants?.[0].name}`;
+			this._headline = `${this.localize.term('create_createUnder')} ${data[0].variants?.[0].name ?? this.localize.term('actionCategories_content')}`;
 		}
 	}
 
 	// close the modal when navigating to data type
-	#onNavigate() {
+	#onNavigate(documentTypeUnique: string, blueprintUnique?: string) {
+		if (!blueprintUnique) {
+			history.pushState(
+				null,
+				'',
+				`section/content/workspace/document/create/parent/${this.data?.parent.entityType}/${this.data?.parent.unique ?? 'null'}/${documentTypeUnique}`,
+			);
+		} else {
+			history.pushState(
+				null,
+				'',
+				`section/content/workspace/document/create/parent/${this.data?.parent.entityType}/${this.data?.parent.unique ?? 'null'}/${documentTypeUnique}/${blueprintUnique}`,
+			);
+		}
 		this._submitModal();
+	}
+
+	async #onSelectDocumentType(documentTypeUnique: string) {
+		this.#documentTypeUnique = documentTypeUnique;
+		this.#documentTypeIcon = this._allowedDocumentTypes.find((dt) => dt.unique === documentTypeUnique)?.icon ?? '';
+
+		const { data } = await this.#documentBlueprintItemRepository.requestItems([]);
+		if (!data?.length) return;
+
+		this._availableBlueprints = data.filter((blueprint) => blueprint.documentType.unique === documentTypeUnique);
+
+		if (!this._availableBlueprints.length) {
+			this.#onNavigate(documentTypeUnique);
+			return;
+		}
 	}
 
 	render() {
 		return html`
-			<umb-body-layout headline=${this._headline ?? ''}>
-				<uui-box>
-					${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
-					${this._allowedDocumentTypes.map(
-						(documentType) => html`
-							<uui-menu-item
-								data-id=${ifDefined(documentType.unique)}
-								href="${`section/content/workspace/document/create/parent/${this.data?.parent.entityType}/${
-									this.data?.parent.unique ?? 'null'
-								}/${documentType.unique}`}"
-								label="${documentType.name}"
-								@click=${this.#onNavigate}>
-								> ${documentType.icon ? html`<umb-icon slot="icon" name=${documentType.icon}></umb-icon>` : nothing}
-							</uui-menu-item>
-						`,
-					)}
-				</uui-box>
+			<umb-body-layout headline=${this.localize.term('actions_create')}>
+				${this._availableBlueprints.length && this.#documentTypeUnique
+					? this.#renderBlueprints()
+					: this.#renderDocumentTypes()}
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
 			</umb-body-layout>
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	#renderDocumentTypes() {
+		return html`<uui-box .headline=${this._headline}>
+			${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
+			${this._allowedDocumentTypes.map(
+				(documentType) => html`
+					<uui-menu-item
+						data-id=${ifDefined(documentType.unique)}
+						label="${documentType.name}"
+						@click=${() => this.#onSelectDocumentType(documentType.unique)}>
+						<umb-icon slot="icon" name=${documentType.icon || 'icon-circle-dotted'}></umb-icon>
+					</uui-menu-item>
+				`,
+			)}
+		</uui-box>`;
+	}
+
+	#renderBlueprints() {
+		return html`<uui-box headline=${this.localize.term('blueprints_selectBlueprint')}>
+			<uui-menu-item
+				id="blank"
+				label=${this.localize.term('blueprints_blankBlueprint')}
+				@click=${() => this.#onNavigate(this.#documentTypeUnique)}>
+				<umb-icon slot="icon" name=${this.#documentTypeIcon}></umb-icon>
+			</uui-menu-item>
+			${repeat(
+				this._availableBlueprints,
+				(blueprint) => blueprint.unique,
+				(blueprint) =>
+					html`<uui-menu-item
+						label=${blueprint.name}
+						@click=${() => this.#onNavigate(this.#documentTypeUnique, blueprint.unique)}>
+						<umb-icon slot="icon" name="icon-blueprint"></umb-icon>
+					</uui-menu-item>`,
+			)}</uui-box
+		> `;
+	}
+
+	static styles = [
+		UmbTextStyles,
+		css`
+			#blank {
+				border-bottom: 1px solid var(--uui-color-border);
+			}
+		`,
+	];
 }
 
 export default UmbDocumentCreateOptionsModalElement;
