@@ -88,6 +88,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		this.#documentTypeUnique = documentTypeUnique;
 		this.#documentTypeIcon = this._allowedDocumentTypes.find((dt) => dt.unique === documentTypeUnique)?.icon ?? '';
 
+		/** TODO: Fix this to use the correct endpoint when it becomes available */
 		const { data } = await this.#documentBlueprintItemRepository.requestItems([]);
 		if (!data?.length) return;
 
