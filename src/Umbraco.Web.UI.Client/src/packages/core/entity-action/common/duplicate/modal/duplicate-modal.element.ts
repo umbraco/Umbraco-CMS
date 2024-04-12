@@ -1,50 +1,71 @@
-import type { UmbDuplicateRepository } from '../duplicate-repository.interface.js';
 import type { UmbDuplicateModalData, UmbDuplicateModalValue } from './duplicate-modal.token.js';
-import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 
 const elementName = 'umb-duplicate-modal';
 @customElement(elementName)
 export class UmbDuplicateModalElement extends UmbModalBaseElement<UmbDuplicateModalData, UmbDuplicateModalValue> {
-	constructor() {
-		super();
+	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
+		const target = event.target as UmbTreeElement;
+		const selection = target.getSelection();
+		if (selection.length === 0) throw new Error('Selection is required');
+		this.updateValue({ destination: { unique: selection[0] } });
 	}
 
-	async #onSubmit(event: PointerEvent) {
-		event?.stopPropagation();
-		if (!this.data?.duplicateRepositoryAlias) throw new Error('duplicateRepositoryAlias is required');
+	#onRelateToOriginalChange(event: UUIBooleanInputEvent) {
+		const target = event.target;
+		this.updateValue({ relateToOriginal: target.checked });
+	}
 
-		const duplicateRepository = await createExtensionApiByAlias<UmbDuplicateRepository>(
-			this,
-			this.data.duplicateRepositoryAlias,
-		);
-
-		const { error } = await duplicateRepository.requestDuplicateTo({
-			unique: this.data.unique,
-			destination: {
-				unique: null,
-			},
-		});
-
-		if (!error) {
-			this._submitModal();
-		}
+	#onIncludeDescendantsChange(event: UUIBooleanInputEvent) {
+		const target = event.target;
+		this.updateValue({ includeDescendants: target.checked });
 	}
 
 	render() {
+		if (!this.data) return nothing;
+
 		return html`
 			<umb-body-layout headline="Duplicate">
-				<div>Render Picker</div>
+				<uui-box headline="Duplicate to">
+					<umb-tree alias=${this.data.treeAlias} @selection-change=${this.#onTreeSelectionChange}></umb-tree>
+				</uui-box>
+				<uui-box headline="Options">
+					<umb-property-layout label="Relate to original" orientation="vertical"
+						><div slot="editor">
+							<uui-toggle
+								@change=${this.#onRelateToOriginalChange}
+								.checked=${this.value?.relateToOriginal}></uui-toggle>
+						</div>
+					</umb-property-layout>
 
-				<div>Render checkbox 1</div>
-				<div>Render checkbox 2</div>
-
-				<uui-button slot="actions" label="Cancel" @click="${this._rejectModal}"></uui-button>
-				<uui-button slot="actions" color="positive" look="primary" label="Sort" @click=${this.#onSubmit}></uui-button>
+					<umb-property-layout label="Include descendants" orientation="vertical"
+						><div slot="editor">
+							<uui-toggle
+								@change=${this.#onIncludeDescendantsChange}
+								.checked=${this.value?.includeDescendants}></uui-toggle>
+						</div>
+					</umb-property-layout>
+				</uui-box>
+				${this.#renderActions()}
 			</umb-body-layout>
+		`;
+	}
+
+	#renderActions() {
+		return html`
+			<uui-button slot="actions" label="Cancel" @click="${this._rejectModal}"></uui-button>
+			<uui-button
+				slot="actions"
+				color="positive"
+				look="primary"
+				label="Duplicate"
+				@click=${this._submitModal}></uui-button>
 		`;
 	}
 

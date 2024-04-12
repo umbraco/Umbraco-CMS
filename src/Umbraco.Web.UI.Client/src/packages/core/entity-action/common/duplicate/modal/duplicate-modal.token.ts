@@ -4,10 +4,16 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 export interface UmbDuplicateModalData {
 	unique: string | null;
 	entityType: string;
-	duplicateRepositoryAlias: string;
+	treeAlias: string;
 }
 
-export interface UmbDuplicateModalValue {}
+export interface UmbDuplicateModalValue {
+	destination: {
+		unique: string | null;
+	};
+	relateToOriginal: boolean;
+	includeDescendants: boolean;
+}
 
 export const UMB_DUPLICATE_MODAL = new UmbModalToken<UmbDuplicateModalData, UmbDuplicateModalValue>(
 	UMB_DUPLICATE_MODAL_ALIAS,

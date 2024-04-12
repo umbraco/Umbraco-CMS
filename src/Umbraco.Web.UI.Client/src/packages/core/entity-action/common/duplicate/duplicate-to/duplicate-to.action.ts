@@ -13,31 +13,38 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modal = modalManager.open(this, UMB_DUPLICATE_MODAL);
-		debugger;
-
-		/*
-		const value = await modalContext.onSubmit();
-		const destinationUnique = value.selection[0];
-		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
-		*/
-
-		const duplicateRepository = await createExtensionApiByAlias<UmbDuplicateRepository>(
-			this,
-			this.args.meta.duplicateRepositoryAlias,
-		);
-		if (!duplicateRepository) throw new Error('Duplicate repository is not available');
-
-		//alert('Duplicate to: ' + destinationUnique);
-
-		/*
-		await duplicateRepository.requestDuplicateTo({
-			unique: this.args.unique,
-			destination: { unique: destinationUnique },
+		const modal = modalManager.open(this, UMB_DUPLICATE_MODAL, {
+			data: {
+				unique: this.args.unique,
+				entityType: this.args.entityType,
+				treeAlias: this.args.meta.treeAlias,
+			},
 		});
-		*/
 
-		//this.#reloadMenu();
+		try {
+			const value = await modal.onSubmit();
+			const destinationUnique = value.destination.unique;
+			if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
+
+			const duplicateRepository = await createExtensionApiByAlias<UmbDuplicateRepository>(
+				this,
+				this.args.meta.duplicateRepositoryAlias,
+			);
+			if (!duplicateRepository) throw new Error('Duplicate repository is not available');
+
+			const { error } = await duplicateRepository.requestDuplicateTo({
+				unique: this.args.unique,
+				destination: { unique: destinationUnique },
+				relateToOriginal: value.relateToOriginal,
+				includeDescendants: value.includeDescendants,
+			});
+
+			if (!error) {
+				this.#reloadMenu();
+			}
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
 	async #reloadMenu() {
