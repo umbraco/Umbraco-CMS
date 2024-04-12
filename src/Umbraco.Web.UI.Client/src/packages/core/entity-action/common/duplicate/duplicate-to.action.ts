@@ -1,8 +1,8 @@
 import { UmbEntityActionBase } from '../../entity-action-base.js';
 import { UmbRequestReloadStructureForEntityEvent } from '../../request-reload-structure-for-entity.event.js';
+import type { UmbDuplicateRepository } from './duplicate-repository.interface.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbduplicateToRepository } from '@umbraco-cms/backoffice/repository';
-import type { MetaEntityActionduplicateToKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { MetaEntityActionDuplicateToKind } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
@@ -17,18 +17,22 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
 
-		const duplicateToRepository = await createExtensionApiByAlias<UmbDuplicateToRepository>(
+		const duplicateRepository = await createExtensionApiByAlias<UmbDuplicateRepository>(
 			this,
-			this.args.meta.duplicateToRepositoryAlias,
+			this.args.meta.duplicateRepositoryAlias,
 		);
-		if (!duplicateToRepository) throw new Error('Duplicate repository is not available');
+		if (!duplicateRepository) throw new Error('Duplicate repository is not available');
 
-		await duplicateToRepository.requestduplicate({
+		alert('Duplicate to: ' + destinationUnique);
+
+		/*
+		await duplicateRepository.requestDuplicateTo({
 			unique: this.args.unique,
 			destination: { unique: destinationUnique },
 		});
+		*/
 
-		this.#reloadMenu();
+		//this.#reloadMenu();
 	}
 
 	async #reloadMenu() {
@@ -44,4 +48,4 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 	}
 }
 
-export default UmbduplicateToEntityAction;
+export { UmbDuplicateToEntityAction as api };

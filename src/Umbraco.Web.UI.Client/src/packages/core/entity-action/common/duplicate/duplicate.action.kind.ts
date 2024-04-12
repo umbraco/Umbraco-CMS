@@ -17,7 +17,7 @@ export const manifest: UmbBackofficeManifestKind = {
 			icon: 'icon-enter',
 			label: '#actions_copy',
 			treeRepositoryAlias: '',
-			duplicateToRepositoryAlias: '',
+			duplicateRepositoryAlias: '',
 			treePickerModal: '',
 		},
 	},

@@ -3,4 +3,6 @@ export interface UmbDuplicateToRequestArgs {
 	destination: {
 		unique: string | null;
 	};
+	relateToOriginal: boolean;
+	includeDescendants: boolean;
 }

@@ -120,7 +120,7 @@ export interface ManifestEntityActionDuplicateToKind extends ManifestEntityActio
 }
 
 export interface MetaEntityActionDuplicateToKind extends MetaEntityActionDefaultKind {
-	duplicateToRepositoryAlias: string;
+	duplicateRepositoryAlias: string;
 	treeRepositoryAlias: string;
 	treePickerModal: UmbModalToken | string;
 }
