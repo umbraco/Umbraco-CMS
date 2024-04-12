@@ -139,7 +139,11 @@ public class TemplateService : RepositoryService, ITemplateService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
-        IQuery<ITemplate> query = Query<ITemplate>().Where(x => keys.Contains(x.Key));
+        IQuery<ITemplate> query = Query<ITemplate>();
+        if (keys.Any())
+        {
+            query = query.Where(x => keys.Contains(x.Key));
+        }
         IEnumerable<ITemplate> templates = _templateRepository.Get(query).OrderBy(x => x.Name);
 
         return Task.FromResult(templates);
