@@ -1,14 +1,14 @@
 import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbMoveToDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
 
 /**
  * Move Dictionary Server Data Source
  * @export
  * @class UmbMoveDictionaryServerDataSource
  */
-export class UmbMoveDictionaryServerDataSource implements UmbMoveToDataSource {
+export class UmbMoveDictionaryServerDataSource implements UmbMoveDataSource {
 	#host: UmbControllerHost;
 
 	/**
