@@ -239,24 +239,15 @@ export class UmbDocumentWorkspaceContext
 		this.resetState();
 		this.#parent.setValue(parent);
 
-		if (blueprintUnique) {
-			/**TODO Right now it always goes into this if statement, because it thinks the unique is "invariant" when none are given */
+		/**TODO Explore bug: A way to make blueprintUnique undefined/null when no unique is given, rather than setting it to invariant */
+		if (blueprintUnique && blueprintUnique.toLowerCase() !== 'invariant') {
 			const { data } = await this.#blueprintRepository.requestByUnique(blueprintUnique);
-			if (data) {
-				this.#getDataPromise = this.repository.createScaffold({
-					documentType: data?.documentType,
-					values: data?.values,
-					variants: data?.variants,
-				});
-			}
-			// Remove this when issue fixed
+			console.log(data);
 			this.#getDataPromise = this.repository.createScaffold({
-				documentType: {
-					unique: documentTypeUnique,
-					collection: null,
-				},
+				documentType: data?.documentType,
+				values: data?.values,
+				variants: data?.variants as Array<UmbDocumentVariantModel>,
 			});
-			//
 		} else {
 			this.#getDataPromise = this.repository.createScaffold({
 				documentType: {
