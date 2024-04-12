@@ -1,3 +1,3 @@
-import { manifest as moveKindManifest } from './move.action.kind.js';
+import { manifest as moveToKindManifest } from './move-to.action.kind.js';
 
-export const manifests = [moveKindManifest];
+export const manifests = [moveToKindManifest];

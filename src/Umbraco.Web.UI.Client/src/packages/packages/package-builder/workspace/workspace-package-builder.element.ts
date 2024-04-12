@@ -20,7 +20,7 @@ import {
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 import { blobDownload } from '@umbraco-cms/backoffice/utils';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
@@ -68,7 +68,6 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	connectedCallback(): void {
 		super.connectedCallback();
 		this.#getPackageCreated();
-		requestAnimationFrame(() => this._packageNameInput?.focus());
 	}
 
 	async #getPackageCreated() {
@@ -147,6 +146,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 					required
 					label="Name of the package"
 					placeholder=${this.localize.term('placeholders_entername')}
+					${umbFocus()}
 					.value=${this._package?.name ?? ''}
 					@input=${(e: UUIInputEvent) => (this._package!.name = e.target.value as string)}></uui-input>
 			</div>

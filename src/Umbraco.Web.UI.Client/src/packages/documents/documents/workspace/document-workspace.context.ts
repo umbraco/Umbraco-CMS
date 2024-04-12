@@ -53,6 +53,7 @@ import {
 	UmbServerModelValidationContext,
 	UmbVariantValuesValidationMessageTranslator,
 } from '@umbraco-cms/backoffice/validation';
+import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -83,6 +84,10 @@ export class UmbDocumentWorkspaceContext
 	#serverValidation = new UmbServerModelValidationContext(this);
 	#serverValidationValuesTranslator = new UmbVariantValuesValidationMessageTranslator(this, this.#serverValidation);
 	#validationRepository?: UmbDocumentValidationRepository;
+
+	#blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
+	/*#blueprint = new UmbObjectState<UmbDocumentBlueprintDetailModel | undefined>(undefined);
+	public readonly blueprint = this.#blueprint.asObservable();*/
 
 	public isLoaded() {
 		return this.#getDataPromise;
@@ -155,6 +160,24 @@ export class UmbDocumentWorkspaceContext
 
 		this.routes.setRoutes([
 			{
+				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique/:blueprintUnique',
+				component: () => import('./document-workspace-editor.element.js'),
+				setup: async (_component, info) => {
+					const parentEntityType = info.match.params.entityType;
+					const parentUnique: string | null =
+						info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					const documentTypeUnique = info.match.params.documentTypeUnique;
+					const blueprintUnique = info.match.params.blueprintUnique;
+
+					this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique, blueprintUnique);
+					new UmbWorkspaceIsNewRedirectController(
+						this,
+						this,
+						this.getHostElement().shadowRoot!.querySelector('umb-router-slot')!,
+					);
+				},
+			},
+			{
 				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique',
 				component: () => import('./document-workspace-editor.element.js'),
 				setup: async (_component, info) => {
@@ -217,15 +240,32 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	async create(parent: { entityType: string; unique: string | null }, documentTypeUnique: string) {
+	async create(
+		parent: { entityType: string; unique: string | null },
+		documentTypeUnique: string,
+		blueprintUnique?: string,
+	) {
 		this.resetState();
 		this.#parent.setValue(parent);
-		this.#getDataPromise = this.repository.createScaffold({
-			documentType: {
-				unique: documentTypeUnique,
-				collection: null,
-			},
-		});
+
+		/**TODO Explore bug: A way to make blueprintUnique undefined/null when no unique is given, rather than setting it to invariant */
+		if (blueprintUnique && blueprintUnique.toLowerCase() !== 'invariant') {
+			const { data } = await this.#blueprintRepository.requestByUnique(blueprintUnique);
+			console.log(data);
+			this.#getDataPromise = this.repository.createScaffold({
+				documentType: data?.documentType,
+				values: data?.values,
+				variants: data?.variants as Array<UmbDocumentVariantModel>,
+			});
+		} else {
+			this.#getDataPromise = this.repository.createScaffold({
+				documentType: {
+					unique: documentTypeUnique,
+					collection: null,
+				},
+			});
+		}
+
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
