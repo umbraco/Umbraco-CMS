@@ -11,6 +11,7 @@ import type {
 
 export const UMB_DATA_TYPE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.DataType.Tree';
 export const UMB_DATA_TYPE_TREE_STORE_ALIAS = 'Umb.Store.DataType.Tree';
+export const UMB_DATA_TYPE_TREE_ALIAS = 'Umb.Tree.DataType';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',
@@ -29,7 +30,7 @@ const treeStore: ManifestTreeStore = {
 const tree: ManifestTree = {
 	type: 'tree',
 	kind: 'default',
-	alias: 'Umb.Tree.DataType',
+	alias: UMB_DATA_TYPE_TREE_ALIAS,
 	name: 'Data Types Tree',
 	meta: {
 		repositoryAlias: UMB_DATA_TYPE_TREE_REPOSITORY_ALIAS,
