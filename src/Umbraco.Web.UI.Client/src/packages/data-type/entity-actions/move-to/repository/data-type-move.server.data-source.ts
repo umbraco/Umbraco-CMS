@@ -1,14 +1,14 @@
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbMoveToDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
 
 /**
  * Move Data Type Server Data Source
  * @export
  * @class UmbMoveDataTypeServerDataSource
  */
-export class UmbMoveDataTypeServerDataSource implements UmbMoveToDataSource {
+export class UmbMoveDataTypeServerDataSource implements UmbMoveDataSource {
 	#host: UmbControllerHost;
 
 	/**

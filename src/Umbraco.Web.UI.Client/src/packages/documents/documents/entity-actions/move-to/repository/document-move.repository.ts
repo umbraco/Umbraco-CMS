@@ -1,9 +1,9 @@
 import { UmbMoveDocumentServerDataSource } from './document-move.server.data-source.js';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { UmbMoveToRepository, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbMoveRepository, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
-export class UmbMoveDocumentRepository extends UmbRepositoryBase implements UmbMoveToRepository {
+export class UmbMoveDocumentRepository extends UmbRepositoryBase implements UmbMoveRepository {
 	#moveSource = new UmbMoveDocumentServerDataSource(this);
 
 	async requestMoveTo(args: UmbMoveToRequestArgs) {
