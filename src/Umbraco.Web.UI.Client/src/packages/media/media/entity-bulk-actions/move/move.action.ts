@@ -1,5 +1,6 @@
+import { UMB_MEDIA_TREE_PICKER_MODAL } from '../../tree/index.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {

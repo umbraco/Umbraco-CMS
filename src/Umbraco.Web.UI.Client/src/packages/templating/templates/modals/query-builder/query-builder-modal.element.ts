@@ -234,7 +234,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 										<umb-localize key=${ifDefined(sort.localizeKey)}>
 											${sort.direction ?? this._defaultSortDirection}
 										</umb-localize>
-								  </uui-button>`
+									</uui-button>`
 								: ''}
 						</div>
 						<div class="row query-results">
