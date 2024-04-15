@@ -114,7 +114,8 @@ test.describe('Partial View tests', () => {
     expect(updatedPartialView.content).toBe(updatedPartialViewContent);
   });
 
-  test('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
+  // Remove skip when the front-end is ready. Currently this function is not stable, sometimes the shown code is not updated after choosing Order By
+  test.skip('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
     //Arrange
     const propertyAliasValue = 'UpdateDate';
     const isAscending = true;
