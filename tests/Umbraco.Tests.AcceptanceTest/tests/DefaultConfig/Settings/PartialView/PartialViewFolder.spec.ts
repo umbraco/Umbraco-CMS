@@ -56,7 +56,7 @@ test.describe('Partial View Folder tests', () => {
     // Act
     await umbracoUi.partialView.clickRootFolderCaretButton();
     await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-    await umbracoUi.partialView.clickCreateThreeDotsButton();
+    await umbracoUi.partialView.clickCreateButton();
     await umbracoUi.partialView.clickNewEmptyPartialViewButton();
     await umbracoUi.partialView.enterPartialViewName(partialViewName);
     await umbracoUi.partialView.clickSaveButton();
@@ -69,5 +69,46 @@ test.describe('Partial View Folder tests', () => {
     await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(partialViewFileName)).not.toBeVisible(); 
     await umbracoUi.partialView.clickCaretButtonForName(folderName);
     await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(partialViewFileName)).toBeVisible(); 
+  });
+
+  test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    await umbracoApi.partialView.createFolder(folderName);
+    const childFolderName = 'childFolderName';
+
+    // Act
+    await umbracoUi.partialView.clickRootFolderCaretButton();
+    await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
+    await umbracoUi.partialView.createFolder(childFolderName);
+
+    // Assert
+    await umbracoUi.partialView.isSuccessNotificationVisible();
+    expect(await umbracoApi.partialView.doesNameExist(childFolderName)).toBeTruthy();
+    const partialViewChildren = await umbracoApi.partialView.getChildren('/' + folderName);
+    expect(partialViewChildren[0].path).toBe('/' + folderName + '/' + childFolderName);
+    await umbracoUi.partialView.clickCaretButtonForName(folderName);
+    await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(childFolderName)).toBeVisible(); 
+  });
+
+  test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const childFolderName = 'ChildFolderName';
+    const childOfChildFolderName = 'ChildOfChildFolderName';
+    await umbracoApi.partialView.createFolder(folderName);
+    await umbracoApi.partialView.createFolder(childFolderName, folderName);
+
+    // Act
+    await umbracoUi.partialView.clickRootFolderCaretButton();
+    await umbracoUi.partialView.clickCaretButtonForName(folderName);
+    await umbracoUi.partialView.clickActionsMenuForPartialView(childFolderName);
+    await umbracoUi.partialView.createFolder(childOfChildFolderName);
+
+    // Assert
+    await umbracoUi.partialView.isSuccessNotificationVisible();
+    expect(await umbracoApi.partialView.doesNameExist(childOfChildFolderName)).toBeTruthy();
+    const partialViewChildren = await umbracoApi.partialView.getChildren('/' + folderName + '/' + childFolderName);
+    expect(partialViewChildren[0].path).toBe('/' + folderName + '/' + childFolderName + '/' + childOfChildFolderName);
+    await umbracoUi.partialView.clickCaretButtonForName(childFolderName);
+    await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(childOfChildFolderName)).toBeVisible(); 
   });
 });
