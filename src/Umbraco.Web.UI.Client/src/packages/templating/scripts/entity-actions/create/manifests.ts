@@ -20,6 +20,6 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'modal',
 		alias: 'Umb.Modal.Script.CreateOptions',
 		name: 'Script Create Options Modal',
-		js: () => import('./options-modal/script-create-options-modal.element.js'),
+		element: () => import('./options-modal/script-create-options-modal.element.js'),
 	},
 ];

@@ -6,7 +6,7 @@ const modal: ManifestModal = {
 	type: 'modal',
 	alias: UMB_STYLESHEET_RULE_SETTINGS_MODAL_ALIAS,
 	name: 'Stylesheet Rule Settings Modal',
-	js: () => import('./stylesheet-rule-settings-modal.element.js'),
+	element: () => import('./stylesheet-rule-settings-modal.element.js'),
 };
 
 export const manifests = [modal];
