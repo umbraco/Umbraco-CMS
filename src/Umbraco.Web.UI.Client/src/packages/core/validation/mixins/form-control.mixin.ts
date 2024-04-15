@@ -34,8 +34,8 @@ interface UmbFormControlValidationConfig {
 }
 
 export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> extends HTMLElement {
-	addValidation: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
-	removeValidation: (obj: UmbFormControlValidationConfig) => void;
+	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
+	removeValidator: (obj: UmbFormControlValidationConfig) => void;
 	//static formAssociated: boolean;
 	//protected getFormElement(): HTMLElement | undefined | null; // allows for null as it makes it simpler to just implement a querySelector as that might return null. [NL]
 	focusFirstInvalidElement(): void;
@@ -56,8 +56,8 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 {
 	protected _internals: ElementInternals;
 	protected _runValidators(): void;
-	addValidation: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
-	removeValidation: (obj: UmbFormControlValidationConfig) => void;
+	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
+	removeValidator: (obj: UmbFormControlValidationConfig) => void;
 	protected addFormControlElement(element: UmbNativeFormControlElement): void;
 
 	//static formAssociated: boolean;
@@ -197,17 +197,17 @@ export const UmbFormControlMixin = <
 		 * See https://developer.mozilla.org/en-US/docs/Web/API/ValidityState for available Validator FlagTypes.
 		 *
 		 * @example
-		 * this.addValidation(
+		 * this.addValidator(
 		 *  'tooLong',
 		 *  () => 'This input contains too many characters',
 		 *  () => this._value.length > 10
 		 * );
-		 * @method addValidation
+		 * @method addValidator
 		 * @param {FlagTypes} flagKey the type of validation.
 		 * @param {method} getMessageMethod method to retrieve relevant message. Is executed every time the validator is re-executed.
 		 * @param {method} checkMethod method to determine if this validator should invalidate this form control. Return true if this should prevent submission.
 		 */
-		addValidation(
+		addValidator(
 			flagKey: FlagTypes,
 			getMessageMethod: () => string,
 			checkMethod: () => boolean,
@@ -220,17 +220,13 @@ export const UmbFormControlMixin = <
 			this.#validators.push(validator);
 			return validator;
 		}
-		/**
-		 * @deprecated Use addValidation instead.
-		 */
-		addValidator = this.addValidation;
 
 		/**
 		 * Remove validation from this form control.
-		 * @method removeValidation
-		 * @param {UmbFormControlValidationConfig} validation - The specific validation configuration to remove.
+		 * @method removeValidator
+		 * @param {UmbFormControlValidationConfig} validator - The specific validation configuration to remove.
 		 */
-		removeValidation(validator: UmbFormControlValidationConfig) {
+		removeValidator(validator: UmbFormControlValidationConfig) {
 			const index = this.#validators.indexOf(validator);
 			if (index !== -1) {
 				this.#validators.splice(index, 1);
@@ -268,11 +264,11 @@ export const UmbFormControlMixin = <
 		 */
 		protected setCustomValidity(message: string | null) {
 			if (this._customValidityObject) {
-				this.removeValidation(this._customValidityObject);
+				this.removeValidator(this._customValidityObject);
 			}
 
 			if (message != null && message !== '') {
-				this._customValidityObject = this.addValidation(
+				this._customValidityObject = this.addValidator(
 					'customError',
 					(): string => message,
 					() => true,

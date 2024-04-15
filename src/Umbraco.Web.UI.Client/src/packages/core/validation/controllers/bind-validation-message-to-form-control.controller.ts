@@ -8,7 +8,6 @@ import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoff
 const ctrlSymbol = Symbol();
 const observeSymbol = Symbol();
 
-// TODO: Include server in the name..
 export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 	readonly controllerAlias: UmbControllerAlias;
 
@@ -16,7 +15,7 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 
 	#control: UmbFormControlMixinInterface<unknown, unknown>;
 
-	#controlValidator?: ReturnType<UmbFormControlMixinInterface<unknown, unknown>['addValidation']>;
+	#controlValidator?: ReturnType<UmbFormControlMixinInterface<unknown, unknown>['addValidator']>;
 	#messages: Array<UmbValidationMessage> = [];
 	#isValid = false;
 
@@ -63,7 +62,7 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 
 	#setup() {
 		if (!this.#controlValidator) {
-			this.#controlValidator = this.#control.addValidation(
+			this.#controlValidator = this.#control.addValidator(
 				'customError',
 				() => this.#messages.map((x) => x.message).join(', '),
 				() => !this.#isValid,
@@ -78,7 +77,7 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 	#demolish() {
 		if (!this.#control || !this.#controlValidator) return;
 
-		this.#control.removeValidation(this.#controlValidator);
+		this.#control.removeValidator(this.#controlValidator);
 		//this.#control.removeEventListener('change', this.#onControlChange);
 		// Legacy event, used by some controls:
 		//this.#control.removeEventListener('property-value-change', this.#onControlChange);

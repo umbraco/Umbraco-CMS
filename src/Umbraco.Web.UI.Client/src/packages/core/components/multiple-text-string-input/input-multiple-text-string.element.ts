@@ -87,21 +87,21 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin(UmbLi
 
 		// TODO: we need a way to overwrite the missing value validator. Se we can validate on other properties than value
 		/*
-		this.removeValidation('valueMissing');
+		this.removeValidator('valueMissing');
 
-		this.addValidation(
+		this.addValidator(
 			'valueMissing',
 			() => this.requiredMessage,
 			() => this.items.length > 0
 		);
 		*/
 
-		this.addValidation(
+		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
 			() => !!this.min && this._items.length < this.min,
 		);
-		this.addValidation(
+		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
 			() => !!this.max && this._items.length > this.max,
