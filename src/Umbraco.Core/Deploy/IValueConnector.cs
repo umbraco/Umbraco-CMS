@@ -40,10 +40,11 @@ public interface IValueConnector
     /// <param name="propertyType">The value property type</param>
     /// <param name="dependencies">The content dependencies.</param>
     /// <param name="contextCache">The context cache.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the deploy property value.
     /// </returns>
-    Task<string?> ToArtifactAsync(object? value, IPropertyType propertyType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache)
+    Task<string?> ToArtifactAsync(object? value, IPropertyType propertyType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache, CancellationToken cancellationToken = default)
 #pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(ToArtifact(value, propertyType, dependencies, contextCache)); // TODO: Remove default implementation in v15
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -68,10 +69,11 @@ public interface IValueConnector
     /// <param name="propertyType">The value property type</param>
     /// <param name="currentValue">The current content property value.</param>
     /// <param name="contextCache">The context cache.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the content property value.
     /// </returns>
-    Task<object?> FromArtifactAsync(string? value, IPropertyType propertyType, object? currentValue, IContextCache contextCache)
+    Task<object?> FromArtifactAsync(string? value, IPropertyType propertyType, object? currentValue, IContextCache contextCache, CancellationToken cancellationToken = default)
 #pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(FromArtifact(value, propertyType, currentValue, contextCache)); // TODO: Remove default implementation in v15
 #pragma warning restore CS0618 // Type or member is obsolete

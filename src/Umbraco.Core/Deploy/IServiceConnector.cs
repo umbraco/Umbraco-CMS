@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Deploy;
@@ -23,10 +24,11 @@ public interface IServiceConnector : IDiscoverable
     /// </summary>
     /// <param name="udi">The entity identifier of the artifact.</param>
     /// <param name="contextCache">The context cache.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the corresponding artifact or <c>null</c>.
     /// </returns>
-    Task<IArtifact?> GetArtifactAsync(Udi udi, IContextCache contextCache)
+    Task<IArtifact?> GetArtifactAsync(Udi udi, IContextCache contextCache, CancellationToken cancellationToken = default)
 #pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(GetArtifact(udi, contextCache)); // TODO: Remove default implementation in v15
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -47,10 +49,11 @@ public interface IServiceConnector : IDiscoverable
     /// </summary>
     /// <param name="entity">The entity.</param>
     /// <param name="contextCache">The context cache.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the corresponding artifact.
     /// </returns>
-    Task<IArtifact> GetArtifactAsync(object entity, IContextCache contextCache)
+    Task<IArtifact> GetArtifactAsync(object entity, IContextCache contextCache, CancellationToken cancellationToken = default)
 #pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(GetArtifact(entity, contextCache)); // TODO: Remove default implementation in v15
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -71,10 +74,11 @@ public interface IServiceConnector : IDiscoverable
     /// </summary>
     /// <param name="artifact">The artifact.</param>
     /// <param name="context">The deploy context.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the state of an artifact being deployed.
     /// </returns>
-    Task<ArtifactDeployState> ProcessInitAsync(IArtifact artifact, IDeployContext context)
+    Task<ArtifactDeployState> ProcessInitAsync(IArtifact artifact, IDeployContext context, CancellationToken cancellationToken = default)
 #pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(ProcessInit(artifact, context)); // TODO: Remove default implementation in v15
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -94,10 +98,11 @@ public interface IServiceConnector : IDiscoverable
     /// <param name="state">The state of the artifact being deployed.</param>
     /// <param name="context">The deploy context.</param>
     /// <param name="pass">The processing pass number.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// A task that represents the asynchronous operation.
     /// </returns>
-    Task ProcessAsync(ArtifactDeployState state, IDeployContext context, int pass)
+    Task ProcessAsync(ArtifactDeployState state, IDeployContext context, int pass, CancellationToken cancellationToken = default)
     {
         // TODO: Remove default implementation in v15
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -119,10 +124,11 @@ public interface IServiceConnector : IDiscoverable
     /// Expands an UDI range into UDIs.
     /// </summary>
     /// <param name="range">The UDI range.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// Returns an <see cref="IAsyncEnumerable{Udi}" /> which when enumerated will asynchronously expand the UDI range into UDIs.
     /// </returns>
-    async IAsyncEnumerable<Udi> ExpandRangeAsync(UdiRange range)
+    async IAsyncEnumerable<Udi> ExpandRangeAsync(UdiRange range, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         // TODO: Remove default implementation in v15
         var udis = new List<Udi>();
@@ -152,10 +158,11 @@ public interface IServiceConnector : IDiscoverable
     /// </summary>
     /// <param name="udi">The UDI.</param>
     /// <param name="selector">The selector.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the named range for the specified UDI and selector.
     /// </returns>
-    Task<NamedUdiRange> GetRangeAsync(Udi udi, string selector)
+    Task<NamedUdiRange> GetRangeAsync(Udi udi, string selector, CancellationToken cancellationToken = default)
 #pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(GetRange(udi, selector)); // TODO: Remove default implementation in v15
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -187,6 +194,7 @@ public interface IServiceConnector : IDiscoverable
     /// <param name="entityType">The entity type.</param>
     /// <param name="sid">The identifier.</param>
     /// <param name="selector">The selector.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the named range for the specified entity type, identifier and selector.
     /// </returns>
@@ -199,7 +207,7 @@ public interface IServiceConnector : IDiscoverable
     /// indicate the "root" i.e. an open UDI.
     /// </para>
     /// </remarks>
-    Task<NamedUdiRange> GetRangeAsync(string entityType, string sid, string selector)
+    Task<NamedUdiRange> GetRangeAsync(string entityType, string sid, string selector, CancellationToken cancellationToken = default)
 #pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(GetRange(entityType, sid, selector)); // TODO: Remove default implementation in v15
 #pragma warning restore CS0618 // Type or member is obsolete

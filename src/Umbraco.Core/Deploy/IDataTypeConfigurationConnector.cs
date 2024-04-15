@@ -37,10 +37,11 @@ public interface IDataTypeConfigurationConnector
     /// <param name="dataType">The data type.</param>
     /// <param name="dependencies">The dependencies.</param>
     /// <param name="contextCache">The context cache.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the artifact configuration value.
     /// </returns>
-    Task<string?> ToArtifactAsync(IDataType dataType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache)
+    Task<string?> ToArtifactAsync(IDataType dataType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache, CancellationToken cancellationToken = default)
 #pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(ToArtifact(dataType, dependencies, contextCache)); // TODO: Remove default implementation in v15
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -63,10 +64,11 @@ public interface IDataTypeConfigurationConnector
     /// <param name="dataType">The data type.</param>
     /// <param name="configuration">The artifact configuration value.</param>
     /// <param name="contextCache">The context cache.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains the data type configuration.
     /// </returns>
-    Task<IDictionary<string, object>> FromArtifactAsync(IDataType dataType, string? configuration, IContextCache contextCache)
+    Task<IDictionary<string, object>> FromArtifactAsync(IDataType dataType, string? configuration, IContextCache contextCache, CancellationToken cancellationToken = default)
 #pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(FromArtifact(dataType, configuration, contextCache)); // TODO: Remove default implementation in v15
 #pragma warning restore CS0618 // Type or member is obsolete
