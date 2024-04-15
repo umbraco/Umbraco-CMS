@@ -46,7 +46,7 @@ public interface IContextCache
         if (shouldCreate)
         {
             // Only invoke and await if we need to create the value
-            value = await factory();
+            value = await factory().ConfigureAwait(false);
             Create(key, value);
         }
 
