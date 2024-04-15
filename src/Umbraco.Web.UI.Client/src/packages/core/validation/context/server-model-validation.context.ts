@@ -72,9 +72,8 @@ export class UmbServerModelValidationContext
 
 	#executeTranslatorsOnFeedback = (feedback: ServerFeedbackEntry) => {
 		return this.#translators.flatMap((translator) => {
-			if (translator.match(feedback.path)) {
-				const newPath = translator.translate(feedback.path);
-
+			let newPath: string | undefined;
+			if ((newPath = translator.translate(feedback.path))) {
 				// TODO: I might need to restructure this part for adjusting existing feedback with a part-translation.
 				// Detect if some part is unhandled?
 				// If so only make a partial translation on the feedback, add a message for the handled part.
