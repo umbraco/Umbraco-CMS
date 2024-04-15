@@ -1,4 +1,3 @@
-import { UMB_DICTIONARY_TREE_ALIAS } from '../../tree/manifests.js';
 import { UmbDictionaryImportRepository } from '../../repository/index.js';
 import type { UmbImportDictionaryModalData, UmbImportDictionaryModalValue } from './import-dictionary-modal.token.js';
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
