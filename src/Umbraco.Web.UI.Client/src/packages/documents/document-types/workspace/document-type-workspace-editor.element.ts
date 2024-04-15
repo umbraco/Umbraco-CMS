@@ -1,8 +1,8 @@
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from './document-type-workspace.context-token.js';
+import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 @customElement('umb-document-type-workspace-editor')
@@ -35,18 +35,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeName');
 		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias), '_observeAlias');
 		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon), '_observeIcon');
-
-		this.observe(
-			this.#workspaceContext.isNew,
-			(isNew) => {
-				if (isNew) {
-					// TODO: Would be good with a more general way to bring focus to the name input.
-					(this.shadowRoot?.querySelector('#name') as HTMLElement)?.focus();
-				}
-				this.removeUmbControllerByAlias('isNewRedirectController');
-			},
-			'_observeIsNew',
-		);
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -113,7 +101,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 						<umb-icon name=${ifDefined(this._icon)}></umb-icon>
 					</uui-button>
 
-					<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}" label="name">
+					<uui-input id="name" label="name" .value=${this._name} @input="${this.#onNameChange}" ${umbFocus()}>
 						<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 						<uui-input
 							name="alias"

@@ -32,7 +32,7 @@ export const manifests: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityBulkAction',
-		alias: 'Umb.EntityBulkAction.Media.Move',
+		alias: 'Umb.EntityBulkAction.Media.MoveTo',
 		name: 'Move Media Entity Bulk Action',
 		weight: 20,
 		api: UmbMediaMoveEntityBulkAction,

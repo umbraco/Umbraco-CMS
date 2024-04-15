@@ -8,6 +8,7 @@ import type {
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 interface GroupedPropertyEditorUIs {
 	[key: string]: Array<ManifestPropertyEditorUi>;
@@ -71,7 +72,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 					return (
 						propertyEditorUI.name.toLowerCase().includes(query) || propertyEditorUI.alias.toLowerCase().includes(query)
 					);
-			  });
+				});
 
 		// TODO: groupBy is not known by TS yet
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -104,7 +105,8 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 			id="filter"
 			@input="${this.#handleFilterInput}"
 			placeholder="Type to filter..."
-			label="Type to filter icons">
+			label="Type to filter icons"
+			${umbFocus()}>
 			<uui-icon name="search" slot="prepend" id="filter-icon"></uui-icon>
 		</uui-input>`;
 	}

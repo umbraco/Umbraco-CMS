@@ -11,6 +11,7 @@ import {
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbItemPickerModalData, UmbItemPickerModel } from '@umbraco-cms/backoffice/modal';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-item-picker-modal')
 export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPickerModalData, UmbItemPickerModel> {
@@ -52,7 +53,11 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 		return html`
 			<umb-body-layout headline=${this.data.headline}>
 				<div id="main">
-					<uui-input type="search" placeholder=${this.localize.term('placeholders_filter')} @input=${this.#filter}>
+					<uui-input
+						type="search"
+						placeholder=${this.localize.term('placeholders_filter')}
+						@input=${this.#filter}
+						${umbFocus()}>
 						<div slot="prepend">
 							<uui-icon name="search"></uui-icon>
 						</div>

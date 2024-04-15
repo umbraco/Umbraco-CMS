@@ -1,6 +1,6 @@
 import { UMB_MEMBER_TYPE_WORKSPACE_CONTEXT } from './member-type-workspace.context-token.js';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -118,7 +118,7 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 						<uui-icon name="${ifDefined(this._icon)}" style="color: ${this._iconColorAlias}"></uui-icon>
 					</uui-button>
 
-					<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}" label="name">
+					<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}" label="name" ${umbFocus()}>
 						<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 						<uui-input
 							name="alias"

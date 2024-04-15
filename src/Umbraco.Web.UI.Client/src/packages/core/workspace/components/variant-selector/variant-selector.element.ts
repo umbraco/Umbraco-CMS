@@ -7,7 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, type ActiveVariant } from '@umbraco-cms/backoffice/workspace';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
@@ -206,6 +206,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				label="Document name (TODO: Localize)"
 				.value=${this._name ?? ''}
 				@input=${this.#handleInput}
+				${umbFocus()}
 			>
 				${
 					this._variants?.length

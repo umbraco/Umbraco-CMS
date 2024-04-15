@@ -4,8 +4,8 @@ import { UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT } from './partial-view-workspace.con
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '@umbraco-cms/backoffice/template';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, html, customElement, query, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-partial-view-workspace-editor')
@@ -20,7 +20,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	private _ready: boolean = false;
 
 	@state()
-	private _isNew?: boolean = false;
+	private _isNew?: boolean;
 
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
@@ -89,29 +89,36 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-workspace-editor alias="Umb.Workspace.PartialView">
-			<div id="workspace-header" slot="header">
-				<uui-input
-					placeholder="Enter name..."
-					.value=${this._name}
-					@input=${this.#onNameInput}
-					label="Partial view name"
-					?readonly=${this._isNew === false}></uui-input>
-			</div>
-			<uui-box>
-				<div slot="header" id="code-editor-menu-container">
-					<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
-					<uui-button look="secondary" id="query-builder-button" label="Query builder" @click=${this.#openQueryBuilder}>
-						<uui-icon name="icon-wand"></uui-icon>Query builder
-					</uui-button>
-				</div>
-				${this._ready
-					? this.#renderCodeEditor()
-					: html`<div id="loader-container">
-							<uui-loader></uui-loader>
-						</div>`}
-			</uui-box>
-		</umb-workspace-editor>`;
+		return this._isNew !== undefined
+			? html`<umb-workspace-editor alias="Umb.Workspace.PartialView">
+					<div id="workspace-header" slot="header">
+						<uui-input
+							placeholder="Enter name..."
+							.value=${this._name}
+							@input=${this.#onNameInput}
+							label="Partial view name"
+							?readonly=${this._isNew === false}
+							${umbFocus()}></uui-input>
+					</div>
+					<uui-box>
+						<div slot="header" id="code-editor-menu-container">
+							<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
+							<uui-button
+								look="secondary"
+								id="query-builder-button"
+								label="Query builder"
+								@click=${this.#openQueryBuilder}>
+								<uui-icon name="icon-wand"></uui-icon>Query builder
+							</uui-button>
+						</div>
+						${this._ready
+							? this.#renderCodeEditor()
+							: html`<div id="loader-container">
+									<uui-loader></uui-loader>
+								</div>`}
+					</uui-box>
+				</umb-workspace-editor>`
+			: nothing;
 	}
 
 	static styles = [
