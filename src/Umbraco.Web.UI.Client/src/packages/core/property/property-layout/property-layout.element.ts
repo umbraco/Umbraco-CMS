@@ -56,6 +56,16 @@ export class UmbPropertyLayoutElement extends LitElement {
 	@property({ type: Boolean, reflect: true })
 	public invalid?: boolean;
 
+	/**
+	 * @description Describe why the property is invalid.
+	 * @type {boolean}
+	 * @attr
+	 * @default undefined
+	 */
+	@property({ type: String, attribute: 'invalid-message' })
+	public invalidMessage?: string;
+	// TODO: put the invalidMessage in some hover tooltip or something. [NL]
+
 	render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`

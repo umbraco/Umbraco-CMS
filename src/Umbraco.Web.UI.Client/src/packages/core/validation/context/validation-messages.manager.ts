@@ -34,7 +34,7 @@ export class UmbValidationMessagesManager {
 		return this.#messages.getValue().length !== 0;
 	}
 
-	/*messagesOf(path: string): Observable<Array<UmbValidationMessage>> {
+	messagesOfPathAndDescendant(path: string): Observable<Array<UmbValidationMessage>> {
 		// Find messages that starts with the given path, if the path is longer then require a dot or [ as the next character. using a more performant way than Regex:
 		return this.#messages.asObservablePart((msgs) =>
 			msgs.filter(
@@ -43,7 +43,7 @@ export class UmbValidationMessagesManager {
 					(x.path.length === path.length || x.path[path.length] === '.' || x.path[path.length] === '['),
 			),
 		);
-	}*/
+	}
 
 	messagesOfTypeAndPath(type: UmbValidationMessageType, path: string): Observable<Array<UmbValidationMessage>> {
 		// Find messages that matches the given type and path.

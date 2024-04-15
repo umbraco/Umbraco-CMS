@@ -50,19 +50,21 @@ export class UmbServerModelValidationContext
 			this.#validatePromiseResolve = resolve;
 		});
 
+		// Store this state of the data for translator look ups:
+		this.#data = data;
 		// Ask the server for validation...
 		const { error } = await requestPromise;
 
-		// Store this state of the data for translator look ups:
-		this.#data = data;
+		this.#isValid = error ? false : true;
 
-		// We are missing some typing here, but we will just go wild: [NL]
-		const readErrorBody = (error as any).body;
-		Object.keys(readErrorBody.errors).forEach((path) => {
-			this.#serverFeedback.push({ path, messages: readErrorBody.errors[path] });
-		});
+		if (!this.#isValid) {
+			// We are missing some typing here, but we will just go wild with 'as any': [NL]
+			const readErrorBody = (error as any).body;
+			Object.keys(readErrorBody.errors).forEach((path) => {
+				this.#serverFeedback.push({ path, messages: readErrorBody.errors[path] });
+			});
+		}
 
-		this.#isValid = data ? true : false;
 		this.#validatePromiseResolve?.();
 		this.#validatePromiseResolve = undefined;
 
