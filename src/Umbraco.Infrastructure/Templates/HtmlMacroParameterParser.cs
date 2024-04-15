@@ -55,9 +55,12 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
                 macroAlias,
                 new Dictionary<string, string>(macroAttributes, StringComparer.OrdinalIgnoreCase))));
 
-        foreach (UmbracoEntityReference umbracoEntityReference in GetUmbracoEntityReferencesFromMacros(foundMacros))
+        if (foundMacros.Count > 0)
         {
-            yield return umbracoEntityReference;
+            foreach (UmbracoEntityReference umbracoEntityReference in GetUmbracoEntityReferencesFromMacros(foundMacros))
+            {
+                yield return umbracoEntityReference;
+            }
         }
     }
 
@@ -82,9 +85,12 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
             }
         }
 
-        foreach (UmbracoEntityReference umbracoEntityReference in GetUmbracoEntityReferencesFromMacros(foundMacros))
+        if (foundMacros.Count > 0)
         {
-            yield return umbracoEntityReference;
+            foreach (UmbracoEntityReference umbracoEntityReference in GetUmbracoEntityReferencesFromMacros(foundMacros))
+            {
+                yield return umbracoEntityReference;
+            }
         }
     }
 
@@ -103,7 +109,9 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
         var foundMacroUmbracoEntityReferences = new List<UmbracoEntityReference>();
 
         // Get all the macro configs in one hit for these unique macro aliases - this is now cached with a custom cache policy
-        IEnumerable<IMacro> macroConfigs = macroWithAliasService.GetAll(uniqueMacroAliases.WhereNotNull().ToArray());
+        IEnumerable<IMacro> macroConfigs = uniqueMacroAliases.Any()
+            ? macroWithAliasService.GetAll(uniqueMacroAliases.WhereNotNull().ToArray())
+            : Enumerable.Empty<IMacro>();
 
         foreach (Tuple<string?, Dictionary<string, string>> macro in macros)
         {
