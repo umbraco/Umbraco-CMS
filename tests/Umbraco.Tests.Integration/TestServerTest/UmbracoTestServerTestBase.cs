@@ -278,6 +278,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
                     // Adds Umbraco.Tests.Integration
                     mvcBuilder.AddApplicationPart(typeof(UmbracoTestServerTestBase).Assembly);
+
+                    CustomMvcSetup(mvcBuilder);
                 })
                 .AddWebServer()
                 .AddWebsite()
@@ -292,6 +294,11 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
 
             builder.Build();
+        }
+
+        protected virtual void CustomMvcSetup(IMvcBuilder mvcBuilder)
+        {
+            
         }
 
         /// <summary>
