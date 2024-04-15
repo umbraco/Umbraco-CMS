@@ -45,18 +45,17 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 
 	async load(unique: string) {
 		this.resetState();
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.value, (value) => {
-				if (value) {
-					const blockTypeData = value.find((x: UmbBlockGridTypeAreaType) => x.key === unique);
-					if (blockTypeData) {
-						this.#data.setValue(blockTypeData);
-						return;
-					}
+		const context = await this.getContext(UMB_PROPERTY_CONTEXT);
+		this.observe(context.value, (value) => {
+			if (value) {
+				const blockTypeData = value.find((x: UmbBlockGridTypeAreaType) => x.key === unique);
+				if (blockTypeData) {
+					this.#data.setValue(blockTypeData);
+					return;
 				}
-				// Fallback to undefined:
-				this.#data.setValue(undefined);
-			});
+			}
+			// Fallback to undefined:
+			this.#data.setValue(undefined);
 		});
 	}
 
@@ -109,15 +108,16 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 	}
 
 	async submit() {
-		if (!this.#data.value) return;
+		if (!this.#data.value) {
+			throw new Error('No data to submit.');
+		}
 
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			// TODO: We should most likely consume already, in this way I avoid having the reset this consumption.
-			context.setValue(appendToFrozenArray(context.getValue() ?? [], this.#data.getValue(), (x) => x?.key));
-		});
+		const context = await this.getContext(UMB_PROPERTY_CONTEXT);
+
+		// TODO: We should most likely consume already, in this way I avoid having the reset this consumption.
+		context.setValue(appendToFrozenArray(context.getValue() ?? [], this.#data.getValue(), (x) => x?.key));
 
 		this.setIsNew(false);
-		return true;
 	}
 
 	public destroy(): void {

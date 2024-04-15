@@ -1,6 +1,6 @@
-import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_CURRENT_USER_CONTEXT } from '../../../user/current-user/current-user.context.js';
 import { isDocumentUserPermission } from './utils.js';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {
