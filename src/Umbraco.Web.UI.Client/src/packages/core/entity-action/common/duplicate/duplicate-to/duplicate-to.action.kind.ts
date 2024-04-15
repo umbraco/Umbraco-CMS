@@ -15,7 +15,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-enter',
-			label: '#actions_copy',
+			label: '#actions_copyTo',
 			treeRepositoryAlias: '',
 			duplicateRepositoryAlias: '',
 			treeAlias: '',
