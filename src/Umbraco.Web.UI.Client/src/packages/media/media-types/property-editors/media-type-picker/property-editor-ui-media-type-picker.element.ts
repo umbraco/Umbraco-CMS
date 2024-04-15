@@ -40,7 +40,6 @@ export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement imp
 				.value=${this.value ?? ''}
 				.min=${this._limitMin ?? 0}
 				.max=${this._limitMax ?? Infinity}>
-				<umb-localize key="general_add">Add</umb-localize>
 			</umb-input-media-type>
 		`;
 	}
