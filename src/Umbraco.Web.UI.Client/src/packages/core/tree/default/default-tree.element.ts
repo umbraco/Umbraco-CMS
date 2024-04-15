@@ -17,6 +17,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	selectionConfiguration: UmbTreeSelectionConfiguration = this._selectionConfiguration;
 
 	@property({ type: Boolean, attribute: false })
+	hideTreeItemActions: boolean = false;
+
+	@property({ type: Boolean, attribute: false })
 	hideTreeRoot: boolean = false;
 
 	@property({ attribute: false })
@@ -94,7 +97,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	#renderTreeRoot() {
 		if (this.hideTreeRoot || this._treeRoot === undefined) return nothing;
 		return html`
-			<umb-tree-item .entityType=${this._treeRoot.entityType} .props=${{ item: this._treeRoot }}></umb-tree-item>
+			<umb-tree-item
+				.entityType=${this._treeRoot.entityType}
+				.props=${{ hideActions: this.hideTreeItemActions, item: this._treeRoot }}></umb-tree-item>
 		`;
 	}
 
@@ -105,7 +110,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 				${repeat(
 					this._rootItems,
 					(item, index) => item.name + '___' + index,
-					(item) => html`<umb-tree-item .entityType=${item.entityType} .props=${{ item }}></umb-tree-item>`,
+					(item) =>
+						html`<umb-tree-item
+							.entityType=${item.entityType}
+							.props=${{ hideActions: this.hideTreeItemActions, item }}></umb-tree-item>`,
 				)}
 				${this.#renderPaging()}
 			`;
