@@ -3,7 +3,7 @@ import { css, html, nothing, customElement, state, query, property } from '@umbr
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_EXAMINE_FIELDS_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { SearchResultResponseModel, FieldPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 import './modal-views/fields-viewer.element.js';
@@ -112,7 +112,8 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 						id="search-input"
 						placeholder="Type to filter..."
 						label="Type to filter"
-						@keypress=${this._onKeyPress}>
+						@keypress=${this._onKeyPress}
+						${umbFocus()}>
 					</uui-input>
 					<uui-button color="positive" look="primary" label="Search" @click="${this._onSearch}"> Search </uui-button>
 				</div>

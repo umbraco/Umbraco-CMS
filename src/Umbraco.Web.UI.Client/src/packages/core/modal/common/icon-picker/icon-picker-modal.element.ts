@@ -7,6 +7,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbIconPickerModalData, UmbIconPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { extractUmbColorVariable, umbracoColors } from '@umbraco-cms/backoffice/resources';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 // TODO: Make use of UmbPickerLayoutBase
 // TODO: to prevent element extension we need to move the Picker logic into a separate class we can reuse across all pickers
@@ -109,7 +110,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 			placeholder=${this.localize.term('placeholders_filter')}
 			label=${this.localize.term('placeholders_filter')}
 			id="searchbar"
-			@keyup="${this.#filterIcons}">
+			@keyup="${this.#filterIcons}"
+			${umbFocus()}>
 			<uui-icon name="search" slot="prepend" id="searchbar_icon"></uui-icon>
 		</uui-input>`;
 	}

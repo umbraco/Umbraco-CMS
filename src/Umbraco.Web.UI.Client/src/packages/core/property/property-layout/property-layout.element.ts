@@ -47,11 +47,22 @@ export class UmbPropertyLayoutElement extends LitElement {
 	@property({ type: String })
 	public description = '';
 
+	/**
+	 * @description Make the property appear invalid
+	 * @type {boolean}
+	 * @attr
+	 * @default undefined
+	 */
+	@property({ type: Boolean, reflect: true })
+	public invalid?: boolean;
+
 	render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
 			<div id="headerColumn">
-				<uui-label title=${this.alias}>${this.label}</uui-label>
+				<uui-label title=${this.alias}>
+					${this.label} ${this.invalid ? html`<uui-badge color="danger" attention>!</uui-badge>` : ''}
+				</uui-label>
 				<slot name="action-menu"></slot>
 				<div id="description">${this.description}</div>
 				<slot name="description"></slot>
@@ -69,7 +80,7 @@ export class UmbPropertyLayoutElement extends LitElement {
 		css`
 			:host {
 				display: grid;
-				grid-template-columns: 200px minmax(0,1fr);
+				grid-template-columns: 200px minmax(0, 1fr);
 				column-gap: var(--uui-size-layout-2);
 				border-bottom: 1px solid var(--uui-color-divider);
 				padding: var(--uui-size-layout-1) 0;
@@ -98,6 +109,16 @@ export class UmbPropertyLayoutElement extends LitElement {
 				top: calc(var(--uui-size-space-2) * -1);
 			}
 			/*}*/
+
+			uui-label {
+				position: relative;
+			}
+			:host([invalid]) uui-label {
+				color: var(--uui-color-danger);
+			}
+			uui-badge {
+				right: -30px;
+			}
 
 			#description {
 				color: var(--uui-color-text-alt);

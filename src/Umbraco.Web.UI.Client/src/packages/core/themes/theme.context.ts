@@ -58,7 +58,6 @@ export class UmbThemeContext extends UmbContextBase<UmbThemeContext> {
 							document.head.appendChild(this.#styleElement);
 						}
 					} else {
-						console.log('remove style element', this.#styleElement);
 						// We could not load a theme for this alias, so we remove the theme.
 						localStorage.removeItem(LOCAL_STORAGE_KEY);
 						this.#styleElement?.childNodes.forEach((node) => node.remove());

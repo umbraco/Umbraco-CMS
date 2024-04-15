@@ -23,26 +23,30 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 	}
 	@property({ type: Number })
 	public set min(value: number) {
+		this.#min = value;
 		if (this.#pickerContext) {
 			this.#pickerContext.min = value;
 		}
 	}
 	public get min(): number {
-		return this.#pickerContext?.min ?? 0;
+		return this.#min;
 	}
+	#min: number = 0;
 
 	@property({ type: String, attribute: 'min-message' })
 	minMessage = 'This field need more items';
 
 	@property({ type: Number })
 	public set max(value: number) {
+		this.#max = value;
 		if (this.#pickerContext) {
 			this.#pickerContext.max = value;
 		}
 	}
 	public get max(): number {
-		return this.#pickerContext?.max ?? Infinity;
+		return this.#max;
 	}
+	#max: number = Infinity;
 
 	@property({ attribute: false })
 	getIcon?: (item: any) => string;
@@ -101,6 +105,9 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 
 	async #observePickerContext() {
 		if (!this.#pickerContext) return;
+
+		this.#pickerContext.min = this.min;
+		this.#pickerContext.max = this.max;
 
 		this.observe(
 			this.#pickerContext.selection,

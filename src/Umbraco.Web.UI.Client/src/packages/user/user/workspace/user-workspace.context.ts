@@ -89,22 +89,17 @@ export class UmbUserWorkspaceContext
 		if (!this.#currentData.value) throw new Error('Data is missing');
 		if (!this.#currentData.value.unique) throw new Error('Unique is missing');
 
-		let newData = undefined;
-
 		if (this.getIsNew()) {
-			const { data } = await this.detailRepository.create(this.#currentData.value);
-			newData = data;
+			const { error, data } = await this.detailRepository.create(this.#currentData.value);
+			if (error) throw new Error(error.message);
+			this.#persistedData.setValue(data);
+			this.#currentData.setValue(data);
 		} else {
-			const { data } = await this.detailRepository.save(this.#currentData.value);
-			newData = data;
+			const { error, data } = await this.detailRepository.save(this.#currentData.value);
+			if (error) throw new Error(error.message);
+			this.#persistedData.setValue(data);
+			this.#currentData.setValue(data);
 		}
-
-		if (newData) {
-			this.#persistedData.setValue(newData);
-			this.#currentData.setValue(newData);
-			this.setIsNew(false);
-		}
-		return true;
 	}
 
 	// TODO: implement upload progress

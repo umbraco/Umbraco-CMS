@@ -1,13 +1,17 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbContentTypeModel,
+	UmbContentTypeStructureManager,
+	UmbPropertyTypeContainerModel,
+} from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import './content-editor-properties.element.js';
 
-import './document-workspace-view-edit-properties.element.js';
-@customElement('umb-document-workspace-view-edit-tab')
-export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
+@customElement('umb-content-workspace-view-edit-tab')
+export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 	@property({ type: String })
 	public get containerId(): string | null | undefined {
 		return this._containerId;
@@ -19,7 +23,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	@state()
 	private _containerId?: string | null;
 
-	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<any>(this);
+	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
 	_groups: Array<UmbPropertyTypeContainerModel> = [];
@@ -30,8 +34,11 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#groupStructureHelper.setStructureManager(workspaceContext.structure);
+		this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#groupStructureHelper.setStructureManager(
+				// Assuming its the same content model type that we are working with here... [NL]
+				workspaceContext.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
+			);
 		});
 		this.observe(this.#groupStructureHelper.mergedContainers, (groups) => {
 			this._groups = groups;
@@ -46,9 +53,9 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 			${this._hasProperties
 				? html`
 						<uui-box>
-							<umb-document-workspace-view-edit-properties
+							<umb-content-workspace-view-edit-properties
 								class="properties"
-								.containerId=${this._containerId}></umb-document-workspace-view-edit-properties>
+								.containerId=${this._containerId}></umb-content-workspace-view-edit-properties>
 						</uui-box>
 					`
 				: ''}
@@ -57,9 +64,9 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 				(group) => group.id,
 				(group) =>
 					html`<uui-box .headline=${group.name ?? ''}>
-						<umb-document-workspace-view-edit-properties
+						<umb-content-workspace-view-edit-properties
 							class="properties"
-							.containerId=${group.id}></umb-document-workspace-view-edit-properties>
+							.containerId=${group.id}></umb-content-workspace-view-edit-properties>
 					</uui-box>`,
 			)}
 		`;
@@ -78,10 +85,10 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	];
 }
 
-export default UmbDocumentWorkspaceViewEditTabElement;
+export default UmbContentWorkspaceViewEditTabElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-workspace-view-edit-tab': UmbDocumentWorkspaceViewEditTabElement;
+		'umb-content-workspace-view-edit-tab': UmbContentWorkspaceViewEditTabElement;
 	}
 }
