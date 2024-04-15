@@ -39,9 +39,9 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 	{
 		type: 'workspaceView',
+		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.Media.Edit',
 		name: 'Media Workspace Edit View',
-		js: () => import('./views/edit/media-workspace-view-edit.element.js'),
 		weight: 200,
 		meta: {
 			label: '#general_details',
