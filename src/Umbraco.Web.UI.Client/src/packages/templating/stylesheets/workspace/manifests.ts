@@ -44,7 +44,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/rich-text-rule/stylesheet-rich-text-rule-workspace-view.element.js'),
 		weight: 800,
 		meta: {
-			label: '#stylesheet_tabRule',
+			label: '#stylesheet_tabRules',
 			pathname: 'rich-text-editor',
 			icon: 'icon-font',
 		},
