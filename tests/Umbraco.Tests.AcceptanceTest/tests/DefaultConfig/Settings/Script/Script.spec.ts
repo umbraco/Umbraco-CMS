@@ -18,18 +18,16 @@ test.describe('Script tests', () => {
   test('can create a empty script', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.script.clickActionsMenuAtRoot();
-    await umbracoUi.script.clickCreateThreeDotsButton();
+    await umbracoUi.script.clickCreateButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.enterScriptName(scriptName);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.clickSaveButton();
 
     // Assert
     await umbracoUi.script.isSuccessNotificationVisible();
     expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
+    await umbracoUi.script.clickRootFolderCaretButton();
+    await expect(umbracoUi.script.checkItemNameUnderScriptTree(scriptName)).toBeVisible();
   });
 
   test('can create a script with content', async ({umbracoApi, umbracoUi}) => {
@@ -38,14 +36,10 @@ test.describe('Script tests', () => {
 
     // Act
     await umbracoUi.script.clickActionsMenuAtRoot();
-    await umbracoUi.script.clickCreateThreeDotsButton();
+    await umbracoUi.script.clickCreateButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.enterScriptName(scriptName);
     await umbracoUi.script.enterScriptContent(scriptContent);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.clickSaveButton();
 
     // Assert
@@ -53,6 +47,8 @@ test.describe('Script tests', () => {
     expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
     const scriptData = await umbracoApi.script.getByName(scriptName);
     expect(scriptData.content).toBe(scriptContent);
+    await umbracoUi.script.clickRootFolderCaretButton();
+    await expect(umbracoUi.script.checkItemNameUnderScriptTree(scriptName)).toBeVisible();
   });
 
   test('can update a script', async ({umbracoApi, umbracoUi}) => {
@@ -62,16 +58,11 @@ test.describe('Script tests', () => {
 
     // Act
     await umbracoUi.script.openScriptAtRoot(scriptName);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.enterScriptContent(updatedScriptContent);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.clickSaveButton();
 
     // Assert
-    // TODO: Uncomment when the notification is visible. Currently there is no notification after you update a script
-    // await umbracoUi.script.isSuccessNotificationVisible();
+    await umbracoUi.script.isSuccessNotificationVisible();
     const updatedScript = await umbracoApi.script.get(scriptPath);
     expect(updatedScript.content).toBe(updatedScriptContent);
   });
@@ -83,10 +74,27 @@ test.describe('Script tests', () => {
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
     await umbracoUi.script.clickActionsMenuForScript(scriptName);
-    await umbracoUi.script.deleteScript();
+    await umbracoUi.script.delete();
 
     // Assert
     await umbracoUi.script.isSuccessNotificationVisible();
     expect(await umbracoApi.script.doesNameExist(scriptName)).toBeFalsy();
+    await expect(umbracoUi.script.checkItemNameUnderScriptTree(scriptName)).not.toBeVisible();
+  });
+
+  test('can rename a script', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const wrongScriptName = 'WrongTestScript.js';
+    await umbracoApi.script.create(wrongScriptName, '');
+
+    // Act
+    await umbracoUi.script.clickRootFolderCaretButton();
+    await umbracoUi.script.clickActionsMenuForScript(wrongScriptName);
+    await umbracoUi.script.rename(scriptName);
+
+    // Assert
+    await umbracoUi.script.isSuccessNotificationVisible();
+    expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
+    expect(await umbracoApi.script.doesNameExist(wrongScriptName)).toBeFalsy();
   });
 });
