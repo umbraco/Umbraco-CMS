@@ -45,9 +45,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	public set type(value: string | string[] | undefined) {
 		if (value === this.#type) return;
 		this.#type = value;
-		if (this.#attached) {
-			this.#observeExtensions();
-		}
+		this.#observeExtensions();
 	}
 	#type?: string | string[] | undefined;
 
@@ -67,9 +65,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	public set filter(value: (manifest: any) => boolean) {
 		if (value === this.#filter) return;
 		this.#filter = value;
-		if (this.#attached) {
-			this.#observeExtensions();
-		}
+		this.#observeExtensions();
 	}
 	#filter: (manifest: any) => boolean = () => true;
 
@@ -147,11 +143,19 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.#observeExtensions();
 		this.#attached = true;
+		this.#observeExtensions();
+	}
+	disconnectedCallback(): void {
+		this.#attached = false;
+		this.#extensionsController?.destroy();
+		this.#extensionsController = undefined;
+		super.disconnectedCallback();
 	}
 
 	#observeExtensions(): void {
+		// We want to be attached before we start observing extensions, cause first at this point we know that we got the right properties. [NL]
+		if (!this.#attached) return;
 		this.#extensionsController?.destroy();
 		if (this.#type) {
 			this.#extensionsController = new UmbExtensionsElementAndApiInitializer(

@@ -11,7 +11,7 @@ import type {
 	ManifestEntityActionRenameServerFileKind,
 	ManifestEntityActionReloadTreeItemChildrenKind,
 	ManifestEntityActionDuplicateKind,
-	ManifestEntityActionMoveKind,
+	ManifestEntityActionMoveToKind,
 	ManifestEntityActionCreateFolderKind,
 	ManifestEntityActionUpdateFolderKind,
 	ManifestEntityActionDeleteFolderKind,
@@ -122,7 +122,7 @@ export type ManifestEntityActions =
 	| ManifestEntityActionDeleteKind
 	| ManifestEntityActionDuplicateKind
 	| ManifestEntityActionEmptyRecycleBinKind
-	| ManifestEntityActionMoveKind
+	| ManifestEntityActionMoveToKind
 	| ManifestEntityActionReloadTreeItemChildrenKind
 	| ManifestEntityActionRenameServerFileKind
 	| ManifestEntityActionRestoreFromRecycleBinKind

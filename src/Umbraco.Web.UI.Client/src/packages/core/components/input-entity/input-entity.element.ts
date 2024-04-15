@@ -9,13 +9,13 @@ import {
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 
 @customElement('umb-input-entity')
-export class UmbInputEntityElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, '') {
 	// TODO: [LK] Add sort ordering.
 
 	protected getFormElement() {

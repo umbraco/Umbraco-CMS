@@ -1,22 +1,11 @@
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_MEDIA_TYPE_PICKER_MODAL } from '../tree/index.js';
 import { manifests as createManifests } from './create/manifests.js';
-import { UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import { manifests as moveManifests } from './move-to/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
-	{
-		type: 'entityAction',
-		kind: 'move',
-		alias: 'Umb.EntityAction.MediaType.Move',
-		name: 'Move Media Type Entity Action',
-		forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
-		meta: {
-			moveRepositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
-			itemRepositoryAlias: UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS,
-			pickerModal: UMB_MEDIA_TREE_PICKER_MODAL,
-		},
-	},
 	{
 		type: 'entityAction',
 		kind: 'duplicate',
@@ -26,7 +15,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			duplicateRepositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS,
-			pickerModal: UMB_MEDIA_TREE_PICKER_MODAL,
+			pickerModal: UMB_MEDIA_TYPE_PICKER_MODAL,
 		},
 	},
 	{
@@ -42,4 +31,4 @@ const entityActions: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...entityActions, ...createManifests];
+export const manifests = [...entityActions, ...createManifests, ...moveManifests];

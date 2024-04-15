@@ -8,12 +8,14 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
@@ -127,6 +129,13 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			);
 		});
 		*/
+		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
+			this._layouts = layouts;
+			// Update sorter.
+			this.#sorter.setModel(layouts);
+			// Update manager:
+			this.#managerContext.setLayouts(layouts);
+		});
 
 		// TODO: Prevent initial notification from these observes:
 		this.observe(this.#managerContext.layouts, (layouts) => {
@@ -135,26 +144,19 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			//console.log('layout changed', this._value);
 			// TODO: idea: consider inserting an await here, so other changes could appear first? Maybe some mechanism to only fire change event onces?
 			//this.#entriesContext.setLayoutEntries(layouts);
-			this.dispatchEvent(new UmbChangeEvent());
-		});
-		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
-			this._layouts = layouts;
-			// Update sorter.
-			this.#sorter.setModel(layouts);
-			// Update manager:
-			this.#managerContext.setLayouts(layouts);
+			this.#fireChangeEvent();
 		});
 		this.observe(this.#managerContext.contents, (contents) => {
 			this._value = { ...this._value, contentData: contents };
 			// Notify that the value has changed.
 			//console.log('content changed', this._value);
-			this.dispatchEvent(new UmbChangeEvent());
+			this.#fireChangeEvent();
 		});
 		this.observe(this.#managerContext.settings, (settings) => {
 			this._value = { ...this._value, settingsData: settings };
 			// Notify that the value has changed.
 			//console.log('settings changed', this._value);
-			this.dispatchEvent(new UmbChangeEvent());
+			this.#fireChangeEvent();
 		});
 		this.observe(this.#managerContext.blockTypes, (blockTypes) => {
 			this._blocks = blockTypes;
@@ -183,6 +185,15 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			});
 			*/
 	}
+
+	#debounceChangeEvent?: boolean;
+	#fireChangeEvent = async () => {
+		if (this.#debounceChangeEvent) return;
+		this.#debounceChangeEvent = true;
+		await Promise.resolve();
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.#debounceChangeEvent = false;
+	};
 
 	render() {
 		let createPath: string | undefined;

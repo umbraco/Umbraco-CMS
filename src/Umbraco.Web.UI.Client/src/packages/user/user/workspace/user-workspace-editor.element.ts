@@ -5,7 +5,7 @@ import { UMB_USER_WORKSPACE_CONTEXT } from './user-workspace.context-token.js';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 // import local components. Theses are not meant to be used outside of this component.
@@ -66,7 +66,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 				<a href="section/user-management">
 					<uui-icon name="icon-arrow-left"></uui-icon>
 				</a>
-				<uui-input id="name" .value=${this._user?.name ?? ''} @input="${this.#onNameChange}"></uui-input>
+				<uui-input id="name" .value=${this._user?.name ?? ''} @input="${this.#onNameChange}" ${umbFocus()}></uui-input>
 			</div>
 		`;
 	}
@@ -81,7 +81,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRightColumn() {
-		if (!this._user || !this.#workspaceContext) return nothing;
+		if (!this._user) return nothing;
 
 		return html`
 			<umb-user-workspace-avatar></umb-user-workspace-avatar>

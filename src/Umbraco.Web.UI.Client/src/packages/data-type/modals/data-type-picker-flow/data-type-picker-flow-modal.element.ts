@@ -14,6 +14,7 @@ import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension
 import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 interface GroupedItems<T> {
 	[key: string]: Array<T>;
@@ -187,7 +188,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			id="filter"
 			@input="${this._handleFilterInput}"
 			placeholder="Type to filter..."
-			label="Type to filter icons">
+			label="Type to filter icons"
+			${umbFocus()}>
 			<uui-icon name="search" slot="prepend" id="filter-icon"></uui-icon>
 		</uui-input>`;
 	}

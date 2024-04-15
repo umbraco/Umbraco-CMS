@@ -4,16 +4,13 @@ import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbDocumentBlueprintItemModel {
 	entityType: UmbDocumentBlueprintEntityType;
-	name: string; // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
+	name: string;
 	unique: string;
-	isTrashed: boolean;
-	isProtected: boolean;
 	documentType: {
 		unique: string;
 		icon: string;
 		collection: UmbReferenceByUnique | null;
 	};
-	variants: Array<UmbDocumentBlueprintItemVariantModel>;
 }
 
 export interface UmbDocumentBlueprintItemVariantModel {

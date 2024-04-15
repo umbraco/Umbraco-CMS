@@ -4,17 +4,14 @@ import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, customElement, query, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, type UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin, type UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_LINK_PICKER_MODAL,
-	UMB_MEDIA_TREE_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_LINK_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 
 /**
  * @element umb-input-markdown
@@ -22,7 +19,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
  */
 
 @customElement('umb-input-markdown')
-export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, '') {
 	protected getFormElement() {
 		return this._codeEditor;
 	}

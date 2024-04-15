@@ -163,6 +163,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 	public destroy(): void {
 		this.#data.destroy();
+		this.#properties.destroy();
 		super.destroy();
 	}
 }

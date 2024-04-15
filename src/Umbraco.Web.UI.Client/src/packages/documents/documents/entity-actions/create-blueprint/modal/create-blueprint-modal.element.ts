@@ -1,19 +1,16 @@
 import { UmbDocumentDetailRepository } from '../../../repository/index.js';
-import type { UmbCreateBlueprintModalData } from './create-blueprint-modal.token.js';
+import type { UmbCreateBlueprintModalData, UmbCreateBlueprintModalValue } from './create-blueprint-modal.token.js';
 import { html, customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbDocumentDetailModel } from '@umbraco-cms/backoffice/document';
-import {
-	type UmbDocumentBlueprintDetailModel,
-	UmbDocumentBlueprintDetailRepository,
-} from '@umbraco-cms/backoffice/document-blueprint';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 
 @customElement('umb-create-blueprint-modal')
-export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<UmbCreateBlueprintModalData, never> {
-	#blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
+export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
+	UmbCreateBlueprintModalData,
+	UmbCreateBlueprintModalValue
+> {
 	#documentRepository = new UmbDocumentDetailRepository(this);
 
 	#documentUnique = '';
@@ -39,24 +36,8 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<UmbCreat
 		this._blueprintName = data.variants[0].name;
 	}
 
-	#mapDocumentToBlueprintModel() {
-		if (!this.#document) return;
-		const variants = this.#document?.variants.map((variant) => ({ ...variant, name: this._blueprintName }));
-		const model: UmbDocumentBlueprintDetailModel = {
-			...this.#document,
-			entityType: 'document-blueprint',
-			variants,
-			unique: UmbId.new(),
-		};
-
-		return model;
-	}
-
 	async #handleSave() {
-		const model = this.#mapDocumentToBlueprintModel();
-		if (!model) return;
-		const { error } = await this.#blueprintRepository.create(model, null);
-		console.log('error', error);
+		this.value = { name: this._blueprintName, parent: null };
 		this.modalContext?.submit();
 	}
 

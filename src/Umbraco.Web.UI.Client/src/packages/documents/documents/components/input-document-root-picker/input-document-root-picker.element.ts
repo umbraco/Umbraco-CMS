@@ -1,5 +1,5 @@
 import { html, css, customElement, property, ifDefined, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -18,7 +18,7 @@ import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import type { UmbTreePickerDynamicRoot, UmbTreePickerDynamicRootQueryStep } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-input-document-root-picker')
-export class UmbInputDocumentRootPickerElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputDocumentRootPickerElement extends UUIFormControlMixin(UmbLitElement, '') {
 	protected getFormElement() {
 		return undefined;
 	}

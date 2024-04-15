@@ -14,12 +14,8 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIComboboxEvent, UUIComboboxElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbMediaTypeDetailRepository } from '@umbraco-cms/backoffice/media-type';
-import {
-	UMB_MEDIA_TYPE_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-	type UmbModalManagerContext,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbMediaTypeDetailRepository, UMB_MEDIA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/media-type';
+import { UMB_MODAL_MANAGER_CONTEXT, type UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 interface FieldPickerValue {
 	alias: string;

@@ -10,7 +10,7 @@ import { css, html, customElement, query, state, nothing, ifDefined } from '@umb
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-template-workspace-editor')
@@ -195,7 +195,8 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				slot="header"
 				.value=${this._name}
 				@input=${this.#onNameInput}
-				label=${this.localize.term('template_template')}>
+				label=${this.localize.term('template_template')}
+				${umbFocus()}>
 				<uui-input-lock slot="append" value=${ifDefined(this._alias!)} @input=${this.#onAliasInput}></uui-input-lock>
 			</uui-input>
 
