@@ -186,8 +186,8 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 			${repeat(
 				this._items,
 				(item) => item.value,
-				(item, index) =>
-					html` <umb-multiple-color-picker-item-input
+				(item, index) => html`
+					<umb-multiple-color-picker-item-input
 						?showLabels=${this.showLabels}
 						value=${item.value}
 						label=${ifDefined(item.label)}
@@ -196,7 +196,9 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 						?disabled=${this.disabled}
 						?readonly=${this.readonly}
 						required
-						required-message="Item ${index + 1} is missing a value"></umb-multiple-color-picker-item-input>`,
+						required-message="Item ${index + 1} is missing a value">
+					</umb-multiple-color-picker-item-input>
+				`,
 			)}
 		`;
 	}
