@@ -1,4 +1,4 @@
-import { manifest as duplicateToKindManifest } from './duplicate-to/duplicate-to.action.kind.js';
-import { manifests as modalManifests } from './modal/manifests.js';
+import { manifests as duplicateManifests } from './duplicate/manifests.js';
+import { manifests as duplicateToManifests } from './duplicate-to/manifests.js';
 
-export const manifests = [duplicateToKindManifest, ...modalManifests];
+export const manifests = [...duplicateManifests, ...duplicateToManifests];

@@ -1,4 +1,4 @@
-import type { UmbDuplicateModalData, UmbDuplicateModalValue } from './duplicate-modal.token.js';
+import type { UmbDuplicateToModalData, UmbDuplicateToModalValue } from './duplicate-to-modal.token.js';
 import { html, customElement, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -7,9 +7,9 @@ import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui'
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 
-const elementName = 'umb-duplicate-modal';
+const elementName = 'umb-duplicate-to-modal';
 @customElement(elementName)
-export class UmbDuplicateModalElement extends UmbModalBaseElement<UmbDuplicateModalData, UmbDuplicateModalValue> {
+export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicateToModalData, UmbDuplicateToModalValue> {
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
 		const selection = target.getSelection();
@@ -79,10 +79,10 @@ export class UmbDuplicateModalElement extends UmbModalBaseElement<UmbDuplicateMo
 	];
 }
 
-export { UmbDuplicateModalElement as element };
+export { UmbDuplicateToModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDuplicateModalElement;
+		[elementName]: UmbDuplicateToModalElement;
 	}
 }

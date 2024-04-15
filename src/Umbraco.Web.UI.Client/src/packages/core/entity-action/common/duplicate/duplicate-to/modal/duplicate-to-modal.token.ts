@@ -1,13 +1,13 @@
-import { UMB_DUPLICATE_MODAL_ALIAS } from './constants.js';
+import { UMB_DUPLICATE_TO_MODAL_ALIAS } from './constants.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbDuplicateModalData {
+export interface UmbDuplicateToModalData {
 	unique: string | null;
 	entityType: string;
 	treeAlias: string;
 }
 
-export interface UmbDuplicateModalValue {
+export interface UmbDuplicateToModalValue {
 	destination: {
 		unique: string | null;
 	};
@@ -15,8 +15,8 @@ export interface UmbDuplicateModalValue {
 	includeDescendants: boolean;
 }
 
-export const UMB_DUPLICATE_MODAL = new UmbModalToken<UmbDuplicateModalData, UmbDuplicateModalValue>(
-	UMB_DUPLICATE_MODAL_ALIAS,
+export const UMB_DUPLICATE_TO_MODAL = new UmbModalToken<UmbDuplicateToModalData, UmbDuplicateToModalValue>(
+	UMB_DUPLICATE_TO_MODAL_ALIAS,
 	{
 		modal: {
 			type: 'sidebar',
