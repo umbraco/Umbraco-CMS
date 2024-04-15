@@ -17,6 +17,7 @@ public interface ILocalLinkParser
     /// <remarks>
     /// Turns {{localLink:1234}} into {{localLink:umb://{type}/{id}}} and adds the corresponding udi to the dependencies.
     /// </remarks>
+    [Obsolete("Use ToArtifactAsync() instead. This method will be removed in a future version.")]
     string ToArtifact(string value, ICollection<Udi> dependencies, IContextCache contextCache);
 
     /// <summary>
@@ -32,7 +33,9 @@ public interface ILocalLinkParser
     /// Turns {{localLink:1234}} into {{localLink:umb://{type}/{id}}} and adds the corresponding udi to the dependencies.
     /// </remarks>
     Task<string> ToArtifactAsync(string value, ICollection<Udi> dependencies, IContextCache contextCache)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(ToArtifact(value, dependencies, contextCache)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Parses an artifact property value and produces an Umbraco property value.
@@ -45,6 +48,7 @@ public interface ILocalLinkParser
     /// <remarks>
     /// Turns {{localLink:umb://{type}/{id}}} into {{localLink:1234}}.
     /// </remarks>
+    [Obsolete("Use FromArtifactAsync() instead. This method will be removed in a future version.")]
     string FromArtifact(string value, IContextCache contextCache);
 
     /// <summary>
@@ -59,5 +63,7 @@ public interface ILocalLinkParser
     /// Turns {{localLink:umb://{type}/{id}}} into {{localLink:1234}}.
     /// </remarks>
     Task<string> FromArtifactAsync(string value, IContextCache contextCache)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(FromArtifact(value, contextCache)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 }

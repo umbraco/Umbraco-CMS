@@ -30,6 +30,7 @@ public interface IValueConnector
     /// <returns>
     /// The deploy property value.
     /// </returns>
+    [Obsolete("Use ToArtifactAsync() instead. This method will be removed in a future version.")]
     string? ToArtifact(object? value, IPropertyType propertyType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache);
 
     /// <summary>
@@ -43,7 +44,9 @@ public interface IValueConnector
     /// A task that represents the asynchronous operation. The task result contains the deploy property value.
     /// </returns>
     Task<string?> ToArtifactAsync(object? value, IPropertyType propertyType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(ToArtifact(value, propertyType, dependencies, contextCache)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Gets the content property value corresponding to a deploy property value.
@@ -55,6 +58,7 @@ public interface IValueConnector
     /// <returns>
     /// The content property value.
     /// </returns>
+    [Obsolete("Use FromArtifactAsync() instead. This method will be removed in a future version.")]
     object? FromArtifact(string? value, IPropertyType propertyType, object? currentValue, IContextCache contextCache);
 
     /// <summary>
@@ -68,5 +72,7 @@ public interface IValueConnector
     /// A task that represents the asynchronous operation. The task result contains the content property value.
     /// </returns>
     Task<object?> FromArtifactAsync(string? value, IPropertyType propertyType, object? currentValue, IContextCache contextCache)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(FromArtifact(value, propertyType, currentValue, contextCache)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 }

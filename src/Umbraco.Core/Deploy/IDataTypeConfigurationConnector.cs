@@ -28,6 +28,7 @@ public interface IDataTypeConfigurationConnector
     /// <returns>
     /// The artifact configuration value.
     /// </returns>
+    [Obsolete("Use ToArtifactAsync() instead. This method will be removed in a future version.")]
     string? ToArtifact(IDataType dataType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache);
 
     /// <summary>
@@ -40,7 +41,9 @@ public interface IDataTypeConfigurationConnector
     /// A task that represents the asynchronous operation. The task result contains the artifact configuration value.
     /// </returns>
     Task<string?> ToArtifactAsync(IDataType dataType, ICollection<ArtifactDependency> dependencies, IContextCache contextCache)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(ToArtifact(dataType, dependencies, contextCache)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Gets the data type configuration corresponding to an artifact configuration value.
@@ -51,6 +54,7 @@ public interface IDataTypeConfigurationConnector
     /// <returns>
     /// The data type configuration.
     /// </returns>
+    [Obsolete("Use FromArtifactAsync() instead. This method will be removed in a future version.")]
     IDictionary<string, object> FromArtifact(IDataType dataType, string? configuration, IContextCache contextCache);
 
     /// <summary>
@@ -63,5 +67,7 @@ public interface IDataTypeConfigurationConnector
     /// A task that represents the asynchronous operation. The task result contains the data type configuration.
     /// </returns>
     Task<IDictionary<string, object>> FromArtifactAsync(IDataType dataType, string? configuration, IContextCache contextCache)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(FromArtifact(dataType, configuration, contextCache)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 }

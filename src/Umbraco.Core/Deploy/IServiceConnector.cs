@@ -15,6 +15,7 @@ public interface IServiceConnector : IDiscoverable
     /// <returns>
     /// The corresponding artifact or <c>null</c>.
     /// </returns>
+    [Obsolete("Use GetArtifactAsync() instead. This method will be removed in a future version.")]
     IArtifact? GetArtifact(Udi udi, IContextCache contextCache);
 
     /// <summary>
@@ -26,7 +27,9 @@ public interface IServiceConnector : IDiscoverable
     /// A task that represents the asynchronous operation. The task result contains the corresponding artifact or <c>null</c>.
     /// </returns>
     Task<IArtifact?> GetArtifactAsync(Udi udi, IContextCache contextCache)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(GetArtifact(udi, contextCache)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Gets an artifact.
@@ -36,6 +39,7 @@ public interface IServiceConnector : IDiscoverable
     /// <returns>
     /// The corresponding artifact.
     /// </returns>
+    [Obsolete("Use GetArtifactAsync() instead. This method will be removed in a future version.")]
     IArtifact GetArtifact(object entity, IContextCache contextCache);
 
     /// <summary>
@@ -47,7 +51,9 @@ public interface IServiceConnector : IDiscoverable
     /// A task that represents the asynchronous operation. The task result contains the corresponding artifact.
     /// </returns>
     Task<IArtifact> GetArtifactAsync(object entity, IContextCache contextCache)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(GetArtifact(entity, contextCache)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Initializes processing for an artifact.
@@ -57,6 +63,7 @@ public interface IServiceConnector : IDiscoverable
     /// <returns>
     /// The state of an artifact being deployed.
     /// </returns>
+    [Obsolete("Use ProcessInitAsync() instead. This method will be removed in a future version.")]
     ArtifactDeployState ProcessInit(IArtifact art, IDeployContext context);
 
     /// <summary>
@@ -68,7 +75,9 @@ public interface IServiceConnector : IDiscoverable
     /// A task that represents the asynchronous operation. The task result contains the state of an artifact being deployed.
     /// </returns>
     Task<ArtifactDeployState> ProcessInitAsync(IArtifact artifact, IDeployContext context)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(ProcessInit(artifact, context)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Processes an artifact.
@@ -76,6 +85,7 @@ public interface IServiceConnector : IDiscoverable
     /// <param name="dart">The state of the artifact being deployed.</param>
     /// <param name="context">The deploy context.</param>
     /// <param name="pass">The processing pass number.</param>
+    [Obsolete("Use ProcessAsync() instead. This method will be removed in a future version.")]
     void Process(ArtifactDeployState dart, IDeployContext context, int pass);
 
     /// <summary>
@@ -90,7 +100,9 @@ public interface IServiceConnector : IDiscoverable
     Task ProcessAsync(ArtifactDeployState state, IDeployContext context, int pass)
     {
         // TODO: Remove default implementation in v15
+#pragma warning disable CS0618 // Type or member is obsolete
         Process(state, context, pass);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         return Task.CompletedTask;
     }
@@ -100,6 +112,7 @@ public interface IServiceConnector : IDiscoverable
     /// </summary>
     /// <param name="range">The UDI range.</param>
     /// <param name="udis">The list of UDIs where to add the exploded/expanded UDIs.</param>
+    [Obsolete("Use ExpandRangeAsync() instead. This method will be removed in a future version.")]
     void Explode(UdiRange range, List<Udi> udis);
 
     /// <summary>
@@ -113,7 +126,9 @@ public interface IServiceConnector : IDiscoverable
     {
         // TODO: Remove default implementation in v15
         var udis = new List<Udi>();
+#pragma warning disable CS0618 // Type or member is obsolete
         Explode(range, udis);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         foreach (Udi udi in udis)
         {
@@ -129,6 +144,7 @@ public interface IServiceConnector : IDiscoverable
     /// <returns>
     /// The named range for the specified UDI and selector.
     /// </returns>
+    [Obsolete("Use GetRangeAsync() instead. This method will be removed in a future version.")]
     NamedUdiRange GetRange(Udi udi, string selector);
 
     /// <summary>
@@ -140,7 +156,9 @@ public interface IServiceConnector : IDiscoverable
     /// A task that represents the asynchronous operation. The task result contains the named range for the specified UDI and selector.
     /// </returns>
     Task<NamedUdiRange> GetRangeAsync(Udi udi, string selector)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(GetRange(udi, selector)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Gets a named range for specified entity type, identifier and selector.
@@ -160,6 +178,7 @@ public interface IServiceConnector : IDiscoverable
     /// indicate the "root" i.e. an open UDI.
     /// </para>
     /// </remarks>
+    [Obsolete("Use GetRangeAsync() instead. This method will be removed in a future version.")]
     NamedUdiRange GetRange(string entityType, string sid, string selector);
 
     /// <summary>
@@ -181,7 +200,9 @@ public interface IServiceConnector : IDiscoverable
     /// </para>
     /// </remarks>
     Task<NamedUdiRange> GetRangeAsync(string entityType, string sid, string selector)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(GetRange(entityType, sid, selector)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Compares two artifacts.

@@ -17,6 +17,7 @@ public interface IImageSourceParser
     /// <remarks>
     /// Turns src="/media/..." into src="umb://media/..." and adds the corresponding udi to the dependencies.
     /// </remarks>
+    [Obsolete("Use ToArtifactAsync() instead. This method will be removed in a future version.")]
     string ToArtifact(string value, ICollection<Udi> dependencies, IContextCache contextCache);
 
     /// <summary>
@@ -32,7 +33,9 @@ public interface IImageSourceParser
     /// Turns src="/media/..." into src="umb://media/..." and adds the corresponding udi to the dependencies.
     /// </remarks>
     Task<string> ToArtifactAsync(string value, ICollection<Udi> dependencies, IContextCache contextCache)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(ToArtifact(value, dependencies, contextCache)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Parses an artifact property value and produces an Umbraco property value.
@@ -45,6 +48,7 @@ public interface IImageSourceParser
     /// <remarks>
     /// Turns umb://media/... into /media/....
     /// </remarks>
+    [Obsolete("Use FromArtifactAsync() instead. This method will be removed in a future version.")]
     string FromArtifact(string value, IContextCache contextCache);
 
     /// <summary>
@@ -59,5 +63,7 @@ public interface IImageSourceParser
     /// Turns umb://media/... into /media/....
     /// </remarks>
     Task<string> FromArtifactAsync(string value, IContextCache contextCache)
+#pragma warning disable CS0618 // Type or member is obsolete
         => Task.FromResult(FromArtifact(value, contextCache)); // TODO: Remove default implementation in v15
+#pragma warning restore CS0618 // Type or member is obsolete
 }
