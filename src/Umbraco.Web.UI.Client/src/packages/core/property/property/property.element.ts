@@ -109,10 +109,8 @@ export class UmbPropertyElement extends UmbLitElement {
 	@property({ type: String, attribute: false })
 	public set dataPath(dataPath: string | undefined) {
 		this.#dataPath = dataPath;
-		new UmbObserveValidationStateController(this, dataPath, (feedback) => {
-			// TODO: Join in a pretty way, and localized way(how to join one or more items varies depending on the language. [NL]
-			// TODO: Also wrap in a general localized message, like "Contains these errors: ..."; [NL]
-			this._validationMessage = feedback.length > 0 ? feedback.map((x) => x.message).join(', ') : undefined;
+		new UmbObserveValidationStateController(this, dataPath, (invalid) => {
+			this._invalid = invalid;
 		});
 	}
 	public get dataPath(): string | undefined {
@@ -127,7 +125,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	private _element?: ManifestPropertyEditorUi['ELEMENT_TYPE'];
 
 	@state()
-	private _validationMessage?: string;
+	private _invalid?: boolean;
 
 	@state()
 	private _alias?: string;
@@ -278,8 +276,7 @@ export class UmbPropertyElement extends UmbLitElement {
 				alias="${ifDefined(this._alias)}"
 				label="${ifDefined(this._label)}"
 				description="${ifDefined(this._description)}"
-				?invalid=${this._validationMessage !== undefined}
-				.invalidMessage=${this._validationMessage}>
+				?invalid=${this._invalid}>
 				${this._renderPropertyActionMenu()}
 				${this._variantDifference
 					? html`<uui-tag look="secondary" slot="description">${this._variantDifference}</uui-tag>`
