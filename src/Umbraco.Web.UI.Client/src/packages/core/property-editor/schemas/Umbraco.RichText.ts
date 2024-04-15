@@ -12,7 +12,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'mediaParentId',
 					label: 'Image Upload Folder',
 					description: 'Choose the upload location of pasted images',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaEntityPicker',
 					config: [{ alias: 'validationLimit', value: { min: 0, max: 1 } }],
 				},
 				{
