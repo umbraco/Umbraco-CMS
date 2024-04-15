@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Umbraco.Cms.Api.Management.ViewModels.Package;
+namespace Umbraco.Cms.Api.Management.ViewModels.Manifest;
 
-public class PackageManifestResponseModel
+public class ManifestResponseModel
 {
     [Required]
     public string Name { get; set; } = string.Empty;

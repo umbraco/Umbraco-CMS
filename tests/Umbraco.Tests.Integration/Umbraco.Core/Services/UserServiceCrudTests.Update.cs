@@ -127,6 +127,34 @@ public partial class UserServiceCrudTests
     }
 
     [Test]
+    public async Task Can_Update_User_Name()
+    {
+        const string userName = "UpdateUserName";
+        const string name = "UpdatedName";
+        const string email = "update@email.com";
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+
+        var (updateModel, createdUser) = await CreateUserForUpdate(userService);
+
+        updateModel.UserName = userName;
+        updateModel.Email = email;
+        updateModel.Name = name;
+
+        var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+
+        Assert.IsTrue(result.Success);
+        var updatedUser = await userService.GetAsync(createdUser.Key);
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(updatedUser);
+            Assert.AreEqual(userName, updatedUser.Username);
+            Assert.AreEqual(email, updatedUser.Email);
+            Assert.AreEqual(name, updatedUser.Name);
+        });
+
+    }
+
+    [Test]
     public async Task Cannot_Change_Email_To_Duplicate_Email_On_Update()
     {
         var userService = CreateUserService();

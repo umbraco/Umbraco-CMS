@@ -676,25 +676,6 @@ internal class DatabaseDataCreator
             "id");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
-            Constants.DataTypes.Guids.ListViewMembers,
-            new NodeDto
-            {
-                NodeId = Constants.DataTypes.DefaultMembersListView,
-                Trashed = false,
-                ParentId = -1,
-                UserId = -1,
-                Level = 1,
-                Path = $"-1,{Constants.DataTypes.DefaultMembersListView}",
-                SortOrder = 2,
-                UniqueId = Constants.DataTypes.Guids.ListViewMembersGuid,
-                Text = Constants.Conventions.DataTypes.ListViewPrefix + "Members",
-                NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
-            },
-            Constants.DatabaseSchema.Tables.Node,
-            "id");
-        ConditionalInsert(
-            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
             Constants.DataTypes.Guids.Tags,
             new NodeDto
             {
@@ -2315,6 +2296,14 @@ internal class DatabaseDataCreator
         var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
         var stateValueKey = upgrader.StateValueKey;
         var finalState = upgrader.Plan.FinalState;
+
+        _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false,
+            new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });
+
+
+        upgrader = new Upgrader(new UmbracoPremigrationPlan());
+        stateValueKey = upgrader.StateValueKey;
+        finalState = upgrader.Plan.FinalState;
 
         _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false,
             new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });

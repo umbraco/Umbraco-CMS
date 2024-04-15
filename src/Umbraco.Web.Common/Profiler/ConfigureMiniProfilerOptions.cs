@@ -7,24 +7,16 @@ using StackExchange.Profiling;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Profiler;
 
 internal sealed class ConfigureMiniProfilerOptions : IConfigureOptions<MiniProfilerOptions>
 {
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly string _backOfficePath;
 
-    public ConfigureMiniProfilerOptions(
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment)
-    {
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
-    }
+    public ConfigureMiniProfilerOptions(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+        => _backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
 
     public void Configure(MiniProfilerOptions options)
     {

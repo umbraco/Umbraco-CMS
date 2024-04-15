@@ -23,7 +23,7 @@ public class PackageManifestServiceTests
             new[]
             {
                 new PackageManifest { Name = "Test", Extensions = Array.Empty<object>(), AllowPublicAccess = false },
-                new PackageManifest { Name = "Test Public", Extensions = Array.Empty<object>(), AllowPublicAccess = true}
+                new PackageManifest { Name = "Test Public", Extensions = Array.Empty<object>(), AllowPublicAccess = true },
             });
 
         _runtimeCache = new ObjectCacheAppCache();
@@ -72,6 +72,16 @@ public class PackageManifestServiceTests
     public async Task Supports_Public_PackageManifests()
     {
         var result = await _service.GetPublicPackageManifestsAsync();
+        Assert.AreEqual(1, result.Count());
+
+        result = await _service.GetAllPackageManifestsAsync();
+        Assert.AreEqual(2, result.Count());
+    }
+
+    [Test]
+    public async Task Supports_Private_PackageManifests()
+    {
+        var result = await _service.GetPrivatePackageManifestsAsync();
         Assert.AreEqual(1, result.Count());
 
         result = await _service.GetAllPackageManifestsAsync();

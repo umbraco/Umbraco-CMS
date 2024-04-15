@@ -1,4 +1,3 @@
-using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -112,14 +111,8 @@ public class MediaPicker3PropertyEditor : DataEditor
 
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            // FIXME: consider creating an object deserialization method on IJsonSerializer instead of relying on deserializing serialized JSON here (and likely other places as well)
-            if (editorValue.Value is not JsonArray jsonArray)
-            {
-                return base.FromEditor(editorValue, currentValue);
-            }
-
-            List<MediaWithCropsDto>? mediaWithCropsDtos = _jsonSerializer.Deserialize<List<MediaWithCropsDto>>(jsonArray.ToJsonString());
-            if (mediaWithCropsDtos is null)
+            if (editorValue.Value is null ||
+                _jsonSerializer.TryDeserialize(editorValue.Value, out List<MediaWithCropsDto>? mediaWithCropsDtos) is false)
             {
                 return base.FromEditor(editorValue, currentValue);
             }

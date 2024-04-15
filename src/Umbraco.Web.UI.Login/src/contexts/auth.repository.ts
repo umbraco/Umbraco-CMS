@@ -9,7 +9,13 @@ import {
 } from "../types.js";
 import { UmbRepositoryBase } from "@umbraco-cms/backoffice/repository";
 import { UmbLocalizationController } from "@umbraco-cms/backoffice/localization-api";
-import { ApiError, CancelError, SecurityResource, UserResource } from "@umbraco-cms/backoffice/external/backend-api";
+import {
+  ApiError,
+  CancelError,
+  ProblemDetails,
+  SecurityService,
+  UserService
+} from "@umbraco-cms/backoffice/external/backend-api";
 import { tryExecute } from "@umbraco-cms/backoffice/resources";
 
 export class UmbAuthRepository extends UmbRepositoryBase {
@@ -82,7 +88,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   }
 
   public async resetPassword(email: string): Promise<ResetPasswordResponse> {
-    const response = await tryExecute(SecurityResource.postSecurityForgotPassword({
+    const response = await tryExecute(SecurityService.postSecurityForgotPassword({
       requestBody: {
         email
       }
@@ -98,7 +104,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   }
 
   public async validatePasswordResetCode(userId: string, resetCode: string): Promise<ValidatePasswordResetCodeResponse> {
-    const { data, error } = await tryExecute(SecurityResource.postSecurityForgotPasswordVerify({
+    const { data, error } = await tryExecute(SecurityService.postSecurityForgotPasswordVerify({
       requestBody: {
         user: {
           id: userId
@@ -119,7 +125,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   }
 
   public async newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse> {
-    const response = await tryExecute(SecurityResource.postSecurityForgotPasswordReset({
+    const response = await tryExecute(SecurityService.postSecurityForgotPasswordReset({
       requestBody: {
         password,
         resetCode,
@@ -139,7 +145,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   }
 
   public async validateInviteCode(token: string, userId: string): Promise<ValidateInviteCodeResponse> {
-    const { data, error } = await tryExecute(UserResource.postUserInviteVerify({
+    const { data, error } = await tryExecute(UserService.postUserInviteVerify({
       requestBody: {
         token,
         user: {
@@ -160,7 +166,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   }
 
   public async newInvitedUserPassword(password: string, token: string, userId: string): Promise<NewPasswordResponse> {
-    const response = await tryExecute(UserResource.postUserInviteCreatePassword({
+    const response = await tryExecute(UserService.postUserInviteCreatePassword({
       requestBody: {
         password,
         token,
@@ -182,7 +188,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   #getApiErrorDetailText(error: ApiError | CancelError | undefined, fallbackText?: string): string | undefined {
     if (error instanceof ApiError) {
       // Try to parse the body
-      return error.body ? error.body.title ?? fallbackText : fallbackText ?? 'An unknown error occurred.';
+      return typeof error.body === 'object' ? (error.body as ProblemDetails).title ?? fallbackText : fallbackText ?? 'An unknown error occurred.';
     }
 
     // Ignore cancel errors (user cancelled the request)

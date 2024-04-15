@@ -156,8 +156,8 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         {
             // If FileExtensions is empty and no allowed extensions have been specified, we allow everything.
             // If there are any extensions specified, we need to check that the uploaded extension is one of them.
-            return fileUploadConfiguration.FileExtensions.IsCollectionEmpty() ||
-                   fileUploadConfiguration.FileExtensions.Any(x => x.Value?.InvariantEquals(extension) ?? false);
+            return fileUploadConfiguration.FileExtensions.Any() is false ||
+                   fileUploadConfiguration.FileExtensions.Contains(extension);
         }
 
         return false;
