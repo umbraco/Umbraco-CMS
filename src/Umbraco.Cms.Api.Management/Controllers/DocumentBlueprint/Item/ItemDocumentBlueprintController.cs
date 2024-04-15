@@ -29,7 +29,7 @@ public class ItemDocumentBlueprintController : DocumentBlueprintItemControllerBa
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
-        if (ids.Count == 0)
+        if (ids.Count is 0)
         {
             return Ok(Enumerable.Empty<DocumentBlueprintItemResponseModel>());
         }
