@@ -15,10 +15,24 @@ public interface ILocalLinkParser
     /// The parsed value.
     /// </returns>
     /// <remarks>
-    /// Turns {{localLink:1234}} into {{localLink:umb://{type}/{id}}} and adds the corresponding udi to the
-    /// dependencies.
+    /// Turns {{localLink:1234}} into {{localLink:umb://{type}/{id}}} and adds the corresponding udi to the dependencies.
     /// </remarks>
     string ToArtifact(string value, ICollection<Udi> dependencies, IContextCache contextCache);
+
+    /// <summary>
+    /// Parses an Umbraco property value and produces an artifact property value.
+    /// </summary>
+    /// <param name="value">The property value.</param>
+    /// <param name="dependencies">A list of dependencies.</param>
+    /// <param name="contextCache">The context cache.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains the parsed value.
+    /// </returns>
+    /// <remarks>
+    /// Turns {{localLink:1234}} into {{localLink:umb://{type}/{id}}} and adds the corresponding udi to the dependencies.
+    /// </remarks>
+    Task<string> ToArtifactAsync(string value, ICollection<Udi> dependencies, IContextCache contextCache)
+        => Task.FromResult(ToArtifact(value, dependencies, contextCache)); // TODO: Remove default implementation in v15
 
     /// <summary>
     /// Parses an artifact property value and produces an Umbraco property value.
@@ -32,4 +46,18 @@ public interface ILocalLinkParser
     /// Turns {{localLink:umb://{type}/{id}}} into {{localLink:1234}}.
     /// </remarks>
     string FromArtifact(string value, IContextCache contextCache);
+
+    /// <summary>
+    /// Parses an artifact property value and produces an Umbraco property value.
+    /// </summary>
+    /// <param name="value">The artifact property value.</param>
+    /// <param name="contextCache">The context cache.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains the parsed value.
+    /// </returns>
+    /// <remarks>
+    /// Turns {{localLink:umb://{type}/{id}}} into {{localLink:1234}}.
+    /// </remarks>
+    Task<string> FromArtifactAsync(string value, IContextCache contextCache)
+        => Task.FromResult(FromArtifact(value, contextCache)); // TODO: Remove default implementation in v15
 }
