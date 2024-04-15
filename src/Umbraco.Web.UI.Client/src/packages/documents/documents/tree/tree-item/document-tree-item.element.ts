@@ -51,14 +51,16 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		return this._variant?.name ?? `(${fallbackName})`;
 	}
 
-	// TODO: implement correct status symbol
 	renderIconContainer() {
 		return html`
 			<span id="icon-container" slot="icon">
 				${this.item?.documentType.icon
 					? html`
 							<umb-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></umb-icon>
+							<!--
+							// TODO: implement correct status symbol
 							<span id="status-symbol"></span>
+							-->
 						`
 					: nothing}
 			</span>
