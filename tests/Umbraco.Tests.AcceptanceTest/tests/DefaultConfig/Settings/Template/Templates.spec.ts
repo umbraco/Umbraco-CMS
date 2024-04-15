@@ -25,6 +25,8 @@ test.describe('Template tests', () => {
     // Assert
     await umbracoUi.template.isSuccessNotificationVisible();
     expect(await umbracoApi.template.doesNameExist(templateName)).toBeTruthy();
+    await umbracoUi.template.clickRootFolderCaretButton();
+    await expect(umbracoUi.template.checkItemNameUnderTemplateTree(templateName)).toBeVisible();
   });
 
   test('can update content of a template', async ({umbracoApi, umbracoUi}) => {
@@ -46,6 +48,25 @@ test.describe('Template tests', () => {
     expect(updatedTemplate.content).toBe(updatedTemplateContent);
   });
 
+  test('can rename a template', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const wrongTemplateName = 'WrongTemplateName';
+    const templateAlias = AliasHelper.toAlias(wrongTemplateName);
+    await umbracoApi.template.ensureNameNotExists(wrongTemplateName);
+    const templateId = await umbracoApi.template.create(wrongTemplateName, templateAlias, '');
+    expect(await umbracoApi.template.doesNameExist(wrongTemplateName)).toBeTruthy();
+
+    // Act
+    await umbracoUi.template.goToTemplate(wrongTemplateName);
+    await umbracoUi.template.enterTemplateName(templateName);
+    await umbracoUi.template.clickSaveButton();
+
+    // Assert
+    await umbracoUi.template.isSuccessNotificationVisible();
+    const templateData = await umbracoApi.template.get(templateId);
+    expect(templateData.name).toBe(templateName);
+  });
+
   test('can delete a template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.template.createDefaultTemplate(templateName);
@@ -53,11 +74,12 @@ test.describe('Template tests', () => {
     // Act
     await umbracoUi.template.clickRootFolderCaretButton();
     await umbracoUi.template.clickActionsMenuForTemplate(templateName);
-    await umbracoUi.template.deleteTemplate();
+    await umbracoUi.template.delete();
 
     // Assert
     await umbracoUi.template.isSuccessNotificationVisible();
     expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
+    await expect(umbracoUi.template.checkItemNameUnderTemplateTree(templateName)).not.toBeVisible();
   });
 
   test('can set a template as master template', async ({umbracoApi, umbracoUi}) => {
@@ -245,10 +267,9 @@ test.describe('Template tests', () => {
     expect(templateData.content).toBe(templateContent);
   });
 
-  test('can insert dictionaryItem into a template', async ({umbracoApi, umbracoUi}) => {
+  test('can insert dictionary item into a template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const templateAlias = AliasHelper.toAlias(templateName);
-    await umbracoApi.template.create(templateName, templateAlias, '');
+    await umbracoApi.template.createDefaultTemplate(templateName);
     const dictionaryName = 'TestDictionary';
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.create(dictionaryName);
@@ -256,7 +277,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-    await umbracoUi.template.insertDictionaryByName(dictionaryName);
+    await umbracoUi.template.insertDictionaryItem(dictionaryName);
     await umbracoUi.template.clickSaveButton();
 
     // Assert
@@ -266,47 +287,70 @@ test.describe('Template tests', () => {
 
     // Clean
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
+  });
+
+  test('can insert partial view into a template', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    await umbracoApi.template.createDefaultTemplate(templateName);
+    const partialViewName = 'TestPartialView';
+    const partialViewFileName = partialViewName + '.cshtml';
+    await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
+    await umbracoApi.partialView.createDefaultPartialView(partialViewFileName);
+    const templateContent = '@await Html.PartialAsync("' + partialViewName + '")' + defaultTemplateContent;
+
+    // Act
+    await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.template.insertPartialView(partialViewFileName);
+    await umbracoUi.template.clickSaveButton();
+
+    // Assert
+    await umbracoUi.template.isSuccessNotificationVisible();
+    const templateData = await umbracoApi.template.getByName(templateName);
+    expect(templateData.content).toBe(templateContent);
   });
 
   test('can insert value into a template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const templateAlias = AliasHelper.toAlias(templateName);
-    await umbracoApi.template.create(templateName, templateAlias, '');
-    const dictionaryName = 'TestDictionary';
-    await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
-    await umbracoApi.dictionary.create(dictionaryName);
-    const templateContent = '@Umbraco.GetDictionaryValue("TestDictionary")' + defaultTemplateContent;
+    await umbracoApi.template.createDefaultTemplate(templateName);
+    const systemFieldValue = 'createDate';
+    const templateContent = '@Model.Value("' + systemFieldValue + '")' + defaultTemplateContent;
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-    await umbracoUi.template.insertDictionaryByName(dictionaryName);
+    await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
     await umbracoUi.template.clickSaveButton();
 
     // Assert
     await umbracoUi.template.isSuccessNotificationVisible();
     const templateData = await umbracoApi.template.getByName(templateName);
     expect(templateData.content).toBe(templateContent);
-
-    // Clean
-    await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   });
 
-  test('can rename a template', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    const wrongTemplateName = 'WrongTemplateName';
-    const templateAlias = AliasHelper.toAlias(wrongTemplateName);
-    await umbracoApi.template.ensureNameNotExists(wrongTemplateName);
-    const templateId = await umbracoApi.template.create(wrongTemplateName, templateAlias, '');
-    expect(await umbracoApi.template.doesNameExist(wrongTemplateName)).toBeTruthy();
-
-    // Act
-    await umbracoUi.template.goToTemplate(wrongTemplateName);
-    await umbracoUi.template.enterTemplateName(templateName);
-    await umbracoUi.template.clickSaveButton();
-
-    // Assert
-    await umbracoUi.template.isSuccessNotificationVisible();
-    const templateData = await umbracoApi.template.get(templateId);
-    expect(templateData.name).toBe(templateName);
-  });
+    // TODO: Remove skip when the front-end is ready. Currently the returned items count is not updated after choosing the root content.
+    test.skip('can show returned items in query builder ', async ({umbracoApi, umbracoUi}) => {
+      //Arrange
+      // Create content at root with a child
+      const documentTypeName = 'ParentDocumentType';
+      const childDocumentTypeName = 'ChildDocumentType';
+      const contentName = 'ContentName';
+      const childContentName = 'ChildContentName';
+      const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(childDocumentTypeName);
+      const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
+      const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+      await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
+      // Create template
+      await umbracoApi.template.createDefaultTemplate(templateName);
+  
+      //Act
+      await umbracoUi.template.goToTemplate(templateName);
+      await umbracoUi.template.clickQueryBuilderButton();
+      await umbracoUi.template.chooseRootContentInQueryBuilder('(' + contentName + ')');
+  
+      // Assert
+      await umbracoUi.template.doesReturnedItemsHaveCount(1);
+      await umbracoUi.template.doesQueryResultHaveContentName(childContentName);
+  
+      // Clean
+      await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+    });
 });
