@@ -50,7 +50,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		api: UmbSaveWorkspaceAction,
 		meta: {
 			label: 'Save',
-			look: 'secondary',
+			look: 'primary',
 			color: 'positive',
 		},
 		conditions: [
