@@ -50,6 +50,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.Document.Edit',
 		name: 'Document Workspace Edit View',
+		weight: 200,
 		meta: {
 			label: '#general_content',
 			pathname: 'content',
