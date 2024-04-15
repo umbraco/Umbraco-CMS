@@ -1,7 +1,7 @@
 import { UmbEntityActionBase } from '../../../entity-action-base.js';
 import { UmbRequestReloadStructureForEntityEvent } from '../../../request-reload-structure-for-entity.event.js';
-import type { UmbDuplicateRepository } from '../duplicate-repository.interface.js';
 import { UMB_DUPLICATE_TO_MODAL } from './modal/duplicate-to-modal.token.js';
+import type { UmbDuplicateToRepository } from './types.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { MetaEntityActionDuplicateToKind } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
@@ -26,7 +26,7 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 			const destinationUnique = value.destination.unique;
 			if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
 
-			const duplicateRepository = await createExtensionApiByAlias<UmbDuplicateRepository>(
+			const duplicateRepository = await createExtensionApiByAlias<UmbDuplicateToRepository>(
 				this,
 				this.args.meta.duplicateRepositoryAlias,
 			);
@@ -35,8 +35,6 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 			const { error } = await duplicateRepository.requestDuplicateTo({
 				unique: this.args.unique,
 				destination: { unique: destinationUnique },
-				relateToOriginal: value.relateToOriginal,
-				includeDescendants: value.includeDescendants,
 			});
 
 			if (!error) {

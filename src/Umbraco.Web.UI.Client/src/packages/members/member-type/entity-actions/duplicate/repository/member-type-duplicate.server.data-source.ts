@@ -1,7 +1,7 @@
 import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbDuplicateDataSource, UmbDuplicateToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbDuplicateDataSource, UmbDuplicateRequestArgs } from '@umbraco-cms/backoffice/entity-action';
 
 /**
  * Duplicate Document Server Data Source
@@ -21,14 +21,13 @@ export class UmbDuplicateMemberTypeServerDataSource implements UmbDuplicateDataS
 	}
 
 	/**
-	 * Duplicate an item for the given id to the destination unique
-	 * @param {UmbDuplicateToRequestArgs} args
+	 * Duplicate an item for the given unique
+	 * @param {UmbDuplicateRequestArgs} args
 	 * @return {*}
-	 * @memberof UmbDuplicateMemberTypeServerDataSource
+	 * @memberof UmbDuplicateDataTypeServerDataSource
 	 */
-	async duplicateTo(args: UmbDuplicateToRequestArgs) {
+	async duplicate(args: UmbDuplicateRequestArgs) {
 		if (!args.unique) throw new Error('Unique is missing');
-		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,

@@ -1,9 +1,0 @@
-import type { UmbRepositoryErrorResponse } from '../../../repository/types.js';
-import type { UmbDuplicateToRequestArgs } from './duplicate-to/types.js';
-import type { UmbDuplicateRequestArgs } from './duplicate/types.js';
-import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-
-export interface UmbDuplicateRepository extends UmbApi {
-	requestDuplicate(args: UmbDuplicateRequestArgs): Promise<UmbRepositoryErrorResponse>;
-	requestDuplicateTo(args: UmbDuplicateToRequestArgs): Promise<UmbRepositoryErrorResponse>;
-}

@@ -1,14 +1,19 @@
 import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbDuplicateDataSource, UmbDuplicateToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
+import type {
+	UmbDuplicateDataSource,
+	UmbDuplicateRequestArgs,
+	UmbDuplicateToDataSource,
+	UmbDuplicateToRequestArgs,
+} from '@umbraco-cms/backoffice/entity-action';
 
 /**
  * Duplicate Document Server Data Source
  * @export
  * @class UmbDuplicateDataTypeServerDataSource
  */
-export class UmbDuplicateDataTypeServerDataSource implements UmbDuplicateDataSource {
+export class UmbDuplicateDataTypeServerDataSource implements UmbDuplicateToDataSource {
 	#host: UmbControllerHost;
 
 	/**
@@ -21,7 +26,7 @@ export class UmbDuplicateDataTypeServerDataSource implements UmbDuplicateDataSou
 	}
 
 	/**
-	 * Duplicate an item for the given id to the destination unique
+	 * Duplicate an item for the given unique to the destination unique
 	 * @param {UmbDuplicateToRequestArgs} args
 	 * @return {*}
 	 * @memberof UmbDuplicateDataTypeServerDataSource

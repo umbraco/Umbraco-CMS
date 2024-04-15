@@ -11,8 +11,6 @@ export interface UmbDuplicateToModalValue {
 	destination: {
 		unique: string | null;
 	};
-	relateToOriginal: boolean;
-	includeDescendants: boolean;
 }
 
 export const UMB_DUPLICATE_TO_MODAL = new UmbModalToken<UmbDuplicateToModalData, UmbDuplicateToModalValue>(

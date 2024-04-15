@@ -1,14 +1,14 @@
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbDuplicateDataSource, UmbDuplicateToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbDuplicateToDataSource, UmbDuplicateToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
 
 /**
  * Duplicate Document Server Data Source
  * @export
  * @class UmbDuplicateMediaTypeServerDataSource
  */
-export class UmbDuplicateMediaTypeServerDataSource implements UmbDuplicateDataSource {
+export class UmbDuplicateMediaTypeServerDataSource implements UmbDuplicateToDataSource {
 	#host: UmbControllerHost;
 
 	/**
@@ -21,7 +21,7 @@ export class UmbDuplicateMediaTypeServerDataSource implements UmbDuplicateDataSo
 	}
 
 	/**
-	 * Duplicate an item for the given id to the destination unique
+	 * Duplicate an item for the given unique to the destination unique
 	 * @param {UmbDuplicateToRequestArgs} args
 	 * @return {*}
 	 * @memberof UmbDuplicateMediaTypeServerDataSource

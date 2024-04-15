@@ -1,9 +1,8 @@
 import type { UmbDuplicateToModalData, UmbDuplicateToModalValue } from './duplicate-to-modal.token.js';
-import { html, customElement, nothing, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 
@@ -17,41 +16,15 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 		this.updateValue({ destination: { unique: selection[0] } });
 	}
 
-	#onRelateToOriginalChange(event: UUIBooleanInputEvent) {
-		const target = event.target;
-		this.updateValue({ relateToOriginal: target.checked });
-	}
-
-	#onIncludeDescendantsChange(event: UUIBooleanInputEvent) {
-		const target = event.target;
-		this.updateValue({ includeDescendants: target.checked });
-	}
-
 	render() {
 		if (!this.data) return nothing;
 
 		return html`
 			<umb-body-layout headline="Duplicate">
-				<uui-box id="tree-box" headline="Duplicate to">
+				<uui-box>
 					<umb-tree alias=${this.data.treeAlias} @selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
-				<uui-box headline="Options">
-					<umb-property-layout label="Relate to original" orientation="vertical"
-						><div slot="editor">
-							<uui-toggle
-								@change=${this.#onRelateToOriginalChange}
-								.checked=${this.value?.relateToOriginal}></uui-toggle>
-						</div>
-					</umb-property-layout>
 
-					<umb-property-layout label="Include descendants" orientation="vertical"
-						><div slot="editor">
-							<uui-toggle
-								@change=${this.#onIncludeDescendantsChange}
-								.checked=${this.value?.includeDescendants}></uui-toggle>
-						</div>
-					</umb-property-layout>
-				</uui-box>
 				${this.#renderActions()}
 			</umb-body-layout>
 		`;
@@ -69,14 +42,7 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 		`;
 	}
 
-	static styles = [
-		UmbTextStyles,
-		css`
-			#tree-box {
-				margin-bottom: var(--uui-size-layout-1);
-			}
-		`,
-	];
+	static styles = [UmbTextStyles];
 }
 
 export { UmbDuplicateToModalElement as element };
