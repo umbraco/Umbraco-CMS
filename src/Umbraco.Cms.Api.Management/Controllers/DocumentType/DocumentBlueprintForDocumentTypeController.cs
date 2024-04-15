@@ -37,7 +37,7 @@ public class DocumentBlueprintForDocumentTypeController : DocumentTypeController
         int skip = 0,
         int take = 100)
     {
-        Attempt<PagedModel<IContent>?, ContentEditingOperationStatus> attempt = await _contentBlueprintEditingService.GetPagedByContentTypeKeyAsync(id, skip, take);
+        Attempt<PagedModel<IContent>?, ContentEditingOperationStatus> attempt = await _contentBlueprintEditingService.GetPagedByContentTypeAsync(id, skip, take);
         if (attempt.Success is false)
         {
             return ContentEditingOperationStatusResult(attempt.Status);

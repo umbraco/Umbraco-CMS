@@ -23,7 +23,7 @@ public partial class ContentBlueprintEditingServiceTests
             await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         }
 
-        var result = await ContentBlueprintEditingService.GetPagedByContentTypeKeyAsync(contentType.Key, 0, 2);
+        var result = await ContentBlueprintEditingService.GetPagedByContentTypeAsync(contentType.Key, 0, 2);
 
         var pagedResult = result.Result;
         Assert.Multiple(() =>
@@ -42,7 +42,7 @@ public partial class ContentBlueprintEditingServiceTests
     [Test]
     public async Task Cannot_Get_Paged_With_Non_Existing_Content_Type()
     {
-        var result = await ContentBlueprintEditingService.GetPagedByContentTypeKeyAsync(Guid.NewGuid(), 0, 10);
+        var result = await ContentBlueprintEditingService.GetPagedByContentTypeAsync(Guid.NewGuid(), 0, 10);
 
         Assert.Multiple(() =>
         {

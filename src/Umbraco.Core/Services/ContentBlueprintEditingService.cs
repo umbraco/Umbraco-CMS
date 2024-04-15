@@ -31,9 +31,9 @@ internal sealed class ContentBlueprintEditingService
         return await Task.FromResult(blueprint);
     }
 
-    public async Task<Attempt<PagedModel<IContent>?, ContentEditingOperationStatus>> GetPagedByContentTypeKeyAsync(Guid key, int skip, int take)
+    public async Task<Attempt<PagedModel<IContent>?, ContentEditingOperationStatus>> GetPagedByContentTypeAsync(Guid contentTypeKey, int skip, int take)
     {
-        IContentType? contentType = await ContentTypeService.GetAsync(key);
+        IContentType? contentType = await ContentTypeService.GetAsync(contentTypeKey);
         if (contentType == null)
         {
             return Attempt.FailWithStatus<PagedModel<IContent>?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeNotFound, null);
