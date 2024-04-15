@@ -1,8 +1,11 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
-import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS, DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
+import {
+	UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
+	UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+} from '../repository/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
-import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/document-type';
+import { manifests as duplicateManifests } from './duplicate/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -13,22 +16,10 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Delete Document-Type Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_TYPE_ENTITY_TYPE],
 		meta: {
-			itemRepositoryAlias: DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-			detailRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-		},
-	},
-	{
-		type: 'entityAction',
-		kind: 'duplicate',
-		alias: 'Umb.EntityAction.DocumentType.Duplicate',
-		name: 'Duplicate Document Type Entity Action',
-		forEntityTypes: [UMB_DOCUMENT_TYPE_ENTITY_TYPE],
-		meta: {
-			itemRepositoryAlias: DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-			duplicateRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			pickerModal: UMB_DOCUMENT_TYPE_PICKER_MODAL,
+			itemRepositoryAlias: UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+			detailRepositoryAlias: UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
 		},
 	},
 ];
 
-export const manifests = [...entityActions, ...createManifests, ...moveManifests];
+export const manifests = [...entityActions, ...createManifests, ...moveManifests, ...duplicateManifests];

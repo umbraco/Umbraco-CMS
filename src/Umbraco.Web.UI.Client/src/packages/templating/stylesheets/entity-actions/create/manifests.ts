@@ -20,6 +20,6 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'modal',
 		alias: 'Umb.Modal.Stylesheet.CreateOptions',
 		name: 'Stylesheet Create Options Modal',
-		js: () => import('./options-modal/stylesheet-create-options-modal.element.js'),
+		element: () => import('./options-modal/stylesheet-create-options-modal.element.js'),
 	},
 ];

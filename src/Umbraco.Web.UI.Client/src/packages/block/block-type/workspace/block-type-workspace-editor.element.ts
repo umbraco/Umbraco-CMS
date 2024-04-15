@@ -4,14 +4,14 @@ import { customElement, css, html, state, property } from '@umbraco-cms/backoffi
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
-import { DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/document-type';
+import { UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-block-type-workspace-editor')
 export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 	//
 	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
-		DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 		(x) => x.unique,
 	);
 

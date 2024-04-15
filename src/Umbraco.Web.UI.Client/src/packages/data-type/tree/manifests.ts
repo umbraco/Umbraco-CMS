@@ -2,16 +2,17 @@ import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadManifests } from './reload-tree-item-children/manifests.js';
 import { UmbDataTypeTreeRepository } from './data-type-tree.repository.js';
 import { UmbDataTypeTreeStore } from './data-type-tree.store.js';
+import {
+	UMB_DATA_TYPE_TREE_ALIAS,
+	UMB_DATA_TYPE_TREE_REPOSITORY_ALIAS,
+	UMB_DATA_TYPE_TREE_STORE_ALIAS,
+} from './constants.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
 	ManifestTreeItem,
 	ManifestTreeStore,
 } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_DATA_TYPE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.DataType.Tree';
-export const UMB_DATA_TYPE_TREE_STORE_ALIAS = 'Umb.Store.DataType.Tree';
-export const UMB_DATA_TYPE_TREE_ALIAS = 'Umb.Tree.DataType';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',
