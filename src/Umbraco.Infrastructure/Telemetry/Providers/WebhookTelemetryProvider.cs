@@ -32,7 +32,9 @@ public class WebhookTelemetryProvider : IDetailedTelemetryProvider
         }
 
         IEnumerable<IWebhook> customWebhooks = allWebhooks.Where(x => x.Events.Except(_defaultEventTypes).Any());
-
         yield return new UsageInformation("WebhookCount_CustomEvent", customWebhooks.Count());
+
+        IEnumerable<IWebhook> customHeaderWebhooks = allWebhooks.Where(x => x.Headers.Any());
+        yield return new UsageInformation("WebhookCount_CustomHeaders", customHeaderWebhooks.Count());
     }
 }
