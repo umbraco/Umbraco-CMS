@@ -24,7 +24,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isSuccessNotificationVisible();
     expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetFolderName)).toBeTruthy();
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
-    await expect(umbracoUi.stylesheet.checkItemNameUnderStylesheetTree(stylesheetFolderName)).toBeVisible();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetFolderName);
   });
 
   test('can delete a folder', async ({umbracoApi, umbracoUi}) => {
@@ -39,7 +39,7 @@ test.describe('Stylesheets tests', () => {
     // Assert
     await umbracoUi.stylesheet.isSuccessNotificationVisible();
     expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetFolderName)).toBeFalsy();
-    await expect(umbracoUi.stylesheet.checkItemNameUnderStylesheetTree(stylesheetFolderName)).not.toBeVisible();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetFolderName, false);
   });
 
   test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
@@ -58,7 +58,7 @@ test.describe('Stylesheets tests', () => {
     const styleChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName);
     expect(styleChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName);
     await umbracoUi.stylesheet.clickCaretButtonForName(stylesheetFolderName);
-    await expect(umbracoUi.stylesheet.checkItemNameUnderStylesheetTree(childFolderName)).toBeVisible();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(childFolderName);
   });
 
   test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
@@ -80,7 +80,7 @@ test.describe('Stylesheets tests', () => {
     const styleChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName + '/' + childFolderName);
     expect(styleChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName + '/' + childOfChildFolderName);
     await umbracoUi.stylesheet.clickCaretButtonForName(childFolderName);
-    await expect(umbracoUi.stylesheet.checkItemNameUnderStylesheetTree(childOfChildFolderName)).toBeVisible();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(childOfChildFolderName);
   });
 
   test('can create a stylesheet in a folder', async ({umbracoApi, umbracoUi}) => {
@@ -105,7 +105,7 @@ test.describe('Stylesheets tests', () => {
     const stylesheetData = await umbracoApi.stylesheet.get(stylesheetChildren[0].path);
     expect(stylesheetData.content).toBe(stylesheetContent);
     await umbracoUi.stylesheet.clickCaretButtonForName(stylesheetFolderName);
-    await expect(umbracoUi.stylesheet.checkItemNameUnderStylesheetTree(stylesheetName)).toBeVisible();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 
   test('can create a stylesheet in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
@@ -133,6 +133,6 @@ test.describe('Stylesheets tests', () => {
     const stylesheetData = await umbracoApi.stylesheet.get(stylesheetChildren[0].path);
     expect(stylesheetData.content).toBe(stylesheetContent);
     await umbracoUi.stylesheet.clickCaretButtonForName(childFolderName);
-    await expect(umbracoUi.stylesheet.checkItemNameUnderStylesheetTree(stylesheetName)).toBeVisible();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 });

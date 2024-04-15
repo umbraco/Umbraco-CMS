@@ -26,7 +26,7 @@ test.describe('Template tests', () => {
     await umbracoUi.template.isSuccessNotificationVisible();
     expect(await umbracoApi.template.doesNameExist(templateName)).toBeTruthy();
     await umbracoUi.template.clickRootFolderCaretButton();
-    await expect(umbracoUi.template.checkItemNameUnderTemplateTree(templateName)).toBeVisible();
+    await umbracoUi.template.isTemplateTreeItemVisibile(templateName);
   });
 
   test('can update content of a template', async ({umbracoApi, umbracoUi}) => {
@@ -74,12 +74,12 @@ test.describe('Template tests', () => {
     // Act
     await umbracoUi.template.clickRootFolderCaretButton();
     await umbracoUi.template.clickActionsMenuForTemplate(templateName);
-    await umbracoUi.template.delete();
+    await umbracoUi.template.clickDeleteAndConfirmButton();
 
     // Assert
     await umbracoUi.template.isSuccessNotificationVisible();
     expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
-    await expect(umbracoUi.template.checkItemNameUnderTemplateTree(templateName)).not.toBeVisible();
+    await umbracoUi.template.isTemplateTreeItemVisibile(templateName, false);
   });
 
   test('can set a template as master template', async ({umbracoApi, umbracoUi}) => {

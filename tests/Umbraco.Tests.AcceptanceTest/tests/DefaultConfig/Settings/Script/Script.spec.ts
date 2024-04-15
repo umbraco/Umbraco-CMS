@@ -27,7 +27,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isSuccessNotificationVisible();
     expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
     await umbracoUi.script.clickRootFolderCaretButton();
-    await expect(umbracoUi.script.checkItemNameUnderScriptTree(scriptName)).toBeVisible();
+    await umbracoUi.script.isScriptTreeItemVisibile(scriptName);
   });
 
   test('can create a script with content', async ({umbracoApi, umbracoUi}) => {
@@ -48,7 +48,7 @@ test.describe('Script tests', () => {
     const scriptData = await umbracoApi.script.getByName(scriptName);
     expect(scriptData.content).toBe(scriptContent);
     await umbracoUi.script.clickRootFolderCaretButton();
-    await expect(umbracoUi.script.checkItemNameUnderScriptTree(scriptName)).toBeVisible();
+    await umbracoUi.script.isScriptTreeItemVisibile(scriptName);
   });
 
   test('can update a script', async ({umbracoApi, umbracoUi}) => {
@@ -74,12 +74,12 @@ test.describe('Script tests', () => {
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
     await umbracoUi.script.clickActionsMenuForScript(scriptName);
-    await umbracoUi.script.delete();
+    await umbracoUi.script.clickDeleteAndConfirmButton();
 
     // Assert
     await umbracoUi.script.isSuccessNotificationVisible();
     expect(await umbracoApi.script.doesNameExist(scriptName)).toBeFalsy();
-    await expect(umbracoUi.script.checkItemNameUnderScriptTree(scriptName)).not.toBeVisible();
+    await umbracoUi.script.isScriptTreeItemVisibile(scriptName, false);
   });
 
   test('can rename a script', async ({umbracoApi, umbracoUi}) => {

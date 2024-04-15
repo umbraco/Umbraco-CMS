@@ -29,7 +29,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isSuccessNotificationVisible();
     expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
-    await expect(umbracoUi.stylesheet.checkItemNameUnderStylesheetTree(stylesheetName)).toBeVisible();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 
   test('can create a stylesheet with content', async ({umbracoApi, umbracoUi}) => {
@@ -50,7 +50,7 @@ test.describe('Stylesheets tests', () => {
     const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
     expect(stylesheetData.content).toEqual(stylesheetContent);
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
-    await expect(umbracoUi.stylesheet.checkItemNameUnderStylesheetTree(stylesheetName)).toBeVisible();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 
   test('can create a new Rich Text Editor stylesheet file', async ({umbracoApi, umbracoUi}) => {
@@ -71,7 +71,7 @@ test.describe('Stylesheets tests', () => {
     const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
     expect(stylesheetData.content).toEqual(stylesheetContent);
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
-    await expect(umbracoUi.stylesheet.checkItemNameUnderStylesheetTree(stylesheetName)).toBeVisible();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 
   test('can update a stylesheet', async ({umbracoApi, umbracoUi}) => {
@@ -98,12 +98,12 @@ test.describe('Stylesheets tests', () => {
     //Act
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
     await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetName);
-    await umbracoUi.stylesheet.delete();
+    await umbracoUi.stylesheet.clickDeleteAndConfirmButton();
 
     // Assert
     await umbracoUi.stylesheet.isSuccessNotificationVisible();
     expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeFalsy();
-    await expect(umbracoUi.stylesheet.checkItemNameUnderStylesheetTree(stylesheetName)).not.toBeVisible();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName, false);
   });
 
   test('can rename a stylesheet', async ({umbracoApi, umbracoUi}) => {
