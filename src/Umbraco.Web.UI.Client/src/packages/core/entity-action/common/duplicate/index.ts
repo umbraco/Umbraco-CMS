@@ -1,5 +1,5 @@
-export type { UmbDuplicateDataSource } from './duplicate/duplicate-data-source.interface.js';
-export type { UmbDuplicateRepository } from './duplicate/duplicate-repository.interface.js';
+export { UmbDuplicateEntityAction } from './duplicate/index.js';
+export { UmbDuplicateToEntityAction } from './duplicate-to/index.js';
 
 export * from './duplicate/types.js';
 export * from './duplicate-to/types.js';

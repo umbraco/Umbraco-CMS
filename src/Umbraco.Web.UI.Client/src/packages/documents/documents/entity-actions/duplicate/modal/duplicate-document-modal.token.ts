@@ -14,12 +14,12 @@ export interface UmbDuplicateDocumentModalValue {
 	includeDescendants: boolean;
 }
 
-export const UMB_DUPLICATE_TO_MODAL = new UmbModalToken<UmbDuplicateDocumentModalData, UmbDuplicateDocumentModalValue>(
-	UMB_DUPLICATE_DOCUMENT_MODAL_ALIAS,
-	{
-		modal: {
-			type: 'sidebar',
-			size: 'small',
-		},
+export const UMB_DUPLICATE_DOCUMENT_MODAL = new UmbModalToken<
+	UmbDuplicateDocumentModalData,
+	UmbDuplicateDocumentModalValue
+>(UMB_DUPLICATE_DOCUMENT_MODAL_ALIAS, {
+	modal: {
+		type: 'sidebar',
+		size: 'small',
 	},
-);
+});

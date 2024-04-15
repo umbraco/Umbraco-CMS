@@ -5,7 +5,7 @@ import type { MetaEntityActionDuplicateToKind } from '@umbraco-cms/backoffice/ex
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
-export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityActionDuplicateToKind> {
+export class UmbDuplicateEntityAction extends UmbEntityActionBase<MetaEntityActionDuplicateToKind> {
 	async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
@@ -40,4 +40,4 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 	}
 }
 
-export { UmbDuplicateToEntityAction as api };
+export { UmbDuplicateEntityAction as api };
