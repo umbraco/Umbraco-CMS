@@ -29,6 +29,10 @@ public sealed class PassThroughCache : IContextCache
         => factory();
 
     /// <inheritdoc />
+    public async Task<T?> GetOrCreateAsync<T>(string key, Func<Task<T?>> factory)
+        => await factory();
+
+    /// <inheritdoc />
     public void Clear()
     { }
 }
