@@ -3,6 +3,7 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 import type { MemberItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
 
 /**
  * A server data source for Member items
@@ -32,6 +33,7 @@ const getItems = (uniques: Array<string>) => MemberService.getItemMember({ id: u
 
 const mapper = (item: MemberItemResponseModel): UmbMemberItemModel => {
 	return {
+		entityType: UMB_MEMBER_ENTITY_TYPE,
 		unique: item.id,
 		name: item.variants[0].name || '',
 		memberType: {
