@@ -32,7 +32,7 @@ public class CreateInitialPasswordUserController : UserControllerBase
         Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.CreateInitialPasswordAsync(model.User.Id, model.Token, model.Password);
 
         return response.Success
-            ? Ok()
+            ? Redirect(BackOfficeLoginController.LoginPath)
             : UserOperationStatusResult(response.Status, response.Result);
     }
 }

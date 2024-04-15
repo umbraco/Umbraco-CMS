@@ -32,7 +32,7 @@ public class ResetPasswordTokenController : SecurityControllerBase
         Attempt<PasswordChangedModel, UserOperationStatus> result = await _userService.ResetPasswordAsync(model.User.Id, model.ResetCode, model.Password);
 
         return result.Success
-            ? NoContent()
+            ? Redirect(BackOfficeLoginController.LoginPath)
             : UserOperationStatusResult(result.Status, result.Result);
     }
 }
