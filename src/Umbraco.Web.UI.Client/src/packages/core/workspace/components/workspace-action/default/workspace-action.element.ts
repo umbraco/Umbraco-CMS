@@ -92,7 +92,6 @@ export class UmbWorkspaceActionElement<
 			await this.#api.execute();
 			this._buttonState = 'success';
 		} catch (error) {
-			console.log('got error', error);
 			this._buttonState = 'failed';
 		}
 

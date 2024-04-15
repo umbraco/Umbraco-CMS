@@ -344,10 +344,8 @@ export class UmbDataTypeWorkspaceContext
 		} else {
 			const { error, data } = await this.repository.save(this.#currentData.value);
 			if (error || !data) {
-				console.log('error');
 				throw error?.message ?? 'Repository did not return data after create.';
 			}
-			console.log('success');
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({

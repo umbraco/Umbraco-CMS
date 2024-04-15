@@ -87,7 +87,7 @@ The default layout will cover most cases, but there might be situations where we
 ```ts
 import { html, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbNotificationHandler } from '@umbraco-cms/notification';
 
 export interface UmbNotificationCustomData {
@@ -158,7 +158,7 @@ class MyElement extends LitElement {
 
 		notificationHandler.onClose().then((result) => {
 			if (result) {
-				console.log('He agreed!');
+				console.log('She agreed!');
 			}
 		});
 	}

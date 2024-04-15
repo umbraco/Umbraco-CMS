@@ -23,8 +23,6 @@ export class UmbVariantValuesValidationMessageTranslator
 		return message.indexOf('$.values[') === 0;
 	}
 	translate(path: string): string {
-		console.log('translate', path);
-
 		// retrieve the number from the message values index:
 		const index = parseInt(path.substring(9, path.indexOf(']')));
 		//

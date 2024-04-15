@@ -98,7 +98,6 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	};
 
 	#resolveSubmit = () => {
-		console.log('resolveSubmit');
 		// Resolve the submit promise:
 		this.#submitResolve?.();
 		this.#submitPromise = undefined;

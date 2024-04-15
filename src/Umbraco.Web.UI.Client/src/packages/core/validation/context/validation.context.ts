@@ -51,7 +51,6 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 			return;
 		}
 
-		console.log('change,..', dataPath, target.isValid);
 		if (target.isValid) {
 			this.messages.removeMessagesByTypeAndPath('client', dataPath);
 		} else {

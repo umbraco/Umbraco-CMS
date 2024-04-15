@@ -13,9 +13,9 @@ export interface UmbValidationMessage {
 export class UmbValidationMessagesManager {
 	#messages = new UmbArrayState<UmbValidationMessage>([], (x) => x.key);
 
-	constructor() {
+	/*constructor() {
 		this.#messages.asObservable().subscribe((x) => console.log('messages:', x));
-	}
+	}*/
 
 	/*
 	serializeMessages(fromPath: string, toPath: string): void {

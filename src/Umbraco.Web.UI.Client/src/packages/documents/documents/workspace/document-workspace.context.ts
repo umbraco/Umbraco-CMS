@@ -251,7 +251,7 @@ export class UmbDocumentWorkspaceContext
 		/**TODO Explore bug: A way to make blueprintUnique undefined/null when no unique is given, rather than setting it to invariant */
 		if (blueprintUnique && blueprintUnique.toLowerCase() !== 'invariant') {
 			const { data } = await this.#blueprintRepository.requestByUnique(blueprintUnique);
-			console.log(data);
+
 			this.#getDataPromise = this.repository.createScaffold({
 				documentType: data?.documentType,
 				values: data?.values,
