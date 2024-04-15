@@ -5,6 +5,7 @@ import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as propertyEditorsManifests } from './property-editors/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as sectionViewManifests } from './section-view/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
@@ -17,6 +18,7 @@ export const manifests = [
 	...propertyEditorsManifests,
 	...recycleBinManifests,
 	...repositoryManifests,
+	...searchManifests,
 	...sectionViewManifests,
 	...treeManifests,
 	...workspaceManifests,
