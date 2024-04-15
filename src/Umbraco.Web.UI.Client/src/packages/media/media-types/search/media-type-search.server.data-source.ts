@@ -1,0 +1,54 @@
+import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
+import type { UmbMediaTypeSearchItemModel } from './media-type.search-provider.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+
+/**
+ * A data source for the Rollback that fetches data from the server
+ * @export
+ * @class UmbMediaTypeSearchServerDataSource
+ * @implements {RepositoryDetailDataSource}
+ */
+export class UmbMediaTypeSearchServerDataSource implements UmbSearchDataSource<UmbMediaTypeSearchItemModel> {
+	#host: UmbControllerHost;
+
+	/**
+	 * Creates an instance of UmbMediaTypeSearchServerDataSource.
+	 * @param {UmbControllerHost} host
+	 * @memberof UmbMediaTypeSearchServerDataSource
+	 */
+	constructor(host: UmbControllerHost) {
+		this.#host = host;
+	}
+
+	/**
+	 * Get a list of versions for a data
+	 * @return {*}
+	 * @memberof UmbMediaTypeSearchServerDataSource
+	 */
+	async search(args: UmbSearchRequestArgs) {
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			MediaTypeService.getItemMediaTypeSearch({
+				query: args.query,
+			}),
+		);
+
+		if (data) {
+			const mappedItems: Array<UmbMediaTypeSearchItemModel> = data.items.map((item) => {
+				return {
+					entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
+					unique: item.id,
+					name: item.name,
+					icon: item.icon || null,
+				};
+			});
+
+			return { data: { items: mappedItems, total: data.total } };
+		}
+
+		return { error };
+	}
+}
