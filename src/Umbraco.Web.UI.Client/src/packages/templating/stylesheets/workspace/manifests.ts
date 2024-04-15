@@ -23,7 +23,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Stylesheet.CodeEditor',
 		name: 'Stylesheet Workspace Code Editor View',
-		js: () => import('./views/code-editor/stylesheet-code-editor-workspace-view.element.js'),
+		element: () => import('./views/code-editor/stylesheet-code-editor-workspace-view.element.js'),
 		weight: 700,
 		meta: {
 			label: '#stylesheet_tabCode',
@@ -41,7 +41,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Stylesheet.RichTextEditor',
 		name: 'Stylesheet Workspace Rich Text Editor View',
-		js: () => import('./views/rich-text-rule/stylesheet-rich-text-rule-workspace-view.element.js'),
+		element: () => import('./views/rich-text-rule/stylesheet-rich-text-rule-workspace-view.element.js'),
 		weight: 800,
 		meta: {
 			label: '#stylesheet_tabRules',

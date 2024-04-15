@@ -20,7 +20,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'modal',
 		alias: 'Umb.Modal.PartialView.CreateOptions',
 		name: 'Partial View Create Options Modal',
-		js: () => import('./options-modal/partial-view-create-options-modal.element.js'),
+		element: () => import('./options-modal/partial-view-create-options-modal.element.js'),
 	},
 	{
 		type: 'modal',

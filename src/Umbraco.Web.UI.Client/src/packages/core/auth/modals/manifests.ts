@@ -5,6 +5,6 @@ export const manifests: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.AppAuth',
 		name: 'Umb App Auth Modal',
-		js: () => import('./umb-app-auth-modal.element.js'),
+		element: () => import('./umb-app-auth-modal.element.js'),
 	},
 ];
