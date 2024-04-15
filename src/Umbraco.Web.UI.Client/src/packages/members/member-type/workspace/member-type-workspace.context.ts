@@ -177,7 +177,11 @@ export class UmbMemberTypeWorkspaceContext
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
-			await this.repository.create(data, parent.unique);
+			const { error } = await this.repository.create(data, parent.unique);
+			if (error) {
+				throw new Error(error.message);
+			}
+			this.setIsNew(false);
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
@@ -187,7 +191,10 @@ export class UmbMemberTypeWorkspaceContext
 			});
 			eventContext.dispatchEvent(event);
 		} else {
-			await this.structure.save();
+			const { error } = await this.structure.save();
+			if (error) {
+				throw new Error(error.message);
+			}
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
@@ -197,9 +204,6 @@ export class UmbMemberTypeWorkspaceContext
 
 			actionEventContext.dispatchEvent(event);
 		}
-
-		this.setIsNew(false);
-		return true;
 	}
 
 	public destroy(): void {

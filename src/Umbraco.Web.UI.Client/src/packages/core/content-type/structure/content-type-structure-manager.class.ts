@@ -26,7 +26,9 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
  * - {@link UmbContentTypePropertyStructureHelper} for managing the structure of properties, optional of another container or root.
  * - {@link UmbContentTypeContainerStructureHelper} for managing the structure of containers, optional of another container or root.
  */
-export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> extends UmbControllerBase {
+export class UmbContentTypeStructureManager<
+	T extends UmbContentTypeModel = UmbContentTypeModel,
+> extends UmbControllerBase {
 	#init!: Promise<unknown>;
 
 	#repository: UmbDetailRepository<T>;
@@ -99,15 +101,15 @@ export class UmbContentTypeStructureManager<T extends UmbContentTypeModel> exten
 	 */
 	public async save() {
 		const contentType = this.getOwnerContentType();
-		if (!contentType || !contentType.unique) return false;
+		if (!contentType || !contentType.unique) throw new Error('Could not find the Content Type to save');
 
-		const { data } = await this.#repository.save(contentType);
-		if (!data) return false;
+		const { error, data } = await this.#repository.save(contentType);
+		if (error || !data) return { error, data };
 
 		// Update state with latest version:
 		this.#contentTypes.updateOne(contentType.unique, data);
 
-		return true;
+		return { error, data };
 	}
 
 	/**

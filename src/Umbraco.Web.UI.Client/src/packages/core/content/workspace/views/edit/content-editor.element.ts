@@ -1,16 +1,21 @@
-import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-token.js';
-import type { UmbMemberWorkspaceViewContentTabElement } from './member-workspace-view-content-tab.element.js';
-import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbContentWorkspaceViewEditTabElement } from './content-editor-tab.element.js';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbContentTypeModel,
+	UmbContentTypeStructureManager,
+	UmbPropertyTypeContainerModel,
+} from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import './content-editor-tab.element.js';
 
-@customElement('umb-member-workspace-view-edit')
-export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
+@customElement('umb-content-workspace-view-edit')
+export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	//@state()
 	//private _hasRootProperties = false;
 
@@ -29,34 +34,38 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 	@state()
 	private _activePath = '';
 
-	private _workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
+	#structureManager?: UmbContentTypeStructureManager<UmbContentTypeModel>;
 
-	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<any>(this);
+	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	constructor() {
 		super();
 
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
-		this.observe(this._tabsStructureHelper.mergedContainers, (tabs) => {
-			this._tabs = tabs;
-			this._createRoutes();
-		});
+		this.observe(
+			this._tabsStructureHelper.mergedContainers,
+			(tabs) => {
+				this._tabs = tabs;
+				this._createRoutes();
+			},
+			null,
+		);
 
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
-		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._workspaceContext = workspaceContext;
+		this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#structureManager = workspaceContext.structure;
 			this._tabsStructureHelper.setStructureManager(workspaceContext.structure);
 			this._observeRootGroups();
 		});
 	}
 
 	private _observeRootGroups() {
-		if (!this._workspaceContext) return;
+		if (!this.#structureManager) return;
 
 		this.observe(
-			this._workspaceContext.structure.hasRootContainers('Group'),
+			this.#structureManager.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
 				this._createRoutes();
@@ -66,7 +75,7 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 	}
 
 	private _createRoutes() {
-		if (!this._tabs || !this._workspaceContext) return;
+		if (!this._tabs || !this.#structureManager) return;
 		const routes: UmbRoute[] = [];
 
 		if (this._tabs.length > 0) {
@@ -74,9 +83,9 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 				const tabName = tab.name ?? '';
 				routes.push({
 					path: `tab/${encodeFolderName(tabName).toString()}`,
-					component: () => import('./member-workspace-view-content-tab.element.js'),
+					component: () => import('./content-editor-tab.element.js'),
 					setup: (component) => {
-						(component as UmbMemberWorkspaceViewContentTabElement).containerId = tab.id;
+						(component as UmbContentWorkspaceViewEditTabElement).containerId = tab.id;
 					},
 				});
 			});
@@ -85,9 +94,9 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 		if (this._hasRootGroups) {
 			routes.push({
 				path: '',
-				component: () => import('./member-workspace-view-content-tab.element.js'),
+				component: () => import('./content-editor-tab.element.js'),
 				setup: (component) => {
-					(component as UmbMemberWorkspaceViewContentTabElement).containerId = null;
+					(component as UmbContentWorkspaceViewEditTabElement).containerId = null;
 				},
 			});
 		}
@@ -99,12 +108,17 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 			});
 		}
 
+		// Find the routes who are removed:
+		//const removedRoutes = this._routes.filter((route) => !routes.find((r) => r.path === route.path));
+
+		// Find the routes who are new:
+		//const newRoutes = routes.filter((route) => !this._routes.find((r) => r.path === route.path));
+
 		this._routes = routes;
 	}
 
 	render() {
-		if (!this._routes || !this._tabs) return nothing;
-
+		if (!this._routes || !this._tabs) return;
 		return html`
 			<umb-body-layout header-fit-height>
 				${this._routerPath && (this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups))
@@ -157,10 +171,10 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 	];
 }
 
-export default UmbMemberWorkspaceViewEditElement;
+export default UmbContentWorkspaceViewEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-member-workspace-view-edit': UmbMemberWorkspaceViewEditElement;
+		'umb-content-workspace-view-edit': UmbContentWorkspaceViewEditElement;
 	}
 }

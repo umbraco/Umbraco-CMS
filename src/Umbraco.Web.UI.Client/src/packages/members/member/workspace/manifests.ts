@@ -43,9 +43,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 export const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.Member.Content',
 		name: 'Member Workspace Content View',
-		js: () => import('./views/content/member-workspace-view-content.element.js'),
 		weight: 100,
 		meta: {
 			label: '#general_details',

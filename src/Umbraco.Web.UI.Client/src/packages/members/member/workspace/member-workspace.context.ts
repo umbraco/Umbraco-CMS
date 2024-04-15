@@ -334,18 +334,23 @@ export class UmbMemberWorkspaceContext
 
 		if (this.getIsNew()) {
 			const { data } = await this.repository.create(this.#currentData.value);
+			if (!data) {
+				throw new Error('Could not create member.');
+			}
 			newData = data;
+			this.setIsNew(false);
 		} else {
 			const { data } = await this.repository.save(this.#currentData.value);
+			if (!data) {
+				throw new Error('Could not create member.');
+			}
 			newData = data;
 		}
 
 		if (newData) {
 			this.#persistedData.setValue(newData);
 			this.#currentData.setValue(newData);
-			this.setIsNew(false);
 		}
-		return true;
 	}
 
 	async delete() {
