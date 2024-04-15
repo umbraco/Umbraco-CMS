@@ -104,7 +104,7 @@ export const UmbFormControlMixin = <
 		 * @attr value
 		 * @default ''
 		 */
-		@property({ reflect: false }) // Do not 'reflect' as the attribute is used as fallback.
+		@property({ reflect: false }) // Do not 'reflect' as the attribute value is used as fallback. [NL]
 		get value(): ValueType | DefaultValueType {
 			return this.#value;
 		}
@@ -127,9 +127,6 @@ export const UmbFormControlMixin = <
 		public set pristine(value: boolean) {
 			if (this._pristine !== value) {
 				this._pristine = value;
-				/*this.#formCtrlElements.forEach((el) => {
-					el.pristine = value;
-				});*/
 				this.#dispatchValidationState();
 			}
 		}
@@ -286,7 +283,6 @@ export const UmbFormControlMixin = <
 		 * Such are mainly properties that are not declared as a Lit state and or Lit property.
 		 */
 		protected _runValidators() {
-			//this._validityState = new UmbValidityState();
 			this.#validity = {};
 			const messages: Set<string> = new Set();
 			let innerFormControlEl: UmbNativeFormControlElement | undefined = undefined;
@@ -299,10 +295,7 @@ export const UmbFormControlMixin = <
 						this.#validity[key] = true;
 						messages.add(formCtrlEl.validationMessage);
 						innerFormControlEl ??= formCtrlEl;
-						//this._internals.setValidity(this.#validity, formCtrlEl.validationMessage, formCtrlEl);
-					} //else {
-					//this.#validity[key] = false;
-					//}
+					}
 				}
 			});
 
@@ -311,9 +304,7 @@ export const UmbFormControlMixin = <
 				if (validator.checkMethod()) {
 					this.#validity[validator.flagKey] = true;
 					messages.add(validator.getMessageMethod());
-				} //else {
-				//this.#validity[validator.flagKey] = false;
-				//}
+				}
 			});
 
 			const hasError = Object.values(this.#validity).includes(true);
@@ -328,18 +319,6 @@ export const UmbFormControlMixin = <
 				[...messages].join(', '),
 				innerFormControlEl ?? this.getFormElement() ?? undefined,
 			);
-
-			/*
-			this.#formCtrlElements.forEach((formCtrlEl) => {
-				formCtrlEl.setCustomValidity(this.validationMessage);
-			});
-			*/
-
-			/*
-			if (!hasError) {
-				this._internals.setValidity({});
-			}
-			*/
 
 			this.#dispatchValidationState();
 		}
