@@ -1,7 +1,7 @@
 import { UMB_MEMBER_GROUP_WORKSPACE_CONTEXT } from './member-group-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -62,7 +62,7 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 				${this.#renderActions()}
 				<div id="header" slot="header">
 					${this.#renderBackButton()}
-					<uui-input id="nameInput" .value=${this._name} @input="${this.#onInput}"></uui-input>
+					<uui-input id="nameInput" .value=${this._name} @input="${this.#onInput}" ${umbFocus()}></uui-input>
 				</div>
 			</umb-workspace-editor>
 		`;

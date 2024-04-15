@@ -4,7 +4,7 @@ import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/section';
@@ -82,7 +82,8 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					id="name"
 					label=${this.localize.term('general_name')}
 					.value=${this._userGroup?.name ?? ''}
-					@input="${this.#onNameChange}"></uui-input>
+					@input="${this.#onNameChange}"
+					${umbFocus()}></uui-input>
 			</div>
 		`;
 	}

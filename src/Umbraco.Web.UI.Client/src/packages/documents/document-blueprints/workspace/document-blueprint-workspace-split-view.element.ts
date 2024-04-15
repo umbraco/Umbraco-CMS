@@ -15,8 +15,6 @@ export class UmbDocumentBlueprintWorkspaceSplitViewElement extends UmbLitElement
 
 	constructor() {
 		super();
-		console.log('split view');
-
 		// TODO: Refactor: use a split view workspace context token:
 		this.consumeContext(UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;

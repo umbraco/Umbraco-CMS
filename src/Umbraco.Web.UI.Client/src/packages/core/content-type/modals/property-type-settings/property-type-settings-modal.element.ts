@@ -8,9 +8,9 @@ import type {
 } from './property-type-settings-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 // TODO: Could base take a token to get its types? [NL]
@@ -90,15 +90,6 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 				});
 			}
 		}
-	}
-
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.firstUpdated(_changedProperties);
-
-		// TODO: Make a general way to put focus on a input in a modal. (also make sure it only happens if its the top-most-modal.) [NL]
-		requestAnimationFrame(() => {
-			(this.shadowRoot!.querySelector('#name-input') as HTMLElement).focus();
-		});
 	}
 
 	#onSubmit(event: SubmitEvent) {
@@ -240,7 +231,8 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 										label="property name (TODO: Localize)"
 										@input=${this.#onNameChange}
 										.value=${this.value.name}
-										placeholder="Enter a name...">
+										placeholder="Enter a name..."
+										${umbFocus()}>
 										<!-- TODO: validation for bad characters -->
 									</uui-input>
 									<uui-input
