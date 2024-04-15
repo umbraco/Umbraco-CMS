@@ -1,5 +1,5 @@
 import type { UmbDuplicateModalData, UmbDuplicateModalValue } from './duplicate-modal.token.js';
-import { html, customElement, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
@@ -32,7 +32,7 @@ export class UmbDuplicateModalElement extends UmbModalBaseElement<UmbDuplicateMo
 
 		return html`
 			<umb-body-layout headline="Duplicate">
-				<uui-box headline="Duplicate to">
+				<uui-box id="tree-box" headline="Duplicate to">
 					<umb-tree alias=${this.data.treeAlias} @selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
 				<uui-box headline="Options">
@@ -69,7 +69,14 @@ export class UmbDuplicateModalElement extends UmbModalBaseElement<UmbDuplicateMo
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static styles = [
+		UmbTextStyles,
+		css`
+			#tree-box {
+				margin-bottom: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export { UmbDuplicateModalElement as element };
