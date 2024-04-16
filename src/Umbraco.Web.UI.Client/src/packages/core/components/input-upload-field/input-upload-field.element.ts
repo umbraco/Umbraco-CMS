@@ -45,7 +45,12 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 	 * @default undefined
 	 */
 	@property({ type: Array })
-	fileExtensions?: Array<string>;
+	set fileExtensions(value: Array<string>) {
+		this.#setExtensions(value);
+	}
+	get fileExtensions(): Array<string> | undefined {
+		return this.extensions;
+	}
 
 	/**
 	 * @description Allows the user to upload multiple files.
@@ -104,11 +109,6 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.#setExtensions();
-	}
-
 	async #setFilePaths() {
 		await this.#serverUrlPromise;
 
@@ -123,11 +123,9 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 		});
 	}
 
-	#setExtensions() {
-		if (!this.fileExtensions?.length) return;
-
+	#setExtensions(value: Array<string>) {
 		// TODO: The dropzone uui component does not support file extensions without a dot. Remove this when it does.
-		this.extensions = this.fileExtensions.map((extension) => {
+		this.extensions = value.map((extension) => {
 			return `.${extension}`;
 		});
 	}
