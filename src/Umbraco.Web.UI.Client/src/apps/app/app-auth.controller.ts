@@ -72,7 +72,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 		}
 
 		// Figure out which providers are available
-		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders());
+		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders(umbExtensionsRegistry));
 
 		if (availableProviders.length === 0) {
 			throw new Error('[Fatal] No auth providers available');
