@@ -209,7 +209,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 			:host {
 				display: flex;
 				flex-direction: column;
-				width: min(600px, 100vw);
+				width: min(610px, 100vw);
 				height: 100%;
 				background-color: var(--uui-color-surface);
 				box-sizing: border-box;

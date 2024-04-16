@@ -18,7 +18,6 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 					${this.item.icon ? html`<umb-icon name="${this.item.icon}"></umb-icon>` : this.#renderHashTag()}
 				</span>
 				<span class="item-name"> ${this.item.name} </span>
-				<span class="item-symbol">></span>
 			</a>
 		`;
 	}
@@ -56,16 +55,11 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 				background-color: var(--uui-color-surface-emphasis);
 				color: var(--uui-color-interactive-emphasis);
 			}
-			.item:hover .item-symbol {
-				font-weight: unset;
-				opacity: 1;
-			}
 			.item-icon {
 				margin-bottom: auto;
 				margin-top: 5px;
 			}
-			.item-icon,
-			.item-symbol {
+			.item-icon {
 				opacity: 0.4;
 			}
 			.item-name {
@@ -76,9 +70,6 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 				height: 1rem;
 				display: flex;
 				width: min-content;
-			}
-			.item-symbol {
-				font-weight: 100;
 			}
 			a {
 				text-decoration: none;
