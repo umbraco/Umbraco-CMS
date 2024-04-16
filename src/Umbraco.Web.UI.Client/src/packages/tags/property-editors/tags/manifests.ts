@@ -4,7 +4,7 @@ const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.Tags',
 	name: 'Tags Property Editor UI',
-	js: () => import('./property-editor-ui-tags.element.js'),
+	element: () => import('./property-editor-ui-tags.element.js'),
 	meta: {
 		label: 'Tags',
 		propertyEditorSchemaAlias: 'Umbraco.Tags',

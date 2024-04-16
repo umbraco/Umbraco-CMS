@@ -23,7 +23,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.Media.CreateOptions',
 		name: 'Media Create Options Modal',
-		js: () => import('./media-create-options-modal.element.js'),
+		element: () => import('./media-create-options-modal.element.js'),
 	},
 ];
 

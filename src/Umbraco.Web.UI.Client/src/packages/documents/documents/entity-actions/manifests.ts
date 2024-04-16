@@ -1,20 +1,20 @@
 import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import { UMB_DOCUMENT_PICKER_MODAL } from '../modals/index.js';
 import {
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,
-	UMB_USER_PERMISSION_DOCUMENT_DUPLICATE,
 	UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
 	UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
 } from '../user-permissions/constants.js';
-import { manifests as createManifests } from './create/manifests.js';
 import { manifests as createBlueprintManifests } from './create-blueprint/manifests.js';
-import { manifests as publicAccessManifests } from './public-access/manifests.js';
+import { manifests as createManifests } from './create/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
-import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
+import { manifests as duplicateManifests } from './duplicate/manifests.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
+import { manifests as publicAccessManifests } from './public-access/manifests.js';
+import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
+
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityAction> = [
@@ -32,25 +32,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
-			},
-		],
-	},
-	{
-		type: 'entityAction',
-		kind: 'duplicate',
-		alias: 'Umb.EntityAction.Document.Duplicate',
-		name: 'Duplicate Document Entity Action',
-		weight: 800,
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-		meta: {
-			duplicateRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			pickerModal: UMB_DOCUMENT_PICKER_MODAL,
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.UserPermission.Document',
-				allOf: [UMB_USER_PERMISSION_DOCUMENT_DUPLICATE],
 			},
 		],
 	},
@@ -133,11 +114,12 @@ const entityActions: Array<ManifestEntityAction> = [
 ];
 
 export const manifests = [
-	...createManifests,
 	...createBlueprintManifests,
-	...publicAccessManifests,
+	...createManifests,
 	...cultureAndHostnamesManifests,
-	...sortChildrenOfManifests,
+	...duplicateManifests,
 	...moveManifests,
+	...publicAccessManifests,
+	...sortChildrenOfManifests,
 	...entityActions,
 ];

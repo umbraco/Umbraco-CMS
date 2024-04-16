@@ -41,7 +41,7 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.MediaType.Structure',
 		name: 'Media Type Workspace Structure View',
-		js: () => import('./views/structure/media-type-workspace-view-structure.element.js'),
+		element: () => import('./views/structure/media-type-workspace-view-structure.element.js'),
 		weight: 800,
 		meta: {
 			label: '#contentTypeEditor_structure',

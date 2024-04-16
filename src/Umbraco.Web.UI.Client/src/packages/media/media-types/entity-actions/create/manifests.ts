@@ -24,7 +24,7 @@ const entityActions: Array<ManifestTypes> = [
 		type: 'modal',
 		alias: 'Umb.Modal.MediaTypeCreateOptions',
 		name: 'Media Type Create Options Modal',
-		js: () => import('./modal/media-type-create-options-modal.element.js'),
+		element: () => import('./modal/media-type-create-options-modal.element.js'),
 	},
 ];
 

@@ -15,11 +15,14 @@ export class UmbPartialViewTreeRepository
 	}
 
 	async requestTreeRoot() {
+		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 1 });
+		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
+
 		const data: UmbPartialViewTreeRootModel = {
 			unique: null,
 			entityType: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 			name: '#treeHeaders_partialViews',
-			hasChildren: true,
+			hasChildren,
 			isFolder: true,
 		};
 

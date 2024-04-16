@@ -1,5 +1,5 @@
 import {
-	DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+	UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 	type UmbDocumentTypeItemModel,
 } from '@umbraco-cms/backoffice/document-type';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -11,7 +11,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	//
 	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
-		DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 		(x) => x.unique,
 	);
 
