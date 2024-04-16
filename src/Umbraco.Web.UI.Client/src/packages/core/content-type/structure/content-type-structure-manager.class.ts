@@ -391,7 +391,7 @@ export class UmbContentTypeStructureManager<
 			throw new Error('Could not find the Content Type to remove container from');
 		}
 		const frozenContainers = contentType.containers ?? [];
-		const containers = frozenContainers.filter((x) => x.id !== containerId || x.parent?.id !== containerId);
+		const containers = frozenContainers.filter((x) => x.id !== containerId && x.parent?.id !== containerId);
 
 		const frozenProperties = contentType.properties ?? [];
 		const properties = frozenProperties.filter((x) => x.container?.id !== containerId);
