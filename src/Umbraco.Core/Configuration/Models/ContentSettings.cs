@@ -211,8 +211,8 @@ public class ContentSettings
     ///     of a light background (e.g. in mobile resolutions).
     /// </summary>
     /// <remarks>This is the alternative version to the regular logo found at <see cref="LoginLogoImage"/>.</remarks>
-    [DefaultValue(StaticLoginLogoImageAlternative)]
-    public string LoginLogoImageAlternative { get; set; } = StaticLoginLogoImageAlternative;
+    [DefaultValue(StaticLoginLogoImage)]
+    public string LoginLogoImageAlternative { get; set; } = StaticLoginLogoImage;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
