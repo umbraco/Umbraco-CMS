@@ -94,7 +94,7 @@ export class UmbAuthFlow {
 	readonly #scope: string;
 
 	// tokens
-	#tokenResponse: TokenResponse | undefined;
+	#tokenResponse?: TokenResponse;
 
 	constructor(
 		openIdConnectUrl: string,
