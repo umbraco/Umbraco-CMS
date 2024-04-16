@@ -8,7 +8,7 @@ export const manifests: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.Script.CreateOptions',
 		name: 'Script Create Options Entity Action',
-		weight: 1000,
+		weight: 1200,
 		api: UmbScriptCreateOptionsEntityAction,
 		forEntityTypes: [UMB_SCRIPT_ROOT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE],
 		meta: {

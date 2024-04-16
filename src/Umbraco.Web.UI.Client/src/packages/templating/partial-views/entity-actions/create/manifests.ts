@@ -8,7 +8,7 @@ export const manifests: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.PartialView.CreateOptions',
 		name: 'Partial View Create Options Entity Action',
-		weight: 1000,
+		weight: 1200,
 		api: UmbPartialViewCreateOptionsEntityAction,
 		forEntityTypes: [UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
 		meta: {

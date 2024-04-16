@@ -11,7 +11,7 @@ const entityActions: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.MemberType.Create',
 		name: 'Create Member Type Entity Action',
-		weight: 1000,
+		weight: 1200,
 		api: UmbCreateMemberTypeEntityAction,
 		forEntityTypes: [UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE],
 		meta: {
