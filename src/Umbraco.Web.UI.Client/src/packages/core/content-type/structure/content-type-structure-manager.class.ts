@@ -386,14 +386,20 @@ export class UmbContentTypeStructureManager<
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
-		const frozenContainers =
-			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.containers ?? [];
-		const containers = frozenContainers.filter((x) => x.id !== containerId);
+		const contentType = this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique);
+		if (!contentType) {
+			throw new Error('Could not find the Content Type to remove container from');
+		}
+		const frozenContainers = contentType.containers ?? [];
+		const containers = frozenContainers.filter((x) => x.id !== containerId || x.parent?.id !== containerId);
+
+		const frozenProperties = contentType.properties ?? [];
+		const properties = frozenProperties.filter((x) => x.container?.id !== containerId);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		// TODO: fix TS partial complaint
-		this.#contentTypes.updateOne(contentTypeUnique, { containers });
+		this.#contentTypes.updateOne(contentTypeUnique, { containers, properties });
 	}
 
 	createPropertyScaffold(containerId: string | null = null) {
@@ -424,7 +430,7 @@ export class UmbContentTypeStructureManager<
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
-		// If we have a container, we need to ensure it exists, and then update the container with the new parent id.
+		// If we have a container, we need to ensure it exists, and then update the container with the new parent id. [NL]
 		if (containerId) {
 			const container = await this.ensureContainerOf(containerId, contentTypeUnique);
 			if (!container) {
@@ -455,7 +461,7 @@ export class UmbContentTypeStructureManager<
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
-		// If we have a container, we need to ensure it exists, and then update the container with the new parent id.
+		// If we have a container, we need to ensure it exists, and then update the container with the new parent id. [NL]
 		if (property.container) {
 			const container = await this.ensureContainerOf(property.container.id, contentTypeUnique);
 			if (!container) {
@@ -501,7 +507,6 @@ export class UmbContentTypeStructureManager<
 
 		const frozenProperties =
 			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? [];
-
 		const properties = partialUpdateFrozenArray(frozenProperties, partialUpdate, (x) => x.id === propertyId);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
