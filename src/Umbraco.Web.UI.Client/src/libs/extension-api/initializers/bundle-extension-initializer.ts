@@ -8,25 +8,35 @@ export class UmbBundleExtensionInitializer extends UmbControllerBase {
 	#extensionRegistry;
 	#bundleMap = new Map();
 
-	constructor(host: UmbControllerHost, extensionRegistry: UmbExtensionRegistry<ManifestBundle>) {
+	constructor(
+		host: UmbControllerHost,
+		extensionRegistry: UmbExtensionRegistry<ManifestBundle>,
+		scope: 'global' | 'local' = 'local',
+	) {
 		super(host);
 		this.#extensionRegistry = extensionRegistry;
-		this.observe(extensionRegistry.byType('bundle'), (bundles) => {
-			// Unregister removed bundles:
-			this.#bundleMap.forEach((existingBundle) => {
-				if (!bundles.find((b) => b.alias === existingBundle.alias)) {
-					this.unregisterBundle(existingBundle);
-					this.#bundleMap.delete(existingBundle.alias);
-				}
-			});
+		this.observe(
+			extensionRegistry.byTypeAndFilter('bundle', (ext) => {
+				const extScope = ext.scope || 'local';
+				return extScope === scope;
+			}),
+			(bundles) => {
+				// Unregister removed bundles:
+				this.#bundleMap.forEach((existingBundle) => {
+					if (!bundles.find((b) => b.alias === existingBundle.alias)) {
+						this.unregisterBundle(existingBundle);
+						this.#bundleMap.delete(existingBundle.alias);
+					}
+				});
 
-			// Register new bundles:
-			bundles.forEach((bundle) => {
-				if (this.#bundleMap.has(bundle.alias)) return;
-				this.#bundleMap.set(bundle.alias, bundle);
-				this.instantiateBundle(bundle);
-			});
-		});
+				// Register new bundles:
+				bundles.forEach((bundle) => {
+					if (this.#bundleMap.has(bundle.alias)) return;
+					this.#bundleMap.set(bundle.alias, bundle);
+					this.instantiateBundle(bundle);
+				});
+			},
+		);
 	}
 
 	async instantiateBundle(manifest: ManifestBundle) {

@@ -9,18 +9,28 @@ export class UmbEntryPointExtensionInitializer extends UmbControllerBase {
 	#extensionRegistry;
 	#entryPointMap = new Map();
 
-	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<ManifestEntryPoint>) {
+	constructor(
+		host: UmbElement,
+		extensionRegistry: UmbExtensionRegistry<ManifestEntryPoint>,
+		scope: 'global' | 'local' = 'local',
+	) {
 		super(host);
 		this.#host = host;
 		this.#extensionRegistry = extensionRegistry;
-		this.observe(extensionRegistry.byType('entryPoint'), (entryPoints) => {
-			entryPoints.forEach((entryPoint) => {
-				if (this.#entryPointMap.has(entryPoint.alias)) return;
-				this.#entryPointMap.set(entryPoint.alias, entryPoint);
-				// TODO: Should we unInit a entry point if is removed?
-				this.instantiateEntryPoint(entryPoint);
-			});
-		});
+		this.observe(
+			extensionRegistry.byTypeAndFilter('entryPoint', (ext) => {
+				const extScope = ext.scope || 'local';
+				return extScope === scope;
+			}),
+			(entryPoints) => {
+				entryPoints.forEach((entryPoint) => {
+					if (this.#entryPointMap.has(entryPoint.alias)) return;
+					this.#entryPointMap.set(entryPoint.alias, entryPoint);
+					// TODO: Should we unInit a entry point if is removed?
+					this.instantiateEntryPoint(entryPoint);
+				});
+			},
+		);
 	}
 
 	async instantiateEntryPoint(manifest: ManifestEntryPoint) {
