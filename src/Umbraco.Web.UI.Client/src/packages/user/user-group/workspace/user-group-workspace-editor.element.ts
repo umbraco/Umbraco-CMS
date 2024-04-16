@@ -241,7 +241,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					${this._hasAccessToAllLanguages === false
 						? html`
 								<umb-input-language
-									slot="editor"
 									.selection=${this._languages}
 									@change=${this.#onLanguagePermissionChange}></umb-input-language>
 							`
