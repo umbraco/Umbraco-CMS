@@ -167,7 +167,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (!this.#workspaceContext || !this._tabs || this._hasRootGroups === undefined) return;
 		const routes: UmbRoute[] = [];
 
-		// We gather the activeTab name to check for rename, this is a bit hacky way to redirect the user without noticing to the new name [NL]
+		// We gather the activeTab name to check for rename, this is a bit hacky way to redirect the user without noticing the url changes to the new name [NL]
 		let activeTabName: string | undefined = undefined;
 
 		if (this._tabs.length > 0) {
@@ -180,8 +180,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./content-type-design-editor-tab.element.js'),
 					setup: (component) => {
-						// Or just cache the current view here, and use it if the same is begin requested?. [NL]
-						//(component as UmbContentTypeDesignEditorTabElement).tabName = tabName;
 						(component as UmbContentTypeDesignEditorTabElement).containerId = tab.id;
 					},
 				});
@@ -192,7 +190,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			path: 'root',
 			component: () => import('./content-type-design-editor-tab.element.js'),
 			setup: (component) => {
-				//(component as UmbContentTypeDesignEditorTabElement).noTabName = true;
 				(component as UmbContentTypeDesignEditorTabElement).containerId = null;
 			},
 		});
@@ -220,7 +217,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				if (oldPath !== newPath) {
 					// Lets cheat a bit and update the activePath already, in this way our input does not loose focus [NL]
 					this._activePath = this._routerPath + newPath;
-					// Update the current URL, so we are still on this specific tab:
+					// Update the current URL, so we are still on this specific tab: [NL]
 					window.history.replaceState(null, '', this._activePath);
 					// TODO: We have some flickering when renaming, this could potentially be fixed if we cache the view and re-use it if the same is requested [NL]
 					// Or maybe its just about we just send the updated tabName to the view, and let it handle the update itself [NL]
@@ -247,7 +244,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			color: 'danger',
 		};
 
-		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
+		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab. [NL]
 
 		await umbConfirmModal(this, modalData);
 
@@ -256,13 +253,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#remove(tabId?: string) {
 		if (!tabId) return;
 		this.#workspaceContext?.structure.removeContainer(null, tabId);
-		// TODO: We should only navigate away if it was the last tab and if it was the active one...
+		// TODO: We should only navigate away if it was the last tab and if it was the active one... [NL]
 		this._tabsStructureHelper?.isOwnerChildContainer(tabId)
 			? window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'))
 			: '';
 	}
 	async #addTab() {
-		// If there is already a Tab with no name, then focus it instead of adding a new one:
+		// If there is already a Tab with no name, then focus it instead of adding a new one: [NL]
 		// TODO: Optimize this so it looks at the data instead of the DOM [NL]
 		const inputEl = this.shadowRoot?.querySelector('uui-tab[active] uui-input') as UUIInputElement;
 		if (inputEl?.value === '') {
@@ -456,7 +453,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 								value=${ifDefined(tab.sortOrder)}
 								style="width:50px"
 								@change=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`
-					: html`<uui-icon class="external" name="icon-merge"></uui-icon>${tab.name!}`}
+					: html`<uui-icon name="icon-merge"></uui-icon>${tab.name!}`}
 			</div>`;
 		}
 
