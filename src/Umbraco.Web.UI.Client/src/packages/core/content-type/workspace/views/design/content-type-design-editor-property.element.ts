@@ -23,8 +23,8 @@ import {
 export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	//
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
-
 	#settingsModal;
+	#dataTypeUnique?: string;
 
 	@property({ attribute: false })
 	public set propertyStructureHelper(value: UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined) {
@@ -49,6 +49,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	}
 	public set property(value: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined) {
 		const oldValue = this._property;
+		if (value === oldValue) return;
 		this._property = value;
 		this.#checkInherited();
 		this.#settingsModal.setUniquePathValue('propertyId', value?.id);
@@ -141,9 +142,15 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._aliasLocked = !this._aliasLocked;
 	}
 
-	async #setDataType(dataTypeId: string | undefined) {
-		if (!dataTypeId) return;
-		this.#dataTypeDetailRepository.requestByUnique(dataTypeId).then((x) => (this._dataTypeName = x?.data?.name));
+	async #setDataType(dataTypeUnique: string | undefined) {
+		if (!dataTypeUnique) {
+			this._dataTypeName = undefined;
+			this.#dataTypeUnique = undefined;
+			return;
+		}
+		if (dataTypeUnique === this.#dataTypeUnique) return;
+		this.#dataTypeUnique = dataTypeUnique;
+		this.#dataTypeDetailRepository.requestByUnique(dataTypeUnique).then((x) => (this._dataTypeName = x?.data?.name));
 	}
 
 	async #requestRemove(e: Event) {

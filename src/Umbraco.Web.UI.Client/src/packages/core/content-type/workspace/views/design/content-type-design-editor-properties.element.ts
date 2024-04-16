@@ -91,8 +91,8 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		return this._containerId;
 	}
 	public set containerId(value: string | null | undefined) {
-		if (value === this._containerId) return;
 		const oldValue = this._containerId;
+		if (value === oldValue) return;
 		this._containerId = value;
 		this.#propertyStructureHelper.setContainerId(value);
 		this.#addPropertyModal.setUniquePathValue('container-id', value === null ? 'root' : value);
