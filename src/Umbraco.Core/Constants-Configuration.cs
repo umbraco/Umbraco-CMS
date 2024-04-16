@@ -39,7 +39,6 @@ public static partial class Constants
         public const string ConfigImaging = ConfigPrefix + "Imaging";
         public const string ConfigExamine = ConfigPrefix + "Examine";
         public const string ConfigIndexing = ConfigPrefix + "Indexing";
-        public const string ConfigKeepAlive = ConfigPrefix + "KeepAlive";
         public const string ConfigLogging = ConfigPrefix + "Logging";
         public const string ConfigMemberPassword = ConfigPrefix + "Security:MemberPassword";
         public const string ConfigModelsBuilder = ConfigPrefix + "ModelsBuilder";
@@ -53,7 +52,6 @@ public static partial class Constants
         public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification + ":Version";
         public const string ConfigSecurity = ConfigPrefix + "Security";
         public const string ConfigBasicAuth = ConfigPrefix + "BasicAuth";
-        public const string ConfigTours = ConfigPrefix + "Tours";
         public const string ConfigTypeFinder = ConfigPrefix + "TypeFinder";
         public const string ConfigWebRouting = ConfigPrefix + "WebRouting";
         public const string ConfigUserPassword = ConfigPrefix + "Security:UserPassword";

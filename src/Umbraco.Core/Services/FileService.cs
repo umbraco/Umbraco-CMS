@@ -788,45 +788,5 @@ public class FileService : RepositoryService, IFileService
 
     #endregion
 
-    #region Snippets
-
-    public string GetPartialViewSnippetContent(string snippetName)
-    {
-        if (snippetName.IsNullOrWhiteSpace())
-        {
-            throw new ArgumentNullException(nameof(snippetName));
-        }
-
-        var snippetProvider =
-            new EmbeddedFileProvider(GetType().Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
-
-        IFileInfo? file = snippetProvider.GetDirectoryContents(string.Empty)
-            .FirstOrDefault(x => x.Exists && x.Name.Equals(snippetName + ".cshtml"));
-
-        // Try and get the snippet path
-        if (file is null)
-        {
-            throw new InvalidOperationException("Could not load snippet with name " + snippetName);
-        }
-
-        using (var snippetFile = new StreamReader(file.CreateReadStream()))
-        {
-            var snippetContent = snippetFile.ReadToEnd().Trim();
-
-            // strip the @inherits if it's there
-            snippetContent = StripPartialViewHeader(snippetContent);
-
-            // Update Model.Content to be Model when used as PartialView
-            snippetContent = snippetContent
-                .Replace("Model.Content.", "Model.")
-                .Replace("(Model.Content)", "(Model)");
-
-            var content = $"{PartialViewHeader}{Environment.NewLine}{snippetContent}";
-            return content;
-        }
-    }
-
-    #endregion
-
     // TODO: Method to change name and/or alias of view template
 }

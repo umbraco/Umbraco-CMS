@@ -24,7 +24,10 @@ public class AllWebhookController : WebhookControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<WebhookResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<WebhookResponseModel>>> All(int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<WebhookResponseModel>>> All(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100)
     {
         PagedModel<IWebhook> result = await _webhookService.GetAllAsync(skip, take);
         IWebhook[] webhooks = result.Items.ToArray();

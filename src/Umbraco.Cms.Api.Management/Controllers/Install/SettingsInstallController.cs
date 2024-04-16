@@ -30,7 +30,7 @@ public class SettingsInstallController : InstallControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(typeof(InstallSettingsResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Settings()
+    public async Task<IActionResult> Settings(CancellationToken cancellationToken)
     {
         // Register that the install has started
         await _installHelper.SetInstallStatusAsync(false, string.Empty);

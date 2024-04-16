@@ -1086,4 +1086,21 @@ public partial class ContentTypeEditingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
     }
+
+    [TestCase("something")]
+    [TestCase("tab")]
+    [TestCase("group")]
+    public async Task Cannot_Create_Container_With_Unknown_Type(string containerType)
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        var container = ContentTypePropertyContainerModel(name: containerType, type: containerType);
+        createModel.Containers = new[] { container };
+
+        var propertyType = ContentTypePropertyTypeModel("Test Property", "testProperty", containerKey: container.Key);
+        createModel.Properties = new[] { propertyType };
+
+        var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidContainerType, result.Status);
+    }
 }

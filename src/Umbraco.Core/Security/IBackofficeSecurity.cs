@@ -21,6 +21,7 @@ public interface IBackOfficeSecurity
     /// <returns>The current user's Id that has been authenticated for the request.</returns>
     /// <remarks>If authentication hasn't taken place this will be unsuccessful.</remarks>
     // TODO: This should just be an extension method on ClaimsIdentity
+    [Obsolete("Scheduled for removal in V15")]
     Attempt<int> GetUserId();
 
     /// <summary>

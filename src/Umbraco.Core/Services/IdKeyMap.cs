@@ -115,6 +115,16 @@ public class IdKeyMap : IIdKeyMap, IDisposable
 
     public Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
     {
+        if (key == Constants.System.RecycleBinContentKey && umbracoObjectType == UmbracoObjectTypes.Document)
+        {
+            return Attempt.Succeed(Constants.System.RecycleBinContent);
+        }
+
+        if (key == Constants.System.RecycleBinMediaKey && umbracoObjectType == UmbracoObjectTypes.Media)
+        {
+            return Attempt.Succeed(Constants.System.RecycleBinMedia);
+        }
+
         bool empty;
 
         try
@@ -232,6 +242,16 @@ public class IdKeyMap : IIdKeyMap, IDisposable
 
     public Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
     {
+        if (id == Constants.System.RecycleBinContent && umbracoObjectType == UmbracoObjectTypes.Document)
+        {
+            return Attempt.Succeed(Constants.System.RecycleBinContentKey);
+        }
+
+        if (id == Constants.System.RecycleBinMedia && umbracoObjectType == UmbracoObjectTypes.Media)
+        {
+            return Attempt.Succeed(Constants.System.RecycleBinMediaKey);
+        }
+
         bool empty;
 
         try

@@ -27,6 +27,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache;
 /// </remarks>
 public class ContentStore
 {
+    private static readonly TimeSpan _monitorTimeout = TimeSpan.FromSeconds(30);
+
     // TODO: collection trigger (ok for now)
     // see SnapDictionary notes
     private const long CollectMinGenDelta = 8;
@@ -330,7 +332,12 @@ public class ContentStore
             throw new InvalidOperationException("Recursive locks not allowed");
         }
 
-        Monitor.Enter(_wlocko, ref lockInfo.Taken);
+        Monitor.TryEnter(_wlocko, _monitorTimeout, ref lockInfo.Taken);
+
+        if (Monitor.IsEntered(_wlocko) is false)
+        {
+            throw new TimeoutException("Could not enter monitor before timeout in content store");
+        }
 
         lock (_rlocko)
         {

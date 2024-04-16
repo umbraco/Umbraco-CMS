@@ -359,8 +359,27 @@ public class EntityService : RepositoryService, IEntityService
         => GetPagedChildren(id, objectType, pageIndex, pageSize, false, filter, ordering, out totalRecords);
 
     public IEnumerable<IEntitySlim> GetPagedChildren(
-        Guid? key,
-        UmbracoObjectTypes objectType,
+        Guid? parentKey,
+        UmbracoObjectTypes childObjectType,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+        => GetPagedChildren(
+            parentKey,
+            new[] { childObjectType },
+            childObjectType,
+            skip,
+            take,
+            out totalRecords,
+            filter,
+            ordering);
+
+    public IEnumerable<IEntitySlim> GetPagedChildren(
+        Guid? parentKey,
+        IEnumerable<UmbracoObjectTypes> parentObjectTypes,
+        UmbracoObjectTypes childObjectType,
         int skip,
         int take,
         out long totalRecords,
@@ -369,9 +388,17 @@ public class EntityService : RepositoryService, IEntityService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        if (ResolveKey(key, objectType, out int parentId) is false)
+        var parentId = 0;
+        var parentIdResolved = parentObjectTypes.Any(parentObjectType => ResolveKey(parentKey, parentObjectType, out parentId));
+        if (parentIdResolved is false)
         {
             totalRecords = 0;
+            return Enumerable.Empty<IEntitySlim>();
+        }
+
+        if (take == 0)
+        {
+            totalRecords = CountChildren(parentId, childObjectType, filter);
             return Enumerable.Empty<IEntitySlim>();
         }
 
@@ -379,7 +406,7 @@ public class EntityService : RepositoryService, IEntityService
 
         IEnumerable<IEntitySlim> children = GetPagedChildren(
             parentId,
-            objectType,
+            childObjectType,
             pageNumber,
             pageSize,
             out totalRecords,
@@ -401,7 +428,7 @@ public class EntityService : RepositoryService, IEntityService
         Ordering? ordering = null)
         => GetPagedChildren(id, objectType, pageIndex, pageSize, true, filter, ordering, out totalRecords);
 
-    IEnumerable<IEntitySlim> GetPagedTrashedChildren(
+    public IEnumerable<IEntitySlim> GetPagedTrashedChildren(
         Guid? key,
         UmbracoObjectTypes objectType,
         int skip,
@@ -624,32 +651,21 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
-    public int CountChildren(
+    private int CountChildren(int id, UmbracoObjectTypes objectType, IQuery<IUmbracoEntity>? filter = null) =>
+        CountChildren(id, new HashSet<UmbracoObjectTypes>() { objectType }, filter);
+
+    private int CountChildren(
         int id,
-        UmbracoObjectTypes objectType,
+        IEnumerable<UmbracoObjectTypes> objectTypes,
         IQuery<IUmbracoEntity>? filter = null)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == false);
 
-            return _entityRepository.CountByQuery(query, objectType.GetGuid(), filter);
+            var objectTypeGuids = objectTypes.Select(x => x.GetGuid()).ToHashSet();
+            return _entityRepository.CountByQuery(query, objectTypeGuids, filter);
         }
-    }
-
-    public int CountChildren(Guid? key, UmbracoObjectTypes objectType, IQuery<IUmbracoEntity>? filter = null)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        if (ResolveKey(key, objectType, out var parentId) is false)
-        {
-            return 0;
-        }
-
-        var count = CountChildren(parentId, objectType, filter);
-
-        scope.Complete();
-        return count;
     }
 
     private bool ResolveKey(Guid? key, UmbracoObjectTypes objectType, out int id)
@@ -698,6 +714,48 @@ public class EntityService : RepositoryService, IEntityService
             }
 
             return _entityRepository.GetPagedResultsByQuery(query, objectType.GetGuid(), pageIndex, pageSize, out totalRecords, filter, ordering);
+        }
+    }
+
+    public IEnumerable<IEntitySlim> GetPagedChildren(
+        Guid? parentKey,
+        IEnumerable<UmbracoObjectTypes> parentObjectTypes,
+        IEnumerable<UmbracoObjectTypes> childObjectTypes,
+        int skip,
+        int take,
+        bool trashed,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            var parentId = 0;
+            var parentIdResolved = parentObjectTypes.Any(parentObjectType => ResolveKey(parentKey, parentObjectType, out parentId));
+            if (parentIdResolved is false)
+            {
+                totalRecords = 0;
+                return Enumerable.Empty<IEntitySlim>();
+            }
+
+            if (take == 0)
+            {
+                totalRecords = CountChildren(parentId, childObjectTypes, filter);
+                return Array.Empty<IEntitySlim>();
+            }
+
+            IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId && x.Trashed == trashed);
+
+            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+            var objectTypeGuids = childObjectTypes.Select(x => x.GetGuid()).ToHashSet();
+            if (pageSize == 0)
+            {
+                totalRecords = _entityRepository.CountByQuery(query, objectTypeGuids, filter);
+                return Enumerable.Empty<IEntitySlim>();
+            }
+
+            return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuids, pageNumber, pageSize, out totalRecords, filter, ordering);
         }
     }
 }

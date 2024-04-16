@@ -10,7 +10,6 @@ using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Extensions;
@@ -33,6 +32,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddSearchManagement()
                 .AddTrees()
                 .AddAuditLogs()
+                .AddConfigurationFactories()
                 .AddDocuments()
                 .AddDocumentTypes()
                 .AddMedia()
@@ -54,8 +54,8 @@ public static partial class UmbracoBuilderExtensions
                 .AddLogViewer()
                 .AddUsers()
                 .AddUserGroups()
-                .AddTours()
                 .AddPackages()
+                .AddManifests()
                 .AddEntities()
                 .AddScripts()
                 .AddPartialViews()
@@ -66,7 +66,8 @@ public static partial class UmbracoBuilderExtensions
                 .AddWebhooks()
                 .AddPreview()
                 .AddPasswordConfiguration()
-                .AddSupplemenataryLocalizedTextFileSources();
+                .AddSupplemenataryLocalizedTextFileSources()
+                .AddUserData();
 
             services
                 .ConfigureOptions<ConfigureApiBehaviorOptions>()
@@ -85,8 +86,8 @@ public static partial class UmbracoBuilderExtensions
                 options.AddFilter(new UmbracoPipelineFilter(
                     "BackOfficeManagementApiFilter",
                     applicationBuilder => applicationBuilder.UseProblemDetailsExceptionHandling(),
-                    applicationBuilder => { },
-                    applicationBuilder => applicationBuilder.UseEndpoints()));
+                    postPipeline: _ => { },
+                    endpoints: applicationBuilder => applicationBuilder.UseEndpoints()));
             });
         }
 
