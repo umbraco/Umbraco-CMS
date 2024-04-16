@@ -1,7 +1,9 @@
 ﻿import { test } from "@umbraco/playwright-testhelpers";
 import { expect } from "@playwright/test";
 
-const listViewTypes = ['List View - Content', 'List View - Media', 'List View - Members'];
+// TODO: Added List View - Members to the list when the front-end is ready
+//const listViewTypes = ['List View - Content', 'List View - Media', 'List View - Members'];
+const listViewTypes = ['List View - Content', 'List View - Media'];
 for (const listViewType of listViewTypes) {
   test.describe(`${listViewType} tests`, () => {
     let dataTypeDefaultData = null;

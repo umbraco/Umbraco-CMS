@@ -107,4 +107,15 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .Build()),
                 _ => new ObjectResult("Unknown content type structure operation status") { StatusCode = StatusCodes.Status500InternalServerError }
             });
+
+    protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status) =>
+        OperationStatusResult(status, problemDetailsBuilder => status switch
+        {
+            ContentEditingOperationStatus.ContentTypeNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("The specified document type was not found")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                .WithTitle("Unknown content editing operation status")
+                .Build()),
+        });
 }
