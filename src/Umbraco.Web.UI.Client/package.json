@@ -149,6 +149,7 @@
 		"prepack": "tsc-alias -f -p src/tsconfig.build.json && npm run generate:jsonschema:dist && npm run wc-analyze && npm run wc-analyze:vscode && node ./devops/publish/cleanse-pkg.js",
 		"preview": "vite preview --open",
 		"storybook:build": "npm run wc-analyze && storybook build",
+		"storybook:preview": "npm run wc-analyze && storybook build && npx serve storybook-static",
 		"storybook": "npm run wc-analyze && storybook dev -p 6006",
 		"test:e2e": "npm run backoffice:test:e2e",
 		"test:dev": "web-test-runner --config ./web-test-runner.dev.config.mjs",
@@ -239,9 +240,9 @@
 		"typedoc": "^0.25.10",
 		"typescript": "^5.3.3",
 		"typescript-json-schema": "^0.63.0",
-		"vite": "^5.1.7",
-		"vite-plugin-static-copy": "^1.0.1",
-		"vite-tsconfig-paths": "^4.3.1",
+		"vite": "^5.2.9",
+		"vite-plugin-static-copy": "^1.0.2",
+		"vite-tsconfig-paths": "^4.3.2",
 		"web-component-analyzer": "^2.0.0"
 	},
 	"msw": {
