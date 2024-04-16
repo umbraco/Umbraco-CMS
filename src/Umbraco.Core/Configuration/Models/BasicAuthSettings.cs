@@ -14,7 +14,7 @@ public class BasicAuthSettings
     private const bool StaticEnabled = false;
 
     /// <summary>
-    /// Gets or sets a value indicating whether to keep the user logged in.
+    /// Gets or sets a value indicating whether Basic Auth Middleware is enabled.
     /// </summary>
     [DefaultValue(StaticEnabled)]
     public bool Enabled { get; set; } = StaticEnabled;
