@@ -31,6 +31,12 @@ export class UmbSearchModalElement extends UmbLitElement {
 	@state()
 	_currentProvider?: SearchProvider;
 
+	@state()
+	_loading: boolean = false;
+
+	#inputTimer?: NodeJS.Timeout;
+	#inputTimerAmount = 300;
+
 	constructor() {
 		super();
 
@@ -74,9 +80,16 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 	#onSearchChange(event: InputEvent) {
 		const target = event.target as HTMLInputElement;
-		this._search = target.value;
+		this._search = target.value.trim();
 
-		this.#updateSearchResults();
+		clearTimeout(this.#inputTimer);
+		if (!this._search) {
+			this._loading = false;
+			return;
+		}
+
+		this._loading = true;
+		this.#inputTimer = setTimeout(() => this.#updateSearchResults(), this.#inputTimerAmount);
 	}
 
 	#setCurrentProvider(searchProvider: SearchProvider) {
@@ -94,14 +107,14 @@ export class UmbSearchModalElement extends UmbLitElement {
 		} else {
 			this._searchResults = [];
 		}
+
+		this._loading = false;
 	}
 
 	render() {
 		return html`
 			<div id="top">
-				<div id="search-icon">
-					<uui-icon name="search"></uui-icon>
-				</div>
+				${this.#renderSearchIcon()}
 				<input
 					value=${this._search}
 					@input=${this.#onSearchChange}
@@ -115,6 +128,12 @@ export class UmbSearchModalElement extends UmbLitElement {
 				? html`<div id="main">${this._searchResults.length > 0 ? this.#renderResults() : this.#renderNoResults()}</div>`
 				: nothing}
 		`;
+	}
+
+	#renderSearchIcon() {
+		return html` <div id="search-icon">
+			${this._loading ? html`<uui-loader-circle></uui-loader-circle>` : html`<uui-icon name="search"></uui-icon>`}
+		</div>`;
 	}
 
 	#renderSearchTags() {
@@ -152,7 +171,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	#renderNoResults() {
-		return html`<div id="no-results">No results found</div>`;
+		return this._loading ? nothing : html`<div id="no-results">No results found</div>`;
 	}
 
 	static styles = [
