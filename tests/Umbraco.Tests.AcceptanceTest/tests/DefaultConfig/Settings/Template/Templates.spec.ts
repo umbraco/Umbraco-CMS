@@ -160,6 +160,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.addQueryBuilderWithOrderByStatement(propertyAliasValue, isAscending);
     // Verify that the code is shown
     await umbracoUi.template.isQueryBuilderCodeShown(expectedCode);
@@ -200,6 +201,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
     // Verify that the code is shown
     await umbracoUi.template.isQueryBuilderCodeShown(expectedCode);
@@ -221,6 +223,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSection(sectionType);
     await umbracoUi.template.clickSaveButton();
 
@@ -240,6 +243,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSection(sectionType, sectionName);
     await umbracoUi.template.clickSaveButton();
 
@@ -259,6 +263,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSection(sectionType, sectionName);
     await umbracoUi.template.clickSaveButton();
 
@@ -278,6 +283,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertDictionaryItem(dictionaryName);
     await umbracoUi.template.clickSaveButton();
 
@@ -301,6 +307,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertPartialView(partialViewFileName);
     await umbracoUi.template.clickSaveButton();
 
@@ -318,6 +325,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
     await umbracoUi.template.clickSaveButton();
 

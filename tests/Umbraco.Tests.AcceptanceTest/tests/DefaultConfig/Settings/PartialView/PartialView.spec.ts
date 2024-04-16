@@ -224,6 +224,7 @@ test.describe('Partial View tests', () => {
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
     await umbracoUi.template.clickSaveButton();
 
