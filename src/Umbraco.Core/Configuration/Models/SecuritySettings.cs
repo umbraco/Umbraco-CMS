@@ -26,6 +26,7 @@ public class SecuritySettings
     internal const int StaticMemberDefaultLockoutTimeInMinutes = 30 * 24 * 60;
     internal const int StaticUserDefaultLockoutTimeInMinutes = 30 * 24 * 60;
     internal const string StaticAuthorizeCallbackPathName = "/umbraco";
+    internal const string StaticAuthorizeCallbackErrorPathName = "/umbraco/error";
 
     /// <summary>
     ///     Gets or sets a value indicating whether to keep the user logged in.
@@ -116,4 +117,7 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticAuthorizeCallbackPathName)]
     public string AuthorizeCallbackPathName { get; set; } = StaticAuthorizeCallbackPathName;
+
+    [DefaultValue(StaticAuthorizeCallbackErrorPathName)]
+    public string AuthorizeCallbackErrorPathName { get; set; } = StaticAuthorizeCallbackErrorPathName;
 }
