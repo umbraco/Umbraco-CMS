@@ -141,7 +141,7 @@ export class UmbAuthFlow {
 					codeVerifier = request.internal.code_verifier;
 				}
 
-				await this.#makeRefreshTokenRequest(response.code, codeVerifier);
+				await this.#makeTokenRequest(response.code, codeVerifier);
 				await this.performWithFreshTokens();
 				await this.#saveTokenState();
 
@@ -301,8 +301,8 @@ export class UmbAuthFlow {
 			return Promise.resolve('Missing refreshToken.');
 		}
 
-		if (this.#accessTokenResponse && this.#accessTokenResponse.isValid()) {
-			// do nothing
+		// if the access token is valid, return it
+		if (this.#accessTokenResponse?.isValid()) {
 			return Promise.resolve(this.#accessTokenResponse.accessToken);
 		}
 
@@ -315,9 +315,11 @@ export class UmbAuthFlow {
 			extras: undefined,
 		});
 
-		const response = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
-		this.#accessTokenResponse = response;
-		return response.accessToken;
+		await this.#performTokenRequest(request);
+
+		return this.#accessTokenResponse
+			? Promise.resolve(this.#accessTokenResponse.accessToken)
+			: Promise.resolve('Missing accessToken.');
 	}
 
 	/**
@@ -335,7 +337,7 @@ export class UmbAuthFlow {
 	/**
 	 * This method will make a token request to the server using the authorization code.
 	 */
-	async #makeRefreshTokenRequest(code: string, codeVerifier: string | undefined): Promise<void> {
+	async #makeTokenRequest(code: string, codeVerifier: string | undefined): Promise<void> {
 		const extras: StringMap = {};
 
 		if (codeVerifier) {
@@ -352,8 +354,21 @@ export class UmbAuthFlow {
 			extras: extras,
 		});
 
-		const response = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
-		this.#refreshToken = response.refreshToken;
-		this.#accessTokenResponse = response;
+		await this.#performTokenRequest(request);
+	}
+
+	/**
+	 * This method will make a token request to the server using the refresh token.
+	 * If the request fails, it will sign the user out (clear the token state).
+	 */
+	async #performTokenRequest(request: TokenRequest): Promise<void> {
+		try {
+			const response = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
+			this.#refreshToken = response.refreshToken;
+			this.#accessTokenResponse = response;
+		} catch (error) {
+			console.error('Token request error', error);
+			this.signOut();
+		}
 	}
 }
