@@ -113,16 +113,16 @@ export interface ManifestEntityActionReloadTreeItemChildrenKind
 
 export interface MetaEntityActionReloadTreeItemChildrenKind extends MetaEntityActionDefaultKind {}
 
-// DUPLICATE
-export interface ManifestEntityActionDuplicateKind extends ManifestEntityAction<MetaEntityActionDuplicateKind> {
+// DUPLICATE TO
+export interface ManifestEntityActionDuplicateToKind extends ManifestEntityAction<MetaEntityActionDuplicateToKind> {
 	type: 'entityAction';
-	kind: 'duplicate';
+	kind: 'duplicateTo';
 }
 
-export interface MetaEntityActionDuplicateKind extends MetaEntityActionDefaultKind {
+export interface MetaEntityActionDuplicateToKind extends MetaEntityActionDefaultKind {
 	duplicateRepositoryAlias: string;
-	itemRepositoryAlias: string;
-	pickerModal: UmbModalToken | string;
+	treeRepositoryAlias: string;
+	treeAlias: string;
 }
 
 // MOVE TO

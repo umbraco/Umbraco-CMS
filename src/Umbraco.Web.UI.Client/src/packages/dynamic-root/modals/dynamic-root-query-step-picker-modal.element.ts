@@ -2,8 +2,7 @@ import { UmbDocumentTypePickerContext } from '../../documents/document-types/com
 import type { UmbDynamicRootQueryStepModalData } from './index.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTreePickerDynamicRootQueryStep } from '@umbraco-cms/backoffice/components';
 import type { ManifestDynamicRootQueryStep } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -76,25 +75,6 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 			</umb-body-layout>
 		`;
 	}
-
-	static styles = [
-		UmbTextStyles,
-		css`
-			uui-box > uui-button {
-				display: block;
-				--uui-button-content-align: flex-start;
-			}
-
-			uui-box > uui-button:not(:last-of-type) {
-				margin-bottom: var(--uui-size-space-5);
-			}
-
-			h3,
-			p {
-				text-align: left;
-			}
-		`,
-	];
 }
 
 export default UmbDynamicRootQueryStepPickerModalModalElement;

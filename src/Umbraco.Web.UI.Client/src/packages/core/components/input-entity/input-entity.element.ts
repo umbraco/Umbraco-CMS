@@ -1,18 +1,10 @@
-import {
-	css,
-	html,
-	customElement,
-	property,
-	state,
-	repeat,
-	ifDefined,
-	when,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
+import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-input-entity')
 export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -78,8 +70,7 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 	}
 
 	@state()
-	// TODO: [LK] Find out if we can have a common interface for tree-picker entities, (rather than use `any`).
-	private _items?: Array<any>;
+	private _items?: Array<UmbUniqueItemModel>;
 
 	constructor() {
 		super();
@@ -158,11 +149,11 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 		`;
 	}
 
-	#renderItem(item: any) {
+	#renderItem(item: UmbUniqueItemModel) {
 		if (!item.unique) return;
-		const icon = this.getIcon?.(item) ?? item.icon;
+		const icon = this.getIcon?.(item) ?? item.icon ?? '';
 		return html`
-			<uui-ref-node name=${ifDefined(item.name)}>
+			<uui-ref-node name=${item.name}>
 				${when(icon, () => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
 				<uui-action-bar slot="actions">
 					<uui-button

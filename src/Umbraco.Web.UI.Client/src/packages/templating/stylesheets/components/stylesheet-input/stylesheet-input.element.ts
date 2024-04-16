@@ -104,7 +104,7 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 				${repeat(
 					this._items,
 					(item) => item.unique,
-					(item) => this._renderItem(item),
+					(item) => this.#renderItem(item),
 				)}
 			</uui-ref-list>
 			<uui-button
@@ -115,16 +115,14 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 		`;
 	}
 
-	private _renderItem(item: UmbStylesheetItemModel) {
+	#renderItem(item: UmbStylesheetItemModel) {
 		if (!item.unique) return;
 		return html`
 			<uui-ref-node-data-type name=${item.name}>
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.unique!)}
-						label="Remove Data Type ${item.name}">
-						Remove
-					</uui-button>
+						label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node-data-type>
 		`;

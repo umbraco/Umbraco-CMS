@@ -44,3 +44,9 @@ export interface UmbReferenceByUniqueAndType {
 	type: string;
 	unique: string;
 }
+
+export interface UmbUniqueItemModel {
+	unique: string;
+	name: string;
+	icon?: string;
+}

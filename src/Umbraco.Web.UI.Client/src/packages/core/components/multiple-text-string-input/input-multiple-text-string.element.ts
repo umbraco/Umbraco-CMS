@@ -171,7 +171,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin(UmbLi
 
 	render() {
 		return html`<div id="sorter-wrapper">${this.#renderItems()}</div>
-			${this.#renderAddButton()} `;
+			${this.#renderAddButton()}`;
 	}
 
 	#renderItems() {
@@ -180,7 +180,7 @@ export class UmbInputMultipleTextStringElement extends UmbFormControlMixin(UmbLi
 				this._items,
 				(item, index) => index,
 				(item, index) =>
-					html` <umb-input-multiple-text-string-item
+					html`<umb-input-multiple-text-string-item
 						value=${item}
 						name="item-${index}"
 						data-sort-entry-id=${item}
