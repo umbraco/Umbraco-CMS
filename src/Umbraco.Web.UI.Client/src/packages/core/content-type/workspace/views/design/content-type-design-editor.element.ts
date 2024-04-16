@@ -447,7 +447,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	renderTabInner(tab: UmbPropertyTypeContainerModel, tabActive: boolean, ownedTab: boolean) {
 		// TODO: Localize this:
 		if (this._sortModeActive) {
-			return html`<div class="no-edit">
+			return html`<div class="not-active">
 				${ownedTab
 					? html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
 							<uui-input
@@ -478,9 +478,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		}
 
 		if (ownedTab) {
-			return html`<div class="no-edit">${tab.name!} ${this.renderDeleteFor(tab)}</div>`;
+			return html`<div class="not-active">${tab.name!} ${this.renderDeleteFor(tab)}</div>`;
 		} else {
-			return html`<div class="no-edit"><uui-icon name="icon-merge"></uui-icon>${tab.name!}</div>`;
+			return html`<div class="not-active"><uui-icon name="icon-merge"></uui-icon>${tab.name!}</div>`;
 		}
 	}
 
@@ -559,11 +559,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				border-right: 1px solid var(--uui-color-border);
 			}
 
-			.no-edit uui-input {
+			.not-active uui-input {
 				pointer-events: auto;
 			}
 
-			.no-edit {
+			.not-active {
 				pointer-events: none;
 				display: inline-flex;
 				padding-left: var(--uui-size-space-3);
