@@ -40,7 +40,13 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	private _documentStartNode?: UmbUserGroupDetailModel['documentStartNode'];
 
 	@state()
+	private _documentRootAccess: UmbUserGroupDetailModel['documentRootAccess'] = false;
+
+	@state()
 	private _mediaStartNode?: UmbUserGroupDetailModel['mediaStartNode'];
+
+	@state()
+	private _mediaRootAccess: UmbUserGroupDetailModel['mediaRootAccess'] = false;
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -67,10 +73,23 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		);
 
 		this.observe(
+			this.#workspaceContext.documentRootAccess,
+			(value) => (this._documentRootAccess = value),
+			'_observeDocumentRootAccess',
+		);
+
+		this.observe(
 			this.#workspaceContext.documentStartNode,
 			(value) => (this._documentStartNode = value),
 			'_observeDocumentStartNode',
 		);
+
+		this.observe(
+			this.#workspaceContext.mediaRootAccess,
+			(value) => (this._mediaRootAccess = value),
+			'_observeMediaRootAccess',
+		);
+
 		this.observe(
 			this.#workspaceContext.mediaStartNode,
 			(value) => (this._mediaStartNode = value),
@@ -81,25 +100,45 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#onSectionsChange(event: UmbChangeEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputSectionElement;
+		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('sections', target.selection);
 	}
 
 	#onAllowAllLanguagesChange(event: UUIBooleanInputEvent) {
 		event.stopPropagation();
 		const target = event.target;
+		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('hasAccessToAllLanguages', target.checked);
 	}
 
 	#onLanguagePermissionChange(event: UmbChangeEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputLanguageElement;
+		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('languages', target.selection);
+	}
+
+	#onAllowAllDocumentsChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		const target = event.target;
+		// TODO make contexts method
+		this.#workspaceContext?.updateProperty('documentRootAccess', target.checked);
+		this.#workspaceContext?.updateProperty('documentStartNode', null);
 	}
 
 	#onDocumentStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputDocumentElement;
+		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('documentStartNode', { unique: target.selection[0] });
+	}
+
+	#onAllowAllMediaChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		const target = event.target;
+		// TODO make contexts method
+		this.#workspaceContext?.updateProperty('mediaRootAccess', target.checked);
+		this.#workspaceContext?.updateProperty('mediaStartNode', null);
 	}
 
 	#onMediaStartNodeChange(event: CustomEvent) {
@@ -188,27 +227,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 						@change=${this.#onSectionsChange}></umb-input-section>
 				</umb-property-layout>
 
-				${this.#renderLanguagePermissions()}
-
-				<umb-property-layout
-					label=${this.localize.term('defaultdialogs_selectContentStartNode')}
-					description=${this.localize.term('user_startnodehelp')}>
-					<umb-input-document
-						slot="editor"
-						max="1"
-						.selection=${this._documentStartNode?.unique ? [this._documentStartNode.unique] : []}
-						@change=${this.#onDocumentStartNodeChange}></umb-input-document>
-				</umb-property-layout>
-
-				<umb-property-layout
-					label=${this.localize.term('defaultdialogs_selectMediaStartNode')}
-					description=${this.localize.term('user_mediastartnodehelp')}>
-					<umb-input-media
-						slot="editor"
-						max="1"
-						.selection=${this._mediaStartNode?.unique ? [this._mediaStartNode.unique] : []}
-						@change=${this.#onMediaStartNodeChange}></umb-input-media>
-				</umb-property-layout>
+				${this.#renderLanguageAccess()} ${this.#renderDocumentAccess()} ${this.#renderMediaAccess()}
 			</uui-box>
 
 			<uui-box>
@@ -226,7 +245,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	#renderLanguagePermissions() {
+	#renderLanguageAccess() {
 		return html`
 			<umb-property-layout
 				label=${this.localize.term('treeHeaders_languages')}
@@ -246,6 +265,58 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 							`
 						: nothing}
 				</div>
+			</umb-property-layout>
+		`;
+	}
+
+	#renderDocumentAccess() {
+		return html`
+			<umb-property-layout
+				label=${this.localize.term('defaultdialogs_selectContentStartNode')}
+				description=${this.localize.term('user_startnodehelp')}>
+				<div slot="editor">
+					<uui-toggle
+						style="margin-bottom: var(--uui-size-space-3);"
+						label="${this.localize.term('user_allowAccessToAllDocuments')}"
+						.checked=${this._documentRootAccess}
+						@change=${this.#onAllowAllDocumentsChange}></uui-toggle>
+				</div>
+
+				${this._documentRootAccess === false
+					? html`
+							<umb-input-document
+								slot="editor"
+								max="1"
+								.selection=${this._documentStartNode?.unique ? [this._documentStartNode.unique] : []}
+								@change=${this.#onDocumentStartNodeChange}></umb-input-document>
+						`
+					: nothing}
+			</umb-property-layout>
+		`;
+	}
+
+	#renderMediaAccess() {
+		return html`
+			<umb-property-layout
+				label=${this.localize.term('defaultdialogs_selectMediaStartNode')}
+				description=${this.localize.term('user_mediastartnodehelp')}>
+				<div slot="editor">
+					<uui-toggle
+						style="margin-bottom: var(--uui-size-space-3);"
+						label="${this.localize.term('user_allowAccessToAllMedia')}"
+						.checked=${this._mediaRootAccess}
+						@change=${this.#onAllowAllMediaChange}></uui-toggle>
+				</div>
+
+				${this._mediaRootAccess === false
+					? html`
+							<umb-input-media
+								slot="editor"
+								max="1"
+								.selection=${this._mediaStartNode?.unique ? [this._mediaStartNode.unique] : []}
+								@change=${this.#onMediaStartNodeChange}></umb-input-media>
+						`
+					: nothing}
 			</umb-property-layout>
 		`;
 	}
