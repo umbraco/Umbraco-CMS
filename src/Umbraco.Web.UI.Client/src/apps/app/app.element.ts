@@ -83,9 +83,10 @@ export class UmbAppElement extends UmbLitElement {
 
 		OpenAPI.BASE = window.location.origin;
 
-		// Let bundles and entry points initialize before the application is initialized if they are global
-		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry, 'global');
-		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry, 'global');
+		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
+
+		// Initialise any entryPoints that export the 'beforeInit' function
+		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry, 'beforeInit');
 
 		new UmbIconRegistry().attach(this);
 		new UUIIconRegistryEssential().attach(this);
@@ -107,7 +108,7 @@ export class UmbAppElement extends UmbLitElement {
 		// Register Core extensions (this is specifically done here because we need these extensions to be registered before the application is initialized)
 		onInit(this, umbExtensionsRegistry);
 
-		// Register public extensions
+		// Register public extensions (login extensions)
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 
 		// Try to initialise the auth flow and get the runtime status
