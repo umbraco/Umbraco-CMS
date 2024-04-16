@@ -5,10 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SixLabors.ImageSharp" VersionOverride="[2.1.7, 3)" />
+    <PackageReference Include="SixLabors.ImageSharp" VersionOverride="[2.1.8, 3)" />
     <PackageReference Include="SixLabors.ImageSharp.Web" VersionOverride="[2.0.2, 3)" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.7" />
-    <PackageReference Include="SixLabors.ImageSharp.Web" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>
