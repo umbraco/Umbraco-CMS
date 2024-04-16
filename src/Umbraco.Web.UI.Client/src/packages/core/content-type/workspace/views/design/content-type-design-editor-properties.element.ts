@@ -208,10 +208,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 								return html`
 									<umb-content-type-design-editor-property
 										data-umb-property-id=${property.id}
-										owner-content-type-id=${ifDefined(this._ownerContentType!.unique)}
-										owner-content-type-name=${ifDefined(this._ownerContentType!.name)}
 										.editContentTypePath=${this._editContentTypePath}
-										?inherited=${property.container?.id !== this.containerId}
 										?sort-mode-active=${this._sortModeActive}
 										.propertyStructureHelper=${this.#propertyStructureHelper}
 										.property=${property}>
