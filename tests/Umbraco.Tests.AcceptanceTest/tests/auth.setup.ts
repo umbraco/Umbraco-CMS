@@ -9,8 +9,6 @@ setup('authenticate', async ({page}) => {
   await umbracoUi.login.enterEmail(process.env.UMBRACO_USER_LOGIN);
   await umbracoUi.login.enterPassword(process.env.UMBRACO_USER_PASSWORD);
   await umbracoUi.login.clickLoginButton();
-  // DELETE LATER
-  await umbracoUi.waitForTimeout(20000);
   await umbracoUi.login.goToSection(ConstantHelper.sections.settings);
   await page.context().storageState({path: STORAGE_STATE});
 });
