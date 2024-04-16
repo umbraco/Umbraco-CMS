@@ -44,7 +44,6 @@ public class CreateInitialPasswordUserController : UserControllerBase
         }
 
         await _tokenManager.RevokeUmbracoUserTokens(model.User.Id);
-        return Redirect(BackOfficeLoginController.LoginPath);
-
+        return Ok();
     }
 }

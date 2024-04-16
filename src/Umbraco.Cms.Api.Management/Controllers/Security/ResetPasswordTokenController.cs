@@ -44,7 +44,7 @@ public class ResetPasswordTokenController : SecurityControllerBase
         }
 
         await _tokenManager.RevokeUmbracoUserTokens(model.User.Id);
-        return Redirect(BackOfficeLoginController.LoginPath);
+        return Ok();
 
     }
 }
