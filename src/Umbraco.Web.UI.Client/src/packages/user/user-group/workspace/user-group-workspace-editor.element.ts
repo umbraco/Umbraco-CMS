@@ -1,7 +1,7 @@
 import type { UmbUserGroupDetailModel } from '../index.js';
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context-token.js';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -11,6 +11,7 @@ import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/section';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 
 import './components/user-group-entity-user-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
@@ -28,6 +29,12 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	private _sections: UmbUserGroupDetailModel['sections'] = [];
+
+	@state()
+	private _languages: UmbUserGroupDetailModel['languages'] = [];
+
+	@state()
+	private _hasAccessToAllLanguages: UmbUserGroupDetailModel['hasAccessToAllLanguages'] = false;
 
 	@state()
 	private _documentStartNode?: UmbUserGroupDetailModel['documentStartNode'];
@@ -52,6 +59,13 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		this.observe(this.#workspaceContext.name, (value) => (this._name = value), '_observeName');
 		this.observe(this.#workspaceContext.icon, (value) => (this._icon = value), '_observeIcon');
 		this.observe(this.#workspaceContext.sections, (value) => (this._sections = value), '_observeSections');
+		this.observe(this.#workspaceContext.languages, (value) => (this._languages = value), '_observeLanguages');
+		this.observe(
+			this.#workspaceContext.hasAccessToAllLanguages,
+			(value) => (this._hasAccessToAllLanguages = value),
+			'_observeHasAccessToAllLanguages',
+		);
+
 		this.observe(
 			this.#workspaceContext.documentStartNode,
 			(value) => (this._documentStartNode = value),
@@ -68,6 +82,18 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		event.stopPropagation();
 		const target = event.target as UmbInputSectionElement;
 		this.#workspaceContext?.updateProperty('sections', target.selection);
+	}
+
+	#onAllowAllLanguagesChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		const target = event.target;
+		this.#workspaceContext?.updateProperty('hasAccessToAllLanguages', target.checked);
+	}
+
+	#onLanguagePermissionChange(event: UmbChangeEvent) {
+		event.stopPropagation();
+		const target = event.target as UmbInputLanguageElement;
+		this.#workspaceContext?.updateProperty('languages', target.selection);
 	}
 
 	#onDocumentStartNodeChange(event: CustomEvent) {
@@ -152,6 +178,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			<uui-box>
 				<div slot="headline"><umb-localize key="user_assignAccess"></umb-localize></div>
+
 				<umb-property-layout
 					label=${this.localize.term('main_sections')}
 					description=${this.localize.term('user_sectionsHelp')}>
@@ -160,6 +187,9 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 						.selection=${this._sections}
 						@change=${this.#onSectionsChange}></umb-input-section>
 				</umb-property-layout>
+
+				${this.#renderLanguagePermissions()}
+
 				<umb-property-layout
 					label=${this.localize.term('defaultdialogs_selectContentStartNode')}
 					description=${this.localize.term('user_startnodehelp')}>
@@ -169,6 +199,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 						.selection=${this._documentStartNode?.unique ? [this._documentStartNode.unique] : []}
 						@change=${this.#onDocumentStartNodeChange}></umb-input-document>
 				</umb-property-layout>
+
 				<umb-property-layout
 					label=${this.localize.term('defaultdialogs_selectMediaStartNode')}
 					description=${this.localize.term('user_mediastartnodehelp')}>
@@ -192,6 +223,30 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 				<div slot="headline"><umb-localize key="user_permissionsGranular"></umb-localize></div>
 				<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
 			</uui-box>
+		`;
+	}
+
+	#renderLanguagePermissions() {
+		return html`
+			<umb-property-layout
+				label=${this.localize.term('treeHeaders_languages')}
+				description=${this.localize.term('user_languagesHelp')}>
+				<div slot="editor">
+					<uui-toggle
+						style="margin-bottom: var(--uui-size-space-3);"
+						label="${this.localize.term('user_allowAccessToAllLanguages')}"
+						.checked=${this._hasAccessToAllLanguages}
+						@change=${this.#onAllowAllLanguagesChange}></uui-toggle>
+
+					${this._hasAccessToAllLanguages === false
+						? html`
+								<umb-input-language
+									.selection=${this._languages}
+									@change=${this.#onLanguagePermissionChange}></umb-input-language>
+							`
+						: nothing}
+				</div>
+			</umb-property-layout>
 		`;
 	}
 
