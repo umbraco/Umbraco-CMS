@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 
@@ -23,18 +24,18 @@ public class WebhookTelemetryProvider : IDetailedTelemetryProvider
     {
         IWebhook[] allWebhooks = _webhookService.GetAllAsync(0, int.MaxValue).GetAwaiter().GetResult().Items.ToArray();
 
-        yield return new UsageInformation("WebhookCount_Total", allWebhooks.Length);
+        yield return new UsageInformation(Constants.Telemetry.WebhookTotal, allWebhooks.Length);
 
         foreach (var eventType in _defaultEventTypes)
         {
             IWebhook[] webhooks = allWebhooks.Where(x => x.Events.Contains(eventType)).ToArray();
-            yield return new UsageInformation($"WebhookCount_{eventType}", webhooks.Length);
+            yield return new UsageInformation($"{Constants.Telemetry.WebhookPrefix}{eventType}", webhooks.Length);
         }
 
         IEnumerable<IWebhook> customWebhooks = allWebhooks.Where(x => x.Events.Except(_defaultEventTypes).Any());
-        yield return new UsageInformation("WebhookCount_CustomEvent", customWebhooks.Count());
+        yield return new UsageInformation(Constants.Telemetry.WebhookCustomEvent, customWebhooks.Count());
 
         IEnumerable<IWebhook> customHeaderWebhooks = allWebhooks.Where(x => x.Headers.Any());
-        yield return new UsageInformation("WebhookCount_CustomHeaders", customHeaderWebhooks.Count());
+        yield return new UsageInformation(Constants.Telemetry.WebhookCustomHeaders, customHeaderWebhooks.Count());
     }
 }
