@@ -46,6 +46,7 @@ using Umbraco.Cms.Web.Common.Blocks;
 using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
+using Umbraco.Cms.Web.Common.Helpers;
 using Umbraco.Cms.Web.Common.Localization;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
@@ -302,6 +303,13 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
 
         builder.AddHttpClients();
+
+        return builder;
+    }
+
+    public static IUmbracoBuilder AddHelpers(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<OAuthOptionsHelper>();
 
         return builder;
     }
