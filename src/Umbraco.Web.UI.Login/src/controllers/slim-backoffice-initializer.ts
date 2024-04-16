@@ -1,6 +1,4 @@
 import {
-  UmbBundleExtensionInitializer,
-  UmbEntryPointExtensionInitializer,
   UmbServerExtensionRegistrator
 } from "@umbraco-cms/backoffice/extension-api";
 import { umbExtensionsRegistry } from "@umbraco-cms/backoffice/extension-registry";
@@ -23,8 +21,6 @@ export class UmbSlimBackofficeController extends UmbControllerBase {
 
   constructor(host: UmbElement) {
     super(host);
-    new UmbBundleExtensionInitializer(host, umbExtensionsRegistry);
-    new UmbEntryPointExtensionInitializer(host, umbExtensionsRegistry);
     new UmbServerExtensionRegistrator(host, umbExtensionsRegistry).registerPublicExtensions();
 
     this.#umbIconRegistry.attach(host);
