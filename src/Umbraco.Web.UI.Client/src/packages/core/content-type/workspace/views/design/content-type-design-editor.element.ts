@@ -373,7 +373,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	renderAddButton() {
 		// TODO: Localize this:
 		if (this._sortModeActive) return;
-		return html`<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab" compact>
+		return html`<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab">
 			<uui-icon name="icon-add"></uui-icon>
 			Add tab
 		</uui-button>`;
@@ -495,7 +495,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			label=${this.localize.term('actions_remove')}
 			class="trash"
 			slot="append"
-			@click=${() => this.#requestRemoveTab(tab)}
+			@click=${(e) => {
+				e.stopPropagation();
+				e.preventDefault();
+				this.#requestRemoveTab(tab);
+			}}
 			compact>
 			<uui-icon name="icon-trash"></uui-icon>
 		</uui-button>`;
@@ -546,7 +550,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				flex-wrap: nowrap;
 			}
 
-			.content-tab-is-empty {
+			uui-tab.content-tab-is-empty {
 				align-self: center;
 				border-radius: 3px;
 				--uui-tab-text: var(--uui-color-text-alt);
@@ -559,7 +563,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				border-right: 1px solid var(--uui-color-border);
 			}
 
-			.not-active uui-input {
+			.not-active uui-button {
 				pointer-events: auto;
 			}
 
@@ -574,12 +578,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			.trash {
 				opacity: 1;
-				transition: opacity 120ms;
+				transition: opacity 100ms;
 			}
 
 			uui-tab:not(:hover, :focus) .trash {
 				opacity: 0;
-				transition: opacity 120ms;
+				transition: opacity 100ms;
 			}
 
 			uui-input:not(:focus, :hover) {
