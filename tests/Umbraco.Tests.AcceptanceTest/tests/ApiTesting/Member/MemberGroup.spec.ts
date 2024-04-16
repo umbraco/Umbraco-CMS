@@ -29,7 +29,7 @@ test.describe('Member Group tests', () => {
     expect(await umbracoApi.memberGroup.doesExist(memberGroupId)).toBeTruthy();
 
     // Act
-    await umbracoApi.memberGroup.update(memberGroupId, memberGroupName);
+    await umbracoApi.memberGroup.rename(memberGroupId, memberGroupName);
 
     // Assert
     expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
