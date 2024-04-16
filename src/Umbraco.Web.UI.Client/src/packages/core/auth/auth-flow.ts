@@ -287,7 +287,16 @@ export class UmbAuthFlow {
 		// which will redirect the user back to the client
 		// and the client will then try and log in again (if the user is not logged in)
 		// which will redirect the user to the login page
-		location.href = `${this.#configuration.endSessionEndpoint}?post_logout_redirect_uri=${this.#postLogoutRedirectUri}`;
+		const postLogoutRedirectUri = new URL(this.#postLogoutRedirectUri, window.origin);
+		const endSessionEndpoint = this.#configuration.endSessionEndpoint;
+		if (!endSessionEndpoint) {
+			location.href = postLogoutRedirectUri.href;
+			return;
+		}
+
+		const postLogoutLocation = new URL(endSessionEndpoint, this.#redirectUri);
+		postLogoutLocation.searchParams.set('post_logout_redirect_uri', postLogoutRedirectUri.href);
+		location.href = postLogoutLocation.href;
 	}
 
 	/**
