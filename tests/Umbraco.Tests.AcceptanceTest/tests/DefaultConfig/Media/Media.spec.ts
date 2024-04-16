@@ -4,6 +4,7 @@ import {expect} from '@playwright/test';
 test.describe('Media tests', () => {
   const mediaFileName = 'TestMediaFile';
   const folderName = 'TestFolder';
+  const mediaTypeName = 'File';
 
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
     await umbracoApi.media.ensureNameNotExists(mediaFileName);
@@ -21,7 +22,7 @@ test.describe('Media tests', () => {
 
     // Act
     await umbracoUi.media.clickCreateMediaItemButton();
-    await umbracoUi.media.clickMediaTypeWithNameButton('File');
+    await umbracoUi.media.clickMediaTypeWithNameButton(mediaTypeName);
     await umbracoUi.media.enterMediaItemName(mediaFileName);
     await umbracoUi.media.clickSaveButton();
 
@@ -35,12 +36,11 @@ test.describe('Media tests', () => {
     // Arrange
     const wrongMediaFileName = 'NotACorrectName';
     await umbracoApi.media.ensureNameNotExists(wrongMediaFileName);
-    const mediaType = await umbracoApi.mediaType.getByName('File');
-    await umbracoApi.media.createDefaultMedia(wrongMediaFileName, mediaType.id);
+    await umbracoApi.media.createDefaultMedia(wrongMediaFileName, mediaTypeName);
     await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
     // Arrange
-    await umbracoUi.media.clickLabelWithName(wrongMediaFileName)
+    await umbracoUi.media.clickLabelWithName(wrongMediaFileName);
     await umbracoUi.media.enterMediaItemName(mediaFileName);
     await umbracoUi.media.clickSaveButton();
 
@@ -50,14 +50,13 @@ test.describe('Media tests', () => {
     expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeTruthy();
   });
 
-  // TODO: Uncomment the mediaTypes when they are able to be created.
   const mediaFileTypes = [
-    // {fileName: 'Article', filePath: 'Article.pdf'},
-    // {fileName: 'Audio', filePath: 'Audio.mp3'},
+    {fileName: 'Article', filePath: 'Article.pdf'},
+    {fileName: 'Audio', filePath: 'Audio.mp3'},
     {fileName: 'File', filePath: 'File.txt'},
     {fileName: 'Image', filePath: 'Umbraco.png'},
-    // {fileName: 'Vector Graphics (SVG)', filePath: 'VectorGraphics.svg'},
-    // {fileName: 'Video', filePath: 'Video.mp4'}
+    {fileName: 'Vector Graphics (SVG)', filePath: 'VectorGraphics.svg'},
+    {fileName: 'Video', filePath: 'Video.mp4'}
   ];
 
   for (const mediaFileType of mediaFileTypes) {
@@ -85,21 +84,19 @@ test.describe('Media tests', () => {
 
   test('can delete a media file', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const mediaType = await umbracoApi.mediaType.getByName('File');
-    await umbracoApi.media.createDefaultMedia(mediaFileName, mediaType.id);
+    await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
     await umbracoUi.media.goToSection(ConstantHelper.sections.media);
     await umbracoApi.media.doesNameExist(mediaFileName);
 
     // Act
     await umbracoUi.media.clickActionsMenuForName(mediaFileName);
-    await umbracoUi.media.clickDeleteThreeDotsButton();
-    await umbracoUi.media.clickDeleteExactLabel();
+    await umbracoUi.media.clickDeleteButton();
+    await umbracoUi.media.clickConfirmToDeleteButton();
 
     // Assert
     await umbracoUi.media.isSuccessNotificationVisible();
     await umbracoUi.media.isTreeItemVisible(mediaFileName, false);
     expect(await umbracoApi.media.doesNameExist(mediaFileName)).toBeFalsy();
-
   });
 
   test('can create a folder', async ({umbracoApi, umbracoUi}) => {
@@ -125,15 +122,14 @@ test.describe('Media tests', () => {
   test('can delete a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.media.ensureNameNotExists(folderName);
-    const mediaType = await umbracoApi.mediaType.getByName('Folder');
-    await umbracoApi.media.createDefaultMedia(folderName, mediaType.id);
+    await umbracoApi.media.createDefaultMediaFolder(folderName);
     await umbracoUi.media.goToSection(ConstantHelper.sections.media);
     await umbracoApi.media.doesNameExist(folderName);
 
     // Act
     await umbracoUi.media.clickActionsMenuForName(folderName);
-    await umbracoUi.media.clickDeleteThreeDotsButton();
-    await umbracoUi.media.clickDeleteExactLabel();
+    await umbracoUi.media.clickDeleteButton();
+    await umbracoUi.media.clickConfirmToDeleteButton();
 
     // Assert
     await umbracoUi.media.isTreeItemVisible(folderName, false);
@@ -144,8 +140,7 @@ test.describe('Media tests', () => {
     // Arrange
     const parentFolderName = 'ParentFolder';
     await umbracoApi.media.ensureNameNotExists(parentFolderName);
-    const mediaType = await umbracoApi.mediaType.getByName('Folder');
-    await umbracoApi.media.createDefaultMedia(parentFolderName, mediaType.id);
+    await umbracoApi.media.createDefaultMediaFolder(parentFolderName);
     await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
     // Act
@@ -169,9 +164,8 @@ test.describe('Media tests', () => {
     // Arrange
     const secondMediaFile = 'SecondMediaFile';
     await umbracoApi.media.ensureNameNotExists(secondMediaFile);
-    const mediaType = await umbracoApi.mediaType.getByName('File');
-    await umbracoApi.media.createDefaultMedia(mediaFileName, mediaType.id);
-    await umbracoApi.media.createDefaultMedia(secondMediaFile, mediaType.id);
+    await umbracoApi.media.createDefaultMedia(mediaFileName, mediaTypeName);
+    await umbracoApi.media.createDefaultMedia(secondMediaFile, mediaTypeName);
     await umbracoUi.media.goToSection(ConstantHelper.sections.media);
 
     // Act
