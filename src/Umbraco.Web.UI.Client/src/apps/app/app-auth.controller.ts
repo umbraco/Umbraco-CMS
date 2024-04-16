@@ -74,6 +74,10 @@ export class UmbAppAuthController extends UmbControllerBase {
 		// Figure out which providers are available
 		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders());
 
+		if (availableProviders.length === 0) {
+			throw new Error('[Fatal] No auth providers available');
+		}
+
 		// If the user is timed out, we can show the login modal directly
 		if (userLoginState === 'timedOut') {
 			const selected = await this.#showLoginModal(userLoginState, availableProviders);
@@ -83,10 +87,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 			}
 
 			return this.#updateState();
-		}
-
-		if (availableProviders.length === 0) {
-			throw new Error('[Fatal] No auth providers available');
 		}
 
 		if (availableProviders.length === 1) {
