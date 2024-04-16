@@ -93,9 +93,12 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	#setCurrentProvider(searchProvider: SearchProvider) {
+		if (this._currentProvider === searchProvider) return;
+
 		this._currentProvider = searchProvider;
 
 		this.#focusInput();
+		this._loading = true;
 		this.#updateSearchResults();
 	}
 
