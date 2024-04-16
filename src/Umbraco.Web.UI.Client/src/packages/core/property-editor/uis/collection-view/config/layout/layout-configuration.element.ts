@@ -51,6 +51,8 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	#onAdd(event: { target: UmbInputManifestElement }) {
 		const manifest = event.target.value;
 
+		// TODO: [LK] Disallow duplicate `collectionView` aliases selections. [LK]
+
 		this.value = [
 			...(this.value ?? []),
 			{
@@ -97,6 +99,14 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	}
 
 	render() {
+		return html`${this.#renderLayouts()} ${this.#renderInput()}`;
+	}
+
+	#renderInput() {
+		return html`<umb-input-manifest extension-type="collectionView" @change=${this.#onAdd}></umb-input-manifest>`;
+	}
+
+	#renderLayouts() {
 		if (!this.value) return nothing;
 		return html`
 			<div id="layout-wrapper">
@@ -106,7 +116,6 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 					(layout, index) => this.#renderLayout(layout, index),
 				)}
 			</div>
-			<umb-input-manifest extension-type="collectionView" @change=${this.#onAdd}></umb-input-manifest>
 		`;
 	}
 
