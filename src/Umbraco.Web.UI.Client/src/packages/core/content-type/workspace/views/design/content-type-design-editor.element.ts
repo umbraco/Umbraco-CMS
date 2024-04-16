@@ -25,7 +25,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 @customElement('umb-content-type-design-editor')
 export class UmbContentTypeDesignEditorElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#sorter = new UmbSorterController<UmbPropertyTypeContainerModel, UUITabElement>(this, {
-		getUniqueOfElement: (element) => element.getAttribute('data-umb-tabs-id'),
+		getUniqueOfElement: (element) => element.getAttribute('data-umb-tab-id'),
 		getUniqueOfModel: (tab) => tab.id,
 		identifier: 'content-type-tabs-sorter',
 		itemSelector: 'uui-tab',
@@ -167,7 +167,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (!this.#workspaceContext || !this._tabs || this._hasRootGroups === undefined) return;
 		const routes: UmbRoute[] = [];
 
-		// We gather the activeTab name to check for rename, this is a bit hacky way to redirect the user without noticing to the new name [NL]
+		// We gather the activeTab name to check for rename, this is a bit hacky way to redirect the user without noticing the url changes to the new name [NL]
 		let activeTabName: string | undefined = undefined;
 
 		if (this._tabs.length > 0) {
@@ -180,8 +180,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./content-type-design-editor-tab.element.js'),
 					setup: (component) => {
-						// Or just cache the current view here, and use it if the same is begin requested?. [NL]
-						//(component as UmbContentTypeDesignEditorTabElement).tabName = tabName;
 						(component as UmbContentTypeDesignEditorTabElement).containerId = tab.id;
 					},
 				});
@@ -192,7 +190,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			path: 'root',
 			component: () => import('./content-type-design-editor-tab.element.js'),
 			setup: (component) => {
-				//(component as UmbContentTypeDesignEditorTabElement).noTabName = true;
 				(component as UmbContentTypeDesignEditorTabElement).containerId = null;
 			},
 		});
@@ -220,7 +217,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				if (oldPath !== newPath) {
 					// Lets cheat a bit and update the activePath already, in this way our input does not loose focus [NL]
 					this._activePath = this._routerPath + newPath;
-					// Update the current URL, so we are still on this specific tab:
+					// Update the current URL, so we are still on this specific tab: [NL]
 					window.history.replaceState(null, '', this._activePath);
 					// TODO: We have some flickering when renaming, this could potentially be fixed if we cache the view and re-use it if the same is requested [NL]
 					// Or maybe its just about we just send the updated tabName to the view, and let it handle the update itself [NL]
@@ -247,7 +244,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			color: 'danger',
 		};
 
-		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
+		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab. [NL]
 
 		await umbConfirmModal(this, modalData);
 
@@ -256,13 +253,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#remove(tabId?: string) {
 		if (!tabId) return;
 		this.#workspaceContext?.structure.removeContainer(null, tabId);
-		// TODO: We should only navigate away if it was the last tab and if it was the active one...
+		// TODO: We should only navigate away if it was the last tab and if it was the active one... [NL]
 		this._tabsStructureHelper?.isOwnerChildContainer(tabId)
 			? window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'))
 			: '';
 	}
 	async #addTab() {
-		// If there is already a Tab with no name, then focus it instead of adding a new one:
+		// If there is already a Tab with no name, then focus it instead of adding a new one: [NL]
 		// TODO: Optimize this so it looks at the data instead of the DOM [NL]
 		const inputEl = this.shadowRoot?.querySelector('uui-tab[active] uui-input') as UUIInputElement;
 		if (inputEl?.value === '') {
@@ -373,7 +370,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	renderAddButton() {
 		// TODO: Localize this:
 		if (this._sortModeActive) return;
-		return html`<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab" compact>
+		return html`<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab">
 			<uui-icon name="icon-add"></uui-icon>
 			Add tab
 		</uui-button>`;
@@ -439,7 +436,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			label=${tab.name ?? 'unnamed'}
 			.active=${tabActive}
 			href=${path}
-			data-umb-tabs-id=${ifDefined(tab.id)}>
+			data-umb-tab-id=${ifDefined(tab.id)}>
 			${this.renderTabInner(tab, tabActive, ownedTab)}
 		</uui-tab>`;
 	}
@@ -447,7 +444,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	renderTabInner(tab: UmbPropertyTypeContainerModel, tabActive: boolean, ownedTab: boolean) {
 		// TODO: Localize this:
 		if (this._sortModeActive) {
-			return html`<div class="no-edit">
+			return html`<div class="not-active">
 				${ownedTab
 					? html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
 							<uui-input
@@ -456,7 +453,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 								value=${ifDefined(tab.sortOrder)}
 								style="width:50px"
 								@change=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`
-					: html`<uui-icon class="external" name="icon-merge"></uui-icon>${tab.name!}`}
+					: html`<uui-icon name="icon-merge"></uui-icon>${tab.name!}`}
 			</div>`;
 		}
 
@@ -471,16 +468,16 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					auto-width
 					@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
 					@input=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-					@blur=${(e: InputEvent) => this.#tabNameBlur()}>
+					@blur=${() => this.#tabNameBlur()}>
 					${this.renderDeleteFor(tab)}
 				</uui-input>
 			</div>`;
 		}
 
 		if (ownedTab) {
-			return html`<div class="no-edit">${tab.name!} ${this.renderDeleteFor(tab)}</div>`;
+			return html`<div class="not-active">${tab.name!} ${this.renderDeleteFor(tab)}</div>`;
 		} else {
-			return html`<div class="no-edit"><uui-icon name="icon-merge"></uui-icon>${tab.name!}</div>`;
+			return html`<div class="not-active"><uui-icon name="icon-merge"></uui-icon>${tab.name!}</div>`;
 		}
 	}
 
@@ -495,7 +492,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			label=${this.localize.term('actions_remove')}
 			class="trash"
 			slot="append"
-			@click=${() => this.#requestRemoveTab(tab)}
+			@click=${(e: MouseEvent) => {
+				e.stopPropagation();
+				e.preventDefault();
+				this.#requestRemoveTab(tab);
+			}}
 			compact>
 			<uui-icon name="icon-trash"></uui-icon>
 		</uui-button>`;
@@ -546,7 +547,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				flex-wrap: nowrap;
 			}
 
-			.content-tab-is-empty {
+			uui-tab.content-tab-is-empty {
 				align-self: center;
 				border-radius: 3px;
 				--uui-tab-text: var(--uui-color-text-alt);
@@ -559,11 +560,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				border-right: 1px solid var(--uui-color-border);
 			}
 
-			.no-edit uui-input {
+			.not-active uui-button {
 				pointer-events: auto;
 			}
 
-			.no-edit {
+			.not-active {
 				pointer-events: none;
 				display: inline-flex;
 				padding-left: var(--uui-size-space-3);
@@ -574,12 +575,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			.trash {
 				opacity: 1;
-				transition: opacity 120ms;
+				transition: opacity 100ms;
 			}
 
 			uui-tab:not(:hover, :focus) .trash {
 				opacity: 0;
-				transition: opacity 120ms;
+				transition: opacity 100ms;
 			}
 
 			uui-input:not(:focus, :hover) {
