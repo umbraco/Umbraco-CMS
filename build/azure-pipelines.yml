@@ -834,7 +834,7 @@ stages:
     displayName: Upload API Documentation
     dependsOn:
       - Build
-      - Deploy_MyGet # Change to "Deploy_Nuget" after release of v14
+      - Deploy_NuGet
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
       - job:
