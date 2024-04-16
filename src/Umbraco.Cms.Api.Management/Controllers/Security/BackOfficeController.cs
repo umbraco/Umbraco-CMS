@@ -1,11 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Asp.Versioning;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -228,44 +225,34 @@ public class BackOfficeController : SecurityControllerBase
 
         if (cookieAuthenticatedUserAttempt.Succeeded == false)
         {
-            return Unauthorized();
+            return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+                "flow=external-login-callback",
+                "status=unauthorized"));
         }
 
         BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(cookieAuthenticatedUserAttempt.Principal);
         if (user == null)
         {
-            // ... this should really not happen
-            // TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "Local user does not exist" };
-            // return RedirectToLogin(new { flow = "external-login", status = "localUserNotFound", logout = "true"});
-            // todo verify
-            return StatusCode(StatusCodes.Status401Unauthorized, new ProblemDetailsBuilder()
-                .WithTitle("No user found")
-                .Build());
+            return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+                "flow=external-login-callback",
+                "status=user-not-found"));
         }
 
         ExternalLoginInfo? info =
             await _backOfficeSignInManager.GetExternalLoginInfoAsync();
-            // await _backOfficeUserManager.GetExternalLoginInfoAsync(await _backOfficeUserManager.GetUserIdAsync(user)); //todo verify
 
         if (info == null)
         {
-            // Add error and redirect for it to be displayed
-            // TempData[ViewDataExtensions.TokenExternalSignInError] =
-            //     new[] { "An error occurred, could not get external login info" };
-            // return RedirectToLogin(new { flow = "external-login", status = "externalLoginInfoNotFound", logout = "true"});
-            return StatusCode(StatusCodes.Status404NotFound, new ProblemDetailsBuilder()
-                .WithTitle("External login info not found")
-                .Build());
+            return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+                "flow=external-login-callback",
+                "status=external-info-not-found"));
         }
 
         IdentityResult addLoginResult = await _backOfficeUserManager.AddLoginAsync(user, info);
         if (addLoginResult.Succeeded)
         {
             // Update any authentication tokens if succeeded
-            // todo?
-            // await _backOfficeUserManager.UpdateExternalAuthenticationTokensAsync(info);
-
-            // return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
+            await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(info);
             return Redirect("/umbraco"); // todo shouldn't this come from configuration
         }
 
@@ -273,60 +260,60 @@ public class BackOfficeController : SecurityControllerBase
         // TempData[ViewDataExtensions.TokenExternalSignInError] = addLoginResult.Errors;
         // return RedirectToLogin(new { flow = "external-login", status = "failed", logout = "true" });
         // todo
-        return BadRequest();
-    }
-
-    // todo move this and cleanup namespaces
-    public class UnLinkLoginModel
-    {
-        [Required]
-        [DataMember(Name = "loginProvider", IsRequired = true)]
-        public required string LoginProvider { get; set; }
-
-        [Required]
-        [DataMember(Name = "providerKey", IsRequired = true)]
-        public required string ProviderKey { get; set; }
+        return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+            "flow=external-login-callback",
+            "status=failed"));
     }
 
     // todo cleanup unhappy responses
     [HttpPost("unlink-login")]
-    public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginRequestModel unlinkLoginRequestModel)
     {
         var userId = User.Identity?.GetUserId();
         if (userId is null)
         {
             throw new InvalidOperationException("Could not find userId");
         }
-        var user = await _backOfficeUserManager.FindByIdAsync(userId);
-        if (user == null) throw new InvalidOperationException("Could not find user");
+
+        BackOfficeIdentityUser? user = await _backOfficeUserManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            throw new InvalidOperationException("Could not find user");
+        }
 
         AuthenticationScheme? authType = (await _backOfficeSignInManager.GetExternalAuthenticationSchemesAsync())
-            .FirstOrDefault(x => x.Name == unlinkLoginModel.LoginProvider);
+            .FirstOrDefault(x => x.Name == unlinkLoginRequestModel.LoginProvider);
 
         if (authType == null)
         {
-            _logger.LogWarning("Could not find external authentication provider registered: {LoginProvider}", unlinkLoginModel.LoginProvider);
+            _logger.LogWarning("Could not find the supplied external authentication provider");
         }
         else
         {
             BackOfficeExternaLoginProviderScheme? opt = await _backOfficeExternalLoginProviders.GetAsync(authType.Name);
             if (opt == null)
             {
-                return BadRequest(
-                    $"Could not find external authentication options registered for provider {unlinkLoginModel.LoginProvider}");
+                return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
+                    .WithTitle("Missing Authentication options")
+                    .WithDetail($"Could not find external authentication options registered for provider {authType.Name}")
+                    .Build());
             }
 
             if (!opt.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking)
             {
                 // If AllowManualLinking is disabled for this provider we cannot unlink
-                return BadRequest();
+                return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
+                    .WithTitle("Unlinking disabled")
+                    .WithDetail($"Manual linking is disabled for provider {authType.Name}")
+                    .Build());
             }
         }
 
         IdentityResult result = await _backOfficeUserManager.RemoveLoginAsync(
             user,
-            unlinkLoginModel.LoginProvider,
-            unlinkLoginModel.ProviderKey);
+            unlinkLoginRequestModel.LoginProvider,
+            unlinkLoginRequestModel.ProviderKey);
 
         if (result.Succeeded)
         {
@@ -334,10 +321,9 @@ public class BackOfficeController : SecurityControllerBase
             return Ok();
         }
 
-        // AddModelErrors(result);
-        // return new ValidationErrorResult(ModelState);
-        // todo
-        return BadRequest();
+        return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
+            .WithTitle("Unlinking failed")
+            .Build());
     }
 
     /// <summary>
