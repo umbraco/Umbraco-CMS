@@ -22,9 +22,9 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.DocumentBlueprint.Edit',
 		name: 'Document Blueprint Workspace Edit View',
-		element: () => import('./views/edit/document-blueprint-workspace-view-edit.element.js'),
 		weight: 200,
 		meta: {
 			label: '#general_content',
@@ -50,7 +50,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		api: UmbSaveWorkspaceAction,
 		meta: {
 			label: 'Save',
-			look: 'secondary',
+			look: 'primary',
 			color: 'positive',
 		},
 		conditions: [

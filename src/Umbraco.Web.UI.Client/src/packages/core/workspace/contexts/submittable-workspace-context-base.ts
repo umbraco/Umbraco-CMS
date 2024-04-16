@@ -18,7 +18,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique (instead of the object type)
 	public readonly modalContext?: UmbModalContext<{ preset: object }>;
 
-	readonly #validation = new UmbValidationContext(this);
+	public readonly validation = new UmbValidationContext(this);
 
 	#submitPromise: Promise<void> | undefined;
 	#submitResolve: (() => void) | undefined;
@@ -48,16 +48,8 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		});
 	}
 
-	/*
-	protected passValidation() {
-		this.#validation.preventFail();
-	}
-	protected failValidation() {
-		this.#validation.allowFail();
-	}
-	*/
-
 	protected resetState() {
+		this.validation.reset();
 		this.#isNew.setValue(undefined);
 	}
 
@@ -70,10 +62,13 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	}
 
 	async requestSubmit(): Promise<void> {
-		return this.validateAndSubmit((valid) => (valid ? this.submit() : this.invalidSubmit()));
+		return this.validateAndSubmit(
+			() => this.submit(),
+			() => this.invalidSubmit(),
+		);
 	}
 
-	protected async validateAndSubmit(callback: (valid: boolean) => Promise<boolean | undefined>): Promise<void> {
+	protected async validateAndSubmit(onValid: () => Promise<void>, onInvalid: () => Promise<void>): Promise<void> {
 		if (this.#submitPromise) {
 			return this.#submitPromise;
 		}
@@ -81,49 +76,55 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 			this.#submitResolve = resolve;
 			this.#submitReject = reject;
 		});
-		this.#validation.validate().then(async (valid: boolean) => {
-			if ((await callback(valid)) === true) {
-				this.#submitComplete();
-			} else {
-				this.#submitFailed();
-			}
-		});
+		this.validation.validate().then(
+			async () => {
+				onValid().then(this.#completeSubmit, this.#rejectSubmit);
+			},
+			async () => {
+				onInvalid().then(this.#resolveSubmit, this.#rejectSubmit);
+			},
+		);
 
 		return this.#submitPromise;
 	}
 
-	#submitFailed() {
+	#rejectSubmit = () => {
 		if (this.#submitPromise) {
 			this.#submitReject?.();
 			this.#submitPromise = undefined;
 			this.#submitResolve = undefined;
 			this.#submitReject = undefined;
 		}
-	}
+	};
 
-	#submitComplete() {
+	#resolveSubmit = () => {
 		// Resolve the submit promise:
 		this.#submitResolve?.();
 		this.#submitPromise = undefined;
 		this.#submitResolve = undefined;
 		this.#submitReject = undefined;
 
-		// Calling reset on the validation context here. [NL]
-		this.#validation.reset();
-
+		// If we do not want to close a modal when saving something with errors, then move this part down to #completeSubmit method. [NL]
 		if (this.modalContext) {
 			this.modalContext?.setValue(this.getData());
 			this.modalContext?.submit();
 		}
-	}
+	};
+
+	#completeSubmit = () => {
+		this.#resolveSubmit();
+
+		// Calling reset on the validation context here. [NL]
+		this.validation.reset();
+	};
 
 	//abstract getIsDirty(): Promise<boolean>;
 	abstract getUnique(): string | undefined;
 	abstract getEntityType(): string;
 	abstract getData(): WorkspaceDataModelType | undefined;
-	protected abstract submit(): Promise<boolean | undefined>;
-	protected invalidSubmit(): Promise<boolean | undefined> {
-		return Promise.resolve(false);
+	protected abstract submit(): Promise<void>;
+	protected invalidSubmit(): Promise<void> {
+		return Promise.reject();
 	}
 }
 

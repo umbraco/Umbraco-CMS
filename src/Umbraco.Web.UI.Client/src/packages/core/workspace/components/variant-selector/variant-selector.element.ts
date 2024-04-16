@@ -183,6 +183,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		return state !== DocumentVariantStateModel.PUBLISHED && !this.#isVariantActive(culture);
 	}
 
+	#hasVariants() {
+		return this._variants?.length > 1;
+	}
+
 	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
@@ -209,7 +213,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				${umbFocus()}
 			>
 				${
-					this._variants?.length
+					this.#hasVariants()
 						? html`
 								<uui-button
 									id="variant-selector-toggle"
@@ -233,7 +237,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			</uui-input>
 
 			${
-				this._variants?.length
+				this.#hasVariants()
 					? html`
 							<uui-popover-container
 								id="variant-selector-popover"

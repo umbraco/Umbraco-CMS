@@ -67,7 +67,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 			const selectedFile = await this.#selectAvatar();
 			this.#userWorkspaceContext?.uploadAvatar(selectedFile);
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	};
 

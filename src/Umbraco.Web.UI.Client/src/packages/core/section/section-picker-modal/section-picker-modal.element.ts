@@ -1,5 +1,4 @@
 import type { UmbSectionPickerModalData, UmbSectionPickerModalValue } from './section-picker-modal.token.js';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
@@ -49,7 +48,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 					${this._sections.map(
 						(item) => html`
 							<uui-menu-item
-								label=${item.meta.label}
+								label=${this.localize.string(item.meta.label)}
 								?selectable=${this._selectable}
 								?selected=${this.#selectionManager.isSelected(item.alias)}
 								@selected=${() => this.#selectionManager.select(item.alias)}

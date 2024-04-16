@@ -70,8 +70,8 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * myState.remove([1, 2]);
 	 */
 	remove(uniques: unknown[]) {
-		let next = this.getValue();
 		if (this.getUniqueMethod) {
+			let next = this.getValue();
 			uniques.forEach((unique) => {
 				next = next.filter((x) => {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -99,8 +99,8 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * myState.removeOne(1);
 	 */
 	removeOne(unique: unknown) {
-		let next = this.getValue();
 		if (this.getUniqueMethod) {
+			let next = this.getValue();
 			next = next.filter((x) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore

@@ -99,23 +99,22 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	async submit() {
-		if (!this.#data.value) return;
+		if (!this.#data.value) throw new Error('Data is missing');
 
 		if (this.getIsNew()) {
-			const { data } = await this.repository.create(this.#data.value);
+			const { error, data } = await this.repository.create(this.#data.value);
 			if (data) {
-				// If it went well, then its not new anymore?.
+				this.#data.setValue(data);
 				this.setIsNew(false);
-				return true;
 			}
+			if (error) throw new Error(error.message);
 		} else if (this.#data.value.unique) {
-			const { data } = await this.repository.save(this.#data.value);
+			const { error, data } = await this.repository.save(this.#data.value);
 			if (data) {
-				return true;
+				this.#data.setValue(data);
 			}
+			if (error) throw new Error(error.message);
 		}
-
-		return false;
 	}
 
 	destroy(): void {

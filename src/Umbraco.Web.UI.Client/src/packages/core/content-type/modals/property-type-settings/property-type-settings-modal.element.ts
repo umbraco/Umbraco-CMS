@@ -133,7 +133,6 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 
 	#onMandatoryChange(event: UUIBooleanInputEvent) {
 		const mandatory = event.target.checked;
-		this.value.validation!.mandatory = mandatory;
 		this.updateValue({
 			validation: { ...this.value.validation, mandatory },
 		});

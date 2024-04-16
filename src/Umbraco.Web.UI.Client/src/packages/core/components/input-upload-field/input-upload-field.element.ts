@@ -45,7 +45,12 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 	 * @default undefined
 	 */
 	@property({ type: Array })
-	fileExtensions?: Array<string>;
+	set fileExtensions(value: Array<string>) {
+		this.#setExtensions(value);
+	}
+	get fileExtensions(): Array<string> | undefined {
+		return this.extensions;
+	}
 
 	/**
 	 * @description Allows the user to upload multiple files.
@@ -82,12 +87,11 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 		super();
 		this.#manager = new UmbTemporaryFileManager(this);
 
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
+		/*this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.observe(await context.propertyValueByAlias('umbracoExtension'), (value) => {
 				//const test = value;
-				//console.log('test', test);
 			});
-		});
+		});*/
 
 		this.#serverUrlPromise = this.consumeContext(UMB_APP_CONTEXT, (instance) => {
 			this.#serverUrl = instance.getServerUrl();
@@ -105,11 +109,6 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.#setExtensions();
-	}
-
 	async #setFilePaths() {
 		await this.#serverUrlPromise;
 
@@ -124,11 +123,9 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 		});
 	}
 
-	#setExtensions() {
-		if (!this.fileExtensions?.length) return;
-
+	#setExtensions(value: Array<string>) {
 		// TODO: The dropzone uui component does not support file extensions without a dot. Remove this when it does.
-		this.extensions = this.fileExtensions.map((extension) => {
+		this.extensions = value.map((extension) => {
 			return `.${extension}`;
 		});
 	}
@@ -257,7 +254,6 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 
 		// Extract the file extension from the path
 		const extension = path.split('.').pop()?.toLowerCase();
-		console.log('extension', extension, path);
 		if (!extension) return 'file';
 		if (['svg'].includes(extension)) return 'svg';
 		if (['mp3', 'weba', 'oga', 'opus'].includes(extension)) return 'audio';

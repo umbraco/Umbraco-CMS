@@ -45,20 +45,31 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		return this.item?.variants.find((x) => x.culture === culture);
 	}
 
+	#isInvariant() {
+		const firstVariant = this.item?.variants[0];
+		return firstVariant?.culture === null && firstVariant?.segment === null;
+	}
+
 	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
 	#getLabel() {
+		if (this.#isInvariant()) {
+			return this._item?.variants[0].name;
+		}
+
 		const fallbackName = this.#getVariant(this._defaultCulture)?.name ?? this._item?.variants[0].name ?? 'Unknown';
 		return this._variant?.name ?? `(${fallbackName})`;
 	}
 
-	// TODO: implement correct status symbol
 	renderIconContainer() {
 		return html`
 			<span id="icon-container" slot="icon">
 				${this.item?.documentType.icon
 					? html`
 							<umb-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></umb-icon>
+							<!--
+							// TODO: implement correct status symbol
 							<span id="status-symbol"></span>
+							-->
 						`
 					: nothing}
 			</span>
