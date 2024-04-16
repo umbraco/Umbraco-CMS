@@ -22,7 +22,7 @@ internal sealed class PackageManifestService : IPackageManifestService
         _cache = appCaches.RuntimeCache;
     }
 
-    public async Task<IEnumerable<PackageManifest>> GetPackageManifestsAsync()
+    public async Task<IEnumerable<PackageManifest>> GetAllPackageManifestsAsync()
         => await _cache.GetCacheItemAsync(
                $"{nameof(PackageManifestService)}-PackageManifests",
                async () =>
@@ -37,9 +37,15 @@ internal sealed class PackageManifestService : IPackageManifestService
                _packageManifestSettings.CacheTimeout)
            ?? Array.Empty<PackageManifest>();
 
+    public async Task<IEnumerable<PackageManifest>> GetPublicPackageManifestsAsync()
+        => (await GetAllPackageManifestsAsync()).Where(manifest => manifest.AllowPublicAccess);
+
+    public async Task<IEnumerable<PackageManifest>> GetPrivatePackageManifestsAsync()
+        => (await GetAllPackageManifestsAsync()).Where(manifest => manifest.AllowPublicAccess == false);
+
     public async Task<PackageManifestImportmap> GetPackageManifestImportmapAsync()
     {
-        IEnumerable<PackageManifest> packageManifests = await GetPackageManifestsAsync();
+        IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();
         var manifests = packageManifests.Select(x => x.Importmap).WhereNotNull().ToList();
 
         var importDict = manifests

@@ -143,9 +143,10 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
             const string query = "SELECT value FROM umbracoLock WITH (REPEATABLEREAD)  WHERE id=@id";
 
-            db.Execute("SET LOCK_TIMEOUT " + _timeout.TotalMilliseconds + ";");
+            var lockTimeoutQuery = $"SET LOCK_TIMEOUT {_timeout.TotalMilliseconds}";
 
-            var i = db.ExecuteScalar<int?>(query, new { id = LockId });
+            // execute the lock timeout query and the actual query in a single server roundtrip
+            var i = db.ExecuteScalar<int?>($"{lockTimeoutQuery};{query}", new { id = LockId });
 
             if (i == null)
             {
@@ -178,9 +179,10 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
             const string query =
                 @"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
 
-            db.Execute("SET LOCK_TIMEOUT " + _timeout.TotalMilliseconds + ";");
+            var lockTimeoutQuery = $"SET LOCK_TIMEOUT {_timeout.TotalMilliseconds}";
 
-            var i = db.Execute(query, new { id = LockId });
+            // execute the lock timeout query and the actual query in a single server roundtrip
+            var i = db.Execute($"{lockTimeoutQuery};{query}", new { id = LockId });
 
             if (i == 0)
             {

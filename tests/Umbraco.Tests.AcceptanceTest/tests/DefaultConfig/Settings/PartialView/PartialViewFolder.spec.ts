@@ -37,7 +37,7 @@ test.describe('Partial View Folder tests', () => {
     // Act
     await umbracoUi.partialView.clickRootFolderCaretButton();
     await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-    await umbracoUi.partialView.deletePartialView();
+    await umbracoUi.partialView.deleteFolder();
 
     // Assert
     await umbracoUi.partialView.isSuccessNotificationVisible(); 

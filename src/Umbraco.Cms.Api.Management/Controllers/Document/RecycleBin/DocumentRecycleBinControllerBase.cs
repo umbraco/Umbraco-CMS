@@ -27,7 +27,7 @@ public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<Documen
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
 
-    protected override int RecycleBinRootId => Constants.System.RecycleBinContent;
+    protected override Guid RecycleBinRootKey => Constants.System.RecycleBinContentKey;
 
     protected override DocumentRecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentId, IEntitySlim entity)
     {

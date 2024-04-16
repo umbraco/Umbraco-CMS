@@ -34,7 +34,9 @@ public class UpdateUserGroupsUserController : UserGroupControllerBase
     [HttpPost("set-user-groups")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateUserGroups(UpdateUserGroupsOnUserRequestModel requestModel)
+    public async Task<IActionResult> UpdateUserGroups(
+        CancellationToken cancellationToken,
+        UpdateUserGroupsOnUserRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

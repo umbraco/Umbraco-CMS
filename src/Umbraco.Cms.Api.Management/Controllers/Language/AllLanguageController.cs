@@ -24,7 +24,10 @@ public class AllLanguageController : LanguageControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LanguageResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<LanguageResponseModel>>> All(int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<LanguageResponseModel>>> All(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100)
     {
         IEnumerable<ILanguage> result = await _languageService.GetAllAsync();
         ILanguage[] allLanguages = result.ToArray();

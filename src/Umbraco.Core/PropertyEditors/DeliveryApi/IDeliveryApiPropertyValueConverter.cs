@@ -54,8 +54,4 @@ public interface IDeliveryApiPropertyValueConverter : IPropertyValueConverter
     ///     </para>
     /// </remarks>
     object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding);
-
-    [Obsolete($"Use the {nameof(ConvertIntermediateToDeliveryApiObject)} that supports property expansion. Will be removed in V14.")]
-    object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-            => ConvertIntermediateToDeliveryApiObject(owner, propertyType, referenceCacheLevel, inter, preview, false);
 }

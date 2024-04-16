@@ -44,6 +44,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Invalid container name")
                     .WithDetail("One or more container names are invalid")
                     .Build()),
+                ContentTypeOperationStatus.InvalidContainerType => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid container type")
+                    .WithDetail("One or more container types are invalid")
+                    .Build()),
                 ContentTypeOperationStatus.MissingContainer => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Missing container")
                     .WithDetail("One or more containers or properties are listed as parents to containers that are not defined.")
@@ -73,6 +77,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                         .WithTitle("Duplicate property type alias")
                         .WithDetail("One or more property type aliases are already in use, all property type aliases must be unique.")
                         .Build()),
+                ContentTypeOperationStatus.NotAllowed => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Operation not permitted")
+                    .WithDetail("The attempted operation was not permitted, likely due to a permission/configuration mismatch with the operation.")
+                    .Build()),
                 _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
             });
 
@@ -99,4 +107,15 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .Build()),
                 _ => new ObjectResult("Unknown content type structure operation status") { StatusCode = StatusCodes.Status500InternalServerError }
             });
+
+    protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status) =>
+        OperationStatusResult(status, problemDetailsBuilder => status switch
+        {
+            ContentEditingOperationStatus.ContentTypeNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("The specified document type was not found")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                .WithTitle("Unknown content editing operation status")
+                .Build()),
+        });
 }

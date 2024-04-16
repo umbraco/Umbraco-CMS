@@ -35,25 +35,17 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
 
     protected void IgnoreUserStartNodesForDataType(Guid? dataTypeKey) => _dataTypeKey = dataTypeKey;
 
-    protected override IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
+    protected override IEntitySlim[] GetPagedRootEntities(int skip, int take, out long totalItems)
         => UserHasRootAccess() || IgnoreUserStartNodes()
-            ? base.GetPagedRootEntities(pageNumber, pageSize, out totalItems)
+            ? base.GetPagedRootEntities(skip, take, out totalItems)
             : CalculateAccessMap(() => _userStartNodeEntitiesService.RootUserAccessEntities(ItemObjectType, UserStartNodeIds), out totalItems);
 
-    protected override IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
+    protected override IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems)
     {
-        IEntitySlim[] children = base.GetPagedChildEntities(parentKey, pageNumber, pageSize, out totalItems);
+        IEntitySlim[] children = base.GetPagedChildEntities(parentKey, skip, take, out totalItems);
         return UserHasRootAccess() || IgnoreUserStartNodes()
             ? children
             : CalculateAccessMap(() => _userStartNodeEntitiesService.ChildUserAccessEntities(children, UserStartNodePaths), out totalItems);
-    }
-
-    protected override IEntitySlim[] GetEntities(Guid[] keys)
-    {
-        IEntitySlim[] entities = base.GetEntities(keys);
-        return UserHasRootAccess() || IgnoreUserStartNodes()
-            ? entities
-            : CalculateAccessMap(() => _userStartNodeEntitiesService.UserAccessEntities(entities, UserStartNodePaths), out _);
     }
 
     protected override TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)

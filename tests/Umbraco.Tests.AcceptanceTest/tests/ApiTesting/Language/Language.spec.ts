@@ -5,22 +5,22 @@ test.describe('Language tests', () => {
   const languageNameDanish = 'Dansk';
   const isoCodeDanish = 'da-DK';
 
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({umbracoApi}) => {
     await umbracoApi.language.delete(isoCodeDanish);
   });
 
-  test.afterEach(async ({page, umbracoApi}) => {
+  test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.language.delete(isoCodeDanish);
   });
 
-  test('can create a language', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a language', async ({umbracoApi}) => {
     await umbracoApi.language.create(languageNameDanish, false, false, isoCodeDanish);
 
     // Assert
-    await expect(await umbracoApi.language.doesExist(isoCodeDanish)).toBeTruthy();
+    expect(await umbracoApi.language.doesExist(isoCodeDanish)).toBeTruthy();
   });
 
-  test('can update a language', async ({page, umbracoApi, umbracoUi}) => {
+  test('can update a language', async ({umbracoApi}) => {
     const wrongLanguageName = 'densk';
 
     await umbracoApi.language.create(wrongLanguageName, false, false, isoCodeDanish);
@@ -32,20 +32,20 @@ test.describe('Language tests', () => {
     await umbracoApi.language.update(isoCodeDanish, language);
 
     // Assert
-    await expect(await umbracoApi.language.doesExist(isoCodeDanish)).toBeTruthy();
+    expect(await umbracoApi.language.doesExist(isoCodeDanish)).toBeTruthy();
     // Checks if the language name was updated
     const updatedLanguage = await umbracoApi.language.get(isoCodeDanish);
-    await expect(updatedLanguage.name).toEqual(languageNameDanish);
+    expect(updatedLanguage.name).toEqual(languageNameDanish);
   });
 
-  test('can delete a language', async ({page, umbracoApi, umbracoUi}) => {
+  test('can delete a language', async ({umbracoApi}) => {
     await umbracoApi.language.create(languageNameDanish, false, false, isoCodeDanish);
 
-    await expect(await umbracoApi.language.doesExist(isoCodeDanish)).toBeTruthy();
+    expect(await umbracoApi.language.doesExist(isoCodeDanish)).toBeTruthy();
 
     await umbracoApi.language.delete(isoCodeDanish);
 
     // Assert
-    await expect(await umbracoApi.language.doesExist(isoCodeDanish)).toBeFalsy();
+    expect(await umbracoApi.language.doesExist(isoCodeDanish)).toBeFalsy();
   });
 });

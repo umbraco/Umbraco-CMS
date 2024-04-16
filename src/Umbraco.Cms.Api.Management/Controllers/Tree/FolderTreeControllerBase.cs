@@ -3,6 +3,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
@@ -11,6 +13,20 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
 {
     private readonly Guid _folderObjectTypeId;
     private bool _foldersOnly;
+
+
+
+    protected override Ordering ItemOrdering
+    {
+        get
+        {
+            // Override to order by type (folder vs item) before the text
+            var ordering = Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.NodeObjectType));
+            ordering.Next = Ordering.By(nameof(Infrastructure.Persistence.Dtos.NodeDto.Text));
+
+            return ordering;
+        }
+    }
 
     protected FolderTreeControllerBase(IEntityService entityService)
         : base(entityService) =>
@@ -21,34 +37,19 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
 
     protected void RenderFoldersOnly(bool foldersOnly) => _foldersOnly = foldersOnly;
 
-    protected override IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
+    protected override IEntitySlim[] GetPagedRootEntities(int skip, int take, out long totalItems)
         => GetEntities(
-            Constants.System.Root,
-            pageNumber,
-            pageSize,
+            Constants.System.RootKey,
+            skip,
+            take,
             out totalItems);
 
-    protected override IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
-    {
-        // EntityService is only able to get paged children by parent ID, so we must first map parent key to parent ID
-        Attempt<int> parentId = EntityService.GetId(parentKey, FolderObjectType);
-        if (parentId.Success == false)
-        {
-            parentId = EntityService.GetId(parentKey, ItemObjectType);
-            if (parentId.Success == false)
-            {
-                // not much else we can do here but return nothing
-                totalItems = 0;
-                return Array.Empty<IEntitySlim>();
-            }
-        }
-
-        return GetEntities(
-            parentId.Result,
-            pageNumber,
-            pageSize,
+    protected override IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems) =>
+        GetEntities(
+            parentKey,
+            skip,
+            take,
             out totalItems);
-    }
 
     protected override TItem MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
@@ -62,41 +63,46 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         return viewModel;
     }
 
-    private IEntitySlim[] GetEntities(int parentId, long pageNumber, int pageSize, out long totalItems)
+    protected override async Task<IEntitySlim[]> GetAncestorEntitiesAsync(Guid descendantKey, bool includeSelf = true)
+    {
+        IEntitySlim? entity = EntityService.Get(descendantKey, ItemObjectType)
+                              ?? EntityService.Get(descendantKey, FolderObjectType);
+        if (entity is null)
+        {
+            // not much else we can do here but return nothing
+            return await Task.FromResult(Array.Empty<IEntitySlim>());
+        }
+
+        var ancestorIds = entity.AncestorIds();
+        // annoyingly we can't use EntityService.GetAll() with container object types, so we have to get them one by one
+        IEntitySlim[] containers = ancestorIds.Select(id => EntityService.Get(id, FolderObjectType)).WhereNotNull().ToArray();
+        IEnumerable<IEntitySlim> ancestors = ancestorIds.Any()
+            ? EntityService
+                .GetAll(ItemObjectType, ancestorIds)
+                .Union(containers)
+            : Array.Empty<IEntitySlim>();
+        ancestors = ancestors.Union(includeSelf ? new[] { entity } : Array.Empty<IEntitySlim>());
+
+        return ancestors.OrderBy(item => item.Level).ToArray();
+    }
+
+    private IEntitySlim[] GetEntities(Guid? parentKey, int skip, int take, out long totalItems)
     {
         totalItems = 0;
 
-        if (pageSize == 0)
-        {
-            totalItems = _foldersOnly
-                ? EntityService.CountChildren(parentId, FolderObjectType)
-                : EntityService.CountChildren(parentId, FolderObjectType)
-                  + EntityService.CountChildren(parentId, ItemObjectType);
-            return Array.Empty<IEntitySlim>();
-        }
+        UmbracoObjectTypes[] childObjectTypes = _foldersOnly ? [FolderObjectType] : [FolderObjectType, ItemObjectType];
 
-        // EntityService is not able to paginate children of multiple item types, so we will only paginate the
-        // item type entities and always return all folders as part of the the first result page
-        IEntitySlim[] folderEntities = pageNumber == 0
-            ? EntityService.GetChildren(parentId, FolderObjectType).OrderBy(c => c.Name).ToArray()
-            : Array.Empty<IEntitySlim>();
-        IEntitySlim[] itemEntities = _foldersOnly
-            ? Array.Empty<IEntitySlim>()
-            : EntityService.GetPagedChildren(
-                    parentId,
-                    ItemObjectType,
-                    pageNumber,
-                    pageSize,
+        IEntitySlim[] itemEntities = EntityService.GetPagedChildren(
+                    parentKey,
+                    new [] { FolderObjectType, ItemObjectType },
+                    childObjectTypes,
+                    skip,
+                    take,
+                    false,
                     out totalItems,
                     ordering: ItemOrdering)
                 .ToArray();
 
-        // the GetChildren for folders does not return an amount and does not get executed when beyond the first page
-        // but the items still count towards the total, so add these to either 0 when only folders, or the out param from paged
-        totalItems += pageNumber == 0
-            ? folderEntities.Length
-            : EntityService.CountChildren(parentId, FolderObjectType);
-
-        return folderEntities.Union(itemEntities).ToArray();
+        return itemEntities;
     }
 }

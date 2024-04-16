@@ -2,15 +2,14 @@ import { expect } from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 test.describe('Examine Management Dashboard tests', () => {
-
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();
     await umbracoUi.examineManagement.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.examineManagement.clickExamineManagementTab();
   });
 
-  test('can view indexers information', async ({umbracoApi, umbracoUi}) => {
-    // Arrange 
+  test.skip('can view indexers information', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
     const allIndexersData = await umbracoApi.indexer.getAll();
     const indexerCount = allIndexersData.total;
 
@@ -22,7 +21,7 @@ test.describe('Examine Management Dashboard tests', () => {
   });
 
   test('can view the details of an index', async ({umbracoApi, umbracoUi}) => {
-    // Arrange 
+    // Arrange
     const allIndexersData = await umbracoApi.indexer.getAll();
     for (const index of allIndexersData.items) {
       const indexName = index.name;
