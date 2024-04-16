@@ -13,7 +13,11 @@ import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { OpenAPI, RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
-import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbBundleExtensionInitializer,
+	UmbEntryPointExtensionInitializer,
+	UmbServerExtensionRegistrator,
+} from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-app')
@@ -78,6 +82,10 @@ export class UmbAppElement extends UmbLitElement {
 		super();
 
 		OpenAPI.BASE = window.location.origin;
+
+		// Let bundles and entry points initialize before the application is initialized if they are global
+		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry, 'global');
+		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry, 'global');
 
 		new UmbIconRegistry().attach(this);
 		new UUIIconRegistryEssential().attach(this);
