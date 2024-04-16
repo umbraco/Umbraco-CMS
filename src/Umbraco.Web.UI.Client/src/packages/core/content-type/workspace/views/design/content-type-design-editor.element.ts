@@ -25,7 +25,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 @customElement('umb-content-type-design-editor')
 export class UmbContentTypeDesignEditorElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#sorter = new UmbSorterController<UmbPropertyTypeContainerModel, UUITabElement>(this, {
-		getUniqueOfElement: (element) => element.getAttribute('data-umb-tabs-id'),
+		getUniqueOfElement: (element) => element.getAttribute('data-umb-tab-id'),
 		getUniqueOfModel: (tab) => tab.id,
 		identifier: 'content-type-tabs-sorter',
 		itemSelector: 'uui-tab',
@@ -439,7 +439,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			label=${tab.name ?? 'unnamed'}
 			.active=${tabActive}
 			href=${path}
-			data-umb-tabs-id=${ifDefined(tab.id)}>
+			data-umb-tab-id=${ifDefined(tab.id)}>
 			${this.renderTabInner(tab, tabActive, ownedTab)}
 		</uui-tab>`;
 	}
