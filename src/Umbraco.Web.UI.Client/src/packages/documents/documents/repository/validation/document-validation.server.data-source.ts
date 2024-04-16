@@ -45,18 +45,12 @@ export class UmbDocumentValidationServerDataSource {
 		};
 
 		// Maybe use: tryExecuteAndNotify
-		const { data, error } = await tryExecute(
+		return tryExecute(
 			//this.#host,
 			DocumentService.postDocumentValidate({
 				requestBody,
 			}),
 		);
-
-		if (data) {
-			return { data };
-		}
-
-		return { error };
 	}
 
 	/**
@@ -75,18 +69,12 @@ export class UmbDocumentValidationServerDataSource {
 		};
 
 		// Maybe use: tryExecuteAndNotify
-		const { data, error } = await tryExecute(
+		return tryExecute(
 			//this.#host,
 			DocumentService.putDocumentByIdValidate({
 				id: model.unique,
 				requestBody,
 			}),
 		);
-
-		if (!error) {
-			return { data };
-		}
-
-		return { error };
 	}
 }
