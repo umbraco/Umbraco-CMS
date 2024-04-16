@@ -24,7 +24,7 @@ public class ByTypeAuditLogController : AuditLogControllerBase
     [HttpGet("type/{logType}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AuditLogResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ByType(AuditType logType, DateTime? sinceDate = null, int skip = 0, int take = 100)
+    public async Task<IActionResult> ByType(CancellationToken cancellationToken, AuditType logType, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
         IAuditItem[] result = _auditService.GetLogs(logType, sinceDate).ToArray();
         IEnumerable<AuditLogResponseModel> mapped = _auditLogPresentationFactory.CreateAuditLogViewModel(result.Skip(skip).Take(take));

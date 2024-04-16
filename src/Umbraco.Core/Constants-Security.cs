@@ -77,11 +77,6 @@ public static partial class Constants
         public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
         public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
         public const string BackOfficeTwoFactorRememberMeAuthenticationType = "UmbracoTwoFactorRememberMeCookie";
-        // FIXME: remove this in favor of BackOfficeAuthenticationType when the old backoffice auth is no longer necessary
-        public const string NewBackOfficeAuthenticationType = "NewUmbracoBackOffice";
-        public const string NewBackOfficeExternalAuthenticationType = "NewUmbracoExternalCookie";
-        public const string NewBackOfficeTwoFactorAuthenticationType = "NewUmbracoTwoFactorCookie";
-        public const string NewBackOfficeTwoFactorRememberMeAuthenticationType = "NewUmbracoTwoFactorRememberMeCookie";
         public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
 
         public const string DefaultMemberTypeAlias = "Member";
@@ -116,6 +111,11 @@ public static partial class Constants
         ///     The claim type for the ASP.NET Identity security stamp
         /// </summary>
         public const string SecurityStampClaimType = "AspNet.Identity.SecurityStamp";
+
+        /// <summary>
+        ///     The claim type for the mandatory OpenIdDict sub claim
+        /// </summary>
+        public const string OpenIdDictSubClaimType = "sub";
 
         public const string AspNetCoreV3PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V3";
         public const string AspNetCoreV2PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V2";

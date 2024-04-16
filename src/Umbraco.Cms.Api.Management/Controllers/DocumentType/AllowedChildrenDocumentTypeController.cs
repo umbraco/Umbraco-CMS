@@ -14,7 +14,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
 public class AllowedChildrenDocumentTypeController : DocumentTypeControllerBase
 {
     private readonly IContentTypeService _contentTypeService;
@@ -30,7 +30,11 @@ public class AllowedChildrenDocumentTypeController : DocumentTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AllowedDocumentType>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AllowedChildrenByKey(Guid id, int skip = 0, int take = 100)
+    public async Task<IActionResult> AllowedChildrenByKey(
+        CancellationToken cancellationToken,
+        Guid id,
+        int skip = 0,
+        int take = 100)
     {
         Attempt<PagedModel<IContentType>?, ContentTypeOperationStatus> attempt = await _contentTypeService.GetAllowedChildrenAsync(id, skip, take);
         if (attempt.Success is false)

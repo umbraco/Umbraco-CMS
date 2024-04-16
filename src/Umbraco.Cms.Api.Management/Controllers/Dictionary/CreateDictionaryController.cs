@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Security.Authorization.Dictionary;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -41,11 +41,13 @@ public class CreateDictionaryController : DictionaryControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Create(CreateDictionaryItemRequestModel createDictionaryItemRequestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        CreateDictionaryItemRequestModel createDictionaryItemRequestModel)
     {
         IDictionaryItem created = await _dictionaryPresentationFactory.MapCreateModelToDictionaryItemAsync(createDictionaryItemRequestModel);
 
-        AuthorizationResult authorizationResult  = await _authorizationService.AuthorizeResourceAsync(
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             new DictionaryPermissionResource(createDictionaryItemRequestModel.Translations.Select(t => t.IsoCode)),
             AuthorizationPolicies.DictionaryPermissionByResource);

@@ -14,11 +14,12 @@ test.describe(`${dataTypeName} tests`, () => {
 
   test.afterEach(async ({umbracoApi}) => {
     if (dataTypeDefaultData !== null) {
-      await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
-    }   
+      await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
+    }
   });
 
-  test('can add crop', async ({umbracoApi, umbracoUi}) => {
+  //TODO: Remove skip when the frontend is ready
+  test.skip('can add crop', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const cropData = ['Test Alias', 100, 50];
     const expectedDataTypeValues = [{
@@ -52,7 +53,8 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toEqual(expectedDataTypeValues);
   });
 
-  test('can edit crop', async ({umbracoApi, umbracoUi}) => {
+  //TODO: Remove skip when the frontend is ready
+  test.skip('can edit crop', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongCropData = ['Wrong Alias', 50, 100];
     const wrongDataTypeValues = [{

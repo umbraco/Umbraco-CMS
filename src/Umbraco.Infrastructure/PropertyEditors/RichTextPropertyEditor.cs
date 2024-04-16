@@ -4,7 +4,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -14,7 +13,6 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
-using Umbraco.Cms.Infrastructure.Macros;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -58,7 +56,7 @@ public class RichTextPropertyEditor : DataEditor
         new RichTextConfigurationEditor(_ioHelper);
 
     /// <summary>
-    ///     A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for
+    ///     A custom value editor to ensure that images and blocks are parsed when being persisted and formatted correctly for
     ///     display in the editor
     /// </summary>
     internal class RichTextPropertyValueEditor : BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>
@@ -150,7 +148,7 @@ public class RichTextPropertyEditor : DataEditor
                 .WhereNotNull()
                 .Select(udi => new UmbracoEntityReference(udi)));
 
-            // references from blocks
+            // references from blocksIg
             if (richTextEditorValue.Blocks is not null)
             {
                 BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);
@@ -193,11 +191,7 @@ public class RichTextPropertyEditor : DataEditor
                 return null;
             }
 
-            var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(richTextEditorValue.Markup);
-            var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(
-                propertyValueWithMediaResolved,
-                new Dictionary<string, string>());
-            richTextEditorValue.Markup = parsed;
+            richTextEditorValue.Markup = _imageSourceParser.EnsureImageSources(richTextEditorValue.Markup);
 
             // return json convertable object
             return CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueToEditor(property, blockValue));
@@ -228,15 +222,12 @@ public class RichTextPropertyEditor : DataEditor
                 return null;
             }
 
-            var parseAndSaveBase64Images = _pastedImages.FindAndPersistEmbeddedImages(
-                richTextEditorValue.Markup, mediaParentId, userKey);
             var parseAndSavedTempImages = _pastedImages
-                .FindAndPersistPastedTempImagesAsync(parseAndSaveBase64Images, mediaParentId, userKey)
+                .FindAndPersistPastedTempImagesAsync(richTextEditorValue.Markup, mediaParentId, userKey)
                 .GetAwaiter()
                 .GetResult();
             var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
-            var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
-            var sanitized = _htmlSanitizer.Sanitize(parsed);
+            var sanitized = _htmlSanitizer.Sanitize(editorValueWithMediaUrlsRemoved);
 
             richTextEditorValue.Markup = sanitized.NullOrWhiteSpaceAsNull() ?? string.Empty;
 

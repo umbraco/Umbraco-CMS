@@ -6,10 +6,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Item;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/dictionary")]
 [ApiExplorerSettings(GroupName = "Dictionary")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDictionary)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDictionary)]
 public class DictionaryItemControllerBase : ManagementApiControllerBase
 {
 }

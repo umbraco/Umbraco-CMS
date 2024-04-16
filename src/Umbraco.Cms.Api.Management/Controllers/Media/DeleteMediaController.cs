@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Security.Authorization.Media;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -35,9 +36,9 @@ public class DeleteMediaController : MediaControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
-        AuthorizationResult authorizationResult  = await _authorizationService.AuthorizeResourceAsync(
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             MediaPermissionResource.RecycleBin(),
             AuthorizationPolicies.MediaPermissionByResource);

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -32,14 +33,15 @@ public class SetAvatarCurrentUserController : CurrentUserControllerBase
     [MapToApiVersion("1.0")]
     [HttpPost("avatar")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> SetAvatar(SetAvatarRequestModel model)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> SetAvatar(CancellationToken cancellationToken, SetAvatarRequestModel model)
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             UserPermissionResource.WithKeys(userKey),
-            AuthorizationPolicies.AdminUserEditsRequireAdmin);
+            AuthorizationPolicies.UserPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

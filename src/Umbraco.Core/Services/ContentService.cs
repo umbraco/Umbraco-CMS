@@ -231,7 +231,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="entity"></param>
     /// <param name="permission"></param>
     /// <param name="groupIds"></param>
-    public void SetPermission(IContent entity, char permission, IEnumerable<int> groupIds)
+    public void SetPermission(IContent entity, string permission, IEnumerable<int> groupIds)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -3516,12 +3516,6 @@ public class ContentService : RepositoryService, IContentService
     public void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        // always ensure the blueprint is at the root
-        if (content.ParentId != -1)
-        {
-            content.ParentId = -1;
-        }
 
         content.Blueprint = true;
 

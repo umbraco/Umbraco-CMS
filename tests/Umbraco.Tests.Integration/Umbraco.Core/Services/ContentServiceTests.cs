@@ -1,12 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -23,7 +23,6 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 using Language = Umbraco.Cms.Core.Models.Language;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
@@ -48,6 +47,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+    private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
@@ -1250,7 +1250,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.HasIdentity);
 
         // content cannot publish values because they are invalid
-        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, ValueEditorCache);
+        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, LocalizedTextService, ValueEditorCache, Mock.Of<ICultureDictionary>());
         var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties,
             CultureImpact.Invariant);
         Assert.IsFalse(isValid);
@@ -1934,7 +1934,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentService.Save(childPage);
 
         // assign explicit permissions to the child
-        ContentService.SetPermission(childPage, 'A', new[] { userGroup.Id });
+        ContentService.SetPermission(childPage, "A", new[] { userGroup.Id });
 
         // Ok, now copy, what should happen is the childPage will retain it's own permissions
         var parentPage2 = ContentBuilder.CreateSimpleContent(contentType);
@@ -1970,7 +1970,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
         var parentPage = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parentPage);
-        ContentService.SetPermission(parentPage, 'A', new[] { userGroup.Id });
+        ContentService.SetPermission(parentPage, "A", new[] { userGroup.Id });
 
         var childPage1 = ContentBuilder.CreateSimpleContent(contentType, "child1", parentPage);
         ContentService.Save(childPage1);
@@ -2002,7 +2002,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // create a new parent with a new permission structure
         var parentPage2 = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parentPage2);
-        ContentService.SetPermission(parentPage2, 'B', new[] { userGroup.Id });
+        ContentService.SetPermission(parentPage2, "B", new[] { userGroup.Id });
 
         // Now copy, what should happen is the child pages will now have permissions inherited from the new parent
         var copy = ContentService.Copy(childPage1, parentPage2.Id, false, true);
@@ -2075,7 +2075,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         var userGroup = UserService.GetUserGroupByAlias(user.Groups.First().Alias);
         Assert.IsNotNull(NotificationService.CreateNotification(user, content1, "X"));
 
-        ContentService.SetPermission(content1, 'A', new[] { userGroup.Id });
+        ContentService.SetPermission(content1, "A", new[] { userGroup.Id });
         var updateDomainResult = await DomainService.UpdateDomainsAsync(
             content1.Key,
             new DomainsUpdateModel
@@ -3544,7 +3544,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // verify saved state
         content = ContentService.GetById(content.Key)!;
         Assert.AreEqual(1, content.PublishedCultures.Count());
-        Assert.AreEqual(langEn.IsoCode.ToLowerInvariant(), content.PublishedCultures.First());
+        Assert.AreEqual(langEn.IsoCode, content.PublishedCultures.First());
     }
 
     private void AssertPerCulture<T>(IContent item, Func<IContent, string, T> getter,

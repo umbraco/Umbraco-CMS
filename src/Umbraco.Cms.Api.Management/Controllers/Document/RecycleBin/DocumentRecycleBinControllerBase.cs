@@ -1,23 +1,22 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Document.RecycleBin;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Document}")]
 [RequireDocumentTreeRootAccess]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocuments)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<DocumentRecycleBinItemResponseModel>
 {
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
@@ -28,7 +27,7 @@ public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<Documen
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
 
-    protected override int RecycleBinRootId => Constants.System.RecycleBinContent;
+    protected override Guid RecycleBinRootKey => Constants.System.RecycleBinContentKey;
 
     protected override DocumentRecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentId, IEntitySlim entity)
     {

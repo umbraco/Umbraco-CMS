@@ -32,7 +32,11 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
         swaggerGenOptions.OperationFilter<ResponseHeaderOperationFilter>();
         swaggerGenOptions.SelectSubTypesUsing(_umbracoJsonTypeInfoResolver.FindSubTypes);
         swaggerGenOptions.UseOneOfForPolymorphism();
-        swaggerGenOptions.UseAllOfForInheritance();
+
+        // Ensure all types that implements the IOpenApiDiscriminator have a $type property in the OpenApi schema with the default value (The class name) that is expected by the server
+        swaggerGenOptions.SelectDiscriminatorNameUsing(type => typeof(IOpenApiDiscriminator).IsAssignableFrom(type) ? "$type" : null);
+        swaggerGenOptions.SelectDiscriminatorValueUsing(type => typeof(IOpenApiDiscriminator).IsAssignableFrom(type) ? type.Name : null);
+
 
         swaggerGenOptions.AddSecurityDefinition(
             ManagementApiConfiguration.ApiSecurityName,
@@ -55,7 +59,7 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
 
         // Sets Security requirement on backoffice apis
         swaggerGenOptions.OperationFilter<BackOfficeSecurityRequirementsOperationFilter>();
+        swaggerGenOptions.OperationFilter<NotificationHeaderFilter>();
         swaggerGenOptions.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
     }
-
 }

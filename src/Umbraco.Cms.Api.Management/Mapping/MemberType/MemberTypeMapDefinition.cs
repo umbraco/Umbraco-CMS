@@ -1,8 +1,8 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
-using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.MemberType;
@@ -13,6 +13,8 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
     {
         mapper.Define<IMemberType, MemberTypeResponseModel>((_, _) => new MemberTypeResponseModel(), Map);
         mapper.Define<IMemberType, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
+        mapper.Define<IMemberEntitySlim, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
+        mapper.Define<IContentEntitySlim, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
         mapper.Define<ISimpleContentType, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
     }
 
@@ -30,12 +32,14 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         target.IsElement = source.IsElement;
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
-
-        target.Compositions = source.ContentTypeComposition.Select(contentTypeComposition => new MemberTypeComposition
-        {
-            MemberType = new ReferenceByIdModel(contentTypeComposition.Key),
-            CompositionType = CalculateCompositionType(source, contentTypeComposition)
-        }).ToArray();
+        target.Compositions = MapNestedCompositions(
+            source.ContentTypeComposition,
+            source.ParentId,
+            (referenceByIdModel, compositionType) => new MemberTypeComposition
+            {
+                MemberType = referenceByIdModel,
+                CompositionType = compositionType,
+            });
     }
 
     // Umbraco.Code.MapAll -Collection
@@ -43,6 +47,18 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
+    }
+
+    private void Map(IMemberEntitySlim source, MemberTypeReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.ContentTypeKey;
+        target.Icon = source.ContentTypeIcon ?? string.Empty;
+    }
+
+    private void Map(IContentEntitySlim source, MemberTypeReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.ContentTypeKey;
+        target.Icon = source.ContentTypeIcon ?? string.Empty;
     }
 
     // Umbraco.Code.MapAll -Collection

@@ -8,18 +8,13 @@ public class RelationTypeResponseModel : RelationTypeBaseModel
 
     public string? Alias { get; set; }
 
-    [Required]
-    public string Path { get; set; } = string.Empty;
-
-    public bool IsSystemRelationType { get; set; }
+    /// <summary>
+    ///     Gets or sets the Parent's object type.
+    /// </summary>
+    public ObjectTypeResponseModel? ParentObject { get; set; }
 
     /// <summary>
-    ///     Gets or sets the Parent's object type name.
+    ///     Gets or sets the Child's object type.
     /// </summary>
-    public string? ParentObjectTypeName { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the Child's object type name.
-    /// </summary>
-    public string? ChildObjectTypeName { get; set; }
+    public ObjectTypeResponseModel? ChildObject { get; set; }
 }

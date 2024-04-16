@@ -8,10 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Folder;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.PartialView}/folder")]
 [ApiExplorerSettings(GroupName = "Partial View")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessPartialViews)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessPartialViews)]
 public class PartialViewFolderControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult OperationStatusResult(PartialViewFolderOperationStatus status) =>

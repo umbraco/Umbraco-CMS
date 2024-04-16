@@ -128,7 +128,7 @@ test.describe('Log Viewer tests', () => {
   });
 
   // Currently only works if the user is using the locale 'en-US' otherwise it will fail
-  test('can sort logs by timestamp', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can sort logs by timestamp', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const locale = 'en-US';
     const options: Intl.DateTimeFormatOptions = {
@@ -155,7 +155,7 @@ test.describe('Log Viewer tests', () => {
   });
 
   // Will fail if there is not enough logs.
-  test('can use pagination', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can use pagination', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const secondPageLogs = await umbracoApi.logViewer.getLog(100, 100, 'Ascending');
     const firstLogOnSecondPage = secondPageLogs.items[0].renderedMessage;

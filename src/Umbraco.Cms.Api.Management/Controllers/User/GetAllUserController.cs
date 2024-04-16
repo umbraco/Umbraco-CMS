@@ -34,7 +34,8 @@ public class GetAllUserController : UserControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<UserResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         Attempt<PagedModel<IUser>?, UserOperationStatus> attempt = await _userService.GetAllAsync(CurrentUserKey(_backOfficeSecurityAccessor), skip, take);
 

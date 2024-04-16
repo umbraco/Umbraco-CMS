@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -13,10 +12,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
-[ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Document)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocuments)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public abstract class DocumentControllerBase : ContentControllerBase
 {
     protected IActionResult DocumentNotFound()
@@ -90,6 +88,14 @@ public abstract class DocumentControllerBase : ContentControllerBase
             ContentPublishingOperationStatus.CultureMissing => BadRequest(problemDetailsBuilder
                 .WithTitle("Culture missing")
                 .WithDetail("A culture needs to be specified to execute the operation.")
+                .Build()),
+            ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant => BadRequest(problemDetailsBuilder
+                .WithTitle("Cannot publish invariant when variant")
+                .WithDetail("Cannot publish invariant culture when the document varies by culture.")
+                .Build()),
+            ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant => BadRequest(problemDetailsBuilder
+                .WithTitle("Cannot publish variant when not variant.")
+                .WithDetail("Cannot publish a given culture when the document is invariant.")
                 .Build()),
             ContentPublishingOperationStatus.ConcurrencyViolation => BadRequest(problemDetailsBuilder
                 .WithTitle("Concurrency violation detected")

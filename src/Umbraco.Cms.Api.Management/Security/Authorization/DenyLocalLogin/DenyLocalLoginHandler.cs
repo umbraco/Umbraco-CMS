@@ -9,32 +9,25 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.DenyLocalLogin;
 /// </summary>
 public class DenyLocalLoginHandler : MustSatisfyRequirementAuthorizationHandler<DenyLocalLoginRequirement>
 {
-    // private readonly IBackOfficeExternalLoginProviders _externalLogins;
-    //
-    // /// <summary>
-    // ///     Initializes a new instance of the <see cref="DenyLocalLoginHandler" /> class.
-    // /// </summary>
-    // /// <param name="externalLogins">Provides access to <see cref="BackOfficeExternalLoginProvider" /> instances.</param>
-    // public DenyLocalLoginHandler(IBackOfficeExternalLoginProviders externalLogins)
-    //     => _externalLogins = externalLogins;
-    //
-    // /// <inheritdoc />
-    // protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, DenyLocalLoginRequirement requirement)
-    //     => Task.FromResult(!_externalLogins.HasDenyLocalLogin());
+    private readonly IBackOfficeExternalLoginProviders _externalLogins;
 
-    // FIXME: Replace the value of isDenied with above implementation, once we have IBackOfficeExternalLoginProviders and related classes
-    // moved from Umbraco.Web.Backoffice
-    // FIXME: Remove [AllowAnonymous] from implementers of <see cref="SecurityControllerBase" /> and in <see cref="VerifyInviteUserController" /> when we have the proper implementation
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DenyLocalLoginHandler" /> class.
+    /// </summary>
+    /// <param name="externalLogins">Provides access to <see cref="BackOfficeExternalLoginProvider" /> instances.</param>
+    public DenyLocalLoginHandler(IBackOfficeExternalLoginProviders externalLogins)
+        => _externalLogins = externalLogins;
+
     protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, DenyLocalLoginRequirement requirement)
     {
-        // Some logic here - for now we will always authorize successfully
-        var isDenied = false;
+        var isDenied = _externalLogins.HasDenyLocalLogin();
 
         if (isDenied is false)
         {
-            // Now allow anonymous (RequireAuthenticatedUser() adds this requirement) - necessary for some of the endpoints (BackOfficeController.Login())
-            var denyAnonymousUserRequirements = context.PendingRequirements.OfType<DenyAnonymousAuthorizationRequirement>();
-            foreach (var denyAnonymousUserRequirement in denyAnonymousUserRequirements)
+            // AuthorizationPolicies.BackOfficeAccess policy adds this requirement by policy.RequireAuthenticatedUser()
+            // Since we want to "allow anonymous" for some endpoints (i.e. BackOfficeController.Login()), it is necessary to succeed this requirement
+            IEnumerable<DenyAnonymousAuthorizationRequirement> denyAnonymousUserRequirements = context.PendingRequirements.OfType<DenyAnonymousAuthorizationRequirement>();
+            foreach (DenyAnonymousAuthorizationRequirement denyAnonymousUserRequirement in denyAnonymousUserRequirements)
             {
                 context.Succeed(denyAnonymousUserRequirement);
             }

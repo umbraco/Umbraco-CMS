@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Security.Authorization.Media;
-using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -34,7 +34,7 @@ public class ByKeyMediaController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MediaResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByKey(Guid id)
+    public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
@@ -52,7 +52,7 @@ public class ByKeyMediaController : MediaControllerBase
             return MediaNotFound();
         }
 
-        MediaResponseModel model = await _mediaPresentationFactory.CreateResponseModelAsync(media);
+        MediaResponseModel model = _mediaPresentationFactory.CreateResponseModel(media);
         return Ok(model);
     }
 }

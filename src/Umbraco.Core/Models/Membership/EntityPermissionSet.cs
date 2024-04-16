@@ -37,5 +37,5 @@ public class EntityPermissionSet
     /// <remarks>
     ///     This value is only calculated once
     /// </remarks>
-    public IEnumerable<string> GetAllPermissions() => PermissionsSet.GetAllPermissions();
+    public ISet<string> GetAllPermissions() => PermissionsSet.GetAllPermissions();
 }

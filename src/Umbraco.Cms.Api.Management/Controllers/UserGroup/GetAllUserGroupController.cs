@@ -27,7 +27,10 @@ public class GetAllUserGroupController : UserGroupControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<UserGroupResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<UserGroupResponseModel>>> GetAll(int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<UserGroupResponseModel>>> GetAll(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100)
     {
         // FIXME: In the old controller this endpoint had a switch "onlyCurrentUserGroup"
         // If this was enabled we'd only return the groups the current user was in

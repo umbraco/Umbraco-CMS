@@ -13,7 +13,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.AuditLog;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessContentOrMedia)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessContentOrMedia)]
 public class ByKeyAuditLogController : AuditLogControllerBase
 {
     private readonly IAuditService _auditService;
@@ -28,7 +28,7 @@ public class ByKeyAuditLogController : AuditLogControllerBase
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AuditLogResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ByKey(Guid id, Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
+    public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id, Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
         PagedModel<IAuditItem> result = await _auditService.GetItemsByKeyAsync(id, skip, take, orderDirection, sinceDate);
         IEnumerable<AuditLogResponseModel> mapped = _auditLogPresentationFactory.CreateAuditLogViewModel(result.Items);

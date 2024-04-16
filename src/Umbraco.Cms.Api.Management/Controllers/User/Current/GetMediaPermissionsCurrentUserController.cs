@@ -30,8 +30,11 @@ public class GetMediaPermissionsCurrentUserController : CurrentUserControllerBas
 
     [MapToApiVersion("1.0")]
     [HttpGet("permissions/media")]
-    [ProducesResponseType(typeof(IEnumerable<UserPermissionsResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetPermissions([FromQuery(Name = "id")] HashSet<Guid> ids)
+    [ProducesResponseType(typeof(UserPermissionsResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetPermissions(
+        CancellationToken cancellationToken,
+        [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissionsAttempt = await _userService.GetMediaPermissionsAsync(CurrentUserKey(_backOfficeSecurityAccessor), ids);
 

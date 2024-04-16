@@ -13,5 +13,10 @@ public static partial class Constants
         ///     Generated resource identifier header name.
         /// </summary>
         public const string GeneratedResource = "Umb-Generated-Resource";
+
+        /// <summary>
+        ///     Response notifications header name.
+        /// </summary>
+        public const string Notifications = "Umb-Notifications";
     }
 }

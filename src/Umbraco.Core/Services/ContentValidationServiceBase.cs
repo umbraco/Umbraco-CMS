@@ -43,7 +43,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
             return new ContentValidationResult { ValidationErrors = validationErrors };
         }
 
-        var cultures = (await _languageService.GetAllAsync()).Select(language => language.IsoCode).ToArray();
+        var cultures = await GetCultureCodes();
         // we don't have any managed segments, so we have to make do with the ones passed in the model
         var segments = contentEditingModelBase.Variants.DistinctBy(variant => variant.Segment).Select(variant => variant.Segment).ToArray();
 
@@ -59,7 +59,20 @@ internal abstract class ContentValidationServiceBase<TContentType>
         }
 
         return new ContentValidationResult { ValidationErrors = validationErrors };
-   }
+    }
+
+    public async Task<bool> ValidateCulturesAsync(ContentEditingModelBase contentEditingModelBase)
+    {
+        var cultures = await GetCultureCodes();
+        var invalidCultures = contentEditingModelBase
+            .Variants
+            .Select(variant => variant.Culture)
+            .WhereNotNull().Except(cultures).ToArray();
+
+        return invalidCultures.IsCollectionEmpty();
+    }
+
+    private async Task<string[]> GetCultureCodes() => (await _languageService.GetAllAsync()).Select(language => language.IsoCode).ToArray();
 
     private IEnumerable<PropertyValidationError> ValidateProperty(ContentEditingModelBase contentEditingModelBase, IPropertyType propertyType, string? culture, string? segment)
     {

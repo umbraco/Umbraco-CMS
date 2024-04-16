@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -21,7 +20,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
-using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
@@ -61,6 +60,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     private IBackOfficeSignInManager BackOfficeSignInManager => GetRequiredService<IBackOfficeSignInManager>();
 
+    private IHttpContextAccessor HttpContextAccessor => GetRequiredService<IHttpContextAccessor>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
@@ -70,8 +71,6 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
                 ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddExamineIndexes();
-        builder.AddBackOfficeIdentity();
-        BackOfficeAuthBuilderExtensions.AddBackOfficeAuthentication(builder);
         builder.Services.AddHostedService<QueuedHostedService>();
     }
 
@@ -86,9 +85,11 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     private async Task SetupUserIdentity(string userId)
     {
-        var identity =
-            await BackOfficeUserStore.FindByIdAsync(userId, CancellationToken.None);
+        var identity = await BackOfficeUserStore.FindByIdAsync(userId, CancellationToken.None);
         await BackOfficeSignInManager.SignInAsync(identity, false);
+        var principal = await BackOfficeSignInManager.CreateUserPrincipalAsync(identity);
+        HttpContextAccessor.HttpContext.SetPrincipalForRequest(principal);
+
     }
 
     private async Task<PublishResult> CreateDefaultPublishedContent(string contentName)
@@ -593,7 +594,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     public async Task Check_All_Indexed_Values_For_Published_Content_With_No_Properties()
     {
         // Arrange
-        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserKey.ToString());
 
         const string contentName = "TestContent";
 

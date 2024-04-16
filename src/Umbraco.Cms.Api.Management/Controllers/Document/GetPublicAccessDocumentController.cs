@@ -8,6 +8,7 @@ using Umbraco.Cms.Api.Management.ViewModels.PublicAccess;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -35,7 +36,7 @@ public class GetPublicAccessDocumentController : DocumentControllerBase
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}/public-access")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetPublicAccess(Guid id)
+    public async Task<IActionResult> GetPublicAccess(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

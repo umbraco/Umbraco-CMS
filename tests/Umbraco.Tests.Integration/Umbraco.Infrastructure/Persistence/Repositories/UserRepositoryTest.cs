@@ -38,6 +38,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
     private IMediaTypeRepository MediaTypeRepository => GetRequiredService<IMediaTypeRepository>();
 
     private IMediaRepository MediaRepository => GetRequiredService<IMediaRepository>();
+    private IEnumerable<IPermissionMapper> PermissionMappers => GetRequiredService<IEnumerable<IPermissionMapper>>();
 
     private UserRepository CreateRepository(ICoreScopeProvider provider)
     {
@@ -52,7 +53,8 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             Options.Create(GlobalSettings),
             Options.Create(new UserPasswordConfigurationSettings()),
             new SystemTextJsonSerializer(),
-            mockRuntimeState.Object);
+            mockRuntimeState.Object,
+            PermissionMappers);
         return repository;
     }
 
@@ -66,7 +68,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
     private UserGroupRepository CreateUserGroupRepository(ICoreScopeProvider provider)
     {
         var accessor = (IScopeAccessor)provider;
-        return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
+        return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper, PermissionMappers);
     }
 
     [Test]
@@ -124,7 +126,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             repository.Save(user);
 
             // Act
-            var resolved = repository.Get(user.Id);
+            var resolved = repository.Get(user.Key);
             var dirty = ((User)resolved).IsDirty();
 
             // Assert
@@ -146,7 +148,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             // Act
             repository.Save(user);
 
-            var id = user.Id;
+            var id = user.Key;
 
             var mockRuntimeState = CreateMockRuntimeState(RuntimeLevel.Run);
 
@@ -158,7 +160,8 @@ public class UserRepositoryTest : UmbracoIntegrationTest
                 Options.Create(GlobalSettings),
                 Options.Create(new UserPasswordConfigurationSettings()),
                 new SystemTextJsonSerializer(),
-                mockRuntimeState.Object);
+                mockRuntimeState.Object,
+                PermissionMappers);
 
             repository2.Delete(user);
 
@@ -182,7 +185,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             var user = CreateAndCommitUserWithGroup(repository, userGroupRepository);
 
             // Act
-            var updatedItem = repository.Get(user.Id);
+            var updatedItem = repository.Get(user.Key);
 
             // TODO: this test cannot work, user has 2 sections but the way it's created,
             // they don't show, so the comparison with updatedItem fails - fix!
@@ -224,7 +227,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             var users = CreateAndCommitMultipleUsers(repository);
 
             // Act
-            var result = repository.GetMany(users[0].Id, users[1].Id).ToArray();
+            var result = repository.GetMany(users[0].Key, users[1].Key).ToArray();
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -266,7 +269,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             var users = CreateAndCommitMultipleUsers(repository);
 
             // Act
-            var exists = repository.Exists(users[0].Id);
+            var exists = repository.Exists(users[0].Key);
 
             // Assert
             Assert.That(exists, Is.True);
@@ -393,7 +396,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             repository.Save(user);
 
             // Get the user
-            var updatedUser = repository.Get(user.Id);
+            var updatedUser = repository.Get(user.Key);
 
             // Ensure the Security Stamp is invalidated & no longer the same
             Assert.AreNotEqual(originalSecurityStamp, updatedUser.SecurityStamp);
@@ -457,7 +460,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             var user = CreateAndCommitUserWithGroup(userRepository, userGroupRepository);
 
             // Act
-            var resolved = (User)userRepository.Get(user.Id);
+            var resolved = (User)userRepository.Get(user.Key);
 
             resolved.Name = "New Name";
 
@@ -475,7 +478,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
 
             userRepository.Save(resolved);
 
-            var updatedItem = (User)userRepository.Get(user.Id);
+            var updatedItem = (User)userRepository.Get(user.Key);
 
             // Assert
             Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));

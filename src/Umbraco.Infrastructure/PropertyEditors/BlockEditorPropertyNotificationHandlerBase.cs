@@ -1,6 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Extensions;
 
@@ -39,7 +40,7 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
             return rawJson;
         }
 
-        JObject? jObject = ParseObject(rawJson);
+        JsonObject? jObject = ParseObject(rawJson);
         if (jObject == null)
         {
             return rawJson;
@@ -71,26 +72,27 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
         return rawJson;
     }
 
-    private void TraverseProperty(JProperty property)
+    private void TraverseProperty(JsonNode property)
     {
-        if (property.Value is JArray jArray)
+        if (property is JsonArray jArray)
         {
-            foreach (JToken token in jArray)
+            foreach (JsonNode token in jArray.WhereNotNull())
             {
                 TraverseToken(token);
             }
         }
         else
         {
-            TraverseToken(property.Value);
+            TraverseToken(property);
         }
     }
 
-    private void TraverseToken(JToken token)
+    private void TraverseToken(JsonNode token)
     {
-        var obj = token as JObject;
-        if (obj == null && token is JValue { Value: string str })
+        var obj = token as JsonObject;
+        if (obj == null && token is JsonValue jsonValue && jsonValue.GetValueKind() is JsonValueKind.String)
         {
+            var str = jsonValue.GetValue<string>();
             obj = ParseObject(str);
         }
 
@@ -102,30 +104,27 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
         TraverseObject(obj);
     }
 
-    private void TraverseObject(JObject obj)
+    private void TraverseObject(JsonObject obj)
     {
-        var contentData = obj.SelectToken("$.contentData") as JArray;
-        var settingsData = obj.SelectToken("$.settingsData") as JArray;
-
         // we'll assume that the object is a data representation of a block based editor if it contains "contentData" and "settingsData".
-        if (contentData != null && settingsData != null)
+        if (obj["contentData"] is JsonArray contentData && obj["settingsData"] is JsonArray settingsData)
         {
             ParseUdis(contentData, settingsData);
             return;
         }
 
-        foreach (JProperty property in obj.Properties())
+        foreach (JsonNode property in obj.Select(n => n.Value).WhereNotNull())
         {
             TraverseProperty(property);
         }
     }
 
-    private void ParseUdis(JArray contentData, JArray settingsData)
+    private void ParseUdis(JsonArray contentData, JsonArray settingsData)
     {
         // grab all UDIs from the objects of contentData and settingsData
-        var udis = contentData.Select(c => c.SelectToken("$.udi"))
-            .Union(settingsData.Select(s => s.SelectToken("$.udi")))
-            .Select(udiToken => udiToken?.Value<string>()?.NullOrWhiteSpaceAsNull())
+        var udis = contentData.Select(c => c?["udi"])
+            .Union(settingsData.Select(s => s?["udi"]))
+            .Select(udiToken => udiToken?.GetValue<string>().NullOrWhiteSpaceAsNull())
             .ToArray();
 
         // the following is solely for avoiding functionality wise breakage. we should consider removing it eventually, but for the time being it's harmless.
@@ -139,16 +138,16 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
 
         _udisToReplace.AddRange(udis.WhereNotNull());
 
-        foreach (JObject item in contentData.Union(settingsData).OfType<JObject>())
+        foreach (JsonObject item in contentData.Union(settingsData).WhereNotNull().OfType<JsonObject>())
         {
-            foreach (JProperty property in item.Properties().Where(p => p.Name != "contentTypeKey" && p.Name != "udi"))
+            foreach (JsonNode property in item.Where(p => p.Key != "contentTypeKey" && p.Key != "udi").Select(p => p.Value).WhereNotNull())
             {
                 TraverseProperty(property);
             }
         }
     }
 
-    private JObject? ParseObject(string json)
+    private JsonObject? ParseObject(string json)
     {
         if (json.DetectIsJson() == false)
         {
@@ -157,7 +156,7 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
 
         try
         {
-            return JObject.Parse(json);
+            return JsonNode.Parse(json) as JsonObject;
         }
         catch (Exception)
         {

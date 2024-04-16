@@ -7,6 +7,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -36,15 +37,14 @@ public class UnpublishDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Unpublish(Guid id, UnpublishDocumentRequestModel requestModel)
+    public async Task<IActionResult> Unpublish(CancellationToken cancellationToken, Guid id, UnpublishDocumentRequestModel requestModel)
     {
-
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             ContentPermissionResource.WithKeys(
                 ActionUnpublish.ActionLetter,
                 id,
-                requestModel.Culture is not null ? requestModel.Culture.Yield() : Enumerable.Empty<string>()),
+                requestModel.Cultures ?? Enumerable.Empty<string>()),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -54,8 +54,9 @@ public class UnpublishDocumentController : DocumentControllerBase
 
         Attempt<ContentPublishingOperationStatus> attempt = await _contentPublishingService.UnpublishAsync(
             id,
-            requestModel.Culture,
+            requestModel.Cultures,
             CurrentUserKey(_backOfficeSecurityAccessor));
+
         return attempt.Success
             ? Ok()
             : DocumentPublishingOperationStatusResult(attempt.Result);

@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -23,6 +24,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     private readonly IUserGroupPermissionService _userGroupPermissionService;
     private readonly IEntityService _entityService;
     private readonly IUserService _userService;
+    private readonly ILogger<UserGroupService> _logger;
 
     public UserGroupService(
         ICoreScopeProvider provider,
@@ -31,13 +33,15 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IUserGroupRepository userGroupRepository,
         IUserGroupPermissionService userGroupPermissionService,
         IEntityService entityService,
-        IUserService userService)
+        IUserService userService,
+        ILogger<UserGroupService> logger)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userGroupRepository = userGroupRepository;
         _userGroupPermissionService = userGroupPermissionService;
         _entityService = entityService;
         _userService = userService;
+        _logger = logger;
     }
 
     /// <inheritdoc/>
@@ -177,15 +181,33 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
-    public async Task UpdateUserGroupsOnUsers(
+    public async Task<UserGroupOperationStatus> UpdateUserGroupsOnUsersAsync(
         ISet<Guid> userGroupKeys,
         ISet<Guid> userKeys)
     {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
         IUser[] users = (await _userService.GetAsync(userKeys)).ToArray();
 
         IReadOnlyUserGroup[] userGroups = (await GetAsync(userGroupKeys))
             .Select(x => x.ToReadOnlyGroup())
             .ToArray();
+
+        // This means that we're potentially de-admining a user, which might cause the admin group to be empty.
+        if (userGroupKeys.Contains(Constants.Security.AdminGroupKey) is false)
+        {
+            IUser[] usersToDeAdmin = users.Where(x => x.IsAdmin()).ToArray();
+            if (usersToDeAdmin.Length > 0)
+            {
+                // Unfortunately we have to resolve the admin group to ensure that it would not be left empty.
+                IUserGroup? adminGroup = await GetAsync(Constants.Security.AdminGroupKey);
+                if (adminGroup is not null && adminGroup.UserCount <= usersToDeAdmin.Length)
+                {
+                    scope.Complete();
+                    return UserGroupOperationStatus.AdminGroupCannotBeEmpty;
+                }
+            }
+        }
 
         foreach (IUser user in users)
         {
@@ -197,6 +219,10 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         _userService.Save(users);
+
+        scope.Complete();
+
+        return UserGroupOperationStatus.Success;
     }
 
     private Attempt<UserGroupOperationStatus> ValidateUserGroupDeletion(IUserGroup? userGroup)
@@ -239,9 +265,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             await _userGroupPermissionService.AuthorizeCreateAsync(performingUser, userGroup);
         if (isAuthorized != UserGroupAuthorizationStatus.Success)
         {
-            // Convert from UserGroupAuthorizationStatus to UserGroupOperationStatus
-            UserGroupOperationStatus operationStatus = isAuthorized.ToUserGroupOperationStatus();
-            return Attempt.FailWithStatus(operationStatus, userGroup);
+            _logger.LogInformation("The performing user is not allowed to create the user group. The authorization status returned was: {AuthorizationStatus}", isAuthorized);
+            return Attempt.FailWithStatus(UserGroupOperationStatus.Unauthorized, userGroup);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -319,9 +344,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             await _userGroupPermissionService.AuthorizeUpdateAsync(performingUser, userGroup);
         if (isAuthorized != UserGroupAuthorizationStatus.Success)
         {
-            // Convert from UserGroupAuthorizationStatus to UserGroupOperationStatus
-            UserGroupOperationStatus operationStatus = isAuthorized.ToUserGroupOperationStatus();
-            return Attempt.FailWithStatus(operationStatus, userGroup);
+            _logger.LogInformation("The performing user is not allowed to update the user group. The authorization status returned was: {AuthorizationStatus}", isAuthorized);
+            return Attempt.FailWithStatus(UserGroupOperationStatus.Unauthorized, userGroup);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -344,68 +368,114 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        UserGroupOperationStatus result = await SafelyManipulateUsersBasedOnGroupAsync(addUsersModel, performingUserKey, (users, group) =>
-        {
-            IReadOnlyUserGroup readOnlyGroup = group.ToReadOnlyGroup();
+        Attempt<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus> resolveAttempt = await ResolveUserGroupManipulationModel(addUsersModel, performingUserKey);
 
-            foreach (IUser user in users)
-            {
-                user.AddGroup(readOnlyGroup);
-            }
-        });
+        if (resolveAttempt.Success is false)
+        {
+            return resolveAttempt.Status;
+        }
+
+        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result;
+
+        // This should never happen, but we need to check it to avoid null reference exceptions
+        if (resolvedModel is null)
+        {
+            throw new InvalidOperationException("The resolved model should not be null.");
+        }
+
+        IReadOnlyUserGroup readOnlyGroup = resolvedModel.UserGroup.ToReadOnlyGroup();
+
+        foreach (IUser user in resolvedModel.Users)
+        {
+            user.AddGroup(readOnlyGroup);
+        }
+
+        _userService.Save(resolvedModel.Users);
 
         scope.Complete();
-        return result;
+
+        return UserGroupOperationStatus.Success;
     }
 
     public async Task<UserGroupOperationStatus> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        UserGroupOperationStatus result = await SafelyManipulateUsersBasedOnGroupAsync(removeUsersModel, performingUserKey, (users, group) =>
+        Attempt<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus> resolveAttempt = await ResolveUserGroupManipulationModel(removeUsersModel, performingUserKey);
+
+        if (resolveAttempt.Success is false)
         {
-            foreach (IUser user in users)
+            return resolveAttempt.Status;
+        }
+
+        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result;
+
+        // This should never happen, but we need to check it to avoid null reference exceptions
+        if (resolvedModel is null)
+        {
+            throw new InvalidOperationException("The resolved model should not be null.");
+        }
+
+        foreach (IUser user in resolvedModel.Users)
+        {
+            // We can't remove a user from a group they're not part of.
+            if (user.Groups.Select(x => x.Key).Contains(resolvedModel.UserGroup.Key) is false)
             {
-                user.RemoveGroup(group.Alias);
+                return UserGroupOperationStatus.UserNotInGroup;
             }
-        });
+
+            user.RemoveGroup(resolvedModel.UserGroup.Alias);
+        }
+
+        // Ensure that that the admin group is never empty.
+        // This would mean that you could never add a user to the admin group again, since you need to be part of the admin group to do so.
+        if (resolvedModel.UserGroup.Key == Constants.Security.AdminGroupKey
+            && resolvedModel.UserGroup.UserCount <= resolvedModel.Users.Length)
+        {
+            return UserGroupOperationStatus.AdminGroupCannotBeEmpty;
+        }
+
+        _userService.Save(resolvedModel.Users);
 
         scope.Complete();
-        return result;
+
+        return UserGroupOperationStatus.Success;
     }
 
     /// <summary>
-    /// Checks whether all users that are part of the manipulation exist,
-    /// performs the manipulation,
-    /// saves the users
+    /// Resolves the user group manipulation model keys into actual entities.
+    /// Checks whether the performing user exists.
+    /// Checks whether all users that are part of the manipulation exist.
     /// </summary>
-    private async Task<UserGroupOperationStatus> SafelyManipulateUsersBasedOnGroupAsync(UsersToUserGroupManipulationModel assignModel, Guid performingUserKey, Action<IUser[], IUserGroup> manipulation)
+    private async Task<Attempt<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus>> ResolveUserGroupManipulationModel(UsersToUserGroupManipulationModel model, Guid performingUserKey)
     {
         IUser? performingUser = await _userService.GetAsync(performingUserKey);
         if (performingUser is null)
         {
-            return UserGroupOperationStatus.MissingUser;
+            return Attempt.FailWithStatus<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus>(UserGroupOperationStatus.MissingUser, null);
         }
 
-        IUserGroup? existingUserGroup = await GetAsync(assignModel.UserGroupKey);
+        IUserGroup? existingUserGroup = await GetAsync(model.UserGroupKey);
 
         if (existingUserGroup is null)
         {
-            return UserGroupOperationStatus.NotFound;
+            return Attempt.FailWithStatus<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus>(UserGroupOperationStatus.NotFound, null);
         }
 
-        IUser[] users = (await _userService.GetAsync(assignModel.UserKeys)).ToArray();
+        IUser[] users = (await _userService.GetAsync(model.UserKeys)).ToArray();
 
-        if (users.Length != assignModel.UserKeys.Length)
+        if (users.Length != model.UserKeys.Length)
         {
-            return UserGroupOperationStatus.UserNotFound;
+            return Attempt.FailWithStatus<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus>(UserGroupOperationStatus.UserNotFound, null);
         }
 
-        manipulation(users, existingUserGroup);
+        var resolvedModel = new ResolvedUserToUserGroupManipulationModel
+        {
+            UserGroup = existingUserGroup,
+            Users = users,
+        };
 
-        _userService.Save(users);
-
-        return UserGroupOperationStatus.Success;
+        return Attempt.SucceedWithStatus<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus>(UserGroupOperationStatus.Success, resolvedModel);
     }
 
     private async Task<UserGroupOperationStatus> ValidateUserGroupUpdateAsync(IUserGroup userGroup)
@@ -456,6 +526,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return startNodesValidationStatus;
         }
 
+        UserGroupOperationStatus granularPermissionsValidationStatus = ValidateGranularPermissionsExists(userGroup);
+        if (granularPermissionsValidationStatus is not UserGroupOperationStatus.Success)
+        {
+            return granularPermissionsValidationStatus;
+        }
+
         return UserGroupOperationStatus.Success;
     }
 
@@ -483,6 +559,25 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             && _entityService.Exists(userGroup.StartMediaId.Value, UmbracoObjectTypes.Media) is false)
         {
             return UserGroupOperationStatus.MediaStartNodeKeyNotFound;
+        }
+
+        return UserGroupOperationStatus.Success;
+    }
+
+    private UserGroupOperationStatus ValidateGranularPermissionsExists(IUserGroup userGroup)
+    {
+        IEnumerable<Guid> documentKeys = userGroup.GranularPermissions.Select(granularPermission =>
+        {
+            if (granularPermission is DocumentGranularPermission nodeGranularPermission)
+            {
+                return (Guid?)nodeGranularPermission.Key;
+            }
+
+            return null;
+        }).Where(x => x.HasValue).Cast<Guid>().ToArray();
+        if (documentKeys.Any() && _entityService.Exists(documentKeys) is false)
+        {
+            return UserGroupOperationStatus.DocumentPermissionKeyNotFound;
         }
 
         return UserGroupOperationStatus.Success;

@@ -23,7 +23,7 @@ public class TelemetryServiceTests : UmbracoIntegrationTest
     private IMetricsConsentService MetricsConsentService => GetRequiredService<IMetricsConsentService>();
 
     [Test]
-    public void Expected_Detailed_Telemetry_Exists()
+    public async Task Expected_Detailed_Telemetry_Exists()
     {
         var expectedData = new[]
         {
@@ -31,7 +31,6 @@ public class TelemetryServiceTests : UmbracoIntegrationTest
             Constants.Telemetry.DomainCount,
             Constants.Telemetry.ExamineIndexCount,
             Constants.Telemetry.LanguageCount,
-            Constants.Telemetry.MacroCount,
             Constants.Telemetry.MediaCount,
             Constants.Telemetry.MediaCount,
             Constants.Telemetry.TemplateCount,
@@ -55,7 +54,7 @@ public class TelemetryServiceTests : UmbracoIntegrationTest
             Constants.Telemetry.DeliveryApiPublicAccess
         };
 
-        MetricsConsentService.SetConsentLevel(TelemetryLevel.Detailed);
+        await MetricsConsentService.SetConsentLevelAsync(TelemetryLevel.Detailed);
         var success = TelemetryService.TryGetTelemetryReportData(out var telemetryReportData);
         var detailed = telemetryReportData.Detailed.ToArray();
 

@@ -17,6 +17,7 @@ using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Delivery.Controllers.Content;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
+using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
@@ -28,7 +29,6 @@ using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Website.Controllers;
 
@@ -105,23 +105,19 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             });
         }
 
-        /// <summary>
-        /// Prepare a url before using <see cref="Client"/>.
-        /// This returns the url but also sets the HttpContext.request into to use this url.
-        /// </summary>
-        /// <returns>The string URL of the controller action.</returns>
-        protected string PrepareApiControllerUrl<T>(Expression<Func<T, object>> methodSelector)
-            where T : UmbracoApiController
-        {
-            var url = LinkGenerator.GetUmbracoApiService(methodSelector);
-            return PrepareUrl(url);
-        }
-
         protected string GetManagementApiUrl<T>(Expression<Func<T, object>> methodSelector)
             where T : ManagementApiControllerBase
         {
             MethodInfo? method = ExpressionHelper.GetMethodInfo(methodSelector);
             IDictionary<string, object?> methodParams = ExpressionHelper.GetMethodParams(methodSelector) ?? new Dictionary<string, object?>();
+
+            // Remove the CancellationToken from the method params, this is automatically added by the framework
+            // So we do not want to add this to the query string
+            var cancellationTokenKey = methodParams.FirstOrDefault(x => x.Value is CancellationToken).Key;
+            if (cancellationTokenKey is not null)
+            {
+                methodParams.Remove(cancellationTokenKey);
+            }
 
 
             methodParams["version"] = method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions?.First().MajorVersion.ToString();
@@ -249,18 +245,13 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddUmbracoCore()
                 .AddWebComponents()
                 .AddNuCache()
-                .AddRuntimeMinifier()
                 .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddMembersIdentity()
-                .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
-                .AddPreviewSupport()
+                // .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
                 .AddMvcAndRazor(mvcBuilding: mvcBuilder =>
                 {
-                    // Adds Umbraco.Web.BackOffice
-                    mvcBuilder.AddApplicationPart(typeof(ContentController).Assembly);
-
                     // Adds Umbraco.Web.Common
                     mvcBuilder.AddApplicationPart(typeof(RenderController).Assembly);
 
@@ -309,7 +300,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 })
                 .WithEndpoints(u =>
                 {
-                    u.UseInstallerEndpoints();
                     u.UseBackOfficeEndpoints();
                     u.UseWebsiteEndpoints();
                 });

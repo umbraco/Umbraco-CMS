@@ -35,7 +35,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     public async Task<ContentAuthorizationStatus> AuthorizeAccessAsync(
         IUser user,
         IEnumerable<Guid> contentKeys,
-        ISet<char> permissionsToCheck)
+        ISet<string> permissionsToCheck)
     {
         var contentItems = _contentService.GetByIds(contentKeys).ToArray();
 
@@ -58,7 +58,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     public async Task<ContentAuthorizationStatus> AuthorizeDescendantsAccessAsync(
         IUser user,
         Guid parentKey,
-        ISet<char> permissionsToCheck)
+        ISet<string> permissionsToCheck)
     {
         var denied = new List<IUmbracoEntity>();
         var page = 0;
@@ -103,7 +103,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     }
 
     /// <inheritdoc/>
-    public async Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, ISet<char> permissionsToCheck)
+    public async Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, ISet<string> permissionsToCheck)
     {
         var hasAccess = user.HasContentRootAccess(_entityService, _appCaches);
 
@@ -119,7 +119,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     }
 
     /// <inheritdoc/>
-    public async Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, ISet<char> permissionsToCheck)
+    public async Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, ISet<string> permissionsToCheck)
     {
         var hasAccess = user.HasContentBinAccess(_entityService, _appCaches);
 
@@ -157,7 +157,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     /// <param name="contentPaths">The paths of the content items to check for access.</param>
     /// <param name="permissionsToCheck">The permissions to authorize.</param>
     /// <returns><c>true</c> if the user has the required permissions; otherwise, <c>false</c>.</returns>
-    private bool HasPermissionAccess(IUser user, IEnumerable<string> contentPaths, IEnumerable<char> permissionsToCheck)
+    private bool HasPermissionAccess(IUser user, IEnumerable<string> contentPaths, ISet<string> permissionsToCheck)
     {
         foreach (var path in contentPaths)
         {
@@ -166,7 +166,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
 
             foreach (var p in permissionsToCheck)
             {
-                if (permissionSet.GetAllPermissions().Contains(p.ToString(CultureInfo.InvariantCulture)) == false)
+                if (permissionSet.GetAllPermissions().Contains(p) == false)
                 {
                     return false;
                 }

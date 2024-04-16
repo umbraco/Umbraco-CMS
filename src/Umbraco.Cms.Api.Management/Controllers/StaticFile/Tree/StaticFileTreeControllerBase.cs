@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/static-file")]
 [ApiExplorerSettings(GroupName = "Static File")]
 public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
@@ -17,8 +17,6 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
         => FileSystem = physicalFileSystem;
 
     protected override IFileSystem FileSystem { get; }
-
-    protected override string ItemType(string path) => "static-file";
 
     protected override string[] GetDirectories(string path) =>
         IsTreeRootPath(path)
@@ -32,7 +30,12 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
             ? Array.Empty<string>()
             : base.GetFiles(path);
 
+    protected override FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
+        => IsAllowedPath(path)
+            ? base.GetAncestorModels(path, includeSelf)
+            : Array.Empty<FileSystemTreeItemPresentationModel>();
+
     private bool IsTreeRootPath(string path) => string.IsNullOrWhiteSpace(path);
 
-    private bool IsAllowedPath(string path) => _allowedRootFolders.Contains(path) || _allowedRootFolders.Any(folder => path.StartsWith($"{folder}/"));
+    private bool IsAllowedPath(string path) => _allowedRootFolders.Contains(path) || _allowedRootFolders.Any(folder => path.StartsWith($"{folder}{Path.DirectorySeparatorChar}"));
 }

@@ -1,20 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Controllers.Tree;
+using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Api.Management.Controllers.Tree;
-using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Tree;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MediaType}")]
 [ApiExplorerSettings(GroupName = "Media Type")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessMediaTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
 public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTreeItemResponseModel>
 {
     private readonly IMediaTypeService _mediaTypeService;

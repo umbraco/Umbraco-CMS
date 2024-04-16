@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
-[ApiController]
 [ApiExplorerSettings(GroupName = "User")]
 public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerBase
 {
@@ -19,6 +18,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
             UserOperationStatus.MissingUserGroup => NotFound(problemDetailsBuilder
                 .WithTitle("Missing User Group")
                 .WithDetail("The specified user group was not found.")
+                .Build()),
+            UserOperationStatus.AdminUserGroupMustNotBeEmpty => BadRequest(problemDetailsBuilder
+                .WithTitle("Admin User Group Must Not Be Empty")
+                .WithDetail("The admin user group must not be empty.")
                 .Build()),
             UserOperationStatus.NoUserGroup => BadRequest(problemDetailsBuilder
                 .WithTitle("No User Group Specified")
@@ -61,9 +64,9 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Cannot delete")
                 .WithDetail("A user cannot delete itself.")
                 .Build()),
-            UserOperationStatus.OldPasswordRequired => BadRequest(problemDetailsBuilder
+            UserOperationStatus.SelfOldPasswordRequired => BadRequest(problemDetailsBuilder
                 .WithTitle("Old password required")
-                .WithDetail("The old password is required to change the password of the specified user.")
+                .WithDetail("The old password is required to change your own password.")
                 .Build()),
             UserOperationStatus.InvalidAvatar => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid avatar")
@@ -116,6 +119,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
             UserOperationStatus.NotInInviteState => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid user state")
                 .WithDetail("The target user is not in the invite state.")
+                .Build()),
+            UserOperationStatus.SelfPasswordResetNotAllowed => BadRequest(problemDetailsBuilder
+                .WithTitle("Self password reset not allowed")
+                .WithDetail("It is not allowed to reset the password for the account you are logged in to.")
                 .Build()),
             UserOperationStatus.Forbidden => Forbidden(),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder

@@ -21,7 +21,7 @@ public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,
         IDocumentEditingPresentationFactory documentEditingPresentationFactory)
-        : base(authorizationService, contentEditingService)
+        : base(authorizationService)
     {
         _contentEditingService = contentEditingService;
         _documentEditingPresentationFactory = documentEditingPresentationFactory;
@@ -32,11 +32,11 @@ public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Validate(Guid id, UpdateDocumentRequestModel requestModel)
-        => await HandleRequest(id, requestModel, async content =>
+    public async Task<IActionResult> Validate(CancellationToken cancellationToken, Guid id, UpdateDocumentRequestModel requestModel)
+        => await HandleRequest(id, requestModel, async () =>
         {
             ContentUpdateModel model = _documentEditingPresentationFactory.MapUpdateModel(requestModel);
-            Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _contentEditingService.ValidateUpdateAsync(content, model);
+            Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _contentEditingService.ValidateUpdateAsync(id, model);
 
             return result.Success
                 ? Ok()

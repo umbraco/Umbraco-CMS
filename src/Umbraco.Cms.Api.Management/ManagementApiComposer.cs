@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Api.Management;
 
 public class ManagementApiComposer : IComposer
 {
-    public void Compose(IUmbracoBuilder builder) => builder.AddUmbracoManagementApi();
+    public void Compose(IUmbracoBuilder builder) =>
+        builder.AddUmbracoManagementApi();
 }
 

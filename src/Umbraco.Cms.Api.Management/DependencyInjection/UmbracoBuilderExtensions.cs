@@ -3,33 +3,41 @@ using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
 using Umbraco.Cms.Api.Management.DependencyInjection;
+using Umbraco.Cms.Api.Management.Middleware;
+using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Extensions;
 
-public static class UmbracoBuilderExtensions
+public static partial class UmbracoBuilderExtensions
 {
     public static IUmbracoBuilder AddUmbracoManagementApi(this IUmbracoBuilder builder)
     {
         IServiceCollection services = builder.Services;
+        builder.Services.AddSingleton<BackOfficeAreaRoutes>();
+        builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
+        builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
 
         if (!services.Any(x => x.ImplementationType == typeof(JsonPatchService)))
         {
             ModelsBuilderBuilderExtensions.AddModelsBuilder(builder)
                 .AddJson()
-                .AddNewInstaller()
+                .AddInstaller()
                 .AddUpgrader()
                 .AddSearchManagement()
                 .AddTrees()
                 .AddAuditLogs()
+                .AddConfigurationFactories()
                 .AddDocuments()
                 .AddDocumentTypes()
                 .AddMedia()
                 .AddMediaTypes()
+                .AddMemberGroups()
                 .AddMember()
                 .AddMemberTypes()
                 .AddLanguages()
@@ -46,8 +54,8 @@ public static class UmbracoBuilderExtensions
                 .AddLogViewer()
                 .AddUsers()
                 .AddUserGroups()
-                .AddTours()
                 .AddPackages()
+                .AddManifests()
                 .AddEntities()
                 .AddScripts()
                 .AddPartialViews()
@@ -55,8 +63,11 @@ public static class UmbracoBuilderExtensions
                 .AddWebhooks()
                 .AddServer()
                 .AddCorsPolicy()
-                .AddBackOfficeAuthentication()
-                .AddPasswordConfiguration();
+                .AddWebhooks()
+                .AddPreview()
+                .AddPasswordConfiguration()
+                .AddSupplemenataryLocalizedTextFileSources()
+                .AddUserData();
 
             services
                 .ConfigureOptions<ConfigureApiBehaviorOptions>()
@@ -75,8 +86,8 @@ public static class UmbracoBuilderExtensions
                 options.AddFilter(new UmbracoPipelineFilter(
                     "BackOfficeManagementApiFilter",
                     applicationBuilder => applicationBuilder.UseProblemDetailsExceptionHandling(),
-                    applicationBuilder => { },
-                    applicationBuilder => applicationBuilder.UseEndpoints()));
+                    postPipeline: _ => { },
+                    endpoints: applicationBuilder => applicationBuilder.UseEndpoints()));
             });
         }
 

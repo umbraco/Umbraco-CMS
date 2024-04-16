@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Security.Authorization.Media;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -36,7 +37,7 @@ public class EmptyMediaRecycleBinController : MediaRecycleBinControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> EmptyRecycleBin()
+    public async Task<IActionResult> EmptyRecycleBin(CancellationToken cancellationToken)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

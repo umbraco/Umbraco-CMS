@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -34,12 +35,12 @@ public class ByKeyUserController : UserControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UserResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByKey(Guid id)
+    public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             UserPermissionResource.WithKeys(id),
-            AuthorizationPolicies.AdminUserEditsRequireAdmin);
+            AuthorizationPolicies.UserPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

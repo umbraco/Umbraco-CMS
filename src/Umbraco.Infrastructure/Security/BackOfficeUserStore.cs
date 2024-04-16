@@ -140,7 +140,9 @@ public class BackOfficeUserStore :
             StartContentIds = user.StartContentIds ?? new int[] { },
             StartMediaIds = user.StartMediaIds ?? new int[] { },
             IsLockedOut = user.IsLockedOut,
+            Key = user.Key,
         };
+
 
         // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
         var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.Logins));
@@ -247,7 +249,8 @@ public class BackOfficeUserStore :
 
         try
         {
-            return Task.FromResult(_userRepository.Get(id));
+            IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => x.Id == id);
+            return Task.FromResult(_userRepository.Get(query).FirstOrDefault());
         }
         catch (DbException)
         {
@@ -267,13 +270,14 @@ public class BackOfficeUserStore :
 
     public Task<IEnumerable<IUser>> GetUsersAsync(params int[]? ids)
     {
-        if (ids?.Length <= 0)
+        if (ids is null || ids.Length <= 0)
         {
             return Task.FromResult(Enumerable.Empty<IUser>());
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<IUser> users = _userRepository.GetMany(ids);
+        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => ids.Contains(x.Id));
+        IEnumerable<IUser> users = _userRepository.Get(query);
 
         return Task.FromResult(users);
     }
@@ -286,8 +290,7 @@ public class BackOfficeUserStore :
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => keys.Contains(x.Key));
-        IEnumerable<IUser> users = _userRepository.Get(query);
+        IEnumerable<IUser> users = _userRepository.GetMany(keys);
 
         return Task.FromResult(users);
     }
@@ -296,8 +299,7 @@ public class BackOfficeUserStore :
     public Task<IUser?> GetAsync(Guid key)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => x.Key == key);
-        return Task.FromResult(_userRepository.Get(query).FirstOrDefault());
+        return Task.FromResult(_userRepository.Get(key));
     }
 
     /// <inheritdoc />
@@ -325,6 +327,7 @@ public class BackOfficeUserStore :
 
             throw;
         }
+
     }
 
     /// <inheritdoc />

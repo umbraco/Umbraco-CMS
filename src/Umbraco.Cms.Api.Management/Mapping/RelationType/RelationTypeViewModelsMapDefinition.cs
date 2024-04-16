@@ -15,7 +15,6 @@ public class RelationTypeViewModelsMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(IRelationType source, RelationTypeResponseModel target, MapperContext context)
     {
-        target.ChildObjectType = source.ChildObjectType;
         target.IsBidirectional = source.IsBidirectional;
 
         if (source is IRelationTypeWithIsDependency sourceWithIsDependency)
@@ -26,22 +25,18 @@ public class RelationTypeViewModelsMapDefinition : IMapDefinition
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
         target.Alias = source.Alias;
-        target.ParentObjectType = source.ParentObjectType;
-        target.Path = "-1," + source.Id;
 
-        target.IsSystemRelationType = source.IsSystemRelationType();
+        target.ChildObject = MapObjectType(source.ChildObjectType);
 
-        // Set the "friendly" and entity names for the parent and child object types
-        if (source.ParentObjectType.HasValue)
-        {
-            UmbracoObjectTypes objType = ObjectTypes.GetUmbracoObjectType(source.ParentObjectType.Value);
-            target.ParentObjectTypeName = objType.GetFriendlyName();
-        }
-
-        if (source.ChildObjectType.HasValue)
-        {
-            UmbracoObjectTypes objType = ObjectTypes.GetUmbracoObjectType(source.ChildObjectType.Value);
-            target.ChildObjectTypeName = objType.GetFriendlyName();
-        }
+        target.ParentObject = MapObjectType(source.ParentObjectType);
     }
+
+    private ObjectTypeResponseModel? MapObjectType(Guid? objectTypeId)
+        => objectTypeId is not null
+            ? new ObjectTypeResponseModel
+            {
+                Id = objectTypeId.Value,
+                Name = ObjectTypes.GetUmbracoObjectType(objectTypeId.Value).GetFriendlyName(),
+            }
+            : null;
 }

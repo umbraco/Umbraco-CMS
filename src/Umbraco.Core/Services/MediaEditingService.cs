@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -32,8 +31,13 @@ internal sealed class MediaEditingService
         return await Task.FromResult(media);
     }
 
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IMedia media, MediaUpdateModel updateModel)
-        => await ValidatePropertiesAsync(updateModel, media.ContentType.Key);
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, MediaUpdateModel updateModel)
+    {
+        IMedia? media = ContentService.GetById(key);
+        return media is not null
+            ? await ValidatePropertiesAsync(updateModel, media.ContentType.Key)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+    }
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MediaCreateModel createModel)
         => await ValidatePropertiesAsync(createModel, createModel.ContentTypeKey);
@@ -60,8 +64,14 @@ internal sealed class MediaEditingService
             : Attempt.FailWithStatus(operationStatus, new MediaCreateResult { Content = media });
     }
 
-    public async Task<Attempt<MediaUpdateResult, ContentEditingOperationStatus>> UpdateAsync(IMedia media, MediaUpdateModel updateModel, Guid userKey)
+    public async Task<Attempt<MediaUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, MediaUpdateModel updateModel, Guid userKey)
     {
+        IMedia? media = ContentService.GetById(key);
+        if (media is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new MediaUpdateResult());
+        }
+
         Attempt<MediaUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<MediaUpdateResult>(media, updateModel);
         if (result.Success == false)
         {
@@ -134,6 +144,7 @@ internal sealed class MediaEditingService
                 // these are the only result states currently expected from Save
                 OperationResultType.Success => ContentEditingOperationStatus.Success,
                 OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
+                OperationResultType.FailedDuplicateKey => ContentEditingOperationStatus.DuplicateKey,
 
                 // for any other state we'll return "unknown" so we know that we need to amend this
                 _ => ContentEditingOperationStatus.Unknown

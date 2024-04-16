@@ -43,8 +43,13 @@ internal sealed class MemberEditingService : IMemberEditingService
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MemberCreateModel createModel)
         => await _memberContentEditingService.ValidateAsync(createModel, createModel.ContentTypeKey);
 
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IMember member, MemberUpdateModel updateModel)
-        => await _memberContentEditingService.ValidateAsync(updateModel, member.ContentType.Key);
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, MemberUpdateModel updateModel)
+    {
+        IMember? member = _memberService.GetById(key);
+        return member is not null
+            ? await _memberContentEditingService.ValidateAsync(updateModel, member.ContentType.Key)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+    }
 
     public async Task<Attempt<MemberCreateResult, MemberEditingStatus>> CreateAsync(MemberCreateModel createModel, IUser user)
     {
@@ -98,9 +103,26 @@ internal sealed class MemberEditingService : IMemberEditingService
             : Attempt.FailWithStatus(status, new MemberCreateResult { Content = member });
     }
 
-    public async Task<Attempt<MemberUpdateResult, MemberEditingStatus>> UpdateAsync(IMember member, MemberUpdateModel updateModel, IUser user)
+    public async Task<Attempt<MemberUpdateResult, MemberEditingStatus>> UpdateAsync(Guid key, MemberUpdateModel updateModel, IUser user)
     {
         var status = new MemberEditingStatus();
+
+        IMember? member = _memberService.GetByKey(key);
+        if (member is null)
+        {
+            status.ContentEditingOperationStatus = ContentEditingOperationStatus.NotFound;
+            return Attempt.FailWithStatus(status, new MemberUpdateResult());
+        }
+
+        if (user.HasAccessToSensitiveData() is false)
+        {
+            // handle sensitive data. certain member properties (IsApproved, IsLockedOut) are subject to "sensitive data" rules.
+            if (member.IsLockedOut != updateModel.IsLockedOut || member.IsApproved != updateModel.IsApproved)
+            {
+                status.ContentEditingOperationStatus = ContentEditingOperationStatus.NotAllowed;
+                return Attempt.FailWithStatus(status, new MemberUpdateResult());
+            }
+        }
 
         MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(member.Id.ToString());
         if (identityMember is null)
@@ -153,8 +175,6 @@ internal sealed class MemberEditingService : IMemberEditingService
             return Attempt.FailWithStatus(status, new MemberUpdateResult { Content = member });
         }
 
-        // FIXME: handle sensitive data. certain properties (IsApproved, IsLockedOut, ...) are subject to "sensitive data" rules.
-        //       reverse engineer what's happening in the old backoffice MemberController and replicate here
         member.IsLockedOut = updateModel.IsLockedOut;
         member.IsApproved = updateModel.IsApproved;
         member.Email = updateModel.Email;

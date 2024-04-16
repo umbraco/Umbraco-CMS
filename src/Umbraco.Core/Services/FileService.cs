@@ -25,10 +25,8 @@ namespace Umbraco.Cms.Core.Services;
 public class FileService : RepositoryService, IFileService
 {
     private const string PartialViewHeader = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage";
-    private const string PartialViewMacroHeader = "@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage";
     private readonly IAuditRepository _auditRepository;
     private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly IPartialViewMacroRepository _partialViewMacroRepository;
     private readonly IPartialViewRepository _partialViewRepository;
     private readonly IScriptRepository _scriptRepository;
     private readonly IStylesheetRepository _stylesheetRepository;
@@ -45,7 +43,6 @@ public class FileService : RepositoryService, IFileService
         IScriptRepository scriptRepository,
         ITemplateRepository templateRepository,
         IPartialViewRepository partialViewRepository,
-        IPartialViewMacroRepository partialViewMacroRepository,
         IAuditRepository auditRepository,
         IShortStringHelper shortStringHelper,
         IOptions<GlobalSettings> globalSettings,
@@ -57,7 +54,6 @@ public class FileService : RepositoryService, IFileService
             stylesheetRepository,
             scriptRepository,
             partialViewRepository,
-            partialViewMacroRepository,
             auditRepository,
             hostingEnvironment,
             StaticServiceProvider.Instance.GetRequiredService<ITemplateService>(),
@@ -76,7 +72,6 @@ public class FileService : RepositoryService, IFileService
         IStylesheetRepository stylesheetRepository,
         IScriptRepository scriptRepository,
         IPartialViewRepository partialViewRepository,
-        IPartialViewMacroRepository partialViewMacroRepository,
         IAuditRepository auditRepository,
         IHostingEnvironment hostingEnvironment,
         ITemplateService templateService,
@@ -90,7 +85,6 @@ public class FileService : RepositoryService, IFileService
         _stylesheetRepository = stylesheetRepository;
         _scriptRepository = scriptRepository;
         _partialViewRepository = partialViewRepository;
-        _partialViewMacroRepository = partialViewMacroRepository;
         _auditRepository = auditRepository;
         _hostingEnvironment = hostingEnvironment;
         _templateService = templateService;
@@ -589,41 +583,12 @@ public class FileService : RepositoryService, IFileService
 
     #region Partial Views
 
-    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
-    public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
-    {
-        var snippetProvider =
-            new EmbeddedFileProvider(GetType().Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
-
-        var files = snippetProvider.GetDirectoryContents(string.Empty)
-            .Where(x => !x.IsDirectory && x.Name.EndsWith(".cshtml"))
-            .Select(x => Path.GetFileNameWithoutExtension(x.Name))
-            .Except(filterNames, StringComparer.InvariantCultureIgnoreCase)
-            .ToArray();
-
-        // Ensure the ones that are called 'Empty' are at the top
-        var empty = files.Where(x => Path.GetFileName(x)?.InvariantStartsWith("Empty") ?? false)
-            .OrderBy(x => x?.Length)
-            .ToArray();
-
-        return empty.Union(files.Except(empty)).WhereNotNull();
-    }
-
     [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     public void DeletePartialViewFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             _partialViewRepository.DeleteFolder(folderPath);
-            scope.Complete();
-        }
-    }
-
-    public void DeletePartialViewMacroFolder(string folderPath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _partialViewMacroRepository.DeleteFolder(folderPath);
             scope.Complete();
         }
     }
@@ -646,44 +611,9 @@ public class FileService : RepositoryService, IFileService
         }
     }
 
-    public IPartialView? GetPartialViewMacro(string path)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _partialViewMacroRepository.Get(path);
-        }
-    }
-
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
-    public Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId) =>
-        CreatePartialViewMacro(partialView, PartialViewType.PartialView, snippetName, userId);
-
-    public Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId) =>
-        CreatePartialViewMacro(partialView, PartialViewType.PartialViewMacro, snippetName, userId);
-
-    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
-    public bool DeletePartialView(string path, int? userId = null) =>
-        DeletePartialViewMacro(path, PartialViewType.PartialView, userId);
-
-    private Attempt<IPartialView?> CreatePartialViewMacro(
-        IPartialView partialView,
-        PartialViewType partialViewType,
-        string? snippetName = null,
-        int? userId = Constants.Security.SuperUserId)
+    public Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId)
     {
-        string partialViewHeader;
-        switch (partialViewType)
-        {
-            case PartialViewType.PartialView:
-                partialViewHeader = PartialViewHeader;
-                break;
-            case PartialViewType.PartialViewMacro:
-                partialViewHeader = PartialViewMacroHeader;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(partialViewType));
-        }
-
         string? partialViewContent = null;
         if (snippetName.IsNullOrWhiteSpace() == false)
         {
@@ -702,12 +632,9 @@ public class FileService : RepositoryService, IFileService
                 snippetContent = StripPartialViewHeader(snippetContent);
 
                 // Update Model.Content. to be Model. when used as PartialView
-                if (partialViewType == PartialViewType.PartialView)
-                {
-                    snippetContent = snippetContent.Replace("Model.Content.", "Model.");
-                }
+                snippetContent = snippetContent.Replace("Model.Content.", "Model.");
 
-                partialViewContent = $"{partialViewHeader}{Environment.NewLine}{snippetContent}";
+                partialViewContent = $"{PartialViewHeader}{Environment.NewLine}{snippetContent}";
             }
         }
 
@@ -721,18 +648,17 @@ public class FileService : RepositoryService, IFileService
                 return Attempt<IPartialView?>.Fail();
             }
 
-            IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
             if (partialViewContent != null)
             {
                 partialView.Content = partialViewContent;
             }
 
-            repository.Save(partialView);
+            _partialViewRepository.Save(partialView);
 
             scope.Notifications.Publish(
                 new PartialViewCreatedNotification(partialView, eventMessages).WithStateFrom(creatingNotification));
 
-            Audit(AuditType.Save, userId!.Value, -1, partialViewType.ToString());
+            Audit(AuditType.Save, userId!.Value, -1, Constants.UdiEntityType.PartialView);
 
             scope.Complete();
         }
@@ -740,19 +666,38 @@ public class FileService : RepositoryService, IFileService
         return Attempt<IPartialView?>.Succeed(partialView);
     }
 
-    public bool DeletePartialViewMacro(string path, int? userId = null) =>
-        DeletePartialViewMacro(path, PartialViewType.PartialViewMacro, userId);
-
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
-    public Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null) =>
-        SavePartialView(partialView, PartialViewType.PartialView, userId);
-
-    private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int? userId = null)
+    public Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
-            IPartialView? partialView = repository.Get(path);
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            var savingNotification = new PartialViewSavingNotification(partialView, eventMessages);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                scope.Complete();
+                return Attempt<IPartialView?>.Fail();
+            }
+
+            userId ??= Constants.Security.SuperUserId;
+            _partialViewRepository.Save(partialView);
+
+            Audit(AuditType.Save, userId.Value, -1, Constants.UdiEntityType.PartialView);
+            scope.Notifications.Publish(
+                new PartialViewSavedNotification(partialView, eventMessages).WithStateFrom(savingNotification));
+
+            scope.Complete();
+        }
+
+        return Attempt.Succeed(partialView);
+    }
+
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
+    public bool DeletePartialView(string path, int? userId = null)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            IPartialView? partialView = _partialViewRepository.Get(path);
             if (partialView == null)
             {
                 scope.Complete();
@@ -768,19 +713,16 @@ public class FileService : RepositoryService, IFileService
             }
 
             userId ??= Constants.Security.SuperUserId;
-            repository.Delete(partialView);
+            _partialViewRepository.Delete(partialView);
             scope.Notifications.Publish(
                 new PartialViewDeletedNotification(partialView, eventMessages).WithStateFrom(deletingNotification));
-            Audit(AuditType.Delete, userId.Value, -1, partialViewType.ToString());
+            Audit(AuditType.Delete, userId.Value, -1, Constants.UdiEntityType.PartialView);
 
             scope.Complete();
         }
 
         return true;
     }
-
-    public Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int? userId = null) =>
-        SavePartialView(partialView, PartialViewType.PartialViewMacro, userId);
 
     [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     public void CreatePartialViewFolder(string folderPath)
@@ -798,33 +740,6 @@ public class FileService : RepositoryService, IFileService
         return headerMatch.Replace(contents, string.Empty);
     }
 
-    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
-    private Attempt<IPartialView?> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int? userId = null)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            var savingNotification = new PartialViewSavingNotification(partialView, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return Attempt<IPartialView?>.Fail();
-            }
-
-            userId ??= Constants.Security.SuperUserId;
-            IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
-            repository.Save(partialView);
-
-            Audit(AuditType.Save, userId.Value, -1, partialViewType.ToString());
-            scope.Notifications.Publish(
-                new PartialViewSavedNotification(partialView, eventMessages).WithStateFrom(savingNotification));
-
-            scope.Complete();
-        }
-
-        return Attempt.Succeed(partialView);
-    }
-
     internal Attempt<string> TryGetSnippetPath(string? fileName)
     {
         if (fileName?.EndsWith(".cshtml") == false)
@@ -840,15 +755,6 @@ public class FileService : RepositoryService, IFileService
             : Attempt<string>.Fail();
     }
 
-    public void CreatePartialViewMacroFolder(string folderPath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _partialViewMacroRepository.AddFolder(folderPath);
-            scope.Complete();
-        }
-    }
-
     /// <inheritdoc />
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public Stream GetPartialViewFileContentStream(string filepath)
@@ -856,19 +762,6 @@ public class FileService : RepositoryService, IFileService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _partialViewRepository.GetFileContentStream(filepath);
-        }
-    }
-
-    private IPartialViewRepository GetPartialViewRepository(PartialViewType partialViewType)
-    {
-        switch (partialViewType)
-        {
-            case PartialViewType.PartialView:
-                return _partialViewRepository;
-            case PartialViewType.PartialViewMacro:
-                return _partialViewMacroRepository;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(partialViewType));
         }
     }
 
@@ -890,96 +783,6 @@ public class FileService : RepositoryService, IFileService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _partialViewRepository.GetFileSize(filepath);
-        }
-    }
-
-    /// <inheritdoc />
-    public Stream GetPartialViewMacroFileContentStream(string filepath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _partialViewMacroRepository.GetFileContentStream(filepath);
-        }
-    }
-
-    /// <inheritdoc />
-    public void SetPartialViewMacroFileContent(string filepath, Stream content)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _partialViewMacroRepository.SetFileContent(filepath, content);
-            scope.Complete();
-        }
-    }
-
-    /// <inheritdoc />
-    public long GetPartialViewMacroFileSize(string filepath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _partialViewMacroRepository.GetFileSize(filepath);
-        }
-    }
-
-    #endregion
-
-    #region Snippets
-
-    public string GetPartialViewSnippetContent(string snippetName) =>
-        GetPartialViewMacroSnippetContent(snippetName, PartialViewType.PartialView);
-
-    public string GetPartialViewMacroSnippetContent(string snippetName) =>
-        GetPartialViewMacroSnippetContent(snippetName, PartialViewType.PartialViewMacro);
-
-    private string GetPartialViewMacroSnippetContent(string snippetName, PartialViewType partialViewType)
-    {
-        if (snippetName.IsNullOrWhiteSpace())
-        {
-            throw new ArgumentNullException(nameof(snippetName));
-        }
-
-        string partialViewHeader;
-        switch (partialViewType)
-        {
-            case PartialViewType.PartialView:
-                partialViewHeader = PartialViewHeader;
-                break;
-            case PartialViewType.PartialViewMacro:
-                partialViewHeader = PartialViewMacroHeader;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(partialViewType));
-        }
-
-        var snippetProvider =
-            new EmbeddedFileProvider(GetType().Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
-
-        IFileInfo? file = snippetProvider.GetDirectoryContents(string.Empty)
-            .FirstOrDefault(x => x.Exists && x.Name.Equals(snippetName + ".cshtml"));
-
-        // Try and get the snippet path
-        if (file is null)
-        {
-            throw new InvalidOperationException("Could not load snippet with name " + snippetName);
-        }
-
-        using (var snippetFile = new StreamReader(file.CreateReadStream()))
-        {
-            var snippetContent = snippetFile.ReadToEnd().Trim();
-
-            // strip the @inherits if it's there
-            snippetContent = StripPartialViewHeader(snippetContent);
-
-            // Update Model.Content to be Model when used as PartialView
-            if (partialViewType == PartialViewType.PartialView)
-            {
-                snippetContent = snippetContent
-                    .Replace("Model.Content.", "Model.")
-                    .Replace("(Model.Content)", "(Model)");
-            }
-
-            var content = $"{partialViewHeader}{Environment.NewLine}{snippetContent}";
-            return content;
         }
     }
 

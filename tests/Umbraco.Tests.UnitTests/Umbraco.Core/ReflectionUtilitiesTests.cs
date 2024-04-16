@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Extensions;
@@ -752,7 +752,7 @@ public class ReflectionUtilitiesTests
 
     public class Class5 : Class4
     {
-        [JsonProperty("intValue2")]
+        [JsonPropertyName("intValue2")]
         public int IntValue2 { get; set; }
 
         public string StringValue2 { get; set; }

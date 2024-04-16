@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Security;
 
@@ -31,7 +32,9 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
 
     public async Task EnsureBackOfficeApplicationAsync(Uri backOfficeUrl, CancellationToken cancellationToken = default)
     {
-        if (_runtimeState.Level < RuntimeLevel.Run)
+        // Install is okay without this, because we do not need a token to install,
+        // but upgrades do, so we need to execute for everything higher then or equal to upgrade.
+        if (_runtimeState.Level < RuntimeLevel.Upgrade)
         {
             return;
         }
@@ -61,7 +64,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                     {
                         CallbackUrlFor(backOfficeUrl, "/umbraco/swagger/oauth2-redirect.html")
                     },
-                    Type = OpenIddictConstants.ClientTypes.Public,
+                    ClientType = OpenIddictConstants.ClientTypes.Public,
                     Permissions =
                     {
                         OpenIddictConstants.Permissions.Endpoints.Authorization,
@@ -81,7 +84,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                     {
                         new Uri("https://oauth.pstmn.io/v1/callback"), new Uri("https://oauth.pstmn.io/v1/browser-callback")
                     },
-                    Type = OpenIddictConstants.ClientTypes.Public,
+                    ClientType = OpenIddictConstants.ClientTypes.Public,
                     Permissions =
                     {
                         OpenIddictConstants.Permissions.Endpoints.Authorization,
@@ -94,21 +97,22 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         }
     }
 
-    public OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri backOfficeUrl) =>
-        new()
+    public OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri backOfficeUrl)
+    {
+        Uri CallbackUrl(string path) => CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, path);
+        return new OpenIddictApplicationDescriptor
         {
             DisplayName = "Umbraco back-office access",
             ClientId = Constants.OAuthClientIds.BackOffice,
             RedirectUris =
             {
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName)
+                CallbackUrl(_authorizeCallbackPathName),
             },
-            Type = OpenIddictConstants.ClientTypes.Public,
+            ClientType = OpenIddictConstants.ClientTypes.Public,
             PostLogoutRedirectUris =
             {
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName + "/login"),
-                // FIXME: remove when we no longer use Umbraco.Web.UI project
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName)
+                CallbackUrl(_authorizeCallbackPathName),
+                CallbackUrl($"{_authorizeCallbackPathName.EnsureEndsWith("/")}logout")
             },
             Permissions =
             {
@@ -121,6 +125,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                 OpenIddictConstants.Permissions.ResponseTypes.Code
             }
         };
+    }
 
     private static Uri CallbackUrlFor(Uri url, string relativePath) => new Uri($"{url.GetLeftPart(UriPartial.Authority)}/{relativePath.TrimStart(Constants.CharArrays.ForwardSlash)}");
 }

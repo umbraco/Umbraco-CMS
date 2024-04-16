@@ -5,9 +5,9 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.AuditLog;
@@ -17,34 +17,24 @@ public class CurrentUserAuditLogController : AuditLogControllerBase
 {
     private readonly IAuditService _auditService;
     private readonly IAuditLogPresentationFactory _auditLogPresentationFactory;
-    private readonly IUserService _userService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CurrentUserAuditLogController(
         IAuditService auditService,
         IAuditLogPresentationFactory auditLogPresentationFactory,
-        IUserService userService)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _auditService = auditService;
         _auditLogPresentationFactory = auditLogPresentationFactory;
-        _userService = userService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AuditLogWithUsernameResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CurrentUser(Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
+    public async Task<IActionResult> CurrentUser(CancellationToken cancellationToken, Direction orderDirection = Direction.Descending, DateTime? sinceDate = null, int skip = 0, int take = 100)
     {
-        // FIXME: Pull out current backoffice user when its implemented.
-        // var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1;
-        var userId = Constants.Security.SuperUserId;
-
-        IUser? user = _userService.GetUserById(userId);
-
-        if (user is null)
-        {
-            throw new PanicException("Could not find current user");
-        }
-
+        IUser user = CurrentUser(_backOfficeSecurityAccessor);
         PagedModel<IAuditItem> result = await _auditService.GetPagedItemsByUserAsync(
             user.Key,
             skip,

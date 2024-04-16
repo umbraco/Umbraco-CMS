@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using System.ComponentModel;
-using Umbraco.Cms.Core.Macros;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
@@ -149,12 +148,11 @@ public class ContentSettings
             </style>
             <script type=""text/javascript"" data-umbraco-path=""{0}"" src=""{0}/js/umbraco.websitepreview.min.js""></script>";
 
-    internal const string StaticMacroErrors = "Inline";
     internal const string StaticDisallowedUploadFiles = "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx";
     internal const bool StaticShowDeprecatedPropertyEditors = false;
-    internal const string StaticLoginBackgroundImage = "assets/img/login.jpg";
-    internal const string StaticLoginLogoImage = "assets/img/application/umbraco_logo_blue.svg";
-    internal const string StaticLoginLogoImageAlternative = "assets/img/application/umbraco_logo_blue.svg";
+    internal const string StaticLoginBackgroundImage = "login/login.jpg";
+    internal const string StaticLoginLogoImage = "login/logo_dark.svg";
+    internal const string StaticLoginLogoImageAlternative = "login/logo_light.svg";
     internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
@@ -189,25 +187,6 @@ public class ContentSettings
     public string PreviewBadge { get; set; } = StaticDefaultPreviewBadge;
 
     /// <summary>
-    ///     Gets or sets a value for the macro error behaviour.
-    /// </summary>
-    [DefaultValue(StaticMacroErrors)]
-    public MacroErrorBehaviour MacroErrors { get; set; } = Enum.Parse<MacroErrorBehaviour>(StaticMacroErrors);
-
-    /// <summary>
-    ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
-    /// </summary>
-    [DefaultValue(StaticDisallowedUploadFiles)]
-    [Obsolete("Please use DisAllowedUploadedFileExtensions instead, scheduled for removal in V13")]
-    public IEnumerable<string> DisallowedUploadFiles { get; set; } = StaticDisallowedUploadFiles.Split(',');
-
-    /// <summary>
-    ///     Gets or sets a value for the collection of file extensions that are allowed for upload.
-    /// </summary>
-    [Obsolete("Please use AllowedUploadedFileExtensions instead, scheduled for removal in V13")]
-    public IEnumerable<string> AllowedUploadFiles { get; set; } = Array.Empty<string>();
-
-    /// <summary>
     ///     Gets or sets a value indicating whether deprecated property editors should be shown.
     /// </summary>
     [DefaultValue(StaticShowDeprecatedPropertyEditors)]
@@ -232,8 +211,8 @@ public class ContentSettings
     ///     of a light background (e.g. in mobile resolutions).
     /// </summary>
     /// <remarks>This is the alternative version to the regular logo found at <see cref="LoginLogoImage"/>.</remarks>
-    [DefaultValue(StaticLoginLogoImageAlternative)]
-    public string LoginLogoImageAlternative { get; set; } = StaticLoginLogoImageAlternative;
+    [DefaultValue(StaticLoginLogoImage)]
+    public string LoginLogoImageAlternative { get; set; } = StaticLoginLogoImage;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.

@@ -12,7 +12,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessWebhooks)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
 public class DeleteWebhookController : WebhookControllerBase
 {
     private readonly IWebhookService _webhookService;
@@ -29,7 +29,7 @@ public class DeleteWebhookController : WebhookControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         Attempt<IWebhook?, WebhookOperationStatus> result = await _webhookService.DeleteAsync(id);
 

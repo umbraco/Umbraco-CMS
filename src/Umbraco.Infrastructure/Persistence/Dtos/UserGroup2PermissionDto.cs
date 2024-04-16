@@ -8,13 +8,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 public class UserGroup2PermissionDto
 {
+    [Column("id")]
     [PrimaryKeyColumn(Name = "PK_userGroup2Permission", AutoIncrement = true)]
     public int Id { get; set; }
 
-    [Column("userGroupId")]
+    [Column("userGroupKey")]
     [Index(IndexTypes.NonClustered, IncludeColumns = "permission")]
-    [ForeignKey(typeof(UserGroupDto))]
-    public int UserGroupId { get; set; }
+    [ForeignKey(typeof(UserGroupDto), Column = "key")]
+    public Guid UserGroupKey { get; set; }
 
     [Column("permission")]
     [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]

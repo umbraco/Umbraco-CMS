@@ -10,7 +10,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DynamicRoot;
 
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessContent)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
 [ApiVersion("1.0")]
 public class GetRootsController : DynamicRootControllerBase
 {
@@ -28,7 +28,7 @@ public class GetRootsController : DynamicRootControllerBase
     [HttpPost("query")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DynamicRootResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetRoots(DynamicRootRequestModel model)
+    public async Task<IActionResult> GetRoots(CancellationToken cancellationToken, DynamicRootRequestModel model)
     {
         _backOfficeVariationContextAccessor.VariationContext = new BackOfficeVariationContext(model.Context.Culture, model.Context.Segment);
 

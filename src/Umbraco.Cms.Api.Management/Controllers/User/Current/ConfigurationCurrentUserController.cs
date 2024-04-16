@@ -9,7 +9,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.BackOfficeAccess)]
+[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
 public class ConfigurationCurrentUserController : CurrentUserControllerBase
 {
     private readonly IUserPresentationFactory _userPresentationFactory;
@@ -19,7 +19,7 @@ public class ConfigurationCurrentUserController : CurrentUserControllerBase
     [MapToApiVersion("1.0")]
     [HttpGet("configuration")]
     [ProducesResponseType(typeof(CurrenUserConfigurationResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Configuration()
+    public async Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         CurrenUserConfigurationResponseModel model = await _userPresentationFactory.CreateCurrentUserConfigurationModelAsync();
         return Ok(model);

@@ -9,6 +9,8 @@ public class SnapDictionary<TKey, TValue>
     where TValue : class
     where TKey : notnull
 {
+    private static readonly TimeSpan _monitorTimeout = TimeSpan.FromSeconds(30);
+
     // minGenDelta to be adjusted
     // we may want to throttle collects even if delta is reached
     // we may want to force collect if delta is not reached but very old
@@ -198,7 +200,12 @@ public class SnapDictionary<TKey, TValue>
             throw new InvalidOperationException("Recursive locks not allowed");
         }
 
-        Monitor.Enter(_wlocko, ref lockInfo.Taken);
+        Monitor.TryEnter(_wlocko, _monitorTimeout, ref lockInfo.Taken);
+
+        if (Monitor.IsEntered(_wlocko) is false)
+        {
+            throw new TimeoutException("Could not enter the monitor before timeout in SnapDictionary");
+        }
 
         lock (_rlocko)
         {

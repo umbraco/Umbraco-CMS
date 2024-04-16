@@ -29,6 +29,11 @@ public static partial class Constants
         public const int RecycleBinContent = -20;
 
         /// <summary>
+        ///     The GUId identifier for content's recycle bin.
+        /// </summary>
+        public static readonly Guid RecycleBinContentKey = new("0F582A79-1E41-4CF0-BFA0-76340651891A");
+
+        /// <summary>
         ///     The string identifier for content's recycle bin.
         /// </summary>
         /// <remarks>Use this instead of re-creating the string everywhere.</remarks>
@@ -47,6 +52,11 @@ public static partial class Constants
         ///     The integer identifier for media's recycle bin.
         /// </summary>
         public const int RecycleBinMedia = -21;
+
+        /// <summary>
+        /// The GUID identifier for media's recycle bin.
+        /// </summary>
+        public static readonly Guid RecycleBinMediaKey = new("BF7C7CBC-952F-4518-97A2-69E9C7B33842");
 
         /// <summary>
         ///     The string identifier for media's recycle bin.

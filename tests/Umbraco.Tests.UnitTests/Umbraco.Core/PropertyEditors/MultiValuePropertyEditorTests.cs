@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Globalization;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -42,12 +41,7 @@ public class MultiValuePropertyEditorTests
             .FromConfigurationObject(
                 new ValueListConfiguration
                 {
-                    Items = new List<ValueListConfiguration.ValueListItem>
-                    {
-                        new() { Value = "Value 1" },
-                        new() { Value = "Value 2" },
-                        new() { Value = "Value 3" },
-                    },
+                    Items = ["Value 1", "Value 2", "Value 3"]
                 },
                 serializer);
 
@@ -98,12 +92,7 @@ public class MultiValuePropertyEditorTests
             .FromConfigurationObject(
                 new ValueListConfiguration
                 {
-                    Items = new List<ValueListConfiguration.ValueListItem>
-                    {
-                        new() { Value = "Value 1" },
-                        new() { Value = "Value 2" },
-                        new() { Value = "Value 3" },
-                    },
+                    Items = ["Value 1", "Value 2", "Value 3"]
                 },
                 serializer);
 
@@ -152,12 +141,7 @@ public class MultiValuePropertyEditorTests
         dataType.ConfigurationData = configurationEditor.FromConfigurationObject(
             new ValueListConfiguration
             {
-                Items = new List<ValueListConfiguration.ValueListItem>
-                {
-                    new() { Value = "Item 1" },
-                    new() { Value = "Item 2" },
-                    new() { Value = "Item 3" },
-                },
+                Items = ["Item 1", "Item 2", "Item 3"]
             },
             serializer);
 
@@ -167,8 +151,8 @@ public class MultiValuePropertyEditorTests
 
         Assert.NotNull(result);
         Assert.AreEqual(3, result.Items.Count);
-        Assert.AreEqual("Item 1", result.Items[0].Value);
-        Assert.AreEqual("Item 2", result.Items[1].Value);
-        Assert.AreEqual("Item 3", result.Items[2].Value);
+        Assert.AreEqual("Item 1", result.Items[0]);
+        Assert.AreEqual("Item 2", result.Items[1]);
+        Assert.AreEqual("Item 3", result.Items[2]);
     }
 }

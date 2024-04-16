@@ -37,7 +37,7 @@ internal abstract class TwoFactorLoginServiceBase
     public virtual async Task<Attempt<IEnumerable<UserTwoFactorProviderModel>, TwoFactorOperationStatus>> GetProviderNamesAsync(Guid userKey)
     {
         IEnumerable<string> allProviders = _twoFactorLoginService.GetAllProviderNames();
-        var userProviders  =(await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(userKey)).ToHashSet();
+        var userProviders = (await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(userKey)).ToHashSet();
 
         IEnumerable<UserTwoFactorProviderModel> result = allProviders.Select(x => new UserTwoFactorProviderModel(x, userProviders.Contains(x)));
         return Attempt.SucceedWithStatus(TwoFactorOperationStatus.Success, result);

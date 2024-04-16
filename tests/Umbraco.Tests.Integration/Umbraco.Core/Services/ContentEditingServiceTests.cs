@@ -24,7 +24,8 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
     [TearDown]
     public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;
 
-    private IContentEditingService ContentTypeEditingService => GetRequiredService<IContentEditingService>();
+    private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     [Test]
@@ -69,7 +70,7 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
             }
         };
 
-        await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
         var content = ContentService.GetById(documentKey)!;
 
@@ -86,7 +87,7 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
             }
         };
 
-        await ContentTypeEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
+        await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
 
         var updatedContent = ContentService.GetById(documentKey)!;
 

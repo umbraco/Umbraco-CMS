@@ -30,25 +30,19 @@ public sealed class UserCacheRefresher : CacheRefresherBase<UserCacheRefresherNo
         base.RefreshAll();
     }
 
-    public override void Refresh(int id)
-    {
-        Remove(id);
-        base.Refresh(id);
-    }
-
-    public override void Remove(int id)
+    public override void Refresh(Guid id)
     {
         Attempt<IAppPolicyCache?> userCache = AppCaches.IsolatedCaches.Get<IUser>();
         if (userCache.Success)
         {
-            userCache.Result?.Clear(RepositoryCacheKeys.GetKey<IUser, int>(id));
+            userCache.Result?.Clear(RepositoryCacheKeys.GetKey<IUser, Guid>(id));
             userCache.Result?.ClearByKey(CacheKeys.UserContentStartNodePathsPrefix + id);
             userCache.Result?.ClearByKey(CacheKeys.UserMediaStartNodePathsPrefix + id);
             userCache.Result?.ClearByKey(CacheKeys.UserAllContentStartNodesPrefix + id);
             userCache.Result?.ClearByKey(CacheKeys.UserAllMediaStartNodesPrefix + id);
         }
 
-        base.Remove(id);
+        base.Refresh(id);
     }
 
     #endregion

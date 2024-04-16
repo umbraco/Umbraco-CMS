@@ -9,10 +9,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template;
 
-[ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Template)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessTemplates)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]
 public class TemplateControllerBase : ManagementApiControllerBase
 {
     protected IActionResult TemplateOperationStatusResult(TemplateOperationStatus status) =>
@@ -30,6 +29,10 @@ public class TemplateControllerBase : ManagementApiControllerBase
             TemplateOperationStatus.DuplicateAlias => BadRequest(problemDetailsBuilder
                 .WithTitle("Duplicate alias")
                 .WithDetail("A template with that alias already exists.")
+                .Build()),
+            TemplateOperationStatus.CircularMasterTemplateReference => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid master template")
+                .WithDetail("The master template referenced in the template leads to a circular reference.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown template operation status.")

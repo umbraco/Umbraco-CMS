@@ -11,7 +11,7 @@ public class UsersViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<PasswordChangedModel, ChangePasswordUserResponseModel>((_, _) => new ChangePasswordUserResponseModel(), Map);
+        mapper.Define<PasswordChangedModel, ResetPasswordUserResponseModel>((_, _) => new ResetPasswordUserResponseModel(), Map);
         mapper.Define<UserCreationResult, CreateUserResponseModel>((_, _) => new CreateUserResponseModel { User = new() }, Map);
         mapper.Define<IIdentityUserLogin, LinkedLoginViewModel>((_, _) => new LinkedLoginViewModel { ProviderKey = string.Empty, ProviderName = string.Empty }, Map);
     }
@@ -34,7 +34,7 @@ public class UsersViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private void Map(PasswordChangedModel source, ChangePasswordUserResponseModel target, MapperContext context)
+    private void Map(PasswordChangedModel source, ResetPasswordUserResponseModel target, MapperContext context)
     {
         target.ResetPassword = source.ResetPassword;
     }

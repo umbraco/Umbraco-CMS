@@ -38,7 +38,7 @@ public class PackageInstallation : IPackageInstallation
 
         InstallationSummary installationSummary = _packageDataInstallation.InstallPackageData(compiledPackage, userId);
 
-        // Make sure the definition is up to date with everything (note: macro partial views are embedded in macros)
+        // Make sure the definition is up to date with everything
         foreach (IDataType x in installationSummary.DataTypesInstalled)
         {
             packageDefinition.DataTypes.Add(x.Id.ToInvariantString());
@@ -52,11 +52,6 @@ public class PackageInstallation : IPackageInstallation
         foreach (IDictionaryItem x in installationSummary.DictionaryItemsInstalled)
         {
             packageDefinition.DictionaryItems.Add(x.Id.ToInvariantString());
-        }
-
-        foreach (IMacro x in installationSummary.MacrosInstalled)
-        {
-            packageDefinition.Macros.Add(x.Id.ToInvariantString());
         }
 
         foreach (ITemplate x in installationSummary.TemplatesInstalled)

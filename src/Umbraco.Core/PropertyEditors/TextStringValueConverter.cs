@@ -51,12 +51,6 @@ public class TextStringValueConverter : PropertyValueConverterBase, IDeliveryApi
         // source should come from ConvertSource and be a string (or null) already
         inter ?? string.Empty;
 
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
-
-        // source should come from ConvertSource and be a string (or null) already
-        inter;
-
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 

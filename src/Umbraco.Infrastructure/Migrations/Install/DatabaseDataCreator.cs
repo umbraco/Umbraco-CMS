@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -132,6 +133,11 @@ internal class DatabaseDataCreator
             CreateUserGroupData();
         }
 
+        if (tableName.Equals(Constants.DatabaseSchema.Tables.UserGroup2Permission))
+        {
+            CreateUserGroup2PermissionData();
+        }
+
         if (tableName.Equals(Constants.DatabaseSchema.Tables.User2UserGroup))
         {
             CreateUser2UserGroupData();
@@ -183,6 +189,35 @@ internal class DatabaseDataCreator
         }
 
         _logger.LogInformation("Completed creating data in {TableName}", tableName);
+    }
+
+    private void CreateUserGroup2PermissionData()
+    {
+        var userGroupKeyToPermissions = new Dictionary<Guid, IEnumerable<string>>()
+        {
+            [Constants.Security.AdminGroupKey] = new []{ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T"},
+            [Constants.Security.WriterGroupKey] =  new []{ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionToPublish.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":"},
+            [Constants.Security.EditorGroupKey] = new []{ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter,  ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T"},
+            [Constants.Security.TranslatorGroupKey] =  new []{ActionUpdate.ActionLetter, ActionBrowse.ActionLetter},
+        };
+
+        var i = 1;
+        foreach (var (userGroupKey, permissions) in userGroupKeyToPermissions)
+        {
+            foreach (var permission in permissions)
+            {
+                _database.Insert(
+                    Constants.DatabaseSchema.Tables.UserGroup2Permission,
+                    "id",
+                    false,
+                    new UserGroup2PermissionDto
+                    {
+                        Id = i++,
+                        UserGroupKey = userGroupKey,
+                        Permission = permission,
+                    });
+            }
+        }
     }
 
     internal static Guid CreateUniqueRelationTypeId(string alias, string name) => (alias + "____" + name).ToGuid();
@@ -239,14 +274,14 @@ internal class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
             new NodeDto
             {
-                NodeId = -20,
+                NodeId = Constants.System.RecycleBinContent,
                 Trashed = false,
                 ParentId = -1,
                 UserId = -1,
                 Level = 0,
                 Path = "-1,-20",
                 SortOrder = 0,
-                UniqueId = new Guid("0F582A79-1E41-4CF0-BFA0-76340651891A"),
+                UniqueId = Constants.System.RecycleBinContentKey,
                 Text = "Recycle Bin",
                 NodeObjectType = Constants.ObjectTypes.ContentRecycleBin,
                 CreateDate = DateTime.Now,
@@ -254,14 +289,14 @@ internal class DatabaseDataCreator
         _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false,
             new NodeDto
             {
-                NodeId = -21,
+                NodeId = Constants.System.RecycleBinMedia,
                 Trashed = false,
                 ParentId = -1,
                 UserId = -1,
                 Level = 0,
                 Path = "-1,-21",
                 SortOrder = 0,
-                UniqueId = new Guid("BF7C7CBC-952F-4518-97A2-69E9C7B33842"),
+                UniqueId = Constants.System.RecycleBinMediaKey,
                 Text = "Recycle Bin",
                 NodeObjectType = Constants.ObjectTypes.MediaRecycleBin,
                 CreateDate = DateTime.Now,
@@ -641,25 +676,6 @@ internal class DatabaseDataCreator
             "id");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
-            Constants.DataTypes.Guids.ListViewMembers,
-            new NodeDto
-            {
-                NodeId = Constants.DataTypes.DefaultMembersListView,
-                Trashed = false,
-                ParentId = -1,
-                UserId = -1,
-                Level = 1,
-                Path = $"-1,{Constants.DataTypes.DefaultMembersListView}",
-                SortOrder = 2,
-                UniqueId = Constants.DataTypes.Guids.ListViewMembersGuid,
-                Text = Constants.Conventions.DataTypes.ListViewPrefix + "Members",
-                NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
-            },
-            Constants.DatabaseSchema.Tables.Node,
-            "id");
-        ConditionalInsert(
-            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
             Constants.DataTypes.Guids.Tags,
             new NodeDto
             {
@@ -736,44 +752,7 @@ internal class DatabaseDataCreator
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
-        ConditionalInsert(
-            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
-            Constants.DataTypes.Guids.MediaPicker,
-            new NodeDto
-            {
-                NodeId = 1048,
-                Trashed = false,
-                ParentId = -1,
-                UserId = -1,
-                Level = 1,
-                Path = "-1,1048",
-                SortOrder = 2,
-                UniqueId = Constants.DataTypes.Guids.MediaPickerGuid,
-                Text = "Media Picker (legacy)",
-                NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
-            },
-            Constants.DatabaseSchema.Tables.Node,
-            "id");
-        ConditionalInsert(
-            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
-            Constants.DataTypes.Guids.MultipleMediaPicker,
-            new NodeDto
-            {
-                NodeId = 1049,
-                Trashed = false,
-                ParentId = -1,
-                UserId = -1,
-                Level = 1,
-                Path = "-1,1049",
-                SortOrder = 2,
-                UniqueId = Constants.DataTypes.Guids.MultipleMediaPickerGuid,
-                Text = "Multiple Media Picker (legacy)",
-                NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
-            },
-            Constants.DatabaseSchema.Tables.Node,
-            "id");
+
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
             Constants.DataTypes.Guids.RelatedLinks,
@@ -1222,7 +1201,6 @@ internal class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
                 Name = "Administrators",
-                DefaultPermissions = "CADMOSKTPIURZ:5F7ïN",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-medal",
@@ -1240,7 +1218,6 @@ internal class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.WriterGroupAlias,
                 Name = "Writers",
-                DefaultPermissions = "CAH:FN",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-edit",
@@ -1258,7 +1235,6 @@ internal class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.EditorGroupAlias,
                 Name = "Editors",
-                DefaultPermissions = "CADMOSKTPUZ:5FïN",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-tools",
@@ -1276,7 +1252,6 @@ internal class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.TranslatorGroupAlias,
                 Name = "Translators",
-                DefaultPermissions = "AF",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-globe",
@@ -1292,7 +1267,6 @@ internal class DatabaseDataCreator
                 Key = Constants.Security.SensitiveDataGroupKey,
                 Alias = Constants.Security.SensitiveDataGroupAlias,
                 Name = "Sensitive data",
-                DefaultPermissions = string.Empty,
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-lock",
@@ -2322,6 +2296,14 @@ internal class DatabaseDataCreator
         var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
         var stateValueKey = upgrader.StateValueKey;
         var finalState = upgrader.Plan.FinalState;
+
+        _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false,
+            new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });
+
+
+        upgrader = new Upgrader(new UmbracoPremigrationPlan());
+        stateValueKey = upgrader.StateValueKey;
+        finalState = upgrader.Plan.FinalState;
 
         _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false,
             new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });

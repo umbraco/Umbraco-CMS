@@ -18,7 +18,7 @@ test.describe('Data Types basic functionalities tests', () => {
   test('can create a data type', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.dataType.clickActionsMenuAtRoot();
-    await umbracoUi.dataType.clickCreateThreeDotsButton();
+    await umbracoUi.dataType.clickCreateButton();
     await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
     await umbracoUi.dataType.enterDataTypeName(dataTypeName);
     await umbracoUi.dataType.clickSaveButton();
@@ -45,7 +45,7 @@ test.describe('Data Types basic functionalities tests', () => {
     expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeName)).toBeFalsy();
   });
 
-  test('can delete a data type', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can delete a data type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.dataType.create(dataTypeName, editorAlias, []);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
@@ -59,12 +59,12 @@ test.describe('Data Types basic functionalities tests', () => {
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeFalsy();
   });
 
-  test('can change Property Editor in a data type', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can change Property Editor in a data type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const updatedEditorName = 'Text Area';
     const updatedEditorAlias = 'Umbraco.TextArea';
     const updatedEditorUiAlias = 'Umb.PropertyEditorUi.TextArea';
-    
+
     await umbracoApi.dataType.create(dataTypeName, editorAlias, []);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 

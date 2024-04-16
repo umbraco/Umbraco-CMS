@@ -23,6 +23,8 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
 
     private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
 
+    private IUserService UserService => GetRequiredService<IUserService>();
+
     [Test]
     public async Task Can_Create_Member()
     {
@@ -81,7 +83,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             }
         };
 
-        var result = await MemberEditingService.UpdateAsync(member, updateModel, SuperUser());
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
         Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
@@ -112,7 +114,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             NewPassword = "NewSuperSecret123"
         };
 
-        var result = await MemberEditingService.UpdateAsync(member, updateModel, SuperUser());
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
         Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
@@ -139,7 +141,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Roles = new [] { "RoleTwo", "RoleThree" }
         };
 
-        var result = await MemberEditingService.UpdateAsync(member, updateModel, SuperUser());
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
         Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
@@ -243,7 +245,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             }
         };
 
-        var result = await MemberEditingService.UpdateAsync(member, updateModel, SuperUser());
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
 
         // success is expected regardless of property level validation - the validation error status is communicated in the attempt status (see below)
         Assert.IsTrue(result.Success);
@@ -263,11 +265,171 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(authorValue, result.Result.Content!.GetValue<string>("author"));
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Cannot_Update_Sensitive_Properties_Without_Access(bool useSuperUser)
+    {
+        // this user does NOT have access to sensitive data
+        var user = UserBuilder.CreateUser();
+        UserService.Save(user);
+
+        var member = await CreateMemberAsync(titleIsSensitive: true);
+
+        var updateModel = new MemberUpdateModel
+        {
+            Email = "test-updated@test.com",
+            Username = "test-updated",
+            IsApproved = member.IsApproved,
+            InvariantName = "T. Est Updated",
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "title", Value = "The updated title value" },
+                new PropertyValueModel { Alias = "author", Value = "The updated author value" }
+            }
+        };
+
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, useSuperUser ? SuperUser() : user);
+        if (useSuperUser)
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
+            Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+        }
+        else
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status.ContentEditingOperationStatus);
+            Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+        }
+
+        member = await MemberEditingService.GetAsync(member.Key);
+        Assert.IsNotNull(member);
+
+        if (useSuperUser)
+        {
+            Assert.AreEqual("The updated title value", member.GetValue<string>("title"));
+            Assert.AreEqual("The updated author value", member.GetValue<string>("author"));
+
+            Assert.AreEqual("test-updated@test.com", member.Email);
+            Assert.AreEqual("test-updated", member.Username);
+            Assert.AreEqual("T. Est Updated", member.Name);
+        }
+        else
+        {
+            Assert.AreEqual("The title value", member.GetValue<string>("title"));
+            Assert.AreEqual("The author value", member.GetValue<string>("author"));
+
+            Assert.AreEqual("test@test.com", member.Email);
+            Assert.AreEqual("test", member.Username);
+            Assert.AreEqual("T. Est", member.Name);
+        }
+    }
+
+    [Test]
+    public async Task Sensitive_Properties_Are_Retained_When_Updating_Without_Access()
+    {
+        // this user does NOT have access to sensitive data
+        var user = UserBuilder.CreateUser();
+        UserService.Save(user);
+
+        var member = await CreateMemberAsync(titleIsSensitive: true);
+
+        var updateModel = new MemberUpdateModel
+        {
+            Email = "test-updated@test.com",
+            Username = "test-updated",
+            IsApproved = member.IsApproved,
+            InvariantName = "T. Est Updated",
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "author", Value = "The updated author value" }
+            }
+        };
+
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
+        Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+
+        member = await MemberEditingService.GetAsync(member.Key);
+        Assert.IsNotNull(member);
+
+        Assert.AreEqual("The title value", member.GetValue<string>("title"));
+        Assert.AreEqual("The updated author value", member.GetValue<string>("author"));
+
+        Assert.AreEqual("test-updated@test.com", member.Email);
+        Assert.AreEqual("test-updated", member.Username);
+        Assert.AreEqual("T. Est Updated", member.Name);
+    }
+
+    [Test]
+    public async Task Cannot_Change_IsApproved_Without_Access()
+    {
+        // this user does NOT have access to sensitive data
+        var user = UserBuilder.CreateUser();
+        UserService.Save(user);
+
+        var member = await CreateMemberAsync();
+
+        var updateModel = new MemberUpdateModel
+        {
+            Email = member.Email,
+            Username = member.Username,
+            IsApproved = false,
+            InvariantName = member.Name,
+            InvariantProperties = member.Properties.Select(property => new PropertyValueModel
+            {
+                Alias = property.Alias,
+                Value = property.GetValue()
+            })
+        };
+
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status.ContentEditingOperationStatus);
+
+        member = await MemberEditingService.GetAsync(member.Key);
+        Assert.IsNotNull(member);
+        Assert.IsTrue(member.IsApproved);
+    }
+
+    [Test]
+    public async Task Cannot_Change_IsLockedOut_Without_Access()
+    {
+        // this user does NOT have access to sensitive data
+        var user = UserBuilder.CreateUser();
+        UserService.Save(user);
+
+        var member = await CreateMemberAsync();
+
+        var updateModel = new MemberUpdateModel
+        {
+            Email = member.Email,
+            Username = member.Username,
+            IsLockedOut = true,
+            InvariantName = member.Name,
+            InvariantProperties = member.Properties.Select(property => new PropertyValueModel
+            {
+                Alias = property.Alias,
+                Value = property.GetValue()
+            })
+        };
+
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status.ContentEditingOperationStatus);
+
+        member = await MemberEditingService.GetAsync(member.Key);
+        Assert.IsNotNull(member);
+        Assert.IsFalse(member.IsLockedOut);
+    }
+
     private IUser SuperUser() => GetRequiredService<IUserService>().GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
 
-    private async Task<IMember> CreateMemberAsync(Guid? key = null)
+    private async Task<IMember> CreateMemberAsync(Guid? key = null, bool titleIsSensitive = false)
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        memberType.SetIsSensitiveProperty("title", titleIsSensitive);
         MemberTypeService.Save(memberType);
         MemberService.AddRole("RoleOne");
 

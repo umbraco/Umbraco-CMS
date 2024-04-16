@@ -51,33 +51,33 @@ public interface IUserService : IMembershipUserService
     /// <remarks>
     /// This creates both the Umbraco user and the identity user.
     /// </remarks>
-    /// <param name="userKey">The key of the user performing the operation.</param>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
     /// <param name="model">Model to create the user from.</param>
     /// <param name="approveUser">Specifies if the user should be enabled be default. Defaults to false.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
-    Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(Guid userKey, UserCreateModel model, bool approveUser = false);
+    Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(Guid performingUserKey, UserCreateModel model, bool approveUser = false);
 
-    Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid userKey, UserInviteModel model);
+    Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid performingUserKey, UserInviteModel model);
 
     Task<Attempt<UserOperationStatus>> VerifyInviteAsync(Guid userKey, string token);
 
     Task<Attempt<PasswordChangedModel, UserOperationStatus>> CreateInitialPasswordAsync(Guid userKey, string token, string password);
 
-    Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid userKey, UserUpdateModel model);
+    Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
 
     Task<UserOperationStatus> SetAvatarAsync(Guid userKey, Guid temporaryFileKey);
 
-    Task<UserOperationStatus> DeleteAsync(Guid userKey, ISet<Guid> keys);
+    Task<UserOperationStatus> DeleteAsync(Guid performingUserKey, ISet<Guid> keys);
 
-    Task<UserOperationStatus> DeleteAsync(Guid userKey, Guid key) => DeleteAsync(userKey, new HashSet<Guid> { key });
+    Task<UserOperationStatus> DeleteAsync(Guid performingUserKey, Guid key) => DeleteAsync(performingUserKey, new HashSet<Guid> { key });
 
-    Task<UserOperationStatus> DisableAsync(Guid userKey, ISet<Guid> keys);
+    Task<UserOperationStatus> DisableAsync(Guid performingUserKey, ISet<Guid> keys);
 
-    Task<UserOperationStatus> EnableAsync(Guid userKey, ISet<Guid> keys);
+    Task<UserOperationStatus> EnableAsync(Guid performingUserKey, ISet<Guid> keys);
 
-    Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid userKey, params Guid[] keys);
+    Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid performingUserKey, params Guid[] keys);
 
-    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid userKey, ChangeUserPasswordModel model);
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model);
 
     Task<UserOperationStatus> ClearAvatarAsync(Guid userKey);
 
@@ -86,11 +86,11 @@ public interface IUserService : IMembershipUserService
     /// <summary>
     /// Gets all users that the requesting user is allowed to see.
     /// </summary>
-    /// <param name="userKey">The Key of the user requesting the users.</param>
+    /// <param name="performingUserKey">The Key of the user requesting the users.</param>
     /// <param name="skip">Amount to skip.</param>
     /// <param name="take">Amount to take.</param>
     /// <returns>All users that the user is allowed to see.</returns>
-    Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(Guid userKey, int skip, int take) => throw new NotImplementedException();
+    Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(Guid performingUserKey, int skip, int take) => throw new NotImplementedException();
 
     public Task<Attempt<PagedModel<IUser>, UserOperationStatus>> FilterAsync(
         Guid userKey,
@@ -294,7 +294,7 @@ public interface IUserService : IMembershipUserService
     ///     removed.
     /// </param>
     /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified group.</remarks>
-    void ReplaceUserGroupPermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds);
+    void ReplaceUserGroupPermissions(int groupId, ISet<string> permissions, params int[] entityIds);
 
     /// <summary>
     ///     Assigns the same permission set for a single user group to any number of entities
@@ -302,7 +302,7 @@ public interface IUserService : IMembershipUserService
     /// <param name="groupId">Id of the group</param>
     /// <param name="permission"></param>
     /// <param name="entityIds">Specify the nodes to replace permissions for</param>
-    void AssignUserGroupPermission(int groupId, char permission, params int[] entityIds);
+    void AssignUserGroupPermission(int groupId, string permission, params int[] entityIds);
 
     /// <summary>
     ///     Gets a list of <see cref="IUser" /> objects associated with a given group
@@ -321,8 +321,6 @@ public interface IUserService : IMembershipUserService
     ///     <see cref="IEnumerable{IUser}" />
     /// </returns>
     IEnumerable<IUser> GetAllNotInGroup(int groupId);
-
-    IEnumerable<IUser> GetNextUsers(int id, int count);
 
     #region User groups
 
@@ -406,4 +404,6 @@ public interface IUserService : IMembershipUserService
     Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail);
 
     Task<Attempt<UserInvitationResult, UserOperationStatus>> ResendInvitationAsync(Guid performingUserKey, UserResendInviteModel model);
+
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid performingUserKey, Guid userKey);
 }

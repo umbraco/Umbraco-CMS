@@ -11,11 +11,11 @@ public interface IMemberEditingService
 
     Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MemberCreateModel createModel);
 
-    Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IMember member, MemberUpdateModel updateModel);
+    Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, MemberUpdateModel updateModel);
 
     Task<Attempt<MemberCreateResult, MemberEditingStatus>> CreateAsync(MemberCreateModel createModel, IUser user);
 
-    Task<Attempt<MemberUpdateResult, MemberEditingStatus>> UpdateAsync(IMember member, MemberUpdateModel updateModel, IUser user);
+    Task<Attempt<MemberUpdateResult, MemberEditingStatus>> UpdateAsync(Guid key, MemberUpdateModel updateModel, IUser user);
 
     Task<Attempt<IMember?, MemberEditingStatus>> DeleteAsync(Guid key, Guid userKey);
 }
