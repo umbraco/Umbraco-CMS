@@ -52,7 +52,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._property = value;
 		this.#checkInherited();
 		this.#settingsModal.setUniquePathValue('propertyId', value?.id);
-		this.setDataType(this._property?.dataType?.unique);
+		this.#setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
 	}
 	private _property?: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined;
@@ -102,7 +102,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				return { data: { contentTypeId: id }, value: propertyData };
 			})
 			.onSubmit((result) => {
-				this._partialUpdate(result as UmbPropertyTypeModel);
+				this.#partialUpdate(result as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder(null);
@@ -122,12 +122,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		}
 	}
 
-	_partialUpdate(partialObject: UmbPropertyTypeModel) {
+	#partialUpdate(partialObject: UmbPropertyTypeModel) {
 		if (!this._property || !this._propertyStructureHelper) return;
 		this._propertyStructureHelper.partialUpdateProperty(this._property.id, partialObject);
 	}
 
-	_singleValueUpdate<PropertyNameType extends keyof UmbPropertyTypeModel>(
+	#singleValueUpdate<PropertyNameType extends keyof UmbPropertyTypeModel>(
 		propertyName: PropertyNameType,
 		value: UmbPropertyTypeModel[PropertyNameType],
 	) {
@@ -141,7 +141,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._aliasLocked = !this._aliasLocked;
 	}
 
-	async setDataType(dataTypeId: string | undefined) {
+	async #setDataType(dataTypeId: string | undefined) {
 		if (!dataTypeId) return;
 		this.#dataTypeDetailRepository.requestByUnique(dataTypeId).then((x) => (this._dataTypeName = x?.data?.name));
 	}
@@ -167,7 +167,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this._propertyStructureHelper?.removeProperty(this._property.id);
 	}
 
-	#onNameChange(event: UUIInputEvent) {
+	#onNameChanged(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
@@ -179,10 +179,10 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					const expectedOldAlias = generateAlias(oldName ?? '');
 					// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
 					if (expectedOldAlias === oldAlias) {
-						this._singleValueUpdate('alias', generateAlias(newName ?? ''));
+						this.#singleValueUpdate('alias', generateAlias(newName ?? ''));
 					}
 				}
-				this._singleValueUpdate('name', newName);
+				this.#singleValueUpdate('name', newName);
 			}
 		}
 	}
@@ -234,7 +234,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						placeholder=${this.localize.term('placeholders_label')}
 						label="label"
 						.value=${this.property.name}
-						@input=${this.#onNameChange}></uui-input>
+						@input=${this.#onNameChanged}></uui-input>
 					${this.renderPropertyAlias()}
 					<slot name="action-menu"></slot>
 					<p>
@@ -245,7 +245,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 							placeholder=${this.localize.term('placeholders_enterDescription')}
 							.value=${this.property.description}
 							@input=${(e: CustomEvent) => {
-								if (e.target) this._singleValueUpdate('description', (e.target as HTMLInputElement).value);
+								if (e.target) this.#singleValueUpdate('description', (e.target as HTMLInputElement).value);
 							}}></uui-textarea>
 					</p>
 				</div>
@@ -276,7 +276,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				?readonly=${this.inherited}
 				label="sort order"
 				@change=${(e: UUIInputEvent) =>
-					this._partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel)}
+					this.#partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel)}
 				.value=${this.property.sortOrder ?? 0}></uui-input>
 		`;
 	}
@@ -291,7 +291,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					.value=${this.property.alias}
 					?disabled=${this._aliasLocked}
 					@input=${(e: CustomEvent) => {
-						if (e.target) this._singleValueUpdate('alias', (e.target as HTMLInputElement).value);
+						if (e.target) this.#singleValueUpdate('alias', (e.target as HTMLInputElement).value);
 					}}>
 					<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 					<!-- TODO: validation for bad characters -->
