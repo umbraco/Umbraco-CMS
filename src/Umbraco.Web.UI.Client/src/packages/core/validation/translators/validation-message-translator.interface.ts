@@ -1,4 +1,3 @@
 export interface UmbValidationMessageTranslator {
-	match(message: string): boolean;
-	translate(message: string): string;
+	translate(message: string): undefined | string;
 }

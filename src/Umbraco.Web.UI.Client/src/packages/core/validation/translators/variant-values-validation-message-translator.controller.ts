@@ -17,15 +17,24 @@ export class UmbVariantValuesValidationMessageTranslator
 		this.#context = context;
 	}
 
-	match(message: string): boolean {
-		//return message.startsWith('values[');
-		// regex match, which starts with "$.values[" and then a number and then continues:
-		return message.indexOf('$.values[') === 0;
-	}
-	translate(path: string): string {
-		// retrieve the number from the message values index:
-		const index = parseInt(path.substring(9, path.indexOf(']')));
-		//
+	translate(path: string) {
+		if (path.indexOf('$.values[') !== 0) {
+			// No translation anyway.
+			return;
+		}
+		const pathEnd = path.indexOf(']');
+		if (pathEnd === -1) {
+			// No translation anyway.
+			return;
+		}
+		// retrieve the number from the message values index: [NL]
+		const index = parseInt(path.substring(9, pathEnd));
+
+		if (isNaN(index)) {
+			// No translation anyway.
+			return;
+		}
+		// Get the data from the validation request, the context holds that for us: [NL]
 		const data = this.#context.getData();
 
 		const specificValue = data.values[index];

@@ -54,6 +54,7 @@ import {
 	UmbVariantValuesValidationMessageTranslator,
 } from '@umbraco-cms/backoffice/validation';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -160,7 +161,7 @@ export class UmbDocumentWorkspaceContext
 
 		this.routes.setRoutes([
 			{
-				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique/:blueprintUnique',
+				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique/blueprint/:blueprintUnique',
 				component: () => import('./document-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
@@ -248,8 +249,7 @@ export class UmbDocumentWorkspaceContext
 		this.resetState();
 		this.#parent.setValue(parent);
 
-		/**TODO Explore bug: A way to make blueprintUnique undefined/null when no unique is given, rather than setting it to invariant */
-		if (blueprintUnique && blueprintUnique.toLowerCase() !== 'invariant') {
+		if (blueprintUnique) {
 			const { data } = await this.#blueprintRepository.requestByUnique(blueprintUnique);
 
 			this.#getDataPromise = this.repository.createScaffold({
@@ -649,6 +649,13 @@ export class UmbDocumentWorkspaceContext
 			async () => {
 				// If data of the selection is not valid Then just save:
 				await this.#performSaveOrCreate(saveData);
+				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
+				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+				// TODO: Get rid of the save notification.
+				// TODO: Translate this message [NL]
+				notificationContext.peek('danger', {
+					data: { message: 'Document was not published, but we saved it for you.' },
+				});
 				// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
 				return await Promise.reject();
 			},

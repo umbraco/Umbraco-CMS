@@ -4,7 +4,7 @@ import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
 import { UMB_SERVER_MODEL_VALIDATION_CONTEXT } from './server-model-validation.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ApiError, CancelError } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 type ServerFeedbackEntry = { path: string; messages: Array<string> };
 
@@ -40,10 +40,7 @@ export class UmbServerModelValidationContext
 		});
 	}
 
-	async askServerForValidation(
-		data: unknown,
-		requestPromise: Promise<{ data: unknown; error: ApiError | CancelError | undefined }>,
-	): Promise<void> {
+	async askServerForValidation(data: unknown, requestPromise: Promise<UmbDataSourceResponse<string>>): Promise<void> {
 		this.#context?.messages.removeMessagesByType('server');
 
 		this.#serverFeedback = [];
@@ -53,47 +50,32 @@ export class UmbServerModelValidationContext
 			this.#validatePromiseResolve = resolve;
 		});
 
-		// Ask the server for validation...
-		//const { data: feedback, error } = await requestPromise;
-		await requestPromise;
-
-		//console.log('VALIDATE — Got server response:');
-		//console.log(data, error);
-
 		// Store this state of the data for translator look ups:
 		this.#data = data;
-		/*
-		const fixedData = {
-			type: 'Error',
-			title: 'Validation failed',
-			status: 400,
-			detail: 'One or more properties did not pass validation',
-			operationStatus: 'PropertyValidationError',
-			errors: {
-				'$.values[0].value': ['#validation.invalidPattern'],
-			} as Record<string, Array<string>>,
-			missingProperties: [],
-		};
+		// Ask the server for validation...
+		const { error } = await requestPromise;
 
-		Object.keys(fixedData.errors).forEach((path) => {
-			this.#serverFeedback.push({ path, messages: fixedData.errors[path] });
-		});*/
+		this.#isValid = error ? false : true;
 
-		//this.#isValid = data ? true : false;
-		//this.#isValid = false;
-		this.#isValid = true;
+		if (!this.#isValid) {
+			// We are missing some typing here, but we will just go wild with 'as any': [NL]
+			const readErrorBody = (error as any).body;
+			Object.keys(readErrorBody.errors).forEach((path) => {
+				this.#serverFeedback.push({ path, messages: readErrorBody.errors[path] });
+			});
+		}
+
 		this.#validatePromiseResolve?.();
 		this.#validatePromiseResolve = undefined;
-		//this.#validatePromise = undefined;
 
+		// Translate feedback:
 		this.#serverFeedback = this.#serverFeedback.flatMap(this.#executeTranslatorsOnFeedback);
 	}
 
 	#executeTranslatorsOnFeedback = (feedback: ServerFeedbackEntry) => {
 		return this.#translators.flatMap((translator) => {
-			if (translator.match(feedback.path)) {
-				const newPath = translator.translate(feedback.path);
-
+			let newPath: string | undefined;
+			if ((newPath = translator.translate(feedback.path))) {
 				// TODO: I might need to restructure this part for adjusting existing feedback with a part-translation.
 				// Detect if some part is unhandled?
 				// If so only make a partial translation on the feedback, add a message for the handled part.
@@ -113,6 +95,7 @@ export class UmbServerModelValidationContext
 		if (this.#translators.indexOf(translator) === -1) {
 			this.#translators.push(translator);
 		}
+		// execute translators here?
 	}
 
 	removeTranslator(translator: UmbValidationMessageTranslator): void {
