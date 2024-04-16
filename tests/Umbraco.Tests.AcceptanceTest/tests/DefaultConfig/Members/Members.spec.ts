@@ -28,13 +28,14 @@ test.describe('Members tests', () => {
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickCreateButton();
     await umbracoUi.member.enterMemberName(memberName);
-    await umbracoUi.member.enterComments(comment);
-    await umbracoUi.member.clickMemberTab();
     await umbracoUi.member.enterUsername(username);
     await umbracoUi.member.enterEmail(email);
     await umbracoUi.member.enterPassword(password);
     await umbracoUi.member.enterConfirmPassword(password);
+    await umbracoUi.member.clickDetailsTab();
+    await umbracoUi.member.enterComments(comment);
     await umbracoUi.member.clickSaveButton();
+
 
     // Assert
     await umbracoUi.member.isSuccessNotificationVisible();
@@ -49,6 +50,7 @@ test.describe('Members tests', () => {
     // Act
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
+    await umbracoUi.member.clickDetailsTab();
     await umbracoUi.member.enterComments(comment);
     await umbracoUi.member.clickSaveButton();
 
@@ -67,7 +69,6 @@ test.describe('Members tests', () => {
     // Act
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
-    await umbracoUi.member.clickMemberTab();
     await umbracoUi.member.enterUsername(updatedUsername);
     await umbracoUi.member.clickSaveButton();
 
@@ -86,7 +87,6 @@ test.describe('Members tests', () => {
     // Act
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
-    await umbracoUi.member.clickMemberTab();
     await umbracoUi.member.enterEmail(updatedEmail);
     await umbracoUi.member.clickSaveButton();
 
@@ -105,7 +105,6 @@ test.describe('Members tests', () => {
     // Act
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
-    await umbracoUi.member.clickMemberTab();
     await umbracoUi.member.clickChangePasswordButton();
     await umbracoUi.member.enterNewPassword(updatedPassword);
     await umbracoUi.member.enterConfirmPassword(updatedPassword);
@@ -126,14 +125,13 @@ test.describe('Members tests', () => {
     // Act
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
-    await umbracoUi.member.clickMemberTab();
     await umbracoUi.member.chooseMemberGroup(memberGroupName);
     await umbracoUi.member.clickSaveButton();
 
     // Assert
     await umbracoUi.member.isSuccessNotificationVisible();
     const memberData = await umbracoApi.member.get(memberId);
-    expect(memberData.groups[0]).toBe(memberGroupId.id);
+    expect(memberData.groups[0]).toBe(memberGroupId);
 
     // Clean
     await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
@@ -150,8 +148,8 @@ test.describe('Members tests', () => {
     // Act
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
-    await umbracoUi.member.clickMemberTab();
     await umbracoUi.member.clickRemoveMemberGroupByName(memberGroupName);
+    await umbracoUi.member.clickRemoveExactButton();
     await umbracoUi.member.clickSaveButton();
 
     // Assert
@@ -171,7 +169,6 @@ test.describe('Members tests', () => {
     // Act
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
-    await umbracoUi.member.clickMemberTab();
 
     // Assert
     const memberData = await umbracoApi.member.get(memberId);
@@ -189,7 +186,6 @@ test.describe('Members tests', () => {
     // Act
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
-    await umbracoUi.member.clickMemberTab();
     await umbracoUi.member.clickApprovedSlider();
     await umbracoUi.member.clickSaveButton();
 
@@ -208,7 +204,7 @@ test.describe('Members tests', () => {
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
     await umbracoUi.memberGroup.clickActionsButton();
-    await umbracoUi.memberGroup.clickDeleteThreeDotsButton();
+    await umbracoUi.memberGroup.clickDeleteButton();
     await umbracoUi.memberGroup.clickConfirmToDeleteButton();
 
     // Assert

@@ -37,12 +37,11 @@ test.describe('Member Group tests', () => {
     await umbracoUi.memberGroup.clickMemberGroupsTab();
     await umbracoUi.memberGroup.clickMemberGroupLinkByName(memberGroupName);
     await umbracoUi.memberGroup.clickActionsButton();
-    await umbracoUi.memberGroup.clickDeleteThreeDotsButton();
+    await umbracoUi.memberGroup.clickDeleteButton();
     await umbracoUi.memberGroup.clickConfirmToDeleteButton();
 
     // Assert
     await umbracoUi.memberGroup.isSuccessNotificationVisible();
-    await umbracoUi.memberGroup.clickLeftArrowButton();
     await umbracoUi.memberGroup.isMemberGroupNameVisible(memberGroupName, false);
     expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeFalsy();
   });
