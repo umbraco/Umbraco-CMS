@@ -161,10 +161,10 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 					this.observe(
 						this.#structure!.containersOfParentId(container.id, this.#childType!),
 						(containers) => {
-							// observe direct owner containers of this container id:
+							// get the direct owner containers of this container id:
 							this.#ownerChildContainers =
 								this.#structure!.getOwnerContainers(this.#childType!, this.#containerId!) ?? [];
-							// TODO: Maybe check for dif before setting it?
+							// TODO: Maybe check for dif before setting it? Cause currently we are setting it every time one of the containers change. [NL]
 
 							// Remove existing containers that are not the parent of the new containers:
 							this.#childContainers.filter(

@@ -468,7 +468,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					auto-width
 					@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
 					@input=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-					@blur=${(e: InputEvent) => this.#tabNameBlur()}>
+					@blur=${() => this.#tabNameBlur()}>
 					${this.renderDeleteFor(tab)}
 				</uui-input>
 			</div>`;

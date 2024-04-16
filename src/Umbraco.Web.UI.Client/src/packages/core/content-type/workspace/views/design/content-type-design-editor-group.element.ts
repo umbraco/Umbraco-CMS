@@ -59,8 +59,13 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 						);
 						const pureOwnerContainer = hasAOwnerContainer && containers.length === 1;
 
+						// TODO: Check if requstUpdate is needed here, I do not think it is when i added it, but I just wanted to be safe when debugging [NL]
+						const oldHasOwnerContainer = this._hasOwnerContainer;
+						const oldInherited = this._inherited;
 						this._hasOwnerContainer = hasAOwnerContainer;
 						this._inherited = !pureOwnerContainer;
+						this.requestUpdate('_hasOwnerContainer', oldHasOwnerContainer);
+						this.requestUpdate('_inherited', oldInherited);
 					},
 					'observeGroupContainers',
 				);
