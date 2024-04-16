@@ -11,7 +11,7 @@ export class UmbDocumentSearchProvider extends UmbControllerBase implements UmbA
 	}
 
 	destroy(): void {
-		throw new Error('Method not implemented.');
+		this.#repository.destroy();
 	}
 }
 
