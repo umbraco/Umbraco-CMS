@@ -160,7 +160,7 @@ export class UmbDocumentWorkspaceContext
 
 		this.routes.setRoutes([
 			{
-				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique/:blueprintUnique',
+				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique/blueprint/:blueprintUnique',
 				component: () => import('./document-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
@@ -248,8 +248,7 @@ export class UmbDocumentWorkspaceContext
 		this.resetState();
 		this.#parent.setValue(parent);
 
-		/**TODO Explore bug: A way to make blueprintUnique undefined/null when no unique is given, rather than setting it to invariant */
-		if (blueprintUnique && blueprintUnique.toLowerCase() !== 'invariant') {
+		if (blueprintUnique) {
 			const { data } = await this.#blueprintRepository.requestByUnique(blueprintUnique);
 
 			this.#getDataPromise = this.repository.createScaffold({

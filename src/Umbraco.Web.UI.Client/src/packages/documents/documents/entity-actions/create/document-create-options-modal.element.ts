@@ -78,7 +78,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 			history.pushState(
 				null,
 				'',
-				`section/content/workspace/document/create/parent/${this.data?.parent.entityType}/${this.data?.parent.unique ?? 'null'}/${documentTypeUnique}/${blueprintUnique}`,
+				`section/content/workspace/document/create/parent/${this.data?.parent.entityType}/${this.data?.parent.unique ?? 'null'}/${documentTypeUnique}/blueprint/${blueprintUnique}`,
 			);
 		}
 		this._submitModal();
@@ -90,9 +90,8 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 
 		/** TODO: Fix this to use the correct endpoint when it becomes available */
 		const { data } = await this.#documentBlueprintItemRepository.requestItems([]);
-		if (!data?.length) return;
 
-		this._availableBlueprints = data.filter((blueprint) => blueprint.documentType.unique === documentTypeUnique);
+		this._availableBlueprints = data?.filter((blueprint) => blueprint.documentType.unique === documentTypeUnique) ?? [];
 
 		if (!this._availableBlueprints.length) {
 			this.#onNavigate(documentTypeUnique);
