@@ -7,7 +7,7 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.SearchProvider.MemberType',
 		type: 'searchProvider',
 		api: () => import('./member-type.search-provider.js'),
-		weight: 1000,
+		weight: 200,
 		meta: {
 			label: 'Member Types',
 		},

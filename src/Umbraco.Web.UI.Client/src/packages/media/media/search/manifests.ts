@@ -7,7 +7,7 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.SearchProvider.Media',
 		type: 'searchProvider',
 		api: () => import('./media.search-provider.js'),
-		weight: 1000,
+		weight: 500,
 		meta: {
 			label: 'Media',
 		},
