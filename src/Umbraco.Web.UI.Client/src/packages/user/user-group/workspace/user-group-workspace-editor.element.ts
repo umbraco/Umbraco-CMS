@@ -11,10 +11,10 @@ import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/section';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 
 import './components/user-group-entity-user-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
-import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
