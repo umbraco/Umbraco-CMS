@@ -4270,6 +4270,54 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/tree/document-blueprint/ancestors": {
+      "get": {
+        "tags": [
+          "Document Blueprint"
+        ],
+        "operationId": "GetTreeDocumentBlueprintAncestors",
+        "parameters": [
+          {
+            "name": "descendantId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/document-blueprint/children": {
       "get": {
         "tags": [
@@ -4877,6 +4925,84 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/PagedAllowedDocumentTypeModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document-type/{id}/blueprint": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "GetDocumentTypeByIdBlueprint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedDocumentTypeBlueprintItemResponseModel"
                     }
                   ]
                 }
@@ -9267,6 +9393,58 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document/urls": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentUrls",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentUrlInfoResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -15708,6 +15886,58 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media/urls": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetMediaUrls",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MediaUrlInfoResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -23739,6 +23969,75 @@
             }
           }
         }
+      }
+    },
+    "/umbraco/management/api/v1/segment": {
+      "get": {
+        "tags": [
+          "Segment"
+        ],
+        "operationId": "GetSegment",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedSegmentResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/server/configuration": {
@@ -34254,8 +34553,7 @@
         "required": [
           "canBeChanged",
           "documentListViewId",
-          "mediaListViewId",
-          "memberListViewId"
+          "mediaListViewId"
         ],
         "type": "object",
         "properties": {
@@ -34267,10 +34565,6 @@
             "format": "uuid"
           },
           "mediaListViewId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "memberListViewId": {
             "type": "string",
             "format": "uuid"
           }
@@ -34942,6 +35236,23 @@
         },
         "additionalProperties": false
       },
+      "DocumentTypeBlueprintItemResponseModel": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "DocumentTypeCleanupModel": {
         "required": [
           "preventCleanup"
@@ -35436,6 +35747,30 @@
           },
           "url": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentUrlInfoResponseModel": {
+        "required": [
+          "id",
+          "urlInfos"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "urlInfos": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentUrlInfoModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -37297,6 +37632,30 @@
         },
         "additionalProperties": false
       },
+      "MediaUrlInfoResponseModel": {
+        "required": [
+          "id",
+          "urlInfos"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "urlInfos": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaUrlInfoModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "MediaValueModel": {
         "required": [
           "alias"
@@ -38626,6 +38985,30 @@
         },
         "additionalProperties": false
       },
+      "PagedDocumentTypeBlueprintItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeBlueprintItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedDocumentTypeTreeItemResponseModel": {
         "required": [
           "items",
@@ -39537,6 +39920,30 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/SearcherResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedSegmentResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SegmentResponseModel"
                 }
               ]
             }
@@ -40515,6 +40922,24 @@
                 "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
               }
             ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "SegmentResponseModel": {
+        "required": [
+          "alias",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "alias": {
+            "minLength": 1,
+            "type": "string"
           }
         },
         "additionalProperties": false
