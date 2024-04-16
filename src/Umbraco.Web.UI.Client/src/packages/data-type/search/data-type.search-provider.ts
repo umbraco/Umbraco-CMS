@@ -1,6 +1,6 @@
-import type { UmbSearchProvider, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbDataTypeItemModel } from '../index.js';
 import { UmbDataTypeSearchRepository } from './data-type-search.repository.js';
+import type { UmbSearchProvider, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 export interface UmbDataTypeSearchItemModel extends UmbDataTypeItemModel {}

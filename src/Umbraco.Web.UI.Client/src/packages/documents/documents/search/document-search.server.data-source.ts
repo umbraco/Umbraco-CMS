@@ -1,5 +1,5 @@
-import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
