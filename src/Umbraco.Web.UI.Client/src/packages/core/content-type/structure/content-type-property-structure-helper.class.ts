@@ -159,7 +159,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 
 				// Lets append the properties that does not exists already:
 				properties?.forEach((property) => {
-					if (!_propertyStructure.find((x) => x.alias === property.alias)) {
+					if (!_propertyStructure.find((x) => x.id === property.id)) {
 						_propertyStructure.push(property);
 					}
 				});
