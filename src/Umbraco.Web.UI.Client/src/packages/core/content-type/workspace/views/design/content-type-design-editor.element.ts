@@ -492,7 +492,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			label=${this.localize.term('actions_remove')}
 			class="trash"
 			slot="append"
-			@click=${(e) => {
+			@click=${(e: MouseEvent) => {
 				e.stopPropagation();
 				e.preventDefault();
 				this.#requestRemoveTab(tab);
