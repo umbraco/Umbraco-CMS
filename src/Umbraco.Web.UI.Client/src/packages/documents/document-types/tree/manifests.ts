@@ -3,6 +3,11 @@ import {
 	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
 	UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
 } from '../entity.js';
+import {
+	UMB_DOCUMENT_TYPE_TREE_ALIAS,
+	UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS,
+	UMB_DOCUMENT_TYPE_TREE_STORE_ALIAS,
+} from './constants.js';
 import { UmbDocumentTypeTreeRepository } from './document-type-tree.repository.js';
 import { UmbDocumentTypeTreeStore } from './document-type.tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
@@ -13,10 +18,6 @@ import type {
 	ManifestTreeItem,
 	ManifestTreeStore,
 } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.DocumentType.Tree';
-export const UMB_DOCUMENT_TYPE_TREE_STORE_ALIAS = 'Umb.Store.DocumentType.Tree';
-export const UMB_DOCUMENT_TYPE_TREE_ALIAS = 'Umb.Tree.DocumentType';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',

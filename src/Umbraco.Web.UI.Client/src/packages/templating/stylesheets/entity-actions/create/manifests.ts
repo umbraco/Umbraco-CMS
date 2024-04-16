@@ -8,7 +8,7 @@ export const manifests: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.Stylesheet.CreateOptions',
 		name: 'Stylesheet Create Options Entity Action',
-		weight: 1000,
+		weight: 1200,
 		api: UmbStylesheetCreateOptionsEntityAction,
 		forEntityTypes: [UMB_STYLESHEET_ROOT_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE],
 		meta: {
@@ -20,6 +20,6 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'modal',
 		alias: 'Umb.Modal.Stylesheet.CreateOptions',
 		name: 'Stylesheet Create Options Modal',
-		js: () => import('./options-modal/stylesheet-create-options-modal.element.js'),
+		element: () => import('./options-modal/stylesheet-create-options-modal.element.js'),
 	},
 ];

@@ -22,7 +22,14 @@ const config: StorybookConfig = {
 		name: '@storybook/web-components-vite',
 		options: {},
 	},
-	staticDirs: ['../public-assets', '../public'],
+	staticDirs: [
+		'../public-assets',
+		'../public',
+		{
+			from: '../src/packages/core/icon-registry/icons',
+			to: 'assets/icons',
+		},
+	],
 	typescript: {
 		check: true,
 	},

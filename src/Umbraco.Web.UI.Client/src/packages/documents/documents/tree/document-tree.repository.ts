@@ -15,11 +15,14 @@ export class UmbDocumentTreeRepository
 	}
 
 	async requestTreeRoot() {
+		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 1 });
+		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
+
 		const data: UmbDocumentTreeRootModel = {
 			unique: null,
 			entityType: UMB_DOCUMENT_ROOT_ENTITY_TYPE,
 			name: '#treeHeaders_content',
-			hasChildren: true,
+			hasChildren,
 			isFolder: true,
 		};
 

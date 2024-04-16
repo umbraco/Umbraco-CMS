@@ -14,20 +14,38 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 	#defaultShowLabels = false;
 
 	@property({ type: Object })
-	value?: UmbSwatchDetails;
+	public set value(value: UmbSwatchDetails | undefined) {
+		if (!value) return;
+		this.#value = this.#ensureHashPrefix(value);
+	}
+	public get value(): UmbSwatchDetails | undefined {
+		return this.#value;
+	}
+	#value?: UmbSwatchDetails | undefined;
 
 	@state()
 	private _showLabels = this.#defaultShowLabels;
 
 	@state()
-	private _swatches: UmbSwatchDetails[] = [];
+	private _swatches: Array<UmbSwatchDetails> = [];
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this._showLabels = config?.getValueByAlias('useLabel') ?? this.#defaultShowLabels;
-		this._swatches = config?.getValueByAlias('items') ?? [];
+		if (!config) return;
+
+		this._showLabels = config?.getValueByAlias<boolean>('useLabel') ?? this.#defaultShowLabels;
+
+		const swatches = config?.getValueByAlias<Array<UmbSwatchDetails>>('items') ?? [];
+		this._swatches = swatches.map((swatch) => this.#ensureHashPrefix(swatch));
 	}
 
-	private _onChange(event: UUIColorSwatchesEvent) {
+	#ensureHashPrefix(swatch: UmbSwatchDetails): UmbSwatchDetails {
+		return {
+			label: swatch.label,
+			value: swatch.value.startsWith('#') ? swatch.value : `#${swatch.value}`,
+		};
+	}
+
+	#onChange(event: UUIColorSwatchesEvent) {
 		const value = event.target.value;
 		this.value = this._swatches.find((swatch) => swatch.value === value);
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
@@ -35,10 +53,10 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 
 	render() {
 		return html`<umb-input-color
-			?showLabels=${this._showLabels}
+			value=${this.value?.value ?? ''}
 			.swatches=${this._swatches}
-			.value=${this.value?.value ?? ''}
-			@change=${this._onChange}></umb-input-color>`;
+			?showLabels=${this._showLabels}
+			@change=${this.#onChange}></umb-input-color>`;
 	}
 }
 

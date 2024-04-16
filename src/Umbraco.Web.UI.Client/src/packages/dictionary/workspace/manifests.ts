@@ -22,7 +22,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Dictionary.Edit',
 		name: 'Dictionary Workspace Edit View',
-		js: () => import('./views/workspace-view-dictionary-editor.element.js'),
+		element: () => import('./views/workspace-view-dictionary-editor.element.js'),
 		weight: 100,
 		meta: {
 			label: '#general_edit',

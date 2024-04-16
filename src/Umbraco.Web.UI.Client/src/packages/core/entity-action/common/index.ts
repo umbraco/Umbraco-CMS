@@ -1,4 +1,4 @@
-export * from './duplicate/duplicate.action.js';
+export * from './duplicate/index.js';
 export * from './move/index.js';
 export * from './delete/delete.action.js';
 export * from './move/move-to.action.js';

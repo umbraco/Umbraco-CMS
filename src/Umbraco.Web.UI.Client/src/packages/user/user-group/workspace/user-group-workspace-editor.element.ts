@@ -3,13 +3,14 @@ import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context-token.js';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/section';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
+import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 import './components/user-group-entity-user-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
@@ -17,7 +18,22 @@ import './components/user-group-granular-permission-list.element.js';
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	@state()
-	private _userGroup?: UmbUserGroupDetailModel;
+	private _unique?: UmbUserGroupDetailModel['unique'];
+
+	@state()
+	private _name?: UmbUserGroupDetailModel['name'];
+
+	@state()
+	private _icon: UmbUserGroupDetailModel['icon'] = null;
+
+	@state()
+	private _sections: UmbUserGroupDetailModel['sections'] = [];
+
+	@state()
+	private _documentStartNode?: UmbUserGroupDetailModel['documentStartNode'];
+
+	@state()
+	private _mediaStartNode?: UmbUserGroupDetailModel['mediaStartNode'];
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -26,8 +42,26 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup), 'umbUserGroupObserver');
+			this.#observeUserGroup();
 		});
+	}
+
+	#observeUserGroup() {
+		if (!this.#workspaceContext) return;
+		this.observe(this.#workspaceContext.unique, (value) => (this._unique = value), '_observeUnique');
+		this.observe(this.#workspaceContext.name, (value) => (this._name = value), '_observeName');
+		this.observe(this.#workspaceContext.icon, (value) => (this._icon = value), '_observeIcon');
+		this.observe(this.#workspaceContext.sections, (value) => (this._sections = value), '_observeSections');
+		this.observe(
+			this.#workspaceContext.documentStartNode,
+			(value) => (this._documentStartNode = value),
+			'_observeDocumentStartNode',
+		);
+		this.observe(
+			this.#workspaceContext.mediaStartNode,
+			(value) => (this._mediaStartNode = value),
+			'_observeDocumentStartNode',
+		);
 	}
 
 	#onSectionsChange(event: UmbChangeEvent) {
@@ -59,7 +93,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	render() {
-		if (!this._userGroup) return nothing;
+		if (!this._unique) return nothing;
 
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.UserGroup" class="uui-text">
@@ -72,16 +106,40 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
+	async #onIconClick() {
+		const [alias, color] = this._icon?.replace('color-', '')?.split(' ') ?? [];
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_ICON_PICKER_MODAL, {
+			value: {
+				icon: alias,
+				color: color,
+			},
+		});
+
+		modalContext?.onSubmit().then((saved) => {
+			if (saved.icon && saved.color) {
+				this.#workspaceContext?.updateProperty('icon', `${saved.icon} color-${saved.color}`);
+			} else if (saved.icon) {
+				this.#workspaceContext?.updateProperty('icon', saved.icon);
+			}
+		});
+	}
+
 	#renderHeader() {
 		return html`
 			<div id="header" slot="header">
-				<a href="/section/users/view/user-groups">
+				<a href="section/user-management/view/user-groups">
 					<uui-icon name="icon-arrow-left"></uui-icon>
 				</a>
+
+				<uui-button id="icon" @click=${this.#onIconClick} label="icon" compact>
+					<umb-icon name=${ifDefined(ifDefined(this._icon))}></umb-icon>
+				</uui-button>
+
 				<uui-input
 					id="name"
 					label=${this.localize.term('general_name')}
-					.value=${this._userGroup?.name ?? ''}
+					.value=${this._name}
 					@input="${this.#onNameChange}"
 					${umbFocus()}></uui-input>
 			</div>
@@ -89,7 +147,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderLeftColumn() {
-		if (!this._userGroup) return nothing;
+		if (!this._unique) return nothing;
 
 		return html`
 			<uui-box>
@@ -99,7 +157,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					description=${this.localize.term('user_sectionsHelp')}>
 					<umb-input-section
 						slot="editor"
-						.selection=${this._userGroup.sections ?? []}
+						.selection=${this._sections}
 						@change=${this.#onSectionsChange}></umb-input-section>
 				</umb-property-layout>
 				<umb-property-layout
@@ -108,7 +166,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					<umb-input-document
 						slot="editor"
 						max="1"
-						.selection=${this._userGroup.documentStartNode?.unique ? [this._userGroup.documentStartNode.unique] : []}
+						.selection=${this._documentStartNode?.unique ? [this._documentStartNode.unique] : []}
 						@change=${this.#onDocumentStartNodeChange}></umb-input-document>
 				</umb-property-layout>
 				<umb-property-layout
@@ -117,7 +175,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					<umb-input-media
 						slot="editor"
 						max="1"
-						.selection=${this._userGroup.mediaStartNode?.unique ? [this._userGroup.mediaStartNode.unique] : []}
+						.selection=${this._mediaStartNode?.unique ? [this._mediaStartNode.unique] : []}
 						@change=${this.#onMediaStartNodeChange}></umb-input-media>
 				</umb-property-layout>
 			</uui-box>
@@ -139,9 +197,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 	#renderRightColumn() {
 		return html` <uui-box headline="Actions">
-			<umb-entity-action-list
-				.entityType=${UMB_USER_GROUP_ENTITY_TYPE}
-				.unique=${this._userGroup?.unique}></umb-entity-action-list
+			<umb-entity-action-list .entityType=${UMB_USER_GROUP_ENTITY_TYPE} .unique=${this._unique}></umb-entity-action-list
 		></uui-box>`;
 	}
 
@@ -152,28 +208,43 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 				display: block;
 				height: 100%;
 			}
+
 			#header {
-				width: 100%;
-				display: grid;
-				grid-template-columns: var(--uui-size-layout-1) 1fr;
+				display: flex;
+				flex: 1 1 auto;
+				gap: var(--uui-size-space-3);
 			}
+
+			#icon {
+				font-size: calc(var(--uui-size-layout-3) / 2);
+			}
+
+			#name {
+				width: 100%;
+				flex: 1 1 auto;
+				align-items: center;
+			}
+
 			#main {
 				display: grid;
 				grid-template-columns: 1fr 350px;
 				gap: var(--uui-size-layout-1);
 				padding: var(--uui-size-layout-1);
 			}
+
 			#left-column,
 			#right-column {
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-4);
 			}
+
 			#right-column > uui-box > div {
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-2);
 			}
+
 			uui-input {
 				width: 100%;
 			}

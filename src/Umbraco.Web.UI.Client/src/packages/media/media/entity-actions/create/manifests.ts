@@ -8,7 +8,7 @@ const entityActions: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.Media.Create',
 		name: 'Create Media Entity Action',
-		weight: 1000,
+		weight: 1200,
 		api: UmbCreateMediaEntityAction,
 		forEntityTypes: [UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_ENTITY_TYPE],
 		meta: {
@@ -23,7 +23,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.Media.CreateOptions',
 		name: 'Media Create Options Modal',
-		js: () => import('./media-create-options-modal.element.js'),
+		element: () => import('./media-create-options-modal.element.js'),
 	},
 ];
 
