@@ -31,7 +31,7 @@ export class UmbDocumentBlueprintItemServerDataSource extends UmbItemServerDataS
 	}
 
 	async getItemsByDocumentType(unique: string) {
-		if (!unique) throw new Error('Unique are missing');
+		if (!unique) throw new Error('Unique is missing');
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentTypeService.getDocumentTypeByIdBlueprint({ id: unique }),
