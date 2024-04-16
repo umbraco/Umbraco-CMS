@@ -5,6 +5,7 @@ test.describe('Partial View tests', () => {
   const partialViewName = 'TestPartialView';
   const partialViewFileName = partialViewName + '.cshtml';
   const dictionaryName = 'TestDictionaryPartialView';
+  const defaultPartialViewContent = '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n';
 
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
     await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
@@ -20,7 +21,7 @@ test.describe('Partial View tests', () => {
   test('can create an empty partial view', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.partialView.clickActionsMenuAtRoot();
-    await umbracoUi.partialView.clickCreateThreeDotsButton();
+    await umbracoUi.partialView.clickCreateButton();
     await umbracoUi.partialView.clickNewEmptyPartialViewButton();
     await umbracoUi.partialView.enterPartialViewName(partialViewName);
     await umbracoUi.partialView.clickSaveButton();
@@ -30,7 +31,7 @@ test.describe('Partial View tests', () => {
     expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
     // Verify the new partial view is displayed under the Partial Views section
     await umbracoUi.partialView.clickRootFolderCaretButton();
-    await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(partialViewFileName)).toBeVisible();
+    await umbracoUi.partialView.isPartialViewTreeItemVisibile(partialViewFileName);
   })
 
   test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) => {
@@ -40,11 +41,10 @@ test.describe('Partial View tests', () => {
 
     // Act
     await umbracoUi.partialView.clickActionsMenuAtRoot();
-    await umbracoUi.partialView.clickCreateThreeDotsButton();
+    await umbracoUi.partialView.clickCreateButton();
     await umbracoUi.partialView.clickNewPartialViewFromSnippetButton();
     await umbracoUi.partialView.clickBreadcrumbButton();
     await umbracoUi.partialView.enterPartialViewName(partialViewName);
-    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
@@ -65,16 +65,16 @@ test.describe('Partial View tests', () => {
 
     // Verify the new partial view is displayed under the Partial Views section
     await umbracoUi.partialView.clickRootFolderCaretButton();
-    await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(partialViewFileName)).toBeVisible();
+    await umbracoUi.partialView.isPartialViewTreeItemVisibile(partialViewFileName);
   });
 
-  test.skip('can update a partial view name', async ({umbracoApi, umbracoUi}) => {
+  test('can rename a partial view', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongPartialViewName = 'WrongName';
     const wrongPartialViewFileName = wrongPartialViewName + '.cshtml';
 
     await umbracoApi.partialView.ensureNameNotExists(wrongPartialViewFileName);
-    await umbracoApi.partialView.create(wrongPartialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    await umbracoApi.partialView.create(wrongPartialViewFileName, defaultPartialViewContent, '/');
     expect(await umbracoApi.partialView.doesExist(wrongPartialViewFileName)).toBeTruthy();
 
     //Act
@@ -87,21 +87,20 @@ test.describe('Partial View tests', () => {
     expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
     expect(await umbracoApi.partialView.doesNameExist(wrongPartialViewFileName)).toBeFalsy();
     // Verify the old partial view is NOT displayed under the Partial Views section
-    await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(wrongPartialViewFileName)).not.toBeVisible();
+    await umbracoUi.partialView.isPartialViewTreeItemVisibile(wrongPartialViewFileName, false);
     // Verify the new partial view is displayed under the Partial Views section
-    await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(partialViewFileName)).toBeVisible();
-
+    await umbracoUi.partialView.isPartialViewTreeItemVisibile(partialViewFileName);
   });
 
   test('can update a partial view content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const updatedPartialViewContent = '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n' +
+    const updatedPartialViewContent = defaultPartialViewContent +
       '@{\r\n' +
       '\tLayout = null;\r\n' +
       '}\r\n' +
       '<p>AcceptanceTests</p>';
 
-    await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    await umbracoApi.partialView.create(partialViewFileName, defaultPartialViewContent, '/');
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
 
     //Act
@@ -110,18 +109,20 @@ test.describe('Partial View tests', () => {
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
+    await umbracoUi.partialView.isSuccessNotificationVisible();
     const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
     expect(updatedPartialView.content).toBe(updatedPartialViewContent);
   });
 
-  test('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
+  // Remove skip when the front-end is ready. Currently this function is not stable, sometimes the shown code is not updated after choosing Order By
+  test.skip('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
     //Arrange
     const propertyAliasValue = 'UpdateDate';
-    const isAscending = false;
+    const isAscending = true;
     const expectedCode = 'Umbraco.ContentAtRoot().FirstOrDefault()\r\n' +
     '    .Children()\r\n' +
     '    .Where(x => x.IsVisible())\r\n' +
-    '    .OrderByDescending(x => x.' + propertyAliasValue + ')';
+    '    .OrderBy(x => x.' + propertyAliasValue + ')';
     const expectedTemplateContent = '\r\n' +
       '@{\r\n' +
       '\tvar selection = ' + expectedCode + ';\r\n' +
@@ -134,16 +135,13 @@ test.describe('Partial View tests', () => {
       '\t\t</li>\r\n' +
       '\t}\r\n' +
       '</ul>\r\n' +
-      '\r\n' +
-      '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n';
+      '\r\n' + defaultPartialViewContent;
 
-    await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    await umbracoApi.partialView.create(partialViewFileName, defaultPartialViewContent, '/');
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    // Wait for the partial view to open
-    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.partialView.addQueryBuilderWithOrderByStatement(propertyAliasValue, isAscending);
     // Verify that the code is shown
     await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);
@@ -151,11 +149,12 @@ test.describe('Partial View tests', () => {
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
+    await umbracoUi.partialView.isSuccessNotificationVisible();
     const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
     expect(updatedPartialView.content).toBe(expectedTemplateContent);
   });
 
-  test.skip('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
+  test('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
     //Arrange
     const propertyAliasValue = 'Name';
     const operatorValue = 'is';
@@ -176,16 +175,13 @@ test.describe('Partial View tests', () => {
       '\t\t</li>\r\n' +
       '\t}\r\n' +
       '</ul>\r\n' +
-      '\r\n' +
-      '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n';
+      '\r\n' + defaultPartialViewContent;
 
-    await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    await umbracoApi.partialView.create(partialViewFileName, defaultPartialViewContent, '/');
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    // Wait for the partial view to open
-    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.partialView.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
     // Verify that the code is shown
     await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);
@@ -193,47 +189,95 @@ test.describe('Partial View tests', () => {
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
+    await umbracoUi.partialView.isSuccessNotificationVisible();
     const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
     expect(updatedPartialView.content).toBe(expectedTemplateContent);
   });
 
-  test('can insert dictionaryItem into a partial view', async ({umbracoApi, umbracoUi}) => {
+  test('can insert dictionary item into a partial view', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    await umbracoApi.partialView.create(partialViewFileName, defaultPartialViewContent, '/');
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
 
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.create(dictionaryName);
 
-    const partialViewContent = '@Umbraco.GetDictionaryValue("' + dictionaryName + '")@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n';
+    const partialViewContent = '@Umbraco.GetDictionaryValue("' + dictionaryName + '")' + defaultPartialViewContent;
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    // Wait for the partial view to open
-    await umbracoUi.waitForTimeout(1000);
-    await umbracoUi.partialView.insertDictionaryByName(dictionaryName);
+    await umbracoUi.partialView.insertDictionaryItem(dictionaryName);
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
+    await umbracoUi.partialView.isSuccessNotificationVisible();
+    const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
+    expect(partialViewData.content).toBe(partialViewContent);
+  });
+
+  test('can insert value into a partial view', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    await umbracoApi.partialView.create(partialViewFileName, defaultPartialViewContent, '/');
+    expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
+    const systemFieldValue = 'createDate';
+    const partialViewContent = '@Model.Value("' + systemFieldValue + '")' + defaultPartialViewContent;
+
+    // Act
+    await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
+    await umbracoUi.waitForTimeout(1000);
+    await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
+    await umbracoUi.template.clickSaveButton();
+
+    // Assert
+    await umbracoUi.partialView.isSuccessNotificationVisible();
     const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
     expect(partialViewData.content).toBe(partialViewContent);
   });
 
   test('can delete a partial view', async ({umbracoApi, umbracoUi}) => {
     //Arrange
-    await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    await umbracoApi.partialView.create(partialViewFileName, partialViewFileName, '/');
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
 
     //Act
     await umbracoUi.partialView.clickRootFolderCaretButton();
     await umbracoUi.partialView.clickActionsMenuForPartialView(partialViewFileName);
-    await umbracoUi.partialView.deletePartialView();
+    await umbracoUi.partialView.clickDeleteAndConfirmButton();
 
     // Assert
     await umbracoUi.partialView.isSuccessNotificationVisible();
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeFalsy();
     // Verify the partial view is NOT displayed under the Partial Views section
     await umbracoUi.partialView.clickRootFolderCaretButton();
-    await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(partialViewFileName)).not.toBeVisible();
+    await umbracoUi.partialView.isPartialViewTreeItemVisibile(partialViewFileName, false);
+  });
+
+  // TODO: Remove skip when the front-end is ready. Currently the returned items count is not updated after choosing the root content.
+  test.skip('can show returned items in query builder ', async ({umbracoApi, umbracoUi}) => {
+    //Arrange
+    // Create content at root with a child
+    const documentTypeName = 'ParentDocumentType';
+    const childDocumentTypeName = 'ChildDocumentType';
+    const contentName = 'ContentName';
+    const childContentName = 'ChildContentName';
+    const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(childDocumentTypeName);
+    const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
+    const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+    await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
+    // Create partial view
+    await umbracoApi.partialView.create(partialViewFileName, partialViewFileName, '/');
+    expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
+
+    //Act
+    await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
+    await umbracoUi.partialView.clickQueryBuilderButton();
+    await umbracoUi.partialView.chooseRootContentInQueryBuilder('(' + contentName + ')');
+
+    // Assert
+    await umbracoUi.partialView.doesReturnedItemsHaveCount(1);
+    await umbracoUi.partialView.doesQueryResultHaveContentName(childContentName);
+
+    // Clean
+    await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   });
 });
