@@ -2,6 +2,7 @@ import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as entityActionsManifests } from './entity-actions/manifests.js';
 import { manifests as entityBulkActionsManifests } from './entity-bulk-actions/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
+import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as propertyEditorsManifests } from './property-editors/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
@@ -14,6 +15,7 @@ export const manifests = [
 	...entityActionsManifests,
 	...entityBulkActionsManifests,
 	...menuManifests,
+	...modalManifests,
 	...propertyEditorsManifests,
 	...recycleBinManifests,
 	...repositoryManifests,
