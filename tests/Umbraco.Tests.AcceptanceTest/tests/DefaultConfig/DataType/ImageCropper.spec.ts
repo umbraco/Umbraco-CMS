@@ -18,8 +18,7 @@ test.describe(`${dataTypeName} tests`, () => {
     }
   });
 
-  //TODO: Remove skip when the frontend is ready
-  test.skip('can add crop', async ({umbracoApi, umbracoUi}) => {
+  test('can add crop', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const cropData = ['Test Label', 'Test Alias', 100, 50];
     const expectedDataTypeValues = [{
@@ -55,8 +54,7 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toEqual(expectedDataTypeValues);
   });
 
-  //TODO: Remove skip when the frontend is ready
-  test.skip('can edit crop', async ({umbracoApi, umbracoUi}) => {
+  test('can edit crop', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongCropData = ['Wrong Alias', 50, 100];
     const wrongDataTypeValues = [{

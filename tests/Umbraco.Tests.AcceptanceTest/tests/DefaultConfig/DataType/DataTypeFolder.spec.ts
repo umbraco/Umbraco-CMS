@@ -28,8 +28,7 @@ test.describe('Data Types Folder tests', () => {
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
   });
 
-  // TODO: Remove skip due to the front-end changes. Need to update the rename folder locator.
-  test.skip('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
+  test('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongDataTypeFolderName = 'Wrong Folder';
     await umbracoApi.dataType.ensureNameNotExists(wrongDataTypeFolderName);
@@ -39,7 +38,7 @@ test.describe('Data Types Folder tests', () => {
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.clickActionsMenuForDataType(wrongDataTypeFolderName);
-    await umbracoUi.dataType.clickRenameFolderThreeDotsButton();
+    await umbracoUi.dataType.clickRenameButton();
     await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
     await umbracoUi.dataType.clickUpdateFolderButton();
 
@@ -61,7 +60,7 @@ test.describe('Data Types Folder tests', () => {
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeFalsy();
   });
 
-  test.skip('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {
+  test('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     let dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
@@ -82,7 +81,7 @@ test.describe('Data Types Folder tests', () => {
   });
 
   //TODO: Remove skip when the frontend is ready
-  test.skip('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'Child Folder';
     let dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
@@ -104,7 +103,7 @@ test.describe('Data Types Folder tests', () => {
   });
 
   //TODO: Remove skip when the frontend is ready
-  test.skip('cannot delete a non-empty data type folder', async ({umbracoApi, umbracoUi}) => {
+  test('cannot delete a non-empty data type folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     let dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();

@@ -45,7 +45,7 @@ test.describe('Data Types basic functionalities tests', () => {
     expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeName)).toBeFalsy();
   });
 
-  test.skip('can delete a data type', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a data type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.dataType.create(dataTypeName, editorAlias, []);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
@@ -59,7 +59,7 @@ test.describe('Data Types basic functionalities tests', () => {
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeFalsy();
   });
 
-  test.skip('can change Property Editor in a data type', async ({umbracoApi, umbracoUi}) => {
+  test('can change Property Editor in a data type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const updatedEditorName = 'Text Area';
     const updatedEditorAlias = 'Umbraco.TextArea';

@@ -37,7 +37,7 @@ test.describe(`${dataTypeName} tests`, () => {
 
   test('can update amount', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const lowValue = 0;
+    const lowValue = 5;
     const highValue = 1000;
     const expectedDataTypeValues = {
       "alias": "validationLimit",

@@ -20,6 +20,7 @@ for (const datePickerType of datePickerTypes) {
       }
     });
 
+    // This test is out-of-date since currently it is impossible to update offset time in front-end
     test.skip(`can update offset time`, async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const expectedDataTypeValues =
