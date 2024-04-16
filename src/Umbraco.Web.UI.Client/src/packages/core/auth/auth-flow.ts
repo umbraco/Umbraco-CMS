@@ -367,6 +367,7 @@ export class UmbAuthFlow {
 			this.#refreshToken = response.refreshToken;
 			this.#accessTokenResponse = response;
 		} catch (error) {
+			// If the token request fails, it means the refresh token is invalid, so we sign the user out.
 			console.error('Token request error', error);
 			this.signOut();
 		}
