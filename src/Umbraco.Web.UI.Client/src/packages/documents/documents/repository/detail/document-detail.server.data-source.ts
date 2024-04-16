@@ -128,7 +128,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 	/**
 	 * Inserts a new Document on the server
-	 * @param {UmbDocumentDetailModel} model
+	 * @param {UmbDocumentDetailModel} model - Document Model
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
@@ -162,7 +162,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 	/**
 	 * Updates a Document on the server
-	 * @param {UmbDocumentDetailModel} Document
+	 * @param {UmbDocumentDetailModel} model - Document Model
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */

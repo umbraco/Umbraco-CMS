@@ -159,7 +159,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 
 				// Lets append the properties that does not exists already:
 				properties?.forEach((property) => {
-					if (!_propertyStructure.find((x) => x.alias === property.alias)) {
+					if (!_propertyStructure.find((x) => x.id === property.id)) {
 						_propertyStructure.push(property);
 					}
 				});
@@ -176,6 +176,13 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		if (!this.#structure) return;
 
 		return this.#structure.ownerContentTypePart((x) => x?.properties.some((y) => y.id === propertyId));
+	}
+
+	async contentTypeOfProperty(propertyId: UmbPropertyTypeId) {
+		await this.#init;
+		if (!this.#structure) return;
+
+		return this.#structure.contentTypeOfProperty(propertyId);
 	}
 
 	// TODO: consider moving this to another class, to separate 'viewer' from 'manipulator':

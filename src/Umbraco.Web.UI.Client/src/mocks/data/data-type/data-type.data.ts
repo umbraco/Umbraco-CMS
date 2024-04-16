@@ -605,7 +605,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		name: 'Media Picker',
 		id: 'dt-mediaPicker',
 		parent: null,
-		editorAlias: 'Umbraco.MediaPicker',
+		editorAlias: 'Umbraco.MediaPicker3',
 		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
 		hasChildren: false,
 		isFolder: false,

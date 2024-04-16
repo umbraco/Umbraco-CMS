@@ -106,13 +106,17 @@ export class UmbMemberGroupWorkspaceContext
 		if (!data) throw new Error('No data to save');
 
 		if (this.getIsNew()) {
-			await this.repository.create(data);
+			const { error } = await this.repository.create(data);
+			if (error) {
+				throw new Error(error.message);
+			}
+			this.setIsNew(false);
 		} else {
-			await this.repository.save(data);
+			const { error } = await this.repository.save(data);
+			if (error) {
+				throw new Error(error.message);
+			}
 		}
-
-		this.setIsNew(false);
-		return true;
 	}
 
 	getData() {

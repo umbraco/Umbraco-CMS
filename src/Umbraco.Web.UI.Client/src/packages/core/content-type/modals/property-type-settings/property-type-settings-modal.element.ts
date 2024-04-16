@@ -65,6 +65,12 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			if (!this.data?.contentTypeId) return;
+			if (instance.getUnique() !== this.data.contentTypeId) {
+				// We can currently only edit properties that are part of a content type workspace, which has to be present outside of the modal. [NL]
+				throw new Error(
+					'The content type workspace context does not match the content type id of the property type settings modal.',
+				);
+			}
 
 			this.observe(instance.variesByCulture, (variesByCulture) => (this._contentTypeVariesByCulture = variesByCulture));
 			this.observe(instance.variesBySegment, (variesBySegment) => (this._contentTypeVariesBySegment = variesBySegment));
@@ -133,7 +139,6 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 
 	#onMandatoryChange(event: UUIBooleanInputEvent) {
 		const mandatory = event.target.checked;
-		this.value.validation!.mandatory = mandatory;
 		this.updateValue({
 			validation: { ...this.value.validation, mandatory },
 		});

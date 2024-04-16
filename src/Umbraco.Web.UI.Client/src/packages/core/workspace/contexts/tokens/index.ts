@@ -1,5 +1,6 @@
 export * from './collection-workspace.context-token.js';
 export * from './entity-workspace.context-token.js';
+export * from './property-structure-workspace.context-token.js';
 export * from './publishable-workspace.context-token.js';
 export * from './routable-workspace.context-token.js';
 export * from './submittable-workspace.context-token.js';

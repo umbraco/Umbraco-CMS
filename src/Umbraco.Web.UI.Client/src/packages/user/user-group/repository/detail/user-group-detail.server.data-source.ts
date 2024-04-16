@@ -40,7 +40,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			unique: UmbId.new(),
 			isSystemGroup: false,
 			name: '',
-			icon: null,
+			icon: 'icon-users',
 			sections: [],
 			languages: [],
 			hasAccessToAllLanguages: false,

@@ -12,7 +12,7 @@ const entityActions: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.DocumentType.Create',
 		name: 'Create Document Type Entity Action',
-		weight: 1000,
+		weight: 1200,
 		api: UmbCreateDataTypeEntityAction,
 		forEntityTypes: [
 			UMB_DOCUMENT_TYPE_ENTITY_TYPE,
