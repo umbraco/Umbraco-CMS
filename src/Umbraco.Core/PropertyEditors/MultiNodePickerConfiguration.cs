@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
@@ -5,6 +7,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class MultiNodePickerConfiguration : IIgnoreUserStartNodesConfig
 {
+    [JsonPropertyName("startNode")]
     [ConfigurationField("startNode")]
     public MultiNodePickerConfigurationTreeSource? TreeSource { get; set; }
 

@@ -7,14 +7,15 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Web;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
@@ -60,8 +61,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
             IUser user;
             if (isAdmin)
             {
-                user = await userService.GetAsync(userKey) ??
-                       throw new Exception("Super user not found.");
+                user = await userService.GetRequiredUserAsync(userKey);
                 user.Username = user.Email = username;
                 userService.Save(user);
             }
@@ -101,11 +101,11 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
             scope.Complete();
         }
 
-        var loginModel = new BackOfficeController.LoginRequestModel { Username = username, Password = password };
+        var loginModel = new LoginRequestModel { Username = username, Password = password };
 
         // Login to ensure the cookie is set (used in next request)
         var loginResponse = await client.PostAsync(
-            GetManagementApiUrl<BackOfficeController>(x => x.Login(null)), JsonContent.Create(loginModel));
+            GetManagementApiUrl<BackOfficeController>(x => x.Login(CancellationToken.None, null)), JsonContent.Create(loginModel));
 
         Assert.AreEqual(HttpStatusCode.OK, loginResponse.StatusCode, await loginResponse.Content.ReadAsStringAsync());
 
@@ -113,9 +113,9 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         var codeChallange = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
             .TrimEnd("=");
 
-        var authorizeResponse = await client.GetAsync(
-            GetManagementApiUrl<BackOfficeController>(x => x.Authorize()) +
-            $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallange}");
+        var authorizationUrl = GetManagementApiUrl<BackOfficeController>(x => x.Authorize(CancellationToken.None)) +
+                  $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallange}";
+        var authorizeResponse = await client.GetAsync(authorizationUrl);
 
         Assert.AreEqual(HttpStatusCode.Found, authorizeResponse.StatusCode, await authorizeResponse.Content.ReadAsStringAsync());
 

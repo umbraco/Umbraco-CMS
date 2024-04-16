@@ -1,9 +1,7 @@
-﻿using Umbraco.Cms.Api.Common.Attributes;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Member;
 
-[ShortGenericSchemaName<MemberValueModel, MemberVariantRequestModel>("CreateContentForMemberRequestModel")]
 public class CreateMemberRequestModel : CreateContentRequestModelBase<MemberValueModel, MemberVariantRequestModel>
 {
     public string Email { get; set; } = string.Empty;

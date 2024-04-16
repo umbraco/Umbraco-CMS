@@ -33,7 +33,8 @@ internal class UmbracoCustomizations : ICustomization
             .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(DatabaseSchemaCreatorFactory), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(InstallHelper), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(DatabaseBuilder), new GreedyConstructorQuery()));
+            .Customize(new ConstructorCustomization(typeof(DatabaseBuilder), new GreedyConstructorQuery()))
+            .Customize(new ConstructorCustomization(typeof(ContentVersionService), new GreedyConstructorQuery()));
 
         // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
         fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc =>
@@ -45,14 +46,6 @@ internal class UmbracoCustomizations : ICustomization
 
         fixture.Customize<HostingSettings>(x =>
             x.With(settings => settings.ApplicationVirtualPath, string.Empty));
-
-        fixture.Customize<BackOfficeAreaRoutes>(u => u.FromFactory(
-            () => new BackOfficeAreaRoutes(
-                Options.Create(new GlobalSettings()),
-                Mock.Of<IHostingEnvironment>(x =>
-                    x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
-                Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run),
-                new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>))));
 
         fixture.Customize<PreviewRoutes>(u => u.FromFactory(
             () => new PreviewRoutes(

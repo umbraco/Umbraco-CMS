@@ -17,7 +17,9 @@ public class SetTelemetryController : TelemetryControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> SetConsentLevel(TelemetryRequestModel telemetryRepresentationBase)
+    public async Task<IActionResult> SetConsentLevel(
+        CancellationToken cancellationToken,
+        TelemetryRequestModel telemetryRepresentationBase)
     {
         if (!Enum.IsDefined(telemetryRepresentationBase.TelemetryLevel))
         {
@@ -31,7 +33,7 @@ public class SetTelemetryController : TelemetryControllerBase
             return BadRequest(invalidModelProblem);
         }
 
-        _metricsConsentService.SetConsentLevel(telemetryRepresentationBase.TelemetryLevel);
+        await _metricsConsentService.SetConsentLevelAsync(telemetryRepresentationBase.TelemetryLevel);
         return await Task.FromResult(Ok());
     }
 }

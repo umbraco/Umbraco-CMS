@@ -24,7 +24,7 @@ public class DeleteSavedSearchLogViewerController : SavedSearchLogViewerControll
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Delete(string name)
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, string name)
     {
         Attempt<ILogViewerQuery?, LogViewerOperationStatus> result = await _logViewerService.DeleteSavedLogQueryAsync(name);
 

@@ -19,13 +19,15 @@ public class CreateInitialPasswordUserController : UserControllerBase
 
     public CreateInitialPasswordUserController(IUserService userService) => _userService = userService;
 
-    // [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
+    [AllowAnonymous]
     [HttpPost("invite/create-password")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateInitialPassword(CreateInitialPasswordUserRequestModel model)
+    public async Task<IActionResult> CreateInitialPassword(
+        CancellationToken cancellationToken,
+        CreateInitialPasswordUserRequestModel model)
     {
         Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.CreateInitialPasswordAsync(model.User.Id, model.Token, model.Password);
 

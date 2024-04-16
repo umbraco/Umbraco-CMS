@@ -18,7 +18,9 @@ public class UpdateStatusProfilingController : ProfilingControllerBase
     [HttpPut("status")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Status(ProfilingStatusRequestModel model)
+    public async Task<IActionResult> Status(
+        CancellationToken cancellationToken,
+        ProfilingStatusRequestModel model)
     {
         Attempt<bool, WebProfilerOperationStatus> result = await _webProfilerService.SetStatus(model.Enabled);
         return result.Success

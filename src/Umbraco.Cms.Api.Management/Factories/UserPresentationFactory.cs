@@ -1,5 +1,6 @@
 using Umbraco.Cms.Api.Management.Routing;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core.Cache;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -24,6 +26,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
     private readonly IEmailSender _emailSender;
     private readonly IPasswordConfigurationPresentationFactory _passwordConfigurationPresentationFactory;
+    private readonly IBackOfficeExternalLoginProviders _externalLoginProviders;
     private readonly SecuritySettings _securitySettings;
 
     public UserPresentationFactory(
@@ -35,7 +38,8 @@ public class UserPresentationFactory : IUserPresentationFactory
         IAbsoluteUrlBuilder absoluteUrlBuilder,
         IEmailSender emailSender,
         IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory,
-        IOptionsSnapshot<SecuritySettings> securitySettings)
+        IOptionsSnapshot<SecuritySettings> securitySettings,
+        IBackOfficeExternalLoginProviders externalLoginProviders)
     {
         _entityService = entityService;
         _appCaches = appCaches;
@@ -44,6 +48,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         _userGroupPresentationFactory = userGroupPresentationFactory;
         _emailSender = emailSender;
         _passwordConfigurationPresentationFactory = passwordConfigurationPresentationFactory;
+        _externalLoginProviders = externalLoginProviders;
         _securitySettings = securitySettings.Value;
         _absoluteUrlBuilder = absoluteUrlBuilder;
     }
@@ -69,6 +74,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             LastLoginDate = user.LastLoginDate,
             LastLockoutDate = user.LastLockoutDate,
             LastPasswordChangeDate = user.LastPasswordChangeDate,
+            IsAdmin = user.IsAdmin(),
         };
 
         return responseModel;
@@ -128,7 +134,8 @@ public class UserPresentationFactory : IUserPresentationFactory
     public Task<UserConfigurationResponseModel> CreateUserConfigurationModelAsync() =>
         Task.FromResult(new UserConfigurationResponseModel
         {
-            CanInviteUsers = _emailSender.CanSendRequiredEmail(),
+            // You should not be able to invite users if any providers has deny local login set.
+            CanInviteUsers = _emailSender.CanSendRequiredEmail() && _externalLoginProviders.HasDenyLocalLogin() is false,
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
         });
 
@@ -164,6 +171,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         var hasAccessToAllLanguages = presentationGroups.Any(x => x.HasAccessToAllLanguages);
 
         var allowedSections = presentationGroups.SelectMany(x => x.Sections).ToHashSet();
+
         return await Task.FromResult(new CurrentUserResponseModel()
         {
             Id = presentationUser.Id,
@@ -178,7 +186,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages,
-            AllowedSections = allowedSections
+            HasAccessToSensitiveData = user.HasAccessToSensitiveData(),
+            AllowedSections = allowedSections,
+            IsAdmin = user.IsAdmin()
         });
     }
 
