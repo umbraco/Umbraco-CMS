@@ -174,7 +174,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	#renderNoResults() {
-		return this._loading ? nothing : html`<div id="no-results">No results found</div>`;
+		return this._loading ? nothing : html`<div id="no-results">${this.localize.term('general_searchNoResult')}</div>`;
 	}
 
 	static styles = [
