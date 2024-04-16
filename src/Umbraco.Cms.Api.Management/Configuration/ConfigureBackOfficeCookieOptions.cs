@@ -211,7 +211,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 {
                     _securitySettings.AuthCookieName,
                     Constants.Web.PreviewCookieName, Constants.Security.BackOfficeExternalCookieName,
-                    Constants.Web.AngularCookieName, Constants.Web.CsrfValidationCookieName
+                    Constants.Web.CsrfValidationCookieName
                 };
                 foreach (var cookie in cookies)
                 {

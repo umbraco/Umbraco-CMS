@@ -115,8 +115,7 @@ public class UmbExternalLoginController : SurfaceController
                     await _memberManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
                 if (attemptedUser == null!)
                 {
-                    return new ValidationErrorResult(
-                        $"No local user found for the login provider {loginInfo.LoginProvider} - {loginInfo.ProviderKey}");
+                    return BadRequest($"No local user found for the login provider {loginInfo.LoginProvider} - {loginInfo.ProviderKey}");
                 }
 
                 IEnumerable<string> providerNames =

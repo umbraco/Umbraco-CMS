@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Strings;
@@ -69,13 +68,6 @@ public static partial class UmbracoBuilderExtensions
         builder.DataValueReferenceFactories();
         builder.PropertyValueConverters().Append(builder.TypeLoader.GetTypes<IPropertyValueConverter>());
         builder.UrlSegmentProviders().Append<DefaultUrlSegmentProvider>();
-        builder.ManifestValueValidators()
-            .Add<RequiredValidator>()
-            .Add<RegexValidator>()
-            .Add<DelimitedValueValidator>()
-            .Add<EmailValidator>()
-            .Add<IntegerValidator>()
-            .Add<DecimalValidator>();
         builder.MediaUrlGenerators();
         // register OEmbed providers - no type scanning - all explicit opt-in of adding types, IEmbedProvider is not IDiscoverable
         builder.EmbedProviders()
@@ -211,13 +203,6 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static UrlSegmentProviderCollectionBuilder UrlSegmentProviders(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>();
-
-    /// <summary>
-    /// Gets the validators collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    internal static ManifestValueValidatorCollectionBuilder ManifestValueValidators(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
 
     /// <summary>
     /// Gets the content finders collection builder.

@@ -16,7 +16,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
   allowPasswordReset = false;
 
   @state()
-  private _loginState: UUIButtonState = undefined;
+  private _loginState?: UUIButtonState;
 
   @state()
   private _loginError = '';
@@ -53,13 +53,17 @@ export default class UmbLoginPageElement extends UmbLitElement {
     const form = e.target as HTMLFormElement;
     if (!form) return;
 
-    if (!form.checkValidity()) return;
-
     const formData = new FormData(form);
 
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
     const persist = formData.has('persist');
+
+    if (!username || !password) {
+      this._loginError = this.localize.term('auth_userFailedLogin');
+      this._loginState = 'failed';
+      return;
+    }
 
     this._loginState = 'waiting';
 

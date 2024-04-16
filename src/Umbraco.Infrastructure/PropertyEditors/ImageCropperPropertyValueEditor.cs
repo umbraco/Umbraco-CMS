@@ -222,20 +222,21 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
 
     private ImageCropperValue? TryParseImageCropperValue(object? editorValue)
     {
-        // FIXME: consider creating an object deserialization method on IJsonSerializer instead of relying on deserializing serialized JSON here (and likely other places as well)
-        if (editorValue is JsonObject jsonObject)
+        try
         {
-            try
+            if (editorValue is null ||
+                _jsonSerializer.TryDeserialize(editorValue, out ImageCropperValue? imageCropperValue) is false)
             {
-                ImageCropperValue? imageCropperValue = _jsonSerializer.Deserialize<ImageCropperValue>(jsonObject.ToJsonString());
-                imageCropperValue?.Prune();
-                return imageCropperValue;
+                return null;
             }
-            catch (Exception ex)
-            {
-                // For some reason the value is invalid - log error and continue as if no value was saved
-                _logger.LogWarning(ex, "Could not parse editor value to an ImageCropperValue object.");
-            }
+
+            imageCropperValue.Prune();
+            return imageCropperValue;
+        }
+        catch (Exception ex)
+        {
+            // For some reason the value is invalid - log error and continue as if no value was saved
+            _logger.LogWarning(ex, "Could not parse editor value to an ImageCropperValue object.");
         }
 
         return null;

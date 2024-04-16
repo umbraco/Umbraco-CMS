@@ -32,7 +32,13 @@ public static class DistributedCacheExtensions
         => dc.Refresh(UserCacheRefresher.UniqueId, userId);
 
     public static void RefreshUserCache(this DistributedCache dc, IEnumerable<IUser> users)
-        => dc.Refresh(UserCacheRefresher.UniqueId, users.Select(x => x.Id).Distinct().ToArray());
+    {
+        foreach (IUser user in users)
+        {
+            dc.Refresh(UserCacheRefresher.UniqueId, user.Key);
+            dc.Refresh(UserCacheRefresher.UniqueId, user.Id);
+        }
+    }
 
     public static void RefreshAllUserCache(this DistributedCache dc)
         => dc.RefreshAll(UserCacheRefresher.UniqueId);

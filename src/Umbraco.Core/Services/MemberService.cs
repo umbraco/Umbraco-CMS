@@ -20,8 +20,8 @@ namespace Umbraco.Cms.Core.Services
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
         private readonly IAuditRepository _auditRepository;
-
         private readonly IMemberGroupService _memberGroupService;
+        private readonly Lazy<IIdKeyMap> _idKeyMap;
 
         #region Constructor
 
@@ -33,13 +33,15 @@ namespace Umbraco.Cms.Core.Services
             IMemberRepository memberRepository,
             IMemberTypeRepository memberTypeRepository,
             IMemberGroupRepository memberGroupRepository,
-            IAuditRepository auditRepository)
+            IAuditRepository auditRepository,
+            Lazy<IIdKeyMap> idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _memberRepository = memberRepository;
             _memberTypeRepository = memberTypeRepository;
             _memberGroupRepository = memberGroupRepository;
             _auditRepository = auditRepository;
+            _idKeyMap = idKeyMap;
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
         }
 
@@ -333,8 +335,7 @@ namespace Umbraco.Cms.Core.Services
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTree);
-            IQuery<IMember> query = Query<IMember>().Where(x => x.Key == id);
-            return _memberRepository.Get(query)?.FirstOrDefault();
+            return GetMemberFromRepository(id);
         }
 
         [Obsolete($"Use {nameof(GetById)}. Will be removed in V15.")]
@@ -1069,6 +1070,12 @@ namespace Umbraco.Cms.Core.Services
 
         private void Audit(AuditType type, int userId, int objectId, string? message = null) => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Member), message));
 
+        private IMember? GetMemberFromRepository(Guid id)
+            => _idKeyMap.Value.GetIdForKey(id, UmbracoObjectTypes.Member) switch
+            {
+                { Success: false } => null,
+                { Result: var intId } => _memberRepository.Get(intId),
+            };
         #endregion
 
         #region Membership
