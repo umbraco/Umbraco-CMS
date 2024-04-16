@@ -16,6 +16,7 @@ export const manifests: Array<ManifestTypes> = [
 		name: 'Document Search Result Item ',
 		alias: 'Umb.SearchResultItem.Document',
 		type: 'searchResultItem',
+		js: () => import('./document-search-result-item.element.js'),
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 	},
 ];
