@@ -19,6 +19,8 @@ import {
 import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
+type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
+
 /**
  * Manages a structure of a Content Type and its properties and containers.
  * This loads and merges the structures of the Content Type and its inherited and composed Content Types.
@@ -190,6 +192,10 @@ export class UmbContentTypeStructureManager<
 
 	getOwnerContentType() {
 		return this.#contentTypes.getValue().find((y) => y.unique === this.#ownerContentTypeUnique);
+	}
+
+	getOwnerContentTypeUnique() {
+		return this.#ownerContentTypeUnique;
 	}
 
 	updateOwnerContentType(entry: Partial<T>) {
@@ -391,7 +397,7 @@ export class UmbContentTypeStructureManager<
 			throw new Error('Could not find the Content Type to remove container from');
 		}
 		const frozenContainers = contentType.containers ?? [];
-		const containers = frozenContainers.filter((x) => x.id !== containerId || x.parent?.id !== containerId);
+		const containers = frozenContainers.filter((x) => x.id !== containerId && x.parent?.id !== containerId);
 
 		const frozenProperties = contentType.properties ?? [];
 		const properties = frozenProperties.filter((x) => x.container?.id !== containerId);
@@ -668,6 +674,12 @@ export class UmbContentTypeStructureManager<
 							x.parent === null), // it parentName === null then we expect the container parent to be null.
 			);
 		});
+	}
+
+	contentTypeOfProperty(propertyId: UmbPropertyTypeId) {
+		return this.#contentTypes.asObservablePart((contentTypes) =>
+			contentTypes.find((contentType) => contentType.properties.some((p) => p.id === propertyId)),
+		);
 	}
 
 	private _reset() {
