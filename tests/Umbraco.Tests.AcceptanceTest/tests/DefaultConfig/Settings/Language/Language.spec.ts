@@ -16,8 +16,7 @@ test.describe('Language tests', () => {
     await umbracoApi.language.ensureNameNotExists(languageName);
   });
   
-  // TODO: remove skip when the front-end is ready. Currently it is impossible to add a language as the language dropdown is not displayed.
-  test.skip('can add language', async ({umbracoApi, umbracoUi}) => {
+  test('can add language @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoUi.language.goToSettingsTreeItem('Language');
 
@@ -33,7 +32,7 @@ test.describe('Language tests', () => {
     await umbracoUi.language.isLanguageNameVisible(languageName, true);
   });
 
-  test('can update default language option', async ({umbracoApi, umbracoUi}) => {
+  test('can update default language option @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.language.create(languageName, false, false, isoCode);
     expect(await umbracoApi.language.doesExist(isoCode)).toBeTruthy();
@@ -71,7 +70,7 @@ test.describe('Language tests', () => {
     expect(languageData.isMandatory).toBe(true);
   });
 
-  test('can delete language', async ({umbracoApi, umbracoUi}) => {
+  test('can delete language @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.language.create(languageName, false, false, isoCode);
     expect(await umbracoApi.language.doesExist(isoCode)).toBeTruthy();
