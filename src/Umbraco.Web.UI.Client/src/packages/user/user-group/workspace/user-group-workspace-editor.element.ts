@@ -93,7 +93,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		this.observe(
 			this.#workspaceContext.mediaStartNode,
 			(value) => (this._mediaStartNode = value),
-			'_observeDocumentStartNode',
+			'_observeMediaStartNode',
 		);
 	}
 
