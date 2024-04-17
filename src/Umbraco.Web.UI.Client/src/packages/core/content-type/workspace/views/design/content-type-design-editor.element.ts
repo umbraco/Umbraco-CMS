@@ -1,7 +1,7 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
 import type { UmbContentTypeDesignEditorTabElement } from './content-type-design-editor-tab.element.js';
 import { UmbContentTypeDesignEditorContext } from './content-type-design-editor.context.js';
-import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_COMPOSITION_PICKER_MODAL,
@@ -400,7 +400,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	renderTabsNavigation() {
-		if (!this._tabs) return;
+		if (!this._tabs || this._tabs.length === 0) return;
 
 		return html`<div id="tabs-group" class="flex">
 			<uui-tab-group>
@@ -417,13 +417,17 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	renderRootTab() {
 		const rootTabPath = this._routerPath + '/root';
 		const rootTabActive = rootTabPath === this._activePath;
+		if (!this._hasRootGroups && !this._sortModeActive) {
+			// If we don't have any root groups and we are not in sort mode, then we don't want to render the root tab.
+			return nothing;
+		}
 		return html`<uui-tab
 			id="root-tab"
 			class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
-			label=${this.localize.term('general_content')}
+			label=${this.localize.term('general_generic')}
 			.active=${rootTabActive}
 			href=${rootTabPath}>
-			${this.localize.term('general_content')}
+			${this.localize.term('general_generic')}
 		</uui-tab>`;
 	}
 
