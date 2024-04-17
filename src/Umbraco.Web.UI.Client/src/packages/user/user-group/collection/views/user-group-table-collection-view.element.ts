@@ -14,6 +14,8 @@ import type {
 } from '@umbraco-cms/backoffice/components';
 import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
 import { UmbMediaItemRepository } from '@umbraco-cms/backoffice/media';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 
 import '../components/user-group-table-name-column-layout.element.js';
 import '../components/user-group-table-sections-column-layout.element.js';
@@ -84,8 +86,13 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 
 	private async _createTableItems(userGroups: Array<UmbUserGroupDetailModel>) {
 		await Promise.all([
-			this.#requestAndCacheDocumentStartNodes(userGroups),
-			this.#requestAndCacheMediaStartNodes(userGroups),
+			this.#requestAndCacheStartNodes(
+				userGroups,
+				'documentStartNode',
+				this.#documentItemRepository,
+				this.#documentStartNodeMap,
+			),
+			this.#requestAndCacheStartNodes(userGroups, 'mediaStartNode', this.#mediaItemRepository, this.#mediaStartNodeMap),
 		]);
 
 		this._tableItems = userGroups.map((userGroup) => {
@@ -120,50 +127,37 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		});
 	}
 
-	async #requestAndCacheDocumentStartNodes(userGroups: Array<UmbUserGroupDetailModel>) {
-		const allStartNodes = userGroups
-			.map((userGroup) => userGroup.documentStartNode?.unique)
-			.filter(Boolean) as string[];
+	async #requestAndCacheStartNodes(
+		userGroups: Array<UmbUserGroupDetailModel>,
+		startNodeField: 'documentStartNode' | 'mediaStartNode',
+		itemRepository: UmbItemRepository<UmbUniqueItemModel>,
+		map: Map<string, string>,
+	) {
+		const allStartNodes = userGroups.map((userGroup) => userGroup[startNodeField]?.unique).filter(Boolean) as string[];
 		const uniqueStartNodes = [...new Set(allStartNodes)];
-		const uncachedStartNodes = uniqueStartNodes.filter((unique) => !this.#documentStartNodeMap.has(unique));
+		const uncachedStartNodes = uniqueStartNodes.filter((unique) => !map.has(unique));
 
 		// If there are no uncached start nodes, we don't need to make a request
 		if (uncachedStartNodes.length === 0) return;
 
-		const { data: items } = await this.#documentItemRepository.requestItems(uncachedStartNodes);
+		const { data: items } = await itemRepository.requestItems(uncachedStartNodes);
 
 		if (items) {
 			items.forEach((item) => {
-				this.#documentStartNodeMap.set(item.unique, item.name);
+				// cache the start node
+				map.set(item.unique, item.name);
 			});
 		}
 	}
 
-	async #requestAndCacheMediaStartNodes(userGroups: Array<UmbUserGroupDetailModel>) {
-		const allStartNodes = userGroups.map((userGroup) => userGroup.mediaStartNode?.unique).filter(Boolean) as string[];
-		const uniqueStartNodes = [...new Set(allStartNodes)];
-		const uncachedStartNodes = uniqueStartNodes.filter((unique) => !this.#mediaStartNodeMap.has(unique));
-
-		// If there are no uncached start nodes, we don't need to make a request
-		if (uncachedStartNodes.length === 0) return;
-
-		const { data: items } = await this.#mediaItemRepository.requestItems(uncachedStartNodes);
-
-		if (items) {
-			items.forEach((item) => {
-				this.#mediaStartNodeMap.set(item.unique, item.name);
-			});
-		}
-	}
-
-	private _handleSelected(event: UmbTableSelectedEvent) {
+	#onSelected(event: UmbTableSelectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
 		this.#collectionContext?.selection.setSelection(selection);
 	}
 
-	private _handleDeselected(event: UmbTableDeselectedEvent) {
+	#onDeselected(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
@@ -177,8 +171,8 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
-				@selected="${this._handleSelected}"
-				@deselected="${this._handleDeselected}"></umb-table>
+				@selected="${this.#onSelected}"
+				@deselected="${this.#onDeselected}"></umb-table>
 		`;
 	}
 
