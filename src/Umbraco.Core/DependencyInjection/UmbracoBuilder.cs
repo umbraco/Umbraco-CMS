@@ -254,7 +254,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<IPublishedModelFactory>(factory => factory.CreateDefaultPublishedModelFactory());
 
             Services
+                .AddNotificationAsyncHandler<MemberGroupSavingNotification, PublicAccessHandler>()
                 .AddNotificationHandler<MemberGroupSavedNotification, PublicAccessHandler>()
+                .AddNotificationAsyncHandler<MemberGroupDeletingNotification, PublicAccessHandler>()
                 .AddNotificationHandler<MemberGroupDeletedNotification, PublicAccessHandler>();
 
             Services.AddSingleton<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>();

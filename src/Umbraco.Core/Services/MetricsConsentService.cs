@@ -39,13 +39,12 @@ public class MetricsConsentService : IMetricsConsentService
         return analyticsLevel;
     }
 
-    public void SetConsentLevel(TelemetryLevel telemetryLevel)
+    [Obsolete("Please use SetConsentLevelAsync instead, scheduled for removal in V15")]
+    public void SetConsentLevel(TelemetryLevel telemetryLevel) => SetConsentLevelAsync(telemetryLevel).GetAwaiter().GetResult();
+
+    public async Task SetConsentLevelAsync(TelemetryLevel telemetryLevel)
     {
-        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        if (currentUser is null)
-        {
-            currentUser = _userService.GetUserById(Constants.Security.SuperUserId);
-        }
+        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser ?? await _userService.GetAsync(Constants.Security.SuperUserKey);
 
         _logger.LogInformation("Telemetry level set to {telemetryLevel} by {username}", telemetryLevel, currentUser?.Username);
         _keyValueService.SetValue(Key, telemetryLevel.ToString());
