@@ -1,3 +1,4 @@
+/* eslint-disable lit/attribute-value-entities */
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -70,7 +71,6 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			#our-umbraco {
 				grid-column-start: 1;
 				grid-column-end: -1;
-				margin-bottom: var(--uui-size-layout-1);
 			}
 			#info-links {
 				display: grid;
