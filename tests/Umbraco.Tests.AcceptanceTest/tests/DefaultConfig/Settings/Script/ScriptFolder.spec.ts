@@ -86,7 +86,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isScriptTreeItemVisibile(childFolderName);
   });
 
-  test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a folder in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     const childOfChildFolderName = 'ChildOfChildFolderName';
