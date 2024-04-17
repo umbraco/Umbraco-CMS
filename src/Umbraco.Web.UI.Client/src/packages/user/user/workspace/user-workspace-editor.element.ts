@@ -50,7 +50,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.User" class="uui-text">
+			<umb-workspace-editor alias="Umb.Workspace.User" class="uui-text" backPath="section/user-management">
 				${this.#renderHeader()}
 				<div id="main">
 					<div id="left-column">${this.#renderLeftColumn()}</div>
@@ -63,9 +63,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	#renderHeader() {
 		return html`
 			<div id="header" slot="header">
-				<a href="section/user-management">
-					<uui-icon name="icon-arrow-left"></uui-icon>
-				</a>
 				<uui-input id="name" .value=${this._user?.name ?? ''} @input="${this.#onNameChange}" ${umbFocus()}></uui-input>
 			</div>
 		`;
@@ -106,7 +103,6 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 			#header {
 				width: 100%;
 				display: grid;
-				grid-template-columns: var(--uui-size-layout-1) 1fr;
 			}
 
 			#main {
