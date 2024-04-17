@@ -2440,25 +2440,24 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="content">The <see cref="IContent" /> to move</param>
     /// <param name="parentId">Id of the Content's new Parent</param>
     /// <param name="userId">Optional Id of the User moving the Content</param>
-    public void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
-    {
-        Attempt<OperationResult?> _ = AttemptMove(content, parentId, userId);
-    }
+    public void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId) =>
+        AttemptMove(content, parentId, userId);
 
-    public Attempt<OperationResult?> AttemptMove(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc/>
+    [Obsolete("Adds return type to Move method. Will be removed in V14, as the original method will be adjusted.")]
+    public OperationResult AttemptMove(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         if (content.ParentId == parentId)
         {
-            return OperationResult.Attempt.Succeed(eventMessages);
+            return OperationResult.Succeed(eventMessages);
         }
 
         // if moving to the recycle bin then use the proper method
         if (parentId == Constants.System.RecycleBinContent)
         {
-            MoveToRecycleBin(content, userId);
-            return OperationResult.Attempt.Succeed(eventMessages);
+            return MoveToRecycleBin(content, userId);
         }
 
         var moves = new List<(IContent, string)>();
@@ -2479,7 +2478,7 @@ public class ContentService : RepositoryService, IContentService
             if (scope.Notifications.PublishCancelable(movingNotification))
             {
                 scope.Complete();
-                return OperationResult.Attempt.Cancel(eventMessages);// causes rollback
+                return OperationResult.Cancel(eventMessages);// causes rollback
             }
 
             // if content was trashed, and since we're not moving to the recycle bin,
@@ -2515,7 +2514,7 @@ public class ContentService : RepositoryService, IContentService
             scope.Complete();
         }
 
-        return OperationResult.Attempt.Succeed(eventMessages);
+        return OperationResult.Succeed(eventMessages);
     }
 
     // MUST be called from within WriteLock

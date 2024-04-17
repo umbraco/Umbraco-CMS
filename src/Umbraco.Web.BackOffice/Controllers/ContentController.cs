@@ -2254,9 +2254,9 @@ public class ContentController : ContentControllerBase
             return null;
         }
 
-        Attempt<OperationResult?> moveResult = _contentService.AttemptMove(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        OperationResult moveResult = _contentService.AttemptMove(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
-        if(!moveResult)
+        if (!moveResult.Success)
         {
             return ValidationProblem();
         }
