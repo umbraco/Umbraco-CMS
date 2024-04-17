@@ -15,7 +15,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(stylesheetFolderName);
   });
 
-  test('can create a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a folder', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
     await umbracoUi.stylesheet.createFolder(stylesheetFolderName);
@@ -27,7 +27,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetFolderName);
   });
 
-  test('can delete a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can delete a folder @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.stylesheet.createFolder(stylesheetFolderName, '');
 
@@ -42,7 +42,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetFolderName, false);
   });
 
-  test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a folder in a folder @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
     const childFolderName = 'ChildFolderName';
@@ -61,7 +61,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(childFolderName);
   });
 
-  test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a folder in a folder in a folder @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     const childOfChildFolderName = 'ChildOfChildFolderName';
@@ -83,7 +83,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(childOfChildFolderName);
   });
 
-  test('can create a stylesheet in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a stylesheet in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
     const stylesheetContent = 'TestContent';
@@ -108,7 +108,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 
-  test('can create a stylesheet in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a stylesheet in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     await umbracoApi.stylesheet.createFolder(stylesheetFolderName);

@@ -29,7 +29,7 @@ test.describe('Partial View Folder tests', () => {
     await umbracoUi.partialView.isPartialViewTreeItemVisibile(folderName);  
   });
 
-  test('can delete a folder', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a folder @smoke', async ({umbracoApi, umbracoUi}) => {
     //Arrange
     await umbracoApi.partialView.createFolder(folderName);
     expect(await umbracoApi.partialView.doesFolderExist(folderName)).toBeTruthy();
@@ -90,7 +90,7 @@ test.describe('Partial View Folder tests', () => {
     await umbracoUi.partialView.isPartialViewTreeItemVisibile(childFolderName); 
   });
 
-  test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test('can create a folder in a folder in a folder @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     const childOfChildFolderName = 'ChildOfChildFolderName';

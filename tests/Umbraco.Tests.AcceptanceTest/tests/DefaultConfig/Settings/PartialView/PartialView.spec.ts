@@ -18,7 +18,7 @@ test.describe('Partial View tests', () => {
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   });
 
-  test('can create an empty partial view', async ({umbracoApi, umbracoUi}) => {
+  test('can create an empty partial view @smoke', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.partialView.clickActionsMenuAtRoot();
     await umbracoUi.partialView.clickCreateButton();
@@ -68,7 +68,7 @@ test.describe('Partial View tests', () => {
     await umbracoUi.partialView.isPartialViewTreeItemVisibile(partialViewFileName);
   });
 
-  test('can rename a partial view', async ({umbracoApi, umbracoUi}) => {
+  test('can rename a partial view @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongPartialViewName = 'WrongName';
     const wrongPartialViewFileName = wrongPartialViewName + '.cshtml';
@@ -92,7 +92,7 @@ test.describe('Partial View tests', () => {
     await umbracoUi.partialView.isPartialViewTreeItemVisibile(partialViewFileName);
   });
 
-  test('can update a partial view content', async ({umbracoApi, umbracoUi}) => {
+  test('can update a partial view content @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const updatedPartialViewContent = defaultPartialViewContent +
       '@{\r\n' +
@@ -234,7 +234,7 @@ test.describe('Partial View tests', () => {
     expect(partialViewData.content).toBe(partialViewContent);
   });
 
-  test('can delete a partial view', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a partial view @smoke', async ({umbracoApi, umbracoUi}) => {
     //Arrange
     await umbracoApi.partialView.create(partialViewFileName, partialViewFileName, '/');
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
