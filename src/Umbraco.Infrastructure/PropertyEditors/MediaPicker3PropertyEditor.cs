@@ -1,4 +1,3 @@
-using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -112,14 +111,8 @@ public class MediaPicker3PropertyEditor : DataEditor
 
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            // FIXME: consider creating an object deserialization method on IJsonSerializer instead of relying on deserializing serialized JSON here (and likely other places as well)
-            if (editorValue.Value is not JsonArray jsonArray)
-            {
-                return base.FromEditor(editorValue, currentValue);
-            }
-
-            List<MediaWithCropsDto>? mediaWithCropsDtos = _jsonSerializer.Deserialize<List<MediaWithCropsDto>>(jsonArray.ToJsonString());
-            if (mediaWithCropsDtos is null)
+            if (editorValue.Value is null ||
+                _jsonSerializer.TryDeserialize(editorValue.Value, out List<MediaWithCropsDto>? mediaWithCropsDtos) is false)
             {
                 return base.FromEditor(editorValue, currentValue);
             }
@@ -215,7 +208,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                     continue;
                 }
 
-                GuidUdi? startNodeGuid = configuration.StartNodeId as GuidUdi ?? null;
+                Guid? startNodeGuid = configuration.StartNodeId;
 
                 // make sure we'll clean up the temporary file if the scope completes
                 using IScope scope = _scopeProvider.CreateScope();
@@ -225,7 +218,7 @@ public class MediaPicker3PropertyEditor : DataEditor
                 // there are multiple allowed media types matching the file extension
                 using Stream fileStream = temporaryFile.OpenReadStream();
                 IMedia mediaFile = _mediaImportService
-                    .ImportAsync(temporaryFile.FileName, fileStream, startNodeGuid?.Guid, mediaWithCropsDto.MediaTypeAlias, userKey)
+                    .ImportAsync(temporaryFile.FileName, fileStream, startNodeGuid, mediaWithCropsDto.MediaTypeAlias, userKey)
                     .GetAwaiter()
                     .GetResult();
 

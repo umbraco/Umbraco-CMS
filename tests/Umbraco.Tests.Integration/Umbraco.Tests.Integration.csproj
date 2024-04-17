@@ -139,6 +139,12 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Get.cs">
       <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.GetPagedByContentTypeKey.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Move.cs">
+      <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Update.cs">
       <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
     </Compile>

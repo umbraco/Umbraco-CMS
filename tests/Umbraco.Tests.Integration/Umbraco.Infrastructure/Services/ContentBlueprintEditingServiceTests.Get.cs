@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public partial class ContentBlueprintEditingServiceTests
 {
     [TestCase(true)]
-    [TestCase(true)]
+    [TestCase(false)]
     public async Task Can_Get(bool variant)
     {
         var blueprint = await (variant ? CreateVariantContentBlueprint() : CreateInvariantContentBlueprint());

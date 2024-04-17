@@ -102,7 +102,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         }
 
         var orderByCustomField = listViewProperties
-            .Any(p => p.Alias == orderBy && p.IsSystem);
+            .Any(p => p.Alias == orderBy && p.IsSystem is false);
 
         var ordering = Ordering.By(
             orderBy,

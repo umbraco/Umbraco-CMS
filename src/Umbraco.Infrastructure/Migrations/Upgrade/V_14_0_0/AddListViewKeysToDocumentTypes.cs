@@ -115,11 +115,6 @@ public class AddListViewKeysToDocumentTypes : UnscopedMigrationBase
             return Constants.DataTypes.Guids.ListViewMediaGuid;
         }
 
-        if (dto.NodeDto.NodeObjectType == Constants.ObjectTypes.MemberType)
-        {
-            return Constants.DataTypes.Guids.ListViewMembersGuid;
-        }
-
         // No custom list view was found, and not one of the default types either. Therefore we cannot find it.
         return null;
     }

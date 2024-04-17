@@ -31,6 +31,25 @@ internal sealed class ContentBlueprintEditingService
         return await Task.FromResult(blueprint);
     }
 
+    public async Task<Attempt<PagedModel<IContent>?, ContentEditingOperationStatus>> GetPagedByContentTypeAsync(Guid contentTypeKey, int skip, int take)
+    {
+        IContentType? contentType = await ContentTypeService.GetAsync(contentTypeKey);
+        if (contentType is null)
+        {
+            return Attempt.FailWithStatus<PagedModel<IContent>?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeNotFound, null);
+        }
+
+        IContent[] blueprints = ContentService.GetBlueprintsForContentTypes([contentType.Id]).ToArray();
+
+        var result = new PagedModel<IContent>
+        {
+            Items = blueprints.Skip(skip).Take(take),
+            Total = blueprints.Length,
+        };
+
+        return Attempt.SucceedWithStatus<PagedModel<IContent>?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, result);
+    }
+
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentBlueprintCreateModel createModel, Guid userKey)
     {
         if (await ValidateCulturesAsync(createModel) is false)

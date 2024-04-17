@@ -22,6 +22,7 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [MapToApi(ManagementApiConfiguration.ApiName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 [AppendEventMessages]
+[Produces("application/json")]
 public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {
     protected IActionResult CreatedAtId<T>(Expression<Func<T, string>> action, Guid id)

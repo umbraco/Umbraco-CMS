@@ -29,6 +29,11 @@ public class ItemDocumentBlueprintController : DocumentBlueprintItemControllerBa
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<DocumentBlueprintItemResponseModel>());
+        }
+
         IEnumerable<IDocumentEntitySlim> documents = _entityService
             .GetAll(UmbracoObjectTypes.DocumentBlueprint, ids.ToArray())
             .Select(x => x as IDocumentEntitySlim)

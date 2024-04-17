@@ -676,25 +676,6 @@ internal class DatabaseDataCreator
             "id");
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
-            Constants.DataTypes.Guids.ListViewMembers,
-            new NodeDto
-            {
-                NodeId = Constants.DataTypes.DefaultMembersListView,
-                Trashed = false,
-                ParentId = -1,
-                UserId = -1,
-                Level = 1,
-                Path = $"-1,{Constants.DataTypes.DefaultMembersListView}",
-                SortOrder = 2,
-                UniqueId = Constants.DataTypes.Guids.ListViewMembersGuid,
-                Text = Constants.Conventions.DataTypes.ListViewPrefix + "Members",
-                NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
-            },
-            Constants.DatabaseSchema.Tables.Node,
-            "id");
-        ConditionalInsert(
-            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
             Constants.DataTypes.Guids.Tags,
             new NodeDto
             {
