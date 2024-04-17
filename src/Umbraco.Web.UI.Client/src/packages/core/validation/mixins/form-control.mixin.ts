@@ -334,8 +334,7 @@ export const UmbFormControlMixin = <
 		}
 
 		updated(changedProperties: Map<string | number | symbol, unknown>) {
-			// @ts-expect-error We don't know if we are extending a lit-element:
-			super.updated?.(changedProperties);
+			super.updated(changedProperties);
 			this._runValidators();
 		}
 
