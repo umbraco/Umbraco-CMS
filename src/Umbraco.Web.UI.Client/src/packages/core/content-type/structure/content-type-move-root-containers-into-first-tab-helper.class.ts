@@ -5,8 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 const MoveRootContainersIntoFirstTabHelperControllerAlias = Symbol('moveRootContainersHelper');
 /**
- * This class is a helper class for managing the structure of containers in a content type.
- * This specifically takes care of moving owner root containers into the first created tab.
+ * This class is a helper class that specifically takes care of moving owner root containers into the first created tab.
  * This will give the user the experience of the first tab becoming the 'main' tab.
  */
 export class UmbContentTypeMoveRootGroupsIntoFirstTabHelper<T extends UmbContentTypeModel> extends UmbControllerBase {
