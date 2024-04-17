@@ -91,14 +91,10 @@ test.describe('Data Types Folder tests', () => {
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
-<<<<<<< HEAD
-    await umbracoUi.dataType.createFolder(childFolderName);
-=======
     await umbracoUi.dataType.clickCreateButton();
     await umbracoUi.dataType.clickNewDataTypeFolderButton();
     await umbracoUi.dataType.enterFolderName(childFolderName);
     await umbracoUi.dataType.clickCreateFolderButton();
->>>>>>> v14/dev
 
     // Assert
     expect(await umbracoApi.dataType.doesNameExist(childFolderName)).toBeTruthy();
