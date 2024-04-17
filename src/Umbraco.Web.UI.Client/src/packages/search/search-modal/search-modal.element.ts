@@ -85,6 +85,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		clearTimeout(this.#inputTimer);
 		if (!this._search) {
 			this._loading = false;
+			this._searchResults = [];
 			return;
 		}
 
