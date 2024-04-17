@@ -1,10 +1,12 @@
 using System.Data.Common;
 using System.Globalization;
 using System.Linq.Expressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -28,6 +30,21 @@ internal class UserService : RepositoryService, IUserService
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly IRequestCache _requestCache;
     private readonly IUserRepository _userRepository;
+
+
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
+    public UserService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IRuntimeState runtimeState,
+        IUserRepository userRepository,
+        IUserGroupRepository userGroupRepository,
+        IOptions<GlobalSettings> globalSettings)
+        : this(provider, loggerFactory, eventMessagesFactory, runtimeState, userRepository, userGroupRepository, globalSettings, StaticServiceProvider.Instance.GetRequiredService<IRequestCache>())
+    {
+
+    }
 
     public UserService(
         ICoreScopeProvider provider,
