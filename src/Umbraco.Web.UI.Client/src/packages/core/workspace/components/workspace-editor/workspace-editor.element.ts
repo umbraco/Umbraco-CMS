@@ -32,7 +32,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property({ type: Boolean })
 	public enforceNoFooter = false;
 
-	@property()
+	@property({ attribute: 'back-path' })
 	public backPath?: string;
 
 	@state()
