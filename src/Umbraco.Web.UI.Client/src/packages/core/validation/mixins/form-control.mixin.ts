@@ -83,7 +83,8 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
 export function UmbFormControlMixin<
 	ValueType = FormData | FormDataEntryValue,
 	T extends HTMLElementConstructor<LitElement> = HTMLElementConstructor<LitElement>,
->(superClass: T, defaultValue: ValueType = undefined as ValueType) {
+	DefaultValueType extends ValueType = ValueType,
+>(superClass: T, defaultValue: DefaultValueType = undefined as DefaultValueType) {
 	abstract class UmbFormControlMixinClass extends superClass {
 		/**
 		 * This is a static class field indicating that the element is can be used inside a native form and participate in its events.
@@ -354,7 +355,7 @@ export function UmbFormControlMixin<
 			this.value = this.getInitialValue() ?? this.getDefaultValue();
 		}
 
-		protected getDefaultValue(): ValueType {
+		protected getDefaultValue(): DefaultValueType {
 			return defaultValue;
 		}
 		protected getInitialValue(): ValueType {
