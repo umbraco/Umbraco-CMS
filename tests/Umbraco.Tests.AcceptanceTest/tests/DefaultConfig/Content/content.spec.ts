@@ -623,7 +623,7 @@ test.describe('Content tests', () => {
     await umbracoUi.isSuccessNotificationVisible();
 
     // Ensure that the view gets rendered correctly
-    const expected = `<p> </p><h1>Acceptance test</h1><p> </p>`;
+    const expected = `<p>&nbsp;</p><h1>Acceptancetest</h1><p>&nbsp;</p>`;
     await expect(await umbracoApi.content.verifyRenderedContent('/', expected, true)).toBeTruthy();
 
     // Cleanup
@@ -737,4 +737,3 @@ test.describe('Content tests', () => {
     await umbracoApi.partialViews.ensureMacroFileNameNotExists(macroFileName);
   });
 });
-

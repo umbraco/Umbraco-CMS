@@ -1,0 +1,10 @@
+<div class="umb-property-editor umb-rte" ng-class="{'--initialized': !vm.loading}">
+  <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+  <ng-form name="rteForm">
+      <div class="umb-rte-editor-con">
+          <input type="text" id="{{vm.model.alias}}" ng-focus="vm.focusRTE()" name="modelValue" ng-model="vm.model.value.markup" style="position:absolute;top:0;width:0;height:0;padding:0;border:none;" />
+          <div disable-hotkeys id="{{vm.textAreaHtmlId}}" class="umb-rte-editor" ng-style="{ width: vm.containerWidth, height: vm.containerHeight, overflow: vm.containerOverflow}"></div>
+      </div>
+  </ng-form>
+</div>

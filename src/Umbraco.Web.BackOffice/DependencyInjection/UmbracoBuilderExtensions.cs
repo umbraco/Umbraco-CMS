@@ -4,15 +4,16 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
-using Umbraco.Cms.Infrastructure.Templates.PartialViews;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.Install;
+using Umbraco.Cms.Web.BackOffice.Mapping;
 using Umbraco.Cms.Web.BackOffice.Middleware;
 using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
 using Umbraco.Cms.Web.BackOffice.Routing;
@@ -45,7 +46,7 @@ public static partial class UmbracoBuilderExtensions
             .AddMvcAndRazor(configureMvc)
             .AddWebServer()
             .AddPreviewSupport()
-            .AddHostedServices()
+            .AddRecurringBackgroundJobs()
             .AddNuCache()
             .AddDistributedCache()
             .TryAddModelsBuilderDashboard()
@@ -91,6 +92,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BackOfficeServerVariables>();
         builder.Services.AddScoped<BackOfficeSessionIdValidator>();
         builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
+        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<WebhookMapDefinition>();
 
         // register back office trees
         // the collection builder only accepts types inheriting from TreeControllerBase
@@ -118,6 +120,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
         builder.Services.AddTransient<BlockGridSampleHelper>();
+        builder.Services.AddUnique<IWebhookPresentationFactory, WebhookPresentationFactory>();
 
         return builder;
     }

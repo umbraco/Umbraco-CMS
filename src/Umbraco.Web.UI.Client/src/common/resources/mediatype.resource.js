@@ -166,7 +166,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
                        "mediaTypeApiBaseUrl",
                        "DeleteContainer",
                        [{ id: id }])),
-               'Failed to delete content type contaier');
+               'Failed to delete content type container');
         },
 
         /**

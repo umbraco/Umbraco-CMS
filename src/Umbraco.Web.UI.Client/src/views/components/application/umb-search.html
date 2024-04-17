@@ -12,7 +12,7 @@
         </p>
     </div>
 
-    <div class="flex items-center">
+    <form class="flex items-center mb0" role="search" prevent-default>
         <label for="app-search" class="umb-search__label">
             <umb-icon icon="icon-search" class="umb-search-input-icon"></umb-icon>
             <span class="sr-only">
@@ -42,7 +42,7 @@
         <button ng-show="vm.searchQuery.length > 0" class="umb-search-input-clear umb-animated" ng-click="vm.clearSearch()">
             <localize key="general_clear">Clear</localize>
         </button>
-    </div>
+    </form>
 
     <div class="umb-search-results">
         <div class="umb-search-group" ng-repeat="(key, group) in vm.searchResults" id="search-results" role="listbox">

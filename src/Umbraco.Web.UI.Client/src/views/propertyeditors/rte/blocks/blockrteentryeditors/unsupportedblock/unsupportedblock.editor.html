@@ -1,0 +1,59 @@
+<style>
+    .blockelement-unsupportedblock-editor {
+        position: relative;
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        border: 1px solid #E9E9EB;
+        border-radius: 3px;
+        background-color: lightgrey;
+    }
+
+    .blockelement-unsupportedblock-editor > .__header {
+        display: flex;
+        align-items: center;
+        padding-left: 20px;
+        padding-bottom: 2px;
+        min-height: 48px;
+        border-bottom: 1px solid #E9E9EB;
+        background-color: white;
+        color: #333333;
+    }
+
+    .blockelement-unsupportedblock-editor > .__header.icon {
+        font-size: 22px;
+        margin-right: 5px;
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .blockelement-unsupportedblock-editor > .__headerspan {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .blockelement-unsupportedblock-editor > .__body {
+        padding: 20px;
+    }
+    .blockelement-unsupportedblock-editor > .__body a {
+        text-decoration: underline;
+        color: blue;
+    }
+
+
+</style>
+
+<div class="blockelement-unsupportedblock-editor" ng-focus="block.focus">
+    <div class="__header">
+        <umb-icon icon="icon-alert" class="icon" style="margin-right:10px"></umb-icon>
+        <span>{{block.config.label}}</span>
+    </div>
+    <div class="__body">
+        This content is no longer supported in this context.<br/>
+        You might want to remove this block, or contact your developer to take actions for making this block available again.<br/><br/>
+        <!-- TODO: Add link when we have one
+		    <a href="http://our.umbraco.com" target="_blank" rel="noopener">Learn more about this warning</a>
+		-->
+        <h5>Block data:</h5>
+        <pre>{{block.data | json : 4 }}</pre>
+    </div>
+</div>

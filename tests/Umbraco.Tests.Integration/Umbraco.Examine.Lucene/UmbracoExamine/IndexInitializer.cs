@@ -19,7 +19,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Directory = Lucene.Net.Store.Directory;
 using StaticServiceProvider = Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider;
 
@@ -37,6 +36,7 @@ public class IndexInitializer
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IScopeProvider _scopeProvider;
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly IContentTypeService _contentTypeService;
 
     public IndexInitializer(
         IShortStringHelper shortStringHelper,
@@ -45,7 +45,8 @@ public class IndexInitializer
         IScopeProvider scopeProvider,
         ILoggerFactory loggerFactory,
         IOptions<ContentSettings> contentSettings,
-        ILocalizationService localizationService)
+        ILocalizationService localizationService,
+        IContentTypeService contentTypeService)
     {
         _shortStringHelper = shortStringHelper;
         _propertyEditors = propertyEditors;
@@ -54,8 +55,51 @@ public class IndexInitializer
         _loggerFactory = loggerFactory;
         _contentSettings = contentSettings;
         _localizationService = localizationService;
+        _contentTypeService = contentTypeService;
     }
 
+    [Obsolete("Use ctor that is not obsolete. This will be removed in Umbraco 15.")]
+    public IndexInitializer(
+        IShortStringHelper shortStringHelper,
+        PropertyEditorCollection propertyEditors,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IScopeProvider scopeProvider,
+        ILoggerFactory loggerFactory,
+        IOptions<ContentSettings> contentSettings,
+        ILocalizationService localizationService)
+        : this(
+            shortStringHelper,
+            propertyEditors,
+            mediaUrlGenerators,
+            scopeProvider,
+            loggerFactory,
+            contentSettings,
+            localizationService, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
+    {
+
+    }
+
+    [Obsolete("Use ctor that is not obsolete. This will be removed in Umbraco 15.")]
+    public IndexInitializer(
+        IShortStringHelper shortStringHelper,
+        PropertyEditorCollection propertyEditors,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IScopeProvider scopeProvider,
+        ILoggerFactory loggerFactory,
+        IOptions<ContentSettings> contentSettings,
+        IContentTypeService contentTypeService)
+        : this(
+            shortStringHelper,
+            propertyEditors,
+            mediaUrlGenerators,
+            scopeProvider,
+            loggerFactory,
+            contentSettings,
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>(), contentTypeService)
+    {
+    }
+
+    [Obsolete("Use ctor that is not obsolete. This will be removed in Umbraco 15.")]
     public IndexInitializer(
         IShortStringHelper shortStringHelper,
         PropertyEditorCollection propertyEditors,
@@ -64,13 +108,14 @@ public class IndexInitializer
         ILoggerFactory loggerFactory,
         IOptions<ContentSettings> contentSettings)
         : this(
-        shortStringHelper,
-        propertyEditors,
-        mediaUrlGenerators,
-        scopeProvider,
-        loggerFactory,
-        contentSettings,
-        StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
+            shortStringHelper,
+            propertyEditors,
+            mediaUrlGenerators,
+            scopeProvider,
+            loggerFactory,
+            contentSettings,
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
     {
     }
 
@@ -83,7 +128,9 @@ public class IndexInitializer
             _shortStringHelper,
             _scopeProvider,
             publishedValuesOnly,
-            _localizationService);
+            _localizationService,
+            _contentTypeService,
+            _loggerFactory.CreateLogger<ContentValueSetBuilder>());
 
         return contentValueSetBuilder;
     }

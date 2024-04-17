@@ -131,7 +131,9 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
         switch (algorithmName)
         {
             case "AES":
-                algorithm = new AesCryptoServiceProvider { Key = StringToByteArray(decryptionKey), IV = new byte[16] };
+                algorithm = Aes.Create();
+                algorithm.Key = StringToByteArray(decryptionKey);
+                algorithm.IV = new byte[16];
                 break;
             default:
                 throw new NotSupportedException($"The algorithm ({algorithmName}) is not supported");

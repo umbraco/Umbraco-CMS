@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
 /// <summary>
 ///     Implements periodic server "touching" (to mark as active/deactive) as a hosted service.
 /// </summary>
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.ServerRegistration.TouchServerJob instead.  This class will be removed in Umbraco 14.")]
 public class TouchServerTask : RecurringHostedServiceBase
 {
     private readonly IHostingEnvironment _hostingEnvironment;

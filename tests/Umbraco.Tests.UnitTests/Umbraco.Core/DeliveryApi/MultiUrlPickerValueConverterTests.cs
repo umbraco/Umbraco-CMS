@@ -157,9 +157,43 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var link = result.First();
         Assert.AreEqual("The link", link.Title);
         Assert.AreEqual("https://umbraco.com/?something=true", link.Url);
+        Assert.AreEqual("?something=true", link.QueryString);
         Assert.AreEqual(LinkType.External, link.LinkType);
         Assert.AreEqual("_blank", link.Target);
         Assert.Null(link.Route);
+    }
+
+    [Test]
+    public void MultiUrlPickerValueConverter_AppliesExplicitConfigurationToMediaLink()
+    {
+        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
+        var publishedPropertyType = new Mock<IPublishedPropertyType>();
+        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
+
+        var valueConverter = MultiUrlPickerValueConverter();
+
+        var inter = Serializer().Serialize(new[]
+        {
+            new MultiUrlPickerValueEditor.LinkDto
+            {
+                Udi = new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key),
+                Name = "Custom link name",
+                QueryString = "?something=true",
+                Target = "_blank"
+            }
+        });
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiLink>;
+        Assert.NotNull(result);
+        Assert.AreEqual(1, result.Count());
+        var link = result.First();
+        Assert.AreEqual("Custom link name", link.Title);
+        Assert.AreEqual(PublishedMedia.Key, link.DestinationId);
+        Assert.AreEqual("TheMediaType", link.DestinationType);
+        Assert.AreEqual("the-media-url?something=true", link.Url);
+        Assert.AreEqual(LinkType.Media, link.LinkType);
+        Assert.AreEqual("_blank", link.Target);
+        Assert.AreEqual("?something=true", link.QueryString);
+        Assert.AreEqual(null, link.Route);
     }
 
     [Test]
@@ -190,6 +224,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual("/the-page-url",  link.Route!.Path);
         Assert.AreEqual(LinkType.Content, link.LinkType);
         Assert.AreEqual("_blank", link.Target);
+        Assert.AreEqual("?something=true", link.QueryString);
         Assert.Null(link.Url);
     }
 
@@ -259,7 +294,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 
     private MultiUrlPickerValueConverter MultiUrlPickerValueConverter()
     {
-        var routeBuilder = CreateContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
+        var routeBuilder = CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings());
         return new MultiUrlPickerValueConverter(
             PublishedSnapshotAccessor,
             Mock.Of<IProfilingLogger>(),

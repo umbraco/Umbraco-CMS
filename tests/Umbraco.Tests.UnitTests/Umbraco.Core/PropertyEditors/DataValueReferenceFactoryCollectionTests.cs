@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -173,6 +171,33 @@ public class DataValueReferenceFactoryCollectionTests
         Assert.AreEqual(trackedUdi4, result.ElementAt(1).Udi.ToString());
     }
 
+    [Test]
+    public void GetAutomaticRelationTypesAliases_ContainsDefault()
+    {
+        var collection = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>);
+        var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>));
+
+        var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
+
+        var expected = Constants.Conventions.RelationTypes.AutomaticRelationTypes;
+        CollectionAssert.AreEquivalent(expected, result, "Result does not contain the expected relation type aliases.");
+    }
+
+    [Test]
+    public void GetAutomaticRelationTypesAliases_ContainsCustom()
+    {
+        var collection = new DataValueReferenceFactoryCollection(() => new TestDataValueReferenceFactory().Yield());
+
+        var labelPropertyEditor = new LabelPropertyEditor(DataValueEditorFactory, IOHelper, EditorConfigurationParser);
+        var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => labelPropertyEditor.Yield()));
+        var serializer = new ConfigurationEditorJsonSerializer();
+
+        var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
+
+        var expected = Constants.Conventions.RelationTypes.AutomaticRelationTypes.Append("umbTest");
+        CollectionAssert.AreEquivalent(expected, result, "Result does not contain the expected relation type aliases.");
+    }
+
     private class TestDataValueReferenceFactory : IDataValueReferenceFactory
     {
         public IDataValueReference GetDataValueReference() => new TestMediaDataValueReference();
@@ -196,6 +221,12 @@ public class DataValueReferenceFactoryCollectionTests
                     yield return new UmbracoEntityReference(udi);
                 }
             }
+
+            public IEnumerable<string> GetAutomaticRelationTypesAliases() => new[]
+            {
+                "umbTest",
+                "umbTest", // Duplicate on purpose to test distinct aliases
+            };
         }
     }
 }

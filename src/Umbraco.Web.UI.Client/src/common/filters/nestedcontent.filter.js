@@ -1,4 +1,4 @@
-﻿// Filter to take a node id and grab it's name instead
+// Filter to take a node id and grab it's name instead
 // Usage: {{ pickerAlias | ncNodeName }}
 
 // Cache for node names so we don't make a ton of requests
@@ -25,6 +25,9 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
     }
 
     var currentNode = editorState.getCurrent();
+
+    // Enable using keys with dashes:
+    input = input.split('-').join('');
 
     // Ensure a unique cache per editor instance
     var key = "ncNodeName_" + currentNode.key;
@@ -75,6 +78,9 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
 
 }).filter("ncRichText", function () {
   return function (input) {
-    return $("<div/>").html(input).text();
+    // Get markup from RTE object or assume HTML
+    var html = input && Object.hasOwn(input, 'markup') ? input.markup : input;
+
+    return $("<div/>").html(html).text();
   };
 });

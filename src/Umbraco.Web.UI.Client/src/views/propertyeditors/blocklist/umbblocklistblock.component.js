@@ -9,7 +9,7 @@
    * If a stylesheet is used then this uses a ShadowDom to make a scoped element.
    * This way the backoffice styling does not collide with the block style.
    */
-  
+
   angular
     .module("umbraco")
     .component("umbBlockListBlock", {

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LanguagesEditController($scope, $q, $timeout, $location, $routeParams, overlayService, navigationService, notificationsService, localizationService, languageResource, contentEditingHelper, formHelper, eventsService) {
+    function LanguagesEditController($scope, $q, $timeout, $location, $routeParams, overlayService, navigationService, notificationsService, localizationService, languageResource, formHelper, eventsService) {
         var vm = this;
 
         vm.isNew = false;

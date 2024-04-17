@@ -6,8 +6,10 @@
         var vm = this;
         vm.loading = true;
         vm.selectedVariants = [];
+        vm.sendToPublishAll = false;
 
         vm.changeSelection = changeSelection;
+        vm.changeSendToPublishAllSelection = changeSendToPublishAllSelection;
 
         function onInit() {
 
@@ -29,8 +31,9 @@
             if (vm.availableVariants.length !== 0) {
 
                 vm.availableVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.availableVariants);
+                updateSendToPublishAllSelectionStatus();
             }
-
+            
             $scope.model.disableSubmitButton = true;
             vm.loading = false;
         }
@@ -55,10 +58,39 @@
 
           let firstSelected = vm.variants.find(v => v.save);
           $scope.model.disableSubmitButton = !firstSelected;
+          updateSendToPublishAllSelectionStatus();
+        }
+
+        function changeSendToPublishAllSelection(){
+
+            vm.availableVariants.forEach(variant => {
+
+                variant.publish = vm.sendToPublishAll;
+                let foundVariant = vm.selectedVariants.find(x => x.compositeId === variant.compositeId);
+
+                if (foundVariant === undefined) {
+                    variant.save = true;
+                    vm.selectedVariants.push(variant);
+                } else {
+                    if(!vm.sendToPublishAll){
+                        variant.save = false;
+                        let index = vm.selectedVariants.indexOf(foundVariant);
+                        if (index !== -1) {
+                            vm.selectedVariants.splice(index, 1);
+                        }
+                    }
+                }
+            });
+            let firstSelected = vm.variants.find(v => v.save);
+            $scope.model.disableSubmitButton = !firstSelected;
+        }
+
+        function updateSendToPublishAllSelectionStatus(){
+            vm.sendToPublishAll = vm.availableVariants.every(x => x.publish);
         }
 
 
-      function isMandatoryFilter(variant) {
+        function isMandatoryFilter(variant) {
             //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
             // * has a mandatory language
             // * without having a segment, segments cant be mandatory at current state of code.

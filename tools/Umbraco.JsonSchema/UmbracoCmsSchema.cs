@@ -80,5 +80,7 @@ internal class UmbracoCmsSchema
         public DataTypesSettings DataTypes { get; set; } = null!;
 
         public MarketplaceSettings Marketplace { get; set; } = null!;
+
+        public WebhookSettings Webhook { get; set; } = null!;
     }
 }

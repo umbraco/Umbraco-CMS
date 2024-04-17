@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders;
 /// <summary>
 ///     The model binder for <see cref="T:Umbraco.Web.Models.ContentEditing.ContentItemSave" />
 /// </summary>
-internal class ContentItemBinder : IModelBinder
+public class ContentItemBinder : IModelBinder
 {
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;

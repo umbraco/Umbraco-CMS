@@ -19,6 +19,7 @@ using Umbraco.Cms.Tests.Common;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
 
 [TestFixture]
+[Obsolete("Replaced by BackgroundJobs.Jobs.LogScrubberJobTests")]
 public class LogScrubberTests
 {
     private Mock<IAuditService> _mockAuditService;

@@ -1,12 +1,14 @@
 # Umbraco Backoffice UI API Documentation
 
-This project builds the documentation for the UI of the Umbraco backoffice, it is published on Our Umbraco in the "Reference" section of the documentation.
+This project builds the documentation for the UI of the Umbraco backoffice, it is published on the Umbraco Docs in the "Reference" section of the documentation.
+
+All versions can be accessed through the https://apidocs.umbraco.com/vXX/ui/ url where XX is the major version number of Umbraco.
 
 In order to build the documentation, please follow the following two steps:
 
 ```
 npm ci
-npx gulp docs
+npm start
 ```
 
 After this, you should have an `api` directory which contains index.html. 

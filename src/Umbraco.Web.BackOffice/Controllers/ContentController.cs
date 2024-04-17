@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
@@ -683,17 +684,33 @@ public class ContentController : ContentControllerBase
     [OutgoingEditorModelEvent]
     public ActionResult<ContentItemDisplay?> GetEmptyBlueprint(int blueprintId, int parentId)
     {
-        IContent? blueprint = _contentService.GetBlueprintById(blueprintId);
-        if (blueprint == null)
+        IContent? scaffold;
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            return NotFound();
+            IContent? blueprint = _contentService.GetBlueprintById(blueprintId);
+            if (blueprint is null)
+            {
+                return NotFound();
+            }
+            scaffold = (IContent)blueprint.DeepClone();
+
+            scaffold.Id = 0;
+            scaffold.Name = string.Empty;
+            scaffold.ParentId = parentId;
+
+            var scaffoldedNotification = new ContentScaffoldedNotification(blueprint, scaffold, parentId, new EventMessages());
+            if (scope.Notifications.PublishCancelable(scaffoldedNotification))
+            {
+                scope.Complete();
+                return Problem("Scaffolding was cancelled");
+            }
+
+            scope.Complete();
         }
 
-        blueprint.Id = 0;
-        blueprint.Name = string.Empty;
-        blueprint.ParentId = parentId;
 
-        ContentItemDisplay? mapped = _umbracoMapper.Map<ContentItemDisplay>(blueprint);
+
+        ContentItemDisplay? mapped = _umbracoMapper.Map<ContentItemDisplay>(scaffold);
 
         if (mapped is not null)
         {
@@ -819,12 +836,14 @@ public class ContentController : ContentControllerBase
 
         return pagedResult;
     }
+
     /// <summary>
     ///     Creates a blueprint from a content item
     /// </summary>
     /// <param name="contentId">The content id to copy</param>
     /// <param name="name">The name of the blueprint</param>
     /// <returns></returns>
+    [Authorize(Policy = AuthorizationPolicies.ContentPermissionCreateBlueprintFromId)]
     [HttpPost]
     public ActionResult<SimpleNotificationModel> CreateBlueprintFromContent(
         [FromQuery] int contentId,
@@ -880,8 +899,9 @@ public class ContentController : ContentControllerBase
     /// <summary>
     ///     Saves content
     /// </summary>
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     [FileUploadCleanupFilter]
-    [ContentSaveValidation]
+    [ContentSaveValidation(skipUserAccessValidation:true)] // skip user access validation because we "only" require Settings access to create new blueprints from scratch
     public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>?>?> PostSaveBlueprint(
         [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
     {
@@ -1117,7 +1137,7 @@ public class ContentController : ContentControllerBase
                 AddDomainWarnings(publishStatus.Content, successfulCultures, globalNotifications);
                 AddPublishStatusNotifications(new[] { publishStatus }, globalNotifications, notifications, successfulCultures);
             }
-            break;
+                break;
             case ContentSaveAction.PublishWithDescendants:
             case ContentSaveAction.PublishWithDescendantsNew:
             {
@@ -1134,7 +1154,7 @@ public class ContentController : ContentControllerBase
                 AddDomainWarnings(publishStatus, successfulCultures, globalNotifications);
                 AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
             }
-            break;
+                break;
             case ContentSaveAction.PublishWithDescendantsForce:
             case ContentSaveAction.PublishWithDescendantsForceNew:
             {
@@ -1150,7 +1170,7 @@ public class ContentController : ContentControllerBase
                 var publishStatus = PublishBranchInternal(contentItem, true, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
                 AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
             }
-            break;
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -2041,7 +2061,7 @@ public class ContentController : ContentControllerBase
         var languageCount = _allLangs.Value.Count();
 
         // If there is no culture specified or the cultures specified are equal to the total amount of languages, publish the content in all cultures.
-        if (model.Cultures == null || !model.Cultures.Any() || model.Cultures.Length == languageCount)
+        if (model.Cultures == null || !model.Cultures.Any())
         {
             return PostPublishById(model.Id);
         }
@@ -2076,6 +2096,7 @@ public class ContentController : ContentControllerBase
         return Ok();
     }
 
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     [HttpDelete]
     [HttpPost]
     public IActionResult DeleteBlueprint(int id)
@@ -2306,7 +2327,7 @@ public class ContentController : ContentControllerBase
         }
 
         var languageCount = _allLangs.Value.Count();
-        if (model.Cultures?.Length == 0 || model.Cultures?.Length == languageCount)
+        if (model.Cultures?.Length == 0)
         {
             //this means that the entire content item will be unpublished
             PublishResult unpublishResult = _contentService.Unpublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
@@ -2770,6 +2791,7 @@ public class ContentController : ContentControllerBase
                 case PublishResultType.FailedPublishIsTrashed:
                 case PublishResultType.FailedPublishContentInvalid:
                 case PublishResultType.FailedPublishMandatoryCultureMissing:
+                case PublishResultType.FailedPublishNothingToPublish:
                     //the rest that we are looking for each belong in their own group
                     return x.Result;
                 default:
@@ -2811,7 +2833,7 @@ public class ContentController : ContentControllerBase
                         }
                     }
                 }
-                break;
+                    break;
                 case PublishResultType.SuccessPublish:
                 {
                     // TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
@@ -2839,7 +2861,7 @@ public class ContentController : ContentControllerBase
                         }
                     }
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishPathNotPublished:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
@@ -2848,14 +2870,14 @@ public class ContentController : ContentControllerBase
                         _localizedTextService.Localize(null, "publish"),
                         _localizedTextService.Localize("publish", "contentPublishedFailedByParent", new[] { names }).Trim());
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishCancelledByEvent:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
                     var names = string.Join(", ", status.Select(x => $"'{x.Content?.Name}'"));
                     AddCancelMessage(display, "publish", "contentPublishedFailedByEvent", new[] { names });
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishAwaitingRelease:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
@@ -2864,7 +2886,7 @@ public class ContentController : ContentControllerBase
                         _localizedTextService.Localize(null, "publish"),
                         _localizedTextService.Localize("publish", "contentPublishedFailedAwaitingRelease", new[] { names }).Trim());
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishHasExpired:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
@@ -2873,7 +2895,7 @@ public class ContentController : ContentControllerBase
                         _localizedTextService.Localize(null, "publish"),
                         _localizedTextService.Localize("publish", "contentPublishedFailedExpired", new[] { names }).Trim());
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishIsTrashed:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
@@ -2882,7 +2904,7 @@ public class ContentController : ContentControllerBase
                         _localizedTextService.Localize(null, "publish"),
                         _localizedTextService.Localize("publish", "contentPublishedFailedIsTrashed", new[] { names }).Trim());
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishContentInvalid:
                 {
                     if (successfulCultures == null)
@@ -2906,11 +2928,16 @@ public class ContentController : ContentControllerBase
                         }
                     }
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishMandatoryCultureMissing:
                     display.AddWarningNotification(
                         _localizedTextService.Localize(null, "publish"),
                         "publish/contentPublishedFailedByCulture");
+                    break;
+                case PublishResultType.FailedPublishNothingToPublish:
+                    display.AddWarningNotification(
+                         _localizedTextService.Localize(null, "publish"),
+                        $"Nothing to publish for some languages. Ensure selected languages have a page created.");
                     break;
                 default:
                     throw new IndexOutOfRangeException($"PublishedResultType \"{status.Key}\" was not expected.");

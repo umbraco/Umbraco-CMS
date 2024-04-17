@@ -17,7 +17,7 @@ public class SecuritySettings
     internal const bool StaticHideDisabledUsersInBackOffice = false;
     internal const bool StaticAllowPasswordReset = true;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
-    internal const bool StaticAllowConcurrentLogins = true;
+    internal const bool StaticAllowConcurrentLogins = false;
     internal const string StaticAuthCookieName = "UMB_UCONTEXT";
 
     internal const string StaticAllowedUserNameCharacters =

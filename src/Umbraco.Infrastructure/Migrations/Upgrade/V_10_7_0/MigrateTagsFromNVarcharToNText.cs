@@ -7,6 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_7_0;
 
+[Obsolete("This is no longer used and will be removed in V14.")]
 public class MigrateTagsFromNVarcharToNText : MigrationBase
 {
     public MigrateTagsFromNVarcharToNText(IMigrationContext context)

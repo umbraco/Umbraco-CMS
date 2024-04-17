@@ -66,7 +66,7 @@ public class HelpController : UmbracoAuthorizedJsonController
         }
         catch (HttpRequestException rex)
         {
-            _logger.LogInformation($"Check your network connection, exception: {rex.Message}");
+            _logger.LogInformation("Check your network connection, exception: {message}", rex.Message);
         }
 
         return new List<HelpPage>();

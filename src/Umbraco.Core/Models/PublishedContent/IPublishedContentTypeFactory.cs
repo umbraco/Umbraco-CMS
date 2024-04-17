@@ -60,5 +60,5 @@ public interface IPublishedContentTypeFactory
     ///     <para>This is so the factory can flush its caches.</para>
     ///     <para>Invoked by the IPublishedSnapshotService.</para>
     /// </remarks>
-    void NotifyDataTypeChanges(int[] ids);
+    void NotifyDataTypeChanges(params int[] ids);
 }

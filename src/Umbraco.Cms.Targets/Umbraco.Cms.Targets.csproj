@@ -21,7 +21,7 @@
     <NoWarn>NU5100;NU5128</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" GeneratePathProperty="true" />
     <None Include="$(PkgUmbraco_JsonSchema_Extensions)\tasks\netstandard2.0\**" Pack="true" PackagePath="tasks\netstandard2.0" Visible="false" />
     <Content Include="$(_UmbracoCmsJsonSchemaReference)" PackagePath="" Visible="false" />
   </ItemGroup>

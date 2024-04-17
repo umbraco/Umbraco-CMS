@@ -22,6 +22,7 @@ public static class AuthorizationPolicies
     public const string ContentPermissionProtectById = nameof(ContentPermissionProtectById);
     public const string ContentPermissionBrowseById = nameof(ContentPermissionBrowseById);
     public const string ContentPermissionDeleteById = nameof(ContentPermissionDeleteById);
+    public const string ContentPermissionCreateBlueprintFromId = nameof(ContentPermissionCreateBlueprintFromId);
 
     public const string MediaPermissionByResource = nameof(MediaPermissionByResource);
     public const string MediaPermissionPathById = nameof(MediaPermissionPathById);
@@ -50,6 +51,7 @@ public static class AuthorizationPolicies
     public const string TreeAccessDataTypes = nameof(TreeAccessDataTypes);
     public const string TreeAccessPackages = nameof(TreeAccessPackages);
     public const string TreeAccessLogs = nameof(TreeAccessLogs);
+    public const string TreeAccessWebhooks = nameof(TreeAccessWebhooks);
     public const string TreeAccessTemplates = nameof(TreeAccessTemplates);
     public const string TreeAccessDictionary = nameof(TreeAccessDictionary);
     public const string TreeAccessRelationTypes = nameof(TreeAccessRelationTypes);

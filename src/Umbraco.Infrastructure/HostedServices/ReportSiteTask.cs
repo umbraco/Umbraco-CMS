@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Telemetry.Models;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices;
 
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.ReportSiteJob instead.  This class will be removed in Umbraco 14.")]
 public class ReportSiteTask : RecurringHostedServiceBase
 {
     private static HttpClient _httpClient = new();

@@ -8,6 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
+[Obsolete("Please use implementations of BlockPropertyValueCreatorBase instead of this. See BlockListPropertyValueConverter for inspiration.. Will be removed in V15.")]
 public abstract class BlockPropertyValueConverterBase<TBlockModel, TBlockItemModel, TBlockLayoutItem, TBlockConfiguration> : PropertyValueConverterBase
     where TBlockItemModel : class, IBlockReference<IPublishedElement, IPublishedElement>
     where TBlockLayoutItem : IBlockLayoutItem

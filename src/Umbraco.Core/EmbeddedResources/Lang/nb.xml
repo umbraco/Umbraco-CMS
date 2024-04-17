@@ -474,13 +474,13 @@
     <key alias="renewSession">Forny innlogging for å lagre</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Da er det søndag!</key>
-    <key alias="greeting1">Smil, det er mandag!</key>
-    <key alias="greeting2">Hurra, det er tirsdag!</key>
-    <key alias="greeting3">For en herlig onsdag!</key>
-    <key alias="greeting4">Gledelig torsdag!</key>
-    <key alias="greeting5">Endelig fredag!</key>
-    <key alias="greeting6">Gledelig lørdag</key>
+    <key alias="greeting0">Velkommen</key>
+    <key alias="greeting1">Velkommen</key>
+    <key alias="greeting2">Velkommen</key>
+    <key alias="greeting3">Velkommen</key>
+    <key alias="greeting4">Velkommen</key>
+    <key alias="greeting5">Velkommen</key>
+    <key alias="greeting6">Velkommen</key>
     <key alias="instruction">Logg på nedenfor</key>
     <key alias="signInWith">Logg på med</key>
     <key alias="timeout">Din sesjon er utløpt</key>

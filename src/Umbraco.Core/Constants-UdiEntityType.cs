@@ -46,6 +46,8 @@ public static partial class Constants
 
         public const string RelationType = "relation-type";
 
+        public const string Webhook = "webhook";
+
         // forms
         public const string FormsForm = "forms-form";
         public const string FormsPreValue = "forms-prevalue";

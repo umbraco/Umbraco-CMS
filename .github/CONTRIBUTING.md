@@ -27,7 +27,7 @@ The following steps are a quick-start guide:
 
 4. **Build**
 
-    Build your fork of Umbraco locally as described in the build documentation, you can [build with any IDE that support dotnet or the command line](BUILD.md).
+    Build your fork of Umbraco locally [as described in the build documentation](BUILD.md), you can build with any IDE that supports dotnet or the command line.
 
 5. **Branch**
 

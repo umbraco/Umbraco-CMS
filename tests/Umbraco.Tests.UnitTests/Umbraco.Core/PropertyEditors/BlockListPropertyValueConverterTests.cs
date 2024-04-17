@@ -5,60 +5,19 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
 [TestFixture]
-public class BlockListPropertyValueConverterTests
+public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterTestsBase<BlockListConfiguration>
 {
-    private readonly Guid _contentKey1 = Guid.NewGuid();
-    private readonly Guid _contentKey2 = Guid.NewGuid();
-    private const string ContentAlias1 = "Test1";
-    private const string ContentAlias2 = "Test2";
-    private readonly Guid _settingKey1 = Guid.NewGuid();
-    private readonly Guid _settingKey2 = Guid.NewGuid();
-    private const string SettingAlias1 = "Setting1";
-    private const string SettingAlias2 = "Setting2";
-
-    /// <summary>
-    ///     Setup mocks for IPublishedSnapshotAccessor
-    /// </summary>
-    private IPublishedSnapshotAccessor GetPublishedSnapshotAccessor()
-    {
-        var test1ContentType = Mock.Of<IPublishedContentType>(x =>
-            x.IsElement == true
-            && x.Key == _contentKey1
-            && x.Alias == ContentAlias1);
-        var test2ContentType = Mock.Of<IPublishedContentType>(x =>
-            x.IsElement == true
-            && x.Key == _contentKey2
-            && x.Alias == ContentAlias2);
-        var test3ContentType = Mock.Of<IPublishedContentType>(x =>
-            x.IsElement == true
-            && x.Key == _settingKey1
-            && x.Alias == SettingAlias1);
-        var test4ContentType = Mock.Of<IPublishedContentType>(x =>
-            x.IsElement == true
-            && x.Key == _settingKey2
-            && x.Alias == SettingAlias2);
-        var contentCache = new Mock<IPublishedContentCache>();
-        contentCache.Setup(x => x.GetContentType(_contentKey1)).Returns(test1ContentType);
-        contentCache.Setup(x => x.GetContentType(_contentKey2)).Returns(test2ContentType);
-        contentCache.Setup(x => x.GetContentType(_settingKey1)).Returns(test3ContentType);
-        contentCache.Setup(x => x.GetContentType(_settingKey2)).Returns(test4ContentType);
-        var publishedSnapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == contentCache.Object);
-        var publishedSnapshotAccessor =
-            Mock.Of<IPublishedSnapshotAccessor>(x => x.TryGetPublishedSnapshot(out publishedSnapshot));
-        return publishedSnapshotAccessor;
-    }
+    protected override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.BlockList;
 
     private BlockListPropertyValueConverter CreateConverter()
     {
@@ -68,7 +27,8 @@ public class BlockListPropertyValueConverterTests
             Mock.Of<IProfilingLogger>(),
             new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory),
             Mock.Of<IContentTypeService>(),
-            new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()));
+            new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
+            new BlockListPropertyValueConstructorCache());
         return editor;
     }
 
@@ -78,40 +38,31 @@ public class BlockListPropertyValueConverterTests
         {
             new BlockListConfiguration.BlockConfiguration
             {
-                ContentElementTypeKey = _contentKey1,
-                SettingsElementTypeKey = _settingKey2,
+                ContentElementTypeKey = ContentKey1,
+                SettingsElementTypeKey = SettingKey2,
             },
             new BlockListConfiguration.BlockConfiguration
             {
-                ContentElementTypeKey = _contentKey2,
-                SettingsElementTypeKey = _settingKey1,
+                ContentElementTypeKey = ContentKey2,
+                SettingsElementTypeKey = SettingKey1,
             },
         },
     };
 
     private BlockListConfiguration ConfigForSingle() => new()
     {
-        Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = _contentKey1 } },
+        Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = ContentKey1 } },
     };
 
     private BlockListConfiguration ConfigForSingleBlockMode() => new()
     {
-        Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = _contentKey1 } },
+        Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = ContentKey1 } },
         ValidationLimit = new() { Min = 1, Max = 1 },
         UseSingleBlockMode = true,
     };
 
-    private IPublishedPropertyType GetPropertyType(BlockListConfiguration config)
-    {
-        var dataType = new PublishedDataType(1, "test", new Lazy<object>(() => config));
-        var propertyType = Mock.Of<IPublishedPropertyType>(x =>
-            x.EditorAlias == Constants.PropertyEditors.Aliases.BlockList
-            && x.DataType == dataType);
-        return propertyType;
-    }
-
     [Test]
-    public void Is_Converter_For()
+    public void IsConverter_For()
     {
         var editor = CreateConverter();
         Assert.IsTrue(editor.IsConverter(
@@ -136,7 +87,7 @@ public class BlockListPropertyValueConverterTests
     }
 
     [Test]
-    public void Get_Value_Type_Single()
+    public void Get_Value_TypeSingle()
     {
         var editor = CreateConverter();
         var config = ConfigForSingle();
@@ -151,7 +102,7 @@ public class BlockListPropertyValueConverterTests
     }
 
     [Test]
-    public void Get_Value_Type_SingleBlockMode()
+    public void Get_Value_TypeSingleBlockMode()
     {
         var editor = CreateConverter();
         var config = ConfigForSingleBlockMode();
@@ -263,7 +214,7 @@ data: []}";
     },
         contentData: [
         {
-            'contentTypeKey': '" + _contentKey1 + @"',
+            'contentTypeKey': '" + ContentKey1 + @"',
             'key': '1304E1DD-0000-4396-84FE-8A399231CB3D'
         }
     ]
@@ -294,7 +245,7 @@ data: []}";
     },
         contentData: [
         {
-            'contentTypeKey': '" + _contentKey1 + @"',
+            'contentTypeKey': '" + ContentKey1 + @"',
             'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
         }
     ]
@@ -336,29 +287,29 @@ data: []}";
     },
     contentData: [
         {
-            'contentTypeKey': '" + _contentKey1 + @"',
+            'contentTypeKey': '" + ContentKey1 + @"',
             'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
         },
         {
-            'contentTypeKey': '" + _contentKey2 + @"',
+            'contentTypeKey': '" + ContentKey2 + @"',
             'udi': 'umb://element/E05A034704424AB3A520E048E6197E79'
         },
         {
-            'contentTypeKey': '" + _contentKey2 + @"',
+            'contentTypeKey': '" + ContentKey2 + @"',
             'udi': 'umb://element/0A4A416E547D464FABCC6F345C17809A'
         }
     ],
     settingsData: [
         {
-            'contentTypeKey': '" + _settingKey1 + @"',
+            'contentTypeKey': '" + SettingKey1 + @"',
             'udi': 'umb://element/63027539B0DB45E7B70459762D4E83DD'
         },
         {
-            'contentTypeKey': '" + _settingKey2 + @"',
+            'contentTypeKey': '" + SettingKey2 + @"',
             'udi': 'umb://element/1F613E26CE274898908A561437AF5100'
         },
         {
-            'contentTypeKey': '" + _settingKey2 + @"',
+            'contentTypeKey': '" + SettingKey2 + @"',
             'udi': 'umb://element/BCF4BA3DA40C496C93EC58FAC85F18B9'
         }
     ],
@@ -385,7 +336,7 @@ data: []}";
     }
 
     [Test]
-    public void Data_Item_Removed_If_Removed_From_Config()
+    public void Data_Item_Removed_If_Removed_FromConfig()
     {
         var editor = CreateConverter();
 
@@ -397,7 +348,7 @@ data: []}";
             {
                 new BlockListConfiguration.BlockConfiguration
                 {
-                    ContentElementTypeKey = _contentKey2,
+                    ContentElementTypeKey = ContentKey2,
                     SettingsElementTypeKey = null,
                 },
             },
@@ -422,29 +373,29 @@ data: []}";
     },
     contentData: [
         {
-            'contentTypeKey': '" + _contentKey1 + @"',
+            'contentTypeKey': '" + ContentKey1 + @"',
             'udi': 'umb://element/1304E1DDAC87439684FE8A399231CB3D'
         },
         {
-            'contentTypeKey': '" + _contentKey2 + @"',
+            'contentTypeKey': '" + ContentKey2 + @"',
             'udi': 'umb://element/E05A034704424AB3A520E048E6197E79'
         },
         {
-            'contentTypeKey': '" + _contentKey2 + @"',
+            'contentTypeKey': '" + ContentKey2 + @"',
             'udi': 'umb://element/0A4A416E547D464FABCC6F345C17809A'
         }
     ],
     settingsData: [
         {
-            'contentTypeKey': '" + _settingKey1 + @"',
+            'contentTypeKey': '" + SettingKey1 + @"',
             'udi': 'umb://element/63027539B0DB45E7B70459762D4E83DD'
         },
         {
-            'contentTypeKey': '" + _settingKey2 + @"',
+            'contentTypeKey': '" + SettingKey2 + @"',
             'udi': 'umb://element/1F613E26CE274898908A561437AF5100'
         },
         {
-            'contentTypeKey': '" + _settingKey2 + @"',
+            'contentTypeKey': '" + SettingKey2 + @"',
             'udi': 'umb://element/BCF4BA3DA40C496C93EC58FAC85F18B9'
         }
     ],

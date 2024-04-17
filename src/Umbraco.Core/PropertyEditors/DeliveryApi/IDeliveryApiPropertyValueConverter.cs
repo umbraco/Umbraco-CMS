@@ -12,6 +12,15 @@ public interface IDeliveryApiPropertyValueConverter : IPropertyValueConverter
     PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType);
 
     /// <summary>
+    ///     Gets the property cache level for Delivery API representation when expanding the property.
+    /// </summary>
+    /// <param name="propertyType">The property type.</param>
+    /// <returns>The property cache level.</returns>
+    /// <remarks>Defaults to the value of <see cref="GetDeliveryApiPropertyCacheLevel"/>.</remarks>
+    PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType)
+        => GetDeliveryApiPropertyCacheLevel(propertyType);
+
+    /// <summary>
     ///     Gets the type of values returned by the converter for Delivery API representation.
     /// </summary>
     /// <param name="propertyType">The property type.</param>

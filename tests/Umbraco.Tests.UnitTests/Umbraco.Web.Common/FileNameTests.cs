@@ -1,22 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Install;
@@ -72,19 +63,21 @@ internal class FileNameTests
 
     [Test]
     [AutoMoqData]
-    public async Task BackOfficeDefaultExists(
-        [Frozen] IHostingEnvironment hostingEnvironment,
-        [Frozen] ITempDataDictionary tempDataDictionary,
-        [Frozen] IRuntimeState runtimeState,
-        BackOfficeController sut)
+    public async Task LoginViewExists(BackOfficeController sut)
     {
-        Mock.Get(hostingEnvironment).Setup(x => x.ToAbsolute("/")).Returns("http://localhost/");
-        Mock.Get(hostingEnvironment).SetupGet(x => x.ApplicationVirtualPath).Returns("/");
-        Mock.Get(runtimeState).Setup(x => x.Level).Returns(RuntimeLevel.Run);
+        var viewResult = await sut.Login() as ViewResult;
+        var fileName = GetViewName(viewResult);
 
-        sut.TempData = tempDataDictionary;
+        var views = GetUiFiles(new[] { "umbraco", "UmbracoLogin" });
 
-        var viewResult = await sut.Default() as ViewResult;
+        Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
+    }
+
+    [Test]
+    [AutoMoqData]
+    public void BackOfficeDefaultExists(BackOfficeController sut)
+    {
+        var viewResult = sut.DefaultView();
         var fileName = GetViewName(viewResult);
         var views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
 

@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Umbraco.Cms.Core.PublishedCache;
 
 /// <summary>
@@ -6,5 +8,5 @@ namespace Umbraco.Cms.Core.PublishedCache;
 /// </summary>
 public interface IPublishedSnapshotAccessor
 {
-    bool TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot);
+    bool TryGetPublishedSnapshot([NotNullWhen(true)] out IPublishedSnapshot? publishedSnapshot);
 }

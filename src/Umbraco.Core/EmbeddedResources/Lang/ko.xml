@@ -441,6 +441,13 @@
     <key alias="renewSession">TRANSLATE ME: 'Renew now to save your work'</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">환영합니다</key>
+    <key alias="greeting1">환영합니다</key>
+    <key alias="greeting2">환영합니다</key>
+    <key alias="greeting3">환영합니다</key>
+    <key alias="greeting4">환영합니다</key>
+    <key alias="greeting5">환영합니다</key>
+    <key alias="greeting6">환영합니다</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">

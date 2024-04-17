@@ -113,7 +113,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             if (parts.Length != 2)
             {
                 // invalid filter
-                _logger.LogInformation($"The \"{nameof(filters)}\" query option \"{filter}\" is not valid");
+                _logger.LogInformation("An invalid filter option was encountered. Please ensure that supplied filter options are two-part, separated by ':'.");
                 return null;
             }
 
@@ -127,7 +127,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
                     break;
                 default:
                     // unknown filter
-                    _logger.LogInformation($"The \"{nameof(filters)}\" query option \"{filter}\" is not supported");
+                    _logger.LogInformation("An unsupported filter option was supplied for the query. Please use only valid filter options. See the documentation for details.");
                     return null;
             }
         }
@@ -143,7 +143,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
             if (parts.Length != 2)
             {
                 // invalid sort
-                _logger.LogInformation($"The \"{nameof(sorts)}\" query option \"{sort}\" is not valid");
+                _logger.LogInformation("An invalid sort option was encountered. Please ensure that the supplied sort options are two-part, separated by ':'.");
                 return null;
             }
 
@@ -164,7 +164,7 @@ internal sealed class ApiMediaQueryService : IApiMediaQueryService
                     break;
                 default:
                     // unknown sort
-                    _logger.LogInformation($"The \"{nameof(sorts)}\" query option \"{sort}\" is not supported");
+                    _logger.LogInformation("An unsupported sort option was supplied for the query. Please use only valid sort options. See the documentation for details.");
                     return null;
             }
 

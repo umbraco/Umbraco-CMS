@@ -1,5 +1,5 @@
 window.app.config(function ($routeProvider) {
-    
+
     /**
      * This determines if the route can continue depending on authentication and initialization requirements
      * @param {boolean} authRequired If true, it checks if the user is authenticated and will resolve successfully
@@ -82,9 +82,6 @@ window.app.config(function ($routeProvider) {
         return {
             isLoggedOut: function ($q, $location, userService) {
                 return userService.logout().then(function () {
-                    // we have to redirect here instead of the routes redirectTo
-                    // https://github.com/angular/angular.js/commit/7f4b356c2bebb87f0c26b57a20415b004b20bcd1
-                    $location.path("/login/false");
                     //success so continue
                     return $q.when(true);
                 }, function() {
@@ -117,9 +114,9 @@ window.app.config(function ($routeProvider) {
             template: "<div ng-include='templateUrl'></div>",
             //This controller will execute for this route, then we can execute some code in order to set the template Url
             controller: function ($scope, $route, $routeParams, $location, sectionService) {
-                
+
                 //We are going to check the currently loaded sections for the user and if the section we are navigating
-                //to has a custom route path we'll use that 
+                //to has a custom route path we'll use that
                 sectionService.getSectionsForUser().then(function(sections) {
                     //find the one we're requesting
                     var found = _.find(sections, function(s) {
@@ -199,7 +196,7 @@ window.app.config(function ($routeProvider) {
         })
         .otherwise({ redirectTo: '/login' });
     }).config(function ($locationProvider) {
-        
+
         $locationProvider.html5Mode(false); //turn html5 mode off
         $locationProvider.hashPrefix('');
     });
