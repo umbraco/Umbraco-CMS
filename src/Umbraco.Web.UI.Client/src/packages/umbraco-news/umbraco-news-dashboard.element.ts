@@ -41,13 +41,14 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 						</p>
 						<uui-button
 							look="primary"
+							target="_blank"
 							href="https://our.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=our"
 							label="Visit Our Umbraco"></uui-button>
 					</div>
 				</uui-box>
 				${this.#infoLinks.map(
 					(link) => html`
-						<a class="info-link" href=${link.href}>
+						<a class="info-link" target="_blank" href=${link.href}>
 							<h3 class="uui-h5">${link.name}</h3>
 							<p>${link.description}</p>
 						</a>
@@ -71,6 +72,7 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			#our-umbraco {
 				grid-column-start: 1;
 				grid-column-end: -1;
+				margin-bottom: var(--uui-size-space-4);
 			}
 			#info-links {
 				display: grid;
