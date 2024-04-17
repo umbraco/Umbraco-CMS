@@ -27,7 +27,7 @@ type FlagTypes =
 	| 'valid';
 
 // Acceptable as an internal interface/type, BUT if exposed externally this should be turned into a public interface in a separate file.
-interface UmbFormControlValidationConfig {
+interface UmbFormControlValidatorConfig {
 	flagKey: FlagTypes;
 	getMessageMethod: () => string;
 	checkMethod: () => boolean;
@@ -35,7 +35,7 @@ interface UmbFormControlValidationConfig {
 
 export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> extends HTMLElement {
 	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
-	removeValidator: (obj: UmbFormControlValidationConfig) => void;
+	removeValidator: (obj: UmbFormControlValidatorConfig) => void;
 	//static formAssociated: boolean;
 	//protected getFormElement(): HTMLElement | undefined | null; // allows for null as it makes it simpler to just implement a querySelector as that might return null. [NL]
 	focusFirstInvalidElement(): void;
@@ -57,7 +57,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 	protected _internals: ElementInternals;
 	protected _runValidators(): void;
 	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
-	removeValidator: (obj: UmbFormControlValidationConfig) => void;
+	removeValidator: (obj: UmbFormControlValidatorConfig) => void;
 	protected addFormControlElement(element: UmbNativeFormControlElement): void;
 
 	//static formAssociated: boolean;
@@ -138,7 +138,7 @@ export const UmbFormControlMixin = <
 		#value: ValueType | DefaultValueType = defaultValue;
 		protected _internals: ElementInternals;
 		#form: HTMLFormElement | null = null;
-		#validators: UmbFormControlValidationConfig[] = [];
+		#validators: UmbFormControlValidatorConfig[] = [];
 		#formCtrlElements: UmbNativeFormControlElement[] = [];
 
 		constructor(...args: any[]) {
@@ -208,7 +208,7 @@ export const UmbFormControlMixin = <
 			flagKey: FlagTypes,
 			getMessageMethod: () => string,
 			checkMethod: () => boolean,
-		): UmbFormControlValidationConfig {
+		): UmbFormControlValidatorConfig {
 			const validator = {
 				flagKey: flagKey,
 				getMessageMethod: getMessageMethod,
@@ -221,9 +221,9 @@ export const UmbFormControlMixin = <
 		/**
 		 * Remove validation from this form control.
 		 * @method removeValidator
-		 * @param {UmbFormControlValidationConfig} validator - The specific validation configuration to remove.
+		 * @param {UmbFormControlValidatorConfig} validator - The specific validation configuration to remove.
 		 */
-		removeValidator(validator: UmbFormControlValidationConfig) {
+		removeValidator(validator: UmbFormControlValidatorConfig) {
 			const index = this.#validators.indexOf(validator);
 			if (index !== -1) {
 				this.#validators.splice(index, 1);
@@ -251,7 +251,7 @@ export const UmbFormControlMixin = <
 			}
 		}
 
-		private _customValidityObject?: UmbFormControlValidationConfig;
+		private _customValidityObject?: UmbFormControlValidatorConfig;
 
 		/**
 		 * @method setCustomValidity
