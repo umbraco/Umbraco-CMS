@@ -224,6 +224,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 				display: flex;
 				gap: var(--uui-size-space-3);
 				flex-direction: column;
+				padding: var(--uui-size-space-3);
 			}
 		`,
 	];
