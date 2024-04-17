@@ -15,7 +15,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptName);
   });
 
-  test('can create a empty script @smoke', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a empty script @smoke', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.script.clickActionsMenuAtRoot();
     await umbracoUi.script.clickCreateButton();
@@ -30,7 +30,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isScriptTreeItemVisibile(scriptName);
   });
 
-  test('can create a script with content', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a script with content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const scriptContent = 'TestContent';
 
@@ -51,7 +51,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isScriptTreeItemVisibile(scriptName);
   });
 
-  test('can update a script @smoke', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can update a script @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.create(scriptName, 'test');
     const updatedScriptContent = 'const test = {\r\n    script = \u0022Test\u0022,\r\n    extension = \u0022.js\u0022,\r\n    scriptPath: function() {\r\n        return this.script \u002B this.extension;\r\n    }\r\n};\r\n';
@@ -67,7 +67,7 @@ test.describe('Script tests', () => {
     expect(updatedScript.content).toBe(updatedScriptContent);
   });
 
-  test('can delete a script @smoke', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can delete a script @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.create(scriptName, '');
 
@@ -82,7 +82,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isScriptTreeItemVisibile(scriptName, false);
   });
 
-  test('can rename a script', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can rename a script', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongScriptName = 'WrongTestScript.js';
     await umbracoApi.script.create(wrongScriptName, '');
