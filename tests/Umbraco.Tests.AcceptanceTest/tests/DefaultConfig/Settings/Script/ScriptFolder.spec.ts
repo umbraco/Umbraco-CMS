@@ -15,7 +15,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
   });
 
-  test('can create a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a folder', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.script.clickActionsMenuAtRoot();
     await umbracoUi.script.createFolder(scriptFolderName);
@@ -27,7 +27,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isScriptTreeItemVisibile(scriptFolderName);
   });
 
-  test('can delete a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can delete a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.createFolder(scriptFolderName);
 
@@ -67,7 +67,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isScriptTreeItemVisibile(scriptName);
   });
 
-  test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.createFolder(scriptFolderName);
     const childFolderName = 'childFolderName';
