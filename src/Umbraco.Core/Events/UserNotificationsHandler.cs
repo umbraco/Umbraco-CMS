@@ -197,7 +197,7 @@ public sealed class UserNotificationsHandler :
                     _logger.LogDebug(
                     "There is no current Umbraco user logged in, the notifications will be sent from the administrator");
                 }
-                user = _userService.GetUserById(Constants.Security.SuperUserId);
+                user = _userService.GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
                 if (user == null)
                 {
                     _logger.LogWarning(

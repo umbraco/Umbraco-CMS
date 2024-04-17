@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -15,31 +13,6 @@ public class MetricsConsentService : IMetricsConsentService
     private readonly ILogger<MetricsConsentService> _logger;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUserService _userService;
-
-    // Scheduled for removal in V12
-    [Obsolete("Please use the constructor that takes an ILogger and IBackOfficeSecurity instead")]
-    public MetricsConsentService(IKeyValueService keyValueService)
-        : this(
-            keyValueService,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<MetricsConsentService>>(),
-            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>(),
-            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
-    {
-    }
-
-    // Scheduled for removal in V12
-    [Obsolete("Please use the constructor that takes an IUserService instead")]
-    public MetricsConsentService(
-        IKeyValueService keyValueService,
-        ILogger<MetricsConsentService> logger,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(
-            keyValueService,
-            logger,
-            backOfficeSecurityAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
-    {
-    }
 
     public MetricsConsentService(
         IKeyValueService keyValueService,
@@ -66,13 +39,12 @@ public class MetricsConsentService : IMetricsConsentService
         return analyticsLevel;
     }
 
-    public void SetConsentLevel(TelemetryLevel telemetryLevel)
+    [Obsolete("Please use SetConsentLevelAsync instead, scheduled for removal in V15")]
+    public void SetConsentLevel(TelemetryLevel telemetryLevel) => SetConsentLevelAsync(telemetryLevel).GetAwaiter().GetResult();
+
+    public async Task SetConsentLevelAsync(TelemetryLevel telemetryLevel)
     {
-        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        if (currentUser is null)
-        {
-            currentUser = _userService.GetUserById(Constants.Security.SuperUserId);
-        }
+        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser ?? await _userService.GetAsync(Constants.Security.SuperUserKey);
 
         _logger.LogInformation("Telemetry level set to {telemetryLevel} by {username}", telemetryLevel, currentUser?.Username);
         _keyValueService.SetValue(Key, telemetryLevel.ToString());

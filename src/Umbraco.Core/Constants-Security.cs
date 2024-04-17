@@ -112,6 +112,11 @@ public static partial class Constants
         /// </summary>
         public const string SecurityStampClaimType = "AspNet.Identity.SecurityStamp";
 
+        /// <summary>
+        ///     The claim type for the mandatory OpenIdDict sub claim
+        /// </summary>
+        public const string OpenIdDictSubClaimType = "sub";
+
         public const string AspNetCoreV3PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V3";
         public const string AspNetCoreV2PasswordHashAlgorithmName = "PBKDF2.ASPNETCORE.V2";
         public const string AspNetUmbraco8PasswordHashAlgorithmName = "HMACSHA256";

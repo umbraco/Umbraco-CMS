@@ -22,7 +22,10 @@ public class CopyMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Copy(Guid id, CopyMediaTypeRequestModel copyMediaTypeRequestModel)
+    public async Task<IActionResult> Copy(
+        CancellationToken cancellationToken,
+        Guid id,
+        CopyMediaTypeRequestModel copyMediaTypeRequestModel)
     {
         Attempt<IMediaType?, ContentTypeStructureOperationStatus> result = await _mediaTypeService.CopyAsync(id, copyMediaTypeRequestModel.Target?.Id);
 

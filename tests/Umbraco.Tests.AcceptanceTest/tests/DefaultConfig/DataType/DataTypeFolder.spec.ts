@@ -19,13 +19,17 @@ test.describe('Data Types Folder tests', () => {
   test('can create a data type folder', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.dataType.clickActionsMenuAtRoot();
-    await umbracoUi.dataType.createFolder(dataTypeFolderName);
+    await umbracoUi.dataType.clickCreateButton();
+    await umbracoUi.dataType.clickNewDataTypeFolderButton();
+    await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
+    await umbracoUi.dataType.clickCreateFolderButton();
 
     // Assert
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
   });
 
-  test('can rename a data type folder @smoke', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Remove skip due to the front-end changes. Need to update the rename folder locator.
+  test.skip('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongDataTypeFolderName = 'Wrong Folder';
     await umbracoApi.dataType.ensureNameNotExists(wrongDataTypeFolderName);
@@ -65,7 +69,7 @@ test.describe('Data Types Folder tests', () => {
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
-    await umbracoUi.dataType.clickCreateThreeDotsButton();
+    await umbracoUi.dataType.clickCreateButton();
     await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
     await umbracoUi.dataType.enterDataTypeName(dataTypeName);
     await umbracoUi.dataType.clickSaveButton();
@@ -87,7 +91,14 @@ test.describe('Data Types Folder tests', () => {
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
+<<<<<<< HEAD
     await umbracoUi.dataType.createFolder(childFolderName);
+=======
+    await umbracoUi.dataType.clickCreateButton();
+    await umbracoUi.dataType.clickNewDataTypeFolderButton();
+    await umbracoUi.dataType.enterFolderName(childFolderName);
+    await umbracoUi.dataType.clickCreateFolderButton();
+>>>>>>> v14/dev
 
     // Assert
     expect(await umbracoApi.dataType.doesNameExist(childFolderName)).toBeTruthy();

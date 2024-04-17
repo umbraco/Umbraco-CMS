@@ -3,7 +3,9 @@ import {expect} from '@playwright/test';
 
 test.describe('Stylesheets tests', () => {
   const stylesheetName = 'TestStyleSheetFile.css';
-  const ruleName = 'TestRuleName';
+  const styleName = 'TestStyleName';
+  const styleSelector = 'h1';
+  const styleStyles = 'color:red';
 
   test.beforeEach(async ({umbracoUi,umbracoApi}) => {
     await umbracoUi.goToBackOffice();
@@ -18,7 +20,7 @@ test.describe('Stylesheets tests', () => {
   test('can create a empty stylesheet @smoke', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
-    await umbracoUi.stylesheet.clickCreateThreeDotsButton();
+    await umbracoUi.stylesheet.clickCreateButton();
     await umbracoUi.stylesheet.clickNewStylesheetButton();
     await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
     await umbracoUi.stylesheet.clickSaveButton();
@@ -26,7 +28,8 @@ test.describe('Stylesheets tests', () => {
     // Assert
     await umbracoUi.stylesheet.isSuccessNotificationVisible();
     expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
-    // TODO: when frontend is ready, verify the new stylesheet is displayed under the Stylesheets section
+    await umbracoUi.stylesheet.clickRootFolderCaretButton();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 
   test('can create a stylesheet with content', async ({umbracoApi, umbracoUi}) => {
@@ -35,7 +38,7 @@ test.describe('Stylesheets tests', () => {
 
     //Act
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
-    await umbracoUi.stylesheet.clickCreateThreeDotsButton();
+    await umbracoUi.stylesheet.clickCreateButton();
     await umbracoUi.stylesheet.clickNewStylesheetButton();
     await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
     await umbracoUi.stylesheet.enterStylesheetContent(stylesheetContent);
@@ -44,42 +47,48 @@ test.describe('Stylesheets tests', () => {
     // Assert
     await umbracoUi.stylesheet.isSuccessNotificationVisible();
     expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
-    // TODO: when frontend is ready, verify the new stylesheet is displayed under the Stylesheets section
     const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
     expect(stylesheetData.content).toEqual(stylesheetContent);
+    await umbracoUi.stylesheet.clickRootFolderCaretButton();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 
-  //  We are not able to create stylesheet with RTE styles.
-  test.skip('can create a new Rich Text Editor stylesheet file @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a new Rich Text Editor stylesheet file @smoke', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
+
     //Act
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
-    await umbracoUi.stylesheet.clickCreateThreeDotsButton();
+    await umbracoUi.stylesheet.clickCreateButton();
     await umbracoUi.stylesheet.clickNewRichTextEditorStylesheetButton();
     await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
-    await umbracoUi.stylesheet.addNewRule(ruleName, 'h1', 'color:red');
+    await umbracoUi.stylesheet.addRTEStyle(styleName, styleSelector, styleStyles);
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
     await umbracoUi.stylesheet.isSuccessNotificationVisible();
     expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
-    expect(await umbracoApi.stylesheet.doesRuleNameExist(stylesheetName, ruleName)).toBeTruthy();
-    // TODO: when frontend is ready, verify the new stylesheet is displayed under the Stylesheets section
+    const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
+    expect(stylesheetData.content).toEqual(stylesheetContent);
+    await umbracoUi.stylesheet.clickRootFolderCaretButton();
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 
-  // We are not able to update a stylesheet with RTE styles.
-  test.skip('can update a stylesheet @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can update a stylesheet', async ({umbracoApi, umbracoUi}) => {
     // Arrange
+    const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
     await umbracoApi.stylesheet.create(stylesheetName, '', '/');
+    expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
 
     //Act
     await umbracoUi.stylesheet.openStylesheetByNameAtRoot(stylesheetName);
-    await umbracoUi.stylesheet.addNewRule(ruleName, 'h1', 'color:red');
+    await umbracoUi.stylesheet.addRTEStyle(styleName, styleSelector, styleStyles);
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
-    // await umbracoUi.stylesheet.isSuccessNotificationVisible();
-    expect(await umbracoApi.stylesheet.doesRuleNameExist(stylesheetName, ruleName)).toBeTruthy();
-    // TODO: when frontend is ready, verify the notification displays
+    await umbracoUi.stylesheet.isSuccessNotificationVisible();
+    const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
+    expect(stylesheetData.content).toEqual(stylesheetContent);
   });
 
   test('can delete a stylesheet @smoke', async ({umbracoApi, umbracoUi}) => {
@@ -89,12 +98,65 @@ test.describe('Stylesheets tests', () => {
     //Act
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
     await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetName);
-    await umbracoUi.stylesheet.deleteStylesheet();
+    await umbracoUi.stylesheet.clickDeleteAndConfirmButton();
 
     // Assert
     await umbracoUi.stylesheet.isSuccessNotificationVisible();
     expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeFalsy();
-    // TODO: when frontend is ready, verify the new stylesheet is NOT displayed under the Stylesheets section
-    // TODO: when frontend is ready, verify the notification displays
+    await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName, false);
+  });
+
+  test('can rename a stylesheet', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const wrongStylesheetName = 'WrongStylesheetName.css';
+    await umbracoApi.stylesheet.create(wrongStylesheetName, '', '/');
+
+    //Act
+    await umbracoUi.stylesheet.clickRootFolderCaretButton();
+    await umbracoUi.stylesheet.clickActionsMenuForStylesheet(wrongStylesheetName);
+    await umbracoUi.stylesheet.rename(stylesheetName);
+
+    // Assert
+    await umbracoUi.stylesheet.isSuccessNotificationVisible();
+    expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
+    expect(await umbracoApi.stylesheet.doesNameExist(wrongStylesheetName)).toBeFalsy();
+  });
+
+  test('can edit rich text editor styles', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const newStyleName = 'TestNewStyleName';
+    const newStyleSelector = 'h2';
+    const newStyleStyles = 'color: white';
+    const newStylesheetContent = '/**umb_name:' + newStyleName + '*/\n' + newStyleSelector + ' {\n\t' +  newStyleStyles + '\n}';
+    const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
+    await umbracoApi.stylesheet.create(stylesheetName, stylesheetContent, '/');
+    expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
+
+    //Act
+    await umbracoUi.stylesheet.openStylesheetByNameAtRoot(stylesheetName);
+    await umbracoUi.stylesheet.editRTEStyle(styleName, newStyleName, newStyleSelector, newStyleStyles);
+    await umbracoUi.stylesheet.clickSaveButton();
+
+    // Assert
+    await umbracoUi.stylesheet.isSuccessNotificationVisible();
+    const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
+    expect(stylesheetData.content).toEqual(newStylesheetContent);
+  });
+
+  test('can remove rich text editor styles', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
+    await umbracoApi.stylesheet.create(stylesheetName, stylesheetContent, '/');
+    expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
+
+    //Act
+    await umbracoUi.stylesheet.openStylesheetByNameAtRoot(stylesheetName);
+    await umbracoUi.stylesheet.removeRTEStyle(styleName);
+    await umbracoUi.stylesheet.clickSaveButton();
+
+    // Assert
+    await umbracoUi.stylesheet.isSuccessNotificationVisible();
+    const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
+    expect(stylesheetData.content).toEqual('');
   });
 });

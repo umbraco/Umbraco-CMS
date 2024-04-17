@@ -18,7 +18,7 @@ public class ConfigurationDocumentController : DocumentControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentConfigurationResponseModel), StatusCodes.Status200OK)]
-    public Task<IActionResult> Configuration()
+    public Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         DocumentConfigurationResponseModel responseModel = _configurationPresentationFactory.CreateDocumentConfigurationResponseModel();
         return Task.FromResult<IActionResult>(Ok(responseModel));

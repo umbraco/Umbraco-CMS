@@ -38,7 +38,10 @@ public class UpdateMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateMediaTypeRequestModel requestModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateMediaTypeRequestModel requestModel)
     {
         IMediaType? mediaType = await _mediaTypeService.GetAsync(id);
         if (mediaType is null)

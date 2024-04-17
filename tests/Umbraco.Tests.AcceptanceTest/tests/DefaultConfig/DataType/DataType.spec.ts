@@ -18,7 +18,7 @@ test.describe('Data Types basic functionalities tests', () => {
   test('can create a data type @smoke', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.dataType.clickActionsMenuAtRoot();
-    await umbracoUi.dataType.clickCreateThreeDotsButton();
+    await umbracoUi.dataType.clickCreateButton();
     await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
     await umbracoUi.dataType.enterDataTypeName(dataTypeName);
     await umbracoUi.dataType.clickSaveButton();

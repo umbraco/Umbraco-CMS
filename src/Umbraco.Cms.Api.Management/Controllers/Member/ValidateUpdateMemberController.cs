@@ -29,7 +29,10 @@ public class ValidateUpdateMemberController : MemberControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Validate(Guid id, UpdateMemberRequestModel requestModel)
+    public async Task<IActionResult> Validate(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateMemberRequestModel requestModel)
     {
         MemberUpdateModel model = _memberEditingPresentationFactory.MapUpdateModel(requestModel);
         Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _memberEditingService.ValidateUpdateAsync(id, model);

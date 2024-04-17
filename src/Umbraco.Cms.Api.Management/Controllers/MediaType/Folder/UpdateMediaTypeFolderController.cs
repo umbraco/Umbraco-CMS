@@ -22,6 +22,9 @@ public class UpdateMediaTypeFolderController : MediaTypeFolderControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateFolderResponseModel updateFolderResponseModel)
+    public async Task<IActionResult> Update(
+        CancellationToken cancellationToken,
+        Guid id,
+        UpdateFolderResponseModel updateFolderResponseModel)
         => await UpdateFolderAsync(id, updateFolderResponseModel);
 }

@@ -59,7 +59,7 @@ public class CreateUserStep : StepBase, IInstallStep
 
     public async Task<Attempt<InstallationResult>> ExecuteAsync(InstallData model)
     {
-            IUser? admin = _userService.GetUserById(Constants.Security.SuperUserId);
+            IUser? admin = _userService.GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
             if (admin is null)
             {
                 return FailWithMessage("Could not find the super user");
@@ -92,7 +92,7 @@ public class CreateUserStep : StepBase, IInstallStep
                 return FailWithMessage("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
             }
 
-            _metricsConsentService.SetConsentLevel(model.TelemetryLevel);
+            await _metricsConsentService.SetConsentLevelAsync(model.TelemetryLevel);
 
             if (model.User.SubscribeToNewsletter)
             {

@@ -13,10 +13,9 @@
 		"npm": ">=10.1"
 	},
 	"dependencies": {
-		"msw": "^2.2.0"
+		"msw": "^2.2.13"
 	},
 	"devDependencies": {
-		"@umbraco-ui/uui-css": "1.7.2",
 		"typescript": "^5.3.3",
 		"vite": "^5.2.2",
 		"vite-tsconfig-paths": "^4.3.2"

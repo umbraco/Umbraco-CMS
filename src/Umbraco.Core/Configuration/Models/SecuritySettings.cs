@@ -26,6 +26,7 @@ public class SecuritySettings
     internal const int StaticMemberDefaultLockoutTimeInMinutes = 30 * 24 * 60;
     internal const int StaticUserDefaultLockoutTimeInMinutes = 30 * 24 * 60;
     internal const string StaticAuthorizeCallbackPathName = "/umbraco";
+    internal const string StaticAuthorizeCallbackErrorPathName = "/umbraco/error";
 
     /// <summary>
     ///     Gets or sets a value indicating whether to keep the user logged in.
@@ -66,18 +67,6 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticAllowedUserNameCharacters)]
     public string AllowedUserNameCharacters { get; set; } = StaticAllowedUserNameCharacters;
-
-    /// <summary>
-    ///     Gets or sets a value for the user password settings.
-    /// </summary>
-    [Obsolete("This no longer works. You can now inject this by using IOptions<UserPasswordConfigurationSettings> instead, scheduled for removal in v13")]
-    public UserPasswordConfigurationSettings? UserPassword { get; set; } = new();
-
-    /// <summary>
-    ///     Gets or sets a value for the member password settings.
-    /// </summary>
-    [Obsolete("This no longer works. You can now inject this by using IOptions<MemberPasswordConfigurationSettings> instead, scheduled for removal in v13")]
-    public MemberPasswordConfigurationSettings? MemberPassword { get; set; } = new();
 
     /// <summary>
     ///     Gets or sets a value indicating whether to bypass the two factor requirement in Umbraco when using external login
@@ -128,4 +117,7 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticAuthorizeCallbackPathName)]
     public string AuthorizeCallbackPathName { get; set; } = StaticAuthorizeCallbackPathName;
+
+    [DefaultValue(StaticAuthorizeCallbackErrorPathName)]
+    public string AuthorizeCallbackErrorPathName { get; set; } = StaticAuthorizeCallbackErrorPathName;
 }
