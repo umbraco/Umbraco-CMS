@@ -141,7 +141,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	}
 
 	#observeSimilarContainers() {
-		if (!this.#containerName || !this.#containerType || this.#parentName === undefined) return;
+		if (this.#containerName === undefined || !this.#containerType || this.#parentName === undefined) return;
 		this.observe(
 			this.#structure!.containersByNameAndTypeAndParent(
 				this.#containerName,
