@@ -7,7 +7,8 @@
     "ui": "npx playwright test --headed DefaultConfig",
     "test": "npx playwright test DefaultConfig",
     "all": "npx playwright test",
-    "createTest": "node createTest.js"
+    "createTest": "node createTest.js",
+    "smokeTest": "npx playwright test DefaultConfig --grep '@smoke'"
   },
   "devDependencies": {
     "@playwright/test": "^1.38",
