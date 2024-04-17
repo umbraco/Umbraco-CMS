@@ -82,7 +82,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
  */
 export const UmbFormControlMixin = <
 	ValueType = FormDataEntryValue | FormData,
-	T extends HTMLElementConstructor<LitElement> = HTMLElementConstructor<LitElement>,
+	T extends HTMLElementConstructor<HTMLElement> = HTMLElementConstructor<HTMLElement>,
 	DefaultValueType = undefined,
 >(
 	superClass: T,
