@@ -17,6 +17,9 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	@property({ type: Boolean })
 	displayNavigation = false;
 
+	@property()
+	public backPath?: string;
+
 	@property({ type: Number })
 	public set splitViewIndex(index: number) {
 		this.splitViewContext.setSplitViewIndex(index);
@@ -29,7 +32,11 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-editor alias=${this.alias} .hideNavigation=${!this.displayNavigation} .enforceNoFooter=${true}>
+			<umb-workspace-editor
+				alias=${this.alias}
+				.backPath=${this.backPath}
+				.hideNavigation=${!this.displayNavigation}
+				.enforceNoFooter=${true}>
 				<div id="header" slot="header">
 					<umb-variant-selector></umb-variant-selector>
 				</div>
