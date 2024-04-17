@@ -1153,6 +1153,28 @@ requestBody
 	 * @returns unknown Success
 	 * @throws ApiError
 	 */
+	public static getTreeDocumentBlueprintAncestors(data: DocumentBlueprintData['payloads']['GetTreeDocumentBlueprintAncestors'] = {}): CancelablePromise<DocumentBlueprintData['responses']['GetTreeDocumentBlueprintAncestors']> {
+		const {
+                    
+                    descendantId
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/tree/document-blueprint/ancestors',
+			query: {
+				descendantId
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
 	public static getTreeDocumentBlueprintChildren(data: DocumentBlueprintData['payloads']['GetTreeDocumentBlueprintChildren'] = {}): CancelablePromise<DocumentBlueprintData['responses']['GetTreeDocumentBlueprintChildren']> {
 		const {
                     
@@ -1315,6 +1337,34 @@ take
 		return __request(OpenAPI, {
 			method: 'GET',
 			url: '/umbraco/management/api/v1/document-type/{id}/allowed-children',
+			path: {
+				id
+			},
+			query: {
+				skip, take
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getDocumentTypeByIdBlueprint(data: DocumentTypeData['payloads']['GetDocumentTypeByIdBlueprint']): CancelablePromise<DocumentTypeData['responses']['GetDocumentTypeByIdBlueprint']> {
+		const {
+                    
+                    id,
+skip,
+take
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/document-type/{id}/blueprint',
 			path: {
 				id
 			},
@@ -2444,6 +2494,28 @@ take
 				401: `The resource is protected and requires an authentication token`,
 				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getDocumentUrls(data: DocumentData['payloads']['GetDocumentUrls'] = {}): CancelablePromise<DocumentData['responses']['GetDocumentUrls']> {
+		const {
+                    
+                    id
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/document/urls',
+			query: {
+				id
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4294,6 +4366,28 @@ take
 				401: `The resource is protected and requires an authentication token`,
 				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getMediaUrls(data: MediaData['payloads']['GetMediaUrls'] = {}): CancelablePromise<MediaData['responses']['GetMediaUrls']> {
+		const {
+                    
+                    id
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/media/urls',
+			query: {
+				id
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6587,6 +6681,7 @@ export class SecurityService {
 			url: '/umbraco/management/api/v1/security/configuration',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}

@@ -178,6 +178,13 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		return this.#structure.ownerContentTypePart((x) => x?.properties.some((y) => y.id === propertyId));
 	}
 
+	async contentTypeOfProperty(propertyId: UmbPropertyTypeId) {
+		await this.#init;
+		if (!this.#structure) return;
+
+		return this.#structure.contentTypeOfProperty(propertyId);
+	}
+
 	// TODO: consider moving this to another class, to separate 'viewer' from 'manipulator':
 	/** Manipulate methods: */
 
