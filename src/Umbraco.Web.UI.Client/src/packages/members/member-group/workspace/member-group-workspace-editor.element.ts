@@ -50,7 +50,7 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.MemberGroup" backPath="/section/member-management/view/member-groups">
+			<umb-workspace-editor alias="Umb.Workspace.MemberGroup" back-path="/section/member-management/view/member-groups">
 				${this.#renderActions()}
 				<div id="header" slot="header">
 					<uui-input id="nameInput" .value=${this._name} @input="${this.#onInput}" ${umbFocus()}></uui-input>

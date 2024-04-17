@@ -50,7 +50,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.User" class="uui-text" backPath="section/user-management">
+			<umb-workspace-editor alias="Umb.Workspace.User" class="uui-text" back-path="section/user-management">
 				${this.#renderHeader()}
 				<div id="main">
 					<div id="left-column">${this.#renderLeftColumn()}</div>

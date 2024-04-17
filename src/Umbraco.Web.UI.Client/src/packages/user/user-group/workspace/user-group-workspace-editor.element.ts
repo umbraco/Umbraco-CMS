@@ -167,7 +167,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 			<umb-workspace-editor
 				alias="Umb.Workspace.UserGroup"
 				class="uui-text"
-				backPath="/section/user-management/view/user-groups">
+				back-path="/section/user-management/view/user-groups">
 				${this.#renderHeader()}
 				<div id="main">
 					<div id="left-column">${this.#renderLeftColumn()}</div>

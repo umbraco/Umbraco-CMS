@@ -45,7 +45,7 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 							(view) => html`
 								<umb-workspace-split-view
 									alias="Umb.Workspace.Member"
-									.backPath=${this.#BACK_PATH}
+									back-path=${this.#BACK_PATH}
 									.splitViewIndex=${view.index}
 									.displayNavigation=${view.index === this._variants!.length - 1}>
 								</umb-workspace-split-view>
