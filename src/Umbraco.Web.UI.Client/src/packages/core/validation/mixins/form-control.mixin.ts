@@ -33,14 +33,14 @@ interface UmbFormControlValidatorConfig {
 	checkMethod: () => boolean;
 }
 
-export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> extends HTMLElement {
+export interface UmbFormControlMixinInterface<ValueType> extends HTMLElement {
 	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
 	removeValidator: (obj: UmbFormControlValidatorConfig) => void;
 	//static formAssociated: boolean;
 	//protected getFormElement(): HTMLElement | undefined | null; // allows for null as it makes it simpler to just implement a querySelector as that might return null. [NL]
 	focusFirstInvalidElement(): void;
-	get value(): ValueType | DefaultValueType;
-	set value(newValue: ValueType | DefaultValueType);
+	get value(): ValueType;
+	set value(newValue: ValueType);
 	formResetCallback(): void;
 	checkValidity(): boolean;
 	get validationMessage(): string;
@@ -50,9 +50,9 @@ export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> exten
 	pristine: boolean;
 }
 
-export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValueType>
+export declare abstract class UmbFormControlMixinElement<ValueType>
 	extends LitElement
-	implements UmbFormControlMixinInterface<ValueType, DefaultValueType>
+	implements UmbFormControlMixinInterface<ValueType>
 {
 	protected _internals: ElementInternals;
 	protected _runValidators(): void;
@@ -63,8 +63,8 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
 	//static formAssociated: boolean;
 	protected getFormElement(): HTMLElement | undefined | null;
 	focusFirstInvalidElement(): void;
-	get value(): ValueType | DefaultValueType;
-	set value(newValue: ValueType | DefaultValueType);
+	get value(): ValueType;
+	set value(newValue: ValueType);
 	formResetCallback(): void;
 	checkValidity(): boolean;
 	get validationMessage(): string;
@@ -80,14 +80,10 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
  * @param {Object} superClass - superclass to be extended.
  * @mixin
  */
-export const UmbFormControlMixin = <
-	ValueType = FormDataEntryValue | FormData,
+export function UmbFormControlMixin<
+	ValueType = FormData | FormDataEntryValue,
 	T extends HTMLElementConstructor<LitElement> = HTMLElementConstructor<LitElement>,
-	DefaultValueType = undefined,
->(
-	superClass: T,
-	defaultValue: DefaultValueType = undefined as DefaultValueType,
-) => {
+>(superClass: T, defaultValue: ValueType = undefined as ValueType) {
 	abstract class UmbFormControlMixinClass extends superClass {
 		/**
 		 * This is a static class field indicating that the element is can be used inside a native form and participate in its events.
@@ -105,10 +101,10 @@ export const UmbFormControlMixin = <
 		 * @default ''
 		 */
 		@property({ reflect: false }) // Do not 'reflect' as the attribute value is used as fallback. [NL]
-		get value(): ValueType | DefaultValueType {
+		get value(): ValueType {
 			return this.#value;
 		}
-		set value(newValue: ValueType | DefaultValueType) {
+		set value(newValue: ValueType) {
 			this.#value = newValue;
 			this._runValidators();
 		}
@@ -135,7 +131,7 @@ export const UmbFormControlMixin = <
 		}
 		private _pristine: boolean = true;
 
-		#value: ValueType | DefaultValueType = defaultValue;
+		#value: ValueType = defaultValue;
 		protected _internals: ElementInternals;
 		#form: HTMLFormElement | null = null;
 		#validators: UmbFormControlValidatorConfig[] = [];
@@ -358,11 +354,11 @@ export const UmbFormControlMixin = <
 			this.value = this.getInitialValue() ?? this.getDefaultValue();
 		}
 
-		protected getDefaultValue(): DefaultValueType {
+		protected getDefaultValue(): ValueType {
 			return defaultValue;
 		}
-		protected getInitialValue(): ValueType | DefaultValueType {
-			return this.getAttribute('value') as ValueType | DefaultValueType;
+		protected getInitialValue(): ValueType {
+			return this.getAttribute('value') as ValueType;
 		}
 
 		public checkValidity() {
@@ -387,8 +383,5 @@ export const UmbFormControlMixin = <
 			return this._internals?.validationMessage;
 		}
 	}
-	return UmbFormControlMixinClass as unknown as HTMLElementConstructor<
-		UmbFormControlMixinElement<ValueType, DefaultValueType>
-	> &
-		T;
-};
+	return UmbFormControlMixinClass as unknown as HTMLElementConstructor<UmbFormControlMixinElement<ValueType>> & T;
+}

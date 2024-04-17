@@ -9,7 +9,7 @@ function getNumberOrUndefined(value: string) {
 }
 
 @customElement('umb-input-number-range')
-export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElement, undefined) {
+export class UmbInputNumberRangeElement extends UmbFormControlMixin<string>(UmbLitElement, '') {
 	@property({ type: String, attribute: 'min-label' })
 	minLabel = 'Low value';
 
