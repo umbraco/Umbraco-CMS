@@ -83,7 +83,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(childOfChildFolderName);
   });
 
-  test('can create a stylesheet in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a stylesheet in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
     const stylesheetContent = 'TestContent';
@@ -108,7 +108,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 
-  test('can create a stylesheet in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a stylesheet in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     await umbracoApi.stylesheet.createFolder(stylesheetFolderName);

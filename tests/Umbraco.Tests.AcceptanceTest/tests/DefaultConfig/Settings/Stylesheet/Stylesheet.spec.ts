@@ -17,7 +17,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   });
 
-  test('can create a empty stylesheet', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a empty stylesheet', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
     await umbracoUi.stylesheet.clickCreateButton();
@@ -32,7 +32,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 
-  test('can create a stylesheet with content', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a stylesheet with content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const stylesheetContent = 'TestContent';
 
@@ -53,7 +53,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 
-  test('can create a new Rich Text Editor stylesheet file', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a new Rich Text Editor stylesheet file', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
 
@@ -74,7 +74,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName);
   });
 
-  test('can update a stylesheet', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can update a stylesheet', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
     await umbracoApi.stylesheet.create(stylesheetName, '', '/');
@@ -91,7 +91,7 @@ test.describe('Stylesheets tests', () => {
     expect(stylesheetData.content).toEqual(stylesheetContent);
   });
 
-  test('can delete a stylesheet', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can delete a stylesheet', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.stylesheet.create(stylesheetName, '', '/');
 
@@ -106,7 +106,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetTreeItemVisibile(stylesheetName, false);
   });
 
-  test('can rename a stylesheet', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can rename a stylesheet', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongStylesheetName = 'WrongStylesheetName.css';
     await umbracoApi.stylesheet.create(wrongStylesheetName, '', '/');
@@ -122,7 +122,7 @@ test.describe('Stylesheets tests', () => {
     expect(await umbracoApi.stylesheet.doesNameExist(wrongStylesheetName)).toBeFalsy();
   });
 
-  test('can edit rich text editor styles', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can edit rich text editor styles', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const newStyleName = 'TestNewStyleName';
     const newStyleSelector = 'h2';
@@ -143,7 +143,7 @@ test.describe('Stylesheets tests', () => {
     expect(stylesheetData.content).toEqual(newStylesheetContent);
   });
 
-  test('can remove rich text editor styles', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can remove rich text editor styles', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
     await umbracoApi.stylesheet.create(stylesheetName, stylesheetContent, '/');

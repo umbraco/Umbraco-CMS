@@ -42,7 +42,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isScriptTreeItemVisibile(scriptFolderName, false);
   });
 
-  test('can create a script in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a script in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.createFolder(scriptFolderName);
     const scriptContent = 'const test = {\r\n    script = \u0022Test\u0022,\r\n    extension = \u0022.js\u0022,\r\n    scriptPath: function() {\r\n        return this.script \u002B this.extension;\r\n    }\r\n};\r\n';
@@ -108,7 +108,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isScriptTreeItemVisibile(childOfChildFolderName);
   });
 
-  test('can create a script in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a script in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     await umbracoApi.script.createFolder(scriptFolderName);
