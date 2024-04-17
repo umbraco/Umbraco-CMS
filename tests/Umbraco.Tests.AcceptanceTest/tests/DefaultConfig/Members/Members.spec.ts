@@ -23,7 +23,7 @@ test.describe('Members tests', () => {
     await umbracoApi.member.ensureNameNotExists(memberName);
   });
 
-  test('can create a member', async ({umbracoApi, umbracoUi}) => {
+  test('can create a member @smoke', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickCreateButton();
@@ -96,7 +96,7 @@ test.describe('Members tests', () => {
     expect(memberData.email).toBe(updatedEmail);
   });
 
-  test('can edit password', async ({umbracoApi, umbracoUi}) => {
+  test('can edit password @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const updatedPassword = '9876543210';
     memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
@@ -114,7 +114,7 @@ test.describe('Members tests', () => {
     await umbracoUi.member.isSuccessNotificationVisible();
   });
 
-  test('can add member group', async ({umbracoApi, umbracoUi}) => {
+  test('can add member group @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const memberGroupName = 'TestMemberGroup';
     await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
@@ -195,7 +195,7 @@ test.describe('Members tests', () => {
     expect(memberData.isApproved).toBe(true);
   });
 
-  test('can delete member', async ({umbracoApi, umbracoUi}) => {
+  test('can delete member @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
     memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
