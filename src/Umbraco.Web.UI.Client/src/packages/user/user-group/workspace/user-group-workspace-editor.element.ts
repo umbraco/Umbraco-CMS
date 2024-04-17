@@ -129,8 +129,9 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#onDocumentStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputDocumentElement;
+		const selected = target.selection?.[0];
 		// TODO make contexts method
-		this.#workspaceContext?.updateProperty('documentStartNode', { unique: target.selection[0] });
+		this.#workspaceContext?.updateProperty('documentStartNode', selected ? { unique: selected } : null);
 	}
 
 	#onAllowAllMediaChange(event: UUIBooleanInputEvent) {
@@ -144,7 +145,9 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#onMediaStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputMediaElement;
-		this.#workspaceContext?.updateProperty('mediaStartNode', { unique: target.selection[0] });
+		const selected = target.selection?.[0];
+		// TODO make contexts method
+		this.#workspaceContext?.updateProperty('mediaStartNode', selected ? { unique: selected } : null);
 	}
 
 	#onNameChange(event: UUIInputEvent) {
