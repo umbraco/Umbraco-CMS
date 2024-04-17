@@ -70,7 +70,9 @@ public static class UmbracoBuilderAuthExtensions
                     .Get<GlobalSettings>() ?? new GlobalSettings();
                 TimeSpan timeOut = globalSettings.TimeOut;
 
-                options.SetAccessTokenLifetime(new TimeSpan(timeOut.Ticks / 4)); // 25% faster expiry than the refresh token
+                // Make the access token lifetime 25% of the refresh token lifetime, to help ensure that new access tokens
+                // are obtained by the client before the refresh token expires.
+                options.SetAccessTokenLifetime(new TimeSpan(timeOut.Ticks / 4));
                 options.SetRefreshTokenLifetime(timeOut);
 
                 // Use ASP.NET Core Data Protection for tokens instead of JWT.
