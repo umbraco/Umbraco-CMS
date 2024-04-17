@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
@@ -25,6 +26,7 @@ internal class UserService : RepositoryService, IUserService
     private readonly ILogger<UserService> _logger;
     private readonly IRuntimeState _runtimeState;
     private readonly IUserGroupRepository _userGroupRepository;
+    private readonly IRequestCache _requestCache;
     private readonly IUserRepository _userRepository;
 
     public UserService(
@@ -34,12 +36,14 @@ internal class UserService : RepositoryService, IUserService
         IRuntimeState runtimeState,
         IUserRepository userRepository,
         IUserGroupRepository userGroupRepository,
-        IOptions<GlobalSettings> globalSettings)
+        IOptions<GlobalSettings> globalSettings,
+        IRequestCache requestCache)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _runtimeState = runtimeState;
         _userRepository = userRepository;
         _userGroupRepository = userGroupRepository;
+        _requestCache = requestCache;
         _globalSettings = globalSettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
     }
@@ -1125,17 +1129,23 @@ internal class UserService : RepositoryService, IUserService
     /// <param name="path">Path to check permissions for</param>
     public EntityPermissionSet GetPermissionsForPath(IUser? user, string? path)
     {
-        var nodeIds = path?.GetIdsFromPathReversed();
-
-        if (nodeIds is null || nodeIds.Length == 0 || user is null)
+        var result = (EntityPermissionSet?)_requestCache.Get($"{nameof(GetPermissionsForPath)}|{path}|{user?.Id}", () =>
         {
-            return EntityPermissionSet.Empty();
-        }
+            var nodeIds = path?.GetIdsFromPathReversed();
 
-        // collect all permissions structures for all nodes for all groups belonging to the user
-        EntityPermission[] groupPermissions = GetPermissionsForPath(user.Groups.ToArray(), nodeIds, true).ToArray();
+            if (nodeIds is null || nodeIds.Length == 0 || user is null)
+            {
+                return EntityPermissionSet.Empty();
+            }
 
-        return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
+            // collect all permissions structures for all nodes for all groups belonging to the user
+            EntityPermission[] groupPermissions = GetPermissionsForPath(user.Groups.ToArray(), nodeIds, true).ToArray();
+
+            return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
+        });
+
+        return result ?? EntityPermissionSet.Empty();
+
     }
 
     /// <summary>
