@@ -12,7 +12,7 @@ import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
-			return element.getAttribute('detail');
+			return element.id;
 		},
 		getUniqueOfModel: (modelEntry) => {
 			return modelEntry;
@@ -166,7 +166,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	#renderItems() {
-		if (!this._items?.length) return;
+		if (!this._items) return;
 		return html`<uui-ref-list>
 			${repeat(
 				this._items,
@@ -191,7 +191,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		const name = item.variants[0]?.name;
 
 		return html`
-			<uui-ref-node name=${name}>
+			<uui-ref-node name=${name} id=${item.unique}>
 				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
