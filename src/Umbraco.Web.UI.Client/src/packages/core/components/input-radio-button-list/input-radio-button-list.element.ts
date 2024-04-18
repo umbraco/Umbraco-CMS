@@ -1,8 +1,8 @@
 import { css, html, nothing, repeat, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin, UUIRadioElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-radio-button-list')
 export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -23,11 +23,10 @@ export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitEl
 		return undefined;
 	}
 
-	#onChange(event: UUIBooleanInputEvent) {
+	#onChange(event: UUIRadioEvent) {
 		event.stopPropagation();
-
+		if (!(event.target instanceof UUIRadioElement)) return;
 		this.value = event.target.value;
-
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -46,7 +45,7 @@ export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitEl
 	}
 
 	#renderRadioButton(item: (typeof this.list)[0]) {
-		return html`<uui-radio value="${item.value}" label="${item.label}"></uui-radio>`;
+		return html`<uui-radio value=${item.value} label=${item.label}></uui-radio>`;
 	}
 
 	static styles = [

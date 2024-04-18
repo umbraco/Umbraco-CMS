@@ -95,7 +95,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 	readonly = false;
 
 	@property({ type: Boolean })
-	showLabels = true;
+	showLabels = false;
 
 	constructor() {
 		super();
@@ -105,8 +105,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 			this.observe(
 				await workspace.propertyValueByAlias<boolean>('useLabel'),
 				(value) => {
-					// Only set a true/false value. If value is undefined, keep the default value of True, if value is defined, set the value but remove the undefined type from the Type Union.
-					this.showLabels = value === undefined ? true : (value as Exclude<typeof value, undefined>);
+					this.showLabels = !!value;
 				},
 				'observeUseLabel',
 			);
@@ -128,12 +127,12 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 	private _items: Array<UmbSwatchDetails> = [];
 
 	@property({ type: Array })
-	public get items(): Array<UmbSwatchDetails> {
-		return this._items;
-	}
 	public set items(items: Array<UmbSwatchDetails>) {
 		this._items = items ?? [];
 		this.#sorter.setModel(this.items);
+	}
+	public get items(): Array<UmbSwatchDetails> {
+		return this._items;
 	}
 
 	#onAdd() {
@@ -177,43 +176,43 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 	}
 
 	render() {
-		return html`<div id="sorter-wrapper">${this.#renderItems()}</div>
-			${this.#renderAddButton()} `;
+		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
 	#renderItems() {
 		return html`
-			${repeat(
-				this._items,
-				(item) => item.value,
-				(item, index) => html`
-					<umb-multiple-color-picker-item-input
-						?showLabels=${this.showLabels}
-						value=${item.value}
-						label=${ifDefined(item.label)}
-						@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}
-						@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
-						?disabled=${this.disabled}
-						?readonly=${this.readonly}
-						required
-						required-message="Item ${index + 1} is missing a value">
-					</umb-multiple-color-picker-item-input>
-				`,
-			)}
+			<div id="sorter-wrapper">
+				${repeat(
+					this._items,
+					(item) => item.value,
+					(item, index) => html`
+						<umb-multiple-color-picker-item-input
+							label=${item.label}
+							value=${item.value}
+							required
+							required-message="Item ${index + 1} is missing a value"
+							?disabled=${this.disabled}
+							?readonly=${this.readonly}
+							?showLabels=${this.showLabels}
+							@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}
+							@delete=${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}>
+						</umb-multiple-color-picker-item-input>
+					`,
+				)}
+			</div>
 		`;
 	}
 
 	#renderAddButton() {
+		if (this.disabled || this.readonly) return nothing;
 		return html`
-			${this.disabled || this.readonly
-				? nothing
-				: html`<uui-button
-						id="action"
-						label=${this.localize.term('general_add')}
-						look="placeholder"
-						color="default"
-						@click="${this.#onAdd}"
-						?disabled=${this.disabled}></uui-button>`}
+			<uui-button
+				id="action"
+				label=${this.localize.term('general_add')}
+				look="placeholder"
+				color="default"
+				?disabled=${this.disabled}
+				@click=${this.#onAdd}></uui-button>
 		`;
 	}
 
