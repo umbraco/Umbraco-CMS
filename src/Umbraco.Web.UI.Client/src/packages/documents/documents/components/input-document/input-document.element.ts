@@ -1,6 +1,7 @@
 import { UmbDocumentPickerContext } from './input-document.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
@@ -21,6 +22,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
+			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
 
