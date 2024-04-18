@@ -49,9 +49,12 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		this.observe(
 			observeMultiple([this.#collectionContext.orderByOptions, this.#collectionContext.activeOrderByOption]),
 			([options, activeOption]) => {
-				this._orderByOptions = options;
+				// the options are hardcoded in the context, so we can just compare the length
+				if (this._orderByOptions.length !== options.length) {
+					this._orderByOptions = options;
+				}
 
-				if (activeOption) {
+				if (activeOption && activeOption !== this._activeOrderByOption?.unique) {
 					this._activeOrderByOption = this._orderByOptions.find((option) => option.unique === activeOption);
 				}
 			},
