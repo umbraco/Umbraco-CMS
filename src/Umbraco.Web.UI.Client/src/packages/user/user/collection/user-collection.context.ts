@@ -1,51 +1,53 @@
 import type { UmbUserDetailModel } from '../types.js';
 import { UMB_COLLECTION_VIEW_USER_GRID } from './views/index.js';
-import type { UmbUserCollectionFilterModel, UmbUserOrderByOption, UmbUserStateFilterModel } from './types.js';
-import { UmbUserOrderByModel } from './types.js';
+import type { UmbUserCollectionFilterModel, UmbUserOrderByOption } from './types.js';
+import type { UmbUserOrderByType, UmbUserStateFilterType } from './utils/index.js';
+import { UmbUserOrderBy } from './utils/index.js';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDirectionModel } from '@umbraco-cms/backoffice/models';
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbDirectionType } from '@umbraco-cms/backoffice/utils';
+import { UmbDirection } from '@umbraco-cms/backoffice/utils';
 
 const orderByOptions: Array<UmbUserOrderByOption> = [
 	{
 		unique: 'nameAscending',
 		label: '#user_sortNameAscending',
 		config: {
-			orderBy: UmbUserOrderByModel.NAME,
-			orderDirection: UmbDirectionModel.ASCENDING,
+			orderBy: UmbUserOrderBy.NAME,
+			orderDirection: UmbDirection.ASCENDING,
 		},
 	},
 	{
 		unique: 'nameDescending',
 		label: '#user_sortNameDescending',
 		config: {
-			orderBy: UmbUserOrderByModel.NAME,
-			orderDirection: UmbDirectionModel.DESCENDING,
+			orderBy: UmbUserOrderBy.NAME,
+			orderDirection: UmbDirection.DESCENDING,
 		},
 	},
 	{
 		unique: 'createDateDescending',
 		label: '#user_sortCreateDateDescending',
 		config: {
-			orderBy: UmbUserOrderByModel.CREATE_DATE,
-			orderDirection: UmbDirectionModel.DESCENDING,
+			orderBy: UmbUserOrderBy.CREATE_DATE,
+			orderDirection: UmbDirection.DESCENDING,
 		},
 	},
 	{
 		unique: 'createDateAscending',
 		label: '#user_sortCreateDateAscending',
 		config: {
-			orderBy: UmbUserOrderByModel.CREATE_DATE,
-			orderDirection: UmbDirectionModel.ASCENDING,
+			orderBy: UmbUserOrderBy.CREATE_DATE,
+			orderDirection: UmbDirection.ASCENDING,
 		},
 	},
 	{
 		unique: 'lastLoginDateDescending',
 		label: '#user_sortLastLoginDateDescending',
 		config: {
-			orderBy: UmbUserOrderByModel.LAST_LOGIN_DATE,
-			orderDirection: UmbDirectionModel.DESCENDING,
+			orderBy: UmbUserOrderBy.LAST_LOGIN_DATE,
+			orderDirection: UmbDirection.DESCENDING,
 		},
 	},
 ];
@@ -73,9 +75,8 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 	}
 
 	/**
-	 * Sets the active order by for the collection and refreshes the collection.
-	 * @param {UmbUserOrderByModel} orderBy
-	 * @param {UmbDirectionModel} orderDirection
+	 * Sets the active order by option for the collection and refreshes the collection.
+	 * @param {string} unique
 	 * @memberof UmbUserCollectionContext
 	 */
 	setActiveOrderByOption(unique: string) {
@@ -89,7 +90,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 	 * @param {Array<UmbUserStateFilterModel>} selection
 	 * @memberof UmbUserCollectionContext
 	 */
-	setStateFilter(selection: Array<UmbUserStateFilterModel>) {
+	setStateFilter(selection: Array<UmbUserStateFilterType>) {
 		this.setFilter({ userStates: selection });
 	}
 
@@ -98,7 +99,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 	 * @param {UmbUserOrderByModel} orderBy
 	 * @memberof UmbUserCollectionContext
 	 */
-	setOrderByFilter(orderBy: UmbUserOrderByModel) {
+	setOrderByFilter(orderBy: UmbUserOrderByType) {
 		this.setFilter({ orderBy });
 	}
 
@@ -113,10 +114,10 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the order direction filter for the collection and refreshes the collection.
-	 * @param {UmbDirectionModel} orderDirection
+	 * @param {any} orderDirection
 	 * @memberof UmbUserCollectionContext
 	 */
-	setOrderDirectionFilter(orderDirection: UmbDirectionModel) {
+	setOrderDirectionFilter(orderDirection: UmbDirectionType) {
 		this.setFilter({ orderDirection });
 	}
 }

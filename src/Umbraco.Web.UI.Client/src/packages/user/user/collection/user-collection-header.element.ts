@@ -1,6 +1,7 @@
 import type { UmbUserCollectionContext } from './user-collection.context.js';
 import type { UmbUserOrderByOption } from './types.js';
-import { UmbUserStateFilterModel } from './types.js';
+import type { UmbUserStateFilterType } from './utils/index.js';
+import { UmbUserStateFilter } from './utils/index.js';
 import type { UUIBooleanInputEvent, UUICheckboxElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -12,10 +13,10 @@ import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	@state()
-	private _stateFilterOptions: Array<UmbUserStateFilterModel> = Object.values(UmbUserStateFilterModel);
+	private _stateFilterOptions: Array<UmbUserStateFilterType> = Object.values(UmbUserStateFilter);
 
 	@state()
-	private _stateFilterSelection: Array<UmbUserStateFilterModel> = [];
+	private _stateFilterSelection: Array<UmbUserStateFilterType> = [];
 
 	@state()
 	private _userGroups: Array<UmbUserGroupDetailModel> = [];
@@ -84,7 +85,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	#onStateFilterChange(event: UUIBooleanInputEvent) {
 		event.stopPropagation();
 		const target = event.currentTarget as UUICheckboxElement;
-		const value = target.value as UmbUserStateFilterModel;
+		const value = target.value as UmbUserStateFilterType;
 		const isChecked = target.checked;
 
 		this._stateFilterSelection = isChecked

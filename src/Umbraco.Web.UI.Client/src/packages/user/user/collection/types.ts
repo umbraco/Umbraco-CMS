@@ -1,12 +1,13 @@
-import type { UmbDirectionModel } from '@umbraco-cms/backoffice/models';
+import type { UmbUserOrderByType, UmbUserStateFilterType } from './utils/index.js';
+import type { UmbDirectionType } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbUserCollectionFilterModel {
 	skip?: number;
 	take?: number;
-	orderBy?: UmbUserOrderByModel;
-	orderDirection?: UmbDirectionModel;
+	orderBy?: UmbUserOrderByType;
+	orderDirection?: UmbDirectionType;
 	userGroupIds?: string[];
-	userStates?: UmbUserStateFilterModel[];
+	userStates?: UmbUserStateFilterType[];
 	filter?: string;
 }
 
@@ -14,22 +15,7 @@ export interface UmbUserOrderByOption {
 	unique: string;
 	label: string;
 	config: {
-		orderBy: UmbUserOrderByModel;
-		orderDirection: UmbDirectionModel;
+		orderBy: UmbUserOrderByType;
+		orderDirection: UmbDirectionType;
 	};
-}
-
-export enum UmbUserOrderByModel {
-	NAME = 'Name',
-	CREATE_DATE = 'CreateDate',
-	LAST_LOGIN_DATE = 'LastLoginDate',
-}
-
-export enum UmbUserStateFilterModel {
-	ACTIVE = 'Active',
-	DISABLED = 'Disabled',
-	LOCKED_OUT = 'LockedOut',
-	INVITED = 'Invited',
-	INACTIVE = 'Inactive',
-	ALL = 'All',
 }

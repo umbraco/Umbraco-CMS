@@ -50,8 +50,3 @@ export interface UmbUniqueItemModel {
 	name: string;
 	icon?: string;
 }
-
-export enum UmbDirectionModel {
-	ASCENDING = 'Ascending',
-	DESCENDING = 'Descending',
-}
