@@ -62,6 +62,7 @@ import type { ManifestGranularUserPermission } from './user-granular-permission.
 import type { ManifestCollectionAction } from './collection-action.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
 import type {
+	ManifestAppEntryPoint,
 	ManifestBase,
 	ManifestBundle,
 	ManifestCondition,
@@ -139,6 +140,7 @@ export type ManifestWorkspaces = ManifestWorkspace | ManifestWorkspaceRoutableKi
 export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceViewContentTypeDesignEditorKind;
 
 export type ManifestTypes =
+	| ManifestAppEntryPoint
 	| ManifestAuthProvider
 	| ManifestBundle<ManifestTypes>
 	| ManifestBlockEditorCustomView
