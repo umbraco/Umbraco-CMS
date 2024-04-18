@@ -122,7 +122,6 @@ export class UmbInputTreeElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	#renderMediaPicker() {
-		// TODO: [LK] Review the data structure of this input editor.
 		return html`<umb-input-media
 			.selection=${this.#selection}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
