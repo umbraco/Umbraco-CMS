@@ -49,14 +49,18 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	@property()
-	public set value(valueString: string) {
+	public set value(valueString: string | undefined) {
 		if (valueString !== this.value) {
+			if (valueString === undefined) {
+				this.minValue = this.maxValue = undefined;
+				return;
+			}
 			const splittedValue = valueString.split(/[ ,]+/);
 			this.minValue = getNumberOrUndefined(splittedValue[0]);
 			this.maxValue = getNumberOrUndefined(splittedValue[1]);
 		}
 	}
-	public get value(): string {
+	public get value(): string | undefined {
 		return this.minValue || this.maxValue ? (this.minValue || '') + ',' + (this.maxValue || '') : undefined;
 	}
 
