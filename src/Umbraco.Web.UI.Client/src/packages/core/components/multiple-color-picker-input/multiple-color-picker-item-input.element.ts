@@ -7,12 +7,13 @@ import {
 	query,
 	ifDefined,
 	state,
+	when,
 } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIColorPickerElement, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIColorPickerElement, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-multiple-color-picker-item-input
@@ -64,7 +65,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 	protected _colorPicker!: UUIColorPickerElement;
 
 	@property({ type: Boolean })
-	showLabels = true;
+	showLabels = false;
 
 	async #onDelete() {
 		await umbConfirmModal(this, {
@@ -142,39 +143,45 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 							value=${this.value}
 							label=${this.localize.term('general_value')}
 							placeholder=${this.localize.term('general_value')}
-							@input="${this.#onValueInput}"
-							@change="${this.#onValueChange}"
-							required="${this.required}"
-							required-message="Value is missing">
+							required=${this.required}
+							required-message="Value is missing"
+							@input=${this.#onValueInput}
+							@change=${this.#onValueChange}>
 							<uui-color-swatch
 								slot="prepend"
 								label=${this.value}
-								value="${this._valueHex}"
+								value=${this._valueHex}
 								@click=${this.#onColorClick}></uui-color-swatch>
 						</uui-input>
 						<input aria-hidden="${true}" type="color" id="color" value=${this.value} @input=${this.#onColorInput} />
 					</div>
-					${this.showLabels
-						? html` <uui-input
+					${when(
+						this.showLabels,
+						() => html`
+							<uui-input
 								label=${this.localize.term('placeholders_label')}
 								placeholder=${this.localize.term('placeholders_label')}
 								value=${ifDefined(this.label)}
 								@input="${this.#onLabelInput}"
 								@change="${this.#onLabelChange}"
 								?disabled=${this.disabled}
-								?readonly=${this.readonly}></uui-input>`
-						: nothing}
-					${this.readonly
-						? nothing
-						: html`<uui-button
-								label="${this.localize.term('actions_delete')} ${this.value}"
-								look="primary"
+								?readonly=${this.readonly}></uui-input>
+						`,
+					)}
+					${when(
+						!this.readonly,
+						() => html`
+							<uui-button
+								compact
 								color="danger"
-								@click="${this.#onDelete}"
+								label=${this.localize.term('actions_delete')}
+								look="primary"
 								?disabled=${this.disabled}
-								compact>
+								@click=${this.#onDelete}>
 								<uui-icon name="icon-trash"></uui-icon>
-							</uui-button>`}
+							</uui-button>
+						`,
+					)}
 				</div>
 			</uui-form-validation-message>
 		`;

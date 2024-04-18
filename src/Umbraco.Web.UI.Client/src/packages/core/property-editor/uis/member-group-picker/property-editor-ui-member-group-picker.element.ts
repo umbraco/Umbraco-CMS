@@ -59,9 +59,8 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 				@change=${this._onChange}
 				.selection=${this._items}
 				.min=${this._limitMin ?? 0}
-				.max=${this._limitMax ?? Infinity}
-				>Add</umb-input-member-group
-			>
+				.max=${this._limitMax ?? Infinity}>
+			</umb-input-member-group>
 		`;
 	}
 }

@@ -130,7 +130,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		weight: 90,
 		api: () => import('./actions/save-and-preview.action.js'),
 		meta: {
-			label: 'Save And Preview',
+			label: '#buttons_saveAndPreview',
 		},
 		conditions: [
 			{

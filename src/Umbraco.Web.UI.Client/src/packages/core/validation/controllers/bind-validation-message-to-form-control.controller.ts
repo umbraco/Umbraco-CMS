@@ -13,9 +13,9 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 
-	#control: UmbFormControlMixinInterface<unknown, unknown>;
+	#control: UmbFormControlMixinInterface<unknown>;
 
-	#controlValidator?: ReturnType<UmbFormControlMixinInterface<unknown, unknown>['addValidator']>;
+	#controlValidator?: ReturnType<UmbFormControlMixinInterface<unknown>['addValidator']>;
 	#messages: Array<UmbValidationMessage> = [];
 	#isValid = false;
 
@@ -38,7 +38,7 @@ export class UmbBindValidationMessageToFormControl extends UmbControllerBase {
 		}
 	}
 
-	constructor(host: UmbControllerHost, formControl: UmbFormControlMixinInterface<unknown, unknown>, dataPath: string) {
+	constructor(host: UmbControllerHost, formControl: UmbFormControlMixinInterface<unknown>, dataPath: string) {
 		super(host, ctrlSymbol);
 		this.#control = formControl;
 		this.consumeContext(UMB_VALIDATION_CONTEXT, (context) => {

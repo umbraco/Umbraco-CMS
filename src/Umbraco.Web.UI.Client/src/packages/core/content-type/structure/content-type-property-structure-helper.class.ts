@@ -121,7 +121,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	}
 
 	#observeSimilarContainers() {
-		if (!this._containerName || !this._containerType || this._parentName === undefined) return;
+		if (this._containerName === undefined || !this._containerType || this._parentName === undefined) return;
 		this.observe(
 			this.#structure!.containersByNameAndTypeAndParent(
 				this._containerName,
@@ -176,6 +176,13 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		if (!this.#structure) return;
 
 		return this.#structure.ownerContentTypePart((x) => x?.properties.some((y) => y.id === propertyId));
+	}
+
+	async contentTypeOfProperty(propertyId: UmbPropertyTypeId) {
+		await this.#init;
+		if (!this.#structure) return;
+
+		return this.#structure.contentTypeOfProperty(propertyId);
 	}
 
 	// TODO: consider moving this to another class, to separate 'viewer' from 'manipulator':

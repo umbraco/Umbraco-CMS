@@ -10,7 +10,10 @@ import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
  * @element umb-input-multiple-text-string
  */
 @customElement('umb-input-multiple-text-string')
-export class UmbInputMultipleTextStringElement extends UmbFormControlMixin(UmbLitElement) {
+export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undefined | string, typeof UmbLitElement>(
+	UmbLitElement,
+	undefined,
+) {
 	#sorter = new UmbSorterController(this, {
 		getUniqueOfElement: (element) => {
 			return element.getAttribute('data-sort-entry-id');

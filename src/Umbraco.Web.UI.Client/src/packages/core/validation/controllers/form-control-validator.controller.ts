@@ -12,12 +12,12 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;
 
-	#control: UmbFormControlMixinInterface<unknown, unknown>;
+	#control: UmbFormControlMixinInterface<unknown>;
 	readonly controllerAlias: UmbControllerAlias;
 
 	#isValid = true;
 
-	constructor(host: UmbControllerHost, formControl: UmbFormControlMixinInterface<unknown, unknown>, dataPath?: string) {
+	constructor(host: UmbControllerHost, formControl: UmbFormControlMixinInterface<unknown>, dataPath?: string) {
 		super(host);
 		this.#dataPath = dataPath;
 		this.consumeContext(UMB_VALIDATION_CONTEXT, (context) => {
