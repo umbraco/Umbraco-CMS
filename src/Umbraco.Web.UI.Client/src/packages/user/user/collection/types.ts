@@ -1,11 +1,26 @@
-import type { DirectionModel, UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDirectionModel } from '@umbraco-cms/backoffice/models';
 
 export interface UmbUserCollectionFilterModel {
 	skip?: number;
 	take?: number;
-	orderBy?: UserOrderModel;
-	orderDirection?: DirectionModel;
+	orderBy?: UmbUserOrderByModel;
+	orderDirection?: UmbDirectionModel;
 	userGroupIds?: string[];
-	userStates?: UserStateModel[];
+	userStates?: UmbUserStateFilterModel[];
 	filter?: string;
+}
+
+export enum UmbUserOrderByModel {
+	NAME = 'Name',
+	CREATE_DATE = 'CreateDate',
+	LAST_LOGIN_DATE = 'LastLoginDate',
+}
+
+export enum UmbUserStateFilterModel {
+	ACTIVE = 'Active',
+	DISABLED = 'Disabled',
+	LOCKED_OUT = 'LockedOut',
+	INVITED = 'Invited',
+	INACTIVE = 'Inactive',
+	ALL = 'All',
 }
