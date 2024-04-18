@@ -95,7 +95,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 	readonly = false;
 
 	@property({ type: Boolean })
-	showLabels = true;
+	showLabels = false;
 
 	constructor() {
 		super();
@@ -105,8 +105,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 			this.observe(
 				await workspace.propertyValueByAlias<boolean>('useLabel'),
 				(value) => {
-					// Only set a true/false value. If value is undefined, keep the default value of True, if value is defined, set the value but remove the undefined type from the Type Union.
-					this.showLabels = value === undefined ? true : (value as Exclude<typeof value, undefined>);
+					this.showLabels = !!value;
 				},
 				'observeUseLabel',
 			);

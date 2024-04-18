@@ -64,7 +64,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 	protected _colorPicker!: UUIColorPickerElement;
 
 	@property({ type: Boolean })
-	showLabels = true;
+	showLabels = false;
 
 	async #onDelete() {
 		await umbConfirmModal(this, {

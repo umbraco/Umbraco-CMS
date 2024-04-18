@@ -10,7 +10,7 @@ import type { UmbMultipleColorPickerInputElement } from '@umbraco-cms/backoffice
  */
 @customElement('umb-property-editor-ui-color-swatches-editor')
 export class UmbPropertyEditorUIColorSwatchesEditorElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	#defaultShowLabels = true;
+	#defaultShowLabels = false;
 
 	@property({ type: Array })
 	value: Array<UmbSwatchDetails> = [];
