@@ -11,6 +11,7 @@ export interface UmbUserCollectionFilterModel {
 }
 
 export interface UmbUserOrderByOption {
+	unique: string;
 	label: string;
 	config: {
 		orderBy: UmbUserOrderByModel;
