@@ -40,7 +40,7 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 	#onChange(e: UUIBooleanInputEvent) {
 		this.checked = e.target.checked;
 		e.stopPropagation();
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#updateLabel() {
