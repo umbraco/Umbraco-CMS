@@ -83,7 +83,7 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
 export function UmbFormControlMixin<
 	ValueType = FormData | FormDataEntryValue,
 	T extends HTMLElementConstructor<LitElement> = HTMLElementConstructor<LitElement>,
-	DefaultValueType extends ValueType = ValueType,
+	DefaultValueType = undefined,
 >(superClass: T, defaultValue?: DefaultValueType) {
 	abstract class UmbFormControlMixinClass extends superClass {
 		/**
@@ -102,10 +102,10 @@ export function UmbFormControlMixin<
 		 * @default ''
 		 */
 		@property({ reflect: false }) // Do not 'reflect' as the attribute value is used as fallback. [NL]
-		get value(): ValueType {
+		get value(): ValueType | DefaultValueType {
 			return this.#value;
 		}
-		set value(newValue: ValueType) {
+		set value(newValue: ValueType | DefaultValueType) {
 			this.#value = newValue;
 			this._runValidators();
 		}
@@ -132,7 +132,7 @@ export function UmbFormControlMixin<
 		}
 		private _pristine: boolean = true;
 
-		#value: ValueType = defaultValue;
+		#value: ValueType | DefaultValueType = defaultValue as unknown as DefaultValueType;
 		protected _internals: ElementInternals;
 		#form: HTMLFormElement | null = null;
 		#validators: UmbFormControlValidatorConfig[] = [];
@@ -356,10 +356,10 @@ export function UmbFormControlMixin<
 		}
 
 		protected getDefaultValue(): DefaultValueType {
-			return defaultValue;
+			return defaultValue as DefaultValueType;
 		}
-		protected getInitialValue(): ValueType {
-			return this.getAttribute('value') as ValueType;
+		protected getInitialValue(): ValueType | DefaultValueType {
+			return this.getAttribute('value') as ValueType | DefaultValueType;
 		}
 
 		public checkValidity() {
@@ -384,5 +384,8 @@ export function UmbFormControlMixin<
 			return this._internals?.validationMessage;
 		}
 	}
-	return UmbFormControlMixinClass as unknown as HTMLElementConstructor<UmbFormControlMixinElement<ValueType>> & T;
+	return UmbFormControlMixinClass as unknown as HTMLElementConstructor<
+		UmbFormControlMixinElement<ValueType | DefaultValueType>
+	> &
+		T;
 }
