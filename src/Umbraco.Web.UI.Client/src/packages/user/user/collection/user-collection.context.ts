@@ -7,65 +7,69 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDirectionModel } from '@umbraco-cms/backoffice/models';
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
+const orderByOptions: Array<UmbUserOrderByOption> = [
+	{
+		unique: 'nameAscending',
+		label: '#user_sortNameAscending',
+		config: {
+			orderBy: UmbUserOrderByModel.NAME,
+			orderDirection: UmbDirectionModel.ASCENDING,
+		},
+	},
+	{
+		unique: 'nameDescending',
+		label: '#user_sortNameDescending',
+		config: {
+			orderBy: UmbUserOrderByModel.NAME,
+			orderDirection: UmbDirectionModel.DESCENDING,
+		},
+	},
+	{
+		unique: 'createDateDescending',
+		label: '#user_sortCreateDateDescending',
+		config: {
+			orderBy: UmbUserOrderByModel.CREATE_DATE,
+			orderDirection: UmbDirectionModel.DESCENDING,
+		},
+	},
+	{
+		unique: 'createDateAscending',
+		label: '#user_sortCreateDateAscending',
+		config: {
+			orderBy: UmbUserOrderByModel.CREATE_DATE,
+			orderDirection: UmbDirectionModel.ASCENDING,
+		},
+	},
+	{
+		unique: 'lastLoginDateDescending',
+		label: '#user_sortLastLoginDateDescending',
+		config: {
+			orderBy: UmbUserOrderByModel.LAST_LOGIN_DATE,
+			orderDirection: UmbDirectionModel.DESCENDING,
+		},
+	},
+];
+
 export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 	UmbUserDetailModel,
 	UmbUserCollectionFilterModel
 > {
-	#orderByOptions = new UmbArrayState<UmbUserOrderByOption>(
-		[
-			{
-				unique: 'nameAscending',
-				label: '#user_sortNameAscending',
-				config: {
-					orderBy: UmbUserOrderByModel.NAME,
-					orderDirection: UmbDirectionModel.ASCENDING,
-				},
-			},
-			{
-				unique: 'nameDescending',
-				label: '#user_sortNameDescending',
-				config: {
-					orderBy: UmbUserOrderByModel.NAME,
-					orderDirection: UmbDirectionModel.DESCENDING,
-				},
-			},
-			{
-				unique: 'createDateDescending',
-				label: '#user_sortCreateDateDescending',
-				config: {
-					orderBy: UmbUserOrderByModel.CREATE_DATE,
-					orderDirection: UmbDirectionModel.DESCENDING,
-				},
-			},
-			{
-				unique: 'createDateAscending',
-				label: '#user_sortCreateDateAscending',
-				config: {
-					orderBy: UmbUserOrderByModel.CREATE_DATE,
-					orderDirection: UmbDirectionModel.ASCENDING,
-				},
-			},
-			{
-				unique: 'lastLoginDateDescending',
-				label: '#user_sortLastLoginDateDescending',
-				config: {
-					orderBy: UmbUserOrderByModel.LAST_LOGIN_DATE,
-					orderDirection: UmbDirectionModel.DESCENDING,
-				},
-			},
-		],
-		(x) => x.label,
-	);
+	#orderByOptions = new UmbArrayState<UmbUserOrderByOption>([], (x) => x.label);
 	orderByOptions = this.#orderByOptions.asObservable();
 
 	#activeOrderByOption = new UmbStringState<string | undefined>(undefined);
 	activeOrderByOption = this.#activeOrderByOption.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_COLLECTION_VIEW_USER_GRID);
-		// init default orderBy option
-		const defaultOrderByOption = this.#orderByOptions.getValue()[0];
-		this.setActiveOrderByOption(defaultOrderByOption.unique);
+		const firstOption: UmbUserOrderByOption = orderByOptions[0];
+
+		super(host, UMB_COLLECTION_VIEW_USER_GRID, {
+			orderBy: firstOption.config.orderBy,
+			orderDirection: firstOption.config.orderDirection,
+		});
+
+		this.#orderByOptions.setValue(orderByOptions);
+		this.#activeOrderByOption.setValue(firstOption.unique);
 	}
 
 	/**
@@ -79,8 +83,6 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 		this.#activeOrderByOption.setValue(unique);
 		this.setFilter({ orderBy: option?.config.orderBy, orderDirection: option?.config.orderDirection });
 	}
-
-	getActiveOrderByOption() {}
 
 	/**
 	 * Sets the state filter for the collection and refreshes the collection.
