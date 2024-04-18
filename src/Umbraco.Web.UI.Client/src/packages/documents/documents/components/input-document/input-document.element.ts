@@ -159,8 +159,23 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		});
 	}
 
+	#removeItem(item: UmbDocumentItemModel) {
+		this.#pickerContext.requestRemoveItem(item.unique);
+	}
+
 	render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
+	}
+
+	#renderAddButton() {
+		if (this.max === 1 && this.selection.length >= this.max) return;
+		return html`
+			<uui-button
+				id="btn-add"
+				look="placeholder"
+				@click=${this.#openPicker}
+				label=${this.localize.term('general_choose')}></uui-button>
+		`;
 	}
 
 	#renderItems() {
@@ -176,18 +191,6 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		`;
 	}
 
-	#renderAddButton() {
-		if (this.max === 1 && this.selection.length >= this.max) return;
-		return html`
-			<uui-button
-				id="btn-add"
-				look="placeholder"
-				@click=${this.#openPicker}
-				label=${this.localize.term('general_choose')}></uui-button>
-		`;
-	}
-
-
 	#renderItem(item: UmbDocumentItemModel) {
 		if (!item.unique) return;
 		return html`
@@ -195,9 +198,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
-					<uui-button
-						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
-						label=${this.localize.term('general_remove')}></uui-button>
+					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
