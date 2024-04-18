@@ -34,7 +34,7 @@ public class AllSegmentController : SegmentControllerBase
     {
         Attempt<PagedModel<Core.Models.Segment>?, SegmentOperationStatus> pagedAttempt = await _segmentService.GetPagedSegmentsAsync(skip, take);
 
-        if (pagedAttempt.Success == false)
+        if (pagedAttempt.Success is false)
         {
             return MapFailure(pagedAttempt.Status);
         }
