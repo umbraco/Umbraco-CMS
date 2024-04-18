@@ -9,10 +9,7 @@ function getNumberOrUndefined(value: string) {
 }
 
 @customElement('umb-input-number-range')
-export class UmbInputNumberRangeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement, ''>(
-	UmbLitElement,
-	'',
-) {
+export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElement, '') {
 	@property({ type: String, attribute: 'min-label' })
 	minLabel = 'Low value';
 
@@ -44,8 +41,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin<string | und
 	}
 
 	private updateValue() {
-		const newValue =
-			this._minValue || this._maxValue ? (this._minValue ?? '') + ',' + (this._maxValue ?? '') : undefined;
+		const newValue = this._minValue || this._maxValue ? (this._minValue ?? '') + ',' + (this._maxValue ?? '') : '';
 		if (super.value !== newValue) {
 			super.value = newValue;
 		}
