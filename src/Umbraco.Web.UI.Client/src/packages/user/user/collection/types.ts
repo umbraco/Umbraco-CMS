@@ -10,6 +10,14 @@ export interface UmbUserCollectionFilterModel {
 	filter?: string;
 }
 
+export interface UmbUserOrderByOption {
+	label: string;
+	config: {
+		orderBy: UmbUserOrderByModel;
+		orderDirection: UmbDirectionModel;
+	};
+}
+
 export enum UmbUserOrderByModel {
 	NAME = 'Name',
 	CREATE_DATE = 'CreateDate',
