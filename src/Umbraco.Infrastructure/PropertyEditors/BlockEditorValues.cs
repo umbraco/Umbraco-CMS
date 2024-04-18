@@ -83,8 +83,7 @@ internal class BlockEditorValues
 
     private bool ResolveBlockItemData(BlockItemData block, Dictionary<string, Dictionary<string, IPropertyType>> contentTypePropertyTypes, IDictionary<Guid, IContentType> contentTypesDictionary)
     {
-        IContentType? contentType = contentTypesDictionary[block.ContentTypeKey];
-        if (contentType == null)
+        if (contentTypesDictionary.TryGetValue(block.ContentTypeKey, out IContentType? contentType) is false)
         {
             return false;
         }
