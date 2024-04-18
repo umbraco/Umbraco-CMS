@@ -42914,9 +42914,11 @@
       },
       "UpdateUserRequestModel": {
         "required": [
+          "documentRootAccess",
           "documentStartNodeIds",
           "email",
           "languageIsoCode",
+          "mediaRootAccess",
           "mediaStartNodeIds",
           "name",
           "userGroupIds",
@@ -42952,6 +42954,9 @@
               "format": "uuid"
             }
           },
+          "documentRootAccess": {
+            "type": "boolean"
+          },
           "mediaStartNodeIds": {
             "uniqueItems": true,
             "type": "array",
@@ -42959,6 +42964,9 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "mediaRootAccess": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

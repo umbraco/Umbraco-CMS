@@ -6,5 +6,9 @@ public class UpdateUserRequestModel : UserPresentationBase
 
     public ISet<Guid> DocumentStartNodeIds { get; set; } = new HashSet<Guid>();
 
+    public bool DocumentRootAccess { get; init; }
+
     public ISet<Guid> MediaStartNodeIds { get; set; } = new HashSet<Guid>();
+
+    public bool MediaRootAccess { get; init; }
 }

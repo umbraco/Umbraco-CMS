@@ -149,7 +149,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             UserName = updateModel.UserName,
             LanguageIsoCode = updateModel.LanguageIsoCode,
             ContentStartNodeKeys = updateModel.DocumentStartNodeIds,
+            ContentRootAccess = updateModel.DocumentRootAccess,
             MediaStartNodeKeys = updateModel.MediaStartNodeIds,
+            MediaRootAccess = updateModel.MediaRootAccess
         };
 
         model.UserGroupKeys = updateModel.UserGroupIds;
