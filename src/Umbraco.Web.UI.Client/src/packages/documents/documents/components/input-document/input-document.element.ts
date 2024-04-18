@@ -1,11 +1,11 @@
 import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { UmbDocumentPickerContext } from './input-document.context.js';
-import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-input-document')
@@ -93,7 +93,6 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 
 	@property()
 	public set value(idsString: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selection = splitStringToArray(idsString);
 	}
 	public get value() {
@@ -167,37 +166,39 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 
 	#renderItems() {
 		if (!this._items) return;
-		return html`<uui-ref-list>
-			${repeat(
-				this._items,
-				(item) => item.unique,
-				(item) => this.#renderItem(item),
-			)}
-		</uui-ref-list>`;
+		return html`
+			<uui-ref-list>
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this.#renderItem(item),
+				)}
+			</uui-ref-list>
+		`;
 	}
 
 	#renderAddButton() {
 		if (this.max === 1 && this.selection.length >= this.max) return;
-		return html`<uui-button
-			id="add-button"
-			look="placeholder"
-			@click=${this.#openPicker}
-			label=${this.localize.term('general_choose')}></uui-button>`;
+		return html`
+			<uui-button
+				id="btn-add"
+				look="placeholder"
+				@click=${this.#openPicker}
+				label=${this.localize.term('general_choose')}></uui-button>
+		`;
 	}
+
 
 	#renderItem(item: UmbDocumentItemModel) {
 		if (!item.unique) return;
-		// TODO: get correct variant name
-		const name = item.variants[0]?.name;
-
 		return html`
-			<uui-ref-node name=${name} id=${item.unique}>
+			<uui-ref-node name=${item.name} id=${item.unique}>
 				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
-					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.unique)} label="Remove document ${name}"
-						>${this.localize.term('general_remove')}</uui-button
-					>
+					<uui-button
+						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
+						label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
@@ -215,14 +216,10 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 
 	#renderOpenButton(item: UmbDocumentItemModel) {
 		if (!this.showOpenButton) return;
-
-		// TODO: get correct variant name
-		const name = item.variants[0]?.name;
-
 		return html`
 			<uui-button
 				href="${this._editDocumentPath}edit/${item.unique}"
-				label="${this.localize.term('general_open')} ${name}">
+				label="${this.localize.term('general_open')} ${item.name}">
 				${this.localize.term('general_open')}
 			</uui-button>
 		`;
@@ -230,7 +227,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 
 	static styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 
