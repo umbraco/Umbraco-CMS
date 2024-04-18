@@ -49,7 +49,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		this.observe(
 			observeMultiple([this.#collectionContext.orderByOptions, this.#collectionContext.activeOrderByOption]),
 			([options, activeOption]) => {
-				debugger;
 				this._orderByOptions = options;
 
 				if (activeOption) {
@@ -217,7 +216,8 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 							(option) => html`
 								<uui-menu-item
 									label=${this.localize.string(option.label)}
-									@click-label=${() => this.#onOrderByChange(option)}></uui-menu-item>
+									@click-label=${() => this.#onOrderByChange(option)}
+									?active=${this._activeOrderByOption?.unique === option.unique}></uui-menu-item>
 							`,
 						)}
 					</div>
