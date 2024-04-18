@@ -84,7 +84,6 @@ export class UmbAppElement extends UmbLitElement {
 		OpenAPI.BASE = window.location.origin;
 
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
-
 		new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		new UmbIconRegistry().attach(this);
