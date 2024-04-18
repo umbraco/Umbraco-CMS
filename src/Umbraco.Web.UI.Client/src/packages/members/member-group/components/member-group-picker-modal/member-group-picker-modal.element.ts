@@ -49,7 +49,7 @@ export class UmbMemberGroupPickerModalElement extends UmbModalBaseElement<
 	}
 
 	render() {
-		return html`<umb-body-layout headline="Select members">
+		return html`<umb-body-layout headline="Select Member Group">
 			<uui-box>
 				${repeat(
 					this.#filteredMemberGroups,
