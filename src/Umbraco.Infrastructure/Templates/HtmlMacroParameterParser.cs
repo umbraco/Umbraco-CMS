@@ -55,13 +55,9 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
                 macroAlias,
                 new Dictionary<string, string>(macroAttributes, StringComparer.OrdinalIgnoreCase))));
 
-        if (foundMacros.Count > 0)
-        {
-            foreach (UmbracoEntityReference umbracoEntityReference in GetUmbracoEntityReferencesFromMacros(foundMacros))
-            {
-                yield return umbracoEntityReference;
-            }
-        }
+        return foundMacros.Count > 0
+            ? GetUmbracoEntityReferencesFromMacros(foundMacros)
+            : Enumerable.Empty<UmbracoEntityReference>();
     }
 
     /// <summary>
@@ -85,13 +81,9 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
             }
         }
 
-        if (foundMacros.Count > 0)
-        {
-            foreach (UmbracoEntityReference umbracoEntityReference in GetUmbracoEntityReferencesFromMacros(foundMacros))
-            {
-                yield return umbracoEntityReference;
-            }
-        }
+        return foundMacros.Count > 0
+            ? GetUmbracoEntityReferencesFromMacros(foundMacros)
+            : Enumerable.Empty<UmbracoEntityReference>();
     }
 
     private IEnumerable<UmbracoEntityReference> GetUmbracoEntityReferencesFromMacros(
@@ -101,6 +93,7 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
         {
             yield break;
         }
+
 
         IEnumerable<string?> uniqueMacroAliases = macros.Select(f => f.Item1).Distinct();
 
