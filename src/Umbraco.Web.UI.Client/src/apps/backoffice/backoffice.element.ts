@@ -52,8 +52,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 		new UmbBackofficeContext(this);
 
-		// Initialise any entryPoints that export the 'onLoad' function
-		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry, 'onInit');
+		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions();
 
