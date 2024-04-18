@@ -665,7 +665,7 @@ export class UmbContentTypeStructureManager<
 					x.name === name &&
 					x.type === containerType &&
 					// If we look for a parent name, then we need to match that as well:
-					(parentName
+					(parentName !== null
 						? // And we have a parent on this container, then we need to match the parent name and type as well
 							x.parent
 							? data.some((y) => x.parent!.id === y.id && y.name === parentName && y.type === parentType)
