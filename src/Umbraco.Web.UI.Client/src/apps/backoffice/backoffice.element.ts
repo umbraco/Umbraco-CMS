@@ -2,7 +2,6 @@ import { UmbBackofficeContext } from './backoffice.context.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
-	UmbBundleExtensionInitializer,
 	UmbEntryPointExtensionInitializer,
 	UmbServerExtensionRegistrator,
 } from '@umbraco-cms/backoffice/extension-api';
