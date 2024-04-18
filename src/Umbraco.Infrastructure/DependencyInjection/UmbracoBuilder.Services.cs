@@ -83,8 +83,8 @@ public static partial class UmbracoBuilderExtensions
             packageRepoFileName);
 
     // Factory registration is only required because of ambiguous constructor
-    private static PackageDataInstallation CreatePackageDataInstallation(IServiceProvider factory)
-        => new(
+    private static IPackageDataInstallation CreatePackageDataInstallation(IServiceProvider factory)
+        => new PackageDataInstallation(
             factory.GetRequiredService<IDataValueEditorFactory>(),
             factory.GetRequiredService<ILogger<PackageDataInstallation>>(),
             factory.GetRequiredService<IFileService>(),

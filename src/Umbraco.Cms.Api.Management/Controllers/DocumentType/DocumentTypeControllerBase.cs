@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -107,6 +108,23 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .Build()),
                 _ => new ObjectResult("Unknown content type structure operation status") { StatusCode = StatusCodes.Status500InternalServerError }
             });
+
+    protected static IActionResult ContentTypeImportOperationStatusResult(ContentTypeImportOperationStatus operationStatus) =>
+        OperationStatusResult(operationStatus, problemDetailsBuilder => operationStatus switch
+        {
+            ContentTypeImportOperationStatus.TemporaryFileNotFound => new NotFoundObjectResult(problemDetailsBuilder
+                .WithTitle("Temporary file not found")
+                .Build()),
+            ContentTypeImportOperationStatus.TemporaryFileConversionFailure => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("Failed to convert the specified file")
+                .WithDetail($"The import failed due to not being able to convert the file into proper xml")
+                .Build()),
+            ContentTypeImportOperationStatus.DocumentTypeExists => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("Failed to import because document type exits")
+                .WithDetail($"The import failed because the document type that was being imported already exits and the {nameof(ImportDocumentTypeRequestModel.OverWriteExisting)} flag was disabled")
+                .Build()),
+            _ => new ObjectResult("Unknown content type import operation status") { StatusCode = StatusCodes.Status500InternalServerError },
+        });
 
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status) =>
         OperationStatusResult(status, problemDetailsBuilder => status switch

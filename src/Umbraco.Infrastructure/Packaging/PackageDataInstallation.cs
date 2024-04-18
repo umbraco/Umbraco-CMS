@@ -21,7 +21,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Packaging
 {
-    public class PackageDataInstallation
+    public class PackageDataInstallation : IPackageDataInstallation
     {
         private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly ILogger<PackageDataInstallation> _logger;
@@ -744,13 +744,16 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return _contentTypeService.GetContainer(tryCreateFolder.Result!.Entity!.Id);
         }
 
+        public Guid GetContentTypeKey(XElement contentType)
+        => Guid.Parse(contentType.Element("Info")!.Element("Key")!.Value);
+
         private T CreateContentTypeFromXml<T>(
             XElement documentType,
             IReadOnlyDictionary<string, T> importedContentTypes,
             IContentTypeBaseService<T> service)
             where T : class, IContentTypeComposition
         {
-            var key = Guid.Parse(documentType.Element("Info")!.Element("Key")!.Value);
+            var key = GetContentTypeKey(documentType);
 
             XElement infoElement = documentType.Element("Info")!;
 
