@@ -9,7 +9,7 @@ function getNumberOrUndefined(value: string) {
 }
 
 @customElement('umb-input-number-range')
-export class UmbInputNumberRangeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+export class UmbInputNumberRangeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement, ''>(
 	UmbLitElement,
 	'',
 ) {
