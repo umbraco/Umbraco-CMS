@@ -3,10 +3,12 @@ import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 
-export interface UmbVariantPropertyValueModel extends UmbPropertyValueData {
+export interface UmbVariantDataModel {
 	culture: string | null;
 	segment: string | null;
 }
+
+export interface UmbVariantPropertyValueModel extends UmbVariantDataModel, UmbPropertyValueData {}
 
 export interface UmbVariantModel {
 	createDate: string | null;

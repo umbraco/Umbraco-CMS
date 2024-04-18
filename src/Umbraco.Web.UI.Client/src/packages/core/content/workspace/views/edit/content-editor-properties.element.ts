@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbDataPathValueFilter } from '@umbraco-cms/backoffice/validation';
+import { UmbDataPathPropertyValueFilter } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-content-workspace-view-edit-properties')
@@ -51,7 +51,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 					(property) =>
 						html`<umb-property-type-based-property
 							class="property"
-							.dataPath="$.values[${UmbDataPathValueFilter(property)}].value"
+							.dataPath="$.values[${UmbDataPathPropertyValueFilter(property)}].value"
 							.property=${property}></umb-property-type-based-property> `,
 				)
 			: '';
