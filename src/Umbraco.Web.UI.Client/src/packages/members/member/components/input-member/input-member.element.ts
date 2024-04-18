@@ -6,26 +6,23 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { MemberItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
-import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-
-const SORTER_CONFIG: UmbSorterConfig<string> = {
-	getUniqueOfElement: (element) => {
-		return element.getAttribute('detail');
-	},
-	getUniqueOfModel: (modelEntry) => {
-		return modelEntry;
-	},
-	identifier: 'Umb.SorterIdentifier.InputMember',
-	itemSelector: 'uui-ref-node',
-	containerSelector: 'uui-ref-list',
-};
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-input-member')
 export class UmbInputMemberElement extends UUIFormControlMixin(UmbLitElement, '') {
-	#sorter = new UmbSorterController(this, {
-		...SORTER_CONFIG,
+	#sorter = new UmbSorterController<string>(this, {
+		getUniqueOfElement: (element) => {
+			return element.id;
+		},
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry;
+		},
+		identifier: 'Umb.SorterIdentifier.InputMember',
+		itemSelector: 'uui-ref-node',
+		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
+			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
 
