@@ -55,10 +55,14 @@ internal class BlockEditorValues
         var contentTypePropertyTypes = new Dictionary<string, Dictionary<string, IPropertyType>>();
 
         // filter out any content that isn't referenced in the layout references
+        IEnumerable<Guid> contentTypeKeys = blockEditorData.BlockValue.ContentData.Select(x => x.ContentTypeKey)
+            .Union(blockEditorData.BlockValue.SettingsData.Select(x => x.ContentTypeKey)).Distinct();
+        IDictionary<Guid, IContentType> contentTypesDictionary = _contentTypeService.GetAll(contentTypeKeys).ToDictionary(x=>x.Key);
+
         foreach (BlockItemData block in blockEditorData.BlockValue.ContentData.Where(x =>
                      blockEditorData.References.Any(r => x.Udi is not null && r.ContentUdi == x.Udi)))
         {
-            ResolveBlockItemData(block, contentTypePropertyTypes);
+            ResolveBlockItemData(block, contentTypePropertyTypes, contentTypesDictionary);
         }
 
         // filter out any settings that isn't referenced in the layout references
@@ -66,7 +70,7 @@ internal class BlockEditorValues
                      blockEditorData.References.Any(r =>
                          r.SettingsUdi is not null && x.Udi is not null && r.SettingsUdi == x.Udi)))
         {
-            ResolveBlockItemData(block, contentTypePropertyTypes);
+            ResolveBlockItemData(block, contentTypePropertyTypes, contentTypesDictionary);
         }
 
         // remove blocks that couldn't be resolved
@@ -76,11 +80,10 @@ internal class BlockEditorValues
         return blockEditorData;
     }
 
-    private IContentType? GetElementType(BlockItemData item) => _contentTypeService.Get(item.ContentTypeKey);
 
-    private bool ResolveBlockItemData(BlockItemData block, Dictionary<string, Dictionary<string, IPropertyType>> contentTypePropertyTypes)
+    private bool ResolveBlockItemData(BlockItemData block, Dictionary<string, Dictionary<string, IPropertyType>> contentTypePropertyTypes, IDictionary<Guid, IContentType> contentTypesDictionary)
     {
-        IContentType? contentType = GetElementType(block);
+        IContentType? contentType = contentTypesDictionary[block.ContentTypeKey];
         if (contentType == null)
         {
             return false;
