@@ -543,7 +543,6 @@ export type DatatypeConfigurationResponseModel = {
         canBeChanged: DataTypeChangeModeModel
 documentListViewId: string
 mediaListViewId: string
-memberListViewId: string
     };
 
 export type DefaultReferenceResponseModel = {
@@ -689,6 +688,11 @@ documentType: DocumentTypeReferenceResponseModel
 variants: Array<DocumentVariantItemResponseModel>
     };
 
+export type DocumentTypeBlueprintItemResponseModel = {
+        id: string
+name: string
+    };
+
 export type DocumentTypeCleanupModel = {
         preventCleanup: boolean
 keepAllVersionsNewerThanDays?: number | null
@@ -798,6 +802,11 @@ icon: string
 export type DocumentUrlInfoModel = {
         culture?: string | null
 url: string
+    };
+
+export type DocumentUrlInfoResponseModel = {
+        id: string
+urlInfos: Array<DocumentUrlInfoModel>
     };
 
 export type DocumentValueModel = {
@@ -1252,6 +1261,11 @@ export type MediaUrlInfoModel = {
 url: string
     };
 
+export type MediaUrlInfoResponseModel = {
+        id: string
+urlInfos: Array<MediaUrlInfoModel>
+    };
+
 export type MediaValueModel = {
         culture?: string | null
 segment?: string | null
@@ -1577,6 +1591,11 @@ items: Array<DocumentRecycleBinItemResponseModel>
 export type PagedDocumentTreeItemResponseModel = {
         total: number
 items: Array<DocumentTreeItemResponseModel>
+    };
+
+export type PagedDocumentTypeBlueprintItemResponseModel = {
+        total: number
+items: Array<DocumentTypeBlueprintItemResponseModel>
     };
 
 export type PagedDocumentTypeTreeItemResponseModel = {
@@ -2972,6 +2991,10 @@ GetItemDocumentBlueprint: {
                         id?: Array<string>
                         
                     };
+GetTreeDocumentBlueprintAncestors: {
+                        descendantId?: string
+                        
+                    };
 GetTreeDocumentBlueprintChildren: {
                         foldersOnly?: boolean
 parentId?: string
@@ -3000,6 +3023,7 @@ take?: number
                 ,PutDocumentBlueprintFolderById: string
                 ,PostDocumentBlueprintFromDocument: string
                 ,GetItemDocumentBlueprint: Array<DocumentBlueprintItemResponseModel>
+                ,GetTreeDocumentBlueprintAncestors: Array<DocumentBlueprintTreeItemResponseModel>
                 ,GetTreeDocumentBlueprintChildren: PagedDocumentBlueprintTreeItemResponseModel
                 ,GetTreeDocumentBlueprintRoot: PagedDocumentBlueprintTreeItemResponseModel
                 
@@ -3028,6 +3052,12 @@ requestBody?: UpdateDocumentTypeRequestModel
                         
                     };
 GetDocumentTypeByIdAllowedChildren: {
+                        id: string
+skip?: number
+take?: number
+                        
+                    };
+GetDocumentTypeByIdBlueprint: {
                         id: string
 skip?: number
 take?: number
@@ -3109,6 +3139,7 @@ take?: number
                 ,DeleteDocumentTypeById: string
                 ,PutDocumentTypeById: string
                 ,GetDocumentTypeByIdAllowedChildren: PagedAllowedDocumentTypeModel
+                ,GetDocumentTypeByIdBlueprint: PagedDocumentTypeBlueprintItemResponseModel
                 ,GetDocumentTypeByIdCompositionReferences: Array<DocumentTypeCompositionResponseModel>
                 ,PostDocumentTypeByIdCopy: string
                 ,PutDocumentTypeByIdMove: string
@@ -3289,6 +3320,10 @@ PutDocumentSort: {
                         requestBody?: SortingRequestModel
                         
                     };
+GetDocumentUrls: {
+                        id?: Array<string>
+                        
+                    };
 PostDocumentValidate: {
                         requestBody?: CreateDocumentRequestModel
                         
@@ -3373,6 +3408,7 @@ take?: number
                 ,GetDocumentAreReferenced: PagedReferenceByIdModel
                 ,GetDocumentConfiguration: DocumentConfigurationResponseModel
                 ,PutDocumentSort: string
+                ,GetDocumentUrls: Array<DocumentUrlInfoResponseModel>
                 ,PostDocumentValidate: string
                 ,GetItemDocument: Array<DocumentItemResponseModel>
                 ,GetItemDocumentSearch: PagedModelDocumentItemResponseModel
@@ -3836,6 +3872,10 @@ PutMediaSort: {
                         requestBody?: SortingRequestModel
                         
                     };
+GetMediaUrls: {
+                        id?: Array<string>
+                        
+                    };
 PostMediaValidate: {
                         requestBody?: CreateMediaRequestModel
                         
@@ -3900,6 +3940,7 @@ take?: number
                 ,GetMediaAreReferenced: PagedReferenceByIdModel
                 ,GetMediaConfiguration: MediaConfigurationResponseModel
                 ,PutMediaSort: string
+                ,GetMediaUrls: Array<MediaUrlInfoResponseModel>
                 ,PostMediaValidate: string
                 ,DeleteRecycleBinMedia: string
                 ,DeleteRecycleBinMediaById: string

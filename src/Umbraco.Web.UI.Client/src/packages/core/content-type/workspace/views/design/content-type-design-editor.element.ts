@@ -228,7 +228,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		this._routes = routes;
 	}
 
-	async #requestRemoveTab(tab: UmbPropertyTypeContainerModel | undefined) {
+	async #requestDeleteTab(tab: UmbPropertyTypeContainerModel | undefined) {
 		// TODO: Localize this:
 		const modalData: UmbConfirmModalData = {
 			headline: 'Delete tab',
@@ -248,9 +248,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		await umbConfirmModal(this, modalData);
 
-		this.#remove(tab?.id);
+		this.#deleteTab(tab?.id);
 	}
-	#remove(tabId?: string) {
+	#deleteTab(tabId?: string) {
 		if (!tabId) return;
 		this.#workspaceContext?.structure.removeContainer(null, tabId);
 		// TODO: We should only navigate away if it was the last tab and if it was the active one... [NL]
@@ -495,7 +495,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			@click=${(e: MouseEvent) => {
 				e.stopPropagation();
 				e.preventDefault();
-				this.#requestRemoveTab(tab);
+				this.#requestDeleteTab(tab);
 			}}
 			compact>
 			<uui-icon name="icon-trash"></uui-icon>

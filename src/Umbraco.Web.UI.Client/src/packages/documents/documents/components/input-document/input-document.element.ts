@@ -191,7 +191,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		const name = item.variants[0]?.name;
 
 		return html`
-			<uui-ref-node name=${name} detail=${ifDefined(item.unique)}>
+			<uui-ref-node name=${name}>
 				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
