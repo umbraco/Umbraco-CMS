@@ -7,12 +7,4 @@ import type { ManifestPlainJs } from './base.types.js';
  */
 export interface ManifestEntryPoint extends ManifestPlainJs<UmbEntryPointModule> {
 	type: 'entryPoint';
-
-	/**
-	 * The scope of the entry point. If global, the entry point will be loaded on the root host and never be destroyed.
-	 * If local, the entry point will be loaded on the BackofficeElement and will be destroyed when the host is removed for example when signing out.
-	 * @default 'local'
-	 * @enum ['global', 'local']
-	 */
-	scope?: 'global' | 'local';
 }
