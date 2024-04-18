@@ -5,6 +5,7 @@
 *
 * Language Alias: pt 
 * Language Int Name: Portuguese Brazil 
+* Language Local Name: Portuguese Brazil 
 * Language LCID:  
 * Language Culture: pt-BR 
 */

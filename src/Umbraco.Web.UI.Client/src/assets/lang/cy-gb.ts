@@ -5,6 +5,7 @@
 *
 * Language Alias: cy_gb 
 * Language Int Name: Welsh (UK) 
+* Language Local Name: Cymraeg (UK) 
 * Language LCID: 1106 
 * Language Culture: cy-GB 
 */

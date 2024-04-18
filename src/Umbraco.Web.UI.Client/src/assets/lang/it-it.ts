@@ -5,6 +5,7 @@
 *
 * Language Alias: it 
 * Language Int Name: Italian 
+* Language Local Name: italiano 
 * Language LCID: 16 
 * Language Culture: it-IT 
 */

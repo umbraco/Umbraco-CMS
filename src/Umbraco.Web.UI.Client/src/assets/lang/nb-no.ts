@@ -5,6 +5,7 @@
 *
 * Language Alias: no 
 * Language Int Name: Norwegian 
+* Language Local Name: norsk 
 * Language LCID: 20 
 * Language Culture: nb-NO 
 */

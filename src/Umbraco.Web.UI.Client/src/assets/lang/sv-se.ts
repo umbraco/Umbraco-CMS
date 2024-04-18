@@ -5,6 +5,7 @@
 *
 * Language Alias: sv 
 * Language Int Name: Swedish 
+* Language Local Name: Svenska 
 * Language LCID: 29 
 * Language Culture: sv-SE 
 */

@@ -5,6 +5,7 @@
 *
 * Language Alias: hr 
 * Language Int Name: Croatian 
+* Language Local Name: Hrvatski 
 * Language LCID: 1050 
 * Language Culture: hr-HR 
 */

@@ -5,6 +5,7 @@
 *
 * Language Alias: bs 
 * Language Int Name: Bosnian 
+* Language Local Name: Bosanski 
 * Language LCID: 25 
 * Language Culture: bs 
 */

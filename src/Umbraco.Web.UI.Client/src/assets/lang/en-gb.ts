@@ -5,6 +5,7 @@
 *
 * Language Alias: en 
 * Language Int Name: English (UK) 
+* Language Local Name: English (UK) 
 * Language LCID:  
 * Language Culture: en-GB 
 */

@@ -5,6 +5,7 @@
 *
 * Language Alias: fr 
 * Language Int Name: French 
+* Language Local Name: français 
 * Language LCID: 12 
 * Language Culture: fr-FR 
 */

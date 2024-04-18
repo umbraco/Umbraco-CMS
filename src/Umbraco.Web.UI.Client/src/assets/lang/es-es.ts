@@ -5,6 +5,7 @@
 *
 * Language Alias: es 
 * Language Int Name: Spanish 
+* Language Local Name: español 
 * Language LCID: 10 
 * Language Culture: es-ES 
 */

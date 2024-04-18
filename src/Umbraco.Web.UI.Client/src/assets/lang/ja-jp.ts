@@ -5,6 +5,7 @@
 *
 * Language Alias: ja 
 * Language Int Name: Japanese 
+* Language Local Name: 日本語 
 * Language LCID: 17 
 * Language Culture: ja-JP 
 */

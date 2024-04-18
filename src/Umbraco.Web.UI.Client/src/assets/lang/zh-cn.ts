@@ -5,6 +5,7 @@
 *
 * Language Alias: zh 
 * Language Int Name: Chinese (Simple) 
+* Language Local Name: 中文（简体，中国） 
 * Language LCID: 0804 
 * Language Culture: zh-CN 
 */

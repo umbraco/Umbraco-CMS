@@ -5,6 +5,7 @@
 *
 * Language Alias: uk 
 * Language Int Name: Ukrainian 
+* Language Local Name: Українська 
 * Language LCID:  
 * Language Culture: uk-UA 
 */

@@ -5,6 +5,7 @@
 *
 * Language Alias: nl 
 * Language Int Name: Dutch 
+* Language Local Name: Nederlands 
 * Language LCID: 19 
 * Language Culture: nl-NL 
 */

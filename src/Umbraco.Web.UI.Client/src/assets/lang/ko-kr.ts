@@ -5,6 +5,7 @@
 *
 * Language Alias: ko 
 * Language Int Name: Korean 
+* Language Local Name: 한국어 
 * Language LCID: 18 
 * Language Culture: ko-KR 
 */

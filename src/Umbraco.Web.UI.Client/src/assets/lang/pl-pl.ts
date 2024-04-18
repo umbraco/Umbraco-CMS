@@ -5,6 +5,7 @@
 *
 * Language Alias: pl 
 * Language Int Name: Polish 
+* Language Local Name: polski 
 * Language LCID: 21 
 * Language Culture: pl-PL 
 */

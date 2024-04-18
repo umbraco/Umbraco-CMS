@@ -5,6 +5,7 @@
 *
 * Language Alias: de 
 * Language Int Name: German (DE) 
+* Language Local Name: Deutsch (DE) 
 * Language LCID: 7 
 * Language Culture: de-DE 
 */

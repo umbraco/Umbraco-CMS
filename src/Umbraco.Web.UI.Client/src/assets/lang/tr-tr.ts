@@ -5,6 +5,7 @@
 *
 * Language Alias: tr 
 * Language Int Name: Turkish 
+* Language Local Name: Türkçe 
 * Language LCID:  
 * Language Culture: tr-TR 
 */

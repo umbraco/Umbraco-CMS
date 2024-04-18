@@ -5,6 +5,7 @@
 *
 * Language Alias: ro 
 * Language Int Name: Romanian (Romania) 
+* Language Local Name: romana (Romania) 
 * Language LCID:  
 * Language Culture: ro-RO 
 */

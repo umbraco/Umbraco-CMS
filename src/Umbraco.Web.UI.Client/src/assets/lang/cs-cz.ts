@@ -5,6 +5,7 @@
 *
 * Language Alias: cs 
 * Language Int Name: Czech 
+* Language Local Name: česky 
 * Language LCID: 5 
 * Language Culture: cs-CZ 
 */

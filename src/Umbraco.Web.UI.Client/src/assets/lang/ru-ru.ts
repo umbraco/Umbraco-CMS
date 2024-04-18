@@ -5,6 +5,7 @@
 *
 * Language Alias: ru 
 * Language Int Name: Russian 
+* Language Local Name: русский 
 * Language LCID:  
 * Language Culture: ru-RU 
 */
