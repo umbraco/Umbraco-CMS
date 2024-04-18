@@ -139,7 +139,6 @@ export class UmbInputTreeElement extends UUIFormControlMixin(UmbLitElement, '') 
 			.min=${this.min}
 			.max=${this.max}
 			?showOpenButton=${this.showOpenButton}
-			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
 			@change=${this.#onChange}></umb-input-member>`;
 	}
 
