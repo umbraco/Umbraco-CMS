@@ -1,5 +1,6 @@
 import type { ManifestAppEntryPoint } from '../types/index.js';
-import { hasInitExport, loadManifestPlainJs } from '../functions/index.js';
+import { hasInitExport, hasOnUnloadExport, loadManifestPlainJs } from '../functions/index.js';
+import type { UmbEntryPointModule } from '../models/index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { UmbExtensionInitializerBase } from './extension-initializer-base.js';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
@@ -11,6 +12,8 @@ export class UmbAppEntryPointExtensionInitializer extends UmbExtensionInitialize
 	'appEntryPoint',
 	ManifestAppEntryPoint
 > {
+	#jsInstance?: UmbEntryPointModule;
+
 	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<ManifestAppEntryPoint>) {
 		super(host, extensionRegistry, 'appEntryPoint');
 	}
@@ -27,8 +30,9 @@ export class UmbAppEntryPointExtensionInitializer extends UmbExtensionInitialize
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	unloadExtension(_manifest: ManifestAppEntryPoint): void {
-		// No-op
-		// Entry points are not unloaded, but if they were, this is where you would do it.
+	async unloadExtension(_manifest: ManifestAppEntryPoint): Promise<void> {
+		if (this.#jsInstance && hasOnUnloadExport(this.#jsInstance)) {
+			this.#jsInstance.onUnload(this.host, this.extensionRegistry);
+		}
 	}
 }
