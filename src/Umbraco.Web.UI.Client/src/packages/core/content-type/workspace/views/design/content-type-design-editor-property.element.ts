@@ -58,27 +58,20 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	}
 	private _property?: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined;
 
-	/**
-	 * Inherited, Determines if the property is part of the main content type thats being edited.
-	 * If true, then the property is inherited from another content type, not a part of the main content type.
-	 * @type {boolean}
-	 * @attr
-	 * @default undefined
-	 */
-	@property({ type: Boolean })
-	public inherited?: boolean;
-
 	@property({ type: Boolean, reflect: true, attribute: 'sort-mode-active' })
 	public sortModeActive = false;
 
-	@property({ type: String, attribute: 'owner-content-type-id' })
-	public ownerContentTypeId?: string;
-
-	@property({ type: String, attribute: 'owner-content-type-name' })
-	public ownerContentTypeName?: string;
-
 	@property({ type: String, attribute: 'edit-content-type-path' })
 	public editContentTypePath?: string;
+
+	@state()
+	public _inherited?: boolean;
+
+	@state()
+	public _inheritedContentTypeId?: string;
+
+	@state()
+	public _inheritedContentTypeName?: string;
 
 	@state()
 	protected _modalRoute?: string;
@@ -96,7 +89,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		this.#settingsModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_SETTINGS_MODAL)
 			.addUniquePaths(['propertyId'])
 			.onSetup(() => {
-				const id = this.ownerContentTypeId;
+				const id = this._inheritedContentTypeId;
 				if (id === undefined) return false;
 				const propertyData = this.property;
 				if (propertyData === undefined) return false;
@@ -114,9 +107,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		if (this._propertyStructureHelper && this._property) {
 			// We can first match with something if we have a name [NL]
 			this.observe(
-				await this._propertyStructureHelper!.isOwnerProperty(this._property.id),
-				(isOwned) => {
-					this.inherited = !isOwned;
+				await this._propertyStructureHelper!.contentTypeOfProperty(this._property.id),
+				(contentType) => {
+					this._inherited =
+						this._propertyStructureHelper?.getStructureManager()?.getOwnerContentTypeUnique() !== contentType?.unique;
+					this._inheritedContentTypeId = contentType?.unique;
+					this._inheritedContentTypeName = contentType?.name;
 				},
 				'observeIsOwnerProperty',
 			);
@@ -196,7 +192,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	render() {
 		// TODO: Only show alias on label if user has access to DocumentType within settings: [NL]
-		return this.inherited ? this.renderInheritedProperty() : this.renderEditableProperty();
+		return this._inherited ? this.renderInheritedProperty() : this.renderEditableProperty();
 	}
 
 	renderInheritedProperty() {
@@ -217,8 +213,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 						<uui-icon name="icon-merge"></uui-icon>
 						<span
 							>${this.localize.term('contentTypeEditor_inheritedFrom')}
-							<a href=${this.editContentTypePath + 'edit/' + this.ownerContentTypeId}>
-								${this.ownerContentTypeName ?? '??'}
+							<a href=${this.editContentTypePath + 'edit/' + this._inheritedContentTypeId}>
+								${this._inheritedContentTypeName ?? '??'}
 							</a>
 						</span>
 					</uui-tag>
@@ -275,12 +271,12 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		if (!this.property) return;
 		return html`
 			<div class="sortable">
-				<uui-icon name="${this.inherited ? 'icon-merge' : 'icon-navigation'}"></uui-icon>
+				<uui-icon name="${this._inherited ? 'icon-merge' : 'icon-navigation'}"></uui-icon>
 				${this.property.name} <span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
 			</div>
 			<uui-input
 				type="number"
-				?readonly=${this.inherited}
+				?readonly=${this._inherited}
 				label="sort order"
 				@change=${(e: UUIInputEvent) =>
 					this.#partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel)}

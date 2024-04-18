@@ -27,20 +27,20 @@ type FlagTypes =
 	| 'valid';
 
 // Acceptable as an internal interface/type, BUT if exposed externally this should be turned into a public interface in a separate file.
-interface UmbFormControlValidationConfig {
+interface UmbFormControlValidatorConfig {
 	flagKey: FlagTypes;
 	getMessageMethod: () => string;
 	checkMethod: () => boolean;
 }
 
-export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> extends HTMLElement {
+export interface UmbFormControlMixinInterface<ValueType> extends HTMLElement {
 	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
-	removeValidator: (obj: UmbFormControlValidationConfig) => void;
+	removeValidator: (obj: UmbFormControlValidatorConfig) => void;
 	//static formAssociated: boolean;
 	//protected getFormElement(): HTMLElement | undefined | null; // allows for null as it makes it simpler to just implement a querySelector as that might return null. [NL]
 	focusFirstInvalidElement(): void;
-	get value(): ValueType | DefaultValueType;
-	set value(newValue: ValueType | DefaultValueType);
+	get value(): ValueType;
+	set value(newValue: ValueType);
 	formResetCallback(): void;
 	checkValidity(): boolean;
 	get validationMessage(): string;
@@ -50,21 +50,21 @@ export interface UmbFormControlMixinInterface<ValueType, DefaultValueType> exten
 	pristine: boolean;
 }
 
-export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValueType>
+export declare abstract class UmbFormControlMixinElement<ValueType>
 	extends LitElement
-	implements UmbFormControlMixinInterface<ValueType, DefaultValueType>
+	implements UmbFormControlMixinInterface<ValueType>
 {
 	protected _internals: ElementInternals;
 	protected _runValidators(): void;
 	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
-	removeValidator: (obj: UmbFormControlValidationConfig) => void;
+	removeValidator: (obj: UmbFormControlValidatorConfig) => void;
 	protected addFormControlElement(element: UmbNativeFormControlElement): void;
 
 	//static formAssociated: boolean;
 	protected getFormElement(): HTMLElement | undefined | null;
 	focusFirstInvalidElement(): void;
-	get value(): ValueType | DefaultValueType;
-	set value(newValue: ValueType | DefaultValueType);
+	get value(): ValueType;
+	set value(newValue: ValueType);
 	formResetCallback(): void;
 	checkValidity(): boolean;
 	get validationMessage(): string;
@@ -80,14 +80,11 @@ export declare abstract class UmbFormControlMixinElement<ValueType, DefaultValue
  * @param {Object} superClass - superclass to be extended.
  * @mixin
  */
-export const UmbFormControlMixin = <
-	ValueType = FormDataEntryValue | FormData,
+export function UmbFormControlMixin<
+	ValueType = FormData | FormDataEntryValue,
 	T extends HTMLElementConstructor<LitElement> = HTMLElementConstructor<LitElement>,
 	DefaultValueType = undefined,
->(
-	superClass: T,
-	defaultValue: DefaultValueType = undefined as DefaultValueType,
-) => {
+>(superClass: T, defaultValue?: DefaultValueType) {
 	abstract class UmbFormControlMixinClass extends superClass {
 		/**
 		 * This is a static class field indicating that the element is can be used inside a native form and participate in its events.
@@ -135,10 +132,10 @@ export const UmbFormControlMixin = <
 		}
 		private _pristine: boolean = true;
 
-		#value: ValueType | DefaultValueType = defaultValue;
+		#value: ValueType | DefaultValueType = defaultValue as unknown as DefaultValueType;
 		protected _internals: ElementInternals;
 		#form: HTMLFormElement | null = null;
-		#validators: UmbFormControlValidationConfig[] = [];
+		#validators: UmbFormControlValidatorConfig[] = [];
 		#formCtrlElements: UmbNativeFormControlElement[] = [];
 
 		constructor(...args: any[]) {
@@ -208,7 +205,7 @@ export const UmbFormControlMixin = <
 			flagKey: FlagTypes,
 			getMessageMethod: () => string,
 			checkMethod: () => boolean,
-		): UmbFormControlValidationConfig {
+		): UmbFormControlValidatorConfig {
 			const validator = {
 				flagKey: flagKey,
 				getMessageMethod: getMessageMethod,
@@ -221,9 +218,9 @@ export const UmbFormControlMixin = <
 		/**
 		 * Remove validation from this form control.
 		 * @method removeValidator
-		 * @param {UmbFormControlValidationConfig} validator - The specific validation configuration to remove.
+		 * @param {UmbFormControlValidatorConfig} validator - The specific validation configuration to remove.
 		 */
-		removeValidator(validator: UmbFormControlValidationConfig) {
+		removeValidator(validator: UmbFormControlValidatorConfig) {
 			const index = this.#validators.indexOf(validator);
 			if (index !== -1) {
 				this.#validators.splice(index, 1);
@@ -251,7 +248,7 @@ export const UmbFormControlMixin = <
 			}
 		}
 
-		private _customValidityObject?: UmbFormControlValidationConfig;
+		private _customValidityObject?: UmbFormControlValidatorConfig;
 
 		/**
 		 * @method setCustomValidity
@@ -359,7 +356,7 @@ export const UmbFormControlMixin = <
 		}
 
 		protected getDefaultValue(): DefaultValueType {
-			return defaultValue;
+			return defaultValue as DefaultValueType;
 		}
 		protected getInitialValue(): ValueType | DefaultValueType {
 			return this.getAttribute('value') as ValueType | DefaultValueType;
@@ -388,7 +385,7 @@ export const UmbFormControlMixin = <
 		}
 	}
 	return UmbFormControlMixinClass as unknown as HTMLElementConstructor<
-		UmbFormControlMixinElement<ValueType, DefaultValueType>
+		UmbFormControlMixinElement<ValueType | DefaultValueType>
 	> &
 		T;
-};
+}
