@@ -1,5 +1,7 @@
 const prompt = require('prompt');
 const fs = require('fs');
+var path = require('path');
+
 
 const properties = [
     {
@@ -31,7 +33,8 @@ prompt.get(properties, function (error, result) {
 
 var fileContent = `UMBRACO_USER_LOGIN=${result.username}
 UMBRACO_USER_PASSWORD=${result.password}
-URL=${result.baseUrl || "https://localhost:44339"}`;
+URL=${result.baseUrl || "https://localhost:44339"}
+PROJECT_PATH=${__dirname.replace(/\\/g,'/')}/playwright/.auth/user.json`;
 
     fs.writeFile(configPath, fileContent, function (error) {
         if (error) return console.error(error);
