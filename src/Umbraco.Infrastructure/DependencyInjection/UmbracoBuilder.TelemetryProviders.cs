@@ -19,6 +19,7 @@ public static class UmbracoBuilder_TelemetryProviders
         builder.Services.AddTransient<IDetailedTelemetryProvider, UserTelemetryProvider>();
         builder.Services.AddTransient<IDetailedTelemetryProvider, SystemTroubleshootingInformationTelemetryProvider>();
         builder.Services.AddTransient<IDetailedTelemetryProvider, DeliveryApiTelemetryProvider>();
+        builder.Services.AddTransient<IDetailedTelemetryProvider, WebhookTelemetryProvider>();
         return builder;
     }
 }
