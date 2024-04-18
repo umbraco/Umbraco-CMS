@@ -14,7 +14,7 @@ import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
  */
 @customElement('umb-property-editor-ui-number-range')
 export class UmbPropertyEditorUINumberRangeElement
-	extends UmbFormControlMixin<NumberRangeValueType>(UmbLitElement, undefined)
+	extends UmbFormControlMixin<NumberRangeValueType | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
 	@property({ type: Object })
