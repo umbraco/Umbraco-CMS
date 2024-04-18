@@ -14,8 +14,8 @@ import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { OpenAPI, RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
 import {
+	UmbAppEntryPointExtensionInitializer,
 	UmbBundleExtensionInitializer,
-	UmbEntryPointExtensionInitializer,
 	UmbServerExtensionRegistrator,
 } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -85,8 +85,7 @@ export class UmbAppElement extends UmbLitElement {
 
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 
-		// Initialise any entryPoints that export the 'beforeInit' function
-		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry, 'beforeInit');
+		new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		new UmbIconRegistry().attach(this);
 		new UUIIconRegistryEssential().attach(this);
