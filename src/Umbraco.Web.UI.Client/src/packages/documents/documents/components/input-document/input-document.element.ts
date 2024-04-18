@@ -1,4 +1,3 @@
-import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { UmbDocumentPickerContext } from './input-document.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -143,7 +142,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		return undefined;
 	}
 
-	#pickableFilter: (item: UmbDocumentTreeItemModel) => boolean = (item) => {
+	#pickableFilter: (item: UmbDocumentItemModel) => boolean = (item) => {
 		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
 			return this.allowedContentTypeIds.includes(item.documentType.unique);
 		}
@@ -154,8 +153,6 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		// TODO: Configure the content picker, with `startNodeId` and `ignoreUserStartNodes` [LK]
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
 			pickableFilter: this.#pickableFilter,
 		});
 	}
