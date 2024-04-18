@@ -7,7 +7,7 @@ import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
-import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
+import { UmbExtensionIconsRegistry } from '@umbraco-cms/backoffice/icon';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
@@ -79,7 +79,7 @@ export class UmbAppElement extends UmbLitElement {
 
 		OpenAPI.BASE = window.location.origin;
 
-		new UmbIconRegistry().attach(this);
+		new UmbExtensionIconsRegistry(this);
 		new UUIIconRegistryEssential().attach(this);
 
 		new UmbContextDebugController(this);
