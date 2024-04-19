@@ -122,6 +122,9 @@ const publicManifests: PackageManifestResponse = [
 					defaultView: {
 						icon: 'icon-google',
 					},
+					linking: {
+						allowManualLinking: true,
+					},
 				},
 			},
 			{
@@ -135,6 +138,9 @@ const publicManifests: PackageManifestResponse = [
 						look: 'primary',
 						icon: 'icon-github',
 						color: 'success',
+					},
+					linking: {
+						allowManualLinking: true,
 					},
 				},
 			},
