@@ -1,10 +1,11 @@
 import { UmbBackofficeContext } from './backoffice.context.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
+	UmbBackofficeEntryPointExtensionInitializer,
 	UmbEntryPointExtensionInitializer,
-	UmbServerExtensionRegistrator,
-} from '@umbraco-cms/backoffice/extension-api';
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
+import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './components/index.js';
@@ -51,6 +52,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 		new UmbBackofficeContext(this);
 
+		new UmbBackofficeEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions();

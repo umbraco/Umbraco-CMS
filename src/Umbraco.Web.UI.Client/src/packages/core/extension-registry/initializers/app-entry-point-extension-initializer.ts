@@ -1,9 +1,13 @@
-import type { ManifestAppEntryPoint } from '../types/index.js';
-import { hasInitExport, hasOnUnloadExport, loadManifestPlainJs } from '../functions/index.js';
-import type { UmbEntryPointModule } from '../models/index.js';
-import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import { UmbExtensionInitializerBase } from './extension-initializer-base.js';
+import type { ManifestAppEntryPoint } from '../models/app-entry-point.model.js';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
+import {
+	type UmbEntryPointModule,
+	UmbExtensionInitializerBase,
+	type UmbExtensionRegistry,
+	loadManifestPlainJs,
+	hasInitExport,
+	hasOnUnloadExport,
+} from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * Extension initializer for the `appEntryPoint` extension type
@@ -15,7 +19,7 @@ export class UmbAppEntryPointExtensionInitializer extends UmbExtensionInitialize
 	#instanceMap = new Map<string, UmbEntryPointModule>();
 
 	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<ManifestAppEntryPoint>) {
-		super(host, extensionRegistry, 'appEntryPoint');
+		super(host, extensionRegistry, 'appEntryPoint' satisfies ManifestAppEntryPoint['type']);
 	}
 
 	async instantiateExtension(manifest: ManifestAppEntryPoint) {

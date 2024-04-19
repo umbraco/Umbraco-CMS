@@ -1,5 +1,4 @@
-import type { UmbEntryPointModule } from '../models/index.js';
-import type { ManifestPlainJs } from './base.types.js';
+import type { ManifestPlainJs, UmbEntryPointModule } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * Manifest for an `appEntryPoint`, which is loaded up front when the app starts.

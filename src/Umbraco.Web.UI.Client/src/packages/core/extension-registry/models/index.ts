@@ -61,25 +61,25 @@ import type { ManifestEntityUserPermission } from './entity-user-permission.mode
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestCollectionAction } from './collection-action.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
-import type {
-	ManifestAppEntryPoint,
-	ManifestBase,
-	ManifestBundle,
-	ManifestCondition,
-	ManifestEntryPoint,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
+import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
+import type { ManifestEntryPoint } from './entry-point.model.js';
+import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export type * from './auth-provider.model.js';
+export type * from './backoffice-entry-point.model.js';
 export type * from './block-editor-custom-view.model.js';
-export type * from './collection.models.js';
 export type * from './collection-action.model.js';
 export type * from './collection-view.model.js';
+export type * from './collection.models.js';
 export type * from './current-user-action.model.js';
 export type * from './dashboard-collection.model.js';
 export type * from './dashboard.model.js';
 export type * from './dynamic-root.model.js';
 export type * from './entity-action.model.js';
 export type * from './entity-bulk-action.model.js';
+export type * from './entity-user-permission.model.js';
+export type * from './entry-point.model.js';
 export type * from './external-login-provider.model.js';
 export type * from './global-context.model.js';
 export type * from './header-app.model.js';
@@ -102,14 +102,14 @@ export type * from './tinymce-plugin.model.js';
 export type * from './tree-item.model.js';
 export type * from './tree.model.js';
 export type * from './user-granular-permission.model.js';
-export type * from './entity-user-permission.model.js';
 export type * from './user-profile-app.model.js';
-export type * from './workspace-action.model.js';
 export type * from './workspace-action-menu-item.model.js';
+export type * from './workspace-action.model.js';
 export type * from './workspace-context.model.js';
 export type * from './workspace-footer-app.model.js';
 export type * from './workspace-view.model.js';
 export type * from './workspace.model.js';
+export type * from './app-entry-point.model.js';
 
 export type ManifestEntityActions =
 	| ManifestEntityAction
@@ -142,6 +142,7 @@ export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceVi
 export type ManifestTypes =
 	| ManifestAppEntryPoint
 	| ManifestAuthProvider
+	| ManifestBackofficeEntryPoint
 	| ManifestBundle<ManifestTypes>
 	| ManifestBlockEditorCustomView
 	| ManifestCollection
