@@ -10,7 +10,7 @@ import './external-login-modal.element.js';
 class UmbServerExtensionsHostElement extends UmbLitElement {
 	constructor() {
 		super();
-		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerAllExtensions();
+		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 	}
 
 	render() {
