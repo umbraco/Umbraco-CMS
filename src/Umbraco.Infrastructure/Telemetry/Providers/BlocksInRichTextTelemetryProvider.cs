@@ -19,7 +19,7 @@ public class BlocksInRichTextTelemetryProvider : IDetailedTelemetryProvider
     {
         IEnumerable<IDataType> richTextDataTypes = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.TinyMce).ToArray();
         int registeredBlocks = 0;
-        yield return new UsageInformation("RichTextEditorCount", richTextDataTypes.Count());
+        yield return new UsageInformation(Constants.Telemetry.RichTextEditorCount, richTextDataTypes.Count());
 
         foreach (IDataType richTextDataType in richTextDataTypes)
         {
@@ -37,6 +37,6 @@ public class BlocksInRichTextTelemetryProvider : IDetailedTelemetryProvider
             registeredBlocks += richTextConfiguration.Blocks.Length;
         }
 
-        yield return new UsageInformation("RichTextBlockCount", registeredBlocks);
+        yield return new UsageInformation(Constants.Telemetry.RichTextBlockCount, registeredBlocks);
     }
 }
