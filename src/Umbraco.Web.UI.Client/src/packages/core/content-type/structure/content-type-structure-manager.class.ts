@@ -350,6 +350,15 @@ export class UmbContentTypeStructureManager<
 		this.#contentTypes.updateOne(contentTypeUnique, { containers });
 	}*/
 
+	makeEmptyContainerName(
+		containerId: string,
+		containerType: UmbPropertyContainerTypes,
+		parentId: string | null = null,
+	) {
+		return (
+			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', containerType, parentId) ?? 'Unnamed'
+		);
+	}
 	makeContainerNameUniqueForOwnerContentType(
 		containerId: string,
 		newName: string,

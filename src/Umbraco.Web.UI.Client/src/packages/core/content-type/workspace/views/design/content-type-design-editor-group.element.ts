@@ -104,19 +104,11 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		if (!this.groupStructureHelper || !this._group) return;
 		const newName = (e.target as HTMLInputElement).value;
 		if (newName === '') {
-			const changedName =
-				this.groupStructureHelper
-					.getStructureManager()!
-					.makeContainerNameUniqueForOwnerContentType(
-						this._group.id,
-						'Unnamed',
-						'Group',
-						this._group.parent?.id ?? null,
-					) ?? 'Unnamed';
-			if (changedName) {
-				this._singleValueUpdate('name', changedName);
-				(e.target as HTMLInputElement).value = changedName;
-			}
+			const changedName = this.groupStructureHelper
+				.getStructureManager()!
+				.makeEmptyContainerName(this._group.id, 'Group', this._group.parent?.id ?? null);
+			this._singleValueUpdate('name', changedName);
+			(e.target as HTMLInputElement).value = changedName;
 		}
 	}
 

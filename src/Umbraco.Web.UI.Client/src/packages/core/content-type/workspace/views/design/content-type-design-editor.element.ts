@@ -313,12 +313,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (!this._activeTabId) return;
 		const newName = (event.target as HTMLInputElement).value;
 		if (newName === '') {
-			const changedName =
-				this.#workspaceContext?.structure.makeContainerNameUniqueForOwnerContentType(
-					this._activeTabId,
-					'Unnamed',
-					'Tab',
-				) ?? 'Unnamed';
+			const changedName = this.#workspaceContext!.structure.makeEmptyContainerName(this._activeTabId, 'Tab');
 
 			(event.target as HTMLInputElement).value = changedName;
 
