@@ -74,7 +74,7 @@ public class MigrationTests
         new(
             new TestPlan(),
             Mock.Of<IUmbracoDatabase>(),
-            Mock.Of<ILogger<MigrationContext>>());
+            Mock.Of<ILogger<MigrationContext>>(), () => { });
 
     [Test]
     public void RunGoodMigration()
