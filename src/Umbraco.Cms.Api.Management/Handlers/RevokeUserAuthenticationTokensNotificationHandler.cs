@@ -215,17 +215,9 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
 
     private async Task RevokeTokensAsync(IUser user)
     {
-        var tokens = await _tokenManager.FindBySubjectAsync(user.Key.ToString()).ToArrayAsync();
-        if (tokens.Length == 0)
-        {
-            return;
-        }
+        _logger.LogInformation("Revoking active tokens for user with ID {id}", user.Id);
 
-        _logger.LogInformation("Revoking {count} active tokens for user with ID {id}", tokens.Length, user.Id);
-        foreach (var token in tokens)
-        {
-            await _tokenManager.DeleteAsync(token);
-        }
+        await _tokenManager.RevokeUmbracoUserTokens(user.Key);
     }
 
     private async Task<IUser?> FindUserFromString(string userId)
