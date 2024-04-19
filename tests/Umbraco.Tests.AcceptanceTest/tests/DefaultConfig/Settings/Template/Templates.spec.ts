@@ -232,7 +232,6 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-    // await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSection(sectionType);
     await umbracoUi.template.clickSaveButton();
 
@@ -253,7 +252,6 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-    // await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSection(sectionType, sectionName);
     await umbracoUi.template.clickSaveButton();
 
@@ -274,7 +272,6 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-    // await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSection(sectionType, sectionName);
     await umbracoUi.template.clickSaveButton();
 
@@ -295,7 +292,6 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-    // await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertDictionaryItem(dictionaryName);
     await umbracoUi.template.clickSaveButton();
 
@@ -320,7 +316,6 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-    // await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertPartialView(partialViewFileName);
     await umbracoUi.template.clickSaveButton();
 
@@ -339,7 +334,6 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-    // await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
     await umbracoUi.template.clickSaveButton();
 
