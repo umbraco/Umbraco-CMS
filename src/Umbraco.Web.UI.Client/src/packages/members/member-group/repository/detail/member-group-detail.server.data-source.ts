@@ -111,7 +111,6 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 			name: model.name,
 		};
 
-		/*
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			MemberGroupService.putMemberGroupById({
@@ -119,15 +118,6 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 				requestBody,
 			}),
 		);
-		*/
-
-		const { error } = (await tryExecuteAndNotify(
-			this.#host,
-			fetch(`/umbraco/management/api/v1/member-group/${model.unique}`, {
-				method: 'PUT',
-				body: JSON.stringify(requestBody),
-			}),
-		)) as any;
 
 		if (!error) {
 			return this.read(model.unique);

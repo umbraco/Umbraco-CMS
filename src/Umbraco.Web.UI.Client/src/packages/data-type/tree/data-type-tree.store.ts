@@ -20,3 +20,5 @@ export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 }
 
 export const UMB_DATA_TYPE_TREE_STORE_CONTEXT = new UmbContextToken<UmbDataTypeTreeStore>('UmbDataTypeTreeStore');
+
+export { UmbDataTypeTreeStore as api };

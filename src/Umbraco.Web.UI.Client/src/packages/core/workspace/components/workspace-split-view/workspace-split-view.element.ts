@@ -1,6 +1,6 @@
 import { UmbWorkspaceSplitViewContext } from './workspace-split-view.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import '../variant-selector/index.js';
 /**
@@ -17,6 +17,9 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	@property({ type: Boolean })
 	displayNavigation = false;
 
+	@property({ attribute: 'back-path' })
+	public backPath?: string;
+
 	@property({ type: Number })
 	public set splitViewIndex(index: number) {
 		this.splitViewContext.setSplitViewIndex(index);
@@ -29,7 +32,11 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-editor alias=${this.alias} .hideNavigation=${!this.displayNavigation} .enforceNoFooter=${true}>
+			<umb-workspace-editor
+				alias=${this.alias}
+				back-path=${ifDefined(this.backPath)}
+				.hideNavigation=${!this.displayNavigation}
+				.enforceNoFooter=${true}>
 				<div id="header" slot="header">
 					<umb-variant-selector></umb-variant-selector>
 				</div>
