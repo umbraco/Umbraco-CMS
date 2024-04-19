@@ -1,20 +1,22 @@
 import { UmbIconRegistry } from './icon.registry.js';
 import type { UmbIconDefinition } from './types.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_ICON_REGISTRY_CONTEXT } from './icon-registry.context-token.js';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { type ManifestIcons, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbExtensionIconsRegistry extends UmbControllerBase {
+export class UmbIconRegistryContext extends UmbContextBase<UmbIconRegistryContext> {
 	//#host: UmbControllerHost;
 	#registry: UmbIconRegistry;
 	#manifestMap = new Map();
 	#icons = new UmbArrayState<UmbIconDefinition>([], (x) => x.name);
 	readonly icons = this.#icons.asObservable();
+	readonly approvedIcons = this.#icons.asObservablePart((icons) => icons.filter((x) => x.legacy !== true));
 
 	constructor(host: UmbControllerHost) {
-		super(host);
+		super(host, UMB_ICON_REGISTRY_CONTEXT);
 		//this.#host = host;
 		this.#registry = new UmbIconRegistry();
 		this.#registry.attach(host.getHostElement());
@@ -43,3 +45,5 @@ export class UmbExtensionIconsRegistry extends UmbControllerBase {
 		}
 	}
 }
+
+export { UmbIconRegistryContext as api };

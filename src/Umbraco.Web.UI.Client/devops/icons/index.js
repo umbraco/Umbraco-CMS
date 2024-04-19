@@ -173,7 +173,7 @@ const generateJS = (icons) => {
 	const iconDescriptors = icons.map((icon) => {
 		return `{
 			name: "${icon.name}",
-			legacy: "${icon.legacy}",
+			${icon.legacy ? 'legacy: true,' : ''}
 			path: "./icons/${icon.fileName}.js",
 		}`.replace(/\t/g, ''); // Regex removes white space [NL]
 	});
