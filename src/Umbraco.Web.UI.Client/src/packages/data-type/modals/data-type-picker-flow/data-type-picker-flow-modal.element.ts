@@ -15,8 +15,7 @@ import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, UMB_PROPERTY_TYPE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 
 interface GroupedItems<T> {
 	[key: string]: Array<T>;
@@ -81,8 +80,16 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		this._createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_DATATYPE_WORKSPACE_MODAL)
 			.addAdditionalPath(':uiAlias')
 			.onSetup(async (params) => {
-				const contentContext = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
-				const propContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+				const contentContextConsumer = this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, () => {
+					//this.removeUmbController(contentContextConsumer);
+				}).passContextAliasMatches();
+				const propContextConsumer = this.consumeContext(UMB_PROPERTY_TYPE_CONTEXT, () => {
+					//this.removeUmbController(propContextConsumer);
+				}).passContextAliasMatches();
+				const [contentContext, propContext] = await Promise.all([
+					contentContextConsumer.asPromise(),
+					propContextConsumer.asPromise(),
+				]);
 				const propertyEditorName = this.#propertyEditorUIs.find((ui) => ui.alias === params.uiAlias)?.name;
 				const dataTypeName = `${contentContext?.getName() ?? ''} - ${propContext.getLabel() ?? ''} - ${propertyEditorName}`;
 
