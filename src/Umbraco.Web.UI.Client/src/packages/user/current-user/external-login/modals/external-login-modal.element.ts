@@ -2,10 +2,11 @@ import { UmbCurrentUserRepository } from '../../repository/index.js';
 import type { UmbCurrentUserExternalLoginProviderModel } from '../../types.js';
 import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 
 type UmbExternalLoginProviderOption = UmbCurrentUserExternalLoginProviderModel & {
 	displayName: string;
@@ -138,11 +139,23 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 	}
 
 	async #onProviderEnable(item: UmbExternalLoginProviderOption) {
-		alert('Enable provider ' + item.providerName);
+		const authContext = await this.getContext(UMB_AUTH_CONTEXT);
+		authContext.linkLogin(item.providerName);
 	}
 
 	async #onProviderDisable(item: UmbExternalLoginProviderOption) {
-		alert('Disable provider ' + item.providerName);
+		try {
+			await umbConfirmModal(this, {
+				headline: this.localize.term('defaultdialogs_unLinkYour', item.displayName),
+				content: this.localize.term('defaultdialogs_unLinkYourConfirm', item.displayName),
+				confirmLabel: this.localize.term('general_unlink'),
+				color: 'danger',
+			});
+			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
+			authContext.unlinkLogin(item.providerName, item.providerKey);
+		} catch {
+			// Do nothing
+		}
 	}
 
 	static styles = [

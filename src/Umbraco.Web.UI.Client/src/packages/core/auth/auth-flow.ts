@@ -96,6 +96,10 @@ export class UmbAuthFlow {
 	// tokens
 	#tokenResponse?: TokenResponse;
 
+	// external login
+	#link_endpoint;
+	#unlink_endpoint;
+
 	constructor(
 		openIdConnectUrl: string,
 		redirectUri: string,
@@ -114,6 +118,9 @@ export class UmbAuthFlow {
 			revocation_endpoint: `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/revoke`,
 			end_session_endpoint: `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/signout`,
 		});
+
+		this.#link_endpoint = `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/link-login`;
+		this.#unlink_endpoint = `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/unlink-login`;
 
 		this.#notifier = new AuthorizationNotifier();
 		this.#tokenHandler = new BaseTokenRequestHandler(requestor);
@@ -331,6 +338,59 @@ export class UmbAuthFlow {
 		return this.#tokenResponse
 			? Promise.resolve(this.#tokenResponse.accessToken)
 			: Promise.reject('Missing accessToken.');
+	}
+
+	/**
+	 * This method will link the current user to the specified provider.
+	 * @param provider The provider to link to.
+	 */
+	async linkLogin(provider: string) {
+		const token = await this.performWithFreshTokens();
+		const url = new URL(this.#link_endpoint);
+		url.searchParams.set('provider', provider);
+		const request = new Request(url, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+			body: JSON.stringify({ provider }),
+			redirect: 'manual',
+		});
+
+		const result = await fetch(request);
+
+		if (result.status === 301 || result.status === 302) {
+			const redirectUrl = result.headers.get('Location');
+			if (redirectUrl) {
+				location.href = redirectUrl;
+			}
+		}
+
+		if (!result.ok) {
+			throw new Error('Failed to link login');
+		}
+
+		return true;
+	}
+
+	/**
+	 * This method will unlink the current user from the specified provider.
+	 */
+	async unlinkLogin(loginProvider: string, providerKey: string) {
+		const token = await this.performWithFreshTokens();
+		const request = new Request(this.#unlink_endpoint, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+			body: JSON.stringify({ loginProvider, providerKey }),
+		});
+
+		const result = await fetch(request);
+
+		if (!result.ok) {
+			throw new Error('Failed to unlink login');
+		}
+
+		await this.signOut();
+
+		return true;
 	}
 
 	/**

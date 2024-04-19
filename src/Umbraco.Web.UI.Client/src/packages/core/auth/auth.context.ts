@@ -175,4 +175,12 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	getPostLogoutRedirectUrl() {
 		return `${window.location.origin}${this.#backofficePath.endsWith('/') ? this.#backofficePath : this.#backofficePath + '/'}logout`;
 	}
+
+	linkLogin(provider: string) {
+		return this.#authFlow.linkLogin(provider);
+	}
+
+	unlinkLogin(providerName: string, providerKey: string) {
+		return this.#authFlow.unlinkLogin(providerName, providerKey);
+	}
 }
