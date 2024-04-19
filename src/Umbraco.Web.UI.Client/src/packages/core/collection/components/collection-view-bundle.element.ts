@@ -110,11 +110,6 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 
 	#onClick(view: UmbCollectionViewLayout) {
 		this.#collectionContext?.setLastSelectedView(this._entityUnique, view.alias);
-
-		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this._popover?.hidePopover();
 	}
 
 	render() {
@@ -123,7 +118,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 
 		return html`
 			<uui-button compact popovertarget="collection-view-bundle-popover" label="status">
-				${this.#renderItemDisplay(this._currentView)}
+				<umb-icon name=${this._currentView.icon}></umb-icon>
 			</uui-button>
 			<uui-popover-container id="collection-view-bundle-popover" placement="bottom-end">
 				<umb-popover-layout>
@@ -141,15 +136,14 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 
 	#renderItem(view: UmbCollectionViewLayout) {
 		return html`
-			<uui-button compact href="${this._collectionRootPathName}/${view.pathName}" @click=${() => this.#onClick(view)}>
-				${this.#renderItemDisplay(view)}
-				<span class="label">${view.label}</span>
-			</uui-button>
+			<uui-menu-item
+				label=${view.label}
+				href="${this._collectionRootPathName}/${view.pathName}"
+				@click-label=${() => this.#onClick(view)}
+				?active=${view.alias === this._currentView?.alias}>
+				<umb-icon slot="icon" name=${view.icon}></umb-icon>
+			</uui-menu-item>
 		`;
-	}
-
-	#renderItemDisplay(view: UmbCollectionViewLayout) {
-		return html`<umb-icon name=${view.icon}></umb-icon>`;
 	}
 
 	static styles = [
@@ -158,14 +152,11 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 			:host {
 				--uui-button-content-align: left;
 			}
-			.label {
-				margin-left: var(--uui-size-space-1);
-			}
+
 			.filter-dropdown {
-				display: flex;
-				gap: var(--uui-size-space-1);
-				flex-direction: column;
+				padding: var(--uui-size-space-3);
 			}
+
 			umb-icon {
 				display: inline-block;
 			}
