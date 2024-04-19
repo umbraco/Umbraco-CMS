@@ -377,5 +377,4 @@ test.describe('Template tests', () => {
     // Clean
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   });
-
 });
