@@ -45,7 +45,6 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 					this._properties,
 					(property) => property.alias,
 					(property) =>
-						// TODO: Make a helper method to generate data-path entry for a property.
 						html`<umb-property
 							.dataPath="$.values[${UmbDataPathPropertyValueFilter(property)}].value"
 							label=${property.label}

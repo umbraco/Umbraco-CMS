@@ -23,12 +23,13 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	}
 
 	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
+	#variantId?: UmbVariantId;
 
 	@state()
 	_propertyStructure?: Array<UmbPropertyTypeModel>;
 
 	@state()
-	_variantId?: UmbVariantId;
+	_dataPaths?: Array<string>;
 
 	constructor() {
 		super();
@@ -40,26 +41,40 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 			);
 		});
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
-			this._variantId = datasetContext.getVariantId();
+			this.#variantId = datasetContext.getVariantId();
+			this.#generatePropertyDataPath();
 		});
 		this.observe(
 			this.#propertyStructureHelper.propertyStructure,
 			(propertyStructure) => {
 				this._propertyStructure = propertyStructure;
+				this.#generatePropertyDataPath();
 			},
 			null,
 		);
 	}
 
+	#generatePropertyDataPath() {
+		if (!this.#variantId || !this._propertyStructure) return;
+		this._dataPaths = this._propertyStructure.map(
+			(property) =>
+				`$.values[${UmbDataPathPropertyValueFilter({
+					alias: property.alias,
+					culture: property.variesByCulture ? this.#variantId!.culture : null,
+					segment: property.variesBySegment ? this.#variantId!.segment : null,
+				})}].value`,
+		);
+	}
+
 	render() {
-		return this._propertyStructure
+		return this._propertyStructure && this._dataPaths
 			? repeat(
 					this._propertyStructure,
 					(property) => property.alias,
-					(property) =>
+					(property, index) =>
 						html`<umb-property-type-based-property
 							class="property"
-							.dataPath="$.values[${UmbDataPathPropertyValueFilter(property)}].value"
+							.dataPath=${this._dataPaths![index]}
 							.property=${property}></umb-property-type-based-property> `,
 				)
 			: '';
