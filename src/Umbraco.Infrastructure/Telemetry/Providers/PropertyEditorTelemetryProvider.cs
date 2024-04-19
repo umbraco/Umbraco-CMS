@@ -27,8 +27,8 @@ public class PropertyEditorTelemetryProvider : IDetailedTelemetryProvider
         }
 
         yield return new UsageInformation(Constants.Telemetry.Properties, propertyTypes);
-        yield return new UsageInformation("TotalPropertyCount", propertyTypeCounts.Sum());
-        yield return new UsageInformation("HighestPropertyCount", propertyTypeCounts.Max());
-        yield return new UsageInformation("TotalCompositions", totalCompositions);
+        yield return new UsageInformation(Constants.Telemetry.TotalPropertyCount, propertyTypeCounts.Sum());
+        yield return new UsageInformation(Constants.Telemetry.HighestPropertyCount, propertyTypeCounts.Count > 0 ? propertyTypeCounts.Max() : 0);
+        yield return new UsageInformation(Constants.Telemetry.TotalCompositions, totalCompositions);
     }
 }
