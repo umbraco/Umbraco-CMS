@@ -1,3 +1,4 @@
+import { getGuid } from '../utils.js';
 import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL } from '../modals/media-caption-alt-text/media-caption-alt-text-modal.token.js';
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -145,13 +146,9 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
 			data: {
 				multiple: false,
-				hideTreeRoot: true,
-
-				//startNodeId,
+				selection: currentTarget.udi ? [getGuid(currentTarget.udi)] : [],
+				//hideTreeRoot: true,
 				//startNodeIsVirtual,
-			},
-			value: {
-				selection: currentTarget.udi ? [...currentTarget.udi] : [],
 			},
 		});
 

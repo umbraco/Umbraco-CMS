@@ -5,7 +5,7 @@ export interface UmbMediaCollectionFilterModel extends UmbCollectionFilterModel 
 	dataTypeId?: string;
 	orderBy?: string;
 	orderDirection?: 'asc' | 'desc';
-	userDefinedProperties: Array<{alias: string, header: string, isSystem: boolean}>;
+	userDefinedProperties: Array<{ alias: string; header: string; isSystem: boolean }>;
 }
 
 export interface UmbMediaCollectionItemModel {

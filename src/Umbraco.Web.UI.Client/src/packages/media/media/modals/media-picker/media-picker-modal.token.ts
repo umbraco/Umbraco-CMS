@@ -1,7 +1,8 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbMediaPickerModalData {
-	selection: string[];
+	selection?: string[];
+	multiple?: boolean;
 }
 
 export type UmbMediaPickerModalValue = {
