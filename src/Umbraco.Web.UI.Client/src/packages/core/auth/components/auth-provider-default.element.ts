@@ -17,19 +17,23 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 		this.setAttribute('part', 'auth-provider-default');
 	}
 
+	get #label() {
+		return this.localize.term('login_signInWith', this.manifest.meta?.label ?? this.manifest.forProviderName);
+	}
+
 	render() {
 		return html`
 			<uui-button
 				type="button"
 				@click=${() => this.onSubmit(this.manifest.forProviderName)}
 				id="auth-provider-button"
-				.label=${this.manifest.meta?.label ?? this.manifest.forProviderName}
+				.label=${this.#label}
 				.look=${this.manifest.meta?.defaultView?.look ?? 'outline'}
 				.color=${this.manifest.meta?.defaultView?.color ?? 'default'}>
 				${this.manifest.meta?.defaultView?.icon
 					? html`<uui-icon .name=${this.manifest.meta?.defaultView?.icon}></uui-icon>`
 					: nothing}
-				${this.manifest.meta?.label ?? this.manifest.forProviderName}
+				${this.#label}
 			</uui-button>
 		`;
 	}

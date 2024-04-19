@@ -127,7 +127,10 @@ export const manifestDevelopmentHandlers = [
 							name: 'My Custom Auth Provider',
 							forProviderName: 'Umbraco.Google',
 							meta: {
-								label: 'Sign in with Google',
+								label: 'Google',
+								defaultView: {
+									icon: 'icon-google',
+								},
 							},
 						},
 						{
