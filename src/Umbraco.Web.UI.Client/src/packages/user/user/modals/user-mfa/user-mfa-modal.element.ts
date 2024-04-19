@@ -98,7 +98,6 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 					() => html`
 						<p style="margin-top:0">
 							<umb-localize key="user_2faProviderIsEnabled">This two-factor provider is enabled</umb-localize>
-							<uui-icon icon="check"></uui-icon>
 						</p>
 						<uui-button
 							type="button"
