@@ -1,5 +1,4 @@
-import type { UmbEntryPointModule } from '../../../../libs/extension-api/models/index.js';
-import type { ManifestPlainJs } from '../../../../libs/extension-api/types/base.types.js';
+import type { ManifestPlainJs, UmbEntryPointModule } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * Manifest for an `entryPoint`, which is loaded after the Backoffice has been loaded and authentication has been done.
