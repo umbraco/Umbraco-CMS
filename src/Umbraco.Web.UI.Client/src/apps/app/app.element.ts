@@ -12,8 +12,11 @@ import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { OpenAPI, RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
-import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbBundleExtensionInitializer, UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbAppEntryPointExtensionInitializer,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -78,6 +81,9 @@ export class UmbAppElement extends UmbLitElement {
 
 		OpenAPI.BASE = window.location.origin;
 
+		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
+		new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+
 		new UUIIconRegistryEssential().attach(this);
 
 		new UmbContextDebugController(this);
@@ -97,7 +103,7 @@ export class UmbAppElement extends UmbLitElement {
 		// Register Core extensions (this is specifically done here because we need these extensions to be registered before the application is initialized)
 		onInit(this, umbExtensionsRegistry);
 
-		// Register public extensions
+		// Register public extensions (login extensions)
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 
 		// Try to initialise the auth flow and get the runtime status

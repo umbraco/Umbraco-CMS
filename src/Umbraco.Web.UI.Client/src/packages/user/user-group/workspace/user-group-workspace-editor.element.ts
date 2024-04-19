@@ -164,7 +164,10 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		if (!this._unique) return nothing;
 
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.UserGroup" class="uui-text">
+			<umb-workspace-editor
+				alias="Umb.Workspace.UserGroup"
+				class="uui-text"
+				back-path="/section/user-management/view/user-groups">
 				${this.#renderHeader()}
 				<div id="main">
 					<div id="left-column">${this.#renderLeftColumn()}</div>
@@ -196,10 +199,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#renderHeader() {
 		return html`
 			<div id="header" slot="header">
-				<a href="section/user-management/view/user-groups">
-					<uui-icon name="icon-arrow-left"></uui-icon>
-				</a>
-
 				<uui-button id="icon" @click=${this.#onIconClick} label="icon" compact>
 					<umb-icon name=${ifDefined(ifDefined(this._icon))}></umb-icon>
 				</uui-button>
