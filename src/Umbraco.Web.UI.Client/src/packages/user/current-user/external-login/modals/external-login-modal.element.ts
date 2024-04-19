@@ -84,9 +84,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 					)}
 				</div>
 				<div slot="actions">
-					<uui-button @click=${this.#close} look="secondary" .label=${this.localize.term('general_close')}>
-						${this.localize.term('general_close')}
-					</uui-button>
+					<uui-button @click=${this.#close} look="secondary" .label=${this.localize.term('general_close')}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
