@@ -131,8 +131,13 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	#renderBackButton() {
 		if (!this.backPath) return nothing;
 		return html`
-			<uui-button class="back-button" slot="header" compact href=${this.backPath}>
-				<uui-icon name="icon-arrow-left"> </uui-icon>
+			<uui-button
+				class="back-button"
+				slot="header"
+				compact
+				href=${this.backPath}
+				label=${this.localize.term('general_back')}>
+				<uui-icon name="icon-arrow-left"></uui-icon>
 			</uui-button>
 		`;
 	}
