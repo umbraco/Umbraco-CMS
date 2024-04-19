@@ -29,7 +29,10 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 
 	async #loadProviders() {
 		const serverLoginProviders$ = (await this.#currentUserRepository.requestExternalLoginProviders()).asObservable();
-		const manifestLoginProviders$ = umbExtensionsRegistry.byType('authProvider');
+		const manifestLoginProviders$ = umbExtensionsRegistry.byTypeAndFilter(
+			'authProvider',
+			(ext) => !!ext.meta?.linking?.allowManualLinking,
+		);
 
 		// Merge the server and manifest providers to get the final list of providers
 		const externalLoginProviders$ = mergeObservables(
@@ -40,24 +43,12 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 						(serverLoginProvider) => serverLoginProvider.providerName === manifestLoginProvider.forProviderName,
 					);
 					return {
-						isEnabledOnUser: false, // TODO: Get this from the server
+						isEnabledOnUser: !!serverLoginProvider,
 						providerKey: manifestLoginProvider.forProviderName,
 						providerName: manifestLoginProvider.forProviderName,
 						displayName:
-							manifestLoginProvider.meta?.label ?? serverLoginProvider?.providerName ?? manifestLoginProvider.name,
+							manifestLoginProvider.meta?.label ?? manifestLoginProvider.forProviderName ?? manifestLoginProvider.name,
 					};
-				});
-
-				// Add any server providers that are not in the manifest
-				serverLoginProviders.forEach((serverLoginProvider) => {
-					if (!providers.some((p) => p.providerName === serverLoginProvider.providerName)) {
-						providers.push({
-							isEnabledOnUser: false, // TODO: Get this from the server
-							providerKey: serverLoginProvider.providerName,
-							providerName: serverLoginProvider.providerName,
-							displayName: serverLoginProvider.providerName,
-						});
-					}
 				});
 
 				return providers;
