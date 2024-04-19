@@ -9,6 +9,7 @@ import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbExternalLoginProviderOption = UmbCurrentUserExternalLoginProviderModel & {
 	displayName: string;
+	icon?: string;
 	isEnabledOnUser: boolean;
 };
 
@@ -44,6 +45,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 					);
 					return {
 						isEnabledOnUser: !!serverLoginProvider,
+						icon: manifestLoginProvider.meta?.defaultView?.icon,
 						providerKey: manifestLoginProvider.forProviderName,
 						providerName: manifestLoginProvider.forProviderName,
 						displayName:
@@ -95,27 +97,40 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 	 */
 	#renderProvider(item: UmbExternalLoginProviderOption) {
 		return html`
-			<uui-box headline=${item.displayName}>
+			<uui-box>
+				<div class="header" slot="header">
+					<uui-icon name=${item.icon ?? 'icon-cloud'}></uui-icon>
+					${item.displayName}
+				</div>
 				${when(
 					item.isEnabledOnUser,
 					() => html`
 						<p style="margin-top:0">
-							<umb-localize key="user_2faProviderIsEnabled">This provider is enabled</umb-localize>
-							<uui-icon icon="check"></uui-icon>
+							<umb-localize key="defaultdialogs_linkedToService">Your account is linked to this service</umb-localize>
 						</p>
 						<uui-button
 							type="button"
 							look="secondary"
 							color="danger"
-							.label=${this.localize.term('actions_disable')}
-							@click=${() => this.#onProviderDisable(item)}></uui-button>
+							.label=${this.localize.term('defaultdialogs_unLinkYour', item.displayName)}
+							@click=${() => this.#onProviderDisable(item)}>
+							<umb-localize key="defaultdialogs_unLinkYour" .args=${[item.displayName]}>
+								Unlink your ${item.displayName} account
+							</umb-localize>
+							<uui-icon name="icon-window-popout"></uui-icon>
+						</uui-button>
 					`,
 					() => html`
 						<uui-button
 							type="button"
 							look="secondary"
-							.label=${this.localize.term('actions_enable')}
-							@click=${() => this.#onProviderEnable(item)}></uui-button>
+							.label=${this.localize.term('defaultdialogs_linkYour', item.displayName)}
+							@click=${() => this.#onProviderEnable(item)}>
+							<umb-localize key="defaultdialogs_linkYour" .args=${[item.displayName]}>
+								Link your ${item.displayName} account
+							</umb-localize>
+							<uui-icon name="icon-window-popout"></uui-icon>
+						</uui-button>
 					`,
 				)}
 			</uui-box>
@@ -135,6 +150,15 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 		css`
 			uui-box {
 				margin-bottom: var(--uui-size-space-3);
+			}
+
+			.header {
+				display: flex;
+				align-items: center;
+			}
+
+			.header uui-icon {
+				margin-right: var(--uui-size-space-4);
 			}
 		`,
 	];
