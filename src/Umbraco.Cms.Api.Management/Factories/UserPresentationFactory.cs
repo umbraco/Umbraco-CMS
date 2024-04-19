@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
@@ -164,8 +165,10 @@ public class UserPresentationFactory : IUserPresentationFactory
         var presentationUser = CreateResponseModel(user);
         var presentationGroups = await _userGroupPresentationFactory.CreateMultipleAsync(user.Groups);
         var languages = presentationGroups.SelectMany(x => x.Languages).Distinct().ToArray();
-        var mediaStartNodeKeys = GetKeysFromIds(user.CalculateMediaStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Media);
-        var documentStartNodeKeys = GetKeysFromIds(user.CalculateContentStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Document);
+        var mediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+        var mediaStartNodeKeys = GetKeysFromIds(mediaStartNodeIds, UmbracoObjectTypes.Media);
+        var contentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
+        var documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
 
         var permissions = presentationGroups.SelectMany(x => x.Permissions).ToHashSet();
         var fallbackPermissions = presentationGroups.SelectMany(x => x.FallbackPermissions).ToHashSet();
@@ -184,7 +187,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             AvatarUrls = presentationUser.AvatarUrls,
             LanguageIsoCode = presentationUser.LanguageIsoCode,
             MediaStartNodeIds = mediaStartNodeKeys,
+            MediaRootAccess = mediaStartNodeIds?.Contains(Constants.System.Root) is true,
             DocumentStartNodeIds = documentStartNodeKeys,
+            DocumentRootAccess = contentStartNodeIds?.Contains(Constants.System.Root) is true,
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages,

@@ -34169,6 +34169,7 @@
         "required": [
           "allowedSections",
           "avatarUrls",
+          "documentRootAccess",
           "documentStartNodeIds",
           "email",
           "fallbackPermissions",
@@ -34177,6 +34178,7 @@
           "id",
           "isAdmin",
           "languages",
+          "mediaRootAccess",
           "mediaStartNodeIds",
           "name",
           "permissions",
@@ -34209,6 +34211,9 @@
               "format": "uuid"
             }
           },
+          "documentRootAccess": {
+            "type": "boolean"
+          },
           "mediaStartNodeIds": {
             "uniqueItems": true,
             "type": "array",
@@ -34216,6 +34221,9 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "mediaRootAccess": {
+            "type": "boolean"
           },
           "avatarUrls": {
             "type": "array",
