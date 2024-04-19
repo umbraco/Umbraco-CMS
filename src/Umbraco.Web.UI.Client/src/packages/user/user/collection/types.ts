@@ -1,11 +1,21 @@
-import type { DirectionModel, UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbUserOrderByType, UmbUserStateFilterType } from './utils/index.js';
+import type { UmbDirectionType } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbUserCollectionFilterModel {
 	skip?: number;
 	take?: number;
-	orderBy?: UserOrderModel;
-	orderDirection?: DirectionModel;
+	orderBy?: UmbUserOrderByType;
+	orderDirection?: UmbDirectionType;
 	userGroupIds?: string[];
-	userStates?: UserStateModel[];
+	userStates?: UmbUserStateFilterType[];
 	filter?: string;
+}
+
+export interface UmbUserOrderByOption {
+	unique: string;
+	label: string;
+	config: {
+		orderBy: UmbUserOrderByType;
+		orderDirection: UmbDirectionType;
+	};
 }

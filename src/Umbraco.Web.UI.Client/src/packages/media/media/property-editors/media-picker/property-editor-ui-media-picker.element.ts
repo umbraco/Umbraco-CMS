@@ -74,7 +74,6 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 				.selection=${this._items}
 				.min=${this._limitMin}
 				.max=${this._limitMax}>
-				<umb-localize key="general_add">Add</umb-localize>
 			</umb-input-media>
 		`;
 	}

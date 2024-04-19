@@ -17,7 +17,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'max',
 					label: 'Maximum',
-					description: 'Enter the minimum amount of number to be entered',
+					description: 'Enter the maximum amount of number to be entered',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
 				},
 				{
