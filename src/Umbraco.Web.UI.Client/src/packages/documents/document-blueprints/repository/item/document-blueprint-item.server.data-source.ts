@@ -1,9 +1,10 @@
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../../entity.js';
-import type { UmbDocumentBlueprintItemModel } from './types.js';
-import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDocumentBlueprintItemBaseModel, UmbDocumentBlueprintItemModel } from './types.js';
+import { DocumentBlueprintService, DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { DocumentBlueprintItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Document Blueprint items that fetches data from the server
@@ -15,6 +16,7 @@ export class UmbDocumentBlueprintItemServerDataSource extends UmbItemServerDataS
 	DocumentBlueprintItemResponseModel,
 	UmbDocumentBlueprintItemModel
 > {
+	#host: UmbControllerHost;
 	/**
 	 * Creates an instance of UmbDocumentBlueprintItemServerDataSource.
 	 * @param {UmbControllerHost} host
@@ -25,6 +27,26 @@ export class UmbDocumentBlueprintItemServerDataSource extends UmbItemServerDataS
 			getItems,
 			mapper,
 		});
+		this.#host = host;
+	}
+
+	async getItemsByDocumentType(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			DocumentTypeService.getDocumentTypeByIdBlueprint({ id: unique }),
+		);
+
+		if (data) {
+			const items: Array<UmbDocumentBlueprintItemBaseModel> = data.items.map((item) => ({
+				entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
+				unique: item.id,
+				name: item.name,
+			}));
+			return { data: items };
+		}
+
+		return { error };
 	}
 }
 

@@ -1,11 +1,11 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbDynamicRootRepository } from '@umbraco-cms/backoffice/dynamic-root';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UmbInputTreeElement } from '@umbraco-cms/backoffice/tree';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbInputTreeElement } from '@umbraco-cms/backoffice/tree';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 
 /**
@@ -26,7 +26,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	min = 0;
 
 	@state()
-	max = 0;
+	max = Infinity;
 
 	@state()
 	allowedContentTypeIds?: string | null;
@@ -42,20 +42,21 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	#dynamicRootRepository = new UmbDynamicRootRepository(this);
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		const startNode: UmbTreePickerSource | undefined = config?.getValueByAlias('startNode');
+		if (!config) return;
+
+		const startNode = config.getValueByAlias<UmbTreePickerSource>('startNode');
 		if (startNode) {
 			this.type = startNode.type;
 			this.startNodeId = startNode.id;
 			this.#dynamicRoot = startNode.dynamicRoot;
 		}
 
-		this.min = Number(config?.getValueByAlias('minNumber')) || 0;
-		this.max = Number(config?.getValueByAlias('maxNumber')) || 0;
+		this.min = Number(config.getValueByAlias('minNumber')) || 0;
+		this.max = Number(config.getValueByAlias('maxNumber')) || Infinity;
 
-		this.type = config?.getValueByAlias('type') ?? 'content';
-		this.allowedContentTypeIds = config?.getValueByAlias('filter');
-		this.showOpenButton = config?.getValueByAlias('showOpenButton');
-		this.ignoreUserStartNodes = config?.getValueByAlias('ignoreUserStartNodes');
+		this.allowedContentTypeIds = config.getValueByAlias('filter');
+		this.showOpenButton = config.getValueByAlias('showOpenButton');
+		this.ignoreUserStartNodes = config.getValueByAlias('ignoreUserStartNodes');
 	}
 
 	connectedCallback() {
@@ -79,9 +80,8 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 		}
 	}
 
-	#onChange(e: CustomEvent) {
-		const input = e.target as UmbInputTreeElement;
-		this.value = input.items;
+	#onChange(event: CustomEvent & { target: UmbInputTreeElement }) {
+		this.value = event.target.items;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 

@@ -41,7 +41,8 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 	#ensureHashPrefix(swatch: UmbSwatchDetails): UmbSwatchDetails {
 		return {
 			label: swatch.label,
-			value: swatch.value.startsWith('#') ? swatch.value : `#${swatch.value}`,
+			// hex color regex adapted from: https://stackoverflow.com/a/9682781/12787
+			value: swatch.value.match(/^(?:[0-9a-f]{3}){1,2}$/i) ? `#${swatch.value}` : swatch.value,
 		};
 	}
 

@@ -4,4 +4,4 @@ export {
 } from './detail/index.js';
 export { UmbDocumentBlueprintItemRepository, UMB_DOCUMENT_BLUEPRINT_ITEM_REPOSITORY_ALIAS } from './item/index.js';
 
-export type { UmbDocumentBlueprintItemModel } from './item/types.js';
+export type { UmbDocumentBlueprintItemModel, UmbDocumentBlueprintItemBaseModel } from './item/types.js';

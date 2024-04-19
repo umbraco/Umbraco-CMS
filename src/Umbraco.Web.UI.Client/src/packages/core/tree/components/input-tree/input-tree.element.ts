@@ -122,7 +122,6 @@ export class UmbInputTreeElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	#renderMediaPicker() {
-		// TODO: [LK] Review the data structure of this input editor.
 		return html`<umb-input-media
 			.selection=${this.#selection}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
@@ -140,7 +139,6 @@ export class UmbInputTreeElement extends UUIFormControlMixin(UmbLitElement, '') 
 			.min=${this.min}
 			.max=${this.max}
 			?showOpenButton=${this.showOpenButton}
-			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
 			@change=${this.#onChange}></umb-input-member>`;
 	}
 

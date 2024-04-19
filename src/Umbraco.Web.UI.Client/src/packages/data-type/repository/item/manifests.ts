@@ -1,5 +1,3 @@
-import { UmbDataTypeItemStore } from './data-type-item.store.js';
-import { UmbDataTypeItemRepository } from './data-type-item.repository.js';
 import type { ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.DataType.Item';
@@ -9,14 +7,14 @@ const itemRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS,
 	name: 'Data Type Item Repository',
-	api: UmbDataTypeItemRepository,
+	api: () => import('./data-type-item.repository.js'),
 };
 
 const itemStore: ManifestItemStore = {
 	type: 'itemStore',
 	alias: UMB_DATA_TYPE_STORE_ALIAS,
 	name: 'Data Type Item Store',
-	api: UmbDataTypeItemStore,
+	api: () => import('./data-type-item.store.js'),
 };
 
 export const manifests = [itemRepository, itemStore];
