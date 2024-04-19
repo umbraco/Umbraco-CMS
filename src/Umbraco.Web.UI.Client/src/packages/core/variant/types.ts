@@ -11,10 +11,10 @@ export interface UmbVariantDataModel {
 export interface UmbVariantPropertyValueModel extends UmbVariantDataModel, UmbPropertyValueData {}
 
 export interface UmbVariantModel {
-	createDate: string | null;
-	culture: string | null;
 	name: string;
+	culture: string | null;
 	segment: string | null;
+	createDate: string | null;
 	updateDate: string | null;
 }
 

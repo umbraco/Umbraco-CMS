@@ -9,6 +9,8 @@ import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/c
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathPropertyValueFilter } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 @customElement('umb-content-workspace-view-edit-properties')
 export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -25,6 +27,9 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 	@state()
 	_propertyStructure?: Array<UmbPropertyTypeModel>;
 
+	@state()
+	_variantId?: UmbVariantId;
+
 	constructor() {
 		super();
 
@@ -33,6 +38,9 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 				// Assuming its the same content model type that we are working with here... [NL]
 				workspaceContext.structure as unknown as UmbContentTypeStructureManager<UmbContentTypeModel>,
 			);
+		});
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
+			this._variantId = datasetContext.getVariantId();
 		});
 		this.observe(
 			this.#propertyStructureHelper.propertyStructure,
