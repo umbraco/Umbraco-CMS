@@ -52,6 +52,20 @@ export class UmbCurrentUserServerDataSource {
 	}
 
 	/**
+	 * Get the current user's external login providers
+	 * @memberof UmbCurrentUserServerDataSource
+	 */
+	async getExternalLoginProviders() {
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserService.getUserCurrentLogins());
+
+		if (data) {
+			return { data };
+		}
+
+		return { error };
+	}
+
+	/**
 	 * Get the current user's available MFA login providers
 	 * @memberof UmbCurrentUserServerDataSource
 	 */

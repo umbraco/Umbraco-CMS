@@ -41,6 +41,21 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	}
 
 	/**
+	 * Request the current user's external login providers
+	 * @memberof UmbCurrentUserRepository
+	 */
+	async requestExternalLoginProviders() {
+		await this.#init;
+		const { data, error } = await this.#currentUserSource.getExternalLoginProviders();
+
+		if (data) {
+			this.#currentUserStore?.setExternalLoginProviders(data.linkedLogins);
+		}
+
+		return { data: data?.linkedLogins, error, asObservable: () => this.#currentUserStore!.externalLoginProviders };
+	}
+
+	/**
 	 * Request the current user's available MFA login providers
 	 * @memberof UmbCurrentUserRepository
 	 */
