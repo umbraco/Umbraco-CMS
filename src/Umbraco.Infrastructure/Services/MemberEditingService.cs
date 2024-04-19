@@ -249,21 +249,17 @@ internal sealed class MemberEditingService : IMemberEditingService
         return MemberEditingOperationStatus.Success;
     }
 
-    private async Task<bool> UpdateRoles(IEnumerable<string>? roles, MemberIdentityUser identityMember)
+    private async Task<bool> UpdateRoles(IEnumerable<Guid>? roles, MemberIdentityUser identityMember)
     {
         // We have to convert the GUIDS to names here, as roles on a member are stored by name, not key.
-        var convertedRoles = new List<string>();
-        foreach (var role in roles ?? Enumerable.Empty<string>())
+        var memberGroups = new List<IMemberGroup>();
+        foreach (Guid key in roles ?? Enumerable.Empty<Guid>())
         {
-            if (!Guid.TryParse(role, out Guid key))
-            {
-                continue;
-            }
 
             IMemberGroup? group = await _memberGroupService.GetAsync(key);
             if (group is not null)
             {
-                convertedRoles.Add(group.Name!);
+                memberGroups.Add(group);
             }
         }
 
@@ -274,7 +270,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         IEnumerable<string> currentRoles = (await _memberManager.GetRolesAsync(identityMember)).ToList();
 
         // find the ones to remove and remove them
-        var rolesToRemove = currentRoles.Except(convertedRoles).ToArray();
+        var rolesToRemove = currentRoles.Except(memberGroups.Select(x => x.Name)).WhereNotNull().ToArray();
 
         // Now let's do the role provider stuff - now that we've saved the content item (that is important since
         // if we are changing the username, it must be persisted before looking up the member roles).
@@ -289,7 +285,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         }
 
         // find the ones to add and add them
-        var rolesToAdd = convertedRoles.Except(currentRoles).ToArray();
+        var rolesToAdd = memberGroups.Select(x => x.Name).WhereNotNull().Except(currentRoles).ToArray();
         if (rolesToAdd.Any())
         {
             // add the ones submitted
