@@ -15,6 +15,8 @@ import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 interface GroupedItems<T> {
 	[key: string]: Array<T>;
@@ -78,8 +80,18 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 		this._createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_DATATYPE_WORKSPACE_MODAL)
 			.addAdditionalPath(':uiAlias')
-			.onSetup((params) => {
-				return { data: { entityType: UMB_DATA_TYPE_ENTITY_TYPE, preset: { editorUiAlias: params.uiAlias } } };
+			.onSetup(async (params) => {
+				const contentContext = await this.getContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT);
+				const propContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+				const propertyEditorName = this.#propertyEditorUIs.find((ui) => ui.alias === params.uiAlias)?.name;
+				const dataTypeName = `${contentContext?.getName() ?? ''} - ${propContext.getLabel() ?? ''} - ${propertyEditorName}`;
+
+				return {
+					data: {
+						entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+						preset: { editorUiAlias: params.uiAlias, name: dataTypeName },
+					},
+				};
 			})
 			.onSubmit((value) => {
 				this._select(value?.unique);
