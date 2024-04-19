@@ -1948,8 +1948,8 @@ export default {
 		stateInactive: 'Inactive',
 		sortNameAscending: 'Name (A-Z)',
 		sortNameDescending: 'Name (Z-A)',
-		sortCreateDateAscending: 'Newest',
-		sortCreateDateDescending: 'Oldest',
+		sortCreateDateDescending: 'Newest',
+		sortCreateDateAscending: 'Oldest',
 		sortLastLoginDateDescending: 'Last login',
 		noUserGroupsAdded: 'No user groups have been added',
 		'2faDisableText':

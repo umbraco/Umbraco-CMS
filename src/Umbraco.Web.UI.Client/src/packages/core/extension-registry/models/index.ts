@@ -63,14 +63,13 @@ import type { ManifestCollectionAction } from './collection-action.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
 import type { ManifestSearchProvider } from './search-provider.model.js';
 import type { ManifestSearchResultItem } from './search-result-item.model.js';
-import type {
-	ManifestBase,
-	ManifestBundle,
-	ManifestCondition,
-	ManifestEntryPoint,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
+import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
+import type { ManifestEntryPoint } from './entry-point.model.js';
+import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export type * from './auth-provider.model.js';
+export type * from './backoffice-entry-point.model.js';
 export type * from './block-editor-custom-view.model.js';
 export type * from './collection-action.model.js';
 export type * from './collection-view.model.js';
@@ -82,6 +81,7 @@ export type * from './dynamic-root.model.js';
 export type * from './entity-action.model.js';
 export type * from './entity-bulk-action.model.js';
 export type * from './entity-user-permission.model.js';
+export type * from './entry-point.model.js';
 export type * from './external-login-provider.model.js';
 export type * from './global-context.model.js';
 export type * from './header-app.model.js';
@@ -113,6 +113,7 @@ export type * from './workspace-context.model.js';
 export type * from './workspace-footer-app.model.js';
 export type * from './workspace-view.model.js';
 export type * from './workspace.model.js';
+export type * from './app-entry-point.model.js';
 
 export type ManifestEntityActions =
 	| ManifestEntityAction
@@ -143,7 +144,9 @@ export type ManifestWorkspaces = ManifestWorkspace | ManifestWorkspaceRoutableKi
 export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceViewContentTypeDesignEditorKind;
 
 export type ManifestTypes =
+	| ManifestAppEntryPoint
 	| ManifestAuthProvider
+	| ManifestBackofficeEntryPoint
 	| ManifestBlockEditorCustomView
 	| ManifestBundle<ManifestTypes>
 	| ManifestCollection
