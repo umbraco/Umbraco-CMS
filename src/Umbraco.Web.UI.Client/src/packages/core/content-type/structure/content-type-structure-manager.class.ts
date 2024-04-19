@@ -278,6 +278,22 @@ export class UmbContentTypeStructureManager<
 		return clonedContainer;
 	}
 
+	ensureContainerNames(
+		contentTypeUnique: string | null,
+		type: UmbPropertyContainerTypes,
+		parentId: string | null = null,
+	) {
+		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
+		this.getOwnerContainers(type, parentId)?.forEach((container) => {
+			if (container.name === '') {
+				const newName = 'unnamed';
+				this.updateContainer(null, container.id, {
+					name: this.makeContainerNameUniqueForOwnerContentType(container.id, newName, type, parentId) ?? newName,
+				});
+			}
+		});
+	}
+
 	async createContainer(
 		contentTypeUnique: string | null,
 		parentId: string | null = null,
@@ -295,15 +311,8 @@ export class UmbContentTypeStructureManager<
 			sortOrder: sortOrder ?? 0,
 		};
 
-		this.getOwnerContainers(type, parentId)?.forEach((container) => {
-			if (container.name === '') {
-				const newName = 'unnamed';
-				this.updateContainer(contentTypeUnique, container.id, {
-					name: this.makeContainerNameUniqueForOwnerContentType(container.id, newName, type, parentId) ?? newName,
-				});
-			}
-		});
-
+		// Ensure
+		this.ensureContainerNames(contentTypeUnique, type, parentId);
 
 		const contentTypes = this.#contentTypes.getValue();
 		const containers = [...(contentTypes.find((x) => x.unique === contentTypeUnique)?.containers ?? [])];

@@ -100,6 +100,20 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		(e.target as HTMLInputElement).value = newName;
 	}
 
+	#blurGroup(e: InputEvent) {
+		if (!this.groupStructureHelper || !this._group) return;
+		const newName = (e.target as HTMLInputElement).value;
+		if (newName === '') {
+			const changedName = this.groupStructureHelper
+				.getStructureManager()!
+				.makeContainerNameUniqueForOwnerContentType(this._group.id, newName, 'Group', this._group.parent?.id ?? null);
+			if (changedName) {
+				this._singleValueUpdate('name', changedName);
+				(e.target as HTMLInputElement).value = changedName;
+			}
+		}
+	}
+
 	render() {
 		return this._inherited !== undefined && this._groupId
 			? html`
@@ -119,9 +133,10 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				<uui-input
 					label=${this.localize.term('contentTypeEditor_group')}
 					placeholder=${this.localize.term('placeholders_entername')}
-					.value=${this._group.name}
+					.value=${this._group!.name}
 					?disabled=${!this._hasOwnerContainer}
-					@change=${this.#renameGroup}></uui-input>
+					@change=${this.#renameGroup}
+					@blur=${this.#blurGroup}></uui-input>
 			</div>
 			${this.sortModeActive
 				? html` <uui-input
