@@ -308,7 +308,7 @@ export class UmbContentTypeStructureManager<
 		return container;
 	}
 
-	async insertContainer(contentTypeUnique: string | null, container: UmbPropertyTypeContainerModel) {
+	/*async insertContainer(contentTypeUnique: string | null, container: UmbPropertyTypeContainerModel) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
@@ -330,7 +330,7 @@ export class UmbContentTypeStructureManager<
 		// @ts-ignore
 		// TODO: fix TS partial complaint
 		this.#contentTypes.updateOne(contentTypeUnique, { containers });
-	}
+	}*/
 
 	makeContainerNameUniqueForOwnerContentType(
 		newName: string,
