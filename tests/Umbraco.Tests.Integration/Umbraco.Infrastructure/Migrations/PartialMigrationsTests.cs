@@ -264,7 +264,7 @@ internal class AssertScopeUnscopedTestMigration : UnscopedMigrationBase
         using var scope = _scopeProvider.CreateScope();
         Assert.IsNull(((Scope)scope).ParentScope);
 
-        Context.SetDone();
+        Context.Complete();
     }
 }
 
