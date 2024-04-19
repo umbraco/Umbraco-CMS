@@ -312,14 +312,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	async #tabNameBlur(event: InputEvent) {
 		if (!this._activeTabId) return;
 		const newName = (event.target as HTMLInputElement).value;
+		if (newName === '') {
+			const changedName =
+				this.#workspaceContext?.structure.makeContainerNameUniqueForOwnerContentType(
+					this._activeTabId,
+					'Unnamed',
+					'Tab',
+				) ?? 'Unnamed';
 
-		const changedName = this.#workspaceContext?.structure.makeContainerNameUniqueForOwnerContentType(
-			this._activeTabId,
-			newName,
-			'Tab',
-		);
-
-		if (changedName !== null && changedName !== undefined) {
 			(event.target as HTMLInputElement).value = changedName;
 
 			this.#tabsStructureHelper.partialUpdateContainer(tab.id!, {

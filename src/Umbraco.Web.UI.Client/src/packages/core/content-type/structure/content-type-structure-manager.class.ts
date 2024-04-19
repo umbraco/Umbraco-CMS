@@ -286,7 +286,7 @@ export class UmbContentTypeStructureManager<
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 		this.getOwnerContainers(type, parentId)?.forEach((container) => {
 			if (container.name === '') {
-				const newName = 'unnamed';
+				const newName = 'Unnamed';
 				this.updateContainer(null, container.id, {
 					name: this.makeContainerNameUniqueForOwnerContentType(container.id, newName, type, parentId) ?? newName,
 				});
