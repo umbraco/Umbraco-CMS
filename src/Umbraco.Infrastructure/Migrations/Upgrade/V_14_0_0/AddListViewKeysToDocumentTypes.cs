@@ -31,11 +31,13 @@ public class AddListViewKeysToDocumentTypes : UnscopedMigrationBase
         if (DatabaseType != DatabaseType.SQLite)
         {
             MigrateSqlServer();
+            Context.SetDone();
             scope.Complete();
             return;
         }
 
         MigrateSqlite();
+        Context.SetDone();
         scope.Complete();
     }
 

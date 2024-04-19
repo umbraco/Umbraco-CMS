@@ -57,6 +57,8 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
             Database.Update(userGroup);
         }
 
+        Context.SetDone();
+
         scope.Complete();
     }
 
@@ -87,6 +89,8 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
 
         // Now that keys are disabled and we have a transaction, we'll do our migration.
         MigrateColumnSqlite();
+
+        Context.SetDone();
         scope.Complete();
     }
 
