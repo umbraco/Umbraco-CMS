@@ -79,13 +79,13 @@ internal class MigrateTours : UnscopedMigrationBase
         if (DatabaseType != DatabaseType.SQLite)
         {
             MigrateUserTableSqlServer();
-            Context.SetDone();
+            Context.Complete();
             scope.Complete();
             return;
         }
 
         MigrateUserTableSqlite();
-        Context.SetDone();
+        Context.Complete();
         scope.Complete();
     }
 

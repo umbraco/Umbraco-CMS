@@ -45,17 +45,17 @@ internal class MigrationContext : IMigrationContext
     /// <inheritdoc />
     public bool BuildingExpression { get; set; }
 
-    public bool IsDone { get; private set; } = false;
+    public bool IsCompleted { get; private set; } = false;
 
-    public void SetDone()
+    public void Complete()
     {
-        if (IsDone)
+        if (IsCompleted)
         {
             return;
         }
 
         _onDoneAction();
-        IsDone = true;
+        IsCompleted = true;
     }
 
     /// <inheritdoc />

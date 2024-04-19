@@ -33,13 +33,13 @@ internal class AddGuidsToUsers : UnscopedMigrationBase
         if (DatabaseType != DatabaseType.SQLite)
         {
             MigrateSqlServer();
-            Context.SetDone();
+            Context.Complete();
             scope.Complete();
             return;
         }
 
         MigrateSqlite();
-        Context.SetDone();
+        Context.Complete();
         scope.Complete();
     }
 

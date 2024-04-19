@@ -45,7 +45,7 @@ public interface IMigrationContext
     void AddPostMigration<TMigration>()
         where TMigration : MigrationBase;
 
-    public bool IsDone { get; }
+    public bool IsCompleted { get; }
 
-    public void SetDone();
+    public void Complete();
 }

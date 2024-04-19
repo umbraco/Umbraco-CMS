@@ -213,7 +213,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             }
 
 
-            IEnumerable<IMigrationContext> nonDoneMigrationsContexts = executedMigrationContexts.Where(x => x.IsDone is false);
+            IEnumerable<IMigrationContext> nonDoneMigrationsContexts = executedMigrationContexts.Where(x => x.IsCompleted is false);
             if (nonDoneMigrationsContexts.Any())
             {
                 throw new InvalidOperationException($"Migration ({transition.MigrationType.FullName})has been executed without indicated it was done correctly.");
@@ -301,7 +301,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             RunMigration(transition.MigrationType, context);
 
             // Ensure we call SetDone before the scope completes
-            context.SetDone();
+            context.Complete();
 
             scope.Complete();
 
