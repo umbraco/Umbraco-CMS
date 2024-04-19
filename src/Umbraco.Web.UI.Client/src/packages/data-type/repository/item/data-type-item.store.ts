@@ -22,3 +22,5 @@ export class UmbDataTypeItemStore extends UmbItemStoreBase<UmbDataTypeItemModel>
 }
 
 export const UMB_DATA_TYPE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbDataTypeItemStore>('UmbDataTypeItemStore');
+
+export { UmbDataTypeItemStore as api };

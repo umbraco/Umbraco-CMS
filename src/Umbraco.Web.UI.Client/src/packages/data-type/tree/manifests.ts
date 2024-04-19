@@ -1,7 +1,5 @@
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadManifests } from './reload-tree-item-children/manifests.js';
-import { UmbDataTypeTreeRepository } from './data-type-tree.repository.js';
-import { UmbDataTypeTreeStore } from './data-type-tree.store.js';
 import {
 	UMB_DATA_TYPE_TREE_ALIAS,
 	UMB_DATA_TYPE_TREE_REPOSITORY_ALIAS,
@@ -18,14 +16,14 @@ const treeRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DATA_TYPE_TREE_REPOSITORY_ALIAS,
 	name: 'Data Type Tree Repository',
-	api: UmbDataTypeTreeRepository,
+	api: () => import('./data-type-tree.repository.js'),
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: UMB_DATA_TYPE_TREE_STORE_ALIAS,
 	name: 'Data Type Tree Store',
-	api: UmbDataTypeTreeStore,
+	api: () => import('./data-type-tree.store.js'),
 };
 
 const tree: ManifestTree = {
