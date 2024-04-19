@@ -1,16 +1,14 @@
 const prompt = require('prompt');
 const fs = require('fs');
-var path = require('path');
-
 
 const properties = [
     {
-        description: 'Enter your umbraco superadmin username/email',
+        description: 'Enter your Umbraco superadmin username/email',
         name: 'username',
         required: true
     },
     {
-        description: 'Enter your umbraco superadmin password',
+        description: 'Enter your Umbraco superadmin password',
         name: 'password',
         hidden: true,
         required: true
@@ -24,7 +22,7 @@ const properties = [
 
 const configPath = './.env'
 
-console.log("Configure your umbraco test environment")
+console.log("Configure your Umbraco test environment")
 
 prompt.start();
 
@@ -34,7 +32,7 @@ prompt.get(properties, function (error, result) {
 var fileContent = `UMBRACO_USER_LOGIN=${result.username}
 UMBRACO_USER_PASSWORD=${result.password}
 URL=${result.baseUrl || "https://localhost:44339"}
-PROJECT_PATH=${__dirname.replace(/\\/g,'/')}/playwright/.auth/user.json`;
+STORAGE_STAGE_PATH=${__dirname.replace(/\\/g,'/')}/playwright/.auth/user.json`;
 
     fs.writeFile(configPath, fileContent, function (error) {
         if (error) return console.error(error);
