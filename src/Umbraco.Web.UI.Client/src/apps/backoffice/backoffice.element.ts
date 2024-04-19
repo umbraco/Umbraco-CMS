@@ -12,7 +12,6 @@ import './components/index.js';
 
 const CORE_PACKAGES = [
 	import('../../packages/umbraco-news/umbraco-package.js'),
-	import('../../packages/core/icon-registry/umbraco-package.js'),
 	import('../../packages/documents/umbraco-package.js'),
 	import('../../packages/data-type/umbraco-package.js'),
 	import('../../packages/media/umbraco-package.js'),

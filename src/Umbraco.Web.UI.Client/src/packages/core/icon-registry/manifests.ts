@@ -1,5 +1,4 @@
-export const name = 'Umbraco.Core.Icons';
-export const extensions = [
+export const manifests = [
 	{
 		type: 'icons',
 		alias: 'Umb.Icons.Backoffice',

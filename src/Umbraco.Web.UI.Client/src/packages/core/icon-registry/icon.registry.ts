@@ -1,4 +1,4 @@
-import { UUIIconRegistry } from '@umbraco-cms/backoffice/external/uui';
+import { type UUIIconHost, UUIIconRegistry } from '@umbraco-cms/backoffice/external/uui';
 
 interface UmbIconDescriptor {
 	name: string;
@@ -12,10 +12,34 @@ interface UmbIconDescriptor {
  * @description - Icon Registry. Provides icons from the icon manifest. Icons are loaded on demand. All icons are prefixed with 'icon-'
  */
 export class UmbIconRegistry extends UUIIconRegistry {
+	#initResolve?: () => void;
+	#init: Promise<void> = new Promise((resolve) => {
+		this.#initResolve = resolve;
+	});
+
 	#icons: UmbIconDescriptor[] = [];
+	#unhandledRequests: { name: string; provider: UUIIconHost }[] = [];
 
 	setIcons(icons: UmbIconDescriptor[]) {
+		const oldIcons = this.#icons;
 		this.#icons = icons;
+		if (this.#initResolve) {
+			this.#initResolve();
+			this.#initResolve = undefined;
+		}
+		// Go through the new icons and see if they are already requested.
+		const newIcons = this.#icons.filter((i) => !oldIcons.find((o) => o.name === i.name));
+		newIcons.forEach((icon) => {
+			// Do we already have a request for this one
+			const unhandled = this.#unhandledRequests.find((i) => i.name === icon.name);
+			if (unhandled) {
+				if (unhandled.provider) {
+					this.#loadIcon(icon.name, unhandled.provider).then(() => {
+						this.#unhandledRequests.filter((i) => i.name !== icon.name);
+					});
+				}
+			}
+		});
 	}
 	appendIcons(icons: UmbIconDescriptor[]) {
 		this.#icons = [...this.#icons, ...icons];
@@ -26,20 +50,30 @@ export class UmbIconRegistry extends UUIIconRegistry {
 	 * @memberof UmbIconStore
 	 */
 	acceptIcon(iconName: string): boolean {
-		const iconManifest = this.#icons.find((i: UmbIconDescriptor) => i.name === iconName);
-		if (!iconManifest) return false;
+		const iconProvider = this.provideIcon(iconName);
+		this.#loadIcon(iconName, iconProvider);
 
-		const icon = this.provideIcon(iconName);
+		return true;
+	}
+
+	async #loadIcon(iconName: string, iconProvider: UUIIconHost): Promise<boolean> {
+		await this.#init;
+		const iconManifest = this.#icons.find((i: UmbIconDescriptor) => i.name === iconName);
+		// Icon not found, so lets add it to a list of unhandled requests.
+		if (!iconManifest) {
+			this.#unhandledRequests.push({ name: iconName, provider: iconProvider });
+			return false;
+		}
+
 		const iconPath = iconManifest.path;
 
 		import(/* @vite-ignore */ iconPath)
 			.then((iconModule) => {
-				icon.svg = iconModule.default;
+				iconProvider.svg = iconModule.default;
 			})
 			.catch((err) => {
 				console.error(`Failed to load icon ${iconName} on path ${iconPath}`, err.message);
 			});
-
 		return true;
 	}
 }

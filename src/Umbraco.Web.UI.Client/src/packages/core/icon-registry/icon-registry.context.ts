@@ -8,7 +8,6 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { type ManifestIcons, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbIconRegistryContext extends UmbContextBase<UmbIconRegistryContext> {
-	//#host: UmbControllerHost;
 	#registry: UmbIconRegistry;
 	#manifestMap = new Map();
 	#icons = new UmbArrayState<UmbIconDefinition>([], (x) => x.name);
@@ -17,12 +16,13 @@ export class UmbIconRegistryContext extends UmbContextBase<UmbIconRegistryContex
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_ICON_REGISTRY_CONTEXT);
-		//this.#host = host;
 		this.#registry = new UmbIconRegistry();
 		this.#registry.attach(host.getHostElement());
 
 		this.observe(this.icons, (icons) => {
+			//if (icons.length > 0) {
 			this.#registry.setIcons(icons);
+			//}
 		});
 
 		this.observe(umbExtensionsRegistry.byType('icons'), (manifests) => {
