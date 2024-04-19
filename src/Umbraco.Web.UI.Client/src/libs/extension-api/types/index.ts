@@ -1,5 +1,6 @@
 export * from './base.types.js';
 export * from './condition.types.js';
+export * from './manifest-app-entrypoint.interface.js';
 export * from './manifest-base.interface.js';
 export * from './manifest-bundle.interface.js';
 export * from './manifest-condition.interface.js';
