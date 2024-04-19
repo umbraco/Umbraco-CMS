@@ -92,11 +92,12 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		let newName = (e.target as HTMLInputElement).value;
 		const changedName = this.groupStructureHelper
 			.getStructureManager()!
-			.makeContainerNameUniqueForOwnerContentType(newName, 'Group', this._group.parent?.id ?? null);
+			.makeContainerNameUniqueForOwnerContentType(this._group.id, newName, 'Group', this._group.parent?.id ?? null);
 		if (changedName) {
 			newName = changedName;
 		}
 		this._singleValueUpdate('name', newName);
+		(e.target as HTMLInputElement).value = newName;
 	}
 
 	render() {
@@ -118,7 +119,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				<uui-input
 					label=${this.localize.term('contentTypeEditor_group')}
 					placeholder=${this.localize.term('placeholders_entername')}
-					.value=${this.group!.name}
+					.value=${this._group.name}
 					?disabled=${!this._hasOwnerContainer}
 					@change=${this.#renameGroup}></uui-input>
 			</div>

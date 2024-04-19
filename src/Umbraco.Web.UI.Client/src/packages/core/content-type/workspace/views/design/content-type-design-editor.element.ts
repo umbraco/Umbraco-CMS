@@ -292,9 +292,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		let newName = (event.target as HTMLInputElement).value;
 
 		const changedName = this.#workspaceContext?.structure.makeContainerNameUniqueForOwnerContentType(
+			tab.id,
 			newName,
 			'Tab',
-			tab.id,
 		);
 
 		// Check if it collides with another tab name of this same content-type, if so adjust name:

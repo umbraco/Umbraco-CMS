@@ -295,9 +295,18 @@ export class UmbContentTypeStructureManager<
 			sortOrder: sortOrder ?? 0,
 		};
 
-		const containers = [
-			...(this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.containers ?? []),
-		];
+		this.getOwnerContainers(type, parentId)?.forEach((container) => {
+			if (container.name === '') {
+				const newName = 'unnamed';
+				this.updateContainer(contentTypeUnique, container.id, {
+					name: this.makeContainerNameUniqueForOwnerContentType(container.id, newName, type, parentId) ?? newName,
+				});
+			}
+		});
+
+
+		const contentTypes = this.#contentTypes.getValue();
+		const containers = [...(contentTypes.find((x) => x.unique === contentTypeUnique)?.containers ?? [])];
 		containers.push(container);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -333,21 +342,22 @@ export class UmbContentTypeStructureManager<
 	}*/
 
 	makeContainerNameUniqueForOwnerContentType(
+		containerId: string,
 		newName: string,
-		containerType: UmbPropertyContainerTypes = 'Tab',
+		containerType: UmbPropertyContainerTypes,
 		parentId: string | null = null,
 	) {
 		const ownerRootContainers = this.getOwnerContainers(containerType, parentId); //getRootContainers() can't differentiates between compositions and locals
+		if (!ownerRootContainers) {
+			return null;
+		}
 
 		let changedName = newName;
-		if (ownerRootContainers) {
-			while (ownerRootContainers.find((tab) => tab.name === changedName && tab.id !== parentId)) {
-				changedName = incrementString(changedName);
-			}
-
-			return changedName === newName ? null : changedName;
+		while (ownerRootContainers.find((con) => con.name === changedName && con.id !== containerId)) {
+			changedName = incrementString(changedName);
 		}
-		return null;
+
+		return changedName === newName ? null : changedName;
 	}
 
 	async updateContainer(
