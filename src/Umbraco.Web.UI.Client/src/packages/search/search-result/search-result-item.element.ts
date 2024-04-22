@@ -50,6 +50,7 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 				grid-template-columns: var(--uui-size-space-6) 1fr var(--uui-size-space-5);
 				align-items: center;
 				width: 100%;
+				outline-offset: -3px;
 			}
 			.item:hover {
 				background-color: var(--uui-color-surface-emphasis);
