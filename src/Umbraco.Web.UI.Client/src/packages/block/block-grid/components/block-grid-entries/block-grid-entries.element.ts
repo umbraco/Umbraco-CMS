@@ -206,14 +206,14 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 									look="placeholder"
 									href=${this.#context.getPathForClipboard(-1) ?? ''}>
 									<uui-icon name="icon-paste-in"></uui-icon>
-							  </uui-button>`
+								</uui-button>`
 							: ''}
-				  </uui-button-group>`
+					</uui-button-group>`
 				: html`
 						<uui-button-inline-create
 							href=${this.#context.getPathForCreateBlock(-1) ?? ''}
 							label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
-				  `}
+					`}
 		`;
 	}
 

@@ -1,3 +1,4 @@
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbDataTypeDetailModel } from '../../types.js';
 import { UmbDataTypeServerDataSource } from './data-type-detail.server.data-source.js';
 import type { UmbDataTypeDetailStore } from './data-type-detail.store.js';
@@ -24,3 +25,5 @@ export class UmbDataTypeDetailRepository extends UmbDetailRepositoryBase<UmbData
 		return this.#detailStore!.withPropertyEditorUiAlias(propertyEditorUiAlias);
 	}
 }
+
+export { UmbDataTypeDetailRepository as api };

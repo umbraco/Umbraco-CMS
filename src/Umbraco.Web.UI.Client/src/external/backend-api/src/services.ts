@@ -53,6 +53,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -132,6 +133,7 @@ export class DataTypeService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -154,6 +156,7 @@ export class DataTypeService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -178,6 +181,7 @@ export class DataTypeService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -205,6 +209,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -231,6 +236,7 @@ requestBody
 			responseHeader: 'Umb-Generated-Resource',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -253,6 +259,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -279,6 +286,7 @@ requestBody
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -301,6 +309,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -317,6 +326,7 @@ requestBody
 			url: '/umbraco/management/api/v1/data-type/configuration',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -339,6 +349,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -361,6 +372,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -385,6 +397,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -412,6 +425,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -438,6 +452,7 @@ editorAlias
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -459,6 +474,7 @@ editorAlias
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -482,6 +498,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -503,6 +520,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -527,6 +545,7 @@ foldersOnly
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -550,6 +569,7 @@ foldersOnly
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -577,6 +597,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -623,6 +644,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -647,6 +669,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -701,6 +724,7 @@ includeChildren
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -728,6 +752,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -751,6 +776,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -773,6 +799,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -794,6 +821,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -817,6 +845,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -839,6 +868,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -865,6 +895,7 @@ export class DocumentBlueprintService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -887,6 +918,7 @@ export class DocumentBlueprintService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -911,6 +943,7 @@ export class DocumentBlueprintService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -938,6 +971,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -964,6 +998,7 @@ requestBody
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -987,6 +1022,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1009,6 +1045,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1033,6 +1070,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1060,6 +1098,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1105,6 +1144,29 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getTreeDocumentBlueprintAncestors(data: DocumentBlueprintData['payloads']['GetTreeDocumentBlueprintAncestors'] = {}): CancelablePromise<DocumentBlueprintData['responses']['GetTreeDocumentBlueprintAncestors']> {
+		const {
+                    
+                    descendantId
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/tree/document-blueprint/ancestors',
+			query: {
+				descendantId
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -1129,6 +1191,7 @@ foldersOnly
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -1152,6 +1215,7 @@ foldersOnly
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -1178,6 +1242,7 @@ export class DocumentTypeService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1200,6 +1265,7 @@ export class DocumentTypeService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1223,6 +1289,7 @@ export class DocumentTypeService {
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1250,6 +1317,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1277,6 +1345,35 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getDocumentTypeByIdBlueprint(data: DocumentTypeData['payloads']['GetDocumentTypeByIdBlueprint']): CancelablePromise<DocumentTypeData['responses']['GetDocumentTypeByIdBlueprint']> {
+		const {
+                    
+                    id,
+skip,
+take
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/document-type/{id}/blueprint',
+			path: {
+				id
+			},
+			query: {
+				skip, take
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1300,6 +1397,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1327,6 +1425,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1354,6 +1453,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1377,6 +1477,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -1397,6 +1498,7 @@ take
 			mediaType: 'application/json',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -1412,6 +1514,7 @@ take
 			url: '/umbraco/management/api/v1/document-type/configuration',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -1434,6 +1537,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1456,6 +1560,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1480,6 +1585,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1507,6 +1613,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1529,6 +1636,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -1552,6 +1660,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -1573,6 +1682,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -1597,6 +1707,7 @@ foldersOnly
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -1620,6 +1731,7 @@ foldersOnly
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -1649,6 +1761,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1672,6 +1785,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1700,6 +1814,7 @@ preventCleanup
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1728,6 +1843,7 @@ culture
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1765,6 +1881,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1914,6 +2031,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -1941,6 +2059,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 				409: `Conflict`,
 			},
@@ -2043,6 +2162,7 @@ requestBody
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -2226,6 +2346,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2252,6 +2373,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2331,6 +2453,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2346,6 +2469,7 @@ take
 			url: '/umbraco/management/api/v1/document/configuration',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2370,6 +2494,28 @@ take
 				401: `The resource is protected and requires an authentication token`,
 				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getDocumentUrls(data: DocumentData['payloads']['GetDocumentUrls'] = {}): CancelablePromise<DocumentData['responses']['GetDocumentUrls']> {
+		const {
+                    
+                    id
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/document/urls',
+			query: {
+				id
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2415,6 +2561,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2438,6 +2585,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2556,6 +2704,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2578,6 +2727,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2599,6 +2749,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2623,6 +2774,7 @@ dataTypeId
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2646,6 +2798,7 @@ dataTypeId
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2670,6 +2823,7 @@ export class DynamicRootService {
 			mediaType: 'application/json',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2685,6 +2839,7 @@ export class DynamicRootService {
 			url: '/umbraco/management/api/v1/dynamic-root/steps',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2711,6 +2866,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2732,6 +2888,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -2754,6 +2911,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -2776,6 +2934,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -2965,6 +3124,7 @@ export class LanguageService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3009,6 +3169,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3055,6 +3216,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3082,6 +3244,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3109,6 +3272,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3132,6 +3296,7 @@ endDate
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3159,6 +3324,7 @@ endDate
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3184,6 +3350,7 @@ endDate
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3206,6 +3373,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3228,6 +3396,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3249,6 +3418,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3272,6 +3442,7 @@ take
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3296,6 +3467,7 @@ endDate
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3315,6 +3487,7 @@ export class ManifestService {
 			url: '/umbraco/management/api/v1/manifest/manifest',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3330,6 +3503,7 @@ export class ManifestService {
 			url: '/umbraco/management/api/v1/manifest/manifest/private',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3367,6 +3541,7 @@ export class MediaTypeService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3390,6 +3565,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3412,6 +3588,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3434,6 +3611,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3457,6 +3635,7 @@ take
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3484,6 +3663,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3511,6 +3691,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3534,6 +3715,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3561,6 +3743,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3588,6 +3771,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3611,6 +3795,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3631,6 +3816,7 @@ take
 			mediaType: 'application/json',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3653,6 +3839,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3675,6 +3862,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3699,6 +3887,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3726,6 +3915,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3748,6 +3938,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3772,6 +3963,7 @@ foldersOnly
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3795,6 +3987,7 @@ foldersOnly
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3827,6 +4020,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -3849,6 +4043,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3872,6 +4067,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4050,6 +4246,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4076,6 +4273,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4127,6 +4325,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4142,6 +4341,7 @@ take
 			url: '/umbraco/management/api/v1/media/configuration',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4166,6 +4366,28 @@ take
 				401: `The resource is protected and requires an authentication token`,
 				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getMediaUrls(data: MediaData['payloads']['GetMediaUrls'] = {}): CancelablePromise<MediaData['responses']['GetMediaUrls']> {
+		const {
+                    
+                    id
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/media/urls',
+			query: {
+				id
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4308,6 +4530,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4330,6 +4553,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4351,6 +4575,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4375,6 +4600,7 @@ dataTypeId
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4398,6 +4624,7 @@ dataTypeId
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4423,6 +4650,7 @@ export class MemberGroupService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4445,6 +4673,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4466,6 +4695,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4487,6 +4717,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4511,6 +4742,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4537,6 +4769,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4560,6 +4793,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4585,6 +4819,7 @@ export class MemberTypeService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4608,6 +4843,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4630,6 +4866,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4652,6 +4889,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4675,6 +4913,7 @@ take
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4702,6 +4941,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4725,6 +4965,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4749,6 +4990,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4770,6 +5012,7 @@ requestBody
 			mediaType: 'application/json',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4792,6 +5035,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4825,6 +5069,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4847,6 +5092,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4870,6 +5116,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4892,6 +5139,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4914,6 +5162,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4938,6 +5187,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4965,6 +5215,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -4992,6 +5243,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5008,6 +5260,7 @@ requestBody
 			url: '/umbraco/management/api/v1/member/configuration',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5030,6 +5283,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5051,6 +5305,7 @@ export class ModelsBuilderService {
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				428: `Client Error`,
 			},
 		});
@@ -5067,6 +5322,7 @@ export class ModelsBuilderService {
 			url: '/umbraco/management/api/v1/models-builder/dashboard',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5082,6 +5338,7 @@ export class ModelsBuilderService {
 			url: '/umbraco/management/api/v1/models-builder/status',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5134,6 +5391,7 @@ export class PackageService {
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 				409: `Conflict`,
 			},
@@ -5151,6 +5409,7 @@ export class PackageService {
 			url: '/umbraco/management/api/v1/package/configuration',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5173,6 +5432,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5195,6 +5455,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5217,6 +5478,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5240,6 +5502,7 @@ take
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5266,6 +5529,7 @@ requestBody
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5288,6 +5552,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5311,6 +5576,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5336,6 +5602,7 @@ export class PartialViewService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5358,6 +5625,7 @@ export class PartialViewService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5380,6 +5648,7 @@ export class PartialViewService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5404,6 +5673,7 @@ export class PartialViewService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5431,6 +5701,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5458,6 +5729,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5481,6 +5753,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5503,6 +5776,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5527,6 +5801,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5550,6 +5825,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5571,6 +5847,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -5593,6 +5870,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5616,6 +5894,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5638,6 +5917,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5693,6 +5973,7 @@ export class ProfilingService {
 			url: '/umbraco/management/api/v1/profiling/status',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5714,6 +5995,7 @@ export class ProfilingService {
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5741,6 +6023,7 @@ propertyAlias
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5836,6 +6119,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5862,6 +6146,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5884,6 +6169,7 @@ take
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5899,6 +6185,7 @@ take
 			url: '/umbraco/management/api/v1/redirect-management/status',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5921,6 +6208,7 @@ take
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5946,6 +6234,7 @@ export class RelationTypeService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5968,6 +6257,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5989,6 +6279,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6020,6 +6311,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6046,6 +6338,7 @@ export class ScriptService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6068,6 +6361,7 @@ export class ScriptService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6090,6 +6384,7 @@ export class ScriptService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6114,6 +6409,7 @@ export class ScriptService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6141,6 +6437,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6168,6 +6465,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6191,6 +6489,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6213,6 +6512,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6237,6 +6537,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6259,6 +6560,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6282,6 +6584,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6304,6 +6607,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6377,6 +6681,7 @@ export class SecurityService {
 			url: '/umbraco/management/api/v1/security/configuration',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6399,6 +6704,7 @@ export class SecurityService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6421,6 +6727,7 @@ export class SecurityService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6623,6 +6930,7 @@ export class StylesheetService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6645,6 +6953,7 @@ export class StylesheetService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6667,6 +6976,7 @@ export class StylesheetService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6691,6 +7001,7 @@ export class StylesheetService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6718,6 +7029,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6745,6 +7057,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6768,6 +7081,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6790,6 +7104,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6814,6 +7129,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -6836,6 +7152,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6859,6 +7176,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6881,6 +7199,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6936,6 +7255,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6951,6 +7271,7 @@ take
 			url: '/umbraco/management/api/v1/telemetry/level',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6973,6 +7294,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6998,6 +7320,7 @@ export class TemplateService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7021,6 +7344,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7043,6 +7367,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -7065,6 +7390,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -7089,6 +7415,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -7116,6 +7443,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -7132,6 +7460,7 @@ requestBody
 			url: '/umbraco/management/api/v1/template/configuration',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7152,6 +7481,7 @@ requestBody
 			mediaType: 'application/json',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7167,6 +7497,7 @@ requestBody
 			url: '/umbraco/management/api/v1/template/query/settings',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7188,6 +7519,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7211,6 +7543,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7233,6 +7566,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7341,6 +7675,7 @@ export class UpgradeService {
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				428: `Client Error`,
 				500: `Server Error`,
 			},
@@ -7358,6 +7693,7 @@ export class UpgradeService {
 			url: '/umbraco/management/api/v1/upgrade/settings',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				428: `Client Error`,
 			},
 		});
@@ -7480,6 +7816,7 @@ export class UserGroupService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7525,6 +7862,7 @@ export class UserGroupService {
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7547,6 +7885,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7619,6 +7958,7 @@ requestBody
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -7706,6 +8046,7 @@ filter
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -7728,6 +8069,7 @@ filter
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7750,6 +8092,7 @@ filter
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -7796,6 +8139,7 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -8042,6 +8386,7 @@ requestBody
 			url: '/umbraco/management/api/v1/user/configuration',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -8057,7 +8402,6 @@ requestBody
 			url: '/umbraco/management/api/v1/user/current',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -8172,7 +8516,6 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -8210,6 +8553,7 @@ requestBody
 			url: '/umbraco/management/api/v1/user/current/configuration',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -8361,6 +8705,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -8383,6 +8728,7 @@ requestBody
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				400: `Bad Request`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -8406,6 +8752,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -8427,6 +8774,7 @@ requestBody
 			mediaType: 'application/json',
 			errors: {
 				400: `Bad Request`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -8521,6 +8869,7 @@ take
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -8570,6 +8919,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -8594,6 +8944,7 @@ requestBody
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
 			},
 		});
@@ -8616,6 +8967,7 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}

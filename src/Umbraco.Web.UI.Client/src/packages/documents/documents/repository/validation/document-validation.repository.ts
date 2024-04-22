@@ -24,9 +24,7 @@ export class UmbDocumentValidationRepository extends UmbRepositoryBase {
 	async validateCreate(model: DetailModelType, parentUnique: string | null) {
 		if (!model) throw new Error('Data is missing');
 
-		const { data, error } = await this.#validationDataSource.validateCreate(model, parentUnique);
-
-		return { data, error };
+		return this.#validationDataSource.validateCreate(model, parentUnique);
 	}
 
 	/**
@@ -39,8 +37,6 @@ export class UmbDocumentValidationRepository extends UmbRepositoryBase {
 		if (!model) throw new Error('Data is missing');
 		if (!model.unique) throw new Error('Unique is missing');
 
-		const { data, error } = await this.#validationDataSource.validateUpdate(model);
-
-		return { data, error };
+		return this.#validationDataSource.validateUpdate(model);
 	}
 }

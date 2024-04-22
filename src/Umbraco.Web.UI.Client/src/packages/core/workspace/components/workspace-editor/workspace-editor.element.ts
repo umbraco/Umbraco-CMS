@@ -32,6 +32,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property({ type: Boolean })
 	public enforceNoFooter = false;
 
+	@property({ attribute: 'back-path' })
+	public backPath?: string;
+
 	@state()
 	private _workspaceViews: Array<ManifestWorkspaceView> = [];
 
@@ -83,6 +86,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-body-layout main-no-padding .headline=${this.headline}>
+				${this.#renderBackButton()}
 				<slot name="header" slot="header"></slot>
 				${this.#renderViews()}
 				<slot name="action-menu" slot="action-menu"></slot>
@@ -124,6 +128,20 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
+	#renderBackButton() {
+		if (!this.backPath) return nothing;
+		return html`
+			<uui-button
+				class="back-button"
+				slot="header"
+				compact
+				href=${this.backPath}
+				label=${this.localize.term('general_back')}>
+				<uui-icon name="icon-arrow-left"></uui-icon>
+			</uui-button>
+		`;
+	}
+
 	#renderRoutes() {
 		return html`
 			${this._routes && this._routes.length > 0
@@ -155,6 +173,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				height: 100%;
+			}
+
+			.back-button {
+				margin-right: var(--uui-size-space-4);
 			}
 
 			uui-input {

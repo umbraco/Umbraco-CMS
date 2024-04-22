@@ -11,8 +11,8 @@ import {
 	type UmbAllowedDocumentTypeModel,
 } from '@umbraco-cms/backoffice/document-type';
 import {
-	type UmbDocumentBlueprintItemModel,
 	UmbDocumentBlueprintItemRepository,
+	type UmbDocumentBlueprintItemBaseModel,
 } from '@umbraco-cms/backoffice/document-blueprint';
 
 @customElement('umb-document-create-options-modal')
@@ -35,7 +35,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		`${this.localize.term('create_createUnder')} ${this.localize.term('actionCategories_content')}`;
 
 	@state()
-	private _availableBlueprints: Array<UmbDocumentBlueprintItemModel> = [];
+	private _availableBlueprints: Array<UmbDocumentBlueprintItemBaseModel> = [];
 
 	async firstUpdated() {
 		const parentUnique = this.data?.parent.unique;
@@ -78,7 +78,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 			history.pushState(
 				null,
 				'',
-				`section/content/workspace/document/create/parent/${this.data?.parent.entityType}/${this.data?.parent.unique ?? 'null'}/${documentTypeUnique}/${blueprintUnique}`,
+				`section/content/workspace/document/create/parent/${this.data?.parent.entityType}/${this.data?.parent.unique ?? 'null'}/${documentTypeUnique}/blueprint/${blueprintUnique}`,
 			);
 		}
 		this._submitModal();
@@ -88,11 +88,9 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		this.#documentTypeUnique = documentTypeUnique;
 		this.#documentTypeIcon = this._allowedDocumentTypes.find((dt) => dt.unique === documentTypeUnique)?.icon ?? '';
 
-		/** TODO: Fix this to use the correct endpoint when it becomes available */
-		const { data } = await this.#documentBlueprintItemRepository.requestItems([]);
-		if (!data?.length) return;
+		const { data } = await this.#documentBlueprintItemRepository.requestItemsByDocumentType(documentTypeUnique);
 
-		this._availableBlueprints = data.filter((blueprint) => blueprint.documentType.unique === documentTypeUnique);
+		this._availableBlueprints = data ?? [];
 
 		if (!this._availableBlueprints.length) {
 			this.#onNavigate(documentTypeUnique);

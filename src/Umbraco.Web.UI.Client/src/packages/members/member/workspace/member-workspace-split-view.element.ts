@@ -12,6 +12,8 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 	@state()
 	_variants?: Array<ActiveVariant>;
 
+	#BACK_PATH = '/section/member-management/view/members';
+
 	constructor() {
 		super();
 
@@ -43,8 +45,10 @@ export class UmbMemberWorkspaceSplitViewElement extends UmbLitElement {
 							(view) => html`
 								<umb-workspace-split-view
 									alias="Umb.Workspace.Member"
+									back-path=${this.#BACK_PATH}
 									.splitViewIndex=${view.index}
-									.displayNavigation=${view.index === this._variants!.length - 1}></umb-workspace-split-view>
+									.displayNavigation=${view.index === this._variants!.length - 1}>
+								</umb-workspace-split-view>
 							`,
 						)}
 					</div>

@@ -1893,6 +1893,8 @@ export default {
 		searchAllChildren: 'Search all children',
 		languagesHelp: 'Limit the languages users have access to edit',
 		allowAccessToAllLanguages: 'Allow access to all languages',
+		allowAccessToAllDocuments: 'Allow access to all documents',
+		allowAccessToAllMedia: 'Allow access to all media',
 		sectionsHelp: 'Add sections to give users access',
 		selectUserGroup: (multiple: boolean) => {
 			return multiple ? 'Select User Groups' : 'Select User Group';
@@ -1946,8 +1948,8 @@ export default {
 		stateInactive: 'Inactive',
 		sortNameAscending: 'Name (A-Z)',
 		sortNameDescending: 'Name (Z-A)',
-		sortCreateDateAscending: 'Newest',
-		sortCreateDateDescending: 'Oldest',
+		sortCreateDateDescending: 'Newest',
+		sortCreateDateAscending: 'Oldest',
 		sortLastLoginDateDescending: 'Last login',
 		noUserGroupsAdded: 'No user groups have been added',
 		'2faDisableText':

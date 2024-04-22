@@ -1,15 +1,12 @@
 import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import {
 	UMB_DATATYPE_WORKSPACE_MODAL,
 	UMB_DATA_TYPE_ENTITY_TYPE,
-	UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS,
 	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/data-type';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
-import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-collection-configuration')
@@ -18,37 +15,23 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(
 		return undefined;
 	}
 
-	#itemManager = new UmbRepositoryItemsManager<UmbDataTypeItemModel>(
-		this,
-		UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.unique,
-	);
-
-	#createDataTypeModal: UmbModalRouteRegistrationController;
+	#dataTypeModal: UmbModalRouteRegistrationController;
 
 	#propertyEditorUiAlias = 'Umb.PropertyEditorUi.CollectionView';
 
 	@state()
 	private _dataTypePickerModalPath?: string;
 
-	@state()
-	private _item?: UmbDataTypeItemModel;
-
 	@property({ attribute: 'default-value' })
 	defaultValue?: string;
 
 	#setValue(value: string) {
 		this.value = value;
-		this.#itemManager.setUniques(value ? [value] : []);
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	constructor() {
 		super();
-
-		this.observe(this.#itemManager.items, (items) => {
-			this._item = items[0];
-		});
 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL)
 			.addAdditionalPath(':uiAlias')
@@ -71,7 +54,7 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(
 				this._dataTypePickerModalPath = routeBuilder({ uiAlias: this.#propertyEditorUiAlias });
 			});
 
-		this.#createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_DATATYPE_WORKSPACE_MODAL)
+		this.#dataTypeModal = new UmbModalRouteRegistrationController(this, UMB_DATATYPE_WORKSPACE_MODAL)
 			.addAdditionalPath(':uiAlias')
 			.onSetup((params) => {
 				return { data: { entityType: UMB_DATA_TYPE_ENTITY_TYPE, preset: { editorUiAlias: params.uiAlias } } };
@@ -81,23 +64,19 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(
 			});
 	}
 
-	connectedCallback() {
-		super.connectedCallback();
-
-		if (this.value) {
-			this.#itemManager.setUniques([this.value as string]);
-		}
-	}
-
 	#clearDataType() {
 		this.#setValue('');
 	}
 
 	#createDataType() {
-		this.#createDataTypeModal.open(
+		this.#dataTypeModal.open(
 			{ uiAlias: this.#propertyEditorUiAlias },
 			`create/parent/${UMB_DATA_TYPE_ENTITY_TYPE}/null`,
 		);
+	}
+
+	#editDataType() {
+		this.#dataTypeModal?.open({}, `edit/${this.value}`);
 	}
 
 	render() {
@@ -106,26 +85,28 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(
 
 	#renderCreate() {
 		if (!this._dataTypePickerModalPath) return nothing;
-		return html`<uui-button
-			id="create-button"
-			color="default"
-			look="placeholder"
-			label="Configure as a collection"
-			href=${this._dataTypePickerModalPath}></uui-button>`;
+		return html`
+			<uui-button
+				id="create-button"
+				color="default"
+				look="placeholder"
+				label="Configure as a collection"
+				href=${this._dataTypePickerModalPath}></uui-button>
+		`;
 	}
 
 	#renderConfigured() {
-		if (!this._item || !this._dataTypePickerModalPath) return nothing;
+		if (!this.value || !this._dataTypePickerModalPath) return nothing;
 		return html`
 			<uui-ref-list>
-				<uui-ref-node-data-type standalone name=${this._item.name} detail=${this._item.unique}>
+				<umb-ref-data-type standalone data-type-id=${this.value as string} @open=${this.#editDataType}>
 					<uui-action-bar slot="actions">
 						<uui-button
 							label=${this.localize.term('general_choose')}
 							href=${this._dataTypePickerModalPath}></uui-button>
 						<uui-button @click=${this.#clearDataType} label=${this.localize.term('general_remove')}></uui-button>
 					</uui-action-bar>
-				</uui-ref-node-data-type>
+				</umb-ref-data-type>
 			</uui-ref-list>
 		`;
 	}

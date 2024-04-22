@@ -51,6 +51,7 @@ export class UmbDefaultCollectionContext<
 	public readonly view = new UmbCollectionViewManager(this);
 
 	#defaultViewAlias: string;
+	#defaultFilter: Partial<FilterModelType>;
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -59,10 +60,11 @@ export class UmbDefaultCollectionContext<
 		this.#initialized ? resolve() : (this.#initResolver = resolve);
 	});
 
-	constructor(host: UmbControllerHost, defaultViewAlias: string) {
+	constructor(host: UmbControllerHost, defaultViewAlias: string, defaultFilter: Partial<FilterModelType> = {}) {
 		super(host, UMB_DEFAULT_COLLECTION_CONTEXT);
 
 		this.#defaultViewAlias = defaultViewAlias;
+		this.#defaultFilter = defaultFilter;
 
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 	}
@@ -79,6 +81,7 @@ export class UmbDefaultCollectionContext<
 		}
 
 		this.#filter.setValue({
+			...this.#defaultFilter,
 			...this.#config,
 			...this.#filter.getValue(),
 			skip: 0,
