@@ -65,7 +65,7 @@ export class UmbAppErrorElement extends UmbLitElement {
 		<div id="background"></div>
 
 		<div id="logo">
-			<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg'" alt="Umbraco" />
+			<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg" alt="Umbraco" />
 		</div>
 
 		<div id="container">
@@ -95,7 +95,7 @@ export class UmbAppErrorElement extends UmbLitElement {
 			background-position: 50%;
 			background-repeat: no-repeat;
 			background-size: cover;
-			background-image: url('/umbraco/backoffice/assets/umbraco_background.jpg');
+			background-image: url('/umbraco/backoffice/assets/installer-illustration.svg');
 			width: 100vw;
 			height: 100vh;
 		}
