@@ -1,6 +1,6 @@
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbContentTypeContainerStructureHelper,
 	UmbContentTypeModel,
@@ -134,7 +134,8 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 					.value=${this._group!.name}
 					?disabled=${!this._hasOwnerContainer}
 					@change=${this.#renameGroup}
-					@blur=${this.#blurGroup}></uui-input>
+					@blur=${this.#blurGroup}
+					${this._group!.name === '' ? umbFocus() : nothing}></uui-input>
 			</div>
 			${this.sortModeActive
 				? html` <uui-input
