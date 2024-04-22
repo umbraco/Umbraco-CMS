@@ -50,7 +50,7 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 			}
 
 			#icon {
-				margin-right: var(--uui-size-space-2);
+				margin-right: var(--uui-size-space-1);
 			}
 		`,
 	];
