@@ -36,7 +36,6 @@ test.describe('Template tests', () => {
       defaultTemplateContent + '\r\n' + '<p>AcceptanceTests</p>';
 
     await umbracoApi.template.createDefaultTemplate(templateName);
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
@@ -57,7 +56,6 @@ test.describe('Template tests', () => {
     await umbracoApi.template.ensureNameNotExists(wrongTemplateName);
     const templateId = await umbracoApi.template.create(wrongTemplateName, templateAlias, '');
     expect(await umbracoApi.template.doesNameExist(wrongTemplateName)).toBeTruthy();
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.goToTemplate(wrongTemplateName);
@@ -70,10 +68,9 @@ test.describe('Template tests', () => {
     expect(templateData.name).toBe(templateName);
   });
 
-  test('can delete a template', async ({page, umbracoApi, umbracoUi}) => {
+  test('can delete a template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.template.createDefaultTemplate(templateName);
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.reloadTemplateTree();
@@ -92,7 +89,6 @@ test.describe('Template tests', () => {
     await umbracoApi.template.ensureNameNotExists(childTemplateName);
     await umbracoApi.template.createDefaultTemplate(templateName);
     await umbracoApi.template.createDefaultTemplate(childTemplateName);
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.goToTemplate(childTemplateName);
@@ -122,7 +118,6 @@ test.describe('Template tests', () => {
     await umbracoApi.template.ensureNameNotExists(childTemplateName);
     await umbracoApi.template.create(templateName, templateAlias, '');
     await umbracoApi.template.create(childTemplateName, childTemplateAlias, childTemplateContent);
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.goToTemplate(templateName, childTemplateName);
@@ -163,7 +158,6 @@ test.describe('Template tests', () => {
       '\r\n' + defaultTemplateContent;
 
     await umbracoApi.template.createDefaultTemplate(templateName);
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
@@ -205,7 +199,6 @@ test.describe('Template tests', () => {
       '\r\n' + defaultTemplateContent;
 
     await umbracoApi.template.createDefaultTemplate(templateName);
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
@@ -228,10 +221,11 @@ test.describe('Template tests', () => {
     const insertedContent = '@RenderBody()';
     await umbracoApi.template.createDefaultTemplate(templateName);
     const templateContent = insertedContent + defaultTemplateContent;
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSection(sectionType);
     await umbracoUi.template.clickSaveButton();
 
@@ -248,10 +242,11 @@ test.describe('Template tests', () => {
     const insertedContent = '@RenderSection("' + sectionName + '", false)';
     await umbracoApi.template.createDefaultTemplate(templateName);
     const templateContent = insertedContent + defaultTemplateContent;
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSection(sectionType, sectionName);
     await umbracoUi.template.clickSaveButton();
 
@@ -268,10 +263,11 @@ test.describe('Template tests', () => {
     const insertedContent = '@section ' + sectionName + '\r\n{\r\n\r\n\r\n\r\n}';
     await umbracoApi.template.createDefaultTemplate(templateName);
     const templateContent = insertedContent + defaultTemplateContent;
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSection(sectionType, sectionName);
     await umbracoUi.template.clickSaveButton();
 
@@ -288,10 +284,11 @@ test.describe('Template tests', () => {
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.create(dictionaryName);
     const templateContent = '@Umbraco.GetDictionaryValue("' + dictionaryName + '")' + defaultTemplateContent;
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertDictionaryItem(dictionaryName);
     await umbracoUi.template.clickSaveButton();
 
@@ -312,7 +309,6 @@ test.describe('Template tests', () => {
     await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
     await umbracoApi.partialView.createDefaultPartialView(partialViewFileName);
     const templateContent = '@await Html.PartialAsync("' + partialViewName + '")' + defaultTemplateContent;
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
@@ -330,10 +326,11 @@ test.describe('Template tests', () => {
     await umbracoApi.template.createDefaultTemplate(templateName);
     const systemFieldValue = 'createDate';
     const templateContent = '@Model.Value("' + systemFieldValue + '")' + defaultTemplateContent;
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
     await umbracoUi.template.clickSaveButton();
 
@@ -345,7 +342,7 @@ test.describe('Template tests', () => {
 
   // TODO: Remove skip when the front-end is ready. Currently the returned items count is not updated after choosing the root content.
   test.skip('can show returned items in query builder ', async ({umbracoApi, umbracoUi}) => {
-    //Arrange
+    // Arrange
     // Create content at root with a child
     const documentTypeName = 'ParentDocumentType';
     const childDocumentTypeName = 'ChildDocumentType';
@@ -357,9 +354,8 @@ test.describe('Template tests', () => {
     await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
     // Create template
     await umbracoApi.template.createDefaultTemplate(templateName);
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
-    //Act
+    // Act
     await umbracoUi.template.goToTemplate(templateName);
     await umbracoUi.template.clickQueryBuilderButton();
     await umbracoUi.template.chooseRootContentInQueryBuilder('(' + contentName + ')');
