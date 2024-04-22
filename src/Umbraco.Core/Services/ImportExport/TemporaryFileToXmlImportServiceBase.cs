@@ -15,7 +15,8 @@ public class TemporaryFileToXmlImportServiceBase
     }
 
     internal async Task<Attempt<XElement?, TemporaryFileOperationStatus>> LoadXElementFromTemporaryFileAsync(
-        Guid temporaryFileId)
+        Guid temporaryFileId, bool cleanupFile = true)
+
     {
         TemporaryFileModel? documentTypeFile = await _temporaryFileService.GetAsync(temporaryFileId);
         if (documentTypeFile is null)
@@ -33,7 +34,11 @@ public class TemporaryFileToXmlImportServiceBase
 
         var element = XElement.Parse(xmlDocument.InnerXml);
 
-        await _temporaryFileService.DeleteAsync(documentTypeFile.Key);
+        if (cleanupFile)
+        {
+            await _temporaryFileService.DeleteAsync(documentTypeFile.Key);
+        }
+
         return Attempt.SucceedWithStatus<XElement?, TemporaryFileOperationStatus>(TemporaryFileOperationStatus.Success,
             element);
     }
