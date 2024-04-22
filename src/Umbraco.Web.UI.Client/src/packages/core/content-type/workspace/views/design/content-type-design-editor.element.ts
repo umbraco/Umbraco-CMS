@@ -309,9 +309,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		});
 	}
 
-	async #tabNameBlur(event: InputEvent) {
+	async #tabNameBlur(event: FocusEvent, tab: UmbPropertyTypeContainerModel) {
 		if (!this._activeTabId) return;
-		const newName = (event.target as HTMLInputElement).value;
+		const newName = (event.target as HTMLInputElement | undefined)?.value;
 		if (newName === '') {
 			const changedName = this.#workspaceContext!.structure.makeEmptyContainerName(this._activeTabId, 'Tab');
 
@@ -485,9 +485,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					label=${tab.name!}
 					value="${tab.name!}"
 					auto-width
-					@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-					@input=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-					@blur=${() => this.#tabNameBlur()}>
+					@change=${(e) => this.#tabNameChanged(e, tab)}
+					@input=${(e) => this.#tabNameChanged(e, tab)}
+					@blur=${(e) => this.#tabNameBlur(e, tab)}>
 					${this.renderDeleteFor(tab)}
 				</uui-input>
 			</div>`;
