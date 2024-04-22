@@ -31,7 +31,7 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 				.look=${this.manifest.meta?.defaultView?.look ?? 'outline'}
 				.color=${this.manifest.meta?.defaultView?.color ?? 'default'}>
 				${this.manifest.meta?.defaultView?.icon
-					? html`<uui-icon .name=${this.manifest.meta?.defaultView?.icon}></uui-icon>`
+					? html`<uui-icon id="icon" .name=${this.manifest.meta?.defaultView?.icon}></uui-icon>`
 					: nothing}
 				${this.#label}
 			</uui-button>
@@ -47,6 +47,10 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 
 			#auth-provider-button {
 				width: 100%;
+			}
+
+			#icon {
+				margin-right: var(--uui-size-space-2);
 			}
 		`,
 	];

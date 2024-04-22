@@ -100,7 +100,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 		return html`
 			<uui-box>
 				<div class="header" slot="header">
-					<uui-icon name=${item.icon ?? 'icon-cloud'}></uui-icon>
+					<uui-icon class="header-icon" name=${item.icon ?? 'icon-cloud'}></uui-icon>
 					${item.displayName}
 				</div>
 				${when(
@@ -170,7 +170,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			.header uui-icon {
+			.header-icon {
 				margin-right: var(--uui-size-space-4);
 			}
 		`,
