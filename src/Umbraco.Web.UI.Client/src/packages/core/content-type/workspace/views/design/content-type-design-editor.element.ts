@@ -333,6 +333,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			selection: contentTypes.map((contentType) => contentType.unique).filter((id) => id !== unique),
 			isElement: ownerContentType.isElement,
 			currentPropertyAliases: [],
+			isNew: this.#workspaceContext.getIsNew()!,
 		};
 
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
