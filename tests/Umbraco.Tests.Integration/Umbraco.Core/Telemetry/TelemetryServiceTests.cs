@@ -59,7 +59,10 @@ public class TelemetryServiceTests : UmbracoIntegrationTest
             Constants.Telemetry.WebhookCustomHeaders,
             Constants.Telemetry.WebhookCustomEvent,
             Constants.Telemetry.RichTextEditorCount,
-            Constants.Telemetry.RichTextBlockCount
+            Constants.Telemetry.RichTextBlockCount,
+            Constants.Telemetry.TotalPropertyCount,
+            Constants.Telemetry.HighestPropertyCount,
+            Constants.Telemetry.TotalCompositions,
         };
 
         // Add the default webhook events.
