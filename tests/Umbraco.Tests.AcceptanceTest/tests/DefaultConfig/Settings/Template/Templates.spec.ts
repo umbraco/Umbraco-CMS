@@ -71,6 +71,7 @@ test.describe('Template tests', () => {
   test('can delete a template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.template.createDefaultTemplate(templateName);
+    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.template.reloadTemplateTree();
@@ -202,6 +203,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
     await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
     // Verify that the code is shown
@@ -312,6 +314,8 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertPartialView(partialViewFileName);
     await umbracoUi.template.clickSaveButton();
 
