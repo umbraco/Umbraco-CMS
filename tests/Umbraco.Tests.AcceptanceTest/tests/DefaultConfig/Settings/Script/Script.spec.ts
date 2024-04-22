@@ -27,7 +27,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isSuccessNotificationVisible();
     expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
     await umbracoUi.script.clickRootFolderCaretButton();
-    await umbracoUi.script.isScriptTreeItemVisibile(scriptName);
+    await umbracoUi.script.isScriptTreeItemVisible(scriptName);
   });
 
   test.skip('can create a script with content', async ({umbracoApi, umbracoUi}) => {
@@ -48,7 +48,7 @@ test.describe('Script tests', () => {
     const scriptData = await umbracoApi.script.getByName(scriptName);
     expect(scriptData.content).toBe(scriptContent);
     await umbracoUi.script.clickRootFolderCaretButton();
-    await umbracoUi.script.isScriptTreeItemVisibile(scriptName);
+    await umbracoUi.script.isScriptTreeItemVisible(scriptName);
   });
 
   test.skip('can update a script @smoke', async ({umbracoApi, umbracoUi}) => {
@@ -79,7 +79,7 @@ test.describe('Script tests', () => {
     // Assert
     await umbracoUi.script.isSuccessNotificationVisible();
     expect(await umbracoApi.script.doesNameExist(scriptName)).toBeFalsy();
-    await umbracoUi.script.isScriptTreeItemVisibile(scriptName, false);
+    await umbracoUi.script.isScriptTreeItemVisible(scriptName, false);
   });
 
   test.skip('can rename a script', async ({umbracoApi, umbracoUi}) => {

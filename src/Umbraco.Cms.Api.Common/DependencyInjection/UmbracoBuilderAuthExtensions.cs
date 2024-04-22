@@ -1,11 +1,12 @@
-using Microsoft.Extensions.DependencyInjection;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
-using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
@@ -61,6 +62,17 @@ public static class UmbracoBuilderAuthExtensions
                 options
                     .UseReferenceAccessTokens()
                     .UseReferenceRefreshTokens();
+
+                // Apply sliding window expiry based on the configured max login lifetime
+                GlobalSettings globalSettings = builder.Config
+                    .GetSection(Constants.Configuration.ConfigGlobal)
+                    .Get<GlobalSettings>() ?? new GlobalSettings();
+                TimeSpan timeOut = globalSettings.TimeOut;
+
+                // Make the access token lifetime 25% of the refresh token lifetime, to help ensure that new access tokens
+                // are obtained by the client before the refresh token expires.
+                options.SetAccessTokenLifetime(new TimeSpan(timeOut.Ticks / 4));
+                options.SetRefreshTokenLifetime(timeOut);
 
                 // Use ASP.NET Core Data Protection for tokens instead of JWT.
                 // This is more secure, and has the added benefit of having a high throughput
