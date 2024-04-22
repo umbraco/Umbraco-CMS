@@ -18,3 +18,5 @@ export class UmbDuplicateDataTypeRepository extends UmbRepositoryBase implements
 		return { error };
 	}
 }
+
+export { UmbDuplicateDataTypeRepository as api };
