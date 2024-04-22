@@ -341,40 +341,19 @@ export class UmbAuthFlow {
 	}
 
 	/**
-	 * This method will link the current user to the specified provider.
+	 * This method will link the current user to the specified provider by redirecting the user to the link endpoint.
 	 * @param provider The provider to link to.
 	 */
-	async linkLogin(provider: string) {
-		const token = await this.performWithFreshTokens();
+	linkLogin(provider: string): void {
 		const url = new URL(this.#link_endpoint);
 		url.searchParams.set('provider', provider);
-		const request = new Request(url, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-			body: JSON.stringify({ provider }),
-			redirect: 'manual',
-		});
-
-		const result = await fetch(request);
-
-		if (result.status === 301 || result.status === 302) {
-			const redirectUrl = result.headers.get('Location');
-			if (redirectUrl) {
-				location.href = redirectUrl;
-			}
-		}
-
-		if (!result.ok) {
-			throw new Error('Failed to link login');
-		}
-
-		return true;
+		location.href = url.href;
 	}
 
 	/**
 	 * This method will unlink the current user from the specified provider.
 	 */
-	async unlinkLogin(loginProvider: string, providerKey: string) {
+	async unlinkLogin(loginProvider: string, providerKey: string): Promise<boolean> {
 		const token = await this.performWithFreshTokens();
 		const request = new Request(this.#unlink_endpoint, {
 			method: 'POST',
