@@ -6,7 +6,6 @@ import { manifest as dropdown } from './dropdown/manifests.js';
 import { manifest as eyeDropper } from './eye-dropper/manifests.js';
 import { manifest as iconPicker } from './icon-picker/manifests.js';
 import { manifest as label } from './label/manifests.js';
-import { manifest as memberGroupPicker } from './member-group-picker/manifests.js';
 import { manifest as memberPicker } from './member-picker/manifests.js';
 import { manifest as multipleTextString } from './multiple-text-string/manifests.js';
 import { manifest as multiUrlPicker } from './multi-url-picker/manifests.js';
@@ -35,7 +34,6 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 	eyeDropper,
 	iconPicker,
 	label,
-	memberGroupPicker,
 	memberPicker,
 	multipleTextString,
 	multiUrlPicker,
