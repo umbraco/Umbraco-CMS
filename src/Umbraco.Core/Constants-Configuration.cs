@@ -48,6 +48,7 @@ public static partial class Constants
         public const string ConfigRequestHandler = ConfigPrefix + "RequestHandler";
         public const string ConfigRuntime = ConfigPrefix + "Runtime";
         public const string ConfigRuntimeMode = ConfigRuntime + ":Mode";
+        [Obsolete("Runtime minification is no longer supported. Will be removed entirely in V16.")]
         public const string ConfigRuntimeMinification = ConfigPrefix + "RuntimeMinification";
         public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification + ":Version";
         public const string ConfigSecurity = ConfigPrefix + "Security";

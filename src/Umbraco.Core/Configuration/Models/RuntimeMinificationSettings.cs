@@ -2,6 +2,7 @@ using System.ComponentModel;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
+[Obsolete("Runtime minification is no longer supported. Will be removed entirely in V16.")]
 [UmbracoOptions(Constants.Configuration.ConfigRuntimeMinification)]
 public class RuntimeMinificationSettings
 {
