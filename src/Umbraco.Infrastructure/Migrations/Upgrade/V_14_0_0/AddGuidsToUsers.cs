@@ -47,7 +47,11 @@ internal class AddGuidsToUsers : UnscopedMigrationBase
         AddColumnIfNotExists<UserDto>(columns, NewColumnName);
 
         var nodeDtoTrashedIndex = $"IX_umbracoUser_userKey";
-        CreateIndex<UserDto>(nodeDtoTrashedIndex);
+        if (IndexExists(nodeDtoTrashedIndex) is false)
+        {
+            CreateIndex<UserDto>(nodeDtoTrashedIndex);
+        }
+
 
         List<NewUserDto>? userDtos = Database.Fetch<NewUserDto>();
         if (userDtos is null)
