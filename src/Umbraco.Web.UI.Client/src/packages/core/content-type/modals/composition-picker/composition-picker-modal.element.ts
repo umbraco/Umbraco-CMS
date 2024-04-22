@@ -24,7 +24,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 > {
 	// TODO: Loosen this from begin specific to Document Types, so we can have a general interface for composition repositories. [NL]
 	#compositionRepository?: UmbDocumentTypeCompositionRepository;
-	#unique?: string;
+	#unique: string | null = null;
 	#init?: Promise<void>;
 
 	@state()
@@ -50,26 +50,24 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		this._selection = this.data?.selection ?? [];
 		this.modalContext?.setValue({ selection: this._selection });
 
+		const isNew = this.data!.isNew;
+		this.#unique = !isNew ? this.data!.unique : null;
+
 		this.#requestReference();
+		this.#requestAvailableCompositions();
 	}
 
 	async #requestReference() {
 		await this.#init;
-		this.#unique = this.data?.unique;
 		if (!this.#unique || !this.#compositionRepository) return;
 
 		const { data } = await this.#compositionRepository.getReferences(this.#unique);
-
 		this._references = data ?? [];
-
-		if (!this._references.length) {
-			this.#requestAvailableCompositions();
-		}
 	}
 
 	async #requestAvailableCompositions() {
 		await this.#init;
-		if (!this.#unique || !this.#compositionRepository) return;
+		if (!this.#compositionRepository) return;
 
 		const isElement = this.data?.isElement;
 		const currentPropertyAliases = this.data?.currentPropertyAliases;
