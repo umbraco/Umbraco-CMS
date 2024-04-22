@@ -15,7 +15,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isInitialized = new ReplaySubject<boolean>(1);
 	readonly isInitialized = this.#isInitialized.asObservable().pipe(filter((isInitialized) => isInitialized));
 
-	#isBypassed = false;
+	#isBypassed;
 	#serverUrl;
 	#backofficePath;
 	#authFlow;
@@ -158,28 +158,49 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		};
 	}
 
+	/**
+	 * Sets the auth context as initialized, which means that the auth context is ready to be used.
+	 * @remark This is used to let the app context know that the core module is ready, which means that the core auth providers are available.
+	 */
 	setInitialized() {
 		this.#isInitialized.next(true);
 	}
 
+	/**
+	 * Gets all registered auth providers.
+	 */
 	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
 		return this.isInitialized.pipe(
 			switchMap(() => extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider')),
 		);
 	}
 
+	/**
+	 * Gets the authorized redirect url.
+	 * @returns The redirect url, which is the backoffice path.
+	 */
 	getRedirectUrl() {
 		return `${window.location.origin}${this.#backofficePath}`;
 	}
 
+	/**
+	 * Gets the post logout redirect url.
+	 * @returns The post logout redirect url, which is the backoffice path with the logout path appended.
+	 */
 	getPostLogoutRedirectUrl() {
 		return `${window.location.origin}${this.#backofficePath.endsWith('/') ? this.#backofficePath : this.#backofficePath + '/'}logout`;
 	}
 
+	/**
+	 * @see UmbAuthFlow#linkLogin
+	 */
 	linkLogin(provider: string) {
 		return this.#authFlow.linkLogin(provider);
 	}
 
+	/**
+	 * @see UmbAuthFlow#unlinkLogin
+	 */
 	unlinkLogin(providerName: string, providerKey: string) {
 		return this.#authFlow.unlinkLogin(providerName, providerKey);
 	}
