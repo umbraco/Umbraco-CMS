@@ -18,7 +18,9 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 	}
 
 	get #label() {
-		return this.localize.term('login_signInWith', this.manifest.meta?.label ?? this.manifest.forProviderName);
+		const label = this.manifest.meta?.label ?? this.manifest.forProviderName;
+		const labelLocalized = this.localize.string(label);
+		return this.localize.term('login_signInWith', labelLocalized);
 	}
 
 	render() {

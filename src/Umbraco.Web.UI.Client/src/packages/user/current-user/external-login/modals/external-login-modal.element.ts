@@ -101,7 +101,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 			<uui-box>
 				<div class="header" slot="header">
 					<uui-icon class="header-icon" name=${item.icon ?? 'icon-cloud'}></uui-icon>
-					${item.displayName}
+					${this.localize.string(item.displayName)}
 				</div>
 				${when(
 					item.isEnabledOnUser,
@@ -113,10 +113,10 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 							type="button"
 							look="secondary"
 							color="danger"
-							.label=${this.localize.term('defaultdialogs_unLinkYour', item.displayName)}
+							.label=${this.localize.term('defaultdialogs_unLinkYour', this.localize.string(item.displayName))}
 							@click=${() => this.#onProviderDisable(item)}>
-							<umb-localize key="defaultdialogs_unLinkYour" .args=${[item.displayName]}>
-								Unlink your ${item.displayName} account
+							<umb-localize key="defaultdialogs_unLinkYour" .args=${[this.localize.string(item.displayName)]}>
+								Unlink your ${this.localize.string(item.displayName)} account
 							</umb-localize>
 							<uui-icon name="icon-window-popout"></uui-icon>
 						</uui-button>
@@ -127,8 +127,8 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 							look="secondary"
 							.label=${this.localize.term('defaultdialogs_linkYour', item.displayName)}
 							@click=${() => this.#onProviderEnable(item)}>
-							<umb-localize key="defaultdialogs_linkYour" .args=${[item.displayName]}>
-								Link your ${item.displayName} account
+							<umb-localize key="defaultdialogs_linkYour" .args=${[this.localize.string(item.displayName)]}>
+								Link your ${this.localize.string(item.displayName)} account
 							</umb-localize>
 							<uui-icon name="icon-window-popout"></uui-icon>
 						</uui-button>
@@ -145,9 +145,10 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 
 	async #onProviderDisable(item: UmbExternalLoginProviderOption) {
 		try {
+			const providerDisplayName = this.localize.string(item.displayName);
 			await umbConfirmModal(this, {
-				headline: this.localize.term('defaultdialogs_unLinkYour', item.displayName),
-				content: this.localize.term('defaultdialogs_unLinkYourConfirm', item.displayName),
+				headline: this.localize.term('defaultdialogs_unLinkYour', providerDisplayName),
+				content: this.localize.term('defaultdialogs_unLinkYourConfirm', providerDisplayName),
 				confirmLabel: this.localize.term('general_unlink'),
 				color: 'danger',
 			});
