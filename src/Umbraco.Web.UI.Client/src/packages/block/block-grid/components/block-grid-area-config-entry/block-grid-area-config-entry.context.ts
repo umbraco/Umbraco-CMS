@@ -45,6 +45,9 @@ export class UmbBlockGridAreaConfigEntryContext
 	getRowSpan() {
 		return this.#area.getValue()?.rowSpan;
 	}
+	getAlias() {
+		return this.#area.getValue()?.alias;
+	}
 	public getRelevantColumnSpanOptions() {
 		const layoutColumns = this.#entriesContext?.getLayoutColumns();
 		if (!layoutColumns) return;
@@ -88,7 +91,7 @@ export class UmbBlockGridAreaConfigEntryContext
 
 	async requestDelete() {
 		await umbConfirmModal(this, {
-			headline: `Delete ${this.alias}`,
+			headline: `Delete ${this.getAlias()}`,
 			content: 'Are you sure you want to delete this Area?',
 			confirmLabel: 'Delete',
 			color: 'danger',
