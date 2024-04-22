@@ -168,6 +168,11 @@ export class UmbAppErrorElement extends UmbLitElement {
 
 		<div id="container" class="uui-text">
 			<uui-box id="box" headline-variant="h1">
+				<uui-button
+					slot="header-actions"
+					label=${this.localize.term('general_back')}
+					look="secondary"
+					@click=${() => (location.href = '')}></uui-button>
 				<div slot="headline">
 					${this.errorHeadline
 						? this.errorHeadline
