@@ -139,8 +139,19 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 	}
 
 	async #onProviderEnable(item: UmbExternalLoginProviderOption) {
-		const authContext = await this.getContext(UMB_AUTH_CONTEXT);
-		authContext.linkLogin(item.providerName);
+		try {
+			const providerDisplayName = this.localize.string(item.displayName);
+			await umbConfirmModal(this, {
+				headline: this.localize.term('defaultdialogs_linkYour', providerDisplayName),
+				content: this.localize.term('defaultdialogs_linkYourConfirm', providerDisplayName),
+				confirmLabel: this.localize.term('general_continue'),
+				color: 'positive',
+			});
+			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
+			authContext.linkLogin(item.providerName);
+		} catch {
+			// Do nothing
+		}
 	}
 
 	async #onProviderDisable(item: UmbExternalLoginProviderOption) {
@@ -149,7 +160,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 			await umbConfirmModal(this, {
 				headline: this.localize.term('defaultdialogs_unLinkYour', providerDisplayName),
 				content: this.localize.term('defaultdialogs_unLinkYourConfirm', providerDisplayName),
-				confirmLabel: this.localize.term('general_unlink'),
+				confirmLabel: this.localize.term('general_continue'),
 				color: 'danger',
 			});
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);

@@ -553,12 +553,16 @@ export default {
 		noIconsFound: 'Ingen ikoner blev fundet',
 		noMacroParams: 'Der er ingen parametre for denne makro',
 		noMacros: 'Der er ikke tilføjet nogen makroer',
-		externalLoginProviders: 'Eksterne login-udbydere',
+		externalLoginProviders: 'Eksternt login',
 		exceptionDetail: 'Undtagelsesdetaljer',
 		stacktrace: 'Stacktrace',
 		innerException: 'Indre undtagelse',
 		linkYour: 'Link din {0} konto',
+		linkYourConfirm:
+			'For at linke dine Umbraco og {0} konti, vil du blive sendt til {0} for at bekræfte. Er du sikker på, at du vil fortsætte?',
 		unLinkYour: 'Fjern link fra din {0} konto',
+		unLinkYourConfirm:
+			'Du er ved at fjerne linket mellem dine Umbraco og {0} konti og du vil blive logget ud. Er du sikker på, at du vil fortsætte?',
 		linkedToService: 'Din konto er linket til denne service',
 		selectEditor: 'Vælg editor',
 		selectEditorConfiguration: 'Vælg konfiguration',
