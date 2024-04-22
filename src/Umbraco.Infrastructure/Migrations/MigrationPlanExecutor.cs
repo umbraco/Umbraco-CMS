@@ -216,7 +216,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             IEnumerable<IMigrationContext> nonCompletedMigrationsContexts = executedMigrationContexts.Where(x => x.IsCompleted is false);
             if (nonCompletedMigrationsContexts.Any())
             {
-                throw new InvalidOperationException($"Migration ({transition.MigrationType.FullName})has been executed without indicated it was completed correctly.");
+                throw new InvalidOperationException($"Migration ({transition.MigrationType.FullName}) has been executed without indicated it was completed correctly.");
             }
 
             // The plan migration (transition), completed, so we'll add this to our list so we can return this at some point.
