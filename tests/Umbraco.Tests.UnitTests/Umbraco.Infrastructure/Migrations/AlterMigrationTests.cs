@@ -28,7 +28,7 @@ public class AlterMigrationTests
     private MigrationContext GetMigrationContext(out TestDatabase db)
     {
         db = new TestDatabase();
-        return new MigrationContext(new TestPlan(), db, _logger, () => { });
+        return new MigrationContext(new TestPlan(), db, _logger);
     }
 
     [Test]

@@ -40,7 +40,7 @@ public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
         var logger = Mock.Of<ILogger<MigrationContext>>();
         var sqlSyntax = GetSqlSyntax();
         db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
-        return new MigrationContext(new TestPlan(), db, logger, () => { });
+        return new MigrationContext(new TestPlan(), db, logger);
     }
 
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]

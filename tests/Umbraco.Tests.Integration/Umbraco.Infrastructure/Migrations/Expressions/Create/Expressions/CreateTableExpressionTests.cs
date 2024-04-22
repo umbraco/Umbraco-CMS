@@ -108,7 +108,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Expres
         {
             var logger = GetRequiredService<ILogger<MigrationContext>>();
 
-            var ctx = new MigrationContext(new TestPlan(), db, logger, () => { });
+            var ctx = new MigrationContext(new TestPlan(), db, logger);
 
             return new CreateBuilder(ctx);
         }

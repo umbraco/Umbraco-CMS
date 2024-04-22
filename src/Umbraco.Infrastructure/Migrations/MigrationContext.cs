@@ -10,15 +10,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 /// </summary>
 internal class MigrationContext : IMigrationContext
 {
-    private readonly Action _onDoneAction;
+    private readonly Action? _onCompleteAction;
     private readonly List<Type> _postMigrations = new();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MigrationContext" /> class.
     /// </summary>
-    public MigrationContext(MigrationPlan plan, IUmbracoDatabase? database, ILogger<MigrationContext> logger, Action onDoneAction)
+    public MigrationContext(MigrationPlan plan, IUmbracoDatabase? database, ILogger<MigrationContext> logger, Action? onCompleteAction = null)
     {
-        _onDoneAction = onDoneAction;
+        _onCompleteAction = onCompleteAction;
         Plan = plan;
         Database = database ?? throw new ArgumentNullException(nameof(database));
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -54,7 +54,8 @@ internal class MigrationContext : IMigrationContext
             return;
         }
 
-        _onDoneAction();
+        _onCompleteAction?.Invoke();
+
         IsCompleted = true;
     }
 

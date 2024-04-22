@@ -213,10 +213,10 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             }
 
 
-            IEnumerable<IMigrationContext> nonDoneMigrationsContexts = executedMigrationContexts.Where(x => x.IsCompleted is false);
-            if (nonDoneMigrationsContexts.Any())
+            IEnumerable<IMigrationContext> nonCompletedMigrationsContexts = executedMigrationContexts.Where(x => x.IsCompleted is false);
+            if (nonCompletedMigrationsContexts.Any())
             {
-                throw new InvalidOperationException($"Migration ({transition.MigrationType.FullName})has been executed without indicated it was done correctly.");
+                throw new InvalidOperationException($"Migration ({transition.MigrationType.FullName})has been executed without indicated it was completed correctly.");
             }
 
             // The plan migration (transition), completed, so we'll add this to our list so we can return this at some point.
@@ -271,14 +271,14 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private MigrationContext RunUnscopedMigration(MigrationPlan.Transition transition, MigrationPlan plan)
     {
         using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
-        var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>(), () => OnMigrationDone(plan, transition.TargetState));
+        var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>(), () => OnComplete(plan, transition.TargetState));
 
         RunMigration(transition.MigrationType, context);
 
         return context;
     }
 
-    private void OnMigrationDone(MigrationPlan plan, string targetState)
+    private void OnComplete(MigrationPlan plan, string targetState)
     {
         _keyValueService.SetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, targetState);
     }
@@ -296,11 +296,11 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                 plan,
                 _scopeAccessor.AmbientScope?.Database,
                 _loggerFactory.CreateLogger<MigrationContext>(),
-                () => OnMigrationDone(plan, transition.TargetState));
+                () => OnComplete(plan, transition.TargetState));
 
             RunMigration(transition.MigrationType, context);
 
-            // Ensure we call SetDone before the scope completes
+            // Ensure we mark the context as complete before the scope completes
             context.Complete();
 
             scope.Complete();
