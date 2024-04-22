@@ -17,7 +17,7 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithDetail("A notification handler prevented the content operation.")
                 .Build()),
             ContentEditingOperationStatus.ContentTypeNotFound => NotFound(problemDetailsBuilder
-                .WithTitle("The requested content could not be found")
+                .WithTitle("The requested content type could not be found")
                 .Build()),
             ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch => BadRequest(problemDetailsBuilder
                 .WithTitle("Content type culture variance mismatch")
