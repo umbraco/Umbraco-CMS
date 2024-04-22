@@ -1,1 +1,1 @@
-export * from './data-path-value-filter.function.js';
+export * from './data-path-property-value-filter.function.js';

@@ -3,7 +3,7 @@ import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/back
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbDataPathValueFilter } from '@umbraco-cms/backoffice/validation';
+import { UmbDataPathPropertyValueFilter } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-property-editor-config
@@ -45,9 +45,8 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 					this._properties,
 					(property) => property.alias,
 					(property) =>
-						// TODO: Make a helper method to generate data-path entry for a property.
 						html`<umb-property
-							.dataPath="$.values[${UmbDataPathValueFilter(property)}].value"
+							.dataPath="$.values[${UmbDataPathPropertyValueFilter(property)}].value"
 							label=${property.label}
 							description=${ifDefined(property.description)}
 							alias=${property.alias}
