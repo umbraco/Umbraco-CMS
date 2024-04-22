@@ -18,7 +18,7 @@ export class UmbIconRegistry extends UUIIconRegistry {
 	});
 
 	#icons: UmbIconDescriptor[] = [];
-	#unhandledRequests: { name: string; provider: UUIIconHost }[] = [];
+	#unhandledProviders: Map<string, UUIIconHost> = new Map();
 
 	setIcons(icons: UmbIconDescriptor[]) {
 		const oldIcons = this.#icons;
@@ -27,17 +27,15 @@ export class UmbIconRegistry extends UUIIconRegistry {
 			this.#initResolve();
 			this.#initResolve = undefined;
 		}
-		// Go through the new icons and see if they are already requested.
+		// Go figure out which of the icons are new.
 		const newIcons = this.#icons.filter((i) => !oldIcons.find((o) => o.name === i.name));
 		newIcons.forEach((icon) => {
-			// Do we already have a request for this one
-			const unhandled = this.#unhandledRequests.find((i) => i.name === icon.name);
+			// Do we already have a request for this one, then lets initiate the load for those:
+			const unhandled = this.#unhandledProviders.get(icon.name);
 			if (unhandled) {
-				if (unhandled.provider) {
-					this.#loadIcon(icon.name, unhandled.provider).then(() => {
-						this.#unhandledRequests.filter((i) => i.name !== icon.name);
-					});
-				}
+				this.#loadIcon(icon.name, unhandled).then(() => {
+					this.#unhandledProviders.delete(icon.name);
+				});
 			}
 		});
 	}
@@ -61,7 +59,7 @@ export class UmbIconRegistry extends UUIIconRegistry {
 		const iconManifest = this.#icons.find((i: UmbIconDescriptor) => i.name === iconName);
 		// Icon not found, so lets add it to a list of unhandled requests.
 		if (!iconManifest) {
-			this.#unhandledRequests.push({ name: iconName, provider: iconProvider });
+			this.#unhandledProviders.set(iconName, iconProvider);
 			return false;
 		}
 
