@@ -1,6 +1,5 @@
 import type { ConditionTypes } from '../conditions/types.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbEntityAction, UmbEntityActionElement } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
@@ -9,7 +8,7 @@ import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@um
  * For example for content you may wish to create a new document etc
  */
 export interface ManifestEntityAction<MetaType extends MetaEntityAction = MetaEntityAction>
-	extends ManifestElementAndApi<UmbControllerHostElement, UmbEntityAction<MetaType>>,
+	extends ManifestElementAndApi<UmbEntityActionElement, UmbEntityAction<MetaType>>,
 		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'entityAction';
 	forEntityTypes: Array<string>;
