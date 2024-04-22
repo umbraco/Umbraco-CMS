@@ -51,6 +51,10 @@ export class UmbAppElement extends UmbLitElement {
 
 	private _routes: UmbRoute[] = [
 		{
+			path: 'error',
+			component: () => import('./app-error.element.js'),
+		},
+		{
 			path: 'install',
 			component: () => import('../installer/installer.element.js'),
 		},
@@ -64,15 +68,6 @@ export class UmbAppElement extends UmbLitElement {
 			resolve: () => {
 				this.#authContext?.clearTokenStorage();
 				this.#authController.makeAuthorizationRequest('loggedOut');
-			},
-		},
-		{
-			path: 'error',
-			component: () => import('./app-error.element.js'),
-			setup: (component) => {
-				const searchParams = new URLSearchParams(window.location.search);
-				(component as UmbAppErrorElement).errorHeadline = searchParams.get('status');
-				(component as UmbAppErrorElement).errorMessage = searchParams.get('error_description');
 			},
 		},
 		{
