@@ -67,6 +67,15 @@ export class UmbAppElement extends UmbLitElement {
 			},
 		},
 		{
+			path: 'error',
+			component: () => import('./app-error.element.js'),
+			setup: (component) => {
+				const searchParams = new URLSearchParams(window.location.search);
+				(component as UmbAppErrorElement).errorHeadline = searchParams.get('status');
+				(component as UmbAppErrorElement).errorMessage = searchParams.get('error_description');
+			},
+		},
+		{
 			path: '**',
 			component: () => import('../backoffice/backoffice.element.js'),
 			guards: [this.#isAuthorizedGuard()],

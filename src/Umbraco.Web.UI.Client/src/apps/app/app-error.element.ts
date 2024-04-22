@@ -8,12 +8,20 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-app-error')
 export class UmbAppErrorElement extends UmbLitElement {
 	/**
+	 * The headline to display
+	 *
+	 * @attr
+	 */
+	@property()
+	errorHeadline?: string | null;
+
+	/**
 	 * The error message to display
 	 *
 	 * @attr
 	 */
 	@property()
-	errorMessage?: string;
+	errorMessage?: string | null;
 
 	/**
 	 * The error to display
@@ -62,15 +70,19 @@ export class UmbAppErrorElement extends UmbLitElement {
 
 		<div id="container">
 			<uui-box id="box">
-				<h1>Something went wrong</h1>
+				<h1>
+					${this.errorHeadline
+						? html` <umb-localize key="errors_defaultError">An unknown failure has occured</umb-localize> `
+						: this.errorHeadline}
+				</h1>
 				<p>${this.errorMessage}</p>
 				${this.error
 					? html`
 							<details>
-								<summary>Details</summary>
+								<summary><umb-localize key="general_details">Details</umb-localize></summary>
 								${this.renderError(this.error)}
 							</details>
-					  `
+						`
 					: nothing}
 			</uui-box>
 		</div>
