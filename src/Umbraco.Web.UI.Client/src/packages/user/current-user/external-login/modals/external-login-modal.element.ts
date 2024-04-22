@@ -47,7 +47,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 					return {
 						isEnabledOnUser: !!serverLoginProvider,
 						icon: manifestLoginProvider.meta?.defaultView?.icon,
-						providerKey: manifestLoginProvider.forProviderName,
+						providerKey: serverLoginProvider?.providerKey ?? '',
 						providerName: manifestLoginProvider.forProviderName,
 						displayName:
 							manifestLoginProvider.meta?.label ?? manifestLoginProvider.forProviderName ?? manifestLoginProvider.name,
