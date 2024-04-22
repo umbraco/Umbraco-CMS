@@ -566,10 +566,9 @@ export default {
 		innerException: 'Inner Exception',
 		linkYour: 'Link your {0} account',
 		linkYourConfirm:
-			'You are about to link your Umbraco and {0} accounts and you will be redirected to {0} to confirm. Do you want to continue?',
+			'You are about to link your Umbraco and {0} accounts and you will be redirected to {0} to confirm.',
 		unLinkYour: 'Un-link your {0} account',
-		unLinkYourConfirm:
-			'You are about to un-link your Umbraco and {0} accounts and you will be logged out. Do you want to continue?',
+		unLinkYourConfirm: 'You are about to un-link your Umbraco and {0} accounts and you will be logged out.',
 		linkedToService: 'Your account is linked to this service',
 		selectEditor: 'Select editor',
 		selectEditorConfiguration: 'Select configuration',
