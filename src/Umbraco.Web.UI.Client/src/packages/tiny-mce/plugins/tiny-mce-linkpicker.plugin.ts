@@ -72,7 +72,7 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 
 		if (this.#anchorElement.href.includes('localLink:')) {
 			const href = this.#anchorElement.getAttribute('href')!;
-			currentTarget.unique = href.split('localLink:')[1].slice(0, -1);
+			currentTarget.unique = href.substring(href.indexOf(":") + 1, href.indexOf("}"));
 		} else if (this.#anchorElement.host.length) {
 			currentTarget.url = this.#anchorElement.protocol ? this.#anchorElement.protocol + '//' : undefined;
 			currentTarget.url += this.#anchorElement.host + this.#anchorElement.pathname;
@@ -122,7 +122,9 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 			a.title = name;
 		}
 
-		if (this.#linkPickerData?.link.queryString?.startsWith('#')) {
+		if (this.#linkPickerData?.link.queryString?.startsWith('#') || 
+			this.#linkPickerData?.link.queryString?.startsWith('?')) 
+		{
 			a['data-anchor'] = this.#linkPickerData?.link.queryString;
 			a.href += this.#linkPickerData?.link.queryString;
 		}

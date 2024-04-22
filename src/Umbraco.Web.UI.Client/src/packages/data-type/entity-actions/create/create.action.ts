@@ -17,3 +17,5 @@ export class UmbCreateDataTypeEntityAction extends UmbEntityActionBase<never> {
 		await modalContext.onSubmit();
 	}
 }
+
+export { UmbCreateDataTypeEntityAction as api };
