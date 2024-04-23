@@ -19,6 +19,9 @@ export class UmbBlockGridAreaTypeWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
+			this.observe(this.#workspaceContext.name, (name) => {
+				this._name = name;
+			});
 			this.#workspaceContext?.createPropertyDatasetContext(this);
 		});
 	}
@@ -31,7 +34,7 @@ export class UmbBlockGridAreaTypeWorkspaceEditorElement extends UmbLitElement {
 						alias=${this.workspaceAlias}
 						headline=${this.localize.term('blockEditor_blockConfigurationOverlayTitle', [this._name])}>
 					</umb-workspace-editor>
-			  `
+				`
 			: '';
 	}
 

@@ -1,5 +1,5 @@
 import type { UmbServerModelValidationContext } from '../context/server-model-validation.context.js';
-import { UmbDataPathValueFilter } from '../utils/data-path-value-filter.function.js';
+import { UmbDataPathPropertyValueFilter } from '../utils/data-path-property-value-filter.function.js';
 import type { UmbValidationMessageTranslator } from './validation-message-translator.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -39,7 +39,7 @@ export class UmbVariantValuesValidationMessageTranslator
 
 		const specificValue = data.values[index];
 		// replace the values[ number ] with JSON-Path filter values[@.(...)], continues by the rest of the path:
-		return '$.values[' + UmbDataPathValueFilter(specificValue) + path.substring(path.indexOf(']'));
+		return '$.values[' + UmbDataPathPropertyValueFilter(specificValue) + path.substring(path.indexOf(']'));
 	}
 
 	destroy(): void {

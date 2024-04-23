@@ -3,14 +3,10 @@ import { UmbMediaPropertyDataContext } from '../property-dataset-context/media-p
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
 import type { UmbMediaDetailModel, UmbMediaVariantModel, UmbMediaVariantOptionModel } from '../types.js';
-import UmbMediaWorkspaceEditorElement from './media-workspace-editor.element.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import type {
-	UmbCollectionWorkspaceContext,
-	UmbVariantDatasetWorkspaceContext,
-} from '@umbraco-cms/backoffice/workspace';
 import {
+	type UmbCollectionWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
@@ -28,13 +24,17 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
+import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<EntityType>
-	implements UmbVariantDatasetWorkspaceContext, UmbCollectionWorkspaceContext<UmbMediaTypeDetailModel>
+	implements
+		UmbContentWorkspaceContext<UmbMediaTypeDetailModel, UmbMediaVariantModel>,
+		UmbCollectionWorkspaceContext<UmbMediaTypeDetailModel>
 {
-	//
+	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
+
 	public readonly repository = new UmbMediaDetailRepository(this);
 
 	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);

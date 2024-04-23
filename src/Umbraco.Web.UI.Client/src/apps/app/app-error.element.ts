@@ -239,6 +239,10 @@ export class UmbAppErrorElement extends UmbLitElement {
 				background: var(--uui-color-surface-alt);
 			}
 
+			details summary {
+				cursor: pointer;
+			}
+
 			pre {
 				width: 100%;
 				overflow: auto;

@@ -16,7 +16,7 @@ export const userProfileApps: Array<ManifestCurrentUserActionDefaultKind> = [
 		kind: 'default',
 		alias: 'Umb.CurrentUser.App.ExternalLoginProviders',
 		name: 'External Login Providers Current User App',
-		weight: 800,
+		weight: 700,
 		api: UmbConfigureExternalLoginProvidersApi,
 		meta: {
 			label: '#defaultdialogs_externalLoginProviders',

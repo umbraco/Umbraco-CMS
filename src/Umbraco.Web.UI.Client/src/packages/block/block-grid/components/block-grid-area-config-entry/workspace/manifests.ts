@@ -7,9 +7,9 @@ export const manifests: Array<ManifestTypes> = [
 	...workspaceViewManifests,
 	{
 		type: 'workspace',
+		kind: 'routable',
 		name: 'Block Grid Area Type Workspace',
 		alias: UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_ALIAS,
-		element: () => import('./block-grid-area-type-workspace.element.js'),
 		api: () => import('./block-grid-area-type-workspace.context.js'),
 		meta: {
 			entityType: 'block-grid-area-type',
@@ -17,6 +17,7 @@ export const manifests: Array<ManifestTypes> = [
 	},
 	{
 		type: 'workspaceAction',
+		kind: 'default',
 		alias: 'Umb.WorkspaceAction.BlockGridAreaType.Save',
 		name: 'Save Block Grid Area Type Workspace Action',
 		api: UmbSubmitWorkspaceAction,
