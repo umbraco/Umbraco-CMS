@@ -1,4 +1,4 @@
-import type { UmbInputNumberRangeElement } from '../../../components/input-number-range/input-number-range.element.js';
+import type { UmbInputNumberRangeElement } from '../../core/components/input-number-range/input-number-range.element.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -6,7 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
-import '../../../components/input-number-range/input-number-range.element.js';
+import '../../core/components/input-number-range/input-number-range.element.js';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**

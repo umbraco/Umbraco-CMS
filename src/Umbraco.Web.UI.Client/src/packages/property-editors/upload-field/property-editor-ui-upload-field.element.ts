@@ -1,4 +1,4 @@
-import type { UmbInputUploadFieldElement } from '../../../components/input-upload-field/input-upload-field.element.js';
+import type { UmbInputUploadFieldElement } from '../../core/components/input-upload-field/input-upload-field.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
