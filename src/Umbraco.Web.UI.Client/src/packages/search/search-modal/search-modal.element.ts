@@ -91,7 +91,9 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 			if (!activeProvider) return;
 
+			// When moving backwards in search providers
 			if (event.shiftKey) {
+				// If the FOCUS is on a provider, and it is the first in the list, we need to wrap around and focus the LAST one
 				if (this.#providerHasFocus) {
 					if (this.#isFocusingFirstProvider) {
 						setActiveProviderFocus(root.querySelector('.search-provider:last-child'));
@@ -100,14 +102,19 @@ export class UmbSearchModalElement extends UmbLitElement {
 					return;
 				}
 
+				// If the currently ACTIVE provider is the first in the list, we need to wrap around and focus the LAST one
 				if (isFirstProvider(activeProvider)) {
 					setActiveProviderFocus(root.querySelector('.search-provider:last-child'));
 					event.preventDefault();
 					return;
 				}
 
+				// We set the focus to current provider, and because we don't prevent the default tab behavior, the previous provider will be focused
 				setActiveProviderFocus(activeProvider);
-			} else {
+			}
+			// When moving forwards in search providers
+			else {
+				// If the FOCUS is on a provider, and it is the last in the list, we need to wrap around and focus the FIRST one
 				if (this.#providerHasFocus) {
 					if (this.#isFocusingLastProvider) {
 						setActiveProviderFocus(root.querySelector('.search-provider:first-child'));
@@ -116,14 +123,15 @@ export class UmbSearchModalElement extends UmbLitElement {
 					return;
 				}
 
+				// If the currently ACTIVE provider is the last in the list, we need to wrap around and focus the FIRST one
 				if (isLastProvider(activeProvider)) {
 					setActiveProviderFocus(root.querySelector('.search-provider:first-child'));
 					event.preventDefault();
 					return;
 				}
 
+				// We set the focus to current provider, and because we don't prevent the default tab behavior, the next provider will be focused
 				setActiveProviderFocus(activeProvider);
-				return;
 			}
 		}
 
