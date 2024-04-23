@@ -1,9 +1,9 @@
-import { manifest as checkboxList } from './checkbox-list/manifests.js';
+import { manifests as checkboxListManifests } from './checkbox-list/manifests.js';
 import { manifest as colorEditor } from './color-swatches-editor/manifests.js';
-import { manifest as colorPicker } from './color-picker/manifests.js';
-import { manifest as datePicker } from './date-picker/manifests.js';
+import { manifests as colorPickerManifests } from './color-picker/manifests.js';
+import { manifests as datePickerManifests } from './date-picker/manifests.js';
 import { manifest as dropdown } from './dropdown/manifests.js';
-import { manifest as eyeDropper } from './eye-dropper/manifests.js';
+import { manifests as eyeDropperManifests } from './eye-dropper/manifests.js';
 import { manifest as iconPicker } from './icon-picker/manifests.js';
 import { manifest as label } from './label/manifests.js';
 import { manifest as multipleTextString } from './multiple-text-string/manifests.js';
@@ -22,15 +22,19 @@ import { manifests as collectionView } from './collection-view/manifests.js';
 import { manifests as numbers } from './number/manifests.js';
 import { manifests as textBoxes } from './text-box/manifests.js';
 import { manifests as treePicker } from './tree-picker/manifests.js';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestPropertyEditorUi> = [
-	checkboxList,
+export const manifests: Array<ManifestTypes> = [
+	...checkboxListManifests,
+	...collectionView,
+	...colorPickerManifests,
+	...datePickerManifests,
+	...eyeDropperManifests,
+	...numbers,
+	...textBoxes,
+	...treePicker,
 	colorEditor,
-	colorPicker,
-	datePicker,
 	dropdown,
-	eyeDropper,
 	iconPicker,
 	label,
 	multipleTextString,
@@ -45,8 +49,4 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 	toggle,
 	uploadField,
 	valueType,
-	...collectionView,
-	...numbers,
-	...textBoxes,
-	...treePicker,
 ];
