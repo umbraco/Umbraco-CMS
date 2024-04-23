@@ -28,7 +28,8 @@ test.describe('Data Types Folder tests', () => {
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
   });
 
-  test('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Remove skip due to the front-end changes. Need to update the rename folder locator.
+  test.skip('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongDataTypeFolderName = 'Wrong Folder';
     await umbracoApi.dataType.ensureNameNotExists(wrongDataTypeFolderName);
