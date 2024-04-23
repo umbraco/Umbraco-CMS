@@ -6,11 +6,15 @@ import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { ReplaySubject, filter, firstValueFrom, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
+import { ReplaySubject, Subject, filter, firstValueFrom, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
 	readonly isAuthorized = this.#isAuthorized.asObservable();
+
+	// Timeout is different from `isAuthorized` because it can occur repeatedly
+	#isTimeout = new Subject<void>();
+	readonly isTimeout = this.#isTimeout.asObservable();
 
 	#isInitialized = new ReplaySubject<boolean>(1);
 	readonly isInitialized = this.#isInitialized.asObservable().pipe(filter((isInitialized) => isInitialized));
@@ -162,6 +166,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	timeOut() {
 		this.clearTokenStorage();
 		this.#isAuthorized.setValue(false);
+		this.#isTimeout.next();
 	}
 
 	/**

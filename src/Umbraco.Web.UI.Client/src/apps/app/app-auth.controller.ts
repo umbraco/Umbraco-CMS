@@ -18,12 +18,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 
 			// Observe the user's authorization state and start the authorization flow if the user is not authorized
 			this.observe(
-				context.isAuthorized.pipe(
-					// Skip the first since it is always false
-					skip(1),
-					// Only continue if the value is false
-					filter((x) => !x),
-				),
+				context.isTimeout,
 				() => {
 					this.#firstTimeLoggingIn = false;
 					this.makeAuthorizationRequest('timedOut');
@@ -125,8 +120,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 		// Show the provider selection screen
 		const authModalKey = 'umbAuthModal';
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager.close(authModalKey);
-		modalManager.remove(authModalKey);
+
 		const selected = await modalManager
 			.open(this._host, UMB_MODAL_APP_AUTH, {
 				data: {
