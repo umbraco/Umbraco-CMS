@@ -6,4 +6,10 @@ export const extensions = [
 		type: 'bundle',
 		js: () => import('./manifests.js'),
 	},
+	{
+		name: 'Property Editors Entry Point',
+		alias: 'Umb.EntryPoint.PropertyEditors',
+		type: 'entryPoint',
+		js: () => import('./entry-point.js'),
+	},
 ];
