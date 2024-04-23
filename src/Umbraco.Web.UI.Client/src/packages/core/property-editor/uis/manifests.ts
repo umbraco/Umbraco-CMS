@@ -11,7 +11,7 @@ import { manifest as multiUrlPicker } from '../../../property-editors/multi-url-
 import { manifest as numberRange } from '../../../property-editors/number-range/manifests.js';
 import { manifest as orderDirection } from '../../../property-editors/order-direction/manifests.js';
 import { manifest as overlaySize } from '../../../property-editors/overlay-size/manifests.js';
-import { manifest as radioButtonList } from './radio-button-list/manifests.js';
+import { manifest as radioButtonList } from '../../../property-editors/radio-button-list/manifests.js';
 import { manifest as select } from './select/manifests.js';
 import { manifest as slider } from './slider/manifests.js';
 import { manifest as textArea } from './textarea/manifests.js';
