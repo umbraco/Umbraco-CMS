@@ -153,4 +153,16 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Unknown two factor operation status.")
                 .Build()),
         });
+
+    protected IActionResult ExternalLoginOperationStatusResult(ExternalLoginOperationStatus status) =>
+        OperationStatusResult(status, problemDetailsBuilder => status switch
+        {
+            ExternalLoginOperationStatus.UserNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("User not found")
+                .WithDetail("The specified user id was not found.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                .WithTitle("Unknown two factor operation status.")
+                .Build()),
+        });
 }
