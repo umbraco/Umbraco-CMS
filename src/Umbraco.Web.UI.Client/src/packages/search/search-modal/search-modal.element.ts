@@ -376,9 +376,6 @@ export class UmbSearchModalElement extends UmbLitElement {
 				outline-offset: -3px;
 				display: flex;
 			}
-			.search-item.focused {
-				outline: 2px solid var(--uui-color-focus);
-			}
 		`,
 	];
 }
