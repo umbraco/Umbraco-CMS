@@ -91,7 +91,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 
 		if (availableProviders.length === 1) {
 			// One provider available (most likely the Umbraco provider), so initiate the authorization request to the default provider
-			this.#authContext.makeAuthorizationRequest(availableProviders[0].forProviderName);
+			await this.#authContext.makeAuthorizationRequest(availableProviders[0].forProviderName);
 			return this.#updateState();
 		}
 
@@ -103,7 +103,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 
 		if (redirectProvider) {
 			// Redirect directly to the provider
-			this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName);
+			await this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName);
 			return this.#updateState();
 		}
 
@@ -129,7 +129,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 		const denyLocalLogin = availableProviders.some((provider) => provider.meta?.behavior?.denyLocalLogin);
 		if (denyLocalLogin) {
 			// Unregister the Umbraco provider
-			umbExtensionsRegistry.unregister('Umb.AuthProviders.Umbraco');
+			umbExtensionsRegistry.exclude('Umb.AuthProviders.Umbraco');
 		}
 
 		// Show the provider selection screen
@@ -150,7 +150,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 			.onSubmit()
 			.catch(() => undefined);
 
-		if (!selected) {
+		if (!selected?.success) {
 			return false;
 		}
 
@@ -161,9 +161,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
-
-		// Reinitialize the auth flow (load the state from local storage)
-		this.#authContext.setInitialState();
 
 		// The authorization flow is finished, so let the caller know if the user is authorized
 		return this.#authContext.getIsAuthorized();
