@@ -1,6 +1,6 @@
 import type { UmbTreeSelectionConfiguration } from '../types.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal.token.js';
-import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UMB_WORKSPACE_MODAL,
 	UmbModalBaseElement,
@@ -20,9 +20,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		selectable: true,
 		selection: [],
 	};
-
-	@state()
-	_createButton: boolean = false;
 
 	@state()
 	_createPath?: string;
@@ -47,14 +44,22 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		// To remove the hardcoded URLs for workspaces of entity types, we could make an create event from the tree, which either this or the sidebar impl. will pick up and react to. [NL]
 		// Or maybe the tree item context base can handle this? [NL]
 		// Maybe its a general item context problem to be solved. [NL]
-		if (this._createButton) {
+		const createActionData = this.data?.createAction;
+		console.log('createActionData', createActionData);
+		if (createActionData) {
 			new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-				.addAdditionalPath('document-type')
-				.onSetup(() => {
-					return { data: { entityType: 'document-type', preset: {} } };
+				.onSetup(async () => {
+					return { data: createActionData };
+				})
+				.onSubmit((value) => {
+					console.log('got', value);
+					//this.value = value;
+					//this.modalContext?.dispatchEvent(new UmbSelectedEvent());
 				})
 				.observeRouteBuilder((routeBuilder) => {
-					this._createPath = routeBuilder({});
+					const oldPath = this._createPath;
+					this._createPath = routeBuilder({}) + 'create';
+					this.requestUpdate('_createPath', oldPath);
 				});
 		}
 	}
@@ -95,6 +100,12 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
+					${this._createPath
+						? html` <uui-button
+								label=${this.localize.term('content_createEmpty')}
+								look="secondary"
+								href=${this._createPath}></uui-button>`
+						: nothing}
 					<uui-button
 						label=${this.localize.term('general_choose')}
 						look="primary"
