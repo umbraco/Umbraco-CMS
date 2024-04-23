@@ -18,7 +18,7 @@ test.describe(`${dataTypeName} tests`, () => {
     }   
   });
 
-  test('can update enable multiple choice', async ({umbracoApi, umbracoUi}) => {
+  test('can enable multiple choice', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = [{
       "alias": "multiple",

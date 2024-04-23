@@ -27,7 +27,7 @@ test.describe(`${dataTypeName} tests`, () => {
     await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
-    await umbracoUi.dataType.clickIgnoreUserStartNodesCamelSlider();
+    await umbracoUi.dataType.clickIgnoreUserStartNodesSlider();
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert

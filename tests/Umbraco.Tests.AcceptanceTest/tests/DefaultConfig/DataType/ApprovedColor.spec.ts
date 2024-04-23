@@ -6,7 +6,7 @@ test.describe(`${dataTypeName} tests`, () => {
   let dataTypeDefaultData = null;
   let dataTypeData = null;  
   const colorValue = 'ffffff';
-  const colorLabel = 'TestColor';
+  const colorLabel = '';
 
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
     await umbracoUi.goToBackOffice();
@@ -43,8 +43,7 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toEqual(expectedDataTypeValues);
   });
 
-  //TODO: Remove skip when the frontend is ready
-  test.skip('can add color', async ({umbracoApi, umbracoUi}) => {
+  test('can add color', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = [
       {
@@ -64,7 +63,7 @@ test.describe(`${dataTypeName} tests`, () => {
     await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
-    await umbracoUi.dataType.addColor(colorValue, colorLabel);
+    await umbracoUi.dataType.addColor(colorValue);
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert

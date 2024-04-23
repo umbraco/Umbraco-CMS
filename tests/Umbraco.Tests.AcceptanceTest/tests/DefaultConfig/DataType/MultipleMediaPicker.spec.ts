@@ -110,7 +110,7 @@ test.describe(`${dataTypeName} tests`, () => {
     };
 
     // Act
-    await umbracoUi.dataType.clickIgnoreUserStartNodesCamelSlider();
+    await umbracoUi.dataType.clickIgnoreUserStartNodesSlider();
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
