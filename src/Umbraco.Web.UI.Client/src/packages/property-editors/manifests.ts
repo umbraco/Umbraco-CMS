@@ -6,7 +6,7 @@ import { manifest as dropdown } from './dropdown/manifests.js';
 import { manifests as eyeDropperManifests } from './eye-dropper/manifests.js';
 import { manifest as iconPicker } from './icon-picker/manifests.js';
 import { manifest as label } from './label/manifests.js';
-import { manifest as multipleTextString } from './multiple-text-string/manifests.js';
+import { manifests as multipleTextStringManifests } from './multiple-text-string/manifests.js';
 import { manifest as multiUrlPicker } from './multi-url-picker/manifests.js';
 import { manifest as numberRange } from './number-range/manifests.js';
 import { manifest as orderDirection } from './order-direction/manifests.js';
@@ -30,6 +30,7 @@ export const manifests: Array<ManifestTypes> = [
 	...colorPickerManifests,
 	...datePickerManifests,
 	...eyeDropperManifests,
+	...multipleTextStringManifests,
 	...numbers,
 	...textBoxes,
 	...treePicker,
@@ -37,7 +38,6 @@ export const manifests: Array<ManifestTypes> = [
 	dropdown,
 	iconPicker,
 	label,
-	multipleTextString,
 	multiUrlPicker,
 	numberRange,
 	orderDirection,
