@@ -1,4 +1,4 @@
-import { manifest as checkboxList } from './checkbox-list/manifests.js';
+import { manifest as checkboxList } from '../../../property-editors/checkbox-list/manifests.js';
 import { manifest as colorEditor } from './color-swatches-editor/manifests.js';
 import { manifest as colorPicker } from './color-picker/manifests.js';
 import { manifest as datePicker } from './date-picker/manifests.js';
