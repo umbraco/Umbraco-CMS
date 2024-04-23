@@ -690,6 +690,8 @@ export default {
 		errorRegExpWithoutTab: '%0% er ikke i et korrekt format',
 	},
 	errors: {
+		defaultError: 'Der er sket en ukendt fejl',
+		concurrencyError: 'Optimistisk samtidighedsfejl, objektet er blevet ændret',
 		receivedErrorFromServer: 'Der skete en fejl på severen',
 		dissallowedMediaType: 'Denne filttype er blevet deaktiveret af administratoren',
 		codemirroriewarning:
@@ -707,8 +709,22 @@ export default {
 		tableColMergeLeft: 'Du skal stå til venstre for de 2 celler du ønsker at samle!',
 		tableSplitNotSplittable: 'Du kan ikke opdele en celle, som ikke allerede er delt.',
 		propertyHasErrors: 'Denne egenskab er ugyldig',
-		defaultError: 'An unknown failure has occurred',
-		concurrencyError: 'Optimistic concurrency failure, object has been modified',
+		externalLoginError: 'Der opstod en fejl under login med eksternt login',
+		unauthorized: 'Du har ikke tilladelse til at udføre denne handling',
+		userNotFound: 'Den angivne bruger blev ikke fundet i databasen',
+		externalInfoNotFound: 'Serveren kunne ikke kommunikere med den eksterne loginudbyder',
+		externalLoginFailed: 'Serveren mislykkedes i at logge ind med den eksterne loginudbyder',
+	},
+	openidErrors: {
+		accessDenied: 'Access denied',
+		invalidRequest: 'Ugyldig forespørgsel',
+		invalidClient: 'Ugyldig klient',
+		invalidGrant: 'Ugyldig tildeling',
+		unauthorizedClient: 'Uautoriseret klient',
+		unsupportedGrantType: 'Ikke understøttet tildelingstype',
+		invalidScope: 'Ugyldigt område',
+		serverError: 'Serverfejl',
+		temporarilyUnavailable: 'Servicen er midlertidigt utilgængelig',
 	},
 	general: {
 		options: 'Valgmuligheder',
