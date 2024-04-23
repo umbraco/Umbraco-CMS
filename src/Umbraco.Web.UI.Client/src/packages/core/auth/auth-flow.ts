@@ -304,10 +304,9 @@ export class UmbAuthFlow {
 			return Promise.resolve(this.#tokenResponse.accessToken);
 		}
 
-		// if the refresh token is not set (maybe the provider doesn't support them), sign out
+		// if the refresh token is not set (maybe the provider doesn't support them)
 		if (!this.#tokenResponse?.refreshToken) {
-			this.signOut();
-			return Promise.reject('Missing refreshToken.');
+			return Promise.resolve('Missing refreshToken.');
 		}
 
 		const request = new TokenRequest({
