@@ -86,7 +86,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 								(app) => app.component,
 							)}
 						</umb-section-sidebar>
-				  `
+					`
 				: nothing}
 			<umb-section-main>
 				${this._routes && this._routes.length > 0
@@ -104,10 +104,6 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 				flex: 1 1 auto;
 				height: 100%;
 				display: flex;
-			}
-
-			h3 {
-				padding: var(--uui-size-4) var(--uui-size-8);
 			}
 		`,
 	];
