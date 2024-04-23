@@ -1,6 +1,5 @@
 import { manifest as blockGrid } from './Umbraco.BlockGrid.js';
 import { manifest as blockList } from './Umbraco.BlockList.js';
-import { manifest as dateTime } from './Umbraco.DateTime.js';
 import { manifest as decimal } from './Umbraco.Decimal.js';
 import { manifest as dropdownFlexible } from './Umbraco.Dropdown.Flexible.js';
 import { manifest as emailAddress } from './Umbraco.EmailAddress.js';
@@ -31,7 +30,6 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/exten
 export const manifests: Array<ManifestPropertyEditorSchema> = [
 	blockGrid,
 	blockList,
-	dateTime,
 	decimal,
 	dropdownFlexible,
 	emailAddress,
