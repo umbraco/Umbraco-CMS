@@ -1,16 +1,18 @@
 import {
-	html,
-	customElement,
-	property,
-	repeat,
 	css,
+	customElement,
+	html,
 	ifDefined,
 	nothing,
+	property,
+	repeat,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
+import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbInputManifestElement } from '@umbraco-cms/backoffice/components';
@@ -18,7 +20,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
-interface UmbCollectionLayoutConfig {
+interface UmbCollectionLayoutConfiguration {
 	icon?: string;
 	name?: string;
 	collectionView?: string;
@@ -34,10 +36,31 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	// TODO: [LK] Add sorting.
+	#sorter = new UmbSorterController<UmbCollectionLayoutConfiguration>(this, {
+		getUniqueOfElement: (element) => {
+			return element.id;
+		},
+		getUniqueOfModel: (modelEntry) => {
+			return this.#getUnique(modelEntry);
+		},
+		identifier: 'Umb.SorterIdentifier.CollectionViewLayouConfiguration',
+		itemSelector: '.layout-item',
+		containerSelector: '#layout-wrapper',
+		onChange: ({ model }) => {
+			this.value = model;
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		},
+	});
 
 	@property({ type: Array })
-	value?: Array<UmbCollectionLayoutConfig>;
+	public set value(value: Array<UmbCollectionLayoutConfiguration>) {
+		this.#value = value;
+		this.#sorter.setModel(value);
+	}
+	public get value(): Array<UmbCollectionLayoutConfiguration> {
+		return this.#value;
+	}
+	#value: Array<UmbCollectionLayoutConfiguration> = [];
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
@@ -51,7 +74,13 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	#onAdd(event: { target: UmbInputManifestElement }) {
 		const manifest = event.target.value;
 
-		// TODO: [LK] Disallow duplicate `collectionView` aliases selections. [LK]
+		const duplicate = this.value?.find((config) => manifest?.value === config.collectionView);
+
+		if (duplicate) {
+			// TODO: Show error to user, can not add duplicate `collectionView` aliases. [LK]
+			throw new Error('Duplicate `collectionView` aliases are not allowed.');
+			return;
+		}
 
 		this.value = [
 			...(this.value ?? []),
@@ -98,6 +127,10 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 		return { icon, color: color?.replace('color-', '') };
 	}
 
+	#getUnique(layout: UmbCollectionLayoutConfiguration): string {
+		return 'x' + simpleHashCode('' + layout.collectionView + layout.name + layout.icon).toString(16);
+	}
+
 	render() {
 		return html`${this.#renderLayouts()} ${this.#renderInput()}`;
 	}
@@ -112,19 +145,18 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 			<div id="layout-wrapper">
 				${repeat(
 					this.value,
-					(layout, index) => '' + index + layout.name + layout.icon,
+					(layout) => this.#getUnique(layout),
 					(layout, index) => this.#renderLayout(layout, index),
 				)}
 			</div>
 		`;
 	}
 
-	#renderLayout(layout: UmbCollectionLayoutConfig, index: number) {
+	#renderLayout(layout: UmbCollectionLayoutConfiguration, index: number) {
 		const icon = this.#parseIcon(layout.icon);
 		const varName = icon.color ? extractUmbColorVariable(icon.color) : undefined;
-
 		return html`
-			<div class="layout-item">
+			<div class="layout-item" id=${this.#getUnique(layout)}>
 				<uui-icon name="icon-navigation"></uui-icon>
 
 				<uui-button compact look="outline" label="pick icon" @click=${() => this.#onIconChange(icon, index)}>
