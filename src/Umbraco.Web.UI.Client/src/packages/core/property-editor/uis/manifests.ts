@@ -12,7 +12,7 @@ import { manifest as numberRange } from '../../../property-editors/number-range/
 import { manifest as orderDirection } from '../../../property-editors/order-direction/manifests.js';
 import { manifest as overlaySize } from '../../../property-editors/overlay-size/manifests.js';
 import { manifest as radioButtonList } from '../../../property-editors/radio-button-list/manifests.js';
-import { manifest as select } from './select/manifests.js';
+import { manifest as select } from '../../../property-editors/select/manifests.js';
 import { manifest as slider } from './slider/manifests.js';
 import { manifest as textArea } from './textarea/manifests.js';
 import { manifest as toggle } from './toggle/manifests.js';
