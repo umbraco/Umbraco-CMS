@@ -17,6 +17,7 @@ import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { filter, first } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -74,6 +75,17 @@ export class UmbAppElement extends UmbLitElement {
 			resolve: () => {
 				this.#authContext?.clearTokenStorage();
 				this.#authController.makeAuthorizationRequest('loggedOut');
+
+				// Listen for the user to be authorized
+				this.#authContext?.isAuthorized
+					.pipe(
+						filter((x) => !!x),
+						first(),
+					)
+					.subscribe(() => {
+						// Redirect to the root
+						history.replaceState(null, '', '');
+					});
 			},
 		},
 		{
