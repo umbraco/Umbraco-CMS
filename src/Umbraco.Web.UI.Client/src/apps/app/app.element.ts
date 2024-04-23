@@ -59,13 +59,9 @@ export class UmbAppElement extends UmbLitElement {
 		},
 		{
 			path: 'oauth_complete',
-			resolve: () => {
+			resolve: async () => {
 				// Complete oauth
-				console.log('congrats you hit the oauth complete');
 				this.#authContext?.completeAuthorizationRequest();
-
-				// Let the opener know that we are done
-				window.opener?.postMessage('oauth_complete', '*');
 			},
 		},
 		{
@@ -172,15 +168,15 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#redirect() {
-		// If there is a ?code parameter in the url, then we are in the middle of the oauth flow
-		// and we need to complete the login (the authorization notifier will redirect after this is done
-		// essentially hitting this method again)
+		/** If there is a ?code parameter in the url, then we are in the middle of the oauth flow
+		 * and we need to complete the login (the authorization notifier will redirect after this is done
+		 * essentially hitting this method again)
+		 * @deprecated This is a legacy way of handling oauth flow, it should be removed once the backend starts sending the oauth_complete route
+		 * TODO: Remove this when the backend sends the oauth_complete route
+		 */
 		const queryParams = new URLSearchParams(window.location.search);
 		if (queryParams.has('code')) {
 			this.#authContext?.completeAuthorizationRequest();
-
-			// Let the opener know that we are done
-			window.opener?.postMessage('oauth_complete', '*');
 			return;
 		}
 
