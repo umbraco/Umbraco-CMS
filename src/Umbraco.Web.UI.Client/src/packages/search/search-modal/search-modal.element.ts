@@ -367,6 +367,10 @@ export class UmbSearchModalElement extends UmbLitElement {
 				color: var(--uui-color-selected-contrast);
 				border-color: transparent;
 			}
+			.search-provider.active:focus {
+				outline-offset: -4px;
+				outline-color: var(--uui-color-focus);
+			}
 			input {
 				all: unset;
 				height: 100%;
