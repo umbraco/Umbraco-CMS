@@ -180,7 +180,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		if (this._items && this.max && this._items.length >= this.max) return;
 		return html`
 			<uui-button
-				id="add-button"
+				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
 				label=${this.localize.term('general_choose')}>
@@ -215,9 +215,11 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 
 	#renderIsTrashed(item: UmbMediaItemModel) {
 		if (!item.isTrashed) return;
-		return html`<uui-tag size="s" slot="tag" color="danger"
-			><umb-localize key="mediaPicker_trashed">Trashed</umb-localize></uui-tag
-		>`;
+		return html`
+			<uui-tag size="s" slot="tag" color="danger">
+				<umb-localize key="mediaPicker_trashed">Trashed</umb-localize>
+			</uui-tag>
+		`;
 	}
 
 	#renderOpenButton(item: UmbMediaItemModel) {
@@ -241,7 +243,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
 			}
 
-			#add-button {
+			#btn-add {
 				text-align: center;
 				height: 100%;
 			}

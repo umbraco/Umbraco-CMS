@@ -25,12 +25,15 @@ export class UmbInputEyeDropperElement extends UUIFormControlMixin(UmbLitElement
 	// BTW in the old backoffice "palette" seemed to be true/false setting, but here its an array.
 
 	render() {
-		return html`<uui-color-picker
-			label="Eye dropper"
-			.opacity=${this.opacity}
-			.swatches=${this.swatches}
-			.value=${this.value as string}
-			@change=${this.#onChange}></uui-color-picker>`;
+		return html`
+			<uui-color-picker
+				label="Eye dropper"
+				.opacity=${this.opacity}
+				.swatches=${this.swatches}
+				.value=${this.value as string}
+				@change=${this.#onChange}>
+			</uui-color-picker>
+		`;
 	}
 }
 

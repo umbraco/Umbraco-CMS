@@ -55,11 +55,13 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implemen
 	}
 
 	render() {
-		return html`<umb-input-eye-dropper
-			.opacity=${this._opacity}
-			.swatches=${this._swatches}
-			.value=${this.value}
-			@change=${this.#onChange}></umb-input-eye-dropper>`;
+		return html`
+			<umb-input-eye-dropper
+				.opacity=${this._opacity}
+				.swatches=${this._swatches}
+				value=${this.value}
+				@change=${this.#onChange}></umb-input-eye-dropper>
+		`;
 	}
 }
 

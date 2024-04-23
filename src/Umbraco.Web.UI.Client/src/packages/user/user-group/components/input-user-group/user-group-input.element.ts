@@ -108,9 +108,11 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	render() {
 		return html`
 			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open"
-				>Add</uui-button
-			>
+			<uui-button
+				id="btn-add"
+				look="placeholder"
+				@click=${() => this.#pickerContext.openPicker()}
+				label=${this.localize.term('general_choose')}></uui-button>
 		`;
 	}
 
@@ -119,11 +121,10 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 		return html`
 			<umb-user-group-ref name="${ifDefined(item.name)}">
 				${item.icon ? html`<umb-icon slot="icon" name=${item.icon}></umb-icon>` : nothing}
-
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.unique)} label="Remove ${item.name}"
-						>Remove</uui-button
-					>
+					<uui-button
+						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
+						label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</umb-user-group-ref>
 		`;
@@ -131,7 +132,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 
 	static styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 		`,
