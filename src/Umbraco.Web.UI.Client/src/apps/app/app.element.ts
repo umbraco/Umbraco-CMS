@@ -50,6 +50,10 @@ export class UmbAppElement extends UmbLitElement {
 
 	private _routes: UmbRoute[] = [
 		{
+			path: 'error',
+			component: () => import('./app-error.element.js'),
+		},
+		{
 			path: 'install',
 			component: () => import('../installer/installer.element.js'),
 		},
