@@ -2,6 +2,7 @@ import { getPropertyValueByAlias } from '../index.js';
 import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
@@ -137,10 +138,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 					>${this.localize.term('content_notCreated')}</uui-tag
 				>`;
 			default:
-				// TODO: [LK] Check if we have a `SplitPascalCase`-esque utility function that could be used here.
-				return html`<uui-tag slot="tag" color="danger" look="secondary"
-					>${item.state.replace(/([A-Z])/g, ' $1')}</uui-tag
-				>`;
+				return html`<uui-tag slot="tag" color="danger" look="secondary">${fromCamelCase(item.state)}</uui-tag>`;
 		}
 	}
 
