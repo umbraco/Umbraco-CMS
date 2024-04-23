@@ -372,12 +372,23 @@ export class UmbSearchModalElement extends UmbLitElement {
 			#input-wrapper-fake-cursor {
 				position: absolute;
 				left: 0;
-				border-right: 1px solid hotpink;
+				border-right: 1px solid var(--uui-color-text);
 				height: 1.2rem;
 				color: transparent;
 				user-select: none;
 				pointer-events: none;
 				bottom: 14px;
+				animation: blink-animation 1s infinite;
+			}
+			@keyframes blink-animation {
+				0%,
+				50% {
+					border-color: var(--uui-color-text);
+				}
+				51%,
+				100% {
+					border-color: transparent;
+				}
 			}
 			button {
 				font-family: unset;
