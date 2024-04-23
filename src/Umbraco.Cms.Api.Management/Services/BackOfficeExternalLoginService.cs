@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
@@ -57,7 +58,7 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
                 ExternalLoginOperationStatus.Success, providerStatuses);
     }
 
-    public async Task<Attempt<ExternalLoginOperationStatus>> UnLinkLogin(ClaimsPrincipal claimsPrincipal, string loginProvider, string providerKey)
+    public async Task<Attempt<ExternalLoginOperationStatus>> UnLinkLoginAsync(ClaimsPrincipal claimsPrincipal, string loginProvider, string providerKey)
     {
         var userId = claimsPrincipal.Identity?.GetUserId();
         if (userId is null)
@@ -108,6 +109,41 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
 
         await _backOfficeSignInManager.SignInAsync(user, true);
         return Attempt.Succeed(ExternalLoginOperationStatus.Success);
+    }
+
+    public async Task<Attempt<IEnumerable<IdentityError>, ExternalLoginOperationStatus>> HandleLoginCallbackAsync(HttpContext httpContext)
+    {
+        AuthenticateResult cookieAuthenticatedUserAttempt =
+            await httpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+
+        if (cookieAuthenticatedUserAttempt.Succeeded == false)
+        {
+            return Attempt.FailWithStatus(ExternalLoginOperationStatus.Unauthorized, Enumerable.Empty<IdentityError>());
+        }
+
+        BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(cookieAuthenticatedUserAttempt.Principal);
+        if (user == null)
+        {
+            return Attempt.FailWithStatus(ExternalLoginOperationStatus.UserNotFound, Enumerable.Empty<IdentityError>());
+        }
+
+        ExternalLoginInfo? info =
+            await _backOfficeSignInManager.GetExternalLoginInfoAsync();
+
+        if (info == null)
+        {
+            return Attempt.FailWithStatus(ExternalLoginOperationStatus.ExternalInfoNotFound, Enumerable.Empty<IdentityError>());
+        }
+
+        IdentityResult addLoginResult = await _backOfficeUserManager.AddLoginAsync(user, info);
+        if (addLoginResult.Succeeded is false)
+        {
+            return Attempt.FailWithStatus(ExternalLoginOperationStatus.IdentityFailure, addLoginResult.Errors);
+        }
+
+        // Update any authentication tokens if succeeded
+        await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(info);
+        return Attempt.SucceedWithStatus(ExternalLoginOperationStatus.Success, Enumerable.Empty<IdentityError>());
     }
 
     private ExternalLoginOperationStatus FromUserOperationStatusFailure(UserOperationStatus userOperationStatus) =>

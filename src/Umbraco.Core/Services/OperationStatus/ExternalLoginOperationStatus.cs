@@ -9,5 +9,8 @@ public enum ExternalLoginOperationStatus
     AuthenticationOptionsNotFound,
     UnlinkingDisabled,
     InvalidProviderKey,
-    AuthenticationSchemeNotFound
+    AuthenticationSchemeNotFound,
+    Unauthorized,
+    ExternalInfoNotFound,
+    IdentityFailure
 }

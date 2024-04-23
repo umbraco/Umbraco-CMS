@@ -43,6 +43,10 @@ public class BackOfficeController : SecurityControllerBase
     private readonly IUserTwoFactorLoginService _userTwoFactorLoginService;
     private readonly IBackOfficeExternalLoginService _externalLoginService;
 
+    private const string RedirectFlowParameter = "flow";
+    private const string RedirectStatusParameter = "status";
+    private const string RedirectErrorCodeParameter = "errorCode";
+
     public BackOfficeController(
         IHttpContextAccessor httpContextAccessor,
         IBackOfficeSignInManager backOfficeSignInManager,
@@ -243,57 +247,31 @@ public class BackOfficeController : SecurityControllerBase
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> ExternalLinkLoginCallback()
     {
-        var cookieAuthenticatedUserAttempt =
-            await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+        Attempt<IEnumerable<IdentityError>, ExternalLoginOperationStatus> handleResult = await _externalLoginService.HandleLoginCallbackAsync(HttpContext);
 
-        if (cookieAuthenticatedUserAttempt.Succeeded == false)
+        if (handleResult.Success)
         {
-            return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
-                "flow=external-login-callback",
-                "status=unauthorized"));
-        }
-
-        BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(cookieAuthenticatedUserAttempt.Principal);
-        if (user == null)
-        {
-            return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
-                "flow=external-login-callback",
-                "status=user-not-found"));
-        }
-
-        ExternalLoginInfo? info =
-            await _backOfficeSignInManager.GetExternalLoginInfoAsync();
-
-        if (info == null)
-        {
-            return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
-                "flow=external-login-callback",
-                "status=external-info-not-found"));
-        }
-
-        IdentityResult addLoginResult = await _backOfficeUserManager.AddLoginAsync(user, info);
-        if (addLoginResult.Succeeded)
-        {
-            // Update any authentication tokens if succeeded
-            await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(info);
             return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackPathName);
         }
 
-        // Add errors and redirect for it to be displayed
-        // TempData[ViewDataExtensions.TokenExternalSignInError] = addLoginResult.Errors;
-        // return RedirectToLogin(new { flow = "external-login", status = "failed", logout = "true" });
-        // todo
-        return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
-            "flow=external-login-callback",
-            "status=failed"));
+        return handleResult.Status switch
+        {
+            ExternalLoginOperationStatus.Unauthorized => RedirectWithStatus("unauthorized"),
+            ExternalLoginOperationStatus.UserNotFound => RedirectWithStatus("user-not-found"),
+            ExternalLoginOperationStatus.ExternalInfoNotFound => RedirectWithStatus("external-info-not-found"),
+            ExternalLoginOperationStatus.IdentityFailure => RedirectWithStatus("failed"),
+            _ => RedirectWithStatus("unknown-failure")
+        };
+
+        RedirectResult RedirectWithStatus(string status)
+            => CallbackErrorRedirectWithStatus("external-login-callback", status, handleResult.Result);
     }
 
-    // todo cleanup unhappy responses
     [HttpPost("unlink-login")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginRequestModel unlinkLoginRequestModel)
     {
-        Attempt<ExternalLoginOperationStatus> unlinkResult = await _externalLoginService.UnLinkLogin(
+        Attempt<ExternalLoginOperationStatus> unlinkResult = await _externalLoginService.UnLinkLoginAsync(
             User,
             unlinkLoginRequestModel.LoginProvider,
             unlinkLoginRequestModel.ProviderKey);
@@ -417,4 +395,18 @@ public class BackOfficeController : SecurityControllerBase
     }
 
     private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.BackOfficeAuthenticationType);
+
+    private RedirectResult CallbackErrorRedirectWithStatus( string flowType, string status, IEnumerable<IdentityError> identityErrors)
+    {
+        var redirectUrl = _securitySettings.Value.BackOfficeHost +
+                          _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+                              $"{RedirectFlowParameter}={flowType}",
+                              $"{RedirectStatusParameter}={status}");
+        foreach (IdentityError identityError in identityErrors)
+        {
+            redirectUrl.AppendQueryStringToUrl($"{RedirectErrorCodeParameter}={identityError.Code}");
+        }
+
+        return Redirect(redirectUrl);
+    }
 }
