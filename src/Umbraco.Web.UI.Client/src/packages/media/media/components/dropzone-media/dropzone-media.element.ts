@@ -1,7 +1,7 @@
 import { UmbMediaDetailRepository } from '../../repository/index.js';
 import type { UmbMediaDetailModel } from '../../types.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state, property } from '@umbraco-cms/backoffice/external/lit';
+import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	type UmbAllowedMediaTypeModel,
@@ -24,6 +24,14 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 
 	@state()
 	private queue: Array<UmbTemporaryFileModel> = [];
+
+	@property({ attribute: false })
+	parentUnique: string | null = null;
+
+	public getDropzoneElement() {
+		const element = this.shadowRoot?.querySelector('#dropzone') as UUIFileDropzoneElement;
+		return element;
+	}
 
 	constructor() {
 		super();
@@ -123,8 +131,7 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 			const { data } = await this.#mediaDetailRepository.createScaffold(preset);
 			if (!data) return;
 
-			// TODO Get the parent...
-			await this.#mediaDetailRepository.create(data, null);
+			await this.#mediaDetailRepository.create(data, this.parentUnique);
 
 			this.dispatchEvent(new UmbChangeEvent());
 		}
