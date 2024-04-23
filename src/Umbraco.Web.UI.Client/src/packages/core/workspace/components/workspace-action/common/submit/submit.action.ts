@@ -23,6 +23,8 @@ export class UmbSubmitWorkspaceAction extends UmbWorkspaceActionBase<UmbSubmitta
 				// We can't save if we don't have a unique
 				if (unique === undefined) {
 					this.disable();
+				} else {
+					this.enable();
 				}
 			},
 			'saveWorkspaceActionUniqueObserver',

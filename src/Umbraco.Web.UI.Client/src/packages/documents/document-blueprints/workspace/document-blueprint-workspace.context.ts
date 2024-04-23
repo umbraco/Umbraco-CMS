@@ -20,7 +20,10 @@ import {
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import {
+	type UmbDocumentTypeDetailModel,
+	UmbDocumentTypeDetailRepository,
+} from '@umbraco-cms/backoffice/document-type';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -28,14 +31,15 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import type { UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 
 type EntityType = UmbDocumentBlueprintDetailModel;
 
 export class UmbDocumentBlueprintWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<EntityType>
-	implements UmbRoutableWorkspaceContext
+	implements UmbContentWorkspaceContext<UmbDocumentTypeDetailModel, UmbDocumentBlueprintVariantModel>
 {
+	readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 	//
 	readonly repository = new UmbDocumentBlueprintDetailRepository(this);
 
@@ -104,7 +108,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 					} as UmbDocumentBlueprintVariantOptionModel,
 				];
 			}
-			return [] as Array<UmbDocumentBlueprintVariantOptionModel>;
+			return [];
 		},
 	);
 

@@ -6,7 +6,7 @@ export type UmbPropertyContainerTypes = 'Group' | 'Tab';
 export interface UmbPropertyTypeContainerModel {
 	id: string;
 	parent: { id: string } | null; // TODO: change to unique
-	name: string | null;
+	name: string;
 	type: UmbPropertyContainerTypes;
 	sortOrder: number;
 }

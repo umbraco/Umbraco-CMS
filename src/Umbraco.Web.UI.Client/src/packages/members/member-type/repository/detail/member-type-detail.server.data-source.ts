@@ -104,7 +104,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 				return {
 					id: container.id,
 					parent: container.parent ? { id: container.parent.id } : null,
-					name: container.name || null,
+					name: container.name ?? '',
 					type: container.type as UmbPropertyContainerTypes, // TODO: check if the value is valid
 					sortOrder: container.sortOrder,
 				};

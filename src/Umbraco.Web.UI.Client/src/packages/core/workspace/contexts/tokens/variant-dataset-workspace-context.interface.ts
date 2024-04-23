@@ -13,10 +13,10 @@ export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbVarian
 	name(variantId?: UmbVariantId): Observable<string>;
 
 	// Variant:
-	variants: Observable<Array<UmbVariantModel>>;
+	variants: Observable<Array<VariantType>>;
 	variantOptions: Observable<Array<UmbVariantOptionModel<VariantType>>>;
 	splitView: UmbWorkspaceSplitViewManager;
-	getVariant(variantId: UmbVariantId): UmbVariantModel | undefined;
+	getVariant(variantId: UmbVariantId): VariantType | undefined;
 
 	// Property:
 	// This one is async cause it needs to structure to provide this data: [NL]
