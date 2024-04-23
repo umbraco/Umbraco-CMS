@@ -191,6 +191,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				<umb-tree
 					alias=${UMB_DOCUMENT_TREE_ALIAS}
 					.props=${{
+						hideTreeItemActions: true,
 						hideTreeRoot: true,
 						selectionConfiguration: this._selectionConfiguration,
 					}}
@@ -206,6 +207,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				<umb-tree
 					alias="Umb.Tree.Media"
 					.props=${{
+						hideTreeItemActions: true,
 						hideTreeRoot: true,
 						selectionConfiguration: this._selectionConfiguration,
 					}}
