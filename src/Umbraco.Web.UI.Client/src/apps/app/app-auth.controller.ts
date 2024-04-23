@@ -91,7 +91,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 
 		if (availableProviders.length === 1) {
 			// One provider available (most likely the Umbraco provider), so initiate the authorization request to the default provider
-			await this.#authContext.makeAuthorizationRequest(availableProviders[0].forProviderName);
+			await this.#authContext.makeAuthorizationRequest(availableProviders[0].forProviderName, true);
 			return this.#updateState();
 		}
 
@@ -103,7 +103,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 
 		if (redirectProvider) {
 			// Redirect directly to the provider
-			await this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName);
+			await this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName, true);
 			return this.#updateState();
 		}
 
