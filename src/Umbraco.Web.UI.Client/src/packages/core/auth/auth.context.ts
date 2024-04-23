@@ -79,15 +79,16 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 			return;
 		}
 
+		const popupTarget = 'umbracoAuthPopup';
+
 		if (!this.#authWindowProxy || this.#authWindowProxy.closed) {
-			// TODO: Add popup behavior configuration to the authProvider's manifest
 			this.#authWindowProxy = window.open(
 				redirectUrl,
-				'umbracoAuthPopup',
-				'popup,width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no',
+				popupTarget,
+				'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no',
 			);
 		} else if (this.#previousAuthUrl !== redirectUrl) {
-			this.#authWindowProxy = window.open(redirectUrl, 'umbracoAuthPopup');
+			this.#authWindowProxy = window.open(redirectUrl, popupTarget);
 			this.#authWindowProxy?.focus();
 		}
 
