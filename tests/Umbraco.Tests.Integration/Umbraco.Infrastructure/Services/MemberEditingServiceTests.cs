@@ -131,7 +131,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
     {
         MemberService.AddRole("RoleTwo");
         MemberService.AddRole("RoleThree");
-        var grps = new[] { MemberGroupService.GetByName("RoleTwo"), MemberGroupService.GetByName("RoleThree") };
+        var groups = new[] { MemberGroupService.GetByName("RoleTwo"), MemberGroupService.GetByName("RoleThree") };
 
         var member = await CreateMemberAsync();
 
@@ -141,7 +141,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Username = member.Username,
             IsApproved = true,
             InvariantName = member.Name,
-            Roles = grps.Select(x => x.Key),
+            Roles = groups.Select(x => x.Key),
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
