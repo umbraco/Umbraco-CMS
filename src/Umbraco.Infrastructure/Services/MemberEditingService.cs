@@ -270,7 +270,8 @@ internal sealed class MemberEditingService : IMemberEditingService
         IEnumerable<string> currentRoles = (await _memberManager.GetRolesAsync(identityMember)).ToList();
 
         // find the ones to remove and remove them
-        var rolesToRemove = currentRoles.Except(memberGroups.Select(x => x.Name)).WhereNotNull().ToArray();
+        IEnumerable<string> memberGroupNames = memberGroups.Select(x => x.Name).WhereNotNull().ToArray();
+        var rolesToRemove = currentRoles.Except(memberGroupNames).ToArray();
 
         // Now let's do the role provider stuff - now that we've saved the content item (that is important since
         // if we are changing the username, it must be persisted before looking up the member roles).
@@ -285,7 +286,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         }
 
         // find the ones to add and add them
-        var rolesToAdd = memberGroups.Select(x => x.Name).WhereNotNull().Except(currentRoles).ToArray();
+        var rolesToAdd = memberGroupNames.Except(currentRoles).ToArray();
         if (rolesToAdd.Any())
         {
             // add the ones submitted
