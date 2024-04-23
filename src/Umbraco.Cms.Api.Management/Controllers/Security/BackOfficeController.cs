@@ -291,21 +291,21 @@ public class BackOfficeController : SecurityControllerBase
                 .Build()),
             ExternalLoginOperationStatus.AuthenticationSchemeNotFound => BadRequest(problemDetailsBuilder
                 .WithTitle("Authentication scheme not found")
-                .WithDetail($"Could not find the authentication scheme for the supplied provider")
+                .WithDetail("Could not find the authentication scheme for the supplied provider")
                 .Build()),
             ExternalLoginOperationStatus.AuthenticationOptionsNotFound => BadRequest(problemDetailsBuilder
                 .WithTitle("Missing Authentication options")
-                .WithDetail($"Could not find external authentication options the supplied provider")
+                .WithDetail("Could not find external authentication options for the supplied provider")
                 .Build()),
             ExternalLoginOperationStatus.UnlinkingDisabled => BadRequest(problemDetailsBuilder
                 .WithTitle("Unlinking disabled")
-                .WithDetail($"Manual linking is disabled for the supplied provider")
+                .WithDetail("Manual linking is disabled for the supplied provider")
                 .Build()),
             ExternalLoginOperationStatus.InvalidProviderKey => BadRequest(problemDetailsBuilder
                 .WithTitle("Unlinking failed")
                 .WithDetail("Could not match ProviderKey to the supplied provider")
                 .Build()),
-            _ => throw new ArgumentOutOfRangeException()
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown external login operation status."),
         });
     }
 
