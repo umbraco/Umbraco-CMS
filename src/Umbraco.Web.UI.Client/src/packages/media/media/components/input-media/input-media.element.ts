@@ -140,26 +140,18 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	#pickableFilter: (item: UmbMediaItemModel) => boolean = (item) => {
-		/* TODO: Media item doesn't have the content/media-type ID available to query.
-			 Commenting out until the Management API model is updated. [LK]
-		*/
-		// if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
-		// 	return this.allowedContentTypeIds.includes(item.contentTypeId);
-		// }
+		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
+			return this.allowedContentTypeIds.includes(item.mediaType.unique);
+		}
 		return true;
 	};
 
 	#openPicker() {
-		// TODO: Configure the media picker, with `allowedContentTypeIds` and `ignoreUserStartNodes` [LK]
+		// TODO: Configure the media picker, with `ignoreUserStartNodes` [LK]
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 			pickableFilter: this.#pickableFilter,
 		});
-	}
-
-	#openItem(item: UmbMediaItemModel) {
-		// TODO: Implement the Media editing infinity editor. [LK]
-		console.log('TODO: _openItem', item);
 	}
 
 	render() {
