@@ -2,6 +2,7 @@ import { manifest as bulkActionPermissions } from './config/bulk-action-permissi
 import { manifest as columnConfiguration } from './config/column/manifests.js';
 import { manifest as layoutConfiguration } from './config/layout/manifests.js';
 import { manifest as orderBy } from './config/order-by/manifests.js';
+import { manifest as schema } from './Umbraco.ListView.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUi = {
@@ -81,4 +82,4 @@ const config: Array<ManifestPropertyEditorUi> = [
 	orderBy,
 ];
 
-export const manifests = [manifest, ...config];
+export const manifests = [manifest, ...config, schema];

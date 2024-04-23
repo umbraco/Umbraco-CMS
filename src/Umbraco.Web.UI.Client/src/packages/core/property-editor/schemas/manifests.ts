@@ -1,6 +1,5 @@
 import { manifest as iconPicker } from './Umbraco.IconPicker.js';
 import { manifest as imageCropper } from './Umbraco.ImageCropper.js';
-import { manifest as listView } from './Umbraco.ListView.js';
 import { manifest as markdownEditor } from './Umbraco.MarkdownEditor.js';
 import { manifest as mediaPicker } from './Umbraco.MediaPicker.js';
 import { manifest as multiNodeTreePicker } from './Umbraco.MultiNodeTreePicker.js';
@@ -13,7 +12,6 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/exten
 export const manifests: Array<ManifestPropertyEditorSchema> = [
 	iconPicker,
 	imageCropper,
-	listView,
 	markdownEditor,
 	mediaPicker,
 	multiNodeTreePicker,
