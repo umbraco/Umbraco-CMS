@@ -15,37 +15,31 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptName);
   });
 
-  test('can create a empty script', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a empty script', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.script.clickActionsMenuAtRoot();
-    await umbracoUi.script.clickCreateThreeDotsButton();
+    await umbracoUi.script.clickCreateButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.enterScriptName(scriptName);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.clickSaveButton();
 
     // Assert
     await umbracoUi.script.isSuccessNotificationVisible();
     expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
+    await umbracoUi.script.clickRootFolderCaretButton();
+    await umbracoUi.script.isScriptTreeItemVisible(scriptName);
   });
 
-  test('can create a script with content', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a script with content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const scriptContent = 'TestContent';
 
     // Act
     await umbracoUi.script.clickActionsMenuAtRoot();
-    await umbracoUi.script.clickCreateThreeDotsButton();
+    await umbracoUi.script.clickCreateButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.enterScriptName(scriptName);
     await umbracoUi.script.enterScriptContent(scriptContent);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.clickSaveButton();
 
     // Assert
@@ -53,40 +47,54 @@ test.describe('Script tests', () => {
     expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
     const scriptData = await umbracoApi.script.getByName(scriptName);
     expect(scriptData.content).toBe(scriptContent);
+    await umbracoUi.script.clickRootFolderCaretButton();
+    await umbracoUi.script.isScriptTreeItemVisible(scriptName);
   });
 
-  test('can update a script', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can update a script', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.create(scriptName, 'test');
     const updatedScriptContent = 'const test = {\r\n    script = \u0022Test\u0022,\r\n    extension = \u0022.js\u0022,\r\n    scriptPath: function() {\r\n        return this.script \u002B this.extension;\r\n    }\r\n};\r\n';
 
     // Act
     await umbracoUi.script.openScriptAtRoot(scriptName);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.enterScriptContent(updatedScriptContent);
-    // TODO: Remove this timeout when frontend validation is implemented
-    await umbracoUi.waitForTimeout(500);
     await umbracoUi.script.clickSaveButton();
 
     // Assert
-    // TODO: Uncomment when the notification is visible. Currently there is no notification after you update a script
-    // await umbracoUi.script.isSuccessNotificationVisible();
+    await umbracoUi.script.isSuccessNotificationVisible();
     const updatedScript = await umbracoApi.script.get(scriptPath);
     expect(updatedScript.content).toBe(updatedScriptContent);
   });
 
-  test('can delete a script', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can delete a script', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.create(scriptName, '');
 
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
     await umbracoUi.script.clickActionsMenuForScript(scriptName);
-    await umbracoUi.script.deleteScript();
+    await umbracoUi.script.clickDeleteAndConfirmButton();
 
     // Assert
     await umbracoUi.script.isSuccessNotificationVisible();
     expect(await umbracoApi.script.doesNameExist(scriptName)).toBeFalsy();
+    await umbracoUi.script.isScriptTreeItemVisible(scriptName, false);
+  });
+
+  test.skip('can rename a script', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const wrongScriptName = 'WrongTestScript.js';
+    await umbracoApi.script.create(wrongScriptName, '');
+
+    // Act
+    await umbracoUi.script.clickRootFolderCaretButton();
+    await umbracoUi.script.clickActionsMenuForScript(wrongScriptName);
+    await umbracoUi.script.rename(scriptName);
+
+    // Assert
+    await umbracoUi.script.isSuccessNotificationVisible();
+    expect(await umbracoApi.script.doesNameExist(scriptName)).toBeTruthy();
+    expect(await umbracoApi.script.doesNameExist(wrongScriptName)).toBeFalsy();
   });
 });

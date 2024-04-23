@@ -5,7 +5,7 @@ using NJsonSchema;
 using NJsonSchema.Generation;
 
 /// <inheritdoc />
-public class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
+internal class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoJsonSchemaGenerator" /> class.
@@ -19,11 +19,8 @@ public class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
             ReflectionService = new UmbracoSystemTextJsonReflectionService(),
             SerializerOptions = new JsonSerializerOptions()
             {
-                Converters =
-                {
-                    new JsonStringEnumConverter()
-                },
-                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter() },
+                IgnoreReadOnlyProperties = true,
             },
         })
     { }
@@ -34,16 +31,20 @@ public class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
         /// <inheritdoc />
         public override void GenerateProperties(JsonSchema schema, ContextualType contextualType, SystemTextJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
+            // Populate schema properties
             base.GenerateProperties(schema, contextualType, settings, schemaGenerator, schemaResolver);
 
-            // Remove read-only properties
-            foreach (ContextualPropertyInfo property in contextualType.Properties)
+            if (settings.SerializerOptions.IgnoreReadOnlyProperties)
             {
-                if (property.CanWrite is false)
+                // Remove read-only properties (because this is not implemented by the base class)
+                foreach (ContextualPropertyInfo property in contextualType.Properties)
                 {
-                    string propertyName = GetPropertyName(property, settings);
+                    if (property.CanWrite is false)
+                    {
+                        string propertyName = GetPropertyName(property, settings);
 
-                    schema.Properties.Remove(propertyName);
+                        schema.Properties.Remove(propertyName);
+                    }
                 }
             }
         }

@@ -2,16 +2,22 @@
 // See LICENSE for more details.
 
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -23,7 +29,22 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
 {
     private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
     private IEventAggregator EventAggregator => GetRequiredService<IEventAggregator>();
-    private IMigrationPlanExecutor MigrationPlanExecutor => GetRequiredService<IMigrationPlanExecutor>();
+    private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
+    private IScopeAccessor ScopeAccessor => GetRequiredService<IScopeAccessor>();
+    private ILoggerFactory LoggerFactory => GetRequiredService<ILoggerFactory>();
+    private IMigrationBuilder MigrationBuilder => GetRequiredService<IMigrationBuilder>();
+    private IUmbracoDatabaseFactory UmbracoDatabaseFactory => GetRequiredService<IUmbracoDatabaseFactory>();
+    private IPublishedSnapshotService PublishedSnapshotService => GetRequiredService<IPublishedSnapshotService>();
+    private DistributedCache DistributedCache => GetRequiredService<DistributedCache>();
+    private IMigrationPlanExecutor MigrationPlanExecutor => new MigrationPlanExecutor(
+        CoreScopeProvider,
+        ScopeAccessor,
+        LoggerFactory,
+        MigrationBuilder,
+        UmbracoDatabaseFactory,
+        PublishedSnapshotService,
+        DistributedCache,
+        Mock.Of<IKeyValueService>());
 
     [Test]
     public void CreateTableOfTDto()
