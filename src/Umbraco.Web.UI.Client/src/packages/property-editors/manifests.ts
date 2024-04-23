@@ -1,6 +1,6 @@
 import { manifest as colorEditor } from './color-swatches-editor/manifests.js';
 import { manifest as iconPicker } from './icon-picker/manifests.js';
-import { manifest as label } from './label/manifests.js';
+import { manifests as labelManifests } from './label/manifests.js';
 import { manifest as multiUrlPicker } from './multi-url-picker/manifests.js';
 import { manifest as numberRange } from './number-range/manifests.js';
 import { manifest as orderDirection } from './order-direction/manifests.js';
@@ -31,6 +31,7 @@ export const manifests: Array<ManifestTypes> = [
 	...datePickerManifests,
 	...dropdownManifests,
 	...eyeDropperManifests,
+	...labelManifests,
 	...multipleTextStringManifests,
 	...numbers,
 	...textareaManifests,
@@ -38,7 +39,6 @@ export const manifests: Array<ManifestTypes> = [
 	...treePicker,
 	colorEditor,
 	iconPicker,
-	label,
 	multiUrlPicker,
 	numberRange,
 	orderDirection,

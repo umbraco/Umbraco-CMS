@@ -2,7 +2,6 @@ import { manifest as blockGrid } from './Umbraco.BlockGrid.js';
 import { manifest as blockList } from './Umbraco.BlockList.js';
 import { manifest as iconPicker } from './Umbraco.IconPicker.js';
 import { manifest as imageCropper } from './Umbraco.ImageCropper.js';
-import { manifest as label } from './Umbraco.Label.js';
 import { manifest as listView } from './Umbraco.ListView.js';
 import { manifest as markdownEditor } from './Umbraco.MarkdownEditor.js';
 import { manifest as mediaPicker } from './Umbraco.MediaPicker.js';
@@ -25,7 +24,6 @@ export const manifests: Array<ManifestPropertyEditorSchema> = [
 	blockList,
 	iconPicker,
 	imageCropper,
-	label,
 	listView,
 	markdownEditor,
 	mediaPicker,
