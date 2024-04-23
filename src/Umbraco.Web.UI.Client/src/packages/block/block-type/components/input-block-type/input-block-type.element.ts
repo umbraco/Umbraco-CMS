@@ -119,7 +119,7 @@ export class UmbInputBlockTypeElement<
 				.name=${block.label}
 				.iconColor=${block.iconColor}
 				.backgroundColor=${block.backgroundColor}
-				.href="${this.workspacePath}/edit/${block.contentElementTypeKey}"
+				.href="${this.workspacePath}edit/${block.contentElementTypeKey}"
 				.contentElementTypeKey=${block.contentElementTypeKey}>
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this.#onRequestDelete(block)} label="Remove block">

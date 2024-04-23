@@ -1,5 +1,5 @@
 import type { DirectionModel, AuditTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { AuditLogResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { AuditLogService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -39,7 +39,7 @@ export class UmbAuditLogServerDataSource {
 	}) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			AuditLogResource.getAuditLog({ orderDirection, sinceDate, skip, take }),
+			AuditLogService.getAuditLog({ orderDirection, sinceDate, skip, take }),
 		);
 	}
 
@@ -58,7 +58,7 @@ export class UmbAuditLogServerDataSource {
 	}) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			AuditLogResource.getAuditLogById({ id, orderDirection, sinceDate, skip, take }),
+			AuditLogService.getAuditLogById({ id, orderDirection, sinceDate, skip, take }),
 		);
 	}
 
@@ -75,7 +75,7 @@ export class UmbAuditLogServerDataSource {
 	}) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			AuditLogResource.getAuditLogTypeByLogType({ logType, sinceDate, skip, take }),
+			AuditLogService.getAuditLogTypeByLogType({ logType, sinceDate, skip, take }),
 		);
 	}
 }

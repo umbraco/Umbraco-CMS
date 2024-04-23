@@ -1,7 +1,7 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbConfirmModalData, UmbConfirmModalValue, UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-confirm-modal')
 export class UmbConfirmModalElement extends UmbLitElement {
@@ -31,7 +31,8 @@ export class UmbConfirmModalElement extends UmbLitElement {
 					color="${this.data?.color || 'positive'}"
 					look="primary"
 					label="${this.data?.confirmLabel || 'Confirm'}"
-					@click=${this._handleConfirm}></uui-button>
+					@click=${this._handleConfirm}
+					${umbFocus()}></uui-button>
 			</uui-dialog-layout>
 		`;
 	}

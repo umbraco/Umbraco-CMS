@@ -14,7 +14,7 @@ import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
  */
 @customElement('umb-property-editor-ui-number-range')
 export class UmbPropertyEditorUINumberRangeElement
-	extends UmbFormControlMixin<NumberRangeValueType>(UmbLitElement, undefined)
+	extends UmbFormControlMixin<NumberRangeValueType | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
 	@property({ type: Object })
@@ -36,7 +36,7 @@ export class UmbPropertyEditorUINumberRangeElement
 			min: (event.target as UmbInputNumberRangeElement).minValue,
 			max: (event.target as UmbInputNumberRangeElement).maxValue,
 		};
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new CustomEvent('change'));
 	}
 
 	@state()
@@ -47,6 +47,10 @@ export class UmbPropertyEditorUINumberRangeElement
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-number-range')!);
+	}
+
+	focus(): void {
+		this.shadowRoot!.querySelector('umb-input-number-range')!.focus();
 	}
 
 	render() {

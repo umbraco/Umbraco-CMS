@@ -1,8 +1,8 @@
 import { UmbModalBaseElement } from '../../modal/index.js';
+import { UmbTextStyles } from '../../style/text-style.style.js';
 import { UMB_AUTH_CONTEXT } from '../auth.context.token.js';
 import type { UmbModalAppAuthConfig, UmbModalAppAuthValue } from './umb-app-auth-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-app-auth-modal')
 export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthConfig, UmbModalAppAuthValue> {

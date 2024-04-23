@@ -27,7 +27,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 		name: 'Save Member Workspace Action',
 		api: UmbSubmitWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: '#buttons_save',
 			look: 'primary',
 			color: 'positive',
 		},
@@ -43,12 +43,12 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 export const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		kind: 'contentEditor',
 		alias: 'Umb.WorkspaceView.Member.Content',
 		name: 'Member Workspace Content View',
-		js: () => import('./views/content/member-workspace-view-content.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Content',
+			label: '#general_details',
 			pathname: 'content',
 			icon: 'icon-document',
 		},

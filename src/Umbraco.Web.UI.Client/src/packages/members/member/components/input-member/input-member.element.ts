@@ -1,31 +1,28 @@
 import type { UmbMemberItemModel } from '../../repository/index.js';
 import { UmbMemberPickerContext } from './input-member.context.js';
-import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { MemberItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
-import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-
-const SORTER_CONFIG: UmbSorterConfig<string> = {
-	getUniqueOfElement: (element) => {
-		return element.getAttribute('detail');
-	},
-	getUniqueOfModel: (modelEntry) => {
-		return modelEntry;
-	},
-	identifier: 'Umb.SorterIdentifier.InputMember',
-	itemSelector: 'uui-ref-node',
-	containerSelector: 'uui-ref-list',
-};
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalRouteRegistrationController, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-member')
-export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
-	#sorter = new UmbSorterController(this, {
-		...SORTER_CONFIG,
+export class UmbInputMemberElement extends UUIFormControlMixin(UmbLitElement, '') {
+	#sorter = new UmbSorterController<string>(this, {
+		getUniqueOfElement: (element) => {
+			return element.id;
+		},
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry;
+		},
+		identifier: 'Umb.SorterIdentifier.InputMember',
+		itemSelector: 'uui-ref-node',
+		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selection = model;
+			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
 
@@ -91,7 +88,6 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 
 	@property()
 	public set value(idsString: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selection = splitStringToArray(idsString);
 	}
 	public get value(): string {
@@ -121,10 +117,8 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 				this._editMemberPath = routeBuilder({});
 			});
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => {
-			this._items = selectedItems;
-		});
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observeItems');
 	}
 
 	connectedCallback(): void {
@@ -143,49 +137,49 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		);
 	}
 
-	protected _openPicker() {
-		this.#pickerContext.openPicker({
-			hideTreeRoot: true,
-		});
-	}
-
-	protected _requestRemoveItem(item: UmbMemberItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique!);
-	}
-
 	protected getFormElement() {
 		return undefined;
 	}
 
+	#pickableFilter: (item: UmbMemberItemModel) => boolean = (item) => {
+		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
+			return this.allowedContentTypeIds.includes(item.memberType.unique);
+		}
+		return true;
+	};
+
 	#openPicker() {
 		this.#pickerContext.openPicker({
 			filter: this.filter,
+			pickableFilter: this.#pickableFilter,
 		});
 	}
 
-	#requestRemoveItem(item: MemberItemResponseModel) {
-		this.#pickerContext.requestRemoveItem(item.id!);
+	#removeItem(item: UmbMemberItemModel) {
+		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
 	render() {
-		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
+		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
 	#renderItems() {
 		if (!this._items) return;
-		return html`<uui-ref-list>
-			${repeat(
-				this._items,
-				(item) => item.unique,
-				(item) => this.#renderItem(item),
-			)}
-		</uui-ref-list>`;
+		return html`
+			<uui-ref-list>
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this.#renderItem(item),
+				)}
+			</uui-ref-list>
+		`;
 	}
 
 	#renderAddButton() {
 		if (this.max === 1 && this.selection.length >= this.max) return;
 		return html`<uui-button
-			id="add-button"
+			id="btn-add"
 			look="placeholder"
 			@click=${this.#openPicker}
 			label=${this.localize.term('general_choose')}></uui-button>`;
@@ -193,18 +187,11 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 
 	#renderItem(item: UmbMemberItemModel) {
 		if (!item.unique) return;
-		// TODO: get the correct variant name
-		const name = item.variants[0].name;
 		return html`
-			<uui-ref-node name=${ifDefined(item.variants[0].name)} detail=${ifDefined(item.unique)}>
-				${this.#renderIsTrashed(item)}
+			<uui-ref-node name=${item.name} id=${item.unique}>
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
-					<uui-button
-						@click=${() => this._requestRemoveItem(item)}
-						label="${this.localize.term('general_remove')} ${name}">
-						${this.localize.term('general_remove')}
-					</uui-button>
+					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
@@ -212,26 +199,18 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 
 	#renderOpenButton(item: UmbMemberItemModel) {
 		if (!this.showOpenButton) return;
-		// TODO: get the correct variant name
-		const name = item.variants[0].name;
 		return html`
 			<uui-button
-				compact
 				href="${this._editMemberPath}edit/${item.unique}"
-				label=${this.localize.term('general_edit') + ` ${name}`}>
-				<uui-icon name="icon-edit"></uui-icon>
+				label="${this.localize.term('general_open')} ${item.name}">
+				${this.localize.term('general_open')}
 			</uui-button>
 		`;
-	}
-	#renderIsTrashed(item: UmbMemberItemModel) {
-		// TODO: Uncomment, once the Management API model support deleted members. [LK]
-		// if (!item.isTrashed) return;
-		// return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
 	static styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 

@@ -107,21 +107,23 @@ export class UmbAuthFlow {
 	// state
 	readonly #configuration: AuthorizationServiceConfiguration;
 	readonly #redirectUri: string;
+	readonly #postLogoutRedirectUri: string;
 	readonly #clientId: string;
 	readonly #scope: string;
 
 	// tokens
-	#refreshToken: string | undefined;
-	#accessTokenResponse: TokenResponse | undefined;
+	#tokenResponse?: TokenResponse;
 	#locationInterceptor = new UmbLocationInterceptor();
 
 	constructor(
 		openIdConnectUrl: string,
 		redirectUri: string,
+		postLogoutRedirectUri: string,
 		clientId = 'umbraco-back-office',
 		scope = 'offline_access',
 	) {
 		this.#redirectUri = redirectUri;
+		this.#postLogoutRedirectUri = postLogoutRedirectUri;
 		this.#clientId = clientId;
 		this.#scope = scope;
 
@@ -157,7 +159,7 @@ export class UmbAuthFlow {
 					codeVerifier = request.internal.code_verifier;
 				}
 
-				await this.#makeRefreshTokenRequest(response.code, codeVerifier);
+				await this.#makeTokenRequest(response.code, codeVerifier);
 				await this.performWithFreshTokens();
 				await this.#saveTokenState();
 
@@ -193,8 +195,9 @@ export class UmbAuthFlow {
 		if (tokenResponseJson) {
 			const response = new TokenResponse(JSON.parse(tokenResponseJson));
 			if (response.isValid()) {
-				this.#accessTokenResponse = response;
-				this.#refreshToken = this.#accessTokenResponse.refreshToken;
+				this.#tokenResponse = response;
+			} else {
+				this.signOut();
 			}
 		}
 	}
@@ -255,7 +258,7 @@ export class UmbAuthFlow {
 	 * @returns true if the user is logged in, false otherwise.
 	 */
 	isAuthorized(): boolean {
-		return !!this.#accessTokenResponse && this.#accessTokenResponse.isValid();
+		return !!this.#tokenResponse && this.#tokenResponse.isValid();
 	}
 
 	/**
@@ -265,8 +268,7 @@ export class UmbAuthFlow {
 		await this.#storageBackend.removeItem(UMB_STORAGE_TOKEN_RESPONSE_NAME);
 
 		// clear the internal state
-		this.#accessTokenResponse = undefined;
-		this.#refreshToken = undefined;
+		this.#tokenResponse = undefined;
 	}
 
 	/**
@@ -276,25 +278,27 @@ export class UmbAuthFlow {
 		const signOutPromises: Promise<unknown>[] = [];
 
 		// revoke the access token if it exists
-		if (this.#accessTokenResponse) {
+		if (this.#tokenResponse) {
 			const tokenRevokeRequest = new RevokeTokenRequest({
-				token: this.#accessTokenResponse.accessToken,
+				token: this.#tokenResponse.accessToken,
 				client_id: this.#clientId,
 				token_type_hint: 'access_token',
 			});
 
 			signOutPromises.push(this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest));
-		}
 
-		// revoke the refresh token if it exists
-		if (this.#refreshToken) {
-			const tokenRevokeRequest = new RevokeTokenRequest({
-				token: this.#refreshToken,
-				client_id: this.#clientId,
-				token_type_hint: 'refresh_token',
-			});
+			// revoke the refresh token if it exists
+			if (this.#tokenResponse.refreshToken) {
+				const refreshTokenRevokeRequest = new RevokeTokenRequest({
+					token: this.#tokenResponse.refreshToken,
+					client_id: this.#clientId,
+					token_type_hint: 'refresh_token',
+				});
 
-			signOutPromises.push(this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest));
+				signOutPromises.push(
+					this.#tokenHandler.performRevokeTokenRequest(this.#configuration, refreshTokenRevokeRequest),
+				);
+			}
 		}
 
 		// clear the internal token state
@@ -308,7 +312,16 @@ export class UmbAuthFlow {
 		// which will redirect the user back to the client
 		// and the client will then try and log in again (if the user is not logged in)
 		// which will redirect the user to the login page
-		location.href = `${this.#configuration.endSessionEndpoint}?post_logout_redirect_uri=${this.#redirectUri}`;
+		const postLogoutRedirectUri = new URL(this.#postLogoutRedirectUri, window.origin);
+		const endSessionEndpoint = this.#configuration.endSessionEndpoint;
+		if (!endSessionEndpoint) {
+			location.href = postLogoutRedirectUri.href;
+			return;
+		}
+
+		const postLogoutLocation = new URL(endSessionEndpoint, this.#redirectUri);
+		postLogoutLocation.searchParams.set('post_logout_redirect_uri', postLogoutRedirectUri.href);
+		location.href = postLogoutLocation.href;
 	}
 
 	/**
@@ -318,14 +331,15 @@ export class UmbAuthFlow {
 	 * @returns The access token for the user.
 	 */
 	async performWithFreshTokens(): Promise<string> {
-		if (!this.#refreshToken) {
-			console.log('Missing refreshToken.');
-			return Promise.resolve('Missing refreshToken.');
+		// if the access token is valid, return it
+		if (this.#tokenResponse?.isValid()) {
+			return Promise.resolve(this.#tokenResponse.accessToken);
 		}
 
-		if (this.#accessTokenResponse && this.#accessTokenResponse.isValid()) {
-			// do nothing
-			return Promise.resolve(this.#accessTokenResponse.accessToken);
+		// if the refresh token is not set (maybe the provider doesn't support them), sign out
+		if (!this.#tokenResponse?.refreshToken) {
+			this.signOut();
+			return Promise.reject('Missing refreshToken.');
 		}
 
 		const request = new TokenRequest({
@@ -333,31 +347,30 @@ export class UmbAuthFlow {
 			redirect_uri: this.#redirectUri,
 			grant_type: GRANT_TYPE_REFRESH_TOKEN,
 			code: undefined,
-			refresh_token: this.#refreshToken,
+			refresh_token: this.#tokenResponse.refreshToken,
 			extras: undefined,
 		});
 
-		const response = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
-		this.#accessTokenResponse = response;
-		return response.accessToken;
+		await this.#performTokenRequest(request);
+
+		return this.#tokenResponse
+			? Promise.resolve(this.#tokenResponse.accessToken)
+			: Promise.reject('Missing accessToken.');
 	}
 
 	/**
 	 * Save the current token response to local storage.
 	 */
 	async #saveTokenState() {
-		if (this.#accessTokenResponse) {
-			await this.#storageBackend.setItem(
-				UMB_STORAGE_TOKEN_RESPONSE_NAME,
-				JSON.stringify(this.#accessTokenResponse.toJson()),
-			);
+		if (this.#tokenResponse) {
+			await this.#storageBackend.setItem(UMB_STORAGE_TOKEN_RESPONSE_NAME, JSON.stringify(this.#tokenResponse.toJson()));
 		}
 	}
 
 	/**
 	 * This method will make a token request to the server using the authorization code.
 	 */
-	async #makeRefreshTokenRequest(code: string, codeVerifier: string | undefined): Promise<void> {
+	async #makeTokenRequest(code: string, codeVerifier: string | undefined): Promise<void> {
 		const extras: StringMap = {};
 
 		if (codeVerifier) {
@@ -374,8 +387,20 @@ export class UmbAuthFlow {
 			extras: extras,
 		});
 
-		const response = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
-		this.#refreshToken = response.refreshToken;
-		this.#accessTokenResponse = response;
+		await this.#performTokenRequest(request);
+	}
+
+	/**
+	 * This method will make a token request to the server using the refresh token.
+	 * If the request fails, it will sign the user out (clear the token state).
+	 */
+	async #performTokenRequest(request: TokenRequest): Promise<void> {
+		try {
+			this.#tokenResponse = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
+		} catch (error) {
+			// If the token request fails, it means the refresh token is invalid, so we sign the user out.
+			console.error('Token request error', error);
+			this.signOut();
+		}
 	}
 }

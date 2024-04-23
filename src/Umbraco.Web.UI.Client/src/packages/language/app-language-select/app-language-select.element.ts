@@ -114,6 +114,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			}
 
 			#toggle {
+				color: var(--uui-color-text);
 				width: var(--umb-section-sidebar-width);
 				text-align: left;
 				background: none;
@@ -131,6 +132,10 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 			#toggle:hover {
 				background-color: var(--uui-color-surface-emphasis);
+			}
+
+			uui-menu-item {
+				color: var(--uui-color-text);
 			}
 		`,
 	];

@@ -9,11 +9,12 @@ const entityActions: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.Template.Create',
 		name: 'Create Template Entity Action',
+		weight: 1200,
 		api: UmbCreateEntityAction,
 		forEntityTypes: [UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create',
+			label: '#actions_create',
 		},
 	},
 	{

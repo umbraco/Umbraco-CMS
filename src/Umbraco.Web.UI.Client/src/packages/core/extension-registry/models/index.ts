@@ -2,6 +2,7 @@ import type { ManifestAuthProvider } from './auth-provider.model.js';
 import type { ManifestBlockEditorCustomView } from './block-editor-custom-view.model.js';
 import type { ManifestCollection } from './collection.models.js';
 import type { ManifestCollectionView } from './collection-view.model.js';
+import type { ManifestCurrentUserAction, ManifestCurrentUserActionDefaultKind } from './current-user-action.model.js';
 import type { ManifestDashboard } from './dashboard.model.js';
 import type { ManifestDashboardCollection } from './dashboard-collection.model.js';
 import type {
@@ -9,13 +10,15 @@ import type {
 	ManifestEntityActionDeleteKind,
 	ManifestEntityActionRenameServerFileKind,
 	ManifestEntityActionReloadTreeItemChildrenKind,
-	ManifestEntityActionDuplicateKind,
-	ManifestEntityActionMoveKind,
+	ManifestEntityActionDuplicateToKind,
+	ManifestEntityActionMoveToKind,
 	ManifestEntityActionCreateFolderKind,
 	ManifestEntityActionUpdateFolderKind,
 	ManifestEntityActionDeleteFolderKind,
 	ManifestEntityActionDefaultKind,
 	ManifestEntityActionTrashKind,
+	ManifestEntityActionRestoreFromRecycleBinKind,
+	ManifestEntityActionEmptyRecycleBinKind,
 	ManifestEntityActionSortChildrenOfKind,
 } from './entity-action.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
@@ -24,6 +27,8 @@ import type { ManifestExternalLoginProvider } from './external-login-provider.mo
 import type { ManifestGlobalContext } from './global-context.model.js';
 import type { ManifestHeaderApp, ManifestHeaderAppButtonKind } from './header-app.model.js';
 import type { ManifestHealthCheck } from './health-check.model.js';
+import type { ManifestIcons } from './icons.model.js';
+import type { ManifestLocalization } from './localization.model.js';
 import type { ManifestMenu } from './menu.model.js';
 import type { ManifestMenuItem, ManifestMenuItemTreeKind } from './menu-item.model.js';
 import type { ManifestModal } from './modal.model.js';
@@ -37,7 +42,6 @@ import type { ManifestSectionView } from './section-view.model.js';
 import type { ManifestStore, ManifestTreeStore, ManifestItemStore } from './store.model.js';
 import type { ManifestTheme } from './theme.model.js';
 import type { ManifestTinyMcePlugin } from './tinymce-plugin.model.js';
-import type { ManifestLocalization } from './localization.model.js';
 import type { ManifestTree } from './tree.model.js';
 import type { ManifestTreeItem } from './tree-item.model.js';
 import type { ManifestUserProfileApp } from './user-profile-app.model.js';
@@ -58,27 +62,31 @@ import type { ManifestEntityUserPermission } from './entity-user-permission.mode
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestCollectionAction } from './collection-action.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
-import type {
-	ManifestBase,
-	ManifestBundle,
-	ManifestCondition,
-	ManifestEntryPoint,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
+import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
+import type { ManifestEntryPoint } from './entry-point.model.js';
+import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
+export type * from './app-entry-point.model.js';
 export type * from './auth-provider.model.js';
+export type * from './backoffice-entry-point.model.js';
 export type * from './block-editor-custom-view.model.js';
-export type * from './collection.models.js';
 export type * from './collection-action.model.js';
 export type * from './collection-view.model.js';
+export type * from './collection.models.js';
+export type * from './current-user-action.model.js';
 export type * from './dashboard-collection.model.js';
 export type * from './dashboard.model.js';
 export type * from './dynamic-root.model.js';
 export type * from './entity-action.model.js';
 export type * from './entity-bulk-action.model.js';
+export type * from './entity-user-permission.model.js';
+export type * from './entry-point.model.js';
 export type * from './external-login-provider.model.js';
 export type * from './global-context.model.js';
 export type * from './header-app.model.js';
 export type * from './health-check.model.js';
+export type * from './icons.model.js';
 export type * from './localization.model.js';
 export type * from './menu-item.model.js';
 export type * from './menu.model.js';
@@ -97,10 +105,9 @@ export type * from './tinymce-plugin.model.js';
 export type * from './tree-item.model.js';
 export type * from './tree.model.js';
 export type * from './user-granular-permission.model.js';
-export type * from './entity-user-permission.model.js';
 export type * from './user-profile-app.model.js';
-export type * from './workspace-action.model.js';
 export type * from './workspace-action-menu-item.model.js';
+export type * from './workspace-action.model.js';
 export type * from './workspace-context.model.js';
 export type * from './workspace-footer-app.model.js';
 export type * from './workspace-view.model.js';
@@ -112,10 +119,12 @@ export type ManifestEntityActions =
 	| ManifestEntityActionDefaultKind
 	| ManifestEntityActionDeleteFolderKind
 	| ManifestEntityActionDeleteKind
-	| ManifestEntityActionDuplicateKind
-	| ManifestEntityActionMoveKind
+	| ManifestEntityActionDuplicateToKind
+	| ManifestEntityActionEmptyRecycleBinKind
+	| ManifestEntityActionMoveToKind
 	| ManifestEntityActionReloadTreeItemChildrenKind
 	| ManifestEntityActionRenameServerFileKind
+	| ManifestEntityActionRestoreFromRecycleBinKind
 	| ManifestEntityActionSortChildrenOfKind
 	| ManifestEntityActionTrashKind
 	| ManifestEntityActionUpdateFolderKind;
@@ -133,12 +142,16 @@ export type ManifestWorkspaces = ManifestWorkspace | ManifestWorkspaceRoutableKi
 export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceViewContentTypeDesignEditorKind;
 
 export type ManifestTypes =
+	| ManifestAppEntryPoint
 	| ManifestAuthProvider
+	| ManifestBackofficeEntryPoint
 	| ManifestBundle<ManifestTypes>
 	| ManifestBlockEditorCustomView
 	| ManifestCollection
 	| ManifestCollectionView
 	| ManifestCollectionAction
+	| ManifestCurrentUserAction
+	| ManifestCurrentUserActionDefaultKind
 	| ManifestCondition
 	| ManifestDashboard
 	| ManifestDashboardCollection
@@ -152,6 +165,7 @@ export type ManifestTypes =
 	| ManifestHeaderApp
 	| ManifestHeaderAppButtonKind
 	| ManifestHealthCheck
+	| ManifestIcons
 	| ManifestItemStore
 	| ManifestMenu
 	| ManifestMenuItem

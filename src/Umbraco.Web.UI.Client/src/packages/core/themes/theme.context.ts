@@ -34,9 +34,7 @@ export class UmbThemeContext extends UmbContextBase<UmbThemeContext> {
 		if (themeAlias) {
 			localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
 			this.#themeObserver = this.observe(
-				umbExtensionsRegistry
-					.byType('theme')
-					.pipe(map((extensions) => extensions.filter((extension) => extension.alias === themeAlias))),
+				umbExtensionsRegistry.byTypeAndFilter('theme', (extension) => extension.alias === themeAlias),
 				async (themes) => {
 					this.#styleElement?.remove();
 					if (themes.length > 0 && themes[0].css) {
@@ -60,7 +58,6 @@ export class UmbThemeContext extends UmbContextBase<UmbThemeContext> {
 							document.head.appendChild(this.#styleElement);
 						}
 					} else {
-						console.log('remove style element', this.#styleElement);
 						// We could not load a theme for this alias, so we remove the theme.
 						localStorage.removeItem(LOCAL_STORAGE_KEY);
 						this.#styleElement?.childNodes.forEach((node) => node.remove());

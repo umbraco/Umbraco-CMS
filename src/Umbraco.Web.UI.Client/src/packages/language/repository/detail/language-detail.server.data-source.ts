@@ -6,7 +6,7 @@ import type {
 	CreateLanguageRequestModel,
 	UpdateLanguageRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { LanguageResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { LanguageService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -59,7 +59,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			LanguageResource.getLanguageByIsoCode({ isoCode: unique }),
+			LanguageService.getLanguageByIsoCode({ isoCode: unique }),
 		);
 
 		if (error || !data) {
@@ -99,7 +99,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			LanguageResource.postLanguage({
+			LanguageService.postLanguage({
 				requestBody,
 			}),
 		);
@@ -130,7 +130,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			LanguageResource.putLanguageByIsoCode({
+			LanguageService.putLanguageByIsoCode({
 				isoCode: model.unique.toLowerCase(),
 				requestBody,
 			}),
@@ -154,7 +154,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 		return tryExecuteAndNotify(
 			this.#host,
-			LanguageResource.deleteLanguageByIsoCode({
+			LanguageService.deleteLanguageByIsoCode({
 				isoCode: unique,
 			}),
 		);

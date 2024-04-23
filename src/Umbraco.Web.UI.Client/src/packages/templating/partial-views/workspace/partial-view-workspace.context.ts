@@ -12,7 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -160,12 +160,15 @@ export class UmbPartialViewWorkspaceContext
 	public async submit() {
 		if (!this.#data.value) throw new Error('Data is missing');
 
-		let newData = undefined;
-
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
-			const { data } = await this.repository.create(this.#data.value, parent.unique);
+			const { error, data } = await this.repository.create(this.#data.value, parent.unique);
+			if (error) {
+				throw new Error(error.message);
+			}
+			this.setIsNew(false);
+			this.#data.setValue(data);
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
@@ -173,28 +176,21 @@ export class UmbPartialViewWorkspaceContext
 				entityType: parent.entityType,
 				unique: parent.unique,
 			});
-
 			eventContext.dispatchEvent(event);
-
-			newData = data;
 		} else {
-			const { data } = await this.repository.save(this.#data.value);
-			newData = data;
+			const { error, data } = await this.repository.save(this.#data.value);
+			if (error) {
+				throw new Error(error.message);
+			}
+			this.#data.setValue(data);
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
 				unique: this.getUnique()!,
 				entityType: this.getEntityType(),
 			});
-
 			actionEventContext.dispatchEvent(event);
 		}
-
-		if (newData) {
-			this.#data.setValue(newData);
-			this.setIsNew(false);
-		}
-		return true;
 	}
 
 	public destroy(): void {
@@ -205,7 +201,7 @@ export class UmbPartialViewWorkspaceContext
 	#getSnippet(snippetId: string) {
 		return tryExecuteAndNotify(
 			this,
-			PartialViewResource.getPartialViewSnippetById({
+			PartialViewService.getPartialViewSnippetById({
 				id: snippetId,
 			}),
 		);

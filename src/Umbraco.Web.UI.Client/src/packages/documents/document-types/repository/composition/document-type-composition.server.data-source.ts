@@ -5,7 +5,7 @@ import type {
 } from '../../types.js';
 import {
 	type DocumentTypeCompositionRequestModel,
-	DocumentTypeResource,
+	DocumentTypeService,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -35,7 +35,7 @@ export class UmbDocumentTypeCompositionServerDataSource {
 	async getReferences(unique: string) {
 		const response = await tryExecuteAndNotify(
 			this.#host,
-			DocumentTypeResource.getDocumentTypeByIdCompositionReferences({ id: unique }),
+			DocumentTypeService.getDocumentTypeByIdCompositionReferences({ id: unique }),
 		);
 		const error = response.error;
 		const data: Array<UmbDocumentTypeCompositionReferenceModel> | undefined = response.data?.map((reference) => {
@@ -64,7 +64,7 @@ export class UmbDocumentTypeCompositionServerDataSource {
 
 		const response = await tryExecuteAndNotify(
 			this.#host,
-			DocumentTypeResource.postDocumentTypeAvailableCompositions({ requestBody }),
+			DocumentTypeService.postDocumentTypeAvailableCompositions({ requestBody }),
 		);
 		const error = response.error;
 		const data: Array<UmbDocumentTypeCompositionCompatibleModel> | undefined = response.data?.map((composition) => {

@@ -9,7 +9,7 @@ function getNumberOrUndefined(value: string) {
 }
 
 @customElement('umb-input-number-range')
-export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElement, undefined) {
+export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-label' })
 	minLabel = 'Low value';
 
@@ -49,24 +49,28 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	@property()
-	public set value(valueString: string) {
+	public set value(valueString: string | undefined) {
 		if (valueString !== this.value) {
+			if (valueString === undefined) {
+				this.minValue = this.maxValue = undefined;
+				return;
+			}
 			const splittedValue = valueString.split(/[ ,]+/);
 			this.minValue = getNumberOrUndefined(splittedValue[0]);
 			this.maxValue = getNumberOrUndefined(splittedValue[1]);
 		}
 	}
-	public get value(): string {
-		return this.minValue || this.maxValue ? (this.minValue || '') + ',' + (this.maxValue || '') : '';
+	public get value(): string | undefined {
+		return this.minValue || this.maxValue ? (this.minValue || '') + ',' + (this.maxValue || '') : undefined;
 	}
 
 	constructor() {
 		super();
 
 		this.addValidator(
-			'customError',
+			'patternMismatch',
 			() => {
-				return 'The low value must be less than the high value';
+				return 'The low value must not be exceed the high value';
 			},
 			() => {
 				return this._minValue !== undefined && this._maxValue !== undefined ? this._minValue > this._maxValue : false;
@@ -111,10 +115,10 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	static styles = css`
-		:host(:invalid) {
+		:host(:invalid:not([pristine])) {
 			color: var(--uui-color-danger);
 		}
-		:host(:invalid) uui-input {
+		:host(:invalid:not([pristine])) uui-input {
 			border-color: var(--uui-color-danger);
 		}
 	`;

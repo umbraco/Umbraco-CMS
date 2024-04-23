@@ -5,7 +5,7 @@ import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import type { TinyMcePluginArguments, UmbTinyMcePluginBase } from './tiny-mce-plugin.js';
 import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { EditorEvent, Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
@@ -44,7 +44,7 @@ async function onResize(
 }
 
 @customElement('umb-input-tiny-mce')
-export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
 

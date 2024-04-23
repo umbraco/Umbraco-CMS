@@ -1,5 +1,5 @@
 import type { UmbCurrentUserModel } from '../types.js';
-import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute, tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -26,7 +26,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getCurrentUser() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getUserCurrent());
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserService.getUserCurrent());
 
 		if (data) {
 			const user: UmbCurrentUserModel = {
@@ -56,7 +56,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getMfaLoginProviders() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getUserCurrent2Fa());
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserService.getUserCurrent2Fa());
 
 		if (data) {
 			return { data };
@@ -70,7 +70,7 @@ export class UmbCurrentUserServerDataSource {
 	 */
 	async enableMfaProvider(providerName: string, code: string, secret: string) {
 		const { error } = await tryExecute(
-			UserResource.postUserCurrent2FaByProviderName({ providerName, requestBody: { code, secret } }),
+			UserService.postUserCurrent2FaByProviderName({ providerName, requestBody: { code, secret } }),
 		);
 
 		if (error) {
@@ -84,7 +84,7 @@ export class UmbCurrentUserServerDataSource {
 	 * Disable an MFA provider
 	 */
 	async disableMfaProvider(providerName: string, code: string) {
-		const { error } = await tryExecute(UserResource.deleteUserCurrent2FaByProviderName({ providerName, code }));
+		const { error } = await tryExecute(UserService.deleteUserCurrent2FaByProviderName({ providerName, code }));
 
 		if (error) {
 			return { error };

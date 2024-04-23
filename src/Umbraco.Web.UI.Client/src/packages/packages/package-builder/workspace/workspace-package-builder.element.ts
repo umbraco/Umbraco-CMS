@@ -1,5 +1,4 @@
 import { UmbDictionaryPickerContext } from '../../../dictionary/components/input-dictionary/input-dictionary.context.js';
-import { UmbMediaPickerContext } from '../../../media/media/components/input-media/input-media.context.js';
 import { UmbPackageRepository } from '../../package/repository/index.js';
 import { UmbPartialViewPickerContext } from '../../../templating/partial-views/components/input-partial-view/input-partial-view.context.js';
 import { UmbScriptPickerContext } from '../../../templating/scripts/components/input-script/input-script.context.js';
@@ -20,15 +19,15 @@ import {
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 import { blobDownload } from '@umbraco-cms/backoffice/utils';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
 import type { UmbInputEntityElement } from '@umbraco-cms/backoffice/components';
+import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UmbInputMediaTypeElement } from '@umbraco-cms/backoffice/media-type';
-import type { UmbMediaItemModel } from '@umbraco-cms/backoffice/media';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import type {
 	UUIBooleanInputEvent,
@@ -68,7 +67,6 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	connectedCallback(): void {
 		super.connectedCallback();
 		this.#getPackageCreated();
-		requestAnimationFrame(() => this._packageNameInput?.focus());
 	}
 
 	async #getPackageCreated() {
@@ -147,6 +145,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 					required
 					label="Name of the package"
 					placeholder=${this.localize.term('placeholders_entername')}
+					${umbFocus()}
 					.value=${this._package?.name ?? ''}
 					@input=${(e: UUIInputEvent) => (this._package!.name = e.target.value as string)}></uui-input>
 			</div>
@@ -225,7 +224,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		`;
 	}
 
-	#onMediaChange(event: { target: UmbInputEntityElement }) {
+	#onMediaChange(event: { target: UmbInputMediaElement }) {
 		if (!this._package) return;
 
 		this._package.mediaIds = event.target.selection ?? [];
@@ -242,12 +241,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		return html`
 			<umb-property-layout label="Media">
 				<div slot="editor">
-					<umb-input-entity
-						.getIcon=${(item: UmbMediaItemModel) => item.mediaType.icon ?? 'icon-picture'}
-						.pickerContext=${UmbMediaPickerContext}
-						.selection=${this._package.mediaIds ?? []}
-						@change=${this.#onMediaChange}>
-					</umb-input-entity>
+					<umb-input-media .selection=${this._package.mediaIds ?? []} @change=${this.#onMediaChange}></umb-input-media>
 					<uui-checkbox
 						label="Include child nodes"
 						.checked=${this._package.mediaLoadChildNodes ?? false}

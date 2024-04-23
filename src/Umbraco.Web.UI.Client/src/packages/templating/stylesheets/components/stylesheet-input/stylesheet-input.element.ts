@@ -1,12 +1,12 @@
 import type { UmbStylesheetItemModel } from '../../types.js';
 import { UmbStylesheetPickerContext } from './stylesheet-input.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-stylesheet-input')
-export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -104,7 +104,7 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 				${repeat(
 					this._items,
 					(item) => item.unique,
-					(item) => this._renderItem(item),
+					(item) => this.#renderItem(item),
 				)}
 			</uui-ref-list>
 			<uui-button
@@ -115,16 +115,14 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	private _renderItem(item: UmbStylesheetItemModel) {
+	#renderItem(item: UmbStylesheetItemModel) {
 		if (!item.unique) return;
 		return html`
 			<uui-ref-node-data-type name=${item.name}>
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.unique!)}
-						label="Remove Data Type ${item.name}">
-						Remove
-					</uui-button>
+						label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node-data-type>
 		`;

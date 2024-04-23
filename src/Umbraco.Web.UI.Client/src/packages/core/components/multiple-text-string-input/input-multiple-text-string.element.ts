@@ -1,16 +1,19 @@
 import type { UmbInputMultipleTextStringItemElement } from './input-multiple-text-string-item.element.js';
 import { css, html, nothing, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-input-multiple-text-string
  */
 @customElement('umb-input-multiple-text-string')
-export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputMultipleTextStringElement extends UmbFormControlMixin<undefined | string, typeof UmbLitElement>(
+	UmbLitElement,
+	undefined,
+) {
 	#sorter = new UmbSorterController(this, {
 		getUniqueOfElement: (element) => {
 			return element.getAttribute('data-sort-entry-id');
@@ -165,13 +168,13 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	protected getFormElement() {
+	getFormElement() {
 		return undefined;
 	}
 
 	render() {
 		return html`<div id="sorter-wrapper">${this.#renderItems()}</div>
-			${this.#renderAddButton()} `;
+			${this.#renderAddButton()}`;
 	}
 
 	#renderItems() {
@@ -180,7 +183,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 				this._items,
 				(item, index) => index,
 				(item, index) =>
-					html` <umb-input-multiple-text-string-item
+					html`<umb-input-multiple-text-string-item
 						value=${item}
 						name="item-${index}"
 						data-sort-entry-id=${item}

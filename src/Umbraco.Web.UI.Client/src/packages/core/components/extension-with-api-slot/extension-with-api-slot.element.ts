@@ -45,9 +45,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	public set type(value: string | string[] | undefined) {
 		if (value === this.#type) return;
 		this.#type = value;
-		if (this.#attached) {
-			this._observeExtensions();
-		}
+		this.#observeExtensions();
 	}
 	#type?: string | string[] | undefined;
 
@@ -67,9 +65,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	public set filter(value: (manifest: any) => boolean) {
 		if (value === this.#filter) return;
 		this.#filter = value;
-		if (this.#attached) {
-			this._observeExtensions();
-		}
+		this.#observeExtensions();
 	}
 	#filter: (manifest: any) => boolean = () => true;
 
@@ -107,8 +103,9 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 		return this.#constructorArgs;
 	}
 	set apiArgs(newVal: Array<unknown> | UmbApiConstructorArgumentsMethodType<any> | undefined) {
-		// TODO, compare changes since last time. only reset the ones that changed. This might be better done by the controller is self:
+		if (newVal === this.#constructorArgs) return;
 		this.#constructorArgs = newVal;
+		this.#observeExtensions();
 	}
 	#constructorArgs?: Array<unknown> | UmbApiConstructorArgumentsMethodType<any> = [];
 
@@ -142,15 +139,24 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	@property()
 	public renderMethod?: (
 		extension: UmbExtensionElementAndApiInitializer,
+		index: number,
 	) => TemplateResult | HTMLElement | null | undefined;
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this._observeExtensions();
 		this.#attached = true;
+		this.#observeExtensions();
+	}
+	disconnectedCallback(): void {
+		this.#attached = false;
+		this.#extensionsController?.destroy();
+		this.#extensionsController = undefined;
+		super.disconnectedCallback();
 	}
 
-	private _observeExtensions(): void {
+	#observeExtensions(): void {
+		// We want to be attached before we start observing extensions, cause first at this point we know that we got the right properties. [NL]
+		if (!this.#attached) return;
 		this.#extensionsController?.destroy();
 		if (this.#type) {
 			this.#extensionsController = new UmbExtensionsElementAndApiInitializer(
@@ -176,7 +182,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 			? repeat(
 					this._permitted,
 					(ext) => ext.alias,
-					(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component),
+					(ext, i) => (this.renderMethod ? this.renderMethod(ext, i) : ext.component),
 				)
 			: html`<slot></slot>`;
 	}

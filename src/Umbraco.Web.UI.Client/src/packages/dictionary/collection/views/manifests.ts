@@ -7,7 +7,7 @@ const tableCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
 	alias: UMB_DICTIONARY_TABLE_COLLECTION_VIEW_ALIAS,
 	name: 'Dictionary Table Collection View',
-	js: () => import('./table/dictionary-table-collection-view.element.js'),
+	element: () => import('./table/dictionary-table-collection-view.element.js'),
 	meta: {
 		label: 'Table',
 		icon: 'icon-list',

@@ -7,3 +7,5 @@ export class UmbDocumentSaveAndScheduleWorkspaceAction extends UmbWorkspaceActio
 		return workspaceContext.schedule();
 	}
 }
+
+export { UmbDocumentSaveAndScheduleWorkspaceAction as api };

@@ -15,8 +15,7 @@ export type UmbDocumentTypeCleanupModel = {
 };
 
 export interface UmbDocumentTypeCompositionRequestModel {
-	unique: string;
-	//Do we really need to send this to the server - Why isn't unique enough?
+	unique: string | null;
 	isElement: boolean;
 	currentPropertyAliases: Array<string>;
 	currentCompositeUniques: Array<string>;

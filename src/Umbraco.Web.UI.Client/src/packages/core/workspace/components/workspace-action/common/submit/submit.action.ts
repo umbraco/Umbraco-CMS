@@ -22,9 +22,9 @@ export class UmbSubmitWorkspaceAction extends UmbWorkspaceActionBase<UmbSubmitta
 			(unique) => {
 				// We can't save if we don't have a unique
 				if (unique === undefined) {
-					this._isDisabled.setValue(true);
+					this.disable();
 				} else {
-					this._isDisabled.setValue(false);
+					this.enable();
 				}
 			},
 			'saveWorkspaceActionUniqueObserver',
@@ -33,7 +33,7 @@ export class UmbSubmitWorkspaceAction extends UmbWorkspaceActionBase<UmbSubmitta
 
 	async execute() {
 		const workspaceContext = await this.getContext(UMB_SUBMITTABLE_WORKSPACE_CONTEXT);
-		return workspaceContext.requestSubmit();
+		return await workspaceContext.requestSubmit();
 	}
 }
 

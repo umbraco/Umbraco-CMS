@@ -7,14 +7,16 @@ import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
-import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { OpenAPI, RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
-import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbBundleExtensionInitializer, UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbAppEntryPointExtensionInitializer,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -48,6 +50,10 @@ export class UmbAppElement extends UmbLitElement {
 
 	private _routes: UmbRoute[] = [
 		{
+			path: 'error',
+			component: () => import('./app-error.element.js'),
+		},
+		{
 			path: 'install',
 			component: () => import('../installer/installer.element.js'),
 		},
@@ -68,6 +74,13 @@ export class UmbAppElement extends UmbLitElement {
 			guards: [this.#isAuthorizedGuard()],
 		},
 		{
+			path: 'logout',
+			resolve: () => {
+				this.#authContext?.clearTokenStorage();
+				this.#authController.makeAuthorizationRequest('loggedOut');
+			},
+		},
+		{
 			path: '**',
 			component: () => import('../backoffice/backoffice.element.js'),
 			guards: [this.#isAuthorizedGuard()],
@@ -83,7 +96,9 @@ export class UmbAppElement extends UmbLitElement {
 
 		OpenAPI.BASE = window.location.origin;
 
-		new UmbIconRegistry().attach(this);
+		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
+		new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+
 		new UUIIconRegistryEssential().attach(this);
 
 		new UmbContextDebugController(this);
@@ -103,7 +118,7 @@ export class UmbAppElement extends UmbLitElement {
 		// Register Core extensions (this is specifically done here because we need these extensions to be registered before the application is initialized)
 		onInit(this, umbExtensionsRegistry);
 
-		// Register public extensions
+		// Register public extensions (login extensions)
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 
 		// Try to initialise the auth flow and get the runtime status

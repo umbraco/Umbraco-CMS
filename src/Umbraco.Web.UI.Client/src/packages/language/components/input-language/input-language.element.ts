@@ -1,12 +1,12 @@
 import type { UmbLanguageItemModel } from '../../repository/index.js';
 import { UmbLanguagePickerContext } from './input-language.context.js';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-language')
-export class UmbInputLanguageElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, '') {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}

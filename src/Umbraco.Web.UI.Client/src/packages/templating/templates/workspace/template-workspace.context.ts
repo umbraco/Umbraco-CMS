@@ -189,13 +189,13 @@ ${currentContent}`;
 	async submit() {
 		if (!this.#data.value) throw new Error('Data is missing');
 
-		let newData = undefined;
-
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
-			const { data } = await this.detailRepository.create(this.#data.value, parent.unique);
-			newData = data;
+			const { error, data } = await this.detailRepository.create(this.#data.value, parent.unique);
+			if (error) throw new Error(error.message);
+			this.#data.setValue(data);
+			this.setIsNew(false);
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
@@ -205,8 +205,9 @@ ${currentContent}`;
 			});
 			eventContext.dispatchEvent(event);
 		} else {
-			const { data } = await this.detailRepository.save(this.#data.value);
-			newData = data;
+			const { error, data } = await this.detailRepository.save(this.#data.value);
+			if (error) throw new Error(error.message);
+			this.#data.setValue(data);
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({
@@ -216,12 +217,6 @@ ${currentContent}`;
 
 			actionEventContext.dispatchEvent(event);
 		}
-
-		if (newData) {
-			this.#data.setValue(newData);
-			this.setIsNew(false);
-		}
-		return true;
 	}
 
 	public destroy() {

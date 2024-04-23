@@ -20,6 +20,7 @@ import { UmbIconRegistry } from '../src/packages/core/icon-registry/icon.registr
 import { UmbLitElement } from '../src/packages/core/lit-element';
 import { umbLocalizationRegistry } from '../src/packages/core/localization';
 import customElementManifests from '../dist-cms/custom-elements.json';
+import icons from '../src/packages/core/icon-registry/icons/icons';
 
 import '../src/libs/context-api/provide/context-provider.element';
 import '../src/packages/core/components';
@@ -36,6 +37,7 @@ class UmbStoryBookElement extends UmbLitElement {
 
 	constructor() {
 		super();
+		this._umbIconRegistry.setIcons(icons);
 		this._umbIconRegistry.attach(this);
 		this._registerExtensions(documentManifests);
 		new UmbModalManagerContext(this);

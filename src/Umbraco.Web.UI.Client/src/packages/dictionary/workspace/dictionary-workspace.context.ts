@@ -124,15 +124,21 @@ export class UmbDictionaryWorkspaceContext
 	}
 
 	async submit() {
-		if (!this.#data.value) return;
-		if (!this.#data.value.unique) return;
+		if (!this.#data.value) {
+			throw new Error('No data to submit.');
+		}
+		if (!this.#data.value.unique) {
+			throw new Error('No unique value to submit.');
+		}
 
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
-			if (!parent) throw new Error('Parent is not set');
+			if (!parent) {
+				throw new Error('Parent is not set');
+			}
 			const { error } = await this.detailRepository.create(this.#data.value, parent.unique);
 			if (error) {
-				return;
+				throw new Error(error.message);
 			}
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
@@ -155,12 +161,6 @@ export class UmbDictionaryWorkspaceContext
 
 			actionEventContext.dispatchEvent(event);
 		}
-
-		const data = this.getData();
-		if (!data) return;
-
-		this.setIsNew(false);
-		return true;
 	}
 
 	public destroy(): void {

@@ -14,6 +14,7 @@ import { manifest as numberRange } from './number-range/manifests.js';
 import { manifest as orderDirection } from './order-direction/manifests.js';
 import { manifest as overlaySize } from './overlay-size/manifests.js';
 import { manifest as radioButtonList } from './radio-button-list/manifests.js';
+import { manifest as select } from './select/manifests.js';
 import { manifest as slider } from './slider/manifests.js';
 import { manifest as textArea } from './textarea/manifests.js';
 import { manifest as toggle } from './toggle/manifests.js';
@@ -43,6 +44,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 	orderDirection,
 	overlaySize,
 	radioButtonList,
+	select,
 	slider,
 	textArea,
 	toggle,

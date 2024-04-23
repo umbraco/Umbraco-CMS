@@ -1,4 +1,4 @@
-import { umbExtensionsRegistry } from '../extension-registry/index.js';
+import type { UmbBackofficeExtensionRegistry, ManifestAuthProvider } from '../extension-registry/index.js';
 import { UmbAuthFlow } from './auth-flow.js';
 import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
@@ -30,7 +30,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		this.#serverUrl = serverUrl;
 		this.#backofficePath = backofficePath;
 
-		this.#authFlow = new UmbAuthFlow(serverUrl, this.#getRedirectUrl());
+		this.#authFlow = new UmbAuthFlow(serverUrl, this.getRedirectUrl(), this.getPostLogoutRedirectUrl());
 	}
 
 	/**
@@ -166,11 +166,17 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		this.#isInitialized.next(true);
 	}
 
-	getAuthProviders() {
-		return this.isInitialized.pipe(switchMap(() => umbExtensionsRegistry.byType('authProvider')));
+	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
+		return this.isInitialized.pipe(
+			switchMap(() => extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider')),
+		);
 	}
 
-	#getRedirectUrl() {
+	getRedirectUrl() {
 		return `${window.location.origin}${this.#backofficePath}`;
+	}
+
+	getPostLogoutRedirectUrl() {
+		return `${window.location.origin}${this.#backofficePath.endsWith('/') ? this.#backofficePath : this.#backofficePath + '/'}logout`;
 	}
 }

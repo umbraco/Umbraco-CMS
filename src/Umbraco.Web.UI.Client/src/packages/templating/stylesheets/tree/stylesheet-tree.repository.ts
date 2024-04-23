@@ -14,11 +14,14 @@ export class UmbStylesheetTreeRepository extends UmbTreeRepositoryBase<
 	}
 
 	async requestTreeRoot() {
+		const { data: treeRootData } = await this._treeSource.getRootItems({ skip: 0, take: 1 });
+		const hasChildren = treeRootData ? treeRootData.total > 0 : false;
+
 		const data: UmbStylesheetTreeRootModel = {
 			unique: null,
 			entityType: UMB_STYLESHEET_ROOT_ENTITY_TYPE,
-			name: 'Stylesheets',
-			hasChildren: true,
+			name: '#treeHeaders_stylesheets',
+			hasChildren,
 			isFolder: true,
 		};
 

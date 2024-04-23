@@ -11,6 +11,7 @@ export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterMod
 
 export interface UmbDocumentCollectionItemModel {
 	unique: string;
+	entityType: string;
 	contentTypeAlias: string;
 	createDate: Date;
 	creator?: string | null;

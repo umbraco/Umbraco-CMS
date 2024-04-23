@@ -1,7 +1,7 @@
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
 import type { UmbBackofficeContext } from '../backoffice.context.js';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -62,7 +62,11 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 						<uui-tab
 							?active="${this._currentSectionAlias === section.alias}"
 							href="${`section/${section.manifest?.meta.pathname}`}"
-							label="${section.manifest?.meta.label ?? section.manifest?.name ?? ''}"></uui-tab>
+							label="${ifDefined(
+								section.manifest?.meta.label
+									? this.localize.string(section.manifest?.meta.label)
+									: section.manifest?.name,
+							)}"></uui-tab>
 					`,
 				)}
 			</uui-tab-group>
@@ -77,7 +81,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 			#tabs {
 				height: 60px;
 				flex-basis: 100%;
-				font-size: 16px;
+				font-size: 16px; /* specific for the header */
 				--uui-tab-text: var(--uui-color-header-contrast);
 				--uui-tab-text-hover: var(--uui-color-header-contrast-emphasis);
 				--uui-tab-text-active: var(--uui-color-header-contrast-emphasis);

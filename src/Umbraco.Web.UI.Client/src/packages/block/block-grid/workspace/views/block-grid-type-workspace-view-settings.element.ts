@@ -107,7 +107,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 			<uui-box headline=${this.localize.term('blockEditor_headlineAllowance')}>
 				<umb-property
 					label=${this.localize.term('blockEditor_allowBlockInRoot')}
-					alias="allowInRoot"
+					alias="allowAtRoot"
 					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
 
 				<umb-property

@@ -303,7 +303,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	async submit() {
 		const layoutData = this.#layout.value;
 		const contentData = this.content.getData();
-		if (!layoutData || !this.#blockManager || !this.#blockEntries || !contentData || !this.#modalContext) return;
+		if (!layoutData || !this.#blockManager || !this.#blockEntries || !contentData || !this.#modalContext) {
+			throw new Error('Missing data');
+		}
 
 		const settingsData = this.settings.getData();
 
@@ -333,7 +335,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		}
 
 		this.setIsNew(false);
-		return true;
 	}
 
 	#modalRejected = () => {

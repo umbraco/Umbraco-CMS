@@ -1,5 +1,5 @@
 import type { UmbCollectionColumnConfiguration } from '../../../../../collection/types.js';
-import { html, customElement, property, repeat, css, state, nothing, when } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, repeat, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -16,7 +16,6 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-
 	// TODO: [LK] Add sorting.
 
 	@property({ type: Array })
@@ -74,15 +73,11 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	}
 
 	render() {
-		if (!this.value) return nothing;
+		return html`${this.#renderColumns()} ${this.#renderInput()}`;
+	}
+
+	#renderInput() {
 		return html`
-			<div id="layout-wrapper">
-				${repeat(
-					this.value,
-					(column) => column.alias,
-					(column) => this.#renderField(column),
-				)}
-			</div>
 			<umb-input-content-type-property
 				document-types
 				media-types
@@ -90,7 +85,20 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 		`;
 	}
 
-	#renderField(column: UmbCollectionColumnConfiguration) {
+	#renderColumns() {
+		if (!this.value) return nothing;
+		return html`
+			<div id="layout-wrapper">
+				${repeat(
+					this.value,
+					(column) => column.alias,
+					(column) => this.#renderColumn(column),
+				)}
+			</div>
+		`;
+	}
+
+	#renderColumn(column: UmbCollectionColumnConfiguration) {
 		return html`
 			<div class="layout-item">
 				<uui-icon name="icon-navigation"></uui-icon>

@@ -1,11 +1,10 @@
 import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -13,34 +12,47 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	public value?: string;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		const validationLimit = config?.find((x) => x.alias === 'validationLimit');
+		if (!config) return;
 
-		this._limitMin = (validationLimit?.value as any)?.min;
-		this._limitMax = (validationLimit?.value as any)?.max;
-	}
-	public get config() {
-		return undefined;
+		const minMax = config?.getValueByAlias<NumberRangeValueType>('validationLimit');
+		this.min = minMax?.min ?? 0;
+		this.max = minMax?.max ?? Infinity;
+
+		this.ignoreUserStartNodes = config?.getValueByAlias('ignoreUserStartNodes');
+		this.startNodeId = config?.getValueByAlias('startNodeId');
+		this.showOpenButton = config?.getValueByAlias('showOpenButton');
 	}
 
 	@state()
-	private _limitMin?: number;
-	@state()
-	private _limitMax?: number;
+	min = 0;
 
-	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputDocumentElement).selection.join(',');
+	@state()
+	max = Infinity;
+
+	@state()
+	startNodeId?: string;
+
+	@state()
+	showOpenButton?: boolean;
+
+	@state()
+	ignoreUserStartNodes?: boolean;
+
+	#onChange(event: CustomEvent & { target: UmbInputDocumentElement }) {
+		this.value = event.target.selection.join(',');
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	// TODO: Implement mandatory?
 	render() {
 		return html`
 			<umb-input-document
-				@change=${this._onChange}
+				.min=${this.min}
+				.max=${this.max}
+				.startNodeId=${this.startNodeId ?? ''}
 				.value=${this.value ?? ''}
-				.min=${this._limitMin ?? 0}
-				.max=${this._limitMax ?? Infinity}>
-				<umb-localize key="general_add">Add</umb-localize>
+				?showOpenButton=${this.showOpenButton}
+				?ignoreUserStartNodes=${this.ignoreUserStartNodes}
+				@change=${this.#onChange}>
 			</umb-input-document>
 		`;
 	}

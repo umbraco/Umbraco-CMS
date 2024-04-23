@@ -20,12 +20,12 @@ const entityActions: Array<ManifestTypes> = [
 		kind: 'default',
 		alias: 'Umb.EntityAction.Language.Create',
 		name: 'Create Language Entity Action',
-		weight: 900,
+		weight: 1200,
 		api: UmbLanguageCreateEntityAction,
 		forEntityTypes: [UMB_LANGUAGE_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
-			label: 'Create',
+			label: '#actions_create',
 		},
 	},
 ];

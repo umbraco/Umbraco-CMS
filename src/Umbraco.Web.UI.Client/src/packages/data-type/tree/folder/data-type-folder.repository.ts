@@ -7,3 +7,5 @@ export class UmbDataTypeFolderRepository extends UmbFolderRepositoryBase {
 		super(host, UmbDataTypeFolderServerDataSource);
 	}
 }
+
+export { UmbDataTypeFolderRepository as api };

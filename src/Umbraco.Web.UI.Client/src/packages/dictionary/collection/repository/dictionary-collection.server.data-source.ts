@@ -1,7 +1,7 @@
 import type { UmbDictionaryCollectionFilterModel, UmbDictionaryCollectionModel } from '../types.js';
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../../entity.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
-import { DictionaryResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -30,7 +30,7 @@ export class UmbDictionaryCollectionServerDataSource implements UmbCollectionDat
 	 * @memberof UmbDictionaryCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbDictionaryCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, DictionaryResource.getDictionary(filter));
+		const { data, error } = await tryExecuteAndNotify(this.#host, DictionaryService.getDictionary(filter));
 
 		if (data) {
 			const items = data.items.map((item) => {

@@ -1,4 +1,5 @@
 import type { UmbValidator } from '../interfaces/validator.interface.js';
+import { UmbValidationMessagesManager } from './validation-messages.manager.js';
 import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -7,7 +8,8 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 	#validators: Array<UmbValidator> = [];
 	#validationMode: boolean = false;
 	#isValid: boolean = false;
-	//#preventFail: boolean = false;
+
+	public readonly messages = new UmbValidationMessagesManager();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_VALIDATION_CONTEXT);
@@ -17,53 +19,70 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 		return this.#isValid;
 	}
 
-	/*
-	preventFail(): void {
-		this.#preventFail = true;
-	}
-
-	allowFail(): void {
-		this.#preventFail = false;
-	}
-	*/
-
-	addValidator(validator: UmbValidator) {
+	addValidator(validator: UmbValidator): void {
+		if (this.#validators.includes(validator)) return;
 		this.#validators.push(validator);
-		//validator.addEventListener('change', this.#runValidate);
+		//validator.addEventListener('change', this.#onValidatorChange);
 		if (this.#validationMode) {
 			this.validate();
 		}
 	}
-	removeValidator(validator: UmbValidator) {
+	removeValidator(validator: UmbValidator): void {
 		const index = this.#validators.indexOf(validator);
 		if (index !== -1) {
+			// Remove the validator:
 			this.#validators.splice(index, 1);
-			//validator.removeEventListener('change', this.#runValidate);
+			// If we are in validation mode then we should re-validate to focus next invalid element:
 			if (this.#validationMode) {
 				this.validate();
 			}
 		}
 	}
 
-	#runValidate = this.validate.bind(this);
+	/*#onValidatorChange = (e: Event) => {
+		const target = e.target as unknown as UmbValidator | undefined;
+		if (!target) {
+			console.error('Validator did not exist.');
+			return;
+		}
+		const dataPath = target.dataPath;
+		if (!dataPath) {
+			console.error('Validator did not exist or did not provide a data-path.');
+			return;
+		}
+
+		if (target.isValid) {
+			this.messages.removeMessagesByTypeAndPath('client', dataPath);
+		} else {
+			this.messages.addMessages('client', dataPath, target.getMessages());
+		}
+	};*/
 
 	/**
 	 *
 	 * @returns succeed {Promise<boolean>} - Returns a promise that resolves to true if the validator succeeded, this depends on the validators and wether forceSucceed is set.
 	 */
-	async validate(): Promise<boolean> {
+	async validate(): Promise<void> {
+		// TODO: clear server messages here?, well maybe only if we know we will get new server messages? Do the server messages hook into the system like another validator?
 		this.#validationMode = true;
-		const results = await Promise.all(this.#validators.map((v) => v.validate()));
-		const isValid = results.every((r) => r);
+
+		const resultsStatus = await Promise.all(this.#validators.map((v) => v.validate())).then(
+			() => Promise.resolve(true),
+			() => Promise.reject(false),
+		);
+
+		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
+		// This enables us to keep client validations though UI is not present anymore — because the client validations got defined as messages. [NL]
+		const isValid = this.messages.getHasAnyMessages() ? false : resultsStatus;
 		this.#isValid = isValid;
 
-		// Focus first invalid element:
-		if (!isValid) {
+		if (isValid === false) {
+			// Focus first invalid element:
 			this.focusFirstInvalidElement();
+			return Promise.reject();
 		}
 
-		//return this.#preventFail ? true : isValid;
-		return isValid;
+		return Promise.resolve();
 	}
 
 	focusFirstInvalidElement(): void {
@@ -73,16 +92,12 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 		}
 	}
 
-	getMessages(): string[] {
-		return this.#validators.reduce((acc, v) => acc.concat(v.getMessages()), [] as string[]);
-	}
-
 	reset(): void {
 		this.#validationMode = false;
 		this.#validators.forEach((v) => v.reset());
 	}
 
-	#destroyValidators() {
+	#destroyValidators(): void {
 		if (this.#validators === undefined || this.#validators.length === 0) return;
 		this.#validators.forEach((validator) => {
 			validator.destroy();

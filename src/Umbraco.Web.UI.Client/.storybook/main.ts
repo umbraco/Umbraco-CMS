@@ -22,7 +22,14 @@ const config: StorybookConfig = {
 		name: '@storybook/web-components-vite',
 		options: {},
 	},
-	staticDirs: ['../public-assets', '../public'],
+	staticDirs: [
+		'../public-assets',
+		'../public',
+		{
+			from: '../src/packages/core/icon-registry/icons',
+			to: 'assets/icons',
+		},
+	],
 	typescript: {
 		check: true,
 	},
@@ -38,8 +45,8 @@ const config: StorybookConfig = {
 	},
 	refs: {
 		uui: {
-			title: 'Umbraco UI Library (1.6.0)',
-			url: 'https://04709c3--62189360eeb21b003ab2f4ad.chromatic.com/',
+			title: 'Umbraco UI Library',
+			url: 'https://62189360eeb21b003ab2f4ad-vfnpsanjps.chromatic.com/',
 		},
 	},
 };

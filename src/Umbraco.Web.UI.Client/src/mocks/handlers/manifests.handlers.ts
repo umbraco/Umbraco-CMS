@@ -56,7 +56,7 @@ export const manifestDevelopmentHandlers = [
 					name: 'Package with an entry point',
 					extensions: [
 						{
-							type: 'entryPoint',
+							type: 'backofficeEntryPoint',
 							name: 'My Custom Entry Point',
 							alias: 'My.Entrypoint.Custom',
 							js: '/App_Plugins/custom-entrypoint.js',

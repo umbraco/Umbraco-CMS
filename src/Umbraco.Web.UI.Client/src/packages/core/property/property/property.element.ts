@@ -1,7 +1,7 @@
 import { umbExtensionsRegistry, type ManifestPropertyEditorUi } from '../../extension-registry/index.js';
 import { UmbPropertyContext } from './property.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -9,7 +9,11 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorConfig,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UmbFormControlValidator } from '@umbraco-cms/backoffice/validation';
+import {
+	UmbBindValidationMessageToFormControl,
+	UmbFormControlValidator,
+	UmbObserveValidationStateController,
+} from '@umbraco-cms/backoffice/validation';
 
 /**
  *  @element umb-property
@@ -95,15 +99,33 @@ export class UmbPropertyElement extends UmbLitElement {
 		return this.#propertyContext.getConfig();
 	}
 
+	/**
+	 * DataPath, declare the path to the value of the data that this property represents.
+	 * @public
+	 * @type {string}
+	 * @attr
+	 * @default ''
+	 */
+	@property({ type: String, attribute: false })
+	public set dataPath(dataPath: string | undefined) {
+		this.#dataPath = dataPath;
+		new UmbObserveValidationStateController(this, dataPath, (invalid) => {
+			this._invalid = invalid;
+		});
+	}
+	public get dataPath(): string | undefined {
+		return this.#dataPath;
+	}
+	#dataPath?: string;
+
 	@state()
 	private _variantDifference?: string;
 
 	@state()
 	private _element?: ManifestPropertyEditorUi['ELEMENT_TYPE'];
 
-	// Not begin used currently [NL]
-	//@state()
-	//private _value?: unknown;
+	@state()
+	private _invalid?: boolean;
 
 	@state()
 	private _alias?: string;
@@ -116,29 +138,52 @@ export class UmbPropertyElement extends UmbLitElement {
 
 	#propertyContext = new UmbPropertyContext(this);
 
-	#validator?: UmbFormControlValidator;
+	#controlValidator?: UmbFormControlValidator;
+	#validationMessageBinder?: UmbBindValidationMessageToFormControl;
 	#valueObserver?: UmbObserverController<unknown>;
 	#configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
 
 	constructor() {
 		super();
 
-		this.observe(this.#propertyContext.alias, (alias) => {
-			this._alias = alias;
-		});
-		this.observe(this.#propertyContext.label, (label) => {
-			this._label = label;
-		});
-		this.observe(this.#propertyContext.description, (description) => {
-			this._description = description;
-		});
-		this.observe(this.#propertyContext.variantDifference, (variantDifference) => {
-			this._variantDifference = variantDifference;
-		});
+		this.observe(
+			this.#propertyContext.alias,
+			(alias) => {
+				this._alias = alias;
+			},
+			null,
+		);
+		this.observe(
+			this.#propertyContext.label,
+			(label) => {
+				this._label = label;
+			},
+			null,
+		);
+		this.observe(
+			this.#propertyContext.description,
+			(description) => {
+				this._description = description;
+			},
+			null,
+		);
+		this.observe(
+			this.#propertyContext.variantDifference,
+			(variantDifference) => {
+				this._variantDifference = variantDifference;
+			},
+			null,
+		);
 	}
 
 	private _onPropertyEditorChange = (e: CustomEvent): void => {
 		const target = e.composedPath()[0] as any;
+		if (this._element !== target) {
+			console.error(
+				"Property Editor received a Change Event who's target is not the Property Editor Element. Do not make bubble and composed change events.",
+			);
+			return;
+		}
 
 		//this.value = target.value; // Sets value in context.
 		this.#propertyContext.setValue(target.value);
@@ -173,6 +218,8 @@ export class UmbPropertyElement extends UmbLitElement {
 			// cleanup:
 			this.#valueObserver?.destroy();
 			this.#configObserver?.destroy();
+			this.#controlValidator?.destroy();
+			oldElement?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
 			oldElement?.removeEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 
 			this._element = el as ManifestPropertyEditorUi['ELEMENT_TYPE'];
@@ -180,25 +227,41 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.setEditor(this._element);
 
 			if (this._element) {
-				// TODO: Could this be changed to change event? (or additionally support the change event? [NL])
+				this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
 				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 
 				// No need for a controller alias, as the clean is handled via the observer prop:
-				this.#valueObserver = this.observe(this.#propertyContext.value, (value) => {
-					//this._value = value;// This was not used currently [NL]
-					this._element!.value = value;
-				});
-				this.#configObserver = this.observe(this.#propertyContext.config, (config) => {
-					if (config) {
-						this._element!.config = config;
-					}
-				});
+				this.#valueObserver = this.observe(
+					this.#propertyContext.value,
+					(value) => {
+						this._element!.value = value;
+						if (this.#validationMessageBinder) {
+							this.#validationMessageBinder.value = value;
+						}
+					},
+					null,
+				);
+				this.#configObserver = this.observe(
+					this.#propertyContext.config,
+					(config) => {
+						if (config) {
+							this._element!.config = config;
+						}
+					},
+					null,
+				);
 
-				if (this.#validator) {
-					this.#validator.destroy();
-				}
 				if ('checkValidity' in this._element) {
-					this.#validator = new UmbFormControlValidator(this, this._element as any);
+					this.#controlValidator = new UmbFormControlValidator(this, this._element as any, this.#dataPath);
+					// We trust blindly that the dataPath is available at this stage. [NL]
+					if (this.#dataPath) {
+						this.#validationMessageBinder = new UmbBindValidationMessageToFormControl(
+							this,
+							this._element as any,
+							this.#dataPath,
+						);
+						this.#validationMessageBinder.value = this.#propertyContext.getValue();
+					}
 				}
 			}
 
@@ -212,7 +275,8 @@ export class UmbPropertyElement extends UmbLitElement {
 				id="layout"
 				alias="${ifDefined(this._alias)}"
 				label="${ifDefined(this._label)}"
-				description="${ifDefined(this._description)}">
+				description="${ifDefined(this._description)}"
+				?invalid=${this._invalid}>
 				${this._renderPropertyActionMenu()}
 				${this._variantDifference
 					? html`<uui-tag look="secondary" slot="description">${this._variantDifference}</uui-tag>`
@@ -223,12 +287,12 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	private _renderPropertyActionMenu() {
-		return html`${this._propertyEditorUiAlias
+		return this._propertyEditorUiAlias
 			? html`<umb-property-action-menu
 					slot="action-menu"
 					id="action-menu"
 					.propertyEditorUiAlias=${this._propertyEditorUiAlias}></umb-property-action-menu>`
-			: ''}`;
+			: nothing;
 	}
 
 	static styles = [

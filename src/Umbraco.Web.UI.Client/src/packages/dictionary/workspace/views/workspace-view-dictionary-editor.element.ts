@@ -58,7 +58,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	#onTextareaChange(e: Event) {
 		if (e instanceof UUITextareaEvent) {
 			const target = e.composedPath()[0] as UUITextareaElement;
-			const translation = target.value.toString();
+			const translation = (target.value as string).toString();
 			const isoCode = target.getAttribute('name')!;
 
 			this.#workspaceContext.setPropertyValue(isoCode, translation);

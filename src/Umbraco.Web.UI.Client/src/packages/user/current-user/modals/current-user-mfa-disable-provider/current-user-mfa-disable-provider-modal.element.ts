@@ -109,7 +109,7 @@ export class UmbCurrentUserMfaDisableProviderModalElement extends UmbModalBaseEl
 		} else {
 			this._buttonState = 'failed';
 			if (isApiError(error)) {
-				if (error.body.operationStatus === 'InvalidCode') {
+				if ((error.body as any).operationStatus === 'InvalidCode') {
 					this._codeInput.setCustomValidity(this.localize.term('user_2faInvalidCode'));
 					this._codeInput.focus();
 				} else {

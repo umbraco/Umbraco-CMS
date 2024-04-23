@@ -15,7 +15,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-edit',
-			label: 'Rename...',
+			label: '#actions_rename',
 			renameRepositoryAlias: '',
 			itemRepositoryAlias: '',
 		},

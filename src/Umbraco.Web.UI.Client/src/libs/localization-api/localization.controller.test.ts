@@ -274,6 +274,22 @@ describe('UmbLocalizeController', () => {
 		});
 	});
 
+	describe('string', () => {
+		it('should replace words prefixed with a # with translated value', async () => {
+			const str = '#close';
+			const str2 = '#logout #close';
+			const str3 = '#logout #missing_translation_key #close';
+			expect(controller.string(str)).to.equal('Close');
+			expect(controller.string(str2)).to.equal('Log out Close');
+			expect(controller.string(str3)).to.equal('Log out #missing_translation_key Close');
+		});
+
+		it('should return the word with a # if the word is not found', async () => {
+			const str = '#missing_translation_key';
+			expect(controller.string(str)).to.equal('#missing_translation_key');
+		});
+	});
+
 	describe('host element', () => {
 		let element: UmbLocalizeControllerHostElement;
 
