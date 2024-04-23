@@ -32,14 +32,6 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				);
 	}
 
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
-			this.observe(context.authorizationSignal, () => {}, '_authorizationSignal');
-		});
-	}
-
 	render() {
 		return html`
 			<umb-body-layout id="login-layout">
@@ -60,7 +52,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 	private onSubmit = async (providerName: string) => {
 		const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 		await authContext.makeAuthorizationRequest(providerName);
-		console.log('[AuthModal] Received authorization signal');
+
 		const isAuthed = authContext.getIsAuthorized();
 		this.value = { success: isAuthed };
 		if (isAuthed) {
