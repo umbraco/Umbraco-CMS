@@ -1,5 +1,5 @@
-import { UmbLitElement } from '../../../lit-element/index.js';
-import { UMB_PROPERTY_CONTEXT } from '../../../property/property/index.js';
+import { UmbLitElement } from '../../core/lit-element/index.js';
+import { UMB_PROPERTY_CONTEXT } from '../../core/property/property/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputMultiUrlElement } from '@umbraco-cms/backoffice/components';

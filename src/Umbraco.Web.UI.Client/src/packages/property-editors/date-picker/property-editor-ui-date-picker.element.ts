@@ -1,5 +1,5 @@
-import { UmbPropertyValueChangeEvent } from '../../index.js';
-import type { UmbPropertyEditorConfigCollection } from '../../index.js';
+import { UmbPropertyValueChangeEvent } from '../../core/property-editor/index.js';
+import type { UmbPropertyEditorConfigCollection } from '../../core/property-editor/index.js';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';

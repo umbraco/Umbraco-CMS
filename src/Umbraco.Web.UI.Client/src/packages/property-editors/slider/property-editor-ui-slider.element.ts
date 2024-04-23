@@ -1,4 +1,4 @@
-import type { UmbInputSliderElement } from '../../../components/input-slider/input-slider.element.js';
+import type { UmbInputSliderElement } from '../../core/components/input-slider/input-slider.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
