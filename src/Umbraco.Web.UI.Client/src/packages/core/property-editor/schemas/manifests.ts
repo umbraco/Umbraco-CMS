@@ -5,8 +5,6 @@ import { manifest as imageCropper } from './Umbraco.ImageCropper.js';
 import { manifest as listView } from './Umbraco.ListView.js';
 import { manifest as markdownEditor } from './Umbraco.MarkdownEditor.js';
 import { manifest as mediaPicker } from './Umbraco.MediaPicker.js';
-import { manifest as memberGroupPicker } from './Umbraco.MemberGroupPicker.js';
-import { manifest as memberPicker } from './Umbraco.MemberPicker.js';
 import { manifest as multiNodeTreePicker } from './Umbraco.MultiNodeTreePicker.js';
 import { manifest as multiUrlPicker } from './Umbraco.MultiUrlPicker.js';
 import { manifest as radioButtonList } from './Umbraco.RadioButtonList.js';
@@ -26,8 +24,6 @@ export const manifests: Array<ManifestPropertyEditorSchema> = [
 	listView,
 	markdownEditor,
 	mediaPicker,
-	memberGroupPicker,
-	memberPicker,
 	multiNodeTreePicker,
 	multiUrlPicker,
 	radioButtonList,
