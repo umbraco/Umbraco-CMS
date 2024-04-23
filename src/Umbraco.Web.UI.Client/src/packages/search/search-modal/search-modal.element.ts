@@ -34,11 +34,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 	@state()
 	_loading: boolean = false;
 
-	@state()
-	_searchItemNavIndex = 0;
-
-	@state()
-	_inputHasFocus = false;
+	#searchItemNavIndex = 0;
 
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 300;
@@ -83,24 +79,80 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	#onKeydown(event: KeyboardEvent) {
-		if (event.key !== 'Tab' && event.key !== 'Shift') {
-			this.#focusInput();
+		const root = this.shadowRoot;
+		if (!root) return;
+
+		if (event.key === 'Tab') {
+			const isFirstProvider = (element: Element) => element === root.querySelector('.search-provider:first-child');
+			const isLastProvider = (element: Element) => element === root.querySelector('.search-provider:last-child');
+			const setActiveProviderFocus = (element?: Element | null) => (element as HTMLElement)?.focus();
+
+			const activeProvider = root.querySelector('.search-provider.active') as HTMLElement | null;
+
+			if (!activeProvider) return;
+
+			if (event.shiftKey) {
+				if (this.#providerHasFocus) {
+					if (this.#isFocusingFirstProvider) {
+						setActiveProviderFocus(root.querySelector('.search-provider:last-child'));
+						event.preventDefault();
+					}
+					return;
+				}
+
+				if (isFirstProvider(activeProvider)) {
+					setActiveProviderFocus(root.querySelector('.search-provider:last-child'));
+					event.preventDefault();
+					return;
+				}
+
+				setActiveProviderFocus(activeProvider);
+			} else {
+				if (this.#providerHasFocus) {
+					if (this.#isFocusingLastProvider) {
+						setActiveProviderFocus(root.querySelector('.search-provider:first-child'));
+						event.preventDefault();
+					}
+					return;
+				}
+
+				if (isLastProvider(activeProvider)) {
+					setActiveProviderFocus(root.querySelector('.search-provider:first-child'));
+					event.preventDefault();
+					return;
+				}
+
+				setActiveProviderFocus(activeProvider);
+				return;
+			}
 		}
 
-		if (event.key === 'ArrowDown') {
-			this.#setSearchItemNavIndex(Math.min(this._searchItemNavIndex + 1, this._searchResults.length - 1));
-		}
-		if (event.key === 'ArrowUp') {
-			this.#setSearchItemNavIndex(Math.max(this._searchItemNavIndex - 1, 0));
+		switch (event.key) {
+			case 'Tab':
+			case 'Shift':
+			case 'Escape':
+			case 'Enter':
+				break;
+			case 'ArrowDown':
+				event.preventDefault();
+				this.#setSearchItemNavIndex(Math.min(this.#searchItemNavIndex + 1, this._searchResults.length - 1));
+				break;
+			case 'ArrowUp':
+				event.preventDefault();
+				this.#setSearchItemNavIndex(Math.max(this.#searchItemNavIndex - 1, 0));
+				break;
+			default:
+				if (this._input === root.activeElement) return;
+				this.#focusInput();
+				break;
 		}
 	}
 
 	async #setSearchItemNavIndex(index: number) {
-		this._searchItemNavIndex = index;
 		await this.updateComplete;
-		const element = this.shadowRoot?.querySelector(`a[data-item-index="${index}"]`) as HTMLElement | null;
 
-		console.log('element', element, 'index', this._searchResults.length);
+		this.#searchItemNavIndex = index;
+		const element = this.shadowRoot?.querySelector(`a[data-item-index="${index}"]`) as HTMLElement | null;
 
 		if (!element) return;
 		if (!this._searchResults.length) return;
@@ -110,6 +162,21 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 	#focusInput() {
 		this._input.focus();
+	}
+
+	get #providerHasFocus() {
+		const providerElements = this.shadowRoot?.querySelectorAll('.search-provider') || [];
+		return Array.from(providerElements).some((element) => element === this.shadowRoot?.activeElement);
+	}
+
+	get #isFocusingLastProvider() {
+		const providerElements = this.shadowRoot?.querySelectorAll('.search-provider') || [];
+		return providerElements[providerElements.length - 1] === this.shadowRoot?.activeElement;
+	}
+
+	get #isFocusingFirstProvider() {
+		const providerElements = this.shadowRoot?.querySelectorAll('.search-provider') || [];
+		return providerElements[0] === this.shadowRoot?.activeElement;
 	}
 
 	#onSearchChange(event: InputEvent) {
@@ -145,9 +212,9 @@ export class UmbSearchModalElement extends UmbLitElement {
 		} else {
 			this._searchResults = [];
 		}
-		this.#setSearchItemNavIndex(0);
 
 		this._loading = false;
+		this.#searchItemNavIndex = -1;
 	}
 
 	render() {
@@ -182,6 +249,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 				(searchProvider) => searchProvider,
 				(searchProvider) =>
 					html`<button
+						data-provider-alias=${searchProvider.alias}
 						@click=${() => this.#setCurrentProvider(searchProvider)}
 						@keydown=${() => ''}
 						class="search-provider ${this._currentProvider?.alias === searchProvider.alias ? 'active' : ''}">
@@ -201,7 +269,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 	#renderResultItem(item: UmbSearchResultItemModel, index: number) {
 		return html`
-			<a href=${item.href} data-item-index=${index} class="search-item">
+			<a href="google.com" data-item-index=${index} class="search-item">
 				<umb-extension-slot
 					type="searchResultItem"
 					.props=${{ item }}
@@ -218,6 +286,28 @@ export class UmbSearchModalElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				width: min(610px, 100vw);
+				height: 80dvh;
+				background-color: var(--uui-color-surface);
+				box-sizing: border-box;
+				color: var(--uui-color-text);
+				font-size: 1rem;
+				padding-bottom: var(--uui-size-space-2);
+			}
+			#top {
+				background-color: var(--uui-color-surface);
+				display: flex;
+				height: 48px;
+				flex-shrink: 0;
+			}
+			#main {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
 			#search-providers {
 				display: flex;
 				flex-wrap: wrap;
@@ -244,17 +334,6 @@ export class UmbSearchModalElement extends UmbLitElement {
 				color: var(--uui-color-selected-contrast);
 				border-color: transparent;
 			}
-			:host {
-				display: flex;
-				flex-direction: column;
-				width: min(610px, 100vw);
-				height: 100%;
-				background-color: var(--uui-color-surface);
-				box-sizing: border-box;
-				color: var(--uui-color-text);
-				font-size: 1rem;
-				padding-bottom: var(--uui-size-space-2);
-			}
 			input {
 				all: unset;
 				height: 100%;
@@ -272,16 +351,6 @@ export class UmbSearchModalElement extends UmbLitElement {
 				aspect-ratio: 1;
 				height: 100%;
 			}
-			#top {
-				background-color: var(--uui-color-surface);
-				display: flex;
-				height: 48px;
-			}
-			#main {
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-			}
 			#no-results {
 				display: flex;
 				flex-direction: column;
@@ -297,6 +366,10 @@ export class UmbSearchModalElement extends UmbLitElement {
 				color: var(--uui-color-text);
 				text-decoration: none;
 				outline-offset: -3px;
+				display: flex;
+			}
+			.search-item.focused {
+				outline: 2px solid var(--uui-color-focus);
 			}
 		`,
 	];
