@@ -1,1 +1,1 @@
-export * from './checkbox-list/index.js';
+export * from './checkbox-list/components/index.js';

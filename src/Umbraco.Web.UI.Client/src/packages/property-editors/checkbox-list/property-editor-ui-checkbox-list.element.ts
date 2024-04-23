@@ -1,11 +1,11 @@
-import type { UmbInputCheckboxListElement } from './input-checkbox-list/input-checkbox-list.element.js';
+import type { UmbInputCheckboxListElement } from './components/input-checkbox-list/input-checkbox-list.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
-import './input-checkbox-list/input-checkbox-list.element.js';
+import './components/input-checkbox-list/input-checkbox-list.element.js';
 
 /**
  * @element umb-property-editor-ui-checkbox-list
