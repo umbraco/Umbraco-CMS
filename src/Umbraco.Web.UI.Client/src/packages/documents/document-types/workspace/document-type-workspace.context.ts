@@ -1,6 +1,7 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentTypeDetailModel } from '../types.js';
+import { UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH, UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH } from '../paths.js';
 import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -89,7 +90,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 		this.routes.setRoutes([
 			{
-				path: 'create/:entityType/:parentUnique/:presetAlias',
+				path: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH,
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
@@ -105,7 +106,7 @@ export class UmbDocumentTypeWorkspaceContext
 				},
 			},
 			{
-				path: 'edit/:id',
+				path: UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH,
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
 					this.removeUmbControllerByAlias('isNewRedirectController');
