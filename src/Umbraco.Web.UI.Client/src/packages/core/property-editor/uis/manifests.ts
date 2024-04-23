@@ -6,7 +6,7 @@ import { manifest as dropdown } from '../../../property-editors/dropdown/manifes
 import { manifest as eyeDropper } from '../../../property-editors/eye-dropper/manifests.js';
 import { manifest as iconPicker } from '../../../property-editors/icon-picker/manifests.js';
 import { manifest as label } from '../../../property-editors/label/manifests.js';
-import { manifest as multipleTextString } from './multiple-text-string/manifests.js';
+import { manifest as multipleTextString } from '../../../property-editors/multiple-text-string/manifests.js';
 import { manifest as multiUrlPicker } from '../../../property-editors/multi-url-picker/manifests.js';
 import { manifest as numberRange } from './number-range/manifests.js';
 import { manifest as orderDirection } from './order-direction/manifests.js';
