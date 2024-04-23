@@ -1,9 +1,14 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Services;
 
@@ -11,13 +16,19 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
 {
     private readonly IBackOfficeExternalLoginProviders _backOfficeExternalLoginProviders;
     private readonly IUserService _userService;
+    private readonly IBackOfficeUserManager _backOfficeUserManager;
+    private readonly IBackOfficeSignInManager _backOfficeSignInManager;
 
     public BackOfficeExternalLoginService(
         IBackOfficeExternalLoginProviders backOfficeExternalLoginProviders,
-        IUserService userService)
+        IUserService userService,
+        IBackOfficeUserManager backOfficeUserManager,
+        IBackOfficeSignInManager backOfficeSignInManager)
     {
         _backOfficeExternalLoginProviders = backOfficeExternalLoginProviders;
         _userService = userService;
+        _backOfficeUserManager = backOfficeUserManager;
+        _backOfficeSignInManager = backOfficeSignInManager;
     }
 
     public async Task<Attempt<IEnumerable<UserExternalLoginProviderModel>, ExternalLoginOperationStatus>>
@@ -46,12 +57,63 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
                 ExternalLoginOperationStatus.Success, providerStatuses);
     }
 
-    private ExternalLoginOperationStatus FromUserOperationStatusFailure(UserOperationStatus userOperationStatus)
+    public async Task<Attempt<ExternalLoginOperationStatus>> UnLinkLogin(ClaimsPrincipal claimsPrincipal, string loginProvider, string providerKey)
     {
-        return userOperationStatus switch
+        var userId = claimsPrincipal.Identity?.GetUserId();
+        if (userId is null)
+        {
+            return Attempt.Fail(ExternalLoginOperationStatus.IdentityNotFound);
+        }
+
+        BackOfficeIdentityUser? user = await _backOfficeUserManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return Attempt.Fail(ExternalLoginOperationStatus.UserNotFound);
+        }
+
+        AuthenticationScheme? authType = (await _backOfficeSignInManager.GetExternalAuthenticationSchemesAsync())
+            .FirstOrDefault(x => x.Name == loginProvider);
+
+        if (authType == null)
+        {
+            return Attempt.Fail(ExternalLoginOperationStatus.AuthenticationSchemeNotFound);
+        }
+
+        BackOfficeExternaLoginProviderScheme? opt = await _backOfficeExternalLoginProviders.GetAsync(authType.Name);
+        if (opt == null)
+        {
+            return Attempt.Fail(ExternalLoginOperationStatus.AuthenticationOptionsNotFound);
+        }
+
+        if (!opt.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking)
+        {
+            return Attempt.Fail(ExternalLoginOperationStatus.UnlinkingDisabled);
+        }
+
+        IEnumerable<IIdentityUserLogin> externalLogins = user.Logins.Where(l => l.LoginProvider == loginProvider);
+        if (externalLogins.Any(l => l.ProviderKey == providerKey) == false)
+        {
+            return Attempt.Fail(ExternalLoginOperationStatus.InvalidProviderKey);
+        }
+
+        IdentityResult result = await _backOfficeUserManager.RemoveLoginAsync(
+            user,
+            loginProvider,
+            providerKey);
+
+        if (result.Succeeded is false)
+        {
+            return Attempt.Fail(ExternalLoginOperationStatus.Unknown);
+        }
+
+        await _backOfficeSignInManager.SignInAsync(user, true);
+        return Attempt.Succeed(ExternalLoginOperationStatus.Success);
+    }
+
+    private ExternalLoginOperationStatus FromUserOperationStatusFailure(UserOperationStatus userOperationStatus) =>
+        userOperationStatus switch
         {
             UserOperationStatus.MissingUser => ExternalLoginOperationStatus.UserNotFound,
             _ => ExternalLoginOperationStatus.Unknown
         };
-    }
 }

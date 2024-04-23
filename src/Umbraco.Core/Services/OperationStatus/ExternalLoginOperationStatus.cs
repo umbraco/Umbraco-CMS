@@ -4,5 +4,10 @@ public enum ExternalLoginOperationStatus
 {
     Success,
     UserNotFound,
-    Unknown
+    Unknown,
+    IdentityNotFound,
+    AuthenticationOptionsNotFound,
+    UnlinkingDisabled,
+    InvalidProviderKey,
+    AuthenticationSchemeNotFound
 }

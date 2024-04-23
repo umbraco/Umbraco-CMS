@@ -13,12 +13,14 @@ using OpenIddict.Server.AspNetCore;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
@@ -39,7 +41,7 @@ public class BackOfficeController : SecurityControllerBase
     private readonly ILogger<BackOfficeController> _logger;
     private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
     private readonly IUserTwoFactorLoginService _userTwoFactorLoginService;
-    private readonly IBackOfficeExternalLoginProviders _backOfficeExternalLoginProviders;
+    private readonly IBackOfficeExternalLoginService _externalLoginService;
 
     public BackOfficeController(
         IHttpContextAccessor httpContextAccessor,
@@ -49,7 +51,7 @@ public class BackOfficeController : SecurityControllerBase
         ILogger<BackOfficeController> logger,
         IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
         IUserTwoFactorLoginService userTwoFactorLoginService,
-        IBackOfficeExternalLoginProviders backOfficeExternalLoginProviders)
+        IBackOfficeExternalLoginService externalLoginService)
     {
         _httpContextAccessor = httpContextAccessor;
         _backOfficeSignInManager = backOfficeSignInManager;
@@ -58,7 +60,7 @@ public class BackOfficeController : SecurityControllerBase
         _logger = logger;
         _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
         _userTwoFactorLoginService = userTwoFactorLoginService;
-        _backOfficeExternalLoginProviders = backOfficeExternalLoginProviders;
+        _externalLoginService = externalLoginService;
     }
 
     [HttpPost("login")]
@@ -82,6 +84,7 @@ public class BackOfficeController : SecurityControllerBase
                 .WithDetail("The operation is not allowed on the user")
                 .Build());
         }
+
         if (result.IsLockedOut)
         {
             return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
@@ -89,6 +92,7 @@ public class BackOfficeController : SecurityControllerBase
                 .WithDetail("The user is locked, and need to be unlocked before more login attempts can be executed.")
                 .Build());
         }
+
         if(result.RequiresTwoFactor)
         {
             string? twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(model.Username);
@@ -289,69 +293,42 @@ public class BackOfficeController : SecurityControllerBase
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginRequestModel unlinkLoginRequestModel)
     {
-        var userId = User.Identity?.GetUserId();
-        if (userId is null)
-        {
-            throw new InvalidOperationException("Could not find userId");
-        }
-
-        BackOfficeIdentityUser? user = await _backOfficeUserManager.FindByIdAsync(userId);
-        if (user == null)
-        {
-            throw new InvalidOperationException("Could not find user");
-        }
-
-        AuthenticationScheme? authType = (await _backOfficeSignInManager.GetExternalAuthenticationSchemesAsync())
-            .FirstOrDefault(x => x.Name == unlinkLoginRequestModel.LoginProvider);
-
-        if (authType == null)
-        {
-            _logger.LogWarning("Could not find the supplied external authentication provider");
-        }
-        else
-        {
-            BackOfficeExternaLoginProviderScheme? opt = await _backOfficeExternalLoginProviders.GetAsync(authType.Name);
-            if (opt == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
-                    .WithTitle("Missing Authentication options")
-                    .WithDetail($"Could not find external authentication options registered for provider {authType.Name}")
-                    .Build());
-            }
-
-            if (!opt.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking)
-            {
-                // If AllowManualLinking is disabled for this provider we cannot unlink
-                return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
-                    .WithTitle("Unlinking disabled")
-                    .WithDetail($"Manual linking is disabled for provider {authType.Name}")
-                    .Build());
-            }
-        }
-
-        IEnumerable<IIdentityUserLogin> externalLogins = user.Logins.Where(l => l.LoginProvider == unlinkLoginRequestModel.LoginProvider);
-        if (externalLogins.Any(l => l.ProviderKey == unlinkLoginRequestModel.ProviderKey) == false)
-        {
-            return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
-                .WithTitle("Unlinking failed")
-                .WithDetail("Could not match ProviderKey to the supplied provider")
-                .Build());
-        }
-
-        IdentityResult result = await _backOfficeUserManager.RemoveLoginAsync(
-            user,
+        Attempt<ExternalLoginOperationStatus> unlinkResult = await _externalLoginService.UnLinkLogin(
+            User,
             unlinkLoginRequestModel.LoginProvider,
             unlinkLoginRequestModel.ProviderKey);
 
-        if (result.Succeeded)
+        if (unlinkResult.Success)
         {
-            await _backOfficeSignInManager.SignInAsync(user, true);
             return Ok();
         }
 
-        return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
-            .WithTitle("Unlinking failed")
-            .Build());
+        return OperationStatusResult(unlinkResult.Result, problemDetailsBuilder => unlinkResult.Result switch
+        {
+            ExternalLoginOperationStatus.UserNotFound => Unauthorized(problemDetailsBuilder
+                .WithTitle("User not found")
+                .Build()),
+            ExternalLoginOperationStatus.IdentityNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Missing identity")
+                .Build()),
+            ExternalLoginOperationStatus.AuthenticationSchemeNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Authentication scheme not found")
+                .WithDetail($"Could not find the authentication scheme for the supplied provider")
+                .Build()),
+            ExternalLoginOperationStatus.AuthenticationOptionsNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Missing Authentication options")
+                .WithDetail($"Could not find external authentication options the supplied provider")
+                .Build()),
+            ExternalLoginOperationStatus.UnlinkingDisabled => BadRequest(problemDetailsBuilder
+                .WithTitle("Unlinking disabled")
+                .WithDetail($"Manual linking is disabled for the supplied provider")
+                .Build()),
+            ExternalLoginOperationStatus.InvalidProviderKey => BadRequest(problemDetailsBuilder
+                .WithTitle("Unlinking failed")
+                .WithDetail("Could not match ProviderKey to the supplied provider")
+                .Build()),
+            _ => throw new ArgumentOutOfRangeException()
+        });
     }
 
     /// <summary>
