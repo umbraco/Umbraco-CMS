@@ -184,9 +184,10 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 
 		this._focusEditor(); // Focus before opening modal
 		const modalContext = this._modalContext.open(this, UMB_LINK_PICKER_MODAL, {
+			modal: { size: this.overlaySize },
 			data: {
 				index: null,
-				config: { overlaySize: this.overlaySize },
+				config: {},
 			},
 			value: {
 				link: { name: selectedValue },
