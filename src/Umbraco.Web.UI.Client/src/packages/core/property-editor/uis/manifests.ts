@@ -6,8 +6,6 @@ import { manifest as dropdown } from './dropdown/manifests.js';
 import { manifest as eyeDropper } from './eye-dropper/manifests.js';
 import { manifest as iconPicker } from './icon-picker/manifests.js';
 import { manifest as label } from './label/manifests.js';
-import { manifest as memberGroupPicker } from './member-group-picker/manifests.js';
-import { manifest as memberPicker } from './member-picker/manifests.js';
 import { manifest as multipleTextString } from './multiple-text-string/manifests.js';
 import { manifest as multiUrlPicker } from './multi-url-picker/manifests.js';
 import { manifest as numberRange } from './number-range/manifests.js';
@@ -19,7 +17,6 @@ import { manifest as slider } from './slider/manifests.js';
 import { manifest as textArea } from './textarea/manifests.js';
 import { manifest as toggle } from './toggle/manifests.js';
 import { manifest as uploadField } from './upload-field/manifests.js';
-import { manifest as userPicker } from './user-picker/manifests.js';
 import { manifest as valueType } from './value-type/manifests.js';
 import { manifests as collectionView } from './collection-view/manifests.js';
 import { manifests as numbers } from './number/manifests.js';
@@ -36,8 +33,6 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 	eyeDropper,
 	iconPicker,
 	label,
-	memberGroupPicker,
-	memberPicker,
 	multipleTextString,
 	multiUrlPicker,
 	numberRange,
@@ -49,7 +44,6 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 	textArea,
 	toggle,
 	uploadField,
-	userPicker,
 	valueType,
 	...collectionView,
 	...numbers,
