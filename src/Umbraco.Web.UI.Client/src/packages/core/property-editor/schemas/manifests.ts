@@ -1,11 +1,9 @@
 import { manifest as blockGrid } from './Umbraco.BlockGrid.js';
 import { manifest as blockList } from './Umbraco.BlockList.js';
-import { manifest as decimal } from './Umbraco.Decimal.js';
 import { manifest as dropdownFlexible } from './Umbraco.Dropdown.Flexible.js';
 import { manifest as emailAddress } from './Umbraco.EmailAddress.js';
 import { manifest as iconPicker } from './Umbraco.IconPicker.js';
 import { manifest as imageCropper } from './Umbraco.ImageCropper.js';
-import { manifest as integer } from './Umbraco.Integer.js';
 import { manifest as label } from './Umbraco.Label.js';
 import { manifest as listView } from './Umbraco.ListView.js';
 import { manifest as markdownEditor } from './Umbraco.MarkdownEditor.js';
@@ -30,12 +28,10 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/exten
 export const manifests: Array<ManifestPropertyEditorSchema> = [
 	blockGrid,
 	blockList,
-	decimal,
 	dropdownFlexible,
 	emailAddress,
 	iconPicker,
 	imageCropper,
-	integer,
 	label,
 	listView,
 	markdownEditor,
