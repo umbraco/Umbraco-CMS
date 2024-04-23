@@ -1,7 +1,11 @@
 import type { UmbTreeSelectionConfiguration } from '../types.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal.token.js';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_WORKSPACE_MODAL,
+	UmbModalBaseElement,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbDeselectedEvent, UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement, UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 
@@ -17,17 +21,42 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		selection: [],
 	};
 
+	@state()
+	_createButton: boolean = false;
+
+	@state()
+	_createPath?: string;
+
 	connectedCallback() {
 		super.connectedCallback();
 
-		// TODO: We should make a nicer way to observe the value..
+		// TODO: We should make a nicer way to observe the value..  [NL]
+		// This could be by observing when the modalCOntext gets set. [NL]
 		if (this.modalContext) {
 			this.observe(this.modalContext.value, (value) => {
 				this._selectionConfiguration.selection = value?.selection ?? [];
 			});
 		}
 
+		// Same here [NL]
 		this._selectionConfiguration.multiple = this.data?.multiple ?? false;
+
+		// TODO: If data.enableCreate is true, we should add a button to create a new item. [NL]
+		// Does the tree know enough about this, for us to be able to create a new item? [NL]
+		// I think we need to be able to get entityType and a parentId?, or do we only allow creation in the root? and then create via entity actions? [NL]
+		// To remove the hardcoded URLs for workspaces of entity types, we could make an create event from the tree, which either this or the sidebar impl. will pick up and react to. [NL]
+		// Or maybe the tree item context base can handle this? [NL]
+		// Maybe its a general item context problem to be solved. [NL]
+		if (this._createButton) {
+			new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+				.addAdditionalPath('document-type')
+				.onSetup(() => {
+					return { data: { entityType: 'document-type', preset: {} } };
+				})
+				.observeRouteBuilder((routeBuilder) => {
+					this._createPath = routeBuilder({});
+				});
+		}
 	}
 
 	#onSelectionChange(event: UmbSelectionChangeEvent) {
