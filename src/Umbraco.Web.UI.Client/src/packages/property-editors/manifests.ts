@@ -2,7 +2,7 @@ import { manifests as checkboxListManifests } from './checkbox-list/manifests.js
 import { manifest as colorEditor } from './color-swatches-editor/manifests.js';
 import { manifests as colorPickerManifests } from './color-picker/manifests.js';
 import { manifests as datePickerManifests } from './date-picker/manifests.js';
-import { manifest as dropdown } from './dropdown/manifests.js';
+import { manifests as dropdownManifests } from './dropdown/manifests.js';
 import { manifests as eyeDropperManifests } from './eye-dropper/manifests.js';
 import { manifest as iconPicker } from './icon-picker/manifests.js';
 import { manifest as label } from './label/manifests.js';
@@ -29,13 +29,13 @@ export const manifests: Array<ManifestTypes> = [
 	...collectionView,
 	...colorPickerManifests,
 	...datePickerManifests,
+	...dropdownManifests,
 	...eyeDropperManifests,
 	...multipleTextStringManifests,
 	...numbers,
 	...textBoxes,
 	...treePicker,
 	colorEditor,
-	dropdown,
 	iconPicker,
 	label,
 	multiUrlPicker,

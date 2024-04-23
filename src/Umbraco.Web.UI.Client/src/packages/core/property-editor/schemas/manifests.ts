@@ -1,6 +1,5 @@
 import { manifest as blockGrid } from './Umbraco.BlockGrid.js';
 import { manifest as blockList } from './Umbraco.BlockList.js';
-import { manifest as dropdownFlexible } from './Umbraco.Dropdown.Flexible.js';
 import { manifest as emailAddress } from './Umbraco.EmailAddress.js';
 import { manifest as iconPicker } from './Umbraco.IconPicker.js';
 import { manifest as imageCropper } from './Umbraco.ImageCropper.js';
@@ -27,7 +26,6 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/exten
 export const manifests: Array<ManifestPropertyEditorSchema> = [
 	blockGrid,
 	blockList,
-	dropdownFlexible,
 	emailAddress,
 	iconPicker,
 	imageCropper,
