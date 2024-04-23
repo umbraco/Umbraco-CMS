@@ -9,6 +9,7 @@ export * from './path/path-decode.function.js';
 export * from './path/path-encode.function.js';
 export * from './path/path-folder-name.function.js';
 export * from './path/umbraco-path.function.js';
+export * from './path/url-pattern-to-string.function.js';
 export * from './selection-manager/selection.manager.js';
 export * from './string/from-camel-case.function.js';
 export * from './string/generate-umbraco-alias.function.js';
