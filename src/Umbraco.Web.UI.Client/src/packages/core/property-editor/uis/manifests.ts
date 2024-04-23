@@ -15,7 +15,7 @@ import { manifest as radioButtonList } from '../../../property-editors/radio-but
 import { manifest as select } from '../../../property-editors/select/manifests.js';
 import { manifest as slider } from '../../../property-editors/slider/manifests.js';
 import { manifest as textArea } from '../../../property-editors/textarea/manifests.js';
-import { manifest as toggle } from './toggle/manifests.js';
+import { manifest as toggle } from '../../../property-editors/toggle/manifests.js';
 import { manifest as uploadField } from './upload-field/manifests.js';
 import { manifest as valueType } from './value-type/manifests.js';
 import { manifests as collectionView } from '../../../property-editors/collection-view/manifests.js';
