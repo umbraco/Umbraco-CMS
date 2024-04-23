@@ -436,7 +436,7 @@ stages:
       # E2E Tests
       - job:
         displayName: E2E Tests (SQLite)
-        condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqliteAcceptanceTests}})
+        condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), eq(${{parameters.sqlServerIntegrationTests}}, True))
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
