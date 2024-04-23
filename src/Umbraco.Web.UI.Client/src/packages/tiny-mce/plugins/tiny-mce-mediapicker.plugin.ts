@@ -146,9 +146,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
 			data: {
 				multiple: false,
-				//selection: currentTarget.udi ? [getGuid(currentTarget.udi)] : [],
 				submitOnSelection: true,
-				//hideTreeRoot: true,
 				//startNodeIsVirtual,
 			},
 			value: {
