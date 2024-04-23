@@ -5,7 +5,6 @@ import { manifest as markdownEditor } from './Umbraco.MarkdownEditor.js';
 import { manifest as mediaPicker } from './Umbraco.MediaPicker.js';
 import { manifest as multiNodeTreePicker } from './Umbraco.MultiNodeTreePicker.js';
 import { manifest as multiUrlPicker } from './Umbraco.MultiUrlPicker.js';
-import { manifest as radioButtonList } from './Umbraco.RadioButtonList.js';
 import { manifest as richText } from './Umbraco.RichText.js';
 import { manifest as uploadField } from './Umbraco.UploadField.js';
 
@@ -19,7 +18,6 @@ export const manifests: Array<ManifestPropertyEditorSchema> = [
 	mediaPicker,
 	multiNodeTreePicker,
 	multiUrlPicker,
-	radioButtonList,
 	richText,
 	uploadField,
 ];
