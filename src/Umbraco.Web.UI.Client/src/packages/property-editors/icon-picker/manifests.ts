@@ -1,6 +1,7 @@
+import { manifest as schemaManifest } from './Umbraco.IconPicker.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUi = {
+const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.IconPicker',
 	name: 'Icon Picker Property Editor UI',
@@ -12,3 +13,5 @@ export const manifest: ManifestPropertyEditorUi = {
 		group: 'common',
 	},
 };
+
+export const manifests = [manifest, schemaManifest];

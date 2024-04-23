@@ -1,6 +1,7 @@
+import { manifest as schemaManifest } from './Umbraco.MultiUrlPicker.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUi = {
+const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.MultiUrlPicker',
 	name: 'Multi URL Picker Property Editor UI',
@@ -28,3 +29,5 @@ export const manifest: ManifestPropertyEditorUi = {
 		},
 	},
 };
+
+export const manifests = [manifest, schemaManifest];

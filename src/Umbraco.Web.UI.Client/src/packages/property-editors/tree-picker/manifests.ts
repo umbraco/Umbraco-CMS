@@ -1,5 +1,6 @@
 import { manifest as sourcePicker } from './config/source-picker/manifests.js';
 import { manifest as sourceTypePicker } from './config/source-type-picker/manifests.js';
+import { manifest as schemaManifest } from './Umbraco.MultiNodeTreePicker.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUi = {
@@ -33,4 +34,4 @@ const manifest: ManifestPropertyEditorUi = {
 
 const config: Array<ManifestPropertyEditorUi> = [sourcePicker, sourceTypePicker];
 
-export const manifests = [manifest, ...config];
+export const manifests = [manifest, ...config, schemaManifest];
