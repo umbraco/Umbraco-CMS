@@ -1,12 +1,12 @@
 import type { UmbBackofficeExtensionRegistry, ManifestAuthProvider } from '../extension-registry/index.js';
 import { UmbAuthFlow } from './auth-flow.js';
-import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
+import { UMB_AUTH_CONTEXT, UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { ReplaySubject, filter, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
+import { ReplaySubject, filter, firstValueFrom, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
@@ -15,14 +15,17 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isInitialized = new ReplaySubject<boolean>(1);
 	readonly isInitialized = this.#isInitialized.asObservable().pipe(filter((isInitialized) => isInitialized));
 
-	get authRedirect() {
-		return this.#authFlow.authRedirect();
+	get authorizationSignal() {
+		return this.#authFlow.authorizationSignal;
 	}
 
 	#isBypassed = false;
 	#serverUrl;
 	#backofficePath;
 	#authFlow;
+
+	#authWindowProxy?: WindowProxy | null;
+	#previousAuthUrl?: string;
 
 	constructor(host: UmbControllerHost, serverUrl: string, backofficePath: string, isBypassed: boolean) {
 		super(host, UMB_AUTH_CONTEXT);
@@ -31,6 +34,37 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		this.#backofficePath = backofficePath;
 
 		this.#authFlow = new UmbAuthFlow(serverUrl, this.getRedirectUrl(), this.getPostLogoutRedirectUrl());
+
+		// Observe the authorization signal and close the auth window
+		this.observe(
+			this.authorizationSignal,
+			() => {
+				// Update the authorization state
+				this.getIsAuthorized();
+			},
+			'_authFlowAuthorizationSignal',
+		);
+
+		// Observe changes to local storage and update the authorization state
+		// This establishes the tab-to-tab communication
+		window.addEventListener('storage', this.#onStorageEvent.bind(this));
+	}
+
+	destroy(): void {
+		super.destroy();
+		window.removeEventListener('storage', this.#onStorageEvent.bind(this));
+	}
+
+	async #onStorageEvent(evt: StorageEvent) {
+		console.log('[AuthContext] Storage event', evt);
+		if (evt.key === UMB_STORAGE_TOKEN_RESPONSE_NAME) {
+			// Close any open auth windows
+			this.#authWindowProxy?.close();
+			// Refresh the local storage state into memory
+			await this.setInitialState();
+			// Let any auth listeners (such as the auth modal) know that the auth state has changed
+			this.authorizationSignal.next();
+		}
 	}
 
 	/**
@@ -38,8 +72,28 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	 * @param identityProvider The provider to use for login. Default is 'Umbraco'.
 	 * @param usernameHint The username hint to use for login.
 	 */
-	makeAuthorizationRequest(identityProvider = 'Umbraco', usernameHint?: string) {
-		return this.#authFlow.makeAuthorizationRequest(identityProvider, usernameHint);
+	async makeAuthorizationRequest(identityProvider = 'Umbraco', redirect?: boolean, usernameHint?: string) {
+		const redirectUrl = await this.#authFlow.makeAuthorizationRequest(identityProvider, usernameHint);
+		if (redirect) {
+			location.href = redirectUrl;
+			return;
+		}
+
+		if (!this.#authWindowProxy || this.#authWindowProxy.closed) {
+			// TODO: Add popup behavior configuration to the authProvider's manifest
+			this.#authWindowProxy = window.open(
+				redirectUrl,
+				'umbracoAuthPopup',
+				'popup,width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no',
+			);
+		} else if (this.#previousAuthUrl !== redirectUrl) {
+			this.#authWindowProxy = window.open(redirectUrl, 'umbracoAuthPopup');
+			this.#authWindowProxy?.focus();
+		}
+
+		this.#previousAuthUrl = redirectUrl;
+
+		return firstValueFrom(this.authorizationSignal);
 	}
 
 	/**
@@ -173,7 +227,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	}
 
 	getRedirectUrl() {
-		return `${window.location.origin}${this.#backofficePath}`;
+		return `${window.location.origin}${this.#backofficePath}oauth_complete`;
 	}
 
 	getPostLogoutRedirectUrl() {
