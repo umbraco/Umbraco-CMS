@@ -21,7 +21,7 @@ import { manifest as valueType } from './value-type/manifests.js';
 import { manifests as collectionView } from '../../../property-editors/collection-view/manifests.js';
 import { manifests as numbers } from '../../../property-editors/number/manifests.js';
 import { manifests as textBoxes } from '../../../property-editors/text-box/manifests.js';
-import { manifests as treePicker } from './tree-picker/manifests.js';
+import { manifests as treePicker } from '../../../property-editors/tree-picker/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestPropertyEditorUi> = [
