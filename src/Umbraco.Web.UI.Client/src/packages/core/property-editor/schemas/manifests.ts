@@ -15,7 +15,6 @@ import { manifest as tags } from './Umbraco.Tags.js';
 import { manifest as richText } from './Umbraco.RichText.js';
 import { manifest as trueFalse } from './Umbraco.TrueFalse.js';
 import { manifest as uploadField } from './Umbraco.UploadField.js';
-import { manifest as userPicker } from './Umbraco.UserPicker.js';
 
 import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -37,5 +36,4 @@ export const manifests: Array<ManifestPropertyEditorSchema> = [
 	richText,
 	trueFalse,
 	uploadField,
-	userPicker,
 ];
