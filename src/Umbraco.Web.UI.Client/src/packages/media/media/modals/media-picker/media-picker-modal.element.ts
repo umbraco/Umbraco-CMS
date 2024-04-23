@@ -1,46 +1,86 @@
-import { UmbMediaCollectionRepository } from '../../collection/repository/media-collection.repository.js';
-import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from '../../collection/types.js';
+import type { UmbMediaDetailModel } from '../../types.js';
+import { UmbMediaDetailRepository } from '../../repository/index.js';
+import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
+import type { UmbMediaTreeItemModel } from '../../tree/types.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UmbMediaTypeFileType } from '@umbraco-cms/backoffice/media-type';
+
+// Folder media type unique from backend
+const FOLDER = 'f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d';
+
+interface MediaPath {
+	name: string;
+	unique: string | null;
+}
 
 @customElement('umb-media-picker-modal')
 export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPickerModalData, UmbMediaPickerModalValue> {
-	#collectionRepository = new UmbMediaCollectionRepository(this);
+	#mediaTreeRepository = new UmbMediaTreeRepository(this);
+	#mediaDetailRepository = new UmbMediaDetailRepository(this);
 
 	@state()
-	private _items: Array<UmbMediaCollectionItemModel> = [];
+	private _items: Array<UmbMediaTreeItemModel> = [];
 
 	@state()
-	private _selection: Array<string> = [];
+	private _selectableFolders = false;
 
 	@state()
-	private _currentPath = 'media-root';
+	private _paths: Array<MediaPath> = [{ name: 'Media', unique: null }];
+
+	@state()
+	private _currentPath: string | null = null;
 
 	@state()
 	private _typingNewFolder = false;
 
-	@state()
-	private _paths: Array<{ name: string; unique: string }> = [{ name: 'Media', unique: 'media-root' }];
-
 	connectedCallback(): void {
 		super.connectedCallback();
-		this._selection = this.data?.selection ?? [];
-		this.#getCollection();
+		this._selectableFolders = this.data?.selectableFolders ?? false;
+		this._currentPath = this.data?.startNode ?? null;
+		this.#loadPath();
 	}
 
-	async #getCollection() {
-		const params: UmbMediaCollectionFilterModel = {
-			// TODO whatever this is for...
-			userDefinedProperties: [{ alias: 'type', header: '', isSystem: true }],
-		};
+	async #loadPath() {
+		if (this._currentPath) {
+			const { data } = await this.#mediaTreeRepository.requestTreeItemAncestors({
+				descendantUnique: this._currentPath,
+			});
+			const paths = data?.map((item) => ({ name: item.name, unique: item.unique })) ?? [];
+			this._paths = [...this._paths, ...paths];
+		}
 
-		const { data } = await this.#collectionRepository.requestCollection(params);
-		this._items = data?.items ?? [];
+		this.#loadMediaFolder();
+	}
 
-		console.log(data?.items);
+	async #loadMediaFolder() {
+		if (this._currentPath) {
+			const { data } = await this.#mediaTreeRepository.requestTreeItemsOf({
+				parentUnique: this._currentPath,
+				skip: 0,
+				take: 100,
+			});
+			this._items = data?.items ?? [];
+		} else {
+			const { data } = await this.#mediaTreeRepository.requestRootTreeItems({ skip: 0, take: 100 });
+			this._items = data?.items ?? [];
+		}
+	}
+
+	#goToFolder(unique: string | null) {
+		this._paths = [...this._paths].slice(0, this._paths.findIndex((path) => path.unique === unique) + 1);
+		this._currentPath = unique;
+		this.#loadMediaFolder();
+	}
+
+	#onFolderOpen(item: UmbMediaTreeItemModel) {
+		if (item.mediaType.unique !== FOLDER) return;
+		this._paths = [...this._paths, { name: item.name, unique: item.unique }];
+		this._currentPath = item.unique;
+		this.#loadMediaFolder();
 	}
 
 	#focusFolderInput() {
@@ -52,14 +92,51 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		});
 	}
 
-	#addFolder(e: UUIInputEvent) {
+	async #addFolder(e: UUIInputEvent) {
 		const name = e.target.value as string;
+
 		if (name) {
 			const unique = UmbId.new();
+			const parentUnique = this._paths[this._paths.length - 1].unique;
 			this._paths = [...this._paths, { name, unique }];
 			this._currentPath = unique;
+
+			const preset: Partial<UmbMediaDetailModel> = {
+				unique,
+				mediaType: {
+					unique: UmbMediaTypeFileType.FOLDER,
+					collection: null,
+				},
+				variants: [
+					{
+						culture: null,
+						segment: null,
+						name: name,
+						createDate: null,
+						updateDate: null,
+					},
+				],
+			};
+			const { data } = await this.#mediaDetailRepository.createScaffold(preset);
+			if (data) {
+				await this.#mediaDetailRepository.create(data, parentUnique);
+			}
 		}
 		this._typingNewFolder = false;
+		this.#loadMediaFolder();
+	}
+
+	#onSelected(item: UmbMediaTreeItemModel) {
+		const selection = this.data?.multiple ? [...this.value.selection, item.unique] : [item.unique];
+		this.modalContext?.setValue({ selection });
+		if (this.data?.submitOnSelection) {
+			this._submitModal();
+		}
+	}
+
+	#onDeselected(item: UmbMediaTreeItemModel) {
+		const selection = this.value.selection.filter((value) => value !== item.unique);
+		this.modalContext?.setValue({ selection });
 	}
 
 	render() {
@@ -99,7 +176,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				<div id="search">
 					<uui-input
 						label=${this.localize.term('general_search')}
-						placeholder=${this.localize.term('placeholders_search')}>
+						placeholder=${this.localize.term('placeholders_search') + '(TODO)'}>
 						<uui-icon slot="prepend" name="icon-search"></uui-icon>
 					</uui-input>
 					<uui-checkbox label=${this.localize.term('general_excludeFromSubFolders') + '(TODO)'} disabled></uui-checkbox>
@@ -107,11 +184,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				<uui-button label=${this.localize.term('general_upload')} look="primary"></uui-button>
 			</div>
 			${this.#renderPath()}`;
-	}
-
-	#goToFolder(unique: string) {
-		this._paths = [...this._paths].slice(0, this._paths.findIndex((path) => path.unique === unique) + 1);
-		this._currentPath = unique;
 	}
 
 	#renderPath() {
@@ -137,13 +209,17 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		</div>`;
 	}
 
-	#renderCard(item: UmbMediaCollectionItemModel) {
+	#renderCard(item: UmbMediaTreeItemModel) {
 		return html`
 			<uui-card-media
 				.name=${item.name ?? 'Unnamed Media'}
-				selectable
-				?select-only=${this._selection && this._selection.length > 0}
-				file-ext=${item.values.find((value) => value.alias === 'type')?.value ?? item.icon}>
+				@open=${() => this.#onFolderOpen(item)}
+				@selected=${() => this.#onSelected(item)}
+				@deselected=${() => this.#onDeselected(item)}
+				?selected=${this.value?.selection?.find((value) => value === item.unique)}
+				?selectable=${item.mediaType.unique !== FOLDER || this._selectableFolders}
+				?select-only=${item.mediaType.unique !== FOLDER}
+				file-ext=${item.mediaType.unique !== FOLDER ? item.mediaType.icon : ''}>
 			</uui-card-media>
 		`;
 	}

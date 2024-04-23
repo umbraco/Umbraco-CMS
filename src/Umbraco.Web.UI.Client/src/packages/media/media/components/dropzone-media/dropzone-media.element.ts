@@ -68,18 +68,26 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 	}
 
 	#getMediaTypeFromMime(mimetype: string): UmbAllowedMediaTypeModel {
-		const mediaTypeName = getMediaTypeByFileMimeType(mimetype);
-		return this.#allowedMediaTypes.find((type) => type.name === mediaTypeName)!;
+		// TODO: We need to make sure we get the folder media type. Find a better way. The unique is currently hardcoded on the backend f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d
+		const mediaType = getMediaTypeByFileMimeType(mimetype);
+		return this.#allowedMediaTypes.find((type) => type.unique === mediaType)!;
 	}
 
 	async #uploadHandler(files: Array<File>) {
-		const queue = files.map((file): UmbTemporaryFileQueueModel => ({ file }));
+		//TODO: Folders uploaded via UUIDropzone are always empty. Investigate why.
+
+		const folders = files.filter((item) => !item.type).map((file): UmbTemporaryFileQueueModel => ({ file }));
+		const mediaItems = files.filter((item) => item.type);
+
+		const queue = mediaItems.map((file): UmbTemporaryFileQueueModel => ({ file }));
+
 		const uploaded = await this.#fileManager.upload(queue);
-		return uploaded;
+		return [...folders, ...uploaded];
 	}
 
 	async #onFileUpload(event: UUIFileDropzoneEvent) {
 		const files: Array<File> = event.detail.files;
+
 		if (!files.length) return;
 		const uploads = await this.#uploadHandler(files);
 
@@ -100,19 +108,22 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 						updateDate: null,
 					},
 				],
-				values: [
-					{
-						alias: 'umbracoFile',
-						value: { src: upload.unique },
-						culture: null,
-						segment: null,
-					},
-				],
+				values: upload.file.type
+					? [
+							{
+								alias: 'umbracoFile',
+								value: { src: upload.unique },
+								culture: null,
+								segment: null,
+							},
+						]
+					: [],
 			};
 
 			const { data } = await this.#mediaDetailRepository.createScaffold(preset);
 			if (!data) return;
 
+			// TODO Get the parent...
 			await this.#mediaDetailRepository.create(data, null);
 
 			this.dispatchEvent(new UmbChangeEvent());
