@@ -175,7 +175,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	}
 
 	#renderTrees() {
-		//TODO: Make search work
+		//TODO: Make search work (temporarily disabled)
 		return html`
 			<uui-symbol-expand
 				id="document-expand"
@@ -184,6 +184,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			<uui-label for="document-expand">${this.localize.term('defaultdialogs_linkToPage')}</uui-label>
 			<div style="${styleMap({ display: !this.documentExpand ? 'block' : 'none' })}">
 				<uui-input
+					disabled
 					id="search-input"
 					placeholder=${this.localize.term('placeholders_search')}
 					label=${this.localize.term('placeholders_search')}></uui-input>
