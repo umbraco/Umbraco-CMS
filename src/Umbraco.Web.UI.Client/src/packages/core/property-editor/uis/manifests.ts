@@ -3,7 +3,7 @@ import { manifest as colorEditor } from '../../../property-editors/color-swatche
 import { manifest as colorPicker } from '../../../property-editors/color-picker/manifests.js';
 import { manifest as datePicker } from '../../../property-editors/date-picker/manifests.js';
 import { manifest as dropdown } from '../../../property-editors/dropdown/manifests.js';
-import { manifest as eyeDropper } from './eye-dropper/manifests.js';
+import { manifest as eyeDropper } from '../../../property-editors/eye-dropper/manifests.js';
 import { manifest as iconPicker } from './icon-picker/manifests.js';
 import { manifest as label } from './label/manifests.js';
 import { manifest as multipleTextString } from './multiple-text-string/manifests.js';
