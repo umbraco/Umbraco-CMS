@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Services;
+using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -15,13 +17,16 @@ public class ListExternalLoginProvidersCurrentUserController : CurrentUserContro
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IBackOfficeExternalLoginService _backOfficeExternalLoginService;
+    private readonly IUmbracoMapper _mapper;
 
     public ListExternalLoginProvidersCurrentUserController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IBackOfficeExternalLoginService backOfficeExternalLoginService)
+        IBackOfficeExternalLoginService backOfficeExternalLoginService,
+        IUmbracoMapper mapper)
     {
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _backOfficeExternalLoginService = backOfficeExternalLoginService;
+        _mapper = mapper;
     }
 
     [MapToApiVersion("1.0")]
@@ -35,7 +40,8 @@ public class ListExternalLoginProvidersCurrentUserController : CurrentUserContro
             await _backOfficeExternalLoginService.ExternalLoginStatusForUser(userKey);
 
         return result.Success
-            ? Ok(result.Result)
+            ? Ok(_mapper.MapEnumerable<UserExternalLoginProviderModel, UserExternalLoginProviderResponseModel>(
+                result.Result))
             : ExternalLoginOperationStatusResult(result.Status);
     }
 }
