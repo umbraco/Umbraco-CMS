@@ -14,7 +14,7 @@ import { manifest as overlaySize } from '../../../property-editors/overlay-size/
 import { manifest as radioButtonList } from '../../../property-editors/radio-button-list/manifests.js';
 import { manifest as select } from '../../../property-editors/select/manifests.js';
 import { manifest as slider } from '../../../property-editors/slider/manifests.js';
-import { manifest as textArea } from './textarea/manifests.js';
+import { manifest as textArea } from '../../../property-editors/textarea/manifests.js';
 import { manifest as toggle } from './toggle/manifests.js';
 import { manifest as uploadField } from './upload-field/manifests.js';
 import { manifest as valueType } from './value-type/manifests.js';
