@@ -1,8 +1,8 @@
+import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import type { UmbDocumentItemModel, UmbDocumentItemVariantModel } from '../repository/item/types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
@@ -65,12 +65,10 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 		if (!this.item) return nothing;
 
 		return html`
-			<a href="#" class="item">
-				<span class="item-icon">
-					${this.item.icon ? html`<umb-icon name="${this.item.icon}"></umb-icon>` : this.#renderHashTag()}
-				</span>
-				<span class="item-name"> ${this.#getLabel()} </span>
-			</a>
+			<span class="item-icon">
+				${this.item.icon ? html`<umb-icon name="${this.item.icon}"></umb-icon>` : this.#renderHashTag()}
+			</span>
+			<span class="item-name"> ${this.#getLabel()} </span>
 		`;
 	}
 
@@ -89,8 +87,13 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
-				display: flex;
-				gap: 12px;
+				background: var(--uui-color-surface);
+				padding: var(--uui-size-space-3) var(--uui-size-space-5);
+				border-radius: var(--uui-border-radius);
+				color: var(--uui-color-interactive);
+				display: grid;
+				grid-template-columns: var(--uui-size-space-6) 1fr var(--uui-size-space-5);
+				align-items: center;
 				width: 100%;
 			}
 			.item {

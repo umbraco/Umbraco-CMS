@@ -6,6 +6,7 @@ export type UmbSearchResultItemModel = {
 	icon?: string | null;
 	name: string;
 	unique: string;
+	href: string;
 };
 
 export type UmbSearchRequestArgs = {

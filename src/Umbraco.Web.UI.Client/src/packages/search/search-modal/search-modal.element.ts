@@ -34,6 +34,12 @@ export class UmbSearchModalElement extends UmbLitElement {
 	@state()
 	_loading: boolean = false;
 
+	@state()
+	_searchItemNavIndex = 0;
+
+	@state()
+	_inputHasFocus = false;
+
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 300;
 
@@ -69,9 +75,37 @@ export class UmbSearchModalElement extends UmbLitElement {
 	connectedCallback() {
 		super.connectedCallback();
 
+		this.addEventListener('keydown', this.#onKeydown);
+
 		requestAnimationFrame(() => {
 			this.#focusInput();
 		});
+	}
+
+	#onKeydown(event: KeyboardEvent) {
+		if (event.key !== 'Tab' && event.key !== 'Shift') {
+			this.#focusInput();
+		}
+
+		if (event.key === 'ArrowDown') {
+			this.#setSearchItemNavIndex(Math.min(this._searchItemNavIndex + 1, this._searchResults.length - 1));
+		}
+		if (event.key === 'ArrowUp') {
+			this.#setSearchItemNavIndex(Math.max(this._searchItemNavIndex - 1, 0));
+		}
+	}
+
+	async #setSearchItemNavIndex(index: number) {
+		this._searchItemNavIndex = index;
+		await this.updateComplete;
+		const element = this.shadowRoot?.querySelector(`a[data-item-index="${index}"]`) as HTMLElement | null;
+
+		console.log('element', element, 'index', this._searchResults.length);
+
+		if (!element) return;
+		if (!this._searchResults.length) return;
+
+		element.focus();
 	}
 
 	#focusInput() {
@@ -111,6 +145,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 		} else {
 			this._searchResults = [];
 		}
+		this.#setSearchItemNavIndex(0);
 
 		this._loading = false;
 	}
@@ -160,17 +195,19 @@ export class UmbSearchModalElement extends UmbLitElement {
 		return repeat(
 			this._searchResults,
 			(item) => item.unique,
-			(item) => this.#renderResultItem(item),
+			(item, index) => this.#renderResultItem(item, index),
 		);
 	}
 
-	#renderResultItem(item: UmbSearchResultItemModel) {
+	#renderResultItem(item: UmbSearchResultItemModel, index: number) {
 		return html`
-			<umb-extension-slot
-				type="searchResultItem"
-				.props=${{ item }}
-				.filter=${(manifest: ManifestSearchResultItem) => manifest.forEntityTypes.includes(item.entityType)}
-				default-element="umb-search-result-item"></umb-extension-slot>
+			<a href=${item.href} data-item-index=${index} class="search-item">
+				<umb-extension-slot
+					type="searchResultItem"
+					.props=${{ item }}
+					.filter=${(manifest: ManifestSearchResultItem) => manifest.forEntityTypes.includes(item.entityType)}
+					default-element="umb-search-result-item"></umb-extension-slot>
+			</a>
 		`;
 	}
 
@@ -203,9 +240,9 @@ export class UmbSearchModalElement extends UmbLitElement {
 				color: var(--uui-color-interactive-emphasis);
 			}
 			.search-provider.active {
-				background: var(--uui-color-surface-emphasis);
-				color: var(--uui-color-interactive-emphasis);
-				border-color: var(--uui-color-focus);
+				background: var(--uui-color-focus);
+				color: var(--uui-color-selected-contrast);
+				border-color: transparent;
 			}
 			:host {
 				display: flex;
@@ -255,6 +292,11 @@ export class UmbSearchModalElement extends UmbLitElement {
 				margin-top: var(--uui-size-space-5);
 				color: var(--uui-color-text-alt);
 				margin: var(--uui-size-space-5) 0;
+			}
+			.search-item {
+				color: var(--uui-color-text);
+				text-decoration: none;
+				outline-offset: -3px;
 			}
 		`,
 	];

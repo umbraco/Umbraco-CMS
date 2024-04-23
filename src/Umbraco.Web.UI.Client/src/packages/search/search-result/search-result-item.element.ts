@@ -13,12 +13,10 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 		if (!this.item) return nothing;
 
 		return html`
-			<a href="#" class="item">
-				<span class="item-icon">
-					${this.item.icon ? html`<umb-icon name="${this.item.icon}"></umb-icon>` : this.#renderHashTag()}
-				</span>
-				<span class="item-name"> ${this.item.name} </span>
-			</a>
+			<span class="item-icon">
+				${this.item.icon ? html`<umb-icon name="${this.item.icon}"></umb-icon>` : this.#renderHashTag()}
+			</span>
+			<span class="item-name"> ${this.item.name} </span>
 		`;
 	}
 
@@ -37,24 +35,13 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
-				display: flex;
-				gap: 12px;
-				width: 100%;
-			}
-			.item {
-				background: var(--uui-color-surface);
 				padding: var(--uui-size-space-3) var(--uui-size-space-5);
 				border-radius: var(--uui-border-radius);
-				color: var(--uui-color-interactive);
 				display: grid;
 				grid-template-columns: var(--uui-size-space-6) 1fr var(--uui-size-space-5);
 				align-items: center;
 				width: 100%;
 				outline-offset: -3px;
-			}
-			.item:hover {
-				background-color: var(--uui-color-surface-emphasis);
-				color: var(--uui-color-interactive-emphasis);
 			}
 			.item-icon {
 				margin-bottom: auto;
