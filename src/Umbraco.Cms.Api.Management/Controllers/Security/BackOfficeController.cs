@@ -192,16 +192,35 @@ public class BackOfficeController : SecurityControllerBase
     /// </summary>
     /// <param name="provider"></param>
     /// <returns></returns>
-    [HttpPost("link-login")]
+    [HttpGet("link-login")]
+    [AllowAnonymous]
     [MapToApiVersion("1.0")]
-    public IActionResult LinkLogin(string provider)
+    public async Task<IActionResult> LinkLogin(string provider)
     {
+        var cookieAuthenticatedUserAttempt =
+            await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+
+        if (cookieAuthenticatedUserAttempt.Succeeded == false)
+        {
+            return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+                "flow=link-login",
+                "status=unauthorized"));
+        }
+
+        BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(cookieAuthenticatedUserAttempt.Principal);
+        if (user == null)
+        {
+            return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+                "flow=link-login",
+                "status=user-not-found"));
+        }
+
         // Request a redirect to the external login provider to link a login for the current user
         var redirectUrl = Url.Action(nameof(ExternalLinkLoginCallback), this.GetControllerName());
 
         // Configures the redirect URL and user identifier for the specified external login including xsrf data
         AuthenticationProperties properties =
-            _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, _backOfficeUserManager.GetUserId(User));
+            _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, user.Id);
 
         return Challenge(properties, provider);
     }
@@ -225,7 +244,7 @@ public class BackOfficeController : SecurityControllerBase
 
         if (cookieAuthenticatedUserAttempt.Succeeded == false)
         {
-            return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+            return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
                 "flow=external-login-callback",
                 "status=unauthorized"));
         }
@@ -233,7 +252,7 @@ public class BackOfficeController : SecurityControllerBase
         BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(cookieAuthenticatedUserAttempt.Principal);
         if (user == null)
         {
-            return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+            return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
                 "flow=external-login-callback",
                 "status=user-not-found"));
         }
@@ -243,7 +262,7 @@ public class BackOfficeController : SecurityControllerBase
 
         if (info == null)
         {
-            return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+            return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
                 "flow=external-login-callback",
                 "status=external-info-not-found"));
         }
@@ -253,14 +272,14 @@ public class BackOfficeController : SecurityControllerBase
         {
             // Update any authentication tokens if succeeded
             await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(info);
-            return Redirect("/umbraco"); // todo shouldn't this come from configuration
+            return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackPathName);
         }
 
         // Add errors and redirect for it to be displayed
         // TempData[ViewDataExtensions.TokenExternalSignInError] = addLoginResult.Errors;
         // return RedirectToLogin(new { flow = "external-login", status = "failed", logout = "true" });
         // todo
-        return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+        return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
             "flow=external-login-callback",
             "status=failed"));
     }
@@ -308,6 +327,15 @@ public class BackOfficeController : SecurityControllerBase
                     .WithDetail($"Manual linking is disabled for provider {authType.Name}")
                     .Build());
             }
+        }
+
+        IEnumerable<IIdentityUserLogin> externalLogins = user.Logins.Where(l => l.LoginProvider == unlinkLoginRequestModel.LoginProvider);
+        if (externalLogins.Any(l => l.ProviderKey == unlinkLoginRequestModel.ProviderKey) == false)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
+                .WithTitle("Unlinking failed")
+                .WithDetail("Could not match ProviderKey to the supplied provider")
+                .Build());
         }
 
         IdentityResult result = await _backOfficeUserManager.RemoveLoginAsync(

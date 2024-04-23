@@ -48,7 +48,7 @@ public class OAuthOptionsHelper
     public T SetUmbracoRedirectWithFilteredParams<T>(T context, string providerFriendlyName, string eventName)
         where T : HandleRequestContext<RemoteAuthenticationOptions>
     {
-        var callbackPath = _securitySettings.Value.AuthorizeCallbackErrorPathName;
+        var callbackPath =_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName;
 
         callbackPath = callbackPath.AppendQueryStringToUrl("flow=external-login")
         .AppendQueryStringToUrl($"provider={providerFriendlyName}")
@@ -75,7 +75,7 @@ public class OAuthOptionsHelper
     /// <returns></returns>
     public RemoteAuthenticationOptions SetUmbracoBasedCallbackPath(RemoteAuthenticationOptions options, string path)
     {
-        var umbracoCallbackPath = _securitySettings.Value.AuthorizeCallbackPathName;
+        var umbracoCallbackPath = _securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackPathName;
 
         options.CallbackPath = umbracoCallbackPath + path.EnsureStartsWith("/");
         return options;
