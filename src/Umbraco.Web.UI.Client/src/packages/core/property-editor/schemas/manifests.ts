@@ -7,7 +7,6 @@ import { manifest as multiNodeTreePicker } from './Umbraco.MultiNodeTreePicker.j
 import { manifest as multiUrlPicker } from './Umbraco.MultiUrlPicker.js';
 import { manifest as radioButtonList } from './Umbraco.RadioButtonList.js';
 import { manifest as richText } from './Umbraco.RichText.js';
-import { manifest as trueFalse } from './Umbraco.TrueFalse.js';
 import { manifest as uploadField } from './Umbraco.UploadField.js';
 
 import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/extension-registry';
@@ -22,6 +21,5 @@ export const manifests: Array<ManifestPropertyEditorSchema> = [
 	multiUrlPicker,
 	radioButtonList,
 	richText,
-	trueFalse,
 	uploadField,
 ];

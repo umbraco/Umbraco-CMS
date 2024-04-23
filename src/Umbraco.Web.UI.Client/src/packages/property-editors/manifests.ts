@@ -7,8 +7,8 @@ import { manifest as orderDirection } from './order-direction/manifests.js';
 import { manifest as overlaySize } from './overlay-size/manifests.js';
 import { manifest as radioButtonList } from './radio-button-list/manifests.js';
 import { manifest as select } from './select/manifests.js';
-import { manifest as slider } from './slider/manifests.js';
-import { manifest as toggle } from './toggle/manifests.js';
+import { manifests as sliderManifests } from './slider/manifests.js';
+import { manifests as toggleManifests } from './toggle/manifests.js';
 import { manifest as uploadField } from './upload-field/manifests.js';
 import { manifest as valueType } from './value-type/manifests.js';
 import { manifests as checkboxListManifests } from './checkbox-list/manifests.js';
@@ -34,8 +34,10 @@ export const manifests: Array<ManifestTypes> = [
 	...labelManifests,
 	...multipleTextStringManifests,
 	...numbers,
+	...sliderManifests,
 	...textareaManifests,
 	...textBoxManifests,
+	...toggleManifests,
 	...treePicker,
 	colorEditor,
 	iconPicker,
@@ -45,8 +47,6 @@ export const manifests: Array<ManifestTypes> = [
 	overlaySize,
 	radioButtonList,
 	select,
-	slider,
-	toggle,
 	uploadField,
 	valueType,
 ];
