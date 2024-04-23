@@ -17,7 +17,7 @@ import { manifest as slider } from '../../../property-editors/slider/manifests.j
 import { manifest as textArea } from '../../../property-editors/textarea/manifests.js';
 import { manifest as toggle } from '../../../property-editors/toggle/manifests.js';
 import { manifest as uploadField } from '../../../property-editors/upload-field/manifests.js';
-import { manifest as valueType } from './value-type/manifests.js';
+import { manifest as valueType } from '../../../property-editors/value-type/manifests.js';
 import { manifests as collectionView } from '../../../property-editors/collection-view/manifests.js';
 import { manifests as numbers } from '../../../property-editors/number/manifests.js';
 import { manifests as textBoxes } from '../../../property-editors/text-box/manifests.js';
