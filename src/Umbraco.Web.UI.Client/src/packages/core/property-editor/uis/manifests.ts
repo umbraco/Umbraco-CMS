@@ -1,7 +1,7 @@
 import { manifest as checkboxList } from '../../../property-editors/checkbox-list/manifests.js';
 import { manifest as colorEditor } from '../../../property-editors/color-swatches-editor/manifests.js';
 import { manifest as colorPicker } from '../../../property-editors/color-picker/manifests.js';
-import { manifest as datePicker } from './date-picker/manifests.js';
+import { manifest as datePicker } from '../../../property-editors/date-picker/manifests.js';
 import { manifest as dropdown } from './dropdown/manifests.js';
 import { manifest as eyeDropper } from './eye-dropper/manifests.js';
 import { manifest as iconPicker } from './icon-picker/manifests.js';
