@@ -123,15 +123,17 @@ export class UmbAppAuthController extends UmbControllerBase {
 		}
 
 		// Show the provider selection screen
+		const authModalKey = 'umbAuthModal';
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager.remove('umbAuthModal');
+		modalManager.close(authModalKey);
+		modalManager.remove(authModalKey);
 		const selected = await modalManager
 			.open(this._host, UMB_MODAL_APP_AUTH, {
 				data: {
 					userLoginState,
 				},
 				modal: {
-					key: 'umbAuthModal',
+					key: authModalKey,
 					backdropBackground: this.#firstTimeLoggingIn
 						? 'var(--umb-auth-backdrop, url("/umbraco/backoffice/assets/umbraco_logo_white.svg") 20px 20px / 200px no-repeat, radial-gradient(circle, rgba(2,0,36,1) 0%, rgba(40,58,151,.9) 50%, rgba(0,212,255,1) 100%))'
 						: 'var(--umb-auth-backdrop-timedout, rgba(0,0,0,0.75))',
