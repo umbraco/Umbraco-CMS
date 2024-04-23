@@ -161,8 +161,15 @@ export class UmbSearchModalElement extends UmbLitElement {
 	async #setSearchItemNavIndex(index: number) {
 		await this.updateComplete;
 
+		const prevElement = this.shadowRoot?.querySelector(
+			`a[data-item-index="${this.#searchItemNavIndex}"]`,
+		) as HTMLElement | null;
+		prevElement?.classList.remove('active');
+
 		this.#searchItemNavIndex = index;
+
 		const element = this.shadowRoot?.querySelector(`a[data-item-index="${index}"]`) as HTMLElement | null;
+		element?.classList.add('active');
 
 		if (!element) return;
 		if (!this._searchResults.length) return;
@@ -418,6 +425,11 @@ export class UmbSearchModalElement extends UmbLitElement {
 				text-decoration: none;
 				outline-offset: -3px;
 				display: flex;
+			}
+			.search-item.active:not(:focus-within) {
+				outline: 2px solid var(--uui-color-border);
+				border-radius: 6px;
+				outline-offset: -4px;
 			}
 		`,
 	];
