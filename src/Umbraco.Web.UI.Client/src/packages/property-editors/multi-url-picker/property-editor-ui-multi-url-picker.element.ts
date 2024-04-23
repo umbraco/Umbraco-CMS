@@ -1,11 +1,12 @@
-import { UmbLitElement } from '../../core/lit-element/index.js';
-import { UMB_PROPERTY_CONTEXT } from '../../core/property/property/index.js';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbInputMultiUrlElement } from '@umbraco-cms/backoffice/components';
 import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
@@ -13,14 +14,16 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 @customElement('umb-property-editor-ui-multi-url-picker')
 export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Array })
-	value: UmbLinkPickerLink[] = [];
+	value: Array<UmbLinkPickerLink> = [];
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this._overlaySize = config?.getValueByAlias('overlaySize');
-		this._hideAnchor = config?.getValueByAlias('hideAnchor');
-		this._ignoreUserStartNodes = config?.getValueByAlias('ignoreUserStartNodes');
-		this._minNumber = config?.getValueByAlias('minNumber');
-		this._maxNumber = config?.getValueByAlias('maxNumber');
+		if (!config) return;
+
+		this._hideAnchor = config.getValueByAlias('hideAnchor') ?? false;
+		this._ignoreUserStartNodes = config.getValueByAlias<boolean>('ignoreUserStartNodes') ?? false;
+		this._minNumber = Number(config.getValueByAlias('minNumber')) ?? 0;
+		this._maxNumber = Number(config.getValueByAlias('maxNumber')) ?? Infinity;
+		this._overlaySize = config.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';
 	}
 
 	@state()
@@ -33,46 +36,45 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	private _ignoreUserStartNodes?: boolean;
 
 	@state()
-	private _maxNumber?: number;
+	private _minNumber? = 0;
 
 	@state()
-	private _minNumber?: number;
+	private _maxNumber? = Infinity;
 
 	@state()
 	private _alias?: string;
 
 	@state()
-	private _propertyVariantId?: string;
+	private _variantId?: string;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(context.alias, (alias) => {
-				this._alias = alias;
-			});
-			this.observe(context.variantId, (variantId) => {
-				this._propertyVariantId = variantId?.toString() || 'invariant';
-			});
+			this.observe(context.alias, (alias) => (this._alias = alias));
+			this.observe(context.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
 		});
 	}
 
-	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputMultiUrlElement).urls;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+	#onChange(event: CustomEvent & { target: UmbInputMultiUrlElement }) {
+		this.value = event.target.urls;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<umb-input-multi-url
-			.alias="${this._alias}"
-			.variantId="${this._propertyVariantId}"
-			@change="${this._onChange}"
-			.overlaySize="${this._overlaySize}"
-			?hide-anchor="${this._hideAnchor}"
-			.ignoreUserStartNodes=${this._ignoreUserStartNodes}
-			.max=${this._maxNumber}
-			.min=${this._minNumber}
-			.urls="${this.value ?? []}"></umb-input-multi-url>`;
+		return html`
+			<umb-input-multi-url
+				.alias=${this._alias}
+				.ignoreUserStartNodes=${this._ignoreUserStartNodes}
+				.max=${this._maxNumber}
+				.min=${this._minNumber}
+				.overlaySize=${this._overlaySize}
+				.urls=${this.value ?? []}
+				.variantId=${this._variantId}
+				?hide-anchor=${this._hideAnchor}
+				@change=${this.#onChange}>
+			</umb-input-multi-url>
+		`;
 	}
 }
 
