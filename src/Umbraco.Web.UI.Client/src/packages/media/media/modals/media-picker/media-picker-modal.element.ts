@@ -5,7 +5,7 @@ import type { UmbMediaTreeItemModel } from '../../tree/types.js';
 import type { UmbDropzoneMediaElement } from '../../components/index.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbMediaTypeFileType } from '@umbraco-cms/backoffice/media-type';
@@ -37,6 +37,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 	@state()
 	private _typingNewFolder = false;
+
+	@query('#dropzone')
+	private _dropzone!: UmbDropzoneMediaElement;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -140,11 +143,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		this.modalContext?.setValue({ selection });
 	}
 
-	#onUploadClick() {
-		const dropzoneHandler = this.shadowRoot?.querySelector('#dropzone') as UmbDropzoneMediaElement;
-		dropzoneHandler?.getDropzoneElement()?.browse();
-	}
-
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
@@ -191,7 +189,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				<uui-button
 					label=${this.localize.term('general_upload')}
 					look="primary"
-					@click=${this.#onUploadClick}></uui-button>
+					@click=${() => this._dropzone?.browse()}></uui-button>
 			</div>
 			${this.#renderPath()}`;
 	}

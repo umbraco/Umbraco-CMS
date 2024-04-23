@@ -28,9 +28,9 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 	@property({ attribute: false })
 	parentUnique: string | null = null;
 
-	public getDropzoneElement() {
+	public browse() {
 		const element = this.shadowRoot?.querySelector('#dropzone') as UUIFileDropzoneElement;
-		return element;
+		return element.browse();
 	}
 
 	constructor() {
