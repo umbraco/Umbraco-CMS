@@ -31,34 +31,13 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 					][new Date().getDay()],
 				);
 	}
-	#openWindow: WindowProxy | null = null;
-	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		// Listen to the message from the iframe "oauth_complete" and close the modal
-		window.addEventListener('message', this.#onMessage.bind(this));
-
-		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-			this.#authContext = authContext;
-
-			// Observe the auth redirects
-			this.observe(
-				authContext.authRedirect,
-				(url) => {
-					if (url) {
-						this.#openWindow = window.open(url, '_blank');
-					}
-				},
-				'_redirect',
-			);
+		this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
+			this.observe(context.authorizationSignal, () => {}, '_authorizationSignal');
 		});
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		window.removeEventListener('message', this.#onMessage);
 	}
 
 	render() {
@@ -80,38 +59,16 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 
 	private onSubmit = async (providerName: string) => {
 		const authContext = await this.getContext(UMB_AUTH_CONTEXT);
-		const redirect = authContext.makeAuthorizationRequest(providerName);
-
-		this.observe(
-			redirect,
-			(url) => {
-				if (url) {
-					this.#openWindow = window.open(url, '_blank');
-				}
-			},
-			'_redirect',
-		);
-	};
-
-	async #onMessage(evt: MessageEvent) {
-		if (evt.data === 'oauth_complete') {
-			if (this.#openWindow) {
-				this.#openWindow.close();
-			}
-
-			// Refresh the state
-			await this.#authContext?.setInitialState();
-
-			// Test if we are authorized
-			const isAuthed = this.#authContext?.getIsAuthorized();
-			this.value = { success: isAuthed };
-			if (isAuthed) {
-				this._submitModal();
-			} else {
-				this._error = 'Failed to authenticate';
-			}
+		await authContext.makeAuthorizationRequest(providerName);
+		console.log('[AuthModal] Received authorization signal');
+		const isAuthed = authContext.getIsAuthorized();
+		this.value = { success: isAuthed };
+		if (isAuthed) {
+			this._submitModal();
+		} else {
+			this._error = 'Failed to authenticate';
 		}
-	}
+	};
 
 	static styles = [
 		UmbTextStyles,
