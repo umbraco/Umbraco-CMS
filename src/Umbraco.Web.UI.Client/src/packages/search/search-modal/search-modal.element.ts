@@ -16,6 +16,8 @@ type SearchProvider = {
 
 @customElement('umb-search-modal')
 export class UmbSearchModalElement extends UmbLitElement {
+	@query('#input-wrapper-fake-cursor')
+	private _inputFakeCursor!: HTMLElement;
 	@query('input')
 	private _input!: HTMLInputElement;
 
@@ -202,6 +204,17 @@ export class UmbSearchModalElement extends UmbLitElement {
 		this.#inputTimer = setTimeout(() => this.#updateSearchResults(), this.#inputTimerAmount);
 	}
 
+	async #setShowFakeCursor(show: boolean) {
+		if (show) {
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			const getTextBeforeCursor = this._search.substring(0, this._input.selectionStart ?? 0);
+			this._inputFakeCursor.textContent = getTextBeforeCursor;
+			this._inputFakeCursor.style.display = 'block';
+		} else {
+			this._inputFakeCursor.style.display = 'none';
+		}
+	}
+
 	#setCurrentProvider(searchProvider: SearchProvider) {
 		if (this._currentProvider === searchProvider) return;
 
@@ -229,12 +242,17 @@ export class UmbSearchModalElement extends UmbLitElement {
 		return html`
 			<div id="top">
 				${this.#renderSearchIcon()}
-				<input
-					value=${this._search}
-					@input=${this.#onSearchChange}
-					type="text"
-					placeholder="Search..."
-					autocomplete="off" />
+				<div id="input-wrapper">
+					<div id="input-wrapper-fake-cursor" aria-hidden="true"></div>
+					<input
+						value=${this._search}
+						@input=${this.#onSearchChange}
+						@blur=${() => this.#setShowFakeCursor(true)}
+						@focus=${() => this.#setShowFakeCursor(false)}
+						type="text"
+						placeholder="Search..."
+						autocomplete="off" />
+				</div>
 			</div>
 
 			${this.#renderSearchTags()}
@@ -346,6 +364,20 @@ export class UmbSearchModalElement extends UmbLitElement {
 				all: unset;
 				height: 100%;
 				width: 100%;
+			}
+			#input-wrapper {
+				width: 100%;
+				position: relative;
+			}
+			#input-wrapper-fake-cursor {
+				position: absolute;
+				left: 0;
+				border-right: 1px solid hotpink;
+				height: 1.2rem;
+				color: transparent;
+				user-select: none;
+				pointer-events: none;
+				bottom: 14px;
 			}
 			button {
 				font-family: unset;
