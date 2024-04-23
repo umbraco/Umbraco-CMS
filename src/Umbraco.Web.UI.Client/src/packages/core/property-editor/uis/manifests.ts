@@ -18,7 +18,7 @@ import { manifest as textArea } from './textarea/manifests.js';
 import { manifest as toggle } from './toggle/manifests.js';
 import { manifest as uploadField } from './upload-field/manifests.js';
 import { manifest as valueType } from './value-type/manifests.js';
-import { manifests as collectionView } from './collection-view/manifests.js';
+import { manifests as collectionView } from '../../../property-editors/collection-view/manifests.js';
 import { manifests as numbers } from './number/manifests.js';
 import { manifests as textBoxes } from './text-box/manifests.js';
 import { manifests as treePicker } from './tree-picker/manifests.js';
