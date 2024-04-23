@@ -53,10 +53,6 @@ parameters:
     displayName: 'Is nightly build (used for MyGet feed)'
     type: boolean
     default: false
-  - name: sqliteAcceptanceTests
-    displayName: Run SQLite Acceptance Tests
-    type: boolean
-    default: false
 
 variables:
   nodeVersion: 20
@@ -436,7 +432,6 @@ stages:
       # E2E Tests
       - job:
         displayName: E2E Tests (SQLite)
-        condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), eq(${{parameters.sqlServerIntegrationTests}}, True))
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
