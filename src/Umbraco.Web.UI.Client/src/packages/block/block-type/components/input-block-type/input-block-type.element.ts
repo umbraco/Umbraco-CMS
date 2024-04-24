@@ -86,13 +86,7 @@ export class UmbInputBlockTypeElement<
 						hideTreeRoot: true,
 						multiple: false,
 						createAction: {
-							modalData: {
-								entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-								preset: { isElementType: true },
-							},
-							additionalPathGenerator: umbCreateDocumentTypeWorkspacePathGenerator,
 							additionalPathParams: {
-								entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 								parentUnique: null,
 								presetAlias: 'element',
 							},
