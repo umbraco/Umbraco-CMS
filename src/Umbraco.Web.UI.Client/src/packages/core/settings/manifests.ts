@@ -1,4 +1,5 @@
 import { manifests as welcomeDashboardManifests } from './welcome-dashboard/manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_SETTINGS_SECTION_ALIAS = 'Umb.Section.Settings';
 

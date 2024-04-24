@@ -21,6 +21,7 @@ import { manifest as conditionManifest } from './document-user-permission.condit
 import type {
 	ManifestGranularUserPermission,
 	ManifestEntityUserPermission,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const permissions: Array<ManifestEntityUserPermission> = [

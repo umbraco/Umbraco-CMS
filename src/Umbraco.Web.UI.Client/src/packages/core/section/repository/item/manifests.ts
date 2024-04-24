@@ -1,4 +1,4 @@
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_SECTION_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.Section.Item';
 

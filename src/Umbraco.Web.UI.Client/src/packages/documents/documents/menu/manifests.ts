@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_TREE_ALIAS } from '../tree/index.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_CONTENT_MENU_ALIAS = 'Umb.Menu.Content';
 

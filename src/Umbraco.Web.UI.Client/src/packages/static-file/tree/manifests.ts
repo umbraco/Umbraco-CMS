@@ -8,6 +8,7 @@ import type {
 	ManifestTree,
 	ManifestTreeStore,
 	ManifestTreeItem,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_STATIC_FILE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.StaticFile.Tree';

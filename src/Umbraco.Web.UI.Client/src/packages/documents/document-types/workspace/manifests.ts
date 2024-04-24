@@ -1,6 +1,7 @@
 import { UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/composition/index.js';
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
+	ManifestTypes,
 	ManifestWorkspace,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceViews,

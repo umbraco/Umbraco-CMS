@@ -1,4 +1,5 @@
 import type {
+	ManifestTypes,
 	ManifestWorkspace,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,

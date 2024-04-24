@@ -1,5 +1,5 @@
 import { UMB_DICTIONARY_SECTION_ALIAS } from '../section/index.js';
-import type { ManifestDashboard } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestDashboard, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const dashboards: Array<ManifestDashboard> = [
 	{

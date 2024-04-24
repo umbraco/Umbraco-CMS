@@ -1,5 +1,5 @@
 import { UMB_DUPLICATE_MEMBER_TYPE_REPOSITORY_ALIAS } from './constants.js';
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const duplicateRepository: ManifestRepository = {
 	type: 'repository',

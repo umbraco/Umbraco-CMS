@@ -1,4 +1,4 @@
-import type { ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestItemStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.DataType.Item';
 export const UMB_DATA_TYPE_STORE_ALIAS = 'Umb.Store.DataType.Item';

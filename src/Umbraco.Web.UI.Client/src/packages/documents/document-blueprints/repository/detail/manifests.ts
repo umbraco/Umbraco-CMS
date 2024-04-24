@@ -1,6 +1,6 @@
 import { UmbDocumentBlueprintDetailRepository } from './document-blueprint-detail.repository.js';
 import { UmbDocumentBlueprintDetailStore } from './document-blueprint-detail.store.js';
-import type { ManifestRepository, ManifestStore } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_BLUEPRINT_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.DocumentBlueprint.Detail';
 
