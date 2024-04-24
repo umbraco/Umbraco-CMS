@@ -41,7 +41,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 			isDefault: false,
 			isMandatory: false,
 			name: '',
-			unique: UmbId.new(), // Creating a temporary unique until the culture is selected
+			unique: '',
 			...preset,
 		};
 
