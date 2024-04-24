@@ -172,8 +172,6 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	async #setSearchItemNavIndex(index: number) {
-		await this.updateComplete;
-
 		const prevElement = this.shadowRoot?.querySelector(
 			`a[data-item-index="${this.#searchItemNavIndex}"]`,
 		) as HTMLElement | null;
