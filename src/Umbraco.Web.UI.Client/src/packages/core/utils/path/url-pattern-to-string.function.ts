@@ -5,9 +5,9 @@ const PARAM_IDENTIFIER = /:([^/]+)/g;
 export function umbUrlPatternToString(pattern: string, params: UrlParametersRecord | null): string {
 	return params
 		? pattern.replace(PARAM_IDENTIFIER, (_substring: string, ...args: string[]) => {
-				const segmentName = args[0]; // (segmentName is the parameter name without the colon)
+				const segmentValue = params![args[0]]; // (segmentValue is the value to replace the parameter)
 				// Replace the path-segment with the value from the params object or 'null' if it doesn't exist
-				return params![segmentName]?.toString() ?? 'null';
+				return segmentValue === undefined ? `:${args[0]}` : segmentValue === null ? 'null' : segmentValue.toString();
 			})
 		: pattern;
 }
