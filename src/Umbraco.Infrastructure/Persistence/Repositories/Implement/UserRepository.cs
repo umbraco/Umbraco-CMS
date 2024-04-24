@@ -943,7 +943,10 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         }
     }
 
-    // TODO: Remove this once only get user by key.
+    // This is a bit hacky, as we're stealing some of the cache implementation, so we also can cache user by id
+    // We do however need this, as all content have creatorId (as int) and thus when we index content
+    // this gets called for each content item, and we need to cache the user to avoid a lot of db calls
+    // TODO: Remove this once CreatorId gets migrated to a key.
     public IUser? Get(int id)
     {
         string cacheKey = $"uRepo_{typeof(IUser).Name}_" + id;
