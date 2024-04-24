@@ -39,6 +39,7 @@ export class UmbMediaSearchServerDataSource implements UmbSearchDataSource<UmbMe
 		if (data) {
 			const mappedItems: Array<UmbMediaSearchItemModel> = data.items.map((item) => {
 				return {
+					href: '/section/media/workspace/media/edit/' + item.id,
 					entityType: UMB_MEDIA_ENTITY_TYPE,
 					unique: item.id,
 					isTrashed: item.isTrashed,
