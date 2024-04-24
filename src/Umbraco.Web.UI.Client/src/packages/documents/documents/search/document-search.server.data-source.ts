@@ -38,6 +38,7 @@ export class UmbDocumentSearchServerDataSource {
 		if (data) {
 			const mappedItems = data.items.map((item) => {
 				return {
+					href: '/section/content/workspace/document/edit/' + item.id,
 					entityType: UMB_DOCUMENT_ENTITY_TYPE,
 					unique: item.id,
 					isTrashed: item.isTrashed,
