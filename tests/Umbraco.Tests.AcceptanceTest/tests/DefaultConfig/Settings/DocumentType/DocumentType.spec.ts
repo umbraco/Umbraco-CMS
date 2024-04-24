@@ -184,17 +184,14 @@ test.describe('Document Type tests', () => {
     expect(documentTypeData.containers[1].parent.id).toEqual(documentTypeData.containers[0].id);
   });
 
-  test('can create a document type with multiple groups', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a document type with multiple groups', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const secondDataTypeName = 'Image Media Picker';
     const secondGroupName = 'TesterGroup';
     await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
-    const secondDataTypeId = await umbracoApi.dataType.getByName(secondDataTypeName);
-    console.log(secondDataTypeId);
+    const secondDataType = await umbracoApi.dataType.getByName(secondDataTypeName);
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
-
-
 
     // Act
     await umbracoUi.documentType.goToDocumentType(documentTypeName);
@@ -206,23 +203,35 @@ test.describe('Document Type tests', () => {
     // Assert
     await umbracoUi.documentType.isSuccessNotificationVisible();
     expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
-    const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-    const secondDataType = await umbracoApi.dataType.getByName(secondDataTypeName);
-    // console.log(documentTypeData)
-    // Checks if the correct property was added to the document type
-    // expect(documentTypeData.properties[1].dataType.id).toBe(dataTypeData.id);
-    // expect(documentTypeData.properties[2].dataType.id).toBe(secondDataType.id);
-
     expect(await umbracoApi.documentType.doesGroupContainCorrectPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName)).toBeTruthy();
     expect(await umbracoApi.documentType.doesGroupContainCorrectPropertyEditor(documentTypeName, secondDataTypeName, secondDataType.id, secondGroupName)).toBeTruthy();
-
-
-    await page.pause()
   });
 
   // There are currently frontend issues, when you try to add a property editor you have to click the button twice to focus.
-  test('can create a document type with multiple tabs', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a document type with multiple tabs', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    const secondDataTypeName = 'Image Media Picker';
+    const secondGroupName = 'TesterGroup';
+    const secondTabName = 'SecondTab';
+    await umbracoApi.documentType.createDocumentTypeWithPropertyEditorInTab(documentTypeName, dataTypeName, dataTypeData.id, tabName, groupName);
+    const secondDataType = await umbracoApi.dataType.getByName(secondDataTypeName);
+    await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
+    // Act
+    await umbracoUi.documentType.goToDocumentType(documentTypeName);
+    await umbracoUi.documentType.clickAddTabButton();
+    await umbracoUi.documentType.enterTabName(secondTabName);
+    await umbracoUi.documentType.clickAddGroupButton();
+    await umbracoUi.documentType.enterDocumentTypeGroupName(secondGroupName);
+    await umbracoUi.documentType.addPropertyEditor(secondDataTypeName);
+    await umbracoUi.documentType.clickSaveButton();
+
+    // Assert
+    await umbracoUi.documentType.isSuccessNotificationVisible();
+    expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
+    expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, dataTypeName, dataTypeData.id, tabName, groupName)).toBeTruthy();
+    expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, secondDataTypeName, secondDataType.id, secondTabName, secondGroupName)).toBeTruthy();
   });
 
   test('can create a document type with a composition', async ({umbracoApi, umbracoUi}) => {
@@ -237,9 +246,7 @@ test.describe('Document Type tests', () => {
     // Act
     await umbracoUi.documentType.goToDocumentType(documentTypeName);
     await umbracoUi.documentType.clickCompositionsButton();
-    await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName)
-    // This is needed
-    await umbracoUi.waitForTimeout(200);
+    await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
     await umbracoUi.documentType.clickSubmitButton();
     await umbracoUi.documentType.clickSaveButton();
 
@@ -254,11 +261,33 @@ test.describe('Document Type tests', () => {
     await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
   });
 
-  // Not possible
-  test('can reorder a group in a document type', async ({page, umbracoApi, umbracoUi}) => {
+  test('can reorder groups in a document type', async ({page, umbracoApi, umbracoUi}) => {
+    // Arrange
+    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    const secondGroupName = 'SecondGroup';
+    await umbracoApi.documentType.createDocumentTypeWithTwoGroups(documentTypeName, dataTypeName, dataTypeData.id, groupName,secondGroupName);
+    await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.documentType.goToDocumentType(documentTypeName);
+
+    // Act
+    // TODO: Maybe insert sortOrder when creating with builders, that way we can make sure which is first and which is second?
+    const firstGroup = page.locator('umb-content-type-design-editor-group').nth(0);
+    const secondGroup = page.locator('umb-content-type-design-editor-group').nth(1);
+    const firstGroupValue = await firstGroup.getByLabel('Group', {exact: true}).inputValue();
+    const secondGroupValue = await secondGroup.getByLabel('Group', {exact: true}).inputValue();
+    const dragToLocator = firstGroup.locator('[name="icon-navigation"]');
+    const dragFromLocator = secondGroup.locator('[name="icon-navigation"]');
+    await umbracoUi.documentType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 10);
+    await umbracoUi.documentType.clickSaveButton();
+
+    // Assert
+    await umbracoUi.documentType.isSuccessNotificationVisible();
+    // Since we swapped sorting order, the firstGroupValue should have sortOrder 1 and the secondGroupValue should have sortOrder 0
+    expect(await umbracoApi.documentType.doesDocumentTypeGroupNameContainCorrectSortOrder(documentTypeName, secondGroupValue, 0)).toBeTruthy();
+    expect(await umbracoApi.documentType.doesDocumentTypeGroupNameContainCorrectSortOrder(documentTypeName, firstGroupValue, 1)).toBeTruthy();
   });
 
-  test('can reorder a property in a document type', async ({page, umbracoApi, umbracoUi}) => {
+  test('can reorder properties in a document type', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const dataTypeNameTwo = "Second Color Picker";
@@ -279,6 +308,10 @@ test.describe('Document Type tests', () => {
     await umbracoUi.documentType.isSuccessNotificationVisible();
     const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
     expect(documentTypeData.properties[0].name).toBe(dataTypeNameTwo);
+  });
+
+  test('can reorder tabs in a document type', async ({page, umbracoApi, umbracoUi}) => {
+    // Arrange
   });
 
   test('can add a description to a property in a document type', async ({umbracoApi, umbracoUi}) => {
