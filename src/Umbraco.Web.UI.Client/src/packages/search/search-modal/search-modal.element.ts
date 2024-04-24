@@ -337,7 +337,12 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 	#closeModal(event: MouseEvent | KeyboardEvent) {
 		if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
-		this.modalContext?.reject();
+
+		requestAnimationFrame(() => {
+			// In the case where the browser has not triggered focus-visible and we keyboard navigate and press enter.
+			// It is necessary to wait one frame.
+			this.modalContext?.reject();
+		});
 	}
 
 	static styles = [
@@ -455,6 +460,10 @@ export class UmbSearchModalElement extends UmbLitElement {
 				text-decoration: none;
 				outline-offset: -3px;
 				display: flex;
+			}
+			.search-item:hover {
+				background: var(--uui-color-surface-emphasis);
+				color: var(--uui-color-interactive-emphasis);
 			}
 			.search-item:focus {
 				outline: 2px solid var(--uui-color-interactive-emphasis);
