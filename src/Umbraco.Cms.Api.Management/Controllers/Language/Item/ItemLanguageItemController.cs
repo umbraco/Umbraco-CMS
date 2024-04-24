@@ -27,6 +27,11 @@ public class ItemLanguageItemController : LanguageItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "isoCode")] HashSet<string> isoCodes)
     {
+        if (isoCodes.Count is 0)
+        {
+            return Ok(Enumerable.Empty<LanguageItemResponseModel>());
+        }
+
         IEnumerable<ILanguage> languages = await _languageService.GetMultipleAsync(isoCodes);
         List<LanguageItemResponseModel> entityResponseModels = _mapper.MapEnumerable<ILanguage, LanguageItemResponseModel>(languages);
         return Ok(entityResponseModels);

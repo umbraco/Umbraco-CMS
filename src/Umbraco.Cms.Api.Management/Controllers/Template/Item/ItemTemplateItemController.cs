@@ -27,6 +27,11 @@ public class ItemTemplateItemController : TemplateItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<TemplateItemResponseModel>());
+        }
+
         // This is far from ideal, that we pick out the entire model, however, we must do this to get the alias.
         // This is (for one) needed for when specifying master template, since alias + .cshtml
         IEnumerable<ITemplate> templates = await _templateService.GetAllAsync(ids.ToArray());

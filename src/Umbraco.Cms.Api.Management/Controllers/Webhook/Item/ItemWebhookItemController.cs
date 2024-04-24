@@ -27,6 +27,11 @@ public class ItemWebhookItemController : WebhookItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<WebhookItemResponseModel>());
+        }
+
         IEnumerable<IWebhook?> webhooks = await _webhookService.GetMultipleAsync(ids);
         List<WebhookItemResponseModel> entityResponseModels = _mapper.MapEnumerable<IWebhook?, WebhookItemResponseModel>(webhooks);
         return Ok(entityResponseModels);
