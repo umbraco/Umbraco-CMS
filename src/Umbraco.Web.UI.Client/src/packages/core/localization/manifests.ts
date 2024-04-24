@@ -3,26 +3,6 @@ import type { ManifestLocalization } from '../extension-registry/models/localiza
 const localizationManifests: Array<ManifestLocalization> = [
 	{
 		type: 'localization',
-		alias: 'Umb.Localization.En_US',
-		weight: -100,
-		name: 'English (US)',
-		meta: {
-			culture: 'en-us',
-		},
-		js: () => import('../../../assets/lang/en-us.js'),
-	},
-	{
-		type: 'localization',
-		alias: 'Umb.Localization.Da_DK',
-		weight: -100,
-		name: 'Dansk (Danmark)',
-		meta: {
-			culture: 'da-dk',
-		},
-		js: () => import('../../../assets/lang/da-dk.js'),
-	},
-	{
-		type: 'localization',
 		alias: 'Umb.Localization.Bs',
 		weight: -100,
 		name: 'Bosanski',
@@ -53,6 +33,16 @@ const localizationManifests: Array<ManifestLocalization> = [
 	},
 	{
 		type: 'localization',
+		alias: 'Umb.Localization.Da_DK',
+		weight: -100,
+		name: 'Dansk (Danmark)',
+		meta: {
+			culture: 'da-dk',
+		},
+		js: () => import('../../../assets/lang/da-dk.js'),
+	},
+	{
+		type: 'localization',
 		alias: 'Umb.Localization.De-DE',
 		weight: -100,
 		name: 'Deutsch (DE)',
@@ -67,9 +57,19 @@ const localizationManifests: Array<ManifestLocalization> = [
 		weight: -100,
 		name: 'English (UK)',
 		meta: {
-			culture: 'en-gb',
+			culture: 'en',
 		},
-		js: () => import('../../../assets/lang/en-gb.js'),
+		js: () => import('../../../assets/lang/en.js'),
+	},
+	{
+		type: 'localization',
+		alias: 'Umb.Localization.En_US',
+		weight: -100,
+		name: 'English (US)',
+		meta: {
+			culture: 'en-us',
+		},
+		js: () => import('../../../assets/lang/en-us.js'),
 	},
 	{
 		type: 'localization',
