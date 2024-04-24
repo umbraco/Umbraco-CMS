@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -20,6 +21,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
@@ -36,6 +38,8 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     private bool _passwordConfigInitialized;
     private readonly object _sqliteValidateSessionLock = new();
     private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
+    private readonly IAppPolicyCache _globalCache;
+    private readonly IScopeAccessor _scopeAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserRepository" /> class.
@@ -68,15 +72,17 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IJsonSerializer jsonSerializer,
         IRuntimeState runtimeState,
-        IEnumerable<IPermissionMapper> permissionMappers)
+        IEnumerable<IPermissionMapper> permissionMappers, IAppPolicyCache globalCache)
         : base(scopeAccessor, appCaches, logger)
     {
+        _scopeAccessor = scopeAccessor;
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         _passwordConfiguration =
             passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         _jsonSerializer = jsonSerializer;
         _runtimeState = runtimeState;
+        _globalCache = globalCache;
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
@@ -915,6 +921,56 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .Where<UserDto>(x => x.UserName == username);
 
         return Database.ExecuteScalar<int>(sql) > 0;
+    }
+
+    protected IAppPolicyCache Cache
+    {
+        get
+        {
+            IScope? ambientScope = _scopeAccessor.AmbientScope;
+            switch (ambientScope?.RepositoryCacheMode)
+            {
+                case RepositoryCacheMode.Default:
+                    return _globalCache;
+                case RepositoryCacheMode.Scoped:
+                    return ambientScope.IsolatedCaches.GetOrCreate<IUser>();
+                case RepositoryCacheMode.None:
+                    return NoAppCache.Instance;
+                default:
+                    throw new NotSupportedException(
+                        $"Repository cache mode {ambientScope?.RepositoryCacheMode} is not supported.");
+            }
+        }
+    }
+
+    // TODO: Remove this once only get user by key.
+    public IUser? Get(int id)
+    {
+        string cacheKey = $"uRepo_{typeof(IUser).Name}_" + id;
+        IUser? cachedUser = Cache.GetCacheItem<IUser>(cacheKey);
+        if (cachedUser is not null)
+        {
+            return cachedUser;
+        }
+
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .Select<UserDto>()
+            .From<UserDto>()
+            .Where<UserDto>(x => x.Id == id);
+
+        List<UserDto>? dtos = Database.Fetch<UserDto>(sql);
+
+        if (dtos.Count == 0)
+        {
+            return null;
+        }
+
+        PerformGetReferencedDtos(dtos);
+
+        IUser user = UserFactory.BuildEntity(_globalSettings, dtos[0], _permissionMappers);
+        Cache.Insert(cacheKey, () => user, TimeSpan.FromMinutes(5), true);
+
+        return user;
     }
 
     public bool ExistsByLogin(string login)
