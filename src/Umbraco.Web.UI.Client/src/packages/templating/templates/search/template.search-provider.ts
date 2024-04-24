@@ -3,7 +3,9 @@ import { UmbTemplateSearchRepository } from './template-search.repository.js';
 import type { UmbSearchProvider, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export interface UmbTemplateSearchItemModel extends UmbTemplateItemModel {}
+export interface UmbTemplateSearchItemModel extends UmbTemplateItemModel {
+	href: string;
+}
 
 export class UmbTemplateSearchProvider
 	extends UmbControllerBase
