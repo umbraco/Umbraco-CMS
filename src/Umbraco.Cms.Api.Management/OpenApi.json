@@ -31604,7 +31604,7 @@
         "operationId": "GetItemWebhook",
         "parameters": [
           {
-            "name": "ids",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,

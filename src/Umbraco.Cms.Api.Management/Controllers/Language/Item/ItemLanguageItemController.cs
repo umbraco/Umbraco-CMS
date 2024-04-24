@@ -23,7 +23,7 @@ public class ItemLanguageItemController : LanguageItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<LanguageItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Items(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "isoCode")] HashSet<string> isoCodes)
     {
