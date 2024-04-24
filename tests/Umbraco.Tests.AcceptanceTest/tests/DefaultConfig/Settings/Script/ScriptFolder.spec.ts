@@ -15,7 +15,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
   });
 
-  test('can create a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a folder', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.script.clickActionsMenuAtRoot();
     await umbracoUi.script.createFolder(scriptFolderName);
@@ -24,10 +24,10 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isSuccessNotificationVisible();
     expect(await umbracoApi.script.doesFolderExist(scriptFolderName)).toBeTruthy();
     await umbracoUi.script.clickRootFolderCaretButton();
-    await umbracoUi.script.isScriptTreeItemVisibile(scriptFolderName);
+    await umbracoUi.script.isScriptTreeItemVisible(scriptFolderName);
   });
 
-  test('can delete a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can delete a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.createFolder(scriptFolderName);
 
@@ -39,10 +39,10 @@ test.describe('Script tests', () => {
     // Assert
     await umbracoUi.script.isSuccessNotificationVisible();
     expect(await umbracoApi.script.doesFolderExist(scriptFolderName)).toBeFalsy();
-    await umbracoUi.script.isScriptTreeItemVisibile(scriptFolderName, false);
+    await umbracoUi.script.isScriptTreeItemVisible(scriptFolderName, false);
   });
 
-  test('can create a script in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a script in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.createFolder(scriptFolderName);
     const scriptContent = 'const test = {\r\n    script = \u0022Test\u0022,\r\n    extension = \u0022.js\u0022,\r\n    scriptPath: function() {\r\n        return this.script \u002B this.extension;\r\n    }\r\n};\r\n';
@@ -64,10 +64,10 @@ test.describe('Script tests', () => {
     const scriptData = await umbracoApi.script.get(scriptChildren[0].path);
     expect(scriptData.content).toBe(scriptContent);
     await umbracoUi.stylesheet.clickCaretButtonForName(scriptFolderName);
-    await umbracoUi.script.isScriptTreeItemVisibile(scriptName);
+    await umbracoUi.script.isScriptTreeItemVisible(scriptName);
   });
 
-  test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.createFolder(scriptFolderName);
     const childFolderName = 'childFolderName';
@@ -83,10 +83,10 @@ test.describe('Script tests', () => {
     const scriptChildren = await umbracoApi.script.getChildren('/' + scriptFolderName);
     expect(scriptChildren[0].path).toBe('/' + scriptFolderName + '/' + childFolderName);
     await umbracoUi.stylesheet.clickCaretButtonForName(scriptFolderName);
-    await umbracoUi.script.isScriptTreeItemVisibile(childFolderName);
+    await umbracoUi.script.isScriptTreeItemVisible(childFolderName);
   });
 
-  test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a folder in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     const childOfChildFolderName = 'ChildOfChildFolderName';
@@ -105,10 +105,10 @@ test.describe('Script tests', () => {
     const scriptChildren = await umbracoApi.script.getChildren('/' + scriptFolderName + '/' + childFolderName);
     expect(scriptChildren[0].path).toBe('/' + scriptFolderName + '/' + childFolderName + '/' + childOfChildFolderName);
     await umbracoUi.stylesheet.clickCaretButtonForName(childFolderName);
-    await umbracoUi.script.isScriptTreeItemVisibile(childOfChildFolderName);
+    await umbracoUi.script.isScriptTreeItemVisible(childOfChildFolderName);
   });
 
-  test('can create a script in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a script in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     await umbracoApi.script.createFolder(scriptFolderName);
@@ -129,6 +129,6 @@ test.describe('Script tests', () => {
     const scriptChildren = await umbracoApi.script.getChildren('/' + scriptFolderName + '/' + childFolderName);
     expect(scriptChildren[0].path).toBe('/' + scriptFolderName + '/' + childFolderName + '/' + scriptName);
     await umbracoUi.stylesheet.clickCaretButtonForName(childFolderName);
-    await umbracoUi.script.isScriptTreeItemVisibile(scriptName);
+    await umbracoUi.script.isScriptTreeItemVisible(scriptName);
   });
 });

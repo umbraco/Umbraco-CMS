@@ -67,7 +67,8 @@ public static partial class UmbracoBuilderExtensions
                 .AddPreview()
                 .AddPasswordConfiguration()
                 .AddSupplemenataryLocalizedTextFileSources()
-                .AddUserData();
+                .AddUserData()
+                .AddSegment();
 
             services
                 .ConfigureOptions<ConfigureApiBehaviorOptions>()

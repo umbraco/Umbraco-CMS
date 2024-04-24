@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Expres
                 .WithColumn("bar").AsInt32().PrimaryKey("PK_foo")
                 .Do();
 
-            // (TableName, ColumnName, ConstraintName) 
+            // (TableName, ColumnName, ConstraintName)
             var constraint = database.SqlContext.SqlSyntax.GetConstraintsPerColumn(database).Single();
 
             Assert.Multiple(() =>
@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Expres
                 .ForeignKey("MY_SUPER_COOL_FK", "foo", "bar")
                 .Do();
 
-            // (TableName, ColumnName, ConstraintName) 
+            // (TableName, ColumnName, ConstraintName)
             var constraint = database.SqlContext.SqlSyntax
                 .GetConstraintsPerColumn(database)
                 .Single(x => x.Item3 == "MY_SUPER_COOL_FK");
