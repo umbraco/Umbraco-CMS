@@ -191,7 +191,7 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 				`,
 			)}
 			<uui-button
-				id="add-button"
+				id="btn-add"
 				look="placeholder"
 				label="${this.localize.term('general_add')}"
 				@click="${this.#openPicker}"></uui-button>
@@ -207,7 +207,7 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
 			}
 
-			#add-button {
+			#btn-add {
 				text-align: center;
 				height: 100%;
 			}

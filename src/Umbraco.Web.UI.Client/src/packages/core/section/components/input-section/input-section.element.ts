@@ -102,9 +102,11 @@ export class UmbInputSectionElement extends UUIFormControlMixin(UmbLitElement, '
 	render() {
 		return html`
 			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open"
-				>Add</uui-button
-			>
+			<uui-button
+				id="btn-add"
+				look="placeholder"
+				@click=${() => this.#pickerContext.openPicker()}
+				label=${this.localize.term('general_choose')}></uui-button>
 		`;
 	}
 
@@ -121,7 +123,7 @@ export class UmbInputSectionElement extends UUIFormControlMixin(UmbLitElement, '
 
 	static styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 		`,

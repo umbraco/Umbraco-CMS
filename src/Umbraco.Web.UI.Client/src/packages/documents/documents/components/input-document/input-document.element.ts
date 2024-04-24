@@ -72,12 +72,12 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
-	}
 	public set selection(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
 		this.#sorter.setModel(ids);
+	}
+	public get selection(): Array<string> {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property({ type: String })
@@ -120,8 +120,8 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 				this._editDocumentPath = routeBuilder({});
 			});
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 	}
 
 	connectedCallback(): void {

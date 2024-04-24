@@ -1,5 +1,4 @@
 import { UmbModalToken } from './modal-token.js';
-import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 export interface UmbLinkPickerModalData {
 	config: UmbLinkPickerConfig;
@@ -26,7 +25,6 @@ export type UmbLinkPickerLinkType = 'document' | 'external' | 'media';
 export interface UmbLinkPickerConfig {
 	hideAnchor?: boolean;
 	ignoreUserStartNodes?: boolean;
-	overlaySize?: UUIModalSidebarSize;
 }
 
 export const UMB_LINK_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalValue>(

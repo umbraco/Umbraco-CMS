@@ -1,15 +1,26 @@
 import type { UmbStylesheetRule } from '../../types.js';
 import { UMB_STYLESHEET_RULE_SETTINGS_MODAL } from './stylesheet-rule-settings-modal.token.js';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, repeat, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-
-// TODO: add sorting when we have a generic sorting component/functionality for ref lists
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-stylesheet-rule-input')
 export class UmbStylesheetRuleInputElement extends UUIFormControlMixin(UmbLitElement, '') {
+	#sorter = new UmbSorterController<UmbStylesheetRule>(this, {
+		getUniqueOfElement: (element) => element.id,
+		getUniqueOfModel: (modelEntry) => modelEntry.name,
+		identifier: 'Umb.SorterIdentifier.InputStylesheetRule',
+		itemSelector: 'umb-stylesheet-rule-ref',
+		containerSelector: 'uui-ref-list',
+		onChange: ({ model }) => {
+			this.rules = model;
+			this.dispatchEvent(new UmbChangeEvent());
+		},
+	});
+
 	@property({ type: Array, attribute: false })
 	rules: UmbStylesheetRule[] = [];
 
@@ -57,6 +68,10 @@ export class UmbStylesheetRuleInputElement extends UUIFormControlMixin(UmbLitEle
 		this.dispatchEvent(new UmbChangeEvent());
 	};
 
+	firstUpdated() {
+		this.#sorter.setModel(this.rules);
+	}
+
 	render() {
 		return html`
 			<uui-ref-list>
@@ -64,16 +79,20 @@ export class UmbStylesheetRuleInputElement extends UUIFormControlMixin(UmbLitEle
 					this.rules,
 					(rule, index) => rule.name + index,
 					(rule, index) => html`
-						<umb-stylesheet-rule-ref name=${rule.name} detail=${rule.selector}>
+						<umb-stylesheet-rule-ref name=${rule.name} id=${rule.name} detail=${rule.selector}>
 							<uui-action-bar slot="actions">
-								<uui-button @click=${() => this.#editRule(rule, index)} label="Edit ${rule.name}">Edit</uui-button>
-								<uui-button @click=${() => this.#removeRule(rule)} label="Remove ${rule.name}">Remove</uui-button>
+								<uui-button
+									label=${this.localize.term('general_edit')}
+									@click=${() => this.#editRule(rule, index)}></uui-button>
+								<uui-button
+									label=${this.localize.term('general_remove')}
+									@click=${() => this.#removeRule(rule)}></uui-button>
 							</uui-action-bar>
 						</umb-stylesheet-rule-ref>
 					`,
 				)}
 			</uui-ref-list>
-			<uui-button label="Add rule" look="placeholder" @click=${this.#appendRule}>Add</uui-button>
+			<uui-button label=${this.localize.term('general_add')} look="placeholder" @click=${this.#appendRule}></uui-button>
 		`;
 	}
 

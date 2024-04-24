@@ -46,15 +46,17 @@ export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitEleme
 
 	render() {
 		if (!this.list) return nothing;
-		return html`<form>
-			<uui-form @change="${this.#onChange}">
-				${repeat(
-					this.list,
-					(item) => item.value,
-					(item) => this.#renderCheckbox(item),
-				)}
-			</uui-form>
-		</form>`;
+		return html`
+			<form>
+				<uui-form @change=${this.#onChange}>
+					${repeat(
+						this.list,
+						(item) => item.value,
+						(item) => this.#renderCheckbox(item),
+					)}
+				</uui-form>
+			</form>
+		`;
 	}
 
 	#renderCheckbox(item: (typeof this.list)[0]) {

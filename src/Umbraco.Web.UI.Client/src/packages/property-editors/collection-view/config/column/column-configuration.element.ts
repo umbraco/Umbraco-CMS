@@ -1,7 +1,8 @@
 import type { UmbCollectionColumnConfiguration } from '../../../../core/collection/types.js';
-import { html, customElement, property, repeat, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbInputContentTypePropertyElement } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -16,10 +17,27 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	// TODO: [LK] Add sorting.
+	#sorter = new UmbSorterController<UmbCollectionColumnConfiguration>(this, {
+		getUniqueOfElement: (element) => element.id,
+		getUniqueOfModel: (modelEntry) => modelEntry.alias,
+		identifier: 'Umb.SorterIdentifier.CollectionViewColumnConfiguration',
+		itemSelector: '.layout-item',
+		containerSelector: '#layout-wrapper',
+		onChange: ({ model }) => {
+			this.value = model;
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		},
+	});
 
 	@property({ type: Array })
-	value?: Array<UmbCollectionColumnConfiguration> = [];
+	public set value(value: Array<UmbCollectionColumnConfiguration>) {
+		this.#value = value;
+		this.#sorter.setModel(value);
+	}
+	public get value(): Array<UmbCollectionColumnConfiguration> {
+		return this.#value;
+	}
+	#value: Array<UmbCollectionColumnConfiguration> = [];
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
@@ -38,6 +56,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 
 		if (duplicate) {
 			// TODO: Show error to user, can not add duplicate field/column. [LK]
+			throw new Error('Duplicate field/columns are not allowed.');
 			return;
 		}
 
@@ -100,7 +119,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 
 	#renderColumn(column: UmbCollectionColumnConfiguration) {
 		return html`
-			<div class="layout-item">
+			<div class="layout-item" id=${column.alias}>
 				<uui-icon name="icon-navigation"></uui-icon>
 
 				<uui-input
