@@ -17,4 +17,4 @@ const section: ManifestSection = {
 	],
 };
 
-export const manifests = [section];
+export const manifests: Array<ManifestTypes> = [section];

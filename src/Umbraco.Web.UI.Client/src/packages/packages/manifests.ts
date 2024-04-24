@@ -3,7 +3,7 @@ import { manifests as packageBuilderManifests } from './package-builder/manifest
 import { manifests as packageRepoManifests } from './package-repo/manifests.js';
 import { manifests as packageSectionManifests } from './package-section/manifests.js';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...repositoryManifests,
 	...packageBuilderManifests,
 	...packageRepoManifests,

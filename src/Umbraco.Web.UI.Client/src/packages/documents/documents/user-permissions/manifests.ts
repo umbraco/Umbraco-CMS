@@ -212,4 +212,9 @@ export const granularPermissions: Array<ManifestGranularUserPermission> = [
 	},
 ];
 
-export const manifests = [...repositoryManifests, ...permissions, ...granularPermissions, conditionManifest];
+export const manifests: Array<ManifestTypes> = [
+	...repositoryManifests,
+	...permissions,
+	...granularPermissions,
+	conditionManifest,
+];

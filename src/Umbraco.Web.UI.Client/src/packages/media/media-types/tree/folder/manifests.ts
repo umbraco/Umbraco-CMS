@@ -33,4 +33,4 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 ];
 
-export const manifests = [folderRepository, ...entityActions];
+export const manifests: Array<ManifestTypes> = [folderRepository, ...entityActions];

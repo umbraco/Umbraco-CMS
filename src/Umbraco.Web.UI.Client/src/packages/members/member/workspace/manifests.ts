@@ -79,4 +79,4 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceActions, ...workspaceViews];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceActions, ...workspaceViews];

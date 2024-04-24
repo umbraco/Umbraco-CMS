@@ -55,4 +55,11 @@ const treeItem: ManifestTreeItem = {
 	],
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests, ...reloadManifests];
+export const manifests: Array<ManifestTypes> = [
+	treeRepository,
+	treeStore,
+	tree,
+	treeItem,
+	...folderManifests,
+	...reloadManifests,
+];

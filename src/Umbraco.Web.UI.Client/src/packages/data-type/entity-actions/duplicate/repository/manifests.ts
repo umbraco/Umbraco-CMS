@@ -8,4 +8,4 @@ const duplicateRepository: ManifestRepository = {
 	api: () => import('./data-type-duplicate.repository.js'),
 };
 
-export const manifests = [duplicateRepository];
+export const manifests: Array<ManifestTypes> = [duplicateRepository];

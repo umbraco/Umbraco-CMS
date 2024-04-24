@@ -20,4 +20,4 @@ export const createManifest: ManifestCollectionAction = {
 	],
 };
 
-export const manifests = [createManifest];
+export const manifests: Array<ManifestTypes> = [createManifest];

@@ -3,7 +3,7 @@ import { UMB_DICTIONARY_TREE_ALIAS } from '../tree/index.js';
 
 export const UMB_DICTIONARY_MENU_ALIAS = 'Umb.Menu.Dictionary';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'menu',
 		alias: UMB_DICTIONARY_MENU_ALIAS,

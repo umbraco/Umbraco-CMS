@@ -21,4 +21,4 @@ const modals: Array<ManifestModal> = [
 	},
 ];
 
-export const manifests = [...modals];
+export const manifests: Array<ManifestTypes> = [...modals];

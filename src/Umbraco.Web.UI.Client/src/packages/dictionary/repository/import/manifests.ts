@@ -10,4 +10,4 @@ const repository: ManifestRepository = {
 	api: UmbDictionaryImportRepository,
 };
 
-export const manifests = [repository];
+export const manifests: Array<ManifestTypes> = [repository];

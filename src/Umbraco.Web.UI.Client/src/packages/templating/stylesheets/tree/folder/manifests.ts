@@ -25,4 +25,4 @@ const entityActions = [
 	},
 ];
 
-export const manifests = [folderRepository, ...entityActions];
+export const manifests: Array<ManifestTypes> = [folderRepository, ...entityActions];

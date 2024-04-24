@@ -8,4 +8,4 @@ const repository: ManifestRepository = {
 	api: () => import('./media-recycle-bin.repository.js'),
 };
 
-export const manifests = [repository];
+export const manifests: Array<ManifestTypes> = [repository];

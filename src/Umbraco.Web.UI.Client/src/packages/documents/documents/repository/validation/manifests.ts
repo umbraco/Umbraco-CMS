@@ -10,4 +10,4 @@ const validationRepository: ManifestRepository = {
 	api: UmbDocumentValidationRepository,
 };
 
-export const manifests = [validationRepository];
+export const manifests: Array<ManifestTypes> = [validationRepository];

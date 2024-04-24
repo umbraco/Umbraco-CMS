@@ -1,4 +1,4 @@
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.TreePicker',

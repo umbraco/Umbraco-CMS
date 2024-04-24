@@ -21,4 +21,4 @@ const sectionsViews: Array<ManifestSectionView> = [
 	},
 ];
 
-export const manifests = [...sectionsViews];
+export const manifests: Array<ManifestTypes> = [...sectionsViews];

@@ -8,4 +8,4 @@ const queryRepository: ManifestRepository = {
 	api: () => import('./document-recycle-bin.repository.js'),
 };
 
-export const manifests = [queryRepository];
+export const manifests: Array<ManifestTypes> = [queryRepository];

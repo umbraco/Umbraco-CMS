@@ -53,4 +53,11 @@ const rootTreeItem: ManifestTreeItem = {
 	forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE],
 };
 
-export const manifests = [...reloadTreeItemChildrenManifests, tree, treeItem, rootTreeItem, treeRepository, treeStore];
+export const manifests: Array<ManifestTypes> = [
+	...reloadTreeItemChildrenManifests,
+	tree,
+	treeItem,
+	rootTreeItem,
+	treeRepository,
+	treeStore,
+];

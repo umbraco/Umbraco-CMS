@@ -9,4 +9,4 @@ const moveRepository: ManifestRepository = {
 	api: UmbMoveMediaTypeRepository,
 };
 
-export const manifests = [moveRepository];
+export const manifests: Array<ManifestTypes> = [moveRepository];

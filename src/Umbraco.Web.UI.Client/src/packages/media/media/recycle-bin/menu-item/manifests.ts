@@ -16,4 +16,4 @@ const menuItem: ManifestMenuItemTreeKind = {
 	},
 };
 
-export const manifests = [menuItem];
+export const manifests: Array<ManifestTypes> = [menuItem];

@@ -36,4 +36,4 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
-export const manifests = [manifest, schemaManifest];
+export const manifests: Array<ManifestTypes> = [manifest, schemaManifest];

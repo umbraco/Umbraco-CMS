@@ -39,4 +39,4 @@ const menuSectionSidebarApp: ManifestSectionSidebarApp = {
 	],
 };
 
-export const manifests = [section, menuSectionSidebarApp];
+export const manifests: Array<ManifestTypes> = [section, menuSectionSidebarApp];

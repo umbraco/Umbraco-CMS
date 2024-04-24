@@ -1,3 +1,3 @@
 import { manifest as trashKindManifest } from './trash.action.kind.js';
 
-export const manifests = [trashKindManifest];
+export const manifests: Array<ManifestTypes> = [trashKindManifest];

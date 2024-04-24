@@ -136,4 +136,4 @@ const querySteps: Array<ManifestDynamicRootQueryStep> = [
 	},
 ];
 
-export const manifests = [...modals, ...origins, ...querySteps];
+export const manifests: Array<ManifestTypes> = [...modals, ...origins, ...querySteps];

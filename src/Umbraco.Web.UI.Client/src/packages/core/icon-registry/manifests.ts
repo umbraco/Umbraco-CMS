@@ -1,4 +1,4 @@
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'icons',
 		alias: 'Umb.Icons.Backoffice',

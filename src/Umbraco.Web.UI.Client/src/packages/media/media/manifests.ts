@@ -9,7 +9,7 @@ import { manifests as sectionViewManifests } from './section-view/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...collectionManifests,
 	...entityActionsManifests,
 	...entityBulkActionsManifests,

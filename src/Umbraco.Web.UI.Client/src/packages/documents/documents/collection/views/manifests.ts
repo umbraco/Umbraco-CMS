@@ -42,4 +42,4 @@ const tableViewManifest: ManifestCollectionView = {
 	],
 };
 
-export const manifests = [gridViewManifest, tableViewManifest];
+export const manifests: Array<ManifestTypes> = [gridViewManifest, tableViewManifest];

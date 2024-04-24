@@ -9,4 +9,4 @@ const itemRepository: ManifestRepository = {
 	api: () => import('./section-item.repository.js'),
 };
 
-export const manifests = [itemRepository];
+export const manifests: Array<ManifestTypes> = [itemRepository];

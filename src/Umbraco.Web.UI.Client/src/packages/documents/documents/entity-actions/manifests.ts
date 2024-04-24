@@ -113,7 +113,7 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 ];
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...createBlueprintManifests,
 	...createManifests,
 	...cultureAndHostnamesManifests,

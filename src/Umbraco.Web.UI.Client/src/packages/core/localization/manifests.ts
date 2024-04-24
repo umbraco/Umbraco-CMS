@@ -23,4 +23,4 @@ const localizationManifests: Array<ManifestLocalization> = [
 	},
 ];
 
-export const manifests = [...localizationManifests];
+export const manifests: Array<ManifestTypes> = [...localizationManifests];

@@ -1,6 +1,6 @@
 import { manifest as kindManifest } from './restore-from-recycle-bin.action.kind.js';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	kindManifest,
 	{
 		type: 'modal',

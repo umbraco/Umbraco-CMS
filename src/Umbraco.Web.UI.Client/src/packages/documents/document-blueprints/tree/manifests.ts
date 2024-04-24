@@ -46,4 +46,11 @@ const treeItem: ManifestTreeItem = {
 	forEntityTypes: [UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE],
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem, ...reloadManifests, ...folderManifests];
+export const manifests: Array<ManifestTypes> = [
+	treeRepository,
+	treeStore,
+	tree,
+	treeItem,
+	...reloadManifests,
+	...folderManifests,
+];

@@ -17,4 +17,4 @@ const itemStore: ManifestItemStore = {
 	api: () => import('./member-item.store.js'),
 };
 
-export const manifests = [itemRepository, itemStore];
+export const manifests: Array<ManifestTypes> = [itemRepository, itemStore];

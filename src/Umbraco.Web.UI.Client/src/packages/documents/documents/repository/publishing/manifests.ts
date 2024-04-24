@@ -10,4 +10,4 @@ const publishingRepository: ManifestRepository = {
 	api: UmbDocumentPublishingRepository,
 };
 
-export const manifests = [publishingRepository];
+export const manifests: Array<ManifestTypes> = [publishingRepository];

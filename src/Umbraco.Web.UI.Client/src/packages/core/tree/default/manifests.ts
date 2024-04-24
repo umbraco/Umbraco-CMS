@@ -12,4 +12,4 @@ const defaultTreeKind: UmbBackofficeManifestKind = {
 	},
 };
 
-export const manifests = [defaultTreeKind];
+export const manifests: Array<ManifestTypes> = [defaultTreeKind];

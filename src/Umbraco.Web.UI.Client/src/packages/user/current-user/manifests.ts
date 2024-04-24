@@ -28,7 +28,7 @@ export const headerApps: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	actionDefaultKindManifest,
 	...headerApps,
 	...historyManifests,

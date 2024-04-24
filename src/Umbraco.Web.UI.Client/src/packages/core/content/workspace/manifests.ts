@@ -1,3 +1,3 @@
 import { contentEditorManifest } from './views/edit/manifest.js';
 
-export const manifests = [contentEditorManifest];
+export const manifests: Array<ManifestTypes> = [contentEditorManifest];

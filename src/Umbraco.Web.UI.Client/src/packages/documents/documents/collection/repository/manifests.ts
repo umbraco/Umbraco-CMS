@@ -9,4 +9,4 @@ const collectionRepositoryManifest: ManifestRepository = {
 	api: UmbDocumentCollectionRepository,
 };
 
-export const manifests = [collectionRepositoryManifest];
+export const manifests: Array<ManifestTypes> = [collectionRepositoryManifest];

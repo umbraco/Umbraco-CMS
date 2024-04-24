@@ -16,4 +16,4 @@ const entityActions: Array<ManifestSectionSidebarApp> = [
 	},
 ];
 
-export const manifests = [...entityActions];
+export const manifests: Array<ManifestTypes> = [...entityActions];

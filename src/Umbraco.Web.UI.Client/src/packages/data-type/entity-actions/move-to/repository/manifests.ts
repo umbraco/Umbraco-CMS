@@ -8,4 +8,4 @@ const moveRepository: ManifestRepository = {
 	api: () => import('./data-type-move.repository.js'),
 };
 
-export const manifests = [moveRepository];
+export const manifests: Array<ManifestTypes> = [moveRepository];

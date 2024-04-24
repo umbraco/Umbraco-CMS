@@ -10,4 +10,4 @@ const structureRepository: ManifestRepository = {
 	api: UmbDocumentTypeStructureRepository,
 };
 
-export const manifests = [structureRepository];
+export const manifests: Array<ManifestTypes> = [structureRepository];

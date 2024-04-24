@@ -2,7 +2,7 @@ import { manifests as welcomeDashboardManifests } from './welcome-dashboard/mani
 
 export const UMB_SETTINGS_SECTION_ALIAS = 'Umb.Section.Settings';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'section',
 		alias: UMB_SETTINGS_SECTION_ALIAS,

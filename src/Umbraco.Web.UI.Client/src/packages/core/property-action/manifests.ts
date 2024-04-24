@@ -28,4 +28,4 @@ export const propertyActionManifests: Array<ManifestPropertyActions> = [
 	},
 ];
 
-export const manifests = [...defaultManifests, ...propertyActionManifests];
+export const manifests: Array<ManifestTypes> = [...defaultManifests, ...propertyActionManifests];

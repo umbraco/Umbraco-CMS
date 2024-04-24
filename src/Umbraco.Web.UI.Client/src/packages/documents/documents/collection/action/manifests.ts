@@ -10,7 +10,6 @@ export const createManifest: ManifestCollectionAction = {
 	weight: 100,
 	meta: {
 		label: 'Create',
-
 	},
 	conditions: [
 		{
@@ -20,4 +19,4 @@ export const createManifest: ManifestCollectionAction = {
 	],
 };
 
-export const manifests = [createManifest];
+export const manifests: Array<ManifestTypes> = [createManifest];

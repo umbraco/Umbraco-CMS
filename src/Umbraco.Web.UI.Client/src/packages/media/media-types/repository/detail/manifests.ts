@@ -17,4 +17,4 @@ const detailStore: ManifestStore = {
 	api: () => import('./media-type-detail.store.js'),
 };
 
-export const manifests = [detailRepository, detailStore];
+export const manifests: Array<ManifestTypes> = [detailRepository, detailStore];

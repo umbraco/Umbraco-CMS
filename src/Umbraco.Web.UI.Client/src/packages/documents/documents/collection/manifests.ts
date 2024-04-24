@@ -17,7 +17,7 @@ const collectionManifest: ManifestCollection = {
 	},
 };
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	collectionManifest,
 	...collectionActionManifests,
 	...collectionRepositoryManifests,

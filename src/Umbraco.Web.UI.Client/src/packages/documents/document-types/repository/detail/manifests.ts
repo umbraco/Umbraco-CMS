@@ -19,4 +19,4 @@ const detailStore: ManifestStore = {
 	api: UmbDocumentTypeDetailStore,
 };
 
-export const manifests = [detailRepository, detailStore];
+export const manifests: Array<ManifestTypes> = [detailRepository, detailStore];

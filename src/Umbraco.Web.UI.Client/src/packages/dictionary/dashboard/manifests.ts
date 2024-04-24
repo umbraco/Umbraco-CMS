@@ -20,4 +20,4 @@ const dashboards: Array<ManifestDashboard> = [
 	},
 ];
 
-export const manifests = [...dashboards];
+export const manifests: Array<ManifestTypes> = [...dashboards];

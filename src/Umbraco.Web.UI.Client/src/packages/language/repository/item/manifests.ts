@@ -17,4 +17,4 @@ const itemStore: ManifestItemStore = {
 	api: () => import('./language-item.store.js'),
 };
 
-export const manifests = [itemRepository, itemStore];
+export const manifests: Array<ManifestTypes> = [itemRepository, itemStore];

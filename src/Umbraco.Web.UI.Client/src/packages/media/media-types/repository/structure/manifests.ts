@@ -9,4 +9,4 @@ const structureRepository: ManifestRepository = {
 	api: () => import('./media-type-structure.repository.js'),
 };
 
-export const manifests = [structureRepository];
+export const manifests: Array<ManifestTypes> = [structureRepository];

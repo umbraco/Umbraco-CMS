@@ -3,7 +3,7 @@ import { UMB_USER_PERMISSION_DOCUMENT_DUPLICATE } from '../../user-permissions/c
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as modalManifests } from './modal/manifests.js';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		kind: 'duplicateTo',

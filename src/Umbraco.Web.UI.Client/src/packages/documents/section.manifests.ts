@@ -42,4 +42,4 @@ const menuSectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind 
 	],
 };
 
-export const manifests = [section, menuSectionSidebarApp];
+export const manifests: Array<ManifestTypes> = [section, menuSectionSidebarApp];

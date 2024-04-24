@@ -2,7 +2,7 @@ import { manifests as trashEntityActionManifests } from '../recycle-bin/entity-a
 import { manifests as restoreFromRecycleBinEntityActionManifests } from '../recycle-bin/entity-action/restore-from-recycle-bin/manifests.js';
 import { manifests as emptyRecycleBinEntityActionManifests } from '../recycle-bin/entity-action/empty-recycle-bin/manifests.js';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...trashEntityActionManifests,
 	...restoreFromRecycleBinEntityActionManifests,
 	...emptyRecycleBinEntityActionManifests,

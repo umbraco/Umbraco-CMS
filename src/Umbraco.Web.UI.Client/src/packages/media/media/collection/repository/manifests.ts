@@ -8,4 +8,4 @@ const collectionRepositoryManifest: ManifestRepository = {
 	api: () => import('./media-collection.repository.js'),
 };
 
-export const manifests = [collectionRepositoryManifest];
+export const manifests: Array<ManifestTypes> = [collectionRepositoryManifest];

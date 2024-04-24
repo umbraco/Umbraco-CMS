@@ -9,4 +9,4 @@ const duplicateRepository: ManifestRepository = {
 	api: UmbDuplicateDocumentTypeRepository,
 };
 
-export const manifests = [duplicateRepository];
+export const manifests: Array<ManifestTypes> = [duplicateRepository];

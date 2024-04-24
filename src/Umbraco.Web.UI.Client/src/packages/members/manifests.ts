@@ -6,7 +6,7 @@ import { manifests as memberTypeManifests } from './member-type/manifests.js';
 import './member/components/index.js';
 import './member-group/components/index.js';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...memberGroupManifests,
 	...memberManifests,
 	...memberSectionManifests,

@@ -12,7 +12,7 @@ import { manifests as userPermissionManifests } from './user-permissions/manifes
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as globalContextManifests } from './global-contexts/manifests.js';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...collectionManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,

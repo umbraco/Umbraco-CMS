@@ -3,4 +3,9 @@ import { manifests as itemManifests } from './item/manifests.js';
 import { manifests as importManifests } from './import/manifests.js';
 import { manifests as exportManifests } from './export/manifests.js';
 
-export const manifests = [...detailManifests, ...itemManifests, ...importManifests, ...exportManifests];
+export const manifests: Array<ManifestTypes> = [
+	...detailManifests,
+	...itemManifests,
+	...importManifests,
+	...exportManifests,
+];

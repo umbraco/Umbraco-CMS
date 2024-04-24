@@ -10,7 +10,7 @@ import './user-group/components/index.js';
 import './user-permission/components/index.js';
 import './user/components/index.js';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...userGroupManifests,
 	...userManifests,
 	...userSectionManifests,

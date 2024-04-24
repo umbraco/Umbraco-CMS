@@ -21,4 +21,4 @@ const tableCollectionView: ManifestCollectionView = {
 	],
 };
 
-export const manifests = [tableCollectionView];
+export const manifests: Array<ManifestTypes> = [tableCollectionView];

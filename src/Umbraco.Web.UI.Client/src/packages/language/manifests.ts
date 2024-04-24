@@ -7,7 +7,7 @@ import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as globalContextManifests } from './global-contexts/manifests.js';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...repositoryManifests,
 	...entityActions,
 	...menuManifests,

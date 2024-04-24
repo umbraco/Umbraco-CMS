@@ -18,4 +18,4 @@ const store: ManifestStore = {
 	api: () => import('./script-detail.store.js'),
 };
 
-export const manifests = [repository, store, ...itemManifests];
+export const manifests: Array<ManifestTypes> = [repository, store, ...itemManifests];

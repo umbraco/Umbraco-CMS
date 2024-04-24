@@ -9,4 +9,4 @@ const repository: ManifestRepository = {
 	api: () => import('./document-reference.repository.js'),
 };
 
-export const manifests = [repository];
+export const manifests: Array<ManifestTypes> = [repository];

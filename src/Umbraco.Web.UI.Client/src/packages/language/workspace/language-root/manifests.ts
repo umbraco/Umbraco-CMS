@@ -10,4 +10,4 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-export const manifests = [workspace];
+export const manifests: Array<ManifestTypes> = [workspace];

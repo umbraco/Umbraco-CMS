@@ -20,4 +20,4 @@ const store: ManifestStore = {
 	api: UmbDictionaryDetailStore,
 };
 
-export const manifests = [repository, store];
+export const manifests: Array<ManifestTypes> = [repository, store];

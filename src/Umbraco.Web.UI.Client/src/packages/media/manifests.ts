@@ -4,4 +4,4 @@ import { manifests as mediaTypesManifests } from './media-types/manifests.js';
 
 import './media/components/index.js';
 
-export const manifests = [...mediaSectionManifests, ...mediaManifests, ...mediaTypesManifests];
+export const manifests: Array<ManifestTypes> = [...mediaSectionManifests, ...mediaManifests, ...mediaTypesManifests];

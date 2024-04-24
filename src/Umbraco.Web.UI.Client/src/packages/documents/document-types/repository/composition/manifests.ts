@@ -10,4 +10,4 @@ const queryRepository: ManifestRepository = {
 	api: UmbDocumentTypeCompositionRepository,
 };
 
-export const manifests = [queryRepository];
+export const manifests: Array<ManifestTypes> = [queryRepository];

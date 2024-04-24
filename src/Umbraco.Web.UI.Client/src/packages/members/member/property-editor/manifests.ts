@@ -1,3 +1,3 @@
 import { manifests as propertyEditorManifests } from './member-picker/manifests.js';
 
-export const manifests = [...propertyEditorManifests];
+export const manifests: Array<ManifestTypes> = [...propertyEditorManifests];

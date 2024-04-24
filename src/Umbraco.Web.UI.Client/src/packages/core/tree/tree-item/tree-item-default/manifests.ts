@@ -12,4 +12,4 @@ const kind: UmbBackofficeManifestKind = {
 	},
 };
 
-export const manifests = [kind];
+export const manifests: Array<ManifestTypes> = [kind];

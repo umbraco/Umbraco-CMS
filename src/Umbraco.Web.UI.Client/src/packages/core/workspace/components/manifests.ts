@@ -3,7 +3,7 @@ import { manifests as workspaceActionMenuItemManifests } from './workspace-actio
 import { manifests as workspaceBreadcrumbManifests } from './workspace-breadcrumb/manifests.js';
 import { manifests as workspaceViewManifests } from './workspace-collection/manifests.js';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...workspaceActionManifests,
 	...workspaceActionMenuItemManifests,
 	...workspaceBreadcrumbManifests,

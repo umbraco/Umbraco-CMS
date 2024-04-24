@@ -18,4 +18,4 @@ const store: ManifestStore = {
 	api: () => import('./member-group-detail.store.js'),
 };
 
-export const manifests = [repository, store];
+export const manifests: Array<ManifestTypes> = [repository, store];

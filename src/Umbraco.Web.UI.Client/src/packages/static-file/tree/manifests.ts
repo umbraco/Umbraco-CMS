@@ -47,4 +47,4 @@ const treeItem: ManifestTreeItem = {
 	forEntityTypes: [UMB_STATIC_FILE_ENTITY_TYPE, UMB_STATIC_FILE_ROOT_ENTITY_TYPE, UMB_STATIC_FILE_FOLDER_ENTITY_TYPE],
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem];
+export const manifests: Array<ManifestTypes> = [treeRepository, treeStore, tree, treeItem];

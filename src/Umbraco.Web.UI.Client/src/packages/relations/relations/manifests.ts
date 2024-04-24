@@ -1,3 +1,3 @@
 import { manifests as collectionManifests } from './collection/manifests.js';
 
-export const manifests = [...collectionManifests];
+export const manifests: Array<ManifestTypes> = [...collectionManifests];

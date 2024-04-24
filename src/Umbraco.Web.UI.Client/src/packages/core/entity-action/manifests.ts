@@ -4,7 +4,7 @@ import { manifests as duplicateEntityActionManifests } from './common/duplicate/
 import { manifests as moveEntityActionManifests } from './common/move/manifests.js';
 import { manifests as sortChildrenOfEntityActionManifests } from './common/sort-children-of/manifests.js';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...defaultEntityActionManifests,
 	...deleteEntityActionManifests,
 	...duplicateEntityActionManifests,

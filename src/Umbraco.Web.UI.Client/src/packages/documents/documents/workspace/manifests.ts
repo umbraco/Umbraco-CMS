@@ -201,4 +201,9 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions, ...workspaceActionMenuItems];
+export const manifests: Array<ManifestTypes> = [
+	workspace,
+	...workspaceViews,
+	...workspaceActions,
+	...workspaceActionMenuItems,
+];
