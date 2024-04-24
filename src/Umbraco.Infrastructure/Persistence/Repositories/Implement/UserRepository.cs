@@ -56,6 +56,7 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
     /// <param name="permissionMappers">The permission mappers.</param>
+    /// <param name="globalCache">The app policy cache.</param>
     /// <exception cref="System.ArgumentNullException">
     ///     mapperCollection
     ///     or
@@ -72,7 +73,8 @@ internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserReposito
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IJsonSerializer jsonSerializer,
         IRuntimeState runtimeState,
-        IEnumerable<IPermissionMapper> permissionMappers, IAppPolicyCache globalCache)
+        IEnumerable<IPermissionMapper> permissionMappers,
+        IAppPolicyCache globalCache)
         : base(scopeAccessor, appCaches, logger)
     {
         _scopeAccessor = scopeAccessor;
