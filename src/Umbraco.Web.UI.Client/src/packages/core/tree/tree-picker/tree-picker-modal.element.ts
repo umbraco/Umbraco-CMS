@@ -45,20 +45,24 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		// Or maybe the tree item context base can handle this? [NL]
 		// Maybe its a general item context problem to be solved. [NL]
 		const createActionData = this.data?.createAction;
-		console.log('createActionData', createActionData);
 		if (createActionData) {
-			new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-				.onSetup(async () => {
-					return { data: createActionData };
+			new UmbModalRouteRegistrationController(
+				this,
+				(createActionData.modalToken as typeof UMB_WORKSPACE_MODAL) ?? UMB_WORKSPACE_MODAL,
+			)
+				.onSetup(() => {
+					return { data: createActionData.modalData };
 				})
 				.onSubmit((value) => {
-					console.log('got', value);
-					//this.value = value;
-					//this.modalContext?.dispatchEvent(new UmbSelectedEvent());
+					if (value) {
+						this.value = { selection: [value.unique] };
+						this._submitModal();
+					}
 				})
 				.observeRouteBuilder((routeBuilder) => {
 					const oldPath = this._createPath;
-					this._createPath = routeBuilder({}) + 'create';
+					this._createPath =
+						routeBuilder({}) + createActionData.additionalPathGenerator(createActionData.additionalPathParams);
 					this.requestUpdate('_createPath', oldPath);
 				});
 		}
