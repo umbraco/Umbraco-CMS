@@ -1,5 +1,5 @@
-import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import type { UmbDocumentItemModel, UmbDocumentItemVariantModel } from '../repository/item/types.js';
+import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

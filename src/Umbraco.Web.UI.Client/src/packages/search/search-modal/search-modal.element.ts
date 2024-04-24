@@ -1,12 +1,22 @@
 import type { UmbSearchProvider, UmbSearchResultItemModel } from '../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, repeat, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	nothing,
+	repeat,
+	customElement,
+	query,
+	state,
+	property,
+} from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestSearchResultItem } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 import '../search-result/search-result-item.element.js';
+import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 type SearchProvider = {
 	name: string;
@@ -20,6 +30,9 @@ export class UmbSearchModalElement extends UmbLitElement {
 	private _inputFakeCursor!: HTMLElement;
 	@query('input')
 	private _input!: HTMLInputElement;
+
+	@property({ attribute: false })
+	modalContext?: UmbModalContext;
 
 	@state()
 	private _search = '';
@@ -302,7 +315,12 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 	#renderResultItem(item: UmbSearchResultItemModel, index: number) {
 		return html`
-			<a href="google.com" data-item-index=${index} class="search-item">
+			<a
+				href=${item.href}
+				data-item-index=${index}
+				class="search-item"
+				@click=${this.#closeModal}
+				@keydown=${this.#closeModal}>
 				<umb-extension-slot
 					type="searchResultItem"
 					.props=${{ item }}
@@ -314,6 +332,11 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 	#renderNoResults() {
 		return this._loading ? nothing : html`<div id="no-results">${this.localize.term('general_searchNoResult')}</div>`;
+	}
+
+	#closeModal(event: MouseEvent | KeyboardEvent) {
+		if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+		this.modalContext?.reject();
 	}
 
 	static styles = [
@@ -429,6 +452,11 @@ export class UmbSearchModalElement extends UmbLitElement {
 				text-decoration: none;
 				outline-offset: -3px;
 				display: flex;
+			}
+			.search-item:focus {
+				outline: 2px solid var(--uui-color-interactive-emphasis);
+				border-radius: 6px;
+				outline-offset: -4px;
 			}
 			.search-item.active:not(:focus-within) {
 				outline: 2px solid var(--uui-color-border);
