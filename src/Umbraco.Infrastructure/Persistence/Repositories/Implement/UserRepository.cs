@@ -925,26 +925,6 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
-    protected IAppPolicyCache Cache
-    {
-        get
-        {
-            IScope? ambientScope = _scopeAccessor.AmbientScope;
-            switch (ambientScope?.RepositoryCacheMode)
-            {
-                case RepositoryCacheMode.Default:
-                    return _globalCache;
-                case RepositoryCacheMode.Scoped:
-                    return ambientScope.IsolatedCaches.GetOrCreate<IUser>();
-                case RepositoryCacheMode.None:
-                    return NoAppCache.Instance;
-                default:
-                    throw new NotSupportedException(
-                        $"Repository cache mode {ambientScope?.RepositoryCacheMode} is not supported.");
-            }
-        }
-    }
-
     // This is a bit hacky, as we're stealing some of the cache implementation, so we also can cache user by id
     // We do however need this, as all content have creatorId (as int) and thus when we index content
     // this gets called for each content item, and we need to cache the user to avoid a lot of db calls
@@ -952,7 +932,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     public IUser? Get(int id)
     {
         string cacheKey = $"uRepo_{typeof(IUser).Name}_" + id;
-        IUser? cachedUser = Cache.GetCacheItem<IUser>(cacheKey);
+        IUser? cachedUser = IsolatedCache.GetCacheItem<IUser>(cacheKey);
         if (cachedUser is not null)
         {
             return cachedUser;
@@ -973,7 +953,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         PerformGetReferencedDtos(dtos);
 
         IUser user = UserFactory.BuildEntity(_globalSettings, dtos[0], _permissionMappers);
-        Cache.Insert(cacheKey, () => user, TimeSpan.FromMinutes(5), true);
+        IsolatedCache.Insert(cacheKey, () => user, TimeSpan.FromMinutes(5), true);
 
         return user;
     }
