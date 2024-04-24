@@ -10,6 +10,7 @@ import type {
 	ManifestTree,
 	ManifestTreeItem,
 	ManifestTreeStore,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_PARTIAL_VIEW_TREE_REPOSITORY_ALIAS = 'Umb.Repository.PartialView.Tree';
@@ -52,7 +53,7 @@ const treeItem: ManifestTreeItem = {
 	],
 };
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	treeRepository,
 	treeStore,
 	tree,

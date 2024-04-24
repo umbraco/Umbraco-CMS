@@ -1,5 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.UploadField.js';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
@@ -14,4 +14,4 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
-export const manifests = [manifest, schemaManifest];
+export const manifests: Array<ManifestTypes> = [manifest, schemaManifest];

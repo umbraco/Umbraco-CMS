@@ -1,5 +1,5 @@
 import { UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_SCRIPT_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.Script.Folder';
 
@@ -25,4 +25,4 @@ const entityActions = [
 	},
 ];
 
-export const manifests = [folderRepository, ...entityActions];
+export const manifests: Array<ManifestTypes> = [folderRepository, ...entityActions];
