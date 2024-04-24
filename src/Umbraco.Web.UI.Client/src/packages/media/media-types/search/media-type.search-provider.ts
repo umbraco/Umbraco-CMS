@@ -3,7 +3,9 @@ import { UmbMediaTypeSearchRepository } from './media-type-search.repository.js'
 import type { UmbSearchProvider, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export interface UmbMediaTypeSearchItemModel extends UmbMediaTypeItemModel {}
+export interface UmbMediaTypeSearchItemModel extends UmbMediaTypeItemModel {
+	href: string;
+}
 
 export class UmbMediaTypeSearchProvider
 	extends UmbControllerBase
