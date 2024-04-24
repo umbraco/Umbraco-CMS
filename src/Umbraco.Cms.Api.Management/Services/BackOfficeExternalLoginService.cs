@@ -33,7 +33,7 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
     }
 
     public async Task<Attempt<IEnumerable<UserExternalLoginProviderModel>, ExternalLoginOperationStatus>>
-        ExternalLoginStatusForUser(Guid userid)
+        ExternalLoginStatusForUserAsync(Guid userid)
     {
         IEnumerable<BackOfficeExternaLoginProviderScheme> providers =
             await _backOfficeExternalLoginProviders.GetBackOfficeProvidersAsync();

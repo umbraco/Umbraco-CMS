@@ -37,7 +37,7 @@ public class ListExternalLoginProvidersCurrentUserController : CurrentUserContro
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
         Attempt<IEnumerable<UserExternalLoginProviderModel>, ExternalLoginOperationStatus> result =
-            await _backOfficeExternalLoginService.ExternalLoginStatusForUser(userKey);
+            await _backOfficeExternalLoginService.ExternalLoginStatusForUserAsync(userKey);
 
         return result.Success
             ? Ok(_mapper.MapEnumerable<UserExternalLoginProviderModel, UserExternalLoginProviderResponseModel>(
