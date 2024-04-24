@@ -18,17 +18,20 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     private readonly IMemberService _memberService;
     private readonly IMemberTypeService _memberTypeService;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly IMemberGroupService _memberGroupService;
 
     public MemberPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IMemberService memberService,
         IMemberTypeService memberTypeService,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IMemberGroupService memberGroupService)
     {
         _umbracoMapper = umbracoMapper;
         _memberService = memberService;
         _memberTypeService = memberTypeService;
         _twoFactorLoginService = twoFactorLoginService;
+        _memberGroupService = memberGroupService;
     }
 
     public async Task<MemberResponseModel> CreateResponseModelAsync(IMember member, IUser currentUser)
@@ -36,8 +39,10 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         MemberResponseModel responseModel = _umbracoMapper.Map<MemberResponseModel>(member)!;
 
         responseModel.IsTwoFactorEnabled = await _twoFactorLoginService.IsTwoFactorEnabledAsync(member.Key);
-        responseModel.Groups = _memberService.GetAllRoles(member.Username);
+        IEnumerable<string> roles = _memberService.GetAllRoles(member.Username);
 
+        // Get the member groups per role, so we can return the group keys
+        responseModel.Groups = roles.Select(x => _memberGroupService.GetByName(x)).WhereNotNull().Select(x => x.Key).ToArray();
         return currentUser.HasAccessToSensitiveData()
             ? responseModel
             : await RemoveSensitiveDataAsync(member, responseModel);
