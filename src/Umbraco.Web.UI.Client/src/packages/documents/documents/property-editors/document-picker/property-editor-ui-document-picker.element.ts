@@ -14,13 +14,13 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const minMax = config?.getValueByAlias<NumberRangeValueType>('validationLimit');
+		const minMax = config.getValueByAlias<NumberRangeValueType>('validationLimit');
 		this.min = minMax?.min ?? 0;
 		this.max = minMax?.max ?? Infinity;
 
-		this.ignoreUserStartNodes = config?.getValueByAlias('ignoreUserStartNodes');
-		this.startNodeId = config?.getValueByAlias('startNodeId');
-		this.showOpenButton = config?.getValueByAlias('showOpenButton');
+		this.ignoreUserStartNodes = config.getValueByAlias('ignoreUserStartNodes') ?? false;
+		this.startNodeId = config.getValueByAlias('startNodeId');
+		this.showOpenButton = config.getValueByAlias('showOpenButton') ?? false;
 	}
 
 	@state()

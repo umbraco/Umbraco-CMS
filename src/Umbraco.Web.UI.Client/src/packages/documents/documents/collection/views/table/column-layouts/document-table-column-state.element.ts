@@ -1,5 +1,6 @@
 import type { UmbDocumentCollectionItemModel } from '../../../types.js';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
+import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
@@ -25,8 +26,7 @@ export class UmbDocumentTableColumnStateElement extends UmbLitElement implements
 			case 'NotCreated':
 				return html`<uui-tag color="danger" look="secondary">${this.localize.term('content_notCreated')}</uui-tag>`;
 			default:
-				// TODO: [LK] Check if we have a `SplitPascalCase`-esque utility function that could be used here.
-				return html`<uui-tag color="danger" look="secondary">${this.value.state.replace(/([A-Z])/g, ' $1')}</uui-tag>`;
+				return html`<uui-tag color="danger" look="secondary">${fromCamelCase(this.value.state)}</uui-tag>`;
 		}
 	}
 }

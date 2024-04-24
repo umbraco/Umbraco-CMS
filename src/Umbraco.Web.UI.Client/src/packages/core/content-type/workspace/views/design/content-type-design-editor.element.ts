@@ -292,9 +292,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		let newName = (event.target as HTMLInputElement).value;
 
 		const changedName = this.#workspaceContext?.structure.makeContainerNameUniqueForOwnerContentType(
+			tab.id,
 			newName,
 			'Tab',
-			tab.id,
 		);
 
 		// Check if it collides with another tab name of this same content-type, if so adjust name:
@@ -309,7 +309,19 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		});
 	}
 
-	async #tabNameBlur() {
+	async #tabNameBlur(event: FocusEvent, tab: UmbPropertyTypeContainerModel) {
+		if (!this._activeTabId) return;
+		const newName = (event.target as HTMLInputElement | undefined)?.value;
+		if (newName === '') {
+			const changedName = this.#workspaceContext!.structure.makeEmptyContainerName(this._activeTabId, 'Tab');
+
+			(event.target as HTMLInputElement).value = changedName;
+
+			this.#tabsStructureHelper.partialUpdateContainer(tab.id!, {
+				name: changedName,
+			});
+		}
+
 		this._activeTabId = undefined;
 	}
 
@@ -333,6 +345,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			selection: contentTypes.map((contentType) => contentType.unique).filter((id) => id !== unique),
 			isElement: ownerContentType.isElement,
 			currentPropertyAliases: [],
+			isNew: this.#workspaceContext.getIsNew()!,
 		};
 
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
@@ -475,7 +488,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					auto-width
 					@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
 					@input=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-					@blur=${() => this.#tabNameBlur()}>
+					@blur=${(e: FocusEvent) => this.#tabNameBlur(e, tab)}>
 					${this.renderDeleteFor(tab)}
 				</uui-input>
 			</div>`;

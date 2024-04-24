@@ -12,6 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { incrementString } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-property-editor-ui-block-grid-areas-config')
 export class UmbPropertyEditorUIBlockGridAreasConfigElement
@@ -96,6 +97,13 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 		this.#context.setLayoutColumns(this._areaGridColumns);
 	}
 
+	#generateUniqueAreaAlias(alias: string) {
+		while (this._value.find((area) => area.alias === alias)) {
+			alias = incrementString(alias);
+		}
+		return alias;
+	}
+
 	#addNewArea() {
 		if (!this._areaGridColumns) return;
 		const halfGridColumns = this._areaGridColumns * 0.5;
@@ -105,7 +113,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 			...this._value,
 			{
 				key: UmbId.new(),
-				alias: '', // TODO: Should we auto generate something here?
+				alias: this.#generateUniqueAreaAlias('area'),
 				columnSpan: columnSpan,
 				rowSpan: 1,
 				minAllowed: 0,

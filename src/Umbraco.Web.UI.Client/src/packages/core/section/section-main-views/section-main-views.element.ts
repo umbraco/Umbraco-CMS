@@ -98,7 +98,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 						</umb-router-slot>
 					</umb-body-layout>
 				`
-			: html`${nothing}`;
+			: nothing;
 	}
 
 	#renderDashboards() {
@@ -117,7 +117,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 						})}
 					</uui-tab-group>
 				`
-			: '';
+			: nothing;
 	}
 
 	#renderViews() {
@@ -140,7 +140,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 						})}
 					</uui-tab-group>
 				`
-			: '';
+			: nothing;
 	}
 
 	static styles = [

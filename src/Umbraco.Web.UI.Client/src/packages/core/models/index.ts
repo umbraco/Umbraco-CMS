@@ -6,20 +6,6 @@ export type UmbEntityBase = {
 	name?: string;
 };
 
-export interface UmbVariantableValueModel<T = unknown> extends UmbInvariantValueModel<T> {
-	culture?: string | null;
-	segment?: string | null;
-}
-export interface UmbVariantValueModel<T = unknown> extends UmbInvariantValueModel<T> {
-	culture: string | null;
-	segment: string | null;
-}
-
-export interface UmbInvariantValueModel<T = unknown> {
-	alias: string;
-	value: T;
-}
-
 export interface UmbSwatchDetails {
 	label: string;
 	value: string;

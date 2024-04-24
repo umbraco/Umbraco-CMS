@@ -79,9 +79,7 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 					)}
 				</div>
 				<div slot="actions">
-					<uui-button @click=${this.#close} look="secondary" .label=${this.localize.term('general_close')}>
-						${this.localize.term('general_close')}
-					</uui-button>
+					<uui-button @click=${this.#close} look="secondary" .label=${this.localize.term('general_close')}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
@@ -98,7 +96,6 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 					() => html`
 						<p style="margin-top:0">
 							<umb-localize key="user_2faProviderIsEnabled">This two-factor provider is enabled</umb-localize>
-							<uui-icon icon="check"></uui-icon>
 						</p>
 						<uui-button
 							type="button"
