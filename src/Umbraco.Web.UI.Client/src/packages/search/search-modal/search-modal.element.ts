@@ -346,7 +346,8 @@ export class UmbSearchModalElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				width: min(610px, 100vw);
-				height: 80dvh;
+				height: max(600px, 80dvh);
+				max-height: 100dvh;
 				background-color: var(--uui-color-surface);
 				box-sizing: border-box;
 				color: var(--uui-color-text);
@@ -363,6 +364,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				height: 100%;
+				overflow: auto;
 			}
 			#search-providers {
 				display: flex;
