@@ -57,6 +57,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					if (value) {
 						this.value = { selection: [value.unique] };
 						this._submitModal();
+					} else {
+						throw new Error('No value returned from workspace modal');
+						this._rejectModal();
 					}
 				})
 				.observeRouteBuilder((routeBuilder) => {
