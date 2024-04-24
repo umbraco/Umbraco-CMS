@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Color Swatches Editor',
 		icon: 'icon-page-add',
-		group: 'Umbraco.DropDown.Flexible',
+		group: 'pickers',
 	},
 };

@@ -146,7 +146,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	render() {
 		return html`
 			<umb-body-layout headline=${'Sort Children'}>
-				<uui-box> ${this.#renderChildren()} </uui-box>
+				<uui-box>${this.#renderChildren()}</uui-box>
 				<uui-button slot="actions" label="Cancel" @click="${this._rejectModal}"></uui-button>
 				<uui-button slot="actions" color="positive" look="primary" label="Sort" @click=${this.#onSubmit}></uui-button>
 			</umb-body-layout>
@@ -155,7 +155,6 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 
 	#renderChildren() {
 		if (this._children.length === 0) return html`<uui-label>There are no children</uui-label>`;
-
 		return html`
 			<uui-ref-list>
 				${repeat(

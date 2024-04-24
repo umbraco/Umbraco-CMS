@@ -16,9 +16,8 @@ export class UmbPropertyEditorUIUserPickerElement extends UmbLitElement implemen
 	@property({ attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	#onChange(event: CustomEvent) {
-		const element = event.target as UmbUserInputElement;
-		this.value = element.selection.join(',');
+	#onChange(event: CustomEvent & { target: UmbUserInputElement }) {
+		this.value = event.target.selection.join(',');
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
