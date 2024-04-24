@@ -3,6 +3,7 @@ export * from './direction/index.js';
 export * from './download/blob-download.function.js';
 export * from './get-processed-image-url.function.js';
 export * from './math/math.js';
+export * from './object/deep-merge.function.js';
 export * from './pagination-manager/pagination.manager.js';
 export * from './path/ensure-path-ends-with-slash.function.js';
 export * from './path/path-decode.function.js';
