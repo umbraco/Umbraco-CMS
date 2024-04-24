@@ -3,7 +3,9 @@ import { UmbMemberSearchRepository } from './member-search.repository.js';
 import type { UmbSearchProvider, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export interface UmbMemberSearchItemModel extends UmbMemberItemModel {}
+export interface UmbMemberSearchItemModel extends UmbMemberItemModel {
+	href: string;
+}
 
 export class UmbMemberSearchProvider extends UmbControllerBase implements UmbSearchProvider<UmbMemberSearchItemModel> {
 	#repository = new UmbMemberSearchRepository(this);
