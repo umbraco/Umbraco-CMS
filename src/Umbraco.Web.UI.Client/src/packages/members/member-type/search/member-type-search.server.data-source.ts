@@ -39,6 +39,7 @@ export class UmbMemberTypeSearchServerDataSource implements UmbSearchDataSource<
 		if (data) {
 			const mappedItems: Array<UmbMemberTypeSearchItemModel> = data.items.map((item) => {
 				return {
+					href: '/section/settings/workspace/member-type/edit/' + item.id,
 					entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
 					unique: item.id,
 					name: item.name,
