@@ -52,5 +52,11 @@ public static partial class Constants
         public const string CreatedPackages = Data + "/CreatedPackages";
 
         public const string Preview = Data + "/preview";
+
+        /// <summary>
+        ///     The default folder where Umbraco log files are stored
+        /// </summary>
+        [Obsolete("Use LoggingSettings.GetLoggingDirectory() instead, will be removed in Umbraco 13.")]
+        public const string LogFiles = Umbraco + "/Logs";
     }
 }
