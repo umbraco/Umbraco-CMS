@@ -7,8 +7,14 @@ import {
 	UMB_TREE_PICKER_MODAL_ALIAS,
 } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbDocumentTypePickerModalData
+/*export interface UmbDocumentTypePickerModalData
 	extends UmbTreePickerModalData<UmbDocumentTypeTreeItemModel, typeof umbCreateDocumentTypeWorkspacePathGenerator> {}
+*/
+export type UmbDocumentTypePickerModalData = UmbTreePickerModalData<
+	UmbDocumentTypeTreeItemModel,
+	typeof umbCreateDocumentTypeWorkspacePathGenerator
+>;
+
 export interface UmbDocumentTypePickerModalValue extends UmbTreePickerModalValue {}
 
 export const UMB_DOCUMENT_TYPE_PICKER_MODAL = new UmbModalToken<
@@ -23,14 +29,14 @@ export const UMB_DOCUMENT_TYPE_PICKER_MODAL = new UmbModalToken<
 		treeAlias: 'Umb.Tree.DocumentType',
 		createAction: {
 			modalData: {
-				entityType: 'documentType',
+				entityType: 'document-type',
 				preset: {},
 			},
 			additionalPathGenerator: umbCreateDocumentTypeWorkspacePathGenerator,
 			additionalPathParams: {
-				entityType: 'documentType',
-				parentUnique: '',
-				presetAlias: '',
+				entityType: 'document-type',
+				parentUnique: null,
+				presetAlias: null,
 			},
 		},
 	},
