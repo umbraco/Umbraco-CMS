@@ -48,8 +48,7 @@ public class MigrateNotificationCharsToStrings : MigrationBase
     private User2NodeNotifyDto ReplaceAction(LegacyUser2NodeNotifyDto dto)
     {
         // Action is non-nullable
-        // When we expanded the column it padded it with space, so we need to strip it.
-        dto.Action = _charToStringPermissionDictionary.TryGetValue(dto.Action!.StripWhitespace(), out var action) ? action : dto.Action?.StripWhitespace();
+        dto.Action = _charToStringPermissionDictionary.TryGetValue(dto.Action!, out var action) ? action : dto.Action;
 
         return new User2NodeNotifyDto
         {
