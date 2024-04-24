@@ -87,28 +87,13 @@ export class UmbSearchResultItemElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
-				background: var(--uui-color-surface);
 				padding: var(--uui-size-space-3) var(--uui-size-space-5);
 				border-radius: var(--uui-border-radius);
-				color: var(--uui-color-interactive);
 				display: grid;
 				grid-template-columns: var(--uui-size-space-6) 1fr var(--uui-size-space-5);
 				align-items: center;
 				width: 100%;
-			}
-			.item {
-				background: var(--uui-color-surface);
-				padding: var(--uui-size-space-3) var(--uui-size-space-5);
-				border-radius: var(--uui-border-radius);
-				color: var(--uui-color-interactive);
-				display: grid;
-				grid-template-columns: var(--uui-size-space-6) 1fr var(--uui-size-space-5);
-				align-items: center;
-				width: 100%;
-			}
-			.item:hover {
-				background-color: var(--uui-color-surface-emphasis);
-				color: var(--uui-color-interactive-emphasis);
+				outline-offset: -3px;
 			}
 			.item-icon {
 				margin-bottom: auto;
