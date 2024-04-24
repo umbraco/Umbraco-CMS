@@ -1,3 +1,13 @@
+/**
+ * Creator Name: The Umbraco community
+ * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
+ *
+ * Language Alias: da-dk
+ * Language Int Name: Danish (DK)
+ * Language Local Name: dansk (DK)
+ * Language LCID:
+ * Language Culture: da-DK
+ */
 import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
 
 export default {
