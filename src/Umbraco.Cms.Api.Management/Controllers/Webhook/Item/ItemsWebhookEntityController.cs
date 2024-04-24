@@ -23,7 +23,7 @@ public class ItemsWebhookEntityController : WebhookEntityControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<WebhookItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Items(
+    public async Task<IActionResult> Items(
         CancellationToken cancellationToken,
         [FromQuery(Name = "ids")] HashSet<Guid> ids)
     {
