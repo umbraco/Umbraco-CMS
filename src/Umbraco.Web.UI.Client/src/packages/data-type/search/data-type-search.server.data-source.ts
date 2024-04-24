@@ -39,6 +39,7 @@ export class UmbDataTypeSearchServerDataSource implements UmbSearchDataSource<Um
 		if (data) {
 			const mappedItems: Array<UmbDataTypeSearchItemModel> = data.items.map((item) => {
 				return {
+					href: '/section/settings/workspace/data-type/edit/' + item.id,
 					entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 					unique: item.id,
 					name: item.name,
