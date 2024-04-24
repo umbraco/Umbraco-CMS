@@ -22,6 +22,11 @@ public class ItemScriptItemController : ScriptItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "path")] HashSet<string> paths)
     {
+        if (paths.Count is 0)
+        {
+            return Ok(Enumerable.Empty<ScriptItemResponseModel>());
+        }
+
         paths = paths.Select(path => path.VirtualPathToSystemPath()).ToHashSet();
         IEnumerable<ScriptItemResponseModel> responseModels = _fileItemPresentationFactory.CreateScriptItemResponseModels(paths);
         return await Task.FromResult(Ok(responseModels));

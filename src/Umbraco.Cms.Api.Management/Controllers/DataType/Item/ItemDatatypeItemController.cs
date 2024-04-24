@@ -27,6 +27,11 @@ public class ItemDatatypeItemController : DatatypeItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<DataTypeItemResponseModel>());
+        }
+
         var dataTypes = new List<IDataType>();
         foreach (Guid id in ids)
         {
