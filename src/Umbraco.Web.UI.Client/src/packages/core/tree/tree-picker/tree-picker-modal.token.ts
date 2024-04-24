@@ -11,7 +11,7 @@ export interface UmbTreePickerModalCreateActionData<PathGeneratorType extends Um
 }
 
 export interface UmbTreePickerModalData<
-	TreeItemType = any,
+	TreeItemType,
 	PathGeneratorType extends UmbPathGeneratorType = UmbPathGeneratorType,
 > extends UmbPickerModalData<TreeItemType> {
 	treeAlias?: string;
@@ -21,7 +21,7 @@ export interface UmbTreePickerModalData<
 
 export interface UmbTreePickerModalValue extends UmbPickerModalValue {}
 
-export const UMB_TREE_PICKER_MODAL = new UmbModalToken<UmbTreePickerModalData, UmbTreePickerModalValue>(
+export const UMB_TREE_PICKER_MODAL = new UmbModalToken<UmbTreePickerModalData<unknown>, UmbTreePickerModalValue>(
 	UMB_TREE_PICKER_MODAL_ALIAS,
 	{
 		modal: {
