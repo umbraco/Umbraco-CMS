@@ -1,4 +1,4 @@
-import type { ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestItemStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_LANGUAGE_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.LanguageItem';
 export const UMB_LANGUAGE_STORE_ALIAS = 'Umb.Store.LanguageItem';

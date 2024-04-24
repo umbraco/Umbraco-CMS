@@ -1,5 +1,9 @@
 import { UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import type { ManifestEntityAction, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	ManifestEntityAction,
+	ManifestRepository,
+	ManifestTypes,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_MEDIA_TYPE_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.MediaType.Folder';
 

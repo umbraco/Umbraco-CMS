@@ -2,6 +2,7 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_DUPLICATE } from '../../user-permissions/constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as modalManifests } from './modal/manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
 	{

@@ -1,5 +1,5 @@
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_LANGUAGE_TABLE_COLLECTION_VIEW_ALIAS = 'Umb.CollectionView.Language.Table';
 
