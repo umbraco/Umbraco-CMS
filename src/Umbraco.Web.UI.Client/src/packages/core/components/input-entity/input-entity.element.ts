@@ -1,14 +1,30 @@
-import { css, html, customElement, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-input-entity')
 export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, '') {
-	// TODO: [LK] Add sort ordering.
+	#sorter = new UmbSorterController<string>(this, {
+		getUniqueOfElement: (element) => {
+			return element.id;
+		},
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry;
+		},
+		identifier: 'Umb.SorterIdentifier.InputEntity',
+		itemSelector: 'uui-ref-node',
+		containerSelector: 'uui-ref-list',
+		onChange: ({ model }) => {
+			this.selection = model;
+			this.dispatchEvent(new UmbChangeEvent());
+		},
+	});
 
 	protected getFormElement() {
 		return undefined;
@@ -41,14 +57,23 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 	#max: number = Infinity;
 
 	@property({ attribute: false })
-	getIcon?: (item: any) => string;
+	getIcon?: (item: UmbUniqueItemModel) => string;
 
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
+	@property({ type: Array })
+	public set selection(uniques: Array<string>) {
+		this.#pickerContext?.setSelection(uniques);
+		this.#sorter.setModel(uniques);
+	}
+	public get selection(): Array<string> | undefined {
+		return this.#pickerContext?.getSelection();
+	}
+
 	@property()
-	public set value(value: string) {
-		this.selection = splitStringToArray(value);
+	public set value(uniques: string) {
+		this.selection = splitStringToArray(uniques);
 	}
 	public get value(): string {
 		return this.selection?.join(',') ?? '';
@@ -60,17 +85,11 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 		this.#pickerContext = new ctor(this);
 		this.#observePickerContext();
 	}
-	#pickerContext?: UmbPickerInputContext<any>;
-
-	public set selection(value: Array<string>) {
-		this.#pickerContext?.setSelection(value);
-	}
-	public get selection(): Array<string> | undefined {
-		return this.#pickerContext?.getSelection();
-	}
 
 	@state()
 	private _items?: Array<UmbUniqueItemModel>;
+
+	#pickerContext?: UmbPickerInputContext<any>;
 
 	constructor() {
 		super();
@@ -100,25 +119,18 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 		this.#pickerContext.min = this.min;
 		this.#pickerContext.max = this.max;
 
-		this.observe(
-			this.#pickerContext.selection,
-			(selection) => (this.value = selection?.join(',') ?? ''),
-			'observeSelection',
-		);
-
-		this.observe(
-			this.#pickerContext.selectedItems,
-			(selectedItems) => {
-				this._items = selectedItems;
-			},
-			'observeSelectedItems',
-		);
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 	}
 
 	#openPicker() {
 		this.#pickerContext?.openPicker({
 			hideTreeRoot: true,
 		});
+	}
+
+	#removeItem(item: UmbUniqueItemModel) {
+		this.#pickerContext?.requestRemoveItem(item.unique);
 	}
 
 	render() {
@@ -153,12 +165,10 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 		if (!item.unique) return;
 		const icon = this.getIcon?.(item) ?? item.icon ?? '';
 		return html`
-			<uui-ref-node name=${item.name}>
+			<uui-ref-node name=${item.name} id=${item.unique}>
 				${when(icon, () => html`<umb-icon slot="icon" name=${icon}></umb-icon>`)}
 				<uui-action-bar slot="actions">
-					<uui-button
-						@click=${() => this.#pickerContext?.requestRemoveItem(item.unique)}
-						label=${this.localize.term('general_remove')}></uui-button>
+					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;

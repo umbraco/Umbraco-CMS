@@ -91,5 +91,5 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSpl
 }
 
 export const UMB_WORKSPACE_SPLIT_VIEW_CONTEXT = new UmbContextToken<UmbWorkspaceSplitViewContext>(
-	'umbWorkspaceSplitViewContext',
+	'UmbWorkspaceSplitViewContext',
 );

@@ -1,4 +1,9 @@
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS,
+	UMB_DOCUMENT_BLUEPRINT_TREE_REPOSITORY_ALIAS,
+	UMB_DOCUMENT_BLUEPRINT_TREE_STORE_ALIAS,
+} from './constants.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadManifests } from './reload-tree-item-children/manifests.js';
 import { UmbDocumentBlueprintTreeRepository } from './document-blueprint-tree.repository.js';
@@ -9,10 +14,6 @@ import type {
 	ManifestTreeItem,
 	ManifestTreeStore,
 } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_DOCUMENT_BLUEPRINT_TREE_REPOSITORY_ALIAS = 'Umb.Repository.DocumentBlueprint.Tree';
-export const UMB_DOCUMENT_BLUEPRINT_TREE_STORE_ALIAS = 'Umb.Store.DocumentBlueprint.Tree';
-export const UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS = 'Umb.Tree.DocumentBlueprint';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',

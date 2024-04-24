@@ -90,7 +90,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 				: nothing}
 			<umb-section-main>
 				${this._routes && this._routes.length > 0
-					? html`<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>`
+					? html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`
 					: nothing}
 				<slot></slot>
 			</umb-section-main>

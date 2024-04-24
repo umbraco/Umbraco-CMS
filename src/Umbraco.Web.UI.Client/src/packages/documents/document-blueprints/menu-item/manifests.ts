@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS } from '../tree/manifests.js';
+import { UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS } from '../tree/constants.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestTypes = {
@@ -10,8 +10,6 @@ const menuItem: ManifestTypes = {
 	meta: {
 		treeAlias: UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS,
 		label: 'Document Blueprints',
-		//icon: 'icon-blueprint',
-		//entityType: 'document-blueprint',
 		menus: ['Umb.Menu.StructureSettings'],
 	},
 };
