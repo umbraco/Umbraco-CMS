@@ -1,9 +1,15 @@
+import type { UmbDocumentItemModel } from '../index.js';
 import { UmbDocumentSearchRepository } from './document-search.repository.js';
-import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
-import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbSearchProvider, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+export interface UmbDocumentSearchItemModel extends UmbDocumentItemModel {
+	href: string;
+}
 
-export class UmbDocumentSearchProvider extends UmbControllerBase implements UmbApi {
+export class UmbDocumentSearchProvider
+	extends UmbControllerBase
+	implements UmbSearchProvider<UmbDocumentSearchItemModel>
+{
 	#repository = new UmbDocumentSearchRepository(this);
 
 	search(args: UmbSearchRequestArgs) {

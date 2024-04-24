@@ -1,5 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
+import type { UmbDocumentSearchItemModel } from './document.search-provider.js';
+import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -10,7 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDocumentSearchServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentSearchServerDataSource {
+export class UmbDocumentSearchServerDataSource implements UmbSearchDataSource<UmbDocumentSearchItemModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -36,7 +37,7 @@ export class UmbDocumentSearchServerDataSource {
 		);
 
 		if (data) {
-			const mappedItems = data.items.map((item) => {
+			const mappedItems: Array<UmbDocumentSearchItemModel> = data.items.map((item) => {
 				return {
 					href: '/section/content/workspace/document/edit/' + item.id,
 					entityType: UMB_DOCUMENT_ENTITY_TYPE,
