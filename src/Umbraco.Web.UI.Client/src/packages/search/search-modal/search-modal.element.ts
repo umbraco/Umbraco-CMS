@@ -242,6 +242,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 		this.#focusInput();
 		this._loading = true;
+		this._searchResults = [];
 		this.#updateSearchResults();
 	}
 
