@@ -57,10 +57,20 @@ export class UmbSearchModalElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.#observeViews();
+		this.#observeProviders();
 	}
 
-	#observeViews() {
+	connectedCallback() {
+		super.connectedCallback();
+
+		this.addEventListener('keydown', this.#onKeydown);
+
+		requestAnimationFrame(() => {
+			this.#focusInput();
+		});
+	}
+
+	#observeProviders() {
 		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'searchProvider', null, async (providers) => {
 			const searchProviders: Array<SearchProvider> = [];
 
@@ -83,94 +93,6 @@ export class UmbSearchModalElement extends UmbLitElement {
 		});
 	}
 
-	connectedCallback() {
-		super.connectedCallback();
-
-		this.addEventListener('keydown', this.#onKeydown);
-
-		requestAnimationFrame(() => {
-			this.#focusInput();
-		});
-	}
-
-	#onKeydown(event: KeyboardEvent) {
-		const root = this.shadowRoot;
-		if (!root) return;
-
-		if (event.key === 'Tab') {
-			const isFirstProvider = (element: Element) => element === root.querySelector('.search-provider:first-child');
-			const isLastProvider = (element: Element) => element === root.querySelector('.search-provider:last-child');
-			const setActiveProviderFocus = (element?: Element | null) => (element as HTMLElement)?.focus();
-
-			const activeProvider = root.querySelector('.search-provider.active') as HTMLElement | null;
-
-			if (!activeProvider) return;
-
-			// When moving backwards in search providers
-			if (event.shiftKey) {
-				// If the FOCUS is on a provider, and it is the first in the list, we need to wrap around and focus the LAST one
-				if (this.#providerHasFocus) {
-					if (this.#isFocusingFirstProvider) {
-						setActiveProviderFocus(root.querySelector('.search-provider:last-child'));
-						event.preventDefault();
-					}
-					return;
-				}
-
-				// If the currently ACTIVE provider is the first in the list, we need to wrap around and focus the LAST one
-				if (isFirstProvider(activeProvider)) {
-					setActiveProviderFocus(root.querySelector('.search-provider:last-child'));
-					event.preventDefault();
-					return;
-				}
-
-				// We set the focus to current provider, and because we don't prevent the default tab behavior, the previous provider will be focused
-				setActiveProviderFocus(activeProvider);
-			}
-			// When moving forwards in search providers
-			else {
-				// If the FOCUS is on a provider, and it is the last in the list, we need to wrap around and focus the FIRST one
-				if (this.#providerHasFocus) {
-					if (this.#isFocusingLastProvider) {
-						setActiveProviderFocus(root.querySelector('.search-provider:first-child'));
-						event.preventDefault();
-					}
-					return;
-				}
-
-				// If the currently ACTIVE provider is the last in the list, we need to wrap around and focus the FIRST one
-				if (isLastProvider(activeProvider)) {
-					setActiveProviderFocus(root.querySelector('.search-provider:first-child'));
-					event.preventDefault();
-					return;
-				}
-
-				// We set the focus to current provider, and because we don't prevent the default tab behavior, the next provider will be focused
-				setActiveProviderFocus(activeProvider);
-			}
-		}
-
-		switch (event.key) {
-			case 'Tab':
-			case 'Shift':
-			case 'Escape':
-			case 'Enter':
-				break;
-			case 'ArrowDown':
-				event.preventDefault();
-				this.#setSearchItemNavIndex(Math.min(this.#searchItemNavIndex + 1, this._searchResults.length - 1));
-				break;
-			case 'ArrowUp':
-				event.preventDefault();
-				this.#setSearchItemNavIndex(Math.max(this.#searchItemNavIndex - 1, 0));
-				break;
-			default:
-				if (this._input === root.activeElement) return;
-				this.#focusInput();
-				break;
-		}
-	}
-
 	async #setSearchItemNavIndex(index: number) {
 		const prevElement = this.shadowRoot?.querySelector(
 			`a[data-item-index="${this.#searchItemNavIndex}"]`,
@@ -190,36 +112,6 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 	#focusInput() {
 		this._input.focus();
-	}
-
-	get #providerHasFocus() {
-		const providerElements = this.shadowRoot?.querySelectorAll('.search-provider') || [];
-		return Array.from(providerElements).some((element) => element === this.shadowRoot?.activeElement);
-	}
-
-	get #isFocusingLastProvider() {
-		const providerElements = this.shadowRoot?.querySelectorAll('.search-provider') || [];
-		return providerElements[providerElements.length - 1] === this.shadowRoot?.activeElement;
-	}
-
-	get #isFocusingFirstProvider() {
-		const providerElements = this.shadowRoot?.querySelectorAll('.search-provider') || [];
-		return providerElements[0] === this.shadowRoot?.activeElement;
-	}
-
-	#onSearchChange(event: InputEvent) {
-		const target = event.target as HTMLInputElement;
-		this._search = target.value.trim();
-
-		clearTimeout(this.#inputTimer);
-		if (!this._search) {
-			this._loading = false;
-			this._searchResults = [];
-			return;
-		}
-
-		this._loading = true;
-		this.#inputTimer = setTimeout(() => this.#updateSearchResults(), this.#inputTimerAmount);
 	}
 
 	async #setShowFakeCursor(show: boolean) {
@@ -255,6 +147,121 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 		this._loading = false;
 		this.#searchItemNavIndex = -1;
+	}
+
+	#closeModal(event: MouseEvent | KeyboardEvent) {
+		if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+
+		requestAnimationFrame(() => {
+			// In the case where the browser has not triggered focus-visible and we keyboard navigate and press enter.
+			// It is necessary to wait one frame.
+			this.modalContext?.reject();
+		});
+	}
+
+	#onSearchChange(event: InputEvent) {
+		const target = event.target as HTMLInputElement;
+		this._search = target.value.trim();
+
+		clearTimeout(this.#inputTimer);
+		if (!this._search) {
+			this._loading = false;
+			this._searchResults = [];
+			return;
+		}
+
+		this._loading = true;
+		this.#inputTimer = setTimeout(() => this.#updateSearchResults(), this.#inputTimerAmount);
+	}
+
+	#onKeydown(event: KeyboardEvent) {
+		const root = this.shadowRoot;
+		if (!root) return;
+
+		if (event.key === 'Tab') {
+			const isFirstProvider = (element: Element) => element === root.querySelector('.search-provider:first-child');
+			const isLastProvider = (element: Element) => element === root.querySelector('.search-provider:last-child');
+			const setFocus = (element?: Element | null) => (element as HTMLElement)?.focus();
+			const providerHasFocus = () => {
+				const providerElements = root.querySelectorAll('.search-provider') || [];
+				return Array.from(providerElements).some((element) => element === root.activeElement);
+			};
+			const isFocusingLastProvider = () => {
+				const providerElements = root.querySelectorAll('.search-provider') || [];
+				return providerElements[providerElements.length - 1] === root.activeElement;
+			};
+			const isFocusingFirstProvider = () => {
+				const providerElements = root.querySelectorAll('.search-provider') || [];
+				return providerElements[0] === root.activeElement;
+			};
+
+			const activeProvider = root.querySelector('.search-provider.active') as HTMLElement | null;
+
+			if (!activeProvider) return;
+
+			// When moving backwards in search providers
+			if (event.shiftKey) {
+				// If the FOCUS is on a provider, and it is the first in the list, we need to wrap around and focus the LAST one
+				if (providerHasFocus()) {
+					if (isFocusingFirstProvider()) {
+						setFocus(root.querySelector('.search-provider:last-child'));
+						event.preventDefault();
+					}
+					return;
+				}
+
+				// If the currently ACTIVE provider is the first in the list, we need to wrap around and focus the LAST one
+				if (isFirstProvider(activeProvider)) {
+					setFocus(root.querySelector('.search-provider:last-child'));
+					event.preventDefault();
+					return;
+				}
+
+				// We set the focus to current provider, and because we don't prevent the default tab behavior, the previous provider will be focused
+				setFocus(activeProvider);
+			}
+			// When moving forwards in search providers
+			else {
+				// If the FOCUS is on a provider, and it is the last in the list, we need to wrap around and focus the FIRST one
+				if (providerHasFocus()) {
+					if (isFocusingLastProvider()) {
+						setFocus(root.querySelector('.search-provider:first-child'));
+						event.preventDefault();
+					}
+					return;
+				}
+
+				// If the currently ACTIVE provider is the last in the list, we need to wrap around and focus the FIRST one
+				if (isLastProvider(activeProvider)) {
+					setFocus(root.querySelector('.search-provider:first-child'));
+					event.preventDefault();
+					return;
+				}
+
+				// We set the focus to current provider, and because we don't prevent the default tab behavior, the next provider will be focused
+				setFocus(activeProvider);
+			}
+		}
+
+		switch (event.key) {
+			case 'Tab':
+			case 'Shift':
+			case 'Escape':
+			case 'Enter':
+				break;
+			case 'ArrowDown':
+				event.preventDefault();
+				this.#setSearchItemNavIndex(Math.min(this.#searchItemNavIndex + 1, this._searchResults.length - 1));
+				break;
+			case 'ArrowUp':
+				event.preventDefault();
+				this.#setSearchItemNavIndex(Math.max(this.#searchItemNavIndex - 1, 0));
+				break;
+			default:
+				if (this._input === root.activeElement) return;
+				this.#focusInput();
+				break;
+		}
 	}
 
 	render() {
@@ -331,16 +338,6 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 	#renderNoResults() {
 		return this._loading ? nothing : html`<div id="no-results">${this.localize.term('general_searchNoResult')}</div>`;
-	}
-
-	#closeModal(event: MouseEvent | KeyboardEvent) {
-		if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
-
-		requestAnimationFrame(() => {
-			// In the case where the browser has not triggered focus-visible and we keyboard navigate and press enter.
-			// It is necessary to wait one frame.
-			this.modalContext?.reject();
-		});
 	}
 
 	static styles = [
