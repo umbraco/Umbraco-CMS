@@ -25,5 +25,5 @@ public class MemberResponseModel : ContentResponseModelBase<MemberValueModel, Me
 
     public DateTime? LastPasswordChangeDate { get; set; }
 
-    public IEnumerable<string> Groups { get; set; } = [];
+    public IEnumerable<Guid> Groups { get; set; } = [];
 }
