@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: pl
- * Language Int Name: Polish
- * Language Local Name: polski
+ * Language Int Name: Polish (PL)
+ * Language Local Name: polski (PL)
  * Language LCID: 21
  * Language Culture: pl-PL
  */

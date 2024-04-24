@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: zh
- * Language Int Name: Chinese (Simple)
- * Language Local Name: 中文（简体，中国）
+ * Language Int Name: Chinese (Simple) (CN)
+ * Language Local Name: 中文（简体，中国
  * Language LCID: 0804
  * Language Culture: zh-CN
  */

@@ -3,7 +3,7 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: cs
- * Language Int Name: Czech
+ * Language Int Name: Czech (Czech Republic)
  * Language Local Name: česky
  * Language LCID: 5
  * Language Culture: cs-CZ

@@ -3,8 +3,8 @@
  * Creator Link: https://github.com/alevak09
  *
  * Language Alias: hr
- * Language Int Name: Croatian
- * Language Local Name: Hrvatski
+ * Language Int Name: Croatian (HR)
+ * Language Local Name: Hrvatski (HR)
  * Language LCID: 1050
  * Language Culture: hr-HR
  */

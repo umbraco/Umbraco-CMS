@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: ja
- * Language Int Name: Japanese
- * Language Local Name: 日本語
+ * Language Int Name: Japanese (JP)
+ * Language Local Name: 日本語 (日本)
  * Language LCID: 17
  * Language Culture: ja-JP
  */

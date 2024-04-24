@@ -2,7 +2,7 @@
  * Creator Name: The Umbraco community
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
- * Language Alias: no
+ * Language Alias: nb-no
  * Language Int Name: Norwegian Bokmål (NO)
  * Language Local Name: norsk bokmål (NO)
  * Language LCID: 20

@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: es
- * Language Int Name: Spanish
- * Language Local Name: español
+ * Language Int Name: Spanish (ES)
+ * Language Local Name: español (ES)
  * Language LCID: 10
  * Language Culture: es-ES
  */

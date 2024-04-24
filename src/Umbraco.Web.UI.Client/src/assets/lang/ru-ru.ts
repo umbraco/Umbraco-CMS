@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: ru
- * Language Int Name: Russian
- * Language Local Name: русский
+ * Language Int Name: Russian (RU)
+ * Language Local Name: русский (RU)
  * Language LCID:
  * Language Culture: ru-RU
  */

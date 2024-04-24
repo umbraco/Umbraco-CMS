@@ -2,9 +2,9 @@
  * Creator Name: The Umbraco community
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
- * Language Alias: nl
+ * Language Alias: nl-nl
  * Language Int Name: Dutch (NL)
- * Language Local Name: Nederlands
+ * Language Local Name: Nederlands (NL)
  * Language LCID: 19
  * Language Culture: nl-NL
  */

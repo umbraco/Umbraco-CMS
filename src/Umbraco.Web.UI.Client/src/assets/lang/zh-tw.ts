@@ -3,7 +3,7 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: zh_tw
- * Language Int Name: Chinese (Taiwan)
+ * Language Int Name: Chinese (TW)
  * Language Local Name: 中文（正體，台灣）
  * Language LCID: 0404
  * Language Culture: zh-TW

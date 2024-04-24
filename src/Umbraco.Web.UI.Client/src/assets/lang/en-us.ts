@@ -2,7 +2,7 @@
  * Creator Name: The Umbraco community
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
- * Language Alias: en-us
+ * Language Alias: en
  * Language Int Name: English (US)
  * Language Local Name: English (US)
  * Language LCID:

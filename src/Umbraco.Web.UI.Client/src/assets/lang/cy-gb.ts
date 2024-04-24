@@ -2,7 +2,7 @@
  * Creator Name: Method4 Ltd
  * Creator Link: https://www.method4.co.uk/
  *
- * Language Alias: cy_gb
+ * Language Alias: cy
  * Language Int Name: Welsh (UK)
  * Language Local Name: Cymraeg (UK)
  * Language LCID: 1106

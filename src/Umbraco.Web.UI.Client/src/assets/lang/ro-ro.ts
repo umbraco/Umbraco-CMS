@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: ro
- * Language Int Name: Romanian (Romania)
- * Language Local Name: romana (Romania)
+ * Language Int Name: Romanian (RO)
+ * Language Local Name: romana (RO)
  * Language LCID:
  * Language Culture: ro-RO
  */

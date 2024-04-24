@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: it
- * Language Int Name: Italian
- * Language Local Name: italiano
+ * Language Int Name: Italian (IT)
+ * Language Local Name: italiano (IT)
  * Language LCID: 16
  * Language Culture: it-IT
  */

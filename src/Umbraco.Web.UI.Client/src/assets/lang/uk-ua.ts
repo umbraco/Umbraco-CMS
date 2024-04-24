@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: uk
- * Language Int Name: Ukrainian
- * Language Local Name: Українська
+ * Language Int Name: Ukrainian (UA)
+ * Language Local Name: Українська (UA)
  * Language LCID:
  * Language Culture: uk-UA
  */

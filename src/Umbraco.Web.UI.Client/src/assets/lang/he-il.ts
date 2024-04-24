@@ -4,7 +4,7 @@
  *
  * Language Alias: he
  * Language Int Name: Hebrew (Israel)
- * Language Local Name: Hebrew
+ * Language Local Name: עברית (ישראל)
  * Language LCID:
  * Language Culture: he-IL
  */

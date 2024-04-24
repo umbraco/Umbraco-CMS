@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: fr
- * Language Int Name: French
- * Language Local Name: français
+ * Language Int Name: French (FR)
+ * Language Local Name: français (FR)
  * Language LCID: 12
  * Language Culture: fr-FR
  */

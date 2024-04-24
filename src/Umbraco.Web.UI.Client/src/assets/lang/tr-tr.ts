@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: tr
- * Language Int Name: Turkish
- * Language Local Name: Türkçe
+ * Language Int Name: Turkish (TR)
+ * Language Local Name: Türkçe (TR)
  * Language LCID:
  * Language Culture: tr-TR
  */

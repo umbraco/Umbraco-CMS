@@ -3,8 +3,8 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: ko
- * Language Int Name: Korean
- * Language Local Name: 한국어
+ * Language Int Name: Korean (KR)
+ * Language Local Name: 한국어 (대한민국)
  * Language LCID: 18
  * Language Culture: ko-KR
  */

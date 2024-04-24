@@ -2,7 +2,7 @@
  * Creator Name: The Umbraco community
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
- * Language Alias: da-dk
+ * Language Alias: da
  * Language Int Name: Danish (DK)
  * Language Local Name: dansk (DK)
  * Language LCID:
