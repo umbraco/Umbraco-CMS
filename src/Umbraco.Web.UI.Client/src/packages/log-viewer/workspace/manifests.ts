@@ -1,5 +1,6 @@
 import type {
 	ManifestModal,
+	ManifestTypes,
 	ManifestWorkspace,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,

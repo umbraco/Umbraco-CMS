@@ -1,4 +1,4 @@
-import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const section: ManifestSection = {
 	type: 'section',

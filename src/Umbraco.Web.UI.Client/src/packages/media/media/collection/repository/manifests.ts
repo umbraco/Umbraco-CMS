@@ -1,5 +1,5 @@
 import { UMB_MEDIA_COLLECTION_REPOSITORY_ALIAS } from './index.js';
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const collectionRepositoryManifest: ManifestRepository = {
 	type: 'repository',
