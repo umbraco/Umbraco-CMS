@@ -278,6 +278,22 @@ export class UmbContentTypeStructureManager<
 		return clonedContainer;
 	}
 
+	ensureContainerNames(
+		contentTypeUnique: string | null,
+		type: UmbPropertyContainerTypes,
+		parentId: string | null = null,
+	) {
+		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
+		this.getOwnerContainers(type, parentId)?.forEach((container) => {
+			if (container.name === '') {
+				const newName = 'Unnamed';
+				this.updateContainer(null, container.id, {
+					name: this.makeContainerNameUniqueForOwnerContentType(container.id, newName, type, parentId) ?? newName,
+				});
+			}
+		});
+	}
+
 	async createContainer(
 		contentTypeUnique: string | null,
 		parentId: string | null = null,
@@ -295,9 +311,11 @@ export class UmbContentTypeStructureManager<
 			sortOrder: sortOrder ?? 0,
 		};
 
-		const containers = [
-			...(this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.containers ?? []),
-		];
+		// Ensure
+		this.ensureContainerNames(contentTypeUnique, type, parentId);
+
+		const contentTypes = this.#contentTypes.getValue();
+		const containers = [...(contentTypes.find((x) => x.unique === contentTypeUnique)?.containers ?? [])];
 		containers.push(container);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -308,7 +326,7 @@ export class UmbContentTypeStructureManager<
 		return container;
 	}
 
-	async insertContainer(contentTypeUnique: string | null, container: UmbPropertyTypeContainerModel) {
+	/*async insertContainer(contentTypeUnique: string | null, container: UmbPropertyTypeContainerModel) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
@@ -330,24 +348,34 @@ export class UmbContentTypeStructureManager<
 		// @ts-ignore
 		// TODO: fix TS partial complaint
 		this.#contentTypes.updateOne(contentTypeUnique, { containers });
-	}
+	}*/
 
+	makeEmptyContainerName(
+		containerId: string,
+		containerType: UmbPropertyContainerTypes,
+		parentId: string | null = null,
+	) {
+		return (
+			this.makeContainerNameUniqueForOwnerContentType(containerId, 'Unnamed', containerType, parentId) ?? 'Unnamed'
+		);
+	}
 	makeContainerNameUniqueForOwnerContentType(
+		containerId: string,
 		newName: string,
-		containerType: UmbPropertyContainerTypes = 'Tab',
+		containerType: UmbPropertyContainerTypes,
 		parentId: string | null = null,
 	) {
 		const ownerRootContainers = this.getOwnerContainers(containerType, parentId); //getRootContainers() can't differentiates between compositions and locals
+		if (!ownerRootContainers) {
+			return null;
+		}
 
 		let changedName = newName;
-		if (ownerRootContainers) {
-			while (ownerRootContainers.find((tab) => tab.name === changedName && tab.id !== parentId)) {
-				changedName = incrementString(changedName);
-			}
-
-			return changedName === newName ? null : changedName;
+		while (ownerRootContainers.find((con) => con.name === changedName && con.id !== containerId)) {
+			changedName = incrementString(changedName);
 		}
-		return null;
+
+		return changedName === newName ? null : changedName;
 	}
 
 	async updateContainer(

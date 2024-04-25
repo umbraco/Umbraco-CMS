@@ -246,7 +246,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 	/** Manipulate methods: */
 
-	async insertContainer(container: UmbPropertyTypeContainerModel, sortOrder = 0) {
+	/*async insertContainer(container: UmbPropertyTypeContainerModel, sortOrder = 0) {
 		await this.#init;
 		if (!this.#structure) return false;
 
@@ -254,7 +254,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 		await this.#structure.insertContainer(null, newContainer);
 		return true;
-	}
+	}*/
 
 	async addContainer(parentContainerId?: string | null, sortOrder?: number) {
 		if (!this.#structure) return;

@@ -21,6 +21,10 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
+
+		this.observe(this.#selectionManager.selection, (selection) => {
+			this.value = { selection };
+		});
 	}
 
 	async firstUpdated() {
@@ -37,7 +41,6 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	}
 
 	#submit() {
-		this.value = { selection: this.#selectionManager.getSelection() };
 		this.modalContext?.submit();
 	}
 
@@ -57,7 +60,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 							selectable
 							@selected=${() => this.#selectionManager.select(item.unique)}
 							@deselected=${() => this.#selectionManager.deselect(item.unique)}
-							?selected=${this.#selectionManager.isSelected(item.unique)}>
+							?selected=${this.value.selection.includes(item.unique)}>
 							<uui-icon slot="icon" name="icon-globe"></uui-icon>
 						</uui-menu-item>
 					`,

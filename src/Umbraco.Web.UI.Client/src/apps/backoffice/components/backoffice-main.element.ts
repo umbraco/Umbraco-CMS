@@ -1,6 +1,6 @@
 import type { UmbBackofficeContext } from '../backoffice.context.js';
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSectionContext, UMB_SECTION_CONTEXT, UMB_SECTION_PATH_PATTERN } from '@umbraco-cms/backoffice/section';
 import type { UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { ManifestSection, UmbSectionElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -100,17 +100,18 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	render() {
 		return this._routes.length > 0
 			? html`<umb-router-slot .routes=${this._routes} @change=${this._onRouteChange}></umb-router-slot>`
-			: '';
+			: nothing;
 	}
 
 	static styles = [
 		css`
 			:host {
-				background-color: var(--uui-color-background);
 				display: block;
+				background-color: var(--uui-color-background);
+				width: 100%;
 				height: calc(
 					100% - 60px
-				); // 60 => top header height, TODO: Make sure this comes from somewhere so it is maintainable and eventually responsive.
+				); /* 60 => top header height, TODO: Make sure this comes from somewhere so it is maintainable and eventually responsive. */
 			}
 		`,
 	];

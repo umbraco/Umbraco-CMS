@@ -1,5 +1,5 @@
 import { UmbDictionaryExportRepository } from './dictionary-export.repository.js';
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DICTIONARY_EXPORT_REPOSITORY_ALIAS = 'Umb.Repository.Dictionary.Export';
 
@@ -10,4 +10,4 @@ const repository: ManifestRepository = {
 	api: UmbDictionaryExportRepository,
 };
 
-export const manifests = [repository];
+export const manifests: Array<ManifestTypes> = [repository];

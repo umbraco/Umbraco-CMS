@@ -112,7 +112,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		return html`
 			<umb-body-layout headline="Select Link">
 				<uui-box>
-					<div class="url-link">${this._renderLinkUrlInput()} ${this._renderAnchorInput()}</div>
+					<div class="url-link">${this.#renderLinkUrlInput()} ${this.#renderAnchorInput()}</div>
 
 					<uui-label for="link-title-input">${this.localize.term('defaultdialogs_nodeNameLinkPicker')}</uui-label>
 					<uui-input
@@ -134,7 +134,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 					<hr />
 
-					${this._renderTrees()}
+					${this.#renderTrees()}
 				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
@@ -148,7 +148,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		`;
 	}
 
-	private _renderLinkUrlInput() {
+	#renderLinkUrlInput() {
 		return html`<span>
 			<uui-label for="link-input">${this.localize.term('defaultdialogs_link')}</uui-label>
 			<uui-input
@@ -161,7 +161,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		</span>`;
 	}
 
-	private _renderAnchorInput() {
+	#renderAnchorInput() {
 		if (this._layout.hideAnchor) return nothing;
 		return html`<span>
 			<uui-label for="anchor-input">${this.localize.term('defaultdialogs_anchorLinkPicker')}</uui-label>
@@ -174,8 +174,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		</span>`;
 	}
 
-	private _renderTrees() {
-		//TODO: Make search work
+	#renderTrees() {
+		//TODO: Make search work (temporarily disabled)
 		return html`
 			<uui-symbol-expand
 				id="document-expand"
@@ -184,12 +184,14 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			<uui-label for="document-expand">${this.localize.term('defaultdialogs_linkToPage')}</uui-label>
 			<div style="${styleMap({ display: !this.documentExpand ? 'block' : 'none' })}">
 				<uui-input
+					disabled
 					id="search-input"
 					placeholder=${this.localize.term('placeholders_search')}
 					label=${this.localize.term('placeholders_search')}></uui-input>
 				<umb-tree
 					alias=${UMB_DOCUMENT_TREE_ALIAS}
 					.props=${{
+						hideTreeItemActions: true,
 						hideTreeRoot: true,
 						selectionConfiguration: this._selectionConfiguration,
 					}}
@@ -205,6 +207,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				<umb-tree
 					alias="Umb.Tree.Media"
 					.props=${{
+						hideTreeItemActions: true,
 						hideTreeRoot: true,
 						selectionConfiguration: this._selectionConfiguration,
 					}}

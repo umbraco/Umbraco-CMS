@@ -108,7 +108,7 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 				)}
 			</uui-ref-list>
 			<uui-button
-				id="add-button"
+				id="btn-add"
 				look="placeholder"
 				@click=${() => this.#pickerContext.openPicker()}
 				label="Add stylesheet"></uui-button>
@@ -130,7 +130,7 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 
 	static styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 		`,

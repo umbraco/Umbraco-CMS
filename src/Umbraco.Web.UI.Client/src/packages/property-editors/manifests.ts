@@ -1,0 +1,52 @@
+import { manifest as colorEditor } from './color-swatches-editor/manifests.js';
+import { manifest as numberRange } from './number-range/manifests.js';
+import { manifest as orderDirection } from './order-direction/manifests.js';
+import { manifest as overlaySize } from './overlay-size/manifests.js';
+import { manifest as select } from './select/manifests.js';
+import { manifest as valueType } from './value-type/manifests.js';
+import { manifests as checkboxListManifests } from './checkbox-list/manifests.js';
+import { manifests as collectionView } from './collection-view/manifests.js';
+import { manifests as colorPickerManifests } from './color-picker/manifests.js';
+import { manifests as datePickerManifests } from './date-picker/manifests.js';
+import { manifests as dropdownManifests } from './dropdown/manifests.js';
+import { manifests as eyeDropperManifests } from './eye-dropper/manifests.js';
+import { manifests as iconPickerManifests } from './icon-picker/manifests.js';
+import { manifests as labelManifests } from './label/manifests.js';
+import { manifests as multipleTextStringManifests } from './multiple-text-string/manifests.js';
+import { manifests as multiUrlPickerManifests } from './multi-url-picker/manifests.js';
+import { manifests as numberManifests } from './number/manifests.js';
+import { manifests as radioButtonListManifests } from './radio-button-list/manifests.js';
+import { manifests as sliderManifests } from './slider/manifests.js';
+import { manifests as textareaManifests } from './textarea/manifests.js';
+import { manifests as textBoxManifests } from './text-box/manifests.js';
+import { manifests as toggleManifests } from './toggle/manifests.js';
+import { manifests as treePickerManifests } from './tree-picker/manifests.js';
+import { manifests as uploadFieldManifests } from './upload-field/manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+
+export const manifests: Array<ManifestTypes> = [
+	...checkboxListManifests,
+	...collectionView,
+	...colorPickerManifests,
+	...datePickerManifests,
+	...dropdownManifests,
+	...eyeDropperManifests,
+	...iconPickerManifests,
+	...labelManifests,
+	...multipleTextStringManifests,
+	...multiUrlPickerManifests,
+	...numberManifests,
+	...radioButtonListManifests,
+	...sliderManifests,
+	...textareaManifests,
+	...textBoxManifests,
+	...toggleManifests,
+	...treePickerManifests,
+	...uploadFieldManifests,
+	colorEditor,
+	numberRange,
+	orderDirection,
+	overlaySize,
+	select,
+	valueType,
+];

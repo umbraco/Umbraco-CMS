@@ -134,7 +134,7 @@ export class UmbModalContext<
 	 * @memberof UmbModalContext
 	 */
 	public setValue(value: ModalValue) {
-		this.#value.update(value);
+		this.#value.setValue(value);
 	}
 
 	/**

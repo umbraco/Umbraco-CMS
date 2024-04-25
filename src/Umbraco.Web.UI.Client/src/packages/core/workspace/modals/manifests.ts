@@ -1,4 +1,4 @@
-import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspaceModal: ManifestModal = {
 	type: 'modal',
@@ -7,4 +7,4 @@ const workspaceModal: ManifestModal = {
 	js: () => import('./workspace-modal.element.js'),
 };
 
-export const manifests = [workspaceModal];
+export const manifests: Array<ManifestTypes> = [workspaceModal];

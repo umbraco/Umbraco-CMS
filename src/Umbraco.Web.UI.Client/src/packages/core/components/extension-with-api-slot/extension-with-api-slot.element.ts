@@ -139,6 +139,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	@property()
 	public renderMethod?: (
 		extension: UmbExtensionElementAndApiInitializer,
+		index: number,
 	) => TemplateResult | HTMLElement | null | undefined;
 
 	connectedCallback(): void {
@@ -181,7 +182,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 			? repeat(
 					this._permitted,
 					(ext) => ext.alias,
-					(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component),
+					(ext, i) => (this.renderMethod ? this.renderMethod(ext, i) : ext.component),
 				)
 			: html`<slot></slot>`;
 	}

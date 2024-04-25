@@ -1,6 +1,6 @@
 import { UmbDocumentBlueprintItemStore } from './document-blueprint-item.store.js';
 import { UmbDocumentBlueprintItemRepository } from './document-blueprint-item.repository.js';
-import type { ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestItemStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_BLUEPRINT_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.DocumentBlueprint.Item';
 export const UMB_DOCUMENT_BLUEPRINT_STORE_ALIAS = 'Umb.Store.DocumentBlueprint.Item';
@@ -19,4 +19,4 @@ const itemStore: ManifestItemStore = {
 	api: UmbDocumentBlueprintItemStore,
 };
 
-export const manifests = [itemRepository, itemStore];
+export const manifests: Array<ManifestTypes> = [itemRepository, itemStore];
