@@ -1,6 +1,7 @@
+import type { UmbMediaUrlModel } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { MediaService, type MediaUrlInfoResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A server data source for Media Urls
@@ -8,27 +9,37 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbMediaUrlServerDataSource
  * @implements {DocumentTreeDataSource}
  */
-export class UmbMediaUrlServerDataSource {
-	#host: UmbControllerHost;
-
+export class UmbMediaUrlServerDataSource extends UmbItemServerDataSourceBase<
+	MediaUrlInfoResponseModel,
+	UmbMediaUrlModel
+> {
 	/**
 	 * Creates an instance of UmbMediaUrlServerDataSource.
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbMediaUrlServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
-	/**
-	 * Publish one or more variants of a Document
-	 * @param {string} unique
-	 * @param {Array<UmbVariantId>} variantIds
-	 * @return {*}
-	 * @memberof UmbMediaUrlServerDataSource
-	 */
-	async getUrls(uniques: Array<string>) {
-		if (!uniques) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, MediaService.getMediaUrls({ id: uniques }));
+		super(host, {
+			getItems,
+			mapper,
+		});
 	}
 }
+
+/* eslint-disable local-rules/no-direct-api-import */
+const getItems = (uniques: Array<string>) => MediaService.getMediaUrls({ id: uniques });
+
+const mapper = (item: MediaUrlInfoResponseModel): UmbMediaUrlModel => {
+	const url = item.urlInfos.length ? item.urlInfos[0].url : undefined;
+	const extension = url ? url.slice(url.lastIndexOf('.') + 1, url.length) : undefined;
+
+	return {
+		unique: item.id,
+		url,
+		extension,
+		/*info: item.urlInfos.map((urlInfo) => ({
+			...urlInfo,
+			extension: '',
+		})),*/
+	};
+};
