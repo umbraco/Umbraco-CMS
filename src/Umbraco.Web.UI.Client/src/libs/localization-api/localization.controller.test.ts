@@ -6,9 +6,11 @@ import { LitElement, customElement, property } from '@umbraco-cms/backoffice/ext
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+const initialLanguage = 'en-us';
+
 @customElement('umb-localize-controller-host')
 class UmbLocalizeControllerHostElement extends UmbElementMixin(LitElement) {
-	@property() lang = 'en-us';
+	@property() lang = initialLanguage;
 }
 
 @customElement('umb-localization-render-count')
@@ -36,7 +38,7 @@ interface TestLocalization extends UmbLocalizationSetBase {
 
 //#region Localizations
 const english: TestLocalization = {
-	$code: 'en-us',
+	$code: 'en',
 	$dir: 'ltr',
 	close: 'Close',
 	logout: 'Log out',
@@ -81,8 +83,8 @@ describe('UmbLocalizeController', () => {
 
 	beforeEach(async () => {
 		umbLocalizationManager.registerManyLocalizations([english, danish, danishRegional]);
-		document.documentElement.lang = english.$code;
-		document.documentElement.dir = english.$dir;
+		document.documentElement.lang = initialLanguage;
+		document.documentElement.dir = 'ltr';
 		await aTimeout(0);
 		const host = {
 			getHostElement: () => document.createElement('div'),
@@ -101,7 +103,7 @@ describe('UmbLocalizeController', () => {
 	});
 
 	it('should have a default language', () => {
-		expect(controller.lang()).to.equal(english.$code);
+		expect(controller.lang()).to.equal(initialLanguage);
 	});
 
 	it('should update the language when the language changes', async () => {
