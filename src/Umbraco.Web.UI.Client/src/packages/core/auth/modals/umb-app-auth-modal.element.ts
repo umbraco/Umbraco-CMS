@@ -38,7 +38,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 					aria-hidden="true"
 					part="auth-logo-background" />
 				<div id="graphic" aria-hidden="true">
-					<img part="auth-logo" id="logo-on-image" src="/umbraco/backoffice/assets/umbraco_logo_white.svg" alt="Logo" />
+					<img part="auth-logo" id="logo-on-image" src="/umbraco/backoffice/assets/umbraco_logo_blue.svg" alt="Logo" />
 					<svg
 						id="curve-top"
 						width="1746"
@@ -77,8 +77,8 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		`;
 	}
 
-	private onSubmit = (providerName: string) => {
-		this.value = { providerName };
+	private onSubmit = (providerName: string, loginHint?: string) => {
+		this.value = { providerName, loginHint };
 		this._submitModal();
 	};
 
@@ -89,7 +89,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				display: block;
 				background: rgb(244, 244, 244);
 
-				--image: url('https://picsum.photos/800/600') no-repeat center center/cover;
+				--image: url('/umbraco/backoffice/assets/login.jpg') no-repeat center center/cover;
 				--curves-color: var(--umb-login-curves-color, #f5c1bc);
 				--curves-display: var(--umb-login-curves-display, inline);
 			}
