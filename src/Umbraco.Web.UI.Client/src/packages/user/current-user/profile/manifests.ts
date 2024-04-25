@@ -2,6 +2,7 @@ import { UmbChangePasswordCurrentUserAction } from './change-password-current-us
 import { UmbEditCurrentUserAction } from './edit-current-user.action.js';
 import type {
 	ManifestCurrentUserActionDefaultKind,
+	ManifestTypes,
 	ManifestUserProfileApp,
 } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -52,4 +53,4 @@ const currentUserActions: Array<ManifestCurrentUserActionDefaultKind> = [
 	},
 ];
 
-export const manifests = [...userProfileApps, ...currentUserActions];
+export const manifests: Array<ManifestTypes> = [...userProfileApps, ...currentUserActions];

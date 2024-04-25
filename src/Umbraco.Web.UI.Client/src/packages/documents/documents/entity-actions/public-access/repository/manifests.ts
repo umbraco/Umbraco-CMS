@@ -1,5 +1,5 @@
 import { UmbDocumentPublicAccessRepository } from './public-access.repository.js';
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_PUBLIC_ACCESS_REPOSITORY_ALIAS = 'Umb.Repository.Document.PublicAccess';
 
@@ -10,4 +10,4 @@ const repository: ManifestRepository = {
 	api: UmbDocumentPublicAccessRepository,
 };
 
-export const manifests = [repository];
+export const manifests: Array<ManifestTypes> = [repository];

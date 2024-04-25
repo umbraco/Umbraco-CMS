@@ -1,4 +1,4 @@
-import type { ManifestRepository, ManifestStore } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.Template.Detail';
 
@@ -18,4 +18,4 @@ const store: ManifestStore = {
 	api: () => import('./template-detail.store.js'),
 };
 
-export const manifests = [repository, store];
+export const manifests: Array<ManifestTypes> = [repository, store];

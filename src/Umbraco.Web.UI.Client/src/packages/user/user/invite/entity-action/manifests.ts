@@ -25,4 +25,4 @@ const entityActions: Array<ManifestTypes> = [
 	conditionManifest,
 ];
 
-export const manifests = [...entityActions];
+export const manifests: Array<ManifestTypes> = [...entityActions];

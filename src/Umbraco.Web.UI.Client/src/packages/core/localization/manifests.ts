@@ -1,4 +1,5 @@
 import type { ManifestLocalization } from '../extension-registry/models/localization.model.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const localizationManifests: Array<ManifestLocalization> = [
 	{
@@ -253,4 +254,4 @@ const localizationManifests: Array<ManifestLocalization> = [
 	},
 ];
 
-export const manifests = [...localizationManifests];
+export const manifests: Array<ManifestTypes> = [...localizationManifests];

@@ -122,6 +122,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	#openPicker() {
 		this.#pickerContext.openPicker({
 			filter: this.filter,
+			multiple: this.max > 1 ? true : false,
 		});
 	}
 

@@ -1,4 +1,4 @@
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_INVITE_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Invite';
 const inviteRepository: ManifestRepository = {
@@ -8,4 +8,4 @@ const inviteRepository: ManifestRepository = {
 	api: () => import('./invite-user.repository.js'),
 };
 
-export const manifests = [inviteRepository];
+export const manifests: Array<ManifestTypes> = [inviteRepository];
