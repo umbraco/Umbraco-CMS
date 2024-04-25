@@ -3,13 +3,12 @@
  * Creator Link: https://docs.umbraco.com/umbraco-cms/extending/language-files
  *
  * Language Alias: en
- * Language Int Name: English (US)
- * Language Local Name: English (US)
+ * Language Int Name: English (UK)
+ * Language Local Name: English (UK)
  * Language LCID:
- * Language Culture: en-US
+ * Language Culture: en-GB
  */
 import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
-
 export default {
 	actions: {
 		assigndomain: 'Culture and Hostnames',
@@ -96,7 +95,7 @@ export default {
 		sort: 'Allow access to change the sort order for nodes',
 		translate: 'Allow access to translate a node',
 		update: 'Allow access to save a node',
-		createblueprint: 'Allow access to create a Document Blueprint',
+		createblueprint: 'Allow access to create a Content Template',
 		notify: 'Allow access to setup notifications for content nodes',
 	},
 	apps: {
@@ -153,7 +152,7 @@ export default {
 		save: 'Save',
 		saveAndClose: 'Save and close',
 		saveAndPublish: 'Save and publish',
-		saveToPublish: 'Send for approval',
+		saveToPublish: 'Save and send for approval',
 		saveListView: 'Save list view',
 		schedulePublish: 'Schedule',
 		saveAndPreview: 'Save and preview',
@@ -161,7 +160,6 @@ export default {
 		styleChoose: 'Choose style',
 		styleShow: 'Show styles',
 		tableInsert: 'Insert table',
-		generateModelsAndClose: 'Generate models and close',
 		saveAndGenerateModels: 'Save and generate models',
 		undo: 'Undo',
 		redo: 'Redo',
@@ -170,14 +168,20 @@ export default {
 		confirmActionConfirm: 'Confirm',
 		morePublishingOptions: 'More publishing options',
 		submitChanges: 'Submit',
+		generateModelsAndClose: 'Generate models and close',
+	},
+	auditTrailsMedia: {
+		delete: 'Media deleted',
+		move: 'Media moved',
+		copy: 'Media copied',
+		save: 'Media saved',
 	},
 	auditTrails: {
 		atViewingFor: 'Viewing for',
 		delete: 'Content deleted',
 		unpublish: 'Content unpublished',
-		unpublishvariant: 'Content unpublished for languages: %0%',
-		publish: 'Content published',
-		publishvariant: 'Content published for languages: %0%',
+		publish: 'Content saved and Published',
+		publishvariant: 'Content saved and published for languages: %0%',
 		save: 'Content saved',
 		savevariant: 'Content saved for languages: %0%',
 		move: 'Content moved',
@@ -197,7 +201,6 @@ export default {
 		smallSaveVariant: 'Save',
 		smallDelete: 'Delete',
 		smallUnpublish: 'Unpublish',
-		smallUnpublishVariant: 'Unpublish',
 		smallRollBack: 'Rollback',
 		smallSendToPublish: 'Send To Publish',
 		smallSendToPublishVariant: 'Send To Publish',
@@ -206,6 +209,8 @@ export default {
 		smallContentVersionPreventCleanup: 'Save',
 		smallContentVersionEnableCleanup: 'Save',
 		historyIncludingVariants: 'History (all variants)',
+		unpublishvariant: 'Content unpublished for languages: %0%',
+		smallUnpublishVariant: 'Unpublish',
 	},
 	codefile: {
 		createFolderIllegalChars: 'The folder name cannot contain illegal characters.',
@@ -231,7 +236,7 @@ export default {
 		lastPublished: 'Last published',
 		noItemsToShow: 'There are no items to show',
 		listViewNoItems: 'There are no items to show in the list.',
-		listViewNoContent: 'No child items have been added',
+		listViewNoContent: 'No content has been added',
 		listViewNoMembers: 'No members have been added',
 		mediatype: 'Media Type',
 		mediaLinks: 'Link to media item(s)',
@@ -242,7 +247,6 @@ export default {
 		noDate: 'No date chosen',
 		nodeName: 'Page title',
 		noMediaLink: 'This media item has no link',
-		noProperties: 'No content can be added for this item',
 		otherElements: 'Properties',
 		parentNotPublished:
 			"This document is published but is not visible because the parent '%0%' is\n      unpublished\n    ",
@@ -290,9 +294,9 @@ export default {
 		scheduledPublishDocumentation:
 			'<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">What does this mean?</a>',
 		nestedContentDeleteItem: 'Are you sure you want to delete this item?',
-		nestedContentDeleteAllItems: 'Are you sure you want to delete all items?',
 		nestedContentEditorNotSupported:
 			'Property %0% uses editor %1% which is not supported by Nested\n      Content.\n    ',
+		nestedContentDeleteAllItems: 'Are you sure you want to delete all items?',
 		nestedContentNoContentTypes: 'No Content Types are configured for this property.',
 		nestedContentAddElementType: 'Add Element Type',
 		nestedContentSelectElementTypeModalTitle: 'Select Element Type',
@@ -314,7 +318,7 @@ export default {
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
 		languagesToUnpublish:
-			'Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.',
+			'Select the languages to unpublish. Unpublishing a mandatory language will\n      unpublish all languages.\n    ',
 		variantsWillBeSaved: 'All new variants will be saved.',
 		variantsToPublish: 'Which variants would you like to publish?',
 		variantsToSave: 'Choose which variants to be saved.',
@@ -328,21 +332,23 @@ export default {
 		createEmpty: 'Create new',
 		createFromClipboard: 'Paste from clipboard',
 		nodeIsInTrash: 'This item is in the Recycle Bin',
+		noProperties: 'No content can be added for this item',
 		variantSaveNotAllowed: 'Save is not allowed',
 		variantPublishNotAllowed: 'Publish is not allowed',
 		variantSendForApprovalNotAllowed: 'Send for approval is not allowed',
 		variantScheduleNotAllowed: 'Schedule is not allowed',
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
+		selectAllVariants: 'Select all variants',
 	},
 	blueprints: {
-		createBlueprintFrom: 'Create a new Document Blueprint from <em>%0%</em>',
+		createBlueprintFrom: 'Create a new Content Template from <em>%0%</em>',
 		blankBlueprint: 'Blank',
-		selectBlueprint: 'Select a Document Blueprint',
-		createdBlueprintHeading: 'Document Blueprint created',
-		createdBlueprintMessage: "A Document Blueprint was created from '%0%'",
-		duplicateBlueprintMessage: 'Another Document Blueprint with the same name already exists',
+		selectBlueprint: 'Select a Content Template',
+		createdBlueprintHeading: 'Content Template created',
+		createdBlueprintMessage: "A Content Template was created from '%0%'",
+		duplicateBlueprintMessage: 'Another Content Template with the same name already exists',
 		blueprintDescription:
-			'A Document Blueprint is predefined content that an editor can select to use as the\n      basis for creating new content\n    ',
+			'A Content Template is predefined content that an editor can select to use as the\n      basis for creating new content\n    ',
 	},
 	media: {
 		clickToUpload: 'Click to upload',
@@ -352,22 +358,23 @@ export default {
 		invalidFileName: 'Cannot upload this file, it does not have a valid file name',
 		maxFileSize: 'Max file size is',
 		mediaRoot: 'Media root',
-		moveToSameFolderFailed: 'Parent and destination folders cannot be the same',
 		createFolderFailed: 'Failed to create a folder under parent id %0%',
 		renameFolderFailed: 'Failed to rename the folder with id %0%',
 		dragAndDropYourFilesIntoTheArea: 'Drag and drop your file(s) into the area',
+		fileSecurityValidationFailure: 'One or more file security validations have failed',
+		moveToSameFolderFailed: 'Parent and destination folders cannot be the same',
 		uploadNotAllowed: 'Upload is not allowed in this location.',
 	},
 	member: {
 		createNewMember: 'Create a new member',
 		allMembers: 'All Members',
-		duplicateMemberLogin: 'A member with this login already exists',
 		memberGroupNoProperties: 'Member groups have no additional properties for editing.',
+		'2fa': 'Two-Factor Authentication',
+		duplicateMemberLogin: 'A member with this login already exists',
 		memberHasGroup: "The member is already in group '%0%'",
 		memberHasPassword: 'The member already has a password set',
 		memberLockoutNotEnabled: 'Lockout is not enabled for this member',
 		memberNotInGroup: "The member is not in group '%0%'",
-		'2fa': 'Two-Factor Authentication',
 	},
 	contentType: {
 		copyFailed: 'Failed to copy content type',
@@ -384,7 +391,7 @@ export default {
 	create: {
 		chooseNode: 'Where do you want to create the new %0%',
 		createUnder: 'Create an item under',
-		createContentBlueprint: 'Select the Document Type you want to make a content blueprint for',
+		createContentBlueprint: 'Select the Document Type you want to make a content template for',
 		enterFolderName: 'Enter a folder name',
 		updateData: 'Choose a type and a title',
 		noDocumentTypes:
@@ -398,10 +405,10 @@ export default {
 		noDocumentTypesAllowedAtRoot:
 			'There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.',
 		noMediaTypes:
-			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.',
+			'There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			"The selected media in the tree doesn't allow for any other media to be\n      created below it.\n    ",
-		noMediaTypesEditPermissions: 'Edit permissions for this Media Type',
+		noMediaTypesEditPermissions: 'Edit permissions for this Media Types',
 		documentTypeWithoutTemplate: 'Document Type without a template',
 		documentTypeWithTemplate: 'Document Type with Template',
 		documentTypeWithTemplateDescription:
@@ -488,9 +495,10 @@ export default {
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
 		cut: 'Cut',
-		editdictionary: 'Edit Dictionary Item',
-		editlanguage: 'Edit Language',
+		editDictionary: 'Edit dictionary item',
+		editLanguage: 'Edit language',
 		editSelectedMedia: 'Edit selected media',
+		editWebhook: 'Edit webhook',
 		insertAnchor: 'Insert local link',
 		insertCharacter: 'Insert character',
 		insertgraphicheadline: 'Insert graphic headline',
@@ -498,7 +506,7 @@ export default {
 		insertlink: 'Insert link',
 		insertMacro: 'Click to add a Macro',
 		inserttable: 'Insert table',
-		languagedeletewarning: 'This will delete the language',
+		languagedeletewarning: 'This will delete the language and all content related to the language',
 		languageChangeWarning:
 			'Changing the culture for a language may be an expensive operation and will result\n      in the content cache and indexes being rebuilt\n    ',
 		lastEdited: 'Last Edited',
@@ -539,6 +547,7 @@ export default {
 		openInNewWindow: 'Opens the linked document in a new window or tab',
 		linkToMedia: 'Link to media',
 		selectContentStartNode: 'Select content start node',
+		selectEvent: 'Select event',
 		selectMedia: 'Select media',
 		selectMediaType: 'Select media type',
 		selectIcon: 'Select icon',
@@ -567,7 +576,6 @@ export default {
 		unLinkYour: 'Un-link your',
 		account: 'account',
 		selectEditor: 'Select editor',
-		selectEditorConfiguration: 'Select configuration',
 		selectSnippet: 'Select snippet',
 		variantdeletewarning:
 			'This will delete the node and all its languages. If you only want to delete one\n      language, you should unpublish the node in that language instead.\n    ',
@@ -577,6 +585,7 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
+		selectEditorConfiguration: 'Select configuration',
 	},
 	dictionary: {
 		importDictionaryItemHelp:
@@ -621,6 +630,8 @@ export default {
 			'The process is taking longer than expected, check the Umbraco log to see if there\n      have been any errors during this operation\n    ',
 		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
 		iIndexPopulator: 'IIndexPopulator',
+		noResults: 'No results were found',
+		searchResultsFound: 'Showing %0% - %1% of %2% result(s) - Page %3% of %4%',
 	},
 	placeholders: {
 		username: 'Enter your username',
@@ -656,8 +667,6 @@ export default {
 		folderWasRenamed: '%0% was renamed to %1%',
 	},
 	editdatatype: {
-		canChangePropertyEditorHelp:
-			'Changing a property editor on a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		addPrevalue: 'Add prevalue',
 		dataBaseDatatype: 'Database datatype',
 		guid: 'Property editor GUID',
@@ -672,10 +681,11 @@ export default {
 		selectFolder: 'Select the folder to move',
 		inTheTree: 'to in the tree structure below',
 		wasMoved: 'was moved underneath',
+		canChangePropertyEditorHelp:
+			'Changing a property editor on a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		hasReferencesDeleteConsequence:
 			'Deleting <strong>%0%</strong> will delete the properties and their data from the following items',
-		acceptDeleteConsequence:
-			'I understand this action will delete the properties and data based on this Data\n      Type\n    ',
+		acceptDeleteConsequence: 'I understand this action will delete the properties and data based on this Data Type',
 	},
 	errorHandling: {
 		errorButDataWasSaved:
@@ -731,7 +741,6 @@ export default {
 		temporarilyUnavailable: 'The service is temporarily unavailable',
 	},
 	general: {
-		options: 'Options',
 		about: 'About',
 		action: 'Action',
 		actions: 'Actions',
@@ -758,7 +767,6 @@ export default {
 		continue: 'Continue',
 		copy: 'Copy',
 		create: 'Create',
-		cropSection: 'Crop section',
 		database: 'Database',
 		date: 'Date',
 		default: 'Default',
@@ -782,7 +790,6 @@ export default {
 		first: 'First',
 		focalPoint: 'Focal point',
 		general: 'General',
-		generic: 'Generic',
 		groups: 'Groups',
 		group: 'Group',
 		height: 'Height',
@@ -811,7 +818,6 @@ export default {
 		logout: 'Logout',
 		macro: 'Macro',
 		mandatory: 'Mandatory',
-		media: 'Media',
 		message: 'Message',
 		move: 'Move',
 		name: 'Name',
@@ -823,6 +829,7 @@ export default {
 		off: 'Off',
 		ok: 'OK',
 		open: 'Open',
+		options: 'Options',
 		on: 'On',
 		or: 'or',
 		orderBy: 'Order by',
@@ -837,7 +844,6 @@ export default {
 		recycleBin: 'Recycle Bin',
 		recycleBinEmpty: 'Your recycle bin is empty',
 		reload: 'Reload',
-		revert: 'Revert',
 		remaining: 'Remaining',
 		remove: 'Remove',
 		rename: 'Rename',
@@ -873,7 +879,6 @@ export default {
 		url: 'URL',
 		user: 'User',
 		username: 'Username',
-		validate: 'Validate',
 		value: 'Value',
 		view: 'View',
 		welcome: 'Welcome...',
@@ -901,12 +906,18 @@ export default {
 		skipToMenu: 'Skip to menu',
 		skipToContent: 'Skip to content',
 		restore: 'Restore',
+		primary: 'Primary',
+		change: 'Change',
+		cropSection: 'Crop section',
+		generic: 'Generic',
+		media: 'Media',
+		revert: 'Revert',
+		validate: 'Validate',
 	},
 	colors: {
 		blue: 'Blue',
 	},
 	shortcuts: {
-		addTab: 'Add tab',
 		addGroup: 'Add group',
 		addProperty: 'Add property',
 		addEditor: 'Add editor',
@@ -928,11 +939,12 @@ export default {
 		generalHeader: 'General',
 		editorHeader: 'Editor',
 		toggleAllowCultureVariants: 'Toggle allow culture variants',
+		addTab: 'Add tab',
 	},
 	graphicheadline: {
-		backgroundcolor: 'Background color',
+		backgroundcolor: 'Background colour',
 		bold: 'Bold',
-		color: 'Text color',
+		color: 'Text colour',
 		font: 'Font',
 		text: 'Text',
 	},
@@ -954,7 +966,7 @@ export default {
 		databaseUpgrade:
 			"\n      <p>\n      Press the <strong>upgrade</strong> button to upgrade your database to Umbraco %0%</p>\n      <p>\n      Don't worry - no content will be deleted and everything will continue working afterwards!\n      </p>\n      ",
 		databaseUpgradeDone:
-			'Your database has been upgraded to the final version %0%.<br/>Press <strong>Next</strong> to\n      proceed. ',
+			'Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to\n      proceed. ',
 		databaseUpToDate:
 			'Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard',
 		defaultUserChangePass: "<strong>The Default users' password needs to be changed!</strong>",
@@ -1040,9 +1052,34 @@ export default {
 		greeting4: 'Welcome',
 		greeting5: 'Welcome',
 		greeting6: 'Welcome',
-		instruction: 'Sign in to Umbraco',
-		signInWith: 'Sign in with {0}',
-		timeout: 'Your session has timed out. Please sign in again below.',
+		instruction: 'Log in below',
+		signInWith: 'Sign in with',
+		timeout: 'Session timed out',
+		userFailedLogin: "Oops! We couldn't log you in. Please check your credentials and try again.",
+		bottomText:
+			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ',
+		forgottenPassword: 'Forgotten password?',
+		forgottenPasswordInstruction:
+			'An email will be sent to the address specified with a link to reset your\n      password\n    ',
+		requestPasswordResetConfirmation:
+			'An email with password reset instructions will be sent to the\n      specified address if it matched our records\n    ',
+		showPassword: 'Show password',
+		hidePassword: 'Hide password',
+		returnToLogin: 'Return to login form',
+		setPasswordInstruction: 'Please provide a new password',
+		setPasswordConfirmation: 'Your Password has been updated',
+		resetCodeExpired: 'The link you have clicked on is invalid or has expired',
+		resetPasswordEmailCopySubject: 'Umbraco: Reset Password',
+		resetPasswordEmailCopyFormat:
+			"\n        <html>\n\t\t\t<head>\n\t\t\t\t<meta name='viewport' content='width=device-width'>\n\t\t\t\t<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n\t\t\t</head>\n\t\t\t<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>\n\t\t\t\t<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>\n\t\t\t\t<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"body\" style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;\" bgcolor=\"#1d1333\">\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;\" valign=\"top\">\n\t\t\t\t\t\t\t<table style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;\">\n\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t<td background=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" bgcolor=\"#1d1333\" width=\"28\" height=\"28\" valign=\"top\" style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\">\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\" style=\"width:30px;height:30px;\"> <v:fill type=\"tile\" src=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" color=\"#1d1333\" /> <v:textbox inset=\"0,0,0,0\"> <![endif]-->\n<div></div>\n<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->\n</td>\n<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\" valign=\"top\"></td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>\n<tr>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>\n<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>\n<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>\n<br>\n<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>\n<tr>\n<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>\n<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>\n<tr>\n<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>\n<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPassword reset requested\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</h1>\n<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tYour username to login to the Umbraco backoffice is: <strong>%0%</strong>\n</p>\n<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>\n<tbody>\n<tr>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>\n<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tClick this link to reset your password\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</a>\n</td>\n</tr>\n</tbody>\n</table>\n</p>\n<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>If you cannot click on the link, copy and paste this URL into your browser window:</p>\n<table border='0' cellpadding='0' cellspacing='0'>\n<tr>\n<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>\n<font style=\"-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;\">\n<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>\n</font>\n</td>\n</tr>\n</table>\n</p>\n</td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n<br><br><br>\n</div>\n</td>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>\n</tr>\n</table>\n</body>\n</html>\n\t",
+		mfaSecurityCodeSubject: 'Umbraco: Security Code',
+		mfaSecurityCodeMessage: 'Your security code is: %0%',
+		'2faTitle': 'One last step',
+		'2faText': 'You have enabled 2-factor authentication and must verify your identity.',
+		'2faMultipleText': 'Please choose a 2-factor provider',
+		'2faCodeInput': 'Verification code',
+		'2faCodeInputHelp': 'Please enter the verification code',
+		'2faInvalidCode': 'Invalid code entered',
 	},
 	main: {
 		dashboard: 'Dashboard',
@@ -1068,6 +1105,13 @@ export default {
 	notifications: {
 		editNotifications: 'Select your notification for <strong>%0%</strong>',
 		notificationsSavedFor: 'Notification settings saved for',
+		mailBody:
+			"\n      Hi %0%\n\n      This is an automated mail to inform you that the task '%1%'\n      has been performed on the page '%2%'\n      by the user '%3%'\n\n      Go to http://%4%/#/content/content/edit/%5% to edit.\n\n      %6%\n\n      Have a nice day!\n      Cheers from the Umbraco robot\n    ",
+		mailBodyVariantSummary: 'The following languages have been modified %0%',
+		mailBodyHtml:
+			"\n        <html>\n\t\t\t<head>\n\t\t\t\t<meta name='viewport' content='width=device-width'>\n\t\t\t\t<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n\t\t\t</head>\n\t\t\t<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>\n\t\t\t\t<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>\n\t\t\t\t<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"body\" style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;\" bgcolor=\"#1d1333\">\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;\" valign=\"top\">\n\t\t\t\t\t\t\t<table style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;\">\n\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t<td background=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" bgcolor=\"#1d1333\" width=\"28\" height=\"28\" valign=\"top\" style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\">\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\" style=\"width:30px;height:30px;\"> <v:fill type=\"tile\" src=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" color=\"#1d1333\" /> <v:textbox inset=\"0,0,0,0\"> <![endif]-->\n<div></div>\n<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->\n</td>\n<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\" valign=\"top\"></td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>\n<tr>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>\n<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>\n<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>\n<br>\n<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>\n<tr>\n<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>\n<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>\n<tr>\n<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>\n<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tHi %0%,\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</h1>\n<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tThis is an automated mail to inform you that the task <strong>'%1%'</strong> has been performed on the page <a style=\"color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;\" href=\"http://%4%/#/content/content/edit/%5%\"><strong>'%2%'</strong></a> by the user <strong>'%3%'</strong>\n</p>\n<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>\n<tbody>\n<tr>\n<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>\n<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>\n<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>EDIT</a></td></tr></tbody></table>\n</td>\n</tr>\n</tbody>\n</table>\n<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n<h3>Update summary:</h3>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t%6%\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tHave a nice day!<br /><br />\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCheers from the Umbraco robot\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n</td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n<br><br><br>\n</div>\n</td>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>\n</tr>\n</table>\n</body>\n</html>\n\t",
+		mailBodyVariantHtmlSummary: '<p>The following languages have been modified:</p>\n        %0%\n    ',
+		mailSubject: '[%0%] Notification about %1% performed on %2%',
 		notifications: 'Notifications',
 	},
 	packager: {
@@ -1107,7 +1151,7 @@ export default {
 		packageLikes: 'Likes',
 		packageCompatibility: 'Compatibility',
 		packageCompatibilityDescription:
-			'This package is compatible with the following versions of Umbraco, as\n      reported by community members. Full compatability cannot be guaranteed for versions reported below 100%\n    ',
+			'This package is compatible with the following versions of Umbraco, as\n      reported by community members. Full compatibility cannot be guaranteed for versions reported below 100%\n    ',
 		packageExternalSources: 'External sources',
 		packageAuthor: 'Author',
 		packageDocumentation: 'Documentation',
@@ -1118,8 +1162,6 @@ export default {
 			'This package file doesn\'t contain any items to uninstall.<br/><br/>\n      You can safely remove this from the system by clicking "uninstall package" below.',
 		packageOptions: 'Package options',
 		packageMigrationsRun: 'Run pending package migrations',
-		packageMigrationsComplete: 'Package migrations have successfully completed.',
-		packageMigrationsNonePending: 'All package migrations have successfully completed.',
 		packageReadme: 'Package readme',
 		packageRepository: 'Package repository',
 		packageUninstallConfirm: 'Confirm package uninstall',
@@ -1130,6 +1172,8 @@ export default {
 			'You can unselect items you do not wish to remove, at this time, below. When you click "confirm uninstall" all checked-off items will be removed.<br />\n      <span style="color: Red; font-weight: bold;">Notice:</span> any documents, media etc depending on the items you remove, will stop working, and could lead to system instability,\n      so uninstall with caution. If in doubt, contact the package author.',
 		packageVersion: 'Package version',
 		verifiedToWorkOnUmbracoCloud: 'Verified to work on Umbraco Cloud',
+		packageMigrationsComplete: 'Package migrations have successfully completed.',
+		packageMigrationsNonePending: 'All package migrations have successfully completed.',
 	},
 	paste: {
 		doNothing: 'Paste with full formatting (Not recommended)',
@@ -1158,18 +1202,15 @@ export default {
 		paMembersHelp: 'If you wish to grant access to specific members',
 	},
 	publish: {
-		invalidPublishBranchPermissions: 'Insufficient user permissions to publish all descendant documents',
-		contentPublishedFailedIsTrashed: '\n      %0% could not be published because the item is in the recycle bin.\n    ',
 		contentPublishedFailedAwaitingRelease:
 			'\n      %0% could not be published because the item is scheduled for release.\n    ',
 		contentPublishedFailedExpired: '\n      %0% could not be published because the item has expired.\n    ',
 		contentPublishedFailedInvalid:
-			'\n      %0% could not be published because some properties did not pass validation rules.\n    ',
+			'\n      %0% could not be published because these properties:  %1%  did not pass validation rules.\n    ',
 		contentPublishedFailedByEvent: '\n      %0% could not be published, a 3rd party add-in cancelled the action.\n    ',
 		contentPublishedFailedByParent: '\n      %0% can not be published, because a parent page is not published.\n    ',
 		contentPublishedFailedByMissingName: '%0% can not be published, because its missing a name.',
-		contentPublishedFailedReqCultureValidationError:
-			"Validation failed for required language '%0%'. This\n      language was saved but not published.\n    ",
+		includeUnpublished: 'Include unpublished subpages',
 		inProgress: 'Publishing in progress - please wait...',
 		inProgressCounter: '%0% out of %1% pages have been published...',
 		nodePublish: '%0% has been published',
@@ -1177,16 +1218,22 @@ export default {
 		publishAll: 'Publish %0% and all its subpages',
 		publishHelp:
 			'Click <em>Publish</em> to publish <strong>%0%</strong> and thereby making its content publicly available.<br/><br />\n      You can publish this page and all its subpages by checking <em>Include unpublished subpages</em> below.\n      ',
+		invalidPublishBranchPermissions: 'Insufficient user permissions to publish all descendant documents',
+		contentPublishedFailedIsTrashed: '%0% could not be published because the item is in the recycle bin.',
+		contentPublishedFailedReqCultureValidationError:
+			"Validation failed for required language '%0%'. This language was saved but not published.",
 	},
 	colorpicker: {
-		noColors: 'You have not configured any approved colors',
+		noColors: 'You have not configured any approved colours',
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
-		defineDynamicRoot: 'Specify root node',
-		defineRootNode: 'Pick root node',
 		pickedTrashedItem: 'You have picked a content item currently deleted or in the recycle bin',
 		pickedTrashedItems: 'You have picked content items currently deleted or in the recycle bin',
+		specifyPickerRootTitle: 'Specify root',
+		defineRootNode: 'Pick root node',
+		defineXPathOrigin: 'Specify via XPath',
+		defineDynamicRoot: 'Specify a Dynamic Root',
 	},
 	dynamicRoot: {
 		configurationTitle: 'Dynamic Root Query',
@@ -1222,6 +1269,7 @@ export default {
 		noValidStartNodeTitle: 'No matching content',
 		noValidStartNodeDesc:
 			'The configuration of this property does not match any content. Create the missing content or contact your administrator to adjust the Dynamic Root settings for this property.',
+		cancelAndClearQuery: 'Cancel and clear query',
 	},
 	mediaPicker: {
 		deletedItem: 'Deleted item',
@@ -1239,10 +1287,6 @@ export default {
 		tabClipboard: 'Clipboard',
 		notAllowed: 'Not allowed',
 		openMediaPicker: 'Open media picker',
-	},
-	propertyEditorPicker: {
-		title: 'Select Property Editor',
-		openPropertyEditorPicker: 'Select Property Editor',
 	},
 	relatedlinks: {
 		enterExternal: 'enter external link',
@@ -1262,12 +1306,12 @@ export default {
 	rollback: {
 		changes: 'Changes',
 		created: 'Created',
-		headline: 'Select a version to compare with the current version',
 		currentVersion: 'Current version',
 		diffHelp:
 			'This shows the differences between the current (draft) version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added',
 		noDiff: 'There are no differences between the current (draft) version and the selected version',
 		documentRolledBack: 'Document has been rolled back',
+		headline: 'Select a version to compare with the current version',
 		htmlHelp:
 			'This displays the selected version as HTML, if you wish to see the difference between 2\n      versions at the same time, use the diff view\n    ',
 		rollbackTo: 'Rollback to',
@@ -1332,7 +1376,6 @@ export default {
 		validationFailedMessage: 'Validation errors must be fixed before the item can be saved',
 		operationFailedHeader: 'Failed',
 		operationSavedHeader: 'Saved',
-		operationSavedHeaderReloadUser: 'Saved. To view the changes please reload your browser',
 		invalidUserPermissionsText: 'Insufficient user permissions, could not complete the operation',
 		operationCancelledHeader: 'Cancelled',
 		operationCancelledText: 'Operation was cancelled by a 3rd party add-in',
@@ -1342,7 +1385,7 @@ export default {
 		contentTypeDublicatePropertyType: 'Property type already exists',
 		contentTypePropertyTypeCreated: 'Property type created',
 		contentTypePropertyTypeCreatedText: 'Name: %0% <br /> DataType: %1%',
-		contentTypePropertyTypeDeleted: 'Propertytype deleted',
+		contentTypePropertyTypeDeleted: 'Property type deleted',
 		contentTypeSavedHeader: 'Document Type saved',
 		contentTypeTabCreated: 'Tab created',
 		contentTypeTabDeleted: 'Tab deleted',
@@ -1353,19 +1396,13 @@ export default {
 		dataTypeSaved: 'Datatype saved',
 		dictionaryItemSaved: 'Dictionary item saved',
 		editContentPublishedHeader: 'Content published',
-		editContentPublishedText: 'and is visible on the website',
-		editMultiContentPublishedText: '%0% documents published and visible on the website',
-		editVariantPublishedText: '%0% published and visible on the website',
-		editMultiVariantPublishedText: '%0% documents published for languages %1% and visible on the website',
-		editBlueprintSavedHeader: 'Content Blueprint saved',
+		editContentPublishedText: 'and visible on the website',
+		editBlueprintSavedHeader: 'Content Template saved',
 		editBlueprintSavedText: 'Changes have been successfully saved',
 		editContentSavedHeader: 'Content saved',
 		editContentSavedText: 'Remember to publish to make changes visible',
-		editContentScheduledSavedText: 'A schedule for publishing has been updated',
-		editVariantSavedText: '%0% saved',
 		editContentSendToPublish: 'Sent For Approval',
 		editContentSendToPublishText: 'Changes have been sent for approval',
-		editVariantSendToPublishText: '%0% changes have been sent for approval',
 		editMediaSaved: 'Media saved',
 		editMediaSavedText: 'Media saved without any errors',
 		editMemberSaved: 'Member saved',
@@ -1392,9 +1429,6 @@ export default {
 		templateSavedHeader: 'Template saved',
 		templateSavedText: 'Template saved without any errors!',
 		contentUnpublished: 'Content unpublished',
-		contentCultureUnpublished: 'Content variation %0% unpublished',
-		contentMandatoryCultureUnpublished:
-			"The mandatory language '%0%' was unpublished. All languages for this\n      content item are now unpublished.\n    ",
 		partialViewSavedHeader: 'Partial view saved',
 		partialViewSavedText: 'Partial view saved without any errors!',
 		partialViewErrorHeader: 'Partial view not saved',
@@ -1414,28 +1448,38 @@ export default {
 		deleteUserSuccess: 'User %0% was deleted',
 		resendInviteHeader: 'Invite user',
 		resendInviteSuccess: 'Invitation has been re-sent to %0%',
-		contentReqCulturePublishError: "Cannot publish the document since the required '%0%' is not published\n    ",
-		contentCultureValidationError: "Validation failed for language '%0%'",
 		documentTypeExportedSuccess: 'Document Type was exported to file',
 		documentTypeExportedError: 'An error occurred while exporting the Document Type',
 		dictionaryItemExportedSuccess: 'Dictionary item(s) was exported to file',
 		dictionaryItemExportedError: 'An error occurred while exporting the dictionary item(s)',
 		dictionaryItemImported: 'The following dictionary item(s) has been imported!',
-		scheduleErrReleaseDate1: 'The release date cannot be in the past',
-		scheduleErrReleaseDate2:
-			"Cannot schedule the document for publishing since the required '%0%' is not\n      published\n    ",
-		scheduleErrReleaseDate3:
-			"Cannot schedule the document for publishing since the required '%0%' has a\n      publish date later than a non mandatory language\n    ",
-		scheduleErrExpireDate1: 'The expire date cannot be in the past',
-		scheduleErrExpireDate2: 'The expire date cannot be before the release date',
 		publishWithNoDomains:
 			'Domains are not configured for multilingual site, please contact an administrator,\n      see log for more information\n    ',
 		publishWithMissingDomain:
 			'There is no domain configured for %0%, please contact an administrator, see\n      log for more information\n    ',
-		preventCleanupEnableError: 'An error occurred while enabling version cleanup for %0%',
-		preventCleanupDisableError: 'An error occurred while disabling version cleanup for %0%',
 		copySuccessMessage: 'Your system information has successfully been copied to the clipboard',
 		cannotCopyInformation: 'Could not copy your system information to the clipboard',
+		webhookSaved: 'Webhook saved',
+		operationSavedHeaderReloadUser: 'Saved. To view the changes please reload your browser',
+		editMultiContentPublishedText: '%0% documents published and visible on the website',
+		editVariantPublishedText: '%0% published and visible on the website',
+		editMultiVariantPublishedText: '%0% documents published for languages %1% and visible on the website',
+		editContentScheduledSavedText: 'A schedule for publishing has been updated',
+		editVariantSavedText: '%0% saved',
+		editVariantSendToPublishText: '%0% changes have been sent for approval',
+		contentCultureUnpublished: 'Content variation %0% unpublished',
+		contentMandatoryCultureUnpublished:
+			"The mandatory language '%0%' was unpublished. All languages for this content item are now unpublished.",
+		contentReqCulturePublishError: "Cannot publish the document since the required '%0%' is not published",
+		contentCultureValidationError: "Validation failed for language '%0%'",
+		scheduleErrReleaseDate1: 'The release date cannot be in the past',
+		scheduleErrReleaseDate2: "Cannot schedule the document for publishing since the required '%0%' is not published",
+		scheduleErrReleaseDate3:
+			"Cannot schedule the document for publishing since the required '%0%' has a publish date later than a non mandatory language",
+		scheduleErrExpireDate1: 'The expire date cannot be in the past',
+		scheduleErrExpireDate2: 'The expire date cannot be before the release date',
+		preventCleanupEnableError: 'An error occurred while enabling version cleanup for %0%',
+		preventCleanupDisableError: 'An error occurred while disabling version cleanup for %0%',
 	},
 	stylesheet: {
 		addRule: 'Add style',
@@ -1453,7 +1497,7 @@ export default {
 		styles: 'Styles',
 		stylesHelp: 'The CSS that should be applied in the rich text editor, e.g. "color:red;"',
 		tabCode: 'Code',
-		tabRules: 'Rich Text Editor',
+		tabRules: 'Editor',
 	},
 	template: {
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
@@ -1466,30 +1510,31 @@ export default {
 		insertDesc: 'Choose what to insert into your template',
 		insertDictionaryItem: 'Dictionary item',
 		insertDictionaryItemDesc:
-			'A dictionary item is a placeholder for a translatable piece of text, which makes it easy to create designs for multilingual websites.',
+			'A dictionary item is a placeholder for a translatable piece of text, which\n      makes it easy to create designs for multilingual websites.\n    ',
 		insertMacro: 'Macro',
 		insertMacroDesc:
-			'A Macro is a configurable component which is great for reusable parts of your design, where you need the option to provide parameters, such as galleries, forms and lists.',
+			'\n      A Macro is a configurable component which is great for\n      reusable parts of your design, where you need the option to provide parameters,\n      such as galleries, forms and lists.\n    ',
 		insertPageField: 'Value',
 		insertPageFieldDesc:
-			'Displays the value of a named field from the current page, with options to modify the value or fallback to alternative values.',
+			'Displays the value of a named field from the current page, with options to modify\n      the value or fallback to alternative values.\n    ',
 		insertPartialView: 'Partial view',
 		insertPartialViewDesc:
-			"A partial view is a separate template file which can be rendered inside another template, it's great for reusing markup or for separating complex templates into separate files.",
+			"\n      A partial view is a separate template file which can be rendered inside another\n      template, it's great for reusing markup or for separating complex templates into separate files.\n    ",
 		mastertemplate: 'Master template',
 		noMaster: 'No master',
 		renderBody: 'Render child template',
-		renderBodyDesc: 'Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.',
+		renderBodyDesc:
+			'\n     Renders the contents of a child template, by inserting a\n     <code>@RenderBody()</code> placeholder.\n      ',
 		defineSection: 'Define a named section',
 		defineSectionDesc:
-			'Defines a part of your template as a named section by wrapping it in <code>@section { ... }</code>. This can be rendered in a specific area of the parent of this template, by using <code>@RenderSection</code>.',
+			'\n         Defines a part of your template as a named section by wrapping it in\n          <code>@section { ... }</code>. This can be rendered in a\n          specific area of the parent of this template, by using <code>@RenderSection</code>.\n      ',
 		renderSection: 'Render a named section',
 		renderSectionDesc:
-			'Renders a named area of a child template, by inserting a <code>@RenderSection(name)</code> placeholder. This renders an area of a child template which is wrapped in a corresponding <code>@section [name]{ ... }</code> definition.',
+			'\n      Renders a named area of a child template, by inserting a <code>@RenderSection(name)</code> placeholder.\n      This renders an area of a child template which is wrapped in a corresponding <code>@section [name]{ ... }</code> definition.\n      ',
 		sectionName: 'Section Name',
 		sectionMandatory: 'Section is mandatory',
 		sectionMandatoryDesc:
-			'If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.',
+			'\n            If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.\n    ',
 		queryBuilder: 'Query builder',
 		itemsReturned: 'items returned, in',
 		iWant: 'I want',
@@ -1683,6 +1728,31 @@ export default {
 		structure: 'Structure',
 		presentation: 'Presentation',
 	},
+	webhooks: {
+		addWebhook: 'Create webhook',
+		addWebhookHeader: 'Add webhook header',
+		addDocumentType: 'Add Document Type',
+		addMediaType: 'Add Media Type',
+		createHeader: 'Create header',
+		deliveries: 'Deliveries',
+		noHeaders: 'No webhook headers have been added',
+		noEventsFound: 'No events were found.',
+		enabled: 'Enabled',
+		events: 'Events',
+		event: 'Event',
+		url: 'Url',
+		types: 'Types',
+		webhookKey: 'Webhook key',
+		retryCount: 'Retry count',
+		urlDescription: 'The url to call when the webhook is triggered.',
+		eventDescription: 'The events for which the webhook should be triggered.',
+		contentTypeDescription: 'Only trigger the webhook for a specific content type.',
+		enabledDescription: 'Is the webhook enabled?',
+		headersDescription: 'Custom headers to include in the webhook request.',
+		contentType: 'Content Type',
+		headers: 'Headers',
+		selectEventFirst: 'Please select an event first.',
+	},
 	languages: {
 		addLanguage: 'Add language',
 		culture: 'ISO code',
@@ -1756,6 +1826,8 @@ export default {
 		DownloadXmlDTD: 'Download XML DTD',
 		fields: 'Fields',
 		includeSubpages: 'Include subpages',
+		mailBody:
+			"\n      Hi %0%\n\n      This is an automated mail to inform you that the document '%1%'\n      has been requested for translation into '%5%' by %2%.\n\n      Go to http://%3%/translation/details.aspx?id=%4% to edit.\n\n      Or log into Umbraco to get an overview of your translation tasks\n      http://%3%\n\n      Have a nice day!\n      Cheers from the Umbraco robot\n    ",
 		noTranslators:
 			'No translator users found. Please create a translator user before you start sending\n      content to translation\n    ',
 		pageHasBeenSendToTranslation: "The page '%0%' has been send to translation",
@@ -1772,7 +1844,7 @@ export default {
 	},
 	treeHeaders: {
 		content: 'Content',
-		contentBlueprints: 'Content Blueprints',
+		contentBlueprints: 'Content Templates',
 		media: 'Media',
 		cacheBrowser: 'Cache Browser',
 		contentRecycleBin: 'Recycle Bin',
@@ -1988,7 +2060,7 @@ export default {
 		items: 'items',
 		urls: 'URL(s)',
 		urlsSelected: 'URL(s) selected',
-		itemsSelected: 'items selected',
+		itemsSelected: 'item(s) selected',
 		invalidDate: 'Invalid date',
 		invalidNumber: 'Not a number',
 		invalidNumberStepSize: 'Not a valid numeric step size',
@@ -1996,6 +2068,10 @@ export default {
 		invalidNull: 'Value cannot be null',
 		invalidEmpty: 'Value cannot be empty',
 		invalidPattern: 'Value is invalid, it does not match the correct pattern',
+		customValidation: 'Custom validation',
+		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
+		entriesExceed: 'Maximum %0% entries, <strong>%1%</strong> too many.',
+		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
 		invalidMemberGroupName: 'Invalid member group name',
 		invalidUserGroupName: 'Invalid user group name',
 		invalidToken: 'Invalid token',
@@ -2004,10 +2080,6 @@ export default {
 		duplicateUserGroupName: "User group name '%0%' is already taken",
 		duplicateMemberGroupName: "Member group name '%0%' is already taken",
 		duplicateUsername: "Username '%0%' is already taken",
-		customValidation: 'Custom validation',
-		entriesShort: 'Minimum %0% entries, requires <strong>%1%</strong> more.',
-		entriesExceed: 'Maximum %0% entries, <strong>%1%</strong> too many.',
-		entriesAreasMismatch: 'The content amount requirements are not met for one or more areas.',
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",
@@ -2054,16 +2126,19 @@ export default {
 		excessiveHeadersFound:
 			'The following headers revealing information about the website technology were found: <strong>%0%</strong>.',
 		excessiveHeadersNotFound: 'No headers revealing information about the website technology were found.\n    ',
-		smtpMailSettingsNotFound: "The 'Umbraco:CMS:Global:Smtp' configuration could not be found.",
+		smtpMailSettingsNotFound: 'In the Web.config file, system.net/mailsettings could not be found.',
 		smtpMailSettingsHostNotConfigured:
-			"The 'Umbraco:CMS:Global:Smtp:Host' configuration could not be\n      found.\n    ",
+			'In the Web.config file system.net/mailsettings section, the host is\n      not configured.\n    ',
 		smtpMailSettingsConnectionSuccess:
 			'SMTP settings are configured correctly and the service is operating\n      as expected.\n    ',
 		smtpMailSettingsConnectionFail:
-			"The SMTP server configured with host '%0%' and port '%1%' could not be\n      reached. Please check to ensure the SMTP settings in the configuration 'Umbraco:CMS:Global:Smtp' are correct.\n    ",
+			"The SMTP server configured with host '%0%' and port '%1%' could not be\n      reached. Please check to ensure the SMTP settings in the Web.config file system.net/mailsettings are correct.\n    ",
 		notificationEmailsCheckSuccessMessage: 'Notification email has been set to <strong>%0%</strong>.',
 		notificationEmailsCheckErrorMessage:
 			'Notification email is still set to the default value of <strong>%0%</strong>.',
+		scheduledHealthCheckEmailBody:
+			'<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>',
+		scheduledHealthCheckEmailSubject: 'Umbraco Health Check Status: %0%',
 		checkGroup: 'Check group',
 		helpText:
 			'\n        <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.\n        You can add your own health checks, have a look at <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>\n        ',
@@ -2071,7 +2146,6 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Disable URL tracker',
 		enableUrlTracker: 'Enable URL tracker',
-		culture: 'Culture',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Redirected To',
 		redirectUrlManagement: 'Redirect URL Management',
@@ -2087,6 +2161,7 @@ export default {
 		disableError: 'Error disabling the URL tracker, more information can be found in your log file.',
 		enabledConfirm: 'URL tracker has now been enabled.',
 		enableError: 'Error enabling the URL tracker, more information can be found in your log file.',
+		culture: 'Culture',
 	},
 	emptyStates: {
 		emptyDictionaryTree: 'No Dictionary items to choose from',
@@ -2154,7 +2229,7 @@ export default {
 		protectDescription: 'Setup access restrictions on %0%',
 		rightsDescription: 'Setup Permissions on %0%',
 		sortDescription: 'Change sort order for %0%',
-		createblueprintDescription: 'Create Content Blueprint based on %0%',
+		createblueprintDescription: 'Create Content Template based on %0%',
 		openContextMenu: 'Open context menu for',
 		currentLanguage: 'Current language',
 		switchLanguage: 'Switch language to',
@@ -2186,30 +2261,27 @@ export default {
 		addImageCaption: 'Add image caption',
 		searchContentTree: 'Search content tree',
 		maxAmount: 'Maximum amount',
+		expandChildItems: 'Expand child items for',
+		openContextNode: 'Open context node for',
 	},
 	references: {
 		tabName: 'References',
 		DataTypeNoReferences: 'This Data Type has no references.',
 		itemHasNoReferences: 'This item has no references.',
-		labelUsedByDocumentTypes: 'Referenced by the following Document Types',
-		labelUsedByMediaTypes: 'Referenced by the following Media Types',
-		labelUsedByMemberTypes: 'Referenced by the following Member Types',
-		usedByProperties: 'Referenced by',
+		labelUsedByDocumentTypes: 'Used in Document Types',
+		labelUsedByMediaTypes: 'Used in Media Types',
+		labelUsedByMemberTypes: 'Used in Member Types',
+		usedByProperties: 'Used by',
+		labelUsedItems: 'Items in use',
+		labelUsedDescendants: 'Descendants in use',
+		deleteWarning: 'This item or its descendants is being used. Deletion can lead to broken links on your website.',
+		unpublishWarning:
+			'This item or its descendants is being used. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
+		deleteDisabledWarning: 'This item or its descendants is being used. Therefore, deletion has been disabled.',
+		listViewDialogWarning: 'The following items you are trying to %0% are used by other content.',
 		labelUsedByItems: 'Referenced by the following items',
 		labelDependsOnThis: 'The following items depend on this',
-		labelUsedItems: 'The following items are referenced',
-		labelUsedDescendants: 'The following descendant items have dependencies',
 		labelDependentDescendants: 'The following descending items have dependencies',
-		deleteWarning:
-			'This item or its descendants is being referenced. Deletion can lead to broken links on your website.',
-		unpublishWarning:
-			'This item or its descendants is being referenced. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
-		deleteDisabledWarning: 'This item or its descendants is being referenced. Therefore, deletion has been disabled.',
-		listViewDialogWarning: 'The following items you are trying to %0% are referenced by other content.',
-		labelMoreReferences: (count: number) => {
-			if (count === 1) return '...and one more item';
-			return `...and ${count} more items`;
-		},
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',
@@ -2287,18 +2359,20 @@ export default {
 	profiling: {
 		performanceProfiling: 'Performance profiling',
 		performanceProfilingDescription:
-			"\n                <p>\n                    Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.\n                </p>\n                <p>\n                    If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.\n                </p>\n                <p>\n                    If you want the profiler to be activated by default for all page renderings, you can use the toggle below.\n                    It will set a cookie in your browser, which then activates the profiler automatically.\n                    In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.\n                </p>\n        ",
+			"\n            <p>\n                Umbraco currently runs in debug mode. This means you can use the built-in performance profiler to assess the performance when rendering pages.\n            </p>\n            <p>\n                If you want to activate the profiler for a specific page rendering, simply add <strong>umbDebug=true</strong> to the querystring when requesting the page.\n            </p>\n            <p>\n                If you want the profiler to be activated by default for all page renderings, you can use the toggle below.\n                It will set a cookie in your browser, which then activates the profiler automatically.\n                In other words, the profiler will only be active by default in <em>your</em> browser - not everyone else's.\n            </p>\n    ",
 		activateByDefault: 'Activate the profiler by default',
 		reminder: 'Friendly reminder',
 		reminderDescription:
-			'\n            <p>\n                You should never let a production site run in debug mode. Debug mode is turned off by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>false</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.\n            </p>\n        ',
+			'\n        <p>\n            You should never let a production site run in debug mode. Debug mode is turned off by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>false</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.\n        </p>\n    ',
 		profilerEnabledDescription:
-			"\n            <p>\n                Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.\n            </p>\n            <p>\n                Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.\n            </p>\n        ",
+			"\n        <p>\n            Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.\n        </p>\n        <p>\n            Debug mode is turned on by setting <strong>Umbraco:CMS:Hosting:Debug</strong> to <strong>true</strong> in appsettings.json, appsettings.{Environment}.json or via an environment variable.\n        </p>\n    ",
 	},
 	settingsDashboardVideos: {
 		trainingHeadline: 'Hours of Umbraco training videos are only a click away',
 		trainingDescription:
-			'\n        <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>\n    ',
+			'\n            <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>\n        ',
+		learningBaseDescription:
+			'\n        <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p>\n      ',
 		getStarted: 'To get you started',
 	},
 	settingsDashboard: {
@@ -2364,7 +2438,7 @@ export default {
 		tabBlockSettings: 'Settings',
 		headlineAdvanced: 'Advanced',
 		forceHideContentEditor: 'Hide content editor',
-		forceHideContentEditorHelp: 'Hide the content edit button and the content editor from the Block Editor overlay',
+		forceHideContentEditorHelp: 'Hide the content edit button and the content editor from the Block Editor overlay.',
 		girdInlineEditing: 'Inline editing',
 		girdInlineEditingHelp:
 			'Enables inline editing for the first Property. Additional properties can be edited in the overlay.',
@@ -2379,7 +2453,7 @@ export default {
 		focusParentBlock: 'Set focus on the container block',
 		areaIdentification: 'Identification',
 		areaValidation: 'Validation',
-		areaValidationEntriesShort: '<strong>%0%</strong> must be present atleast <strong>%2%</strong> time(s).',
+		areaValidationEntriesShort: '<strong>%0%</strong> must be present at least <strong>%2%</strong> time(s).',
 		areaValidationEntriesExceed: '<strong>%0%</strong> must maximum be present <strong>%3%</strong> time(s).',
 		areaNumberOfBlocks: 'Number of blocks',
 		areaDisallowAllBlocks: 'Only allow specific block types',
@@ -2435,7 +2509,7 @@ export default {
 		headlineAllowance: 'Permissions',
 		getSampleHeadline: 'Install Sample Configuration',
 		getSampleDescription:
-			"This will add basic Blocks and help you get started with the Block Grid Editor. You'll get Blocks for Headline, Rich Text, Image, as well as a Two Column Layout.",
+			"This will add basic Blocks and help you get started with the Block Grid Editor. You'll get Blocks for Headline, Rich Text, Image, as well as a Two Column Layout. ",
 		getSampleButton: 'Install',
 		actionEnterSortMode: 'Sort mode',
 		actionExitSortMode: 'End sort mode',
@@ -2443,17 +2517,19 @@ export default {
 		configureArea: 'Configure area',
 		deleteArea: 'Delete area',
 		addColumnSpanOption: 'Add spanning %0% columns option',
+		insertBlock: 'Insert Block',
+		labelInlineMode: 'Display inline with text',
 	},
 	contentTemplatesDashboard: {
-		whatHeadline: 'What are Content Blueprints?',
+		whatHeadline: 'What are Content Templates?',
 		whatDescription:
-			'Content Blueprints are pre-defined content that can be selected when creating a new content node.',
-		createHeadline: 'How do I create a Content Blueprint?',
+			'Content Templates are pre-defined content that can be selected when creating a new\n      content node.\n    ',
+		createHeadline: 'How do I create a Content Template?',
 		createDescription:
-			'<p>There are two ways to create a Content Blueprint:</p><ul><li>Right-click a content node and select "Create Content Blueprint" to create a new Content Blueprint.</li><li>Right-click the Content Blueprints tree in the Settings section and select the Document Type you want to create a Content Blueprint for.</li></ul><p>Once given a name, editors can start using the Content Blueprint as a foundation for their new page.</p>',
-		manageHeadline: 'How do I manage Content Blueprints?',
+			'\n            <p>There are two ways to create a Content Template:</p>\n            <ul>\n                <li>Right-click a content node and select "Create Content Template" to create a new Content Template.</li>\n                <li>Right-click the Content Templates tree in the Settings section and select the Document Type you want to create a Content Template for.</li>\n            </ul>\n            <p>Once given a name, editors can start using the Content Template as a foundation for their new page.</p>\n        ',
+		manageHeadline: 'How do I manage Content Templates?',
 		manageDescription:
-			'You can edit and delete Content Blueprints from the "Content Blueprints" tree in the Settings section. Expand the Document Type which the Content Blueprint is based on and click it to edit or delete it.',
+			'You can edit and delete Content Templates from the "Content Templates" tree in the\n      Settings section. Expand the Document Type which the Content Template is based on and click it to edit or delete\n      it.\n    ',
 	},
 	preview: {
 		endLabel: 'End',
@@ -2481,14 +2557,18 @@ export default {
 		searchResult: 'item returned',
 		searchResults: 'items returned',
 	},
+	propertyEditorPicker: {
+		title: 'Select Property Editor',
+		openPropertyEditorPicker: 'Select Property Editor',
+	},
 	analytics: {
 		consentForAnalytics: 'Consent for telemetry data',
 		analyticsLevelSavedSuccess: 'Telemetry level saved!',
 		analyticsDescription:
-			'\n      In order to improve Umbraco and add new functionality based on as relevant information as possible,\n          <br>we would like to collect system- and usage information from your installation.\n          <br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n          <br>Hopefully, you will help us collect some valuable data.\n          <br>\n          <br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.\n       ',
+			'In order to improve Umbraco and add new functionality based on as relevant information as possible,\n<br>we would like to collect system- and usage information from your installation.\n<br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.\n<br>Hopefully, you will help us collect some valuable data.\n<br>\n<br>We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data will be fully anonymized.',
 		minimalLevelDescription: 'We will only send an anonymized site ID to let us know that the site exists.',
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:
-			'\n          We will send:\n          <ul>\n            <li>Anonymized site ID, Umbraco version, and packages installed.</li>\n            <li>Number of: Root nodes, Content nodes, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>\n            <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>\n            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>\n          </ul>\n          <em>We might change what we send on the Detailed level in the future. If so, it will be listed above.\n          <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>\n       ',
+			'We will send:\n<ul>\n    <li>Anonymized site ID, Umbraco version, and packages installed.</li>\n    <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>\n    <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>\n    <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>\n</ul>\n<em>We might change what we send on the Detailed level in the future. If so, it will be listed above.\n<br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>',
 	},
 } as UmbLocalizationDictionary;
