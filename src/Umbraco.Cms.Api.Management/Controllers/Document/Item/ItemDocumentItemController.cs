@@ -28,6 +28,11 @@ public class ItemDocumentItemController : DocumentItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<DocumentItemResponseModel>());
+        }
+
         IEnumerable<IDocumentEntitySlim> documents = _entityService
             .GetAll(UmbracoObjectTypes.Document, ids.ToArray())
             .OfType<IDocumentEntitySlim>();
