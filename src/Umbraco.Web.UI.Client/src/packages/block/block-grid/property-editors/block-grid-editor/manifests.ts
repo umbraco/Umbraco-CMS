@@ -44,6 +44,7 @@ export const manifests: Array<ManifestTypes> = [
 						label: 'Grid Columns',
 						description: 'Set the number of columns for the layout. (defaults to 12)',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+						config: [{ alias: 'min', value: 0 }],
 					},
 					{
 						alias: 'layoutStylesheet',
