@@ -123,8 +123,8 @@ export class UmbDocumentTypeWorkspaceContext
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
 					this.removeUmbControllerByAlias('isNewRedirectController');
-					const id = info.match.params.id;
-					this.load(id);
+					const unique = info.match.params.unique;
+					this.load(unique);
 				},
 			},
 		]);
