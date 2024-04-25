@@ -11,16 +11,28 @@ import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
 export type UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> = UmbModalTokenValue extends undefined
-	? {
-			modal?: UmbDeepPartialObject<UmbModalConfig>;
-			data: UmbDeepPartialObject<UmbModalTokenData>;
-			value?: UmbModalTokenValue;
-		}
-	: {
-			modal?: UmbDeepPartialObject<UmbModalConfig>;
-			data: UmbDeepPartialObject<UmbModalTokenData>;
-			value: UmbModalTokenValue;
-		};
+	? UmbModalTokenValue extends undefined
+		? {
+				modal?: UmbDeepPartialObject<UmbModalConfig>;
+				data?: UmbDeepPartialObject<UmbModalTokenData>;
+				value?: UmbModalTokenValue;
+			}
+		: {
+				modal?: UmbDeepPartialObject<UmbModalConfig>;
+				data?: UmbDeepPartialObject<UmbModalTokenData>;
+				value: UmbModalTokenValue;
+			}
+	: UmbModalTokenValue extends undefined
+		? {
+				modal?: UmbDeepPartialObject<UmbModalConfig>;
+				data: UmbDeepPartialObject<UmbModalTokenData>;
+				value?: UmbModalTokenValue;
+			}
+		: {
+				modal?: UmbDeepPartialObject<UmbModalConfig>;
+				data: UmbDeepPartialObject<UmbModalTokenData>;
+				value: UmbModalTokenValue;
+			};
 export class UmbModalRouteRegistrationController<
 		UmbModalTokenData extends { [key: string]: any } = { [key: string]: any },
 		UmbModalTokenValue = any,

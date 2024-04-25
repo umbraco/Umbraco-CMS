@@ -4,9 +4,10 @@ import { css, html, customElement, property, state, repeat, nothing } from '@umb
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbModalRouteRegistrationController, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_DOCUMENT_TYPE_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-input-document-type')
 export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -97,7 +98,6 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 	public get value(): string {
 		return this.selection.join(',');
 	}
-
 	@state()
 	private _items?: Array<UmbDocumentTypeItemModel>;
 
@@ -109,10 +109,10 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 	constructor() {
 		super();
 
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_DOCUMENT_TYPE_WORKSPACE_MODAL)
 			.addAdditionalPath('document-type')
 			.onSetup(() => {
-				return { data: { entityType: 'document-type', preset: {} } };
+				return {};
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editPath = routeBuilder({});
