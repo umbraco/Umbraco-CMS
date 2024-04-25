@@ -1,5 +1,10 @@
 import type { UmbDocumentTypeEntityType } from './entity.js';
-import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbContentTypeCompositionCompatibleModel,
+	UmbContentTypeCompositionReferenceModel,
+	UmbContentTypeCompositionRequestModel,
+	UmbContentTypeModel,
+} from '@umbraco-cms/backoffice/content-type';
 
 export interface UmbDocumentTypeDetailModel extends UmbContentTypeModel {
 	entityType: UmbDocumentTypeEntityType;
@@ -14,23 +19,10 @@ export type UmbDocumentTypeCleanupModel = {
 	keepLatestVersionPerDayForDays?: number | null;
 };
 
-export interface UmbDocumentTypeCompositionRequestModel {
-	unique: string | null;
+export interface UmbDocumentTypeCompositionRequestModel extends UmbContentTypeCompositionRequestModel {
 	isElement: boolean;
-	currentPropertyAliases: Array<string>;
-	currentCompositeUniques: Array<string>;
 }
 
-export interface UmbDocumentTypeCompositionCompatibleModel {
-	unique: string;
-	name: string;
-	icon: string;
-	folderPath: Array<string>;
-	isCompatible: boolean;
-}
+export interface UmbDocumentTypeCompositionCompatibleModel extends UmbContentTypeCompositionCompatibleModel {}
 
-export interface UmbDocumentTypeCompositionReferenceModel {
-	unique: string;
-	name: string;
-	icon: string;
-}
+export interface UmbDocumentTypeCompositionReferenceModel extends UmbContentTypeCompositionReferenceModel {}
