@@ -25,6 +25,11 @@ public class ItemUserItemController : UserItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<UserItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item(CancellationToken cancellationToken, [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<UserItemResponseModel>());
+        }
+
         IEnumerable<IUser> users = await _userService.GetAsync(ids.ToArray());
         List<UserItemResponseModel> responseModels = _mapper.MapEnumerable<IUser, UserItemResponseModel>(users);
         return Ok(responseModels);
