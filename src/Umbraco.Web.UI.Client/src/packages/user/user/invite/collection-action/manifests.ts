@@ -20,4 +20,4 @@ export const inviteManifest: ManifestTypes = {
 	],
 };
 
-export const manifests = [inviteManifest];
+export const manifests: Array<ManifestTypes> = [inviteManifest];

@@ -1,4 +1,4 @@
-import type { ManifestSection, ManifestSectionView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection, ManifestSectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Packages';
 
@@ -76,4 +76,4 @@ const sectionsViews: Array<ManifestSectionView> = [
 	},
 ];
 
-export const manifests = [section, ...sectionsViews];
+export const manifests: Array<ManifestTypes> = [section, ...sectionsViews];

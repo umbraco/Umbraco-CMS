@@ -3,8 +3,9 @@ import { manifests as defaultTreeItemManifests } from './tree-item/tree-item-def
 import { manifests as defaultTreeManifests } from './default/manifests.js';
 import { manifests as treePickerManifests } from './tree-picker/manifests.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
+import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...defaultTreeManifests,
 	...folderManifests,
 	...defaultTreeItemManifests,

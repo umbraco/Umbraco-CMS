@@ -18,4 +18,4 @@ const stylesheetActions: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...stylesheetActions, ...createManifests, ...renameManifests];
+export const manifests: Array<ManifestTypes> = [...stylesheetActions, ...createManifests, ...renameManifests];

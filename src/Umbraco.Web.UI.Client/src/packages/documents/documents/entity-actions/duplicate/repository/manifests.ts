@@ -1,6 +1,6 @@
 import { UMB_DUPLICATE_DOCUMENT_REPOSITORY_ALIAS } from './constants.js';
 import { UmbDuplicateDocumentRepository } from './document-duplicate.repository.js';
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const duplicateRepository: ManifestRepository = {
 	type: 'repository',
@@ -9,4 +9,4 @@ const duplicateRepository: ManifestRepository = {
 	api: UmbDuplicateDocumentRepository,
 };
 
-export const manifests = [duplicateRepository];
+export const manifests: Array<ManifestTypes> = [duplicateRepository];

@@ -106,18 +106,20 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 					</umb-localize>
 				</p>
 			</uui-button>
-			<uui-button
-				@click=${this.#openPartialViewPickerModal}
-				look="placeholder"
-				label=${this.localize.term('template_insert')}>
-				<h3><umb-localize key="template_insertPartialView">Partial view</umb-localize></h3>
-				<p>
-					<umb-localize key="template_insertPartialViewDesc">
-						A partial view is a separate template file which can be rendered inside another template, it's great for
-						reusing markup or for separating complex templates into separate files.
-					</umb-localize>
-				</p>
-			</uui-button>
+			${!this.data?.hidePartialViews
+				? html`<uui-button
+						@click=${this.#openPartialViewPickerModal}
+						look="placeholder"
+						label=${this.localize.term('template_insert')}>
+						<h3><umb-localize key="template_insertPartialView">Partial view</umb-localize></h3>
+						<p>
+							<umb-localize key="template_insertPartialViewDesc">
+								A partial view is a separate template file which can be rendered inside another template, it's great for
+								reusing markup or for separating complex templates into separate files.
+							</umb-localize>
+						</p>
+					</uui-button>`
+				: ''}
 			<uui-button
 				@click=${this.#openDictionaryItemPickerModal}
 				look="placeholder"

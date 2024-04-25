@@ -1,5 +1,5 @@
 import { manifests as itemManifests } from './item/manifests.js';
-import type { ManifestRepository, ManifestStore } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_STYLESHEET_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.Stylesheet.Detail';
 export const UMB_STYLESHEET_DETAIL_STORE_ALIAS = 'Umb.Store.Stylesheet.Detail';
@@ -18,4 +18,4 @@ const store: ManifestStore = {
 	api: () => import('./stylesheet-detail.store.js'),
 };
 
-export const manifests = [repository, store, ...itemManifests];
+export const manifests: Array<ManifestTypes> = [repository, store, ...itemManifests];

@@ -1,4 +1,8 @@
 import { manifest as workspaceBreadcrumbKind } from './workspace-menu-breadcrumb/workspace-menu-breadcrumb.kind.js';
 import { manifest as variantBreadcrumbKind } from './workspace-variant-menu-breadcrumb/workspace-variant-menu-breadcrumb.kind.js';
+import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests = [workspaceBreadcrumbKind, variantBreadcrumbKind];
+export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
+	workspaceBreadcrumbKind,
+	variantBreadcrumbKind,
+];
