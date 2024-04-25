@@ -8,6 +8,9 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 
+// import of local component
+import './components/input-tree/index.js';
+
 /**
  * @element umb-property-editor-ui-tree-picker
  */
