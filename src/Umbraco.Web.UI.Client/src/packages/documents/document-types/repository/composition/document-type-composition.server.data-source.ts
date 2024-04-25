@@ -9,13 +9,14 @@ import {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffice/content-type';
 
 /**
  * A data source for the Document Type Composition that fetches data from the server
  * @export
  * @class UmbDocumentTypeCompositionServerDataSource
  */
-export class UmbDocumentTypeCompositionServerDataSource {
+export class UmbDocumentTypeCompositionServerDataSource implements UmbContentTypeCompositionDataSource {
 	#host: UmbControllerHost;
 
 	/**
