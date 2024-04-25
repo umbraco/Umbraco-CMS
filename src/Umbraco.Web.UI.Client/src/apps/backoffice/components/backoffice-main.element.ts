@@ -1,7 +1,7 @@
 import type { UmbBackofficeContext } from '../backoffice.context.js';
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbSectionContext, UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import { UmbSectionContext, UMB_SECTION_CONTEXT, UMB_SECTION_PATH_PATTERN } from '@umbraco-cms/backoffice/section';
 import type { UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { ManifestSection, UmbSectionElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -16,7 +16,6 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	@state()
 	private _sections: Array<UmbExtensionManifestInitializer<ManifestSection>> = [];
 
-	private _routePrefix = 'section/';
 	private _backofficeContext?: UmbBackofficeContext;
 	private _sectionContext?: UmbSectionContext;
 
@@ -56,7 +55,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 				} else {
 					return {
 						alias: section.alias,
-						path: this._routePrefix + (section.manifest as ManifestSection).meta.pathname,
+						path: UMB_SECTION_PATH_PATTERN.generateLocal({ name: section.manifest!.meta.pathname }),
 						component: () => createExtensionElement(section.manifest!, 'umb-section-default'),
 						setup: (component) => {
 							(component as UmbSectionElement).manifest = section.manifest as ManifestSection;
@@ -78,7 +77,9 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 
 	private _onRouteChange = async (event: UmbRouterSlotChangeEvent) => {
 		const currentPath = event.target.localActiveViewPath || '';
-		const section = this._sections.find((s) => this._routePrefix + s.manifest?.meta.pathname === currentPath);
+		const section = this._sections.find(
+			(s) => UMB_SECTION_PATH_PATTERN.generateLocal({ name: s.manifest!.meta.pathname }) === currentPath,
+		);
 		if (!section) return;
 		await section.asPromise();
 		if (section.manifest) {

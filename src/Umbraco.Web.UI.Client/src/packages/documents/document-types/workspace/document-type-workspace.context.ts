@@ -2,10 +2,10 @@ import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-t
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentTypeDetailModel } from '../types.js';
 import {
-	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH,
+	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_ELEMENT,
 	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_TEMPLATE,
-	UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH,
+	UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
 	type UmbCreateDocumentTypeWorkspacePresetType,
 } from '../paths.js';
 import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
@@ -96,7 +96,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 		this.routes.setRoutes([
 			{
-				path: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH.toString(),
+				path: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.toString(),
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
@@ -112,7 +112,7 @@ export class UmbDocumentTypeWorkspaceContext
 				},
 			},
 			{
-				path: UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH.toString(),
+				path: UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.toString(),
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
 					this.removeUmbControllerByAlias('isNewRedirectController');

@@ -24,6 +24,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	_createPath?: string;
 
+	@state()
+	_createLabel?: string;
+
 	connectedCallback() {
 		super.connectedCallback();
 
@@ -44,29 +47,28 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		// To remove the hardcoded URLs for workspaces of entity types, we could make an create event from the tree, which either this or the sidebar impl. will pick up and react to. [NL]
 		// Or maybe the tree item context base can handle this? [NL]
 		// Maybe its a general item context problem to be solved. [NL]
-		const createActionData = this.data?.createAction;
-		if (createActionData) {
+		const createAction = this.data?.createAction;
+		if (createAction) {
+			this._createLabel = createAction.label;
 			new UmbModalRouteRegistrationController(
 				this,
-				(createActionData.modalToken as typeof UMB_WORKSPACE_MODAL) ?? UMB_WORKSPACE_MODAL,
+				(createAction.modalToken as typeof UMB_WORKSPACE_MODAL) ?? UMB_WORKSPACE_MODAL,
 			)
 				.onSetup(() => {
-					return { data: createActionData.modalData };
+					return { data: createAction.modalData };
 				})
 				.onSubmit((value) => {
 					if (value) {
 						this.value = { selection: [value.unique] };
 						this._submitModal();
 					} else {
-						throw new Error('No value returned from workspace modal');
 						this._rejectModal();
 					}
 				})
 				.observeRouteBuilder((routeBuilder) => {
 					const oldPath = this._createPath;
 					this._createPath =
-						routeBuilder({}) +
-						createActionData.extendWithPathPattern.generateLocal(createActionData.extendWithPathParams);
+						routeBuilder({}) + createAction.extendWithPathPattern.generateLocal(createAction.extendWithPathParams);
 					this.requestUpdate('_createPath', oldPath);
 				});
 		}
@@ -110,7 +112,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					${this._createPath
 						? html` <uui-button
-								label=${this.localize.term('content_createEmpty')}
+								label=${this.localize.string(this._createLabel ?? 'general_create')}
 								look="secondary"
 								href=${this._createPath}></uui-button>`
 						: nothing}

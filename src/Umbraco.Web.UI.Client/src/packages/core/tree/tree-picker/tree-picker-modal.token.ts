@@ -4,6 +4,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbPathPattern, UmbPathPatternParamsType } from '@umbraco-cms/backoffice/router';
 
 export interface UmbTreePickerModalCreateActionData<PathPatternParamsType extends UmbPathPatternParamsType> {
+	label: string;
 	modalData: UmbWorkspaceModalData;
 	modalToken?: UmbModalToken;
 	extendWithPathPattern: UmbPathPattern;

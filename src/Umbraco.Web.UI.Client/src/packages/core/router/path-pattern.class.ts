@@ -25,7 +25,12 @@ export class UmbPathPattern<LocalParamsType extends UmbPathPatternParamsType = U
 	generateLocal(params: LocalParamsType) {
 		return umbUrlPatternToString(this.#local, params);
 	}
-	generateGlobal(params: LocalParamsType) {
+	/**
+	 * generate an absolute path from the path pattern
+	 * @param params
+	 * @returns
+	 */
+	generateAbsolute(params: LocalParamsType) {
 		return this.#base + umbUrlPatternToString(this.#local, params);
 	}
 
