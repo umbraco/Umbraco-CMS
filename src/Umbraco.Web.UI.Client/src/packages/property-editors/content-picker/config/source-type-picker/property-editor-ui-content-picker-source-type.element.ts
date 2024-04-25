@@ -1,7 +1,6 @@
 import type { UmbInputMemberTypeElement } from '@umbraco-cms/backoffice/member-type';
 import type { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
 import type { UmbInputMediaTypeElement } from '@umbraco-cms/backoffice/media-type';
-import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -9,10 +8,10 @@ import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 
 /**
- * @element umb-property-editor-ui-tree-picker-source-type-picker
+ * @element umb-property-editor-ui-content-picker-source-type
  */
-@customElement('umb-property-editor-ui-tree-picker-source-type-picker')
-export class UmbPropertyEditorUITreePickerSourceTypePickerElement
+@customElement('umb-property-editor-ui-content-picker-source-type')
+export class UmbPropertyEditorUIContentPickerSourceTypeElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
@@ -51,7 +50,7 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 			(value) => {
 				if (!value) return;
 
-				const startNode = value as UmbTreePickerSource;
+				const startNode = value as UmbContentPickerSource;
 				if (startNode?.type) {
 					// If we had a sourceType before, we can see this as a change and not the initial value,
 					// so let's reset the value, so we don't carry over content-types to the new source type.
@@ -127,10 +126,10 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 	}
 }
 
-export default UmbPropertyEditorUITreePickerSourceTypePickerElement;
+export default UmbPropertyEditorUIContentPickerSourceTypeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-tree-picker-source-type-picker': UmbPropertyEditorUITreePickerSourceTypePickerElement;
+		'umb-property-editor-ui-content-picker-source-type': UmbPropertyEditorUIContentPickerSourceTypeElement;
 	}
 }

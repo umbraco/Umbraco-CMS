@@ -1,29 +1,10 @@
+import type { UmbContentPickerDynamicRoot, UmbContentPickerSourceType } from '../../../types.js';
 import type { UmbInputDocumentRootPickerElement } from '@umbraco-cms/backoffice/document';
 import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-
-export type UmbContentPickerSource = {
-	type: UmbContentPickerSourceType;
-	id?: string;
-	dynamicRoot?: UmbContentPickerDynamicRoot;
-};
-
-export type UmbContentPickerSourceType = 'content' | 'member' | 'media';
-
-export type UmbContentPickerDynamicRoot = {
-	originAlias: string;
-	originKey?: string;
-	querySteps?: Array<UmbContentPickerDynamicRootQueryStep>;
-};
-
-export type UmbContentPickerDynamicRootQueryStep = {
-	unique: string;
-	alias: string;
-	anyOfDocTypeKeys?: Array<string>;
-};
 
 @customElement('umb-input-content-picker-source')
 export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbLitElement, '') {

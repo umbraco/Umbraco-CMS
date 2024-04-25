@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 	name: 'Multi Node Tree Picker',
 	alias: 'Umbraco.MultiNodeTreePicker',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker',
 		settings: {
 			properties: [
 				{
@@ -30,7 +30,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'startNode',
 					label: 'Node type',
 					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.SourcePicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker.SourcePicker',
 				},
 			],
 			defaultData: [

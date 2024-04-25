@@ -1,15 +1,15 @@
-import { manifest as sourcePicker } from './config/source-picker/manifests.js';
+import { manifest as sourcePicker } from './config/source/manifests.js';
 import { manifest as sourceTypePicker } from './config/source-type-picker/manifests.js';
 import { manifest as schemaManifest } from './Umbraco.MultiNodeTreePicker.js';
 import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
-	alias: 'Umb.PropertyEditorUi.TreePicker',
-	name: 'Tree Picker Property Editor UI',
-	element: () => import('./property-editor-ui-tree-picker.element.js'),
+	alias: 'Umb.PropertyEditorUi.ContentPicker',
+	name: 'Content Picker Property Editor UI',
+	element: () => import('./property-editor-ui-content-picker.element.js'),
 	meta: {
-		label: 'Tree Picker',
+		label: 'Content Picker',
 		icon: 'icon-page-add',
 		group: 'pickers',
 		propertyEditorSchemaAlias: 'Umbraco.MultiNodeTreePicker',
@@ -19,7 +19,7 @@ const manifest: ManifestPropertyEditorUi = {
 					alias: 'filter',
 					label: 'Allow items of type',
 					description: 'Select the applicable types',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.SourceTypePicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker.SourceTypePicker',
 				},
 				{
 					alias: 'showOpenButton',

@@ -1,15 +1,15 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbInputTreeElement } from './input-tree.element.js';
+import { UmbInputContentElement } from './input-content.element.js';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-describe('UmbInputTreeElement', () => {
-	let element: UmbInputTreeElement;
+describe('UmbInputContentElement', () => {
+	let element: UmbInputContentElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-input-tree></umb-input-tree> `);
+		element = await fixture(html` <umb-input-content></umb-input-content> `);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInputTreeElement);
+		expect(element).to.be.instanceOf(UmbInputContentElement);
 	});
 
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {

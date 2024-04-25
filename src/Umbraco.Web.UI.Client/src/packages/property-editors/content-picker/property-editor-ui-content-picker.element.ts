@@ -1,4 +1,5 @@
-import type { UmbInputTreeElement } from './components/input-tree/index.js';
+import type { UmbInputContentElement } from './components/input-content/index.js';
+import type { UmbContentPickerSource } from './types.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDynamicRootRepository } from '@umbraco-cms/backoffice/dynamic-root';
@@ -6,21 +7,20 @@ import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-ed
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 
 // import of local component
-import './components/input-tree/index.js';
+import './components/input-content/index.js';
 
 /**
- * @element umb-property-editor-ui-tree-picker
+ * @element umb-property-editor-ui-content-picker
  */
-@customElement('umb-property-editor-ui-tree-picker')
-export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+@customElement('umb-property-editor-ui-content-picker')
+export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Array })
-	value: UmbInputTreeElement['items'] = [];
+	value: UmbInputContentElement['items'] = [];
 
 	@state()
-	type: UmbTreePickerSource['type'] = 'content';
+	type: UmbContentPickerSource['type'] = 'content';
 
 	@state()
 	startNodeId?: string | null;
@@ -40,14 +40,14 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	@state()
 	ignoreUserStartNodes?: boolean;
 
-	#dynamicRoot?: UmbTreePickerSource['dynamicRoot'];
+	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
 
 	#dynamicRootRepository = new UmbDynamicRootRepository(this);
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const startNode = config.getValueByAlias<UmbTreePickerSource>('startNode');
+		const startNode = config.getValueByAlias<UmbContentPickerSource>('startNode');
 		if (startNode) {
 			this.type = startNode.type;
 			this.startNodeId = startNode.id;
@@ -83,13 +83,13 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 		}
 	}
 
-	#onChange(event: CustomEvent & { target: UmbInputTreeElement }) {
+	#onChange(event: CustomEvent & { target: UmbInputContentElement }) {
 		this.value = event.target.items;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<umb-input-tree
+		return html`<umb-input-content
 			.items=${this.value}
 			.type=${this.type}
 			.startNodeId=${this.startNodeId ?? ''}
@@ -98,14 +98,14 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 			.allowedContentTypeIds=${this.allowedContentTypeIds ?? ''}
 			?showOpenButton=${this.showOpenButton}
 			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
-			@change=${this.#onChange}></umb-input-tree>`;
+			@change=${this.#onChange}></umb-input-content>`;
 	}
 }
 
-export default UmbPropertyEditorUITreePickerElement;
+export default UmbPropertyEditorUIContentPickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-tree-picker': UmbPropertyEditorUITreePickerElement;
+		'umb-property-editor-ui-content-picker': UmbPropertyEditorUIContentPickerElement;
 	}
 }

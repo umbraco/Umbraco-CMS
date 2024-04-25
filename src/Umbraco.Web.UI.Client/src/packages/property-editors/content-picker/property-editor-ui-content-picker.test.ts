@@ -1,16 +1,16 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUITreePickerElement } from './property-editor-ui-tree-picker.element.js';
+import { UmbPropertyEditorUIContentPickerElement } from './property-editor-ui-content-picker.element.js';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
-describe('UmbPropertyEditorUITreePickerElement', () => {
-	let element: UmbPropertyEditorUITreePickerElement;
+describe('UmbPropertyEditorUIContentPickerElement', () => {
+	let element: UmbPropertyEditorUIContentPickerElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-property-editor-ui-tree-picker></umb-property-editor-ui-tree-picker> `);
+		element = await fixture(html` <umb-property-editor-ui-content-picker></umb-property-editor-ui-content-picker> `);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbPropertyEditorUITreePickerElement);
+		expect(element).to.be.instanceOf(UmbPropertyEditorUIContentPickerElement);
 	});
 
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {

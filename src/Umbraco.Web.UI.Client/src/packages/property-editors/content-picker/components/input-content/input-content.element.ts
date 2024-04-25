@@ -1,3 +1,4 @@
+import type { UmbContentPickerSource } from '../../types.js';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -6,24 +7,24 @@ import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
-import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 
-@customElement('umb-input-tree')
-export class UmbInputTreeElement extends UUIFormControlMixin(UmbLitElement, '') {
+const elementName = 'umb-input-content';
+@customElement(elementName)
+export class UmbInputContentElement extends UUIFormControlMixin(UmbLitElement, '') {
 	protected getFormElement() {
 		return undefined;
 	}
 
-	private _type: UmbTreePickerSource['type'] = 'content';
+	private _type: UmbContentPickerSource['type'] = 'content';
 	@property()
-	public set type(newType: UmbTreePickerSource['type']) {
+	public set type(newType: UmbContentPickerSource['type']) {
 		const oldType = this._type;
 		if (newType?.toLowerCase() !== this._type) {
-			this._type = newType?.toLowerCase() as UmbTreePickerSource['type'];
+			this._type = newType?.toLowerCase() as UmbContentPickerSource['type'];
 			this.requestUpdate('type', oldType);
 		}
 	}
-	public get type(): UmbTreePickerSource['type'] {
+	public get type(): UmbContentPickerSource['type'] {
 		return this._type;
 	}
 
@@ -152,10 +153,10 @@ export class UmbInputTreeElement extends UUIFormControlMixin(UmbLitElement, '') 
 	];
 }
 
-export default UmbInputTreeElement;
+export default UmbInputContentElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-tree': UmbInputTreeElement;
+		[elementName]: UmbInputContentElement;
 	}
 }
