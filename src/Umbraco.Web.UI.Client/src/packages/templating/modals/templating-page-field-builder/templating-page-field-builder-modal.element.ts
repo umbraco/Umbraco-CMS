@@ -7,6 +7,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbFieldDropdownListElement } from '@umbraco-cms/backoffice/components';
+import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-templating-page-field-builder-modal')
 export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseElement<
@@ -61,12 +62,14 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 									@click=${() => (this._haveDefault = true)}></uui-button>`
 							: html`<uui-input
 									id="page-field-default-value"
+									@change=${(e: UUIInputEvent) => (this._default = e.target.value as string)}
 									label=${this.localize.term('templateEditor_defaultValue')}></uui-input>`}
 
 						<uui-label for="recursive"><umb-localize key="templateEditor_recursive">Recursive</umb-localize></uui-label>
 						<uui-checkbox
 							id="recursive"
 							label=${this.localize.term('templateEditor_recursiveDescr')}
+							@change=${(e: UUIBooleanInputEvent) => (this._recursive = e.target.checked)}
 							?disabled=${this._field ? false : true}></uui-checkbox>
 
 						<uui-label><umb-localize key="templateEditor_outputSample">Output sample</umb-localize></uui-label>

@@ -3,8 +3,9 @@ import { manifests as documentBlueprintManifests } from './document-blueprints/m
 import { manifests as documentManifests } from './documents/manifests.js';
 import { manifests as documentTypeManifests } from './document-types/manifests.js';
 import { manifests as sectionManifests } from './section.manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...dashboardManifests,
 	...documentBlueprintManifests,
 	...documentManifests,

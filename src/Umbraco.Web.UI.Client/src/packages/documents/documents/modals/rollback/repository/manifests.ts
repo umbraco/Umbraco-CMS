@@ -1,4 +1,4 @@
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_ROLLBACK_REPOSITORY_ALIAS = 'Umb.Repository.Rollback';
 
@@ -9,4 +9,4 @@ const repository: ManifestRepository = {
 	api: () => import('./rollback.repository.js'),
 };
 
-export const manifests = [repository];
+export const manifests: Array<ManifestTypes> = [repository];

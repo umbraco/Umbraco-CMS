@@ -33,4 +33,4 @@ const modals: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...entityActions, ...modals];
+export const manifests: Array<ManifestTypes> = [...entityActions, ...modals];

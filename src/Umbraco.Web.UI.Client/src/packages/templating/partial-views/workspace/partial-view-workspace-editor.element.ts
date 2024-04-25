@@ -102,7 +102,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 					</div>
 					<uui-box>
 						<div slot="header" id="code-editor-menu-container">
-							<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
+							<umb-templating-insert-menu @insert=${this.#insertSnippet} hidePartialViews></umb-templating-insert-menu>
 							<uui-button
 								look="secondary"
 								id="query-builder-button"
@@ -183,6 +183,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				display: flex;
 				justify-content: flex-end;
 				gap: var(--uui-size-space-3);
+				width: 100%;
 			}
 		`,
 	];

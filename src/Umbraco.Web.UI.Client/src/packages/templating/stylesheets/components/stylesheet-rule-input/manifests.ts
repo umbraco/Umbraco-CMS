@@ -1,4 +1,4 @@
-import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_STYLESHEET_RULE_SETTINGS_MODAL_ALIAS = 'Umb.Modal.StylesheetRuleSettings';
 
@@ -9,4 +9,4 @@ const modal: ManifestModal = {
 	element: () => import('./stylesheet-rule-settings-modal.element.js'),
 };
 
-export const manifests = [modal];
+export const manifests: Array<ManifestTypes> = [modal];

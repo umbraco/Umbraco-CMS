@@ -18,6 +18,9 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	@property()
 	value = '';
 
+	@property({ type: Boolean })
+	hidePartialViews = false;
+
 	#modalContext?: UmbModalManagerContext;
 
 	#dictionaryDetailRepository = new UmbDictionaryDetailRepository(this);
@@ -58,7 +61,9 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	async #openTemplatingItemPickerModal() {
-		const itemPickerContext = this.#modalContext?.open(this, UMB_TEMPLATING_ITEM_PICKER_MODAL);
+		const itemPickerContext = this.#modalContext?.open(this, UMB_TEMPLATING_ITEM_PICKER_MODAL, {
+			data: { hidePartialViews: this.hidePartialViews },
+		});
 		const result = await itemPickerContext?.onSubmit().catch(() => undefined);
 
 		if (result === undefined) return;
@@ -135,12 +140,14 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 						label=${this.localize.term('template_insertPageField')}
 						title=${this.localize.term('template_insertPageField')}
 						@click=${this.#openPageFieldBuilderModal}></uui-menu-item>
-					<uui-menu-item
-						class="insert-menu-item"
-						label=${this.localize.term('template_insertPartialView')}
-						title=${this.localize.term('template_insertPartialView')}
-						@click=${this.#openPartialViewPickerModal}>
-					</uui-menu-item>
+					${!this.hidePartialViews
+						? html`<uui-menu-item
+								class="insert-menu-item"
+								label=${this.localize.term('template_insertPartialView')}
+								title=${this.localize.term('template_insertPartialView')}
+								@click=${this.#openPartialViewPickerModal}>
+							</uui-menu-item>`
+						: ''}
 					<uui-menu-item
 						class="insert-menu-item"
 						label=${this.localize.term('template_insertDictionaryItem')}

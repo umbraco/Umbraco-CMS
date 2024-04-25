@@ -2,6 +2,7 @@ import type {
 	ManifestDynamicRootOrigin,
 	ManifestDynamicRootQueryStep,
 	ManifestModal,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL_ALIAS = 'Umb.Modal.DynamicRoot.OriginPicker';
@@ -136,4 +137,4 @@ const querySteps: Array<ManifestDynamicRootQueryStep> = [
 	},
 ];
 
-export const manifests = [...modals, ...origins, ...querySteps];
+export const manifests: Array<ManifestTypes> = [...modals, ...origins, ...querySteps];
