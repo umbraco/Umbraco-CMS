@@ -100,6 +100,11 @@ export class UmbAppElement extends UmbLitElement {
 			guards: [this.#isAuthorizedGuard()],
 		},
 		{
+			path: 'preview',
+			component: () => import('../preview/preview.element.js'),
+			guards: [this.#isAuthorizedGuard()],
+		},
+		{
 			path: 'logout',
 			resolve: () => {
 				this.#authContext?.clearTokenStorage();
