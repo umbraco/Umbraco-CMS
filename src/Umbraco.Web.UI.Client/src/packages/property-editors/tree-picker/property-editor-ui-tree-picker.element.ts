@@ -1,9 +1,9 @@
+import type { UmbInputTreeElement } from './components/input-tree/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDynamicRootRepository } from '@umbraco-cms/backoffice/dynamic-root';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbInputTreeElement } from '@umbraco-cms/backoffice/tree';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
