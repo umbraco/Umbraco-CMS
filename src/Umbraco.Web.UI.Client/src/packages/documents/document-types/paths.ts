@@ -1,5 +1,5 @@
 import type { UmbDocumentTypeEntityTypeUnion } from './entity.js';
-import { umbUrlPatternToString } from '@umbraco-cms/backoffice/utils';
+import { UmbPathPattern } from '@umbraco-cms/backoffice/router';
 
 export const UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_TEMPLATE = 'template';
 export const UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PRESET_ELEMENT = 'element';
@@ -13,13 +13,10 @@ export type UmbCreateDocumentTypeWorkspacePresetType =
 	| UmbCreateDocumentTypeWorkspacePresetTemplateType
 	| UmbCreateDocumentTypeWorkspacePresetElementType;
 
-export const UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH = 'create/:entityType/:parentUnique/:presetAlias';
-export const umbCreateDocumentTypeWorkspacePathGenerator = (params: {
+export const UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH = new UmbPathPattern<{
 	entityType: UmbDocumentTypeEntityTypeUnion;
 	parentUnique?: string | null;
 	presetAlias?: UmbCreateDocumentTypeWorkspacePresetType | null;
-}) => umbUrlPatternToString(UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH, params);
+}>('create/:entityType/:parentUnique/:presetAlias');
 
-export const UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH = 'edit/:id';
-export const umbEditDocumentTypeWorkspacePathGenerator = (params: { id: string }) =>
-	umbUrlPatternToString(UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH, params);
+export const UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH = new UmbPathPattern<{ id: string }>('edit/:id');

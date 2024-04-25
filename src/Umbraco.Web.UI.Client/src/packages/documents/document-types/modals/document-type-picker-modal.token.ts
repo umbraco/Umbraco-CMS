@@ -1,4 +1,4 @@
-import { umbCreateDocumentTypeWorkspacePathGenerator } from '../paths.js';
+import { UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH } from '../paths.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbDocumentTypeTreeItemModel } from '@umbraco-cms/backoffice/document-type';
 import {
@@ -12,7 +12,7 @@ import {
 */
 export type UmbDocumentTypePickerModalData = UmbTreePickerModalData<
 	UmbDocumentTypeTreeItemModel,
-	typeof umbCreateDocumentTypeWorkspacePathGenerator
+	typeof UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH.PARAMS
 >;
 
 export interface UmbDocumentTypePickerModalValue extends UmbTreePickerModalValue {}
@@ -32,8 +32,8 @@ export const UMB_DOCUMENT_TYPE_PICKER_MODAL = new UmbModalToken<
 				entityType: 'document-type',
 				preset: {},
 			},
-			additionalPathGenerator: umbCreateDocumentTypeWorkspacePathGenerator,
-			additionalPathParams: {
+			extendWithPathPattern: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH,
+			extendWithPathParams: {
 				entityType: 'document-type',
 				parentUnique: null,
 				presetAlias: null,

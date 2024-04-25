@@ -96,7 +96,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 		this.routes.setRoutes([
 			{
-				path: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH,
+				path: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH.toString(),
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
 					const parentEntityType = info.match.params.entityType;
@@ -112,7 +112,7 @@ export class UmbDocumentTypeWorkspaceContext
 				},
 			},
 			{
-				path: UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH,
+				path: UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH.toString(),
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
 					this.removeUmbControllerByAlias('isNewRedirectController');

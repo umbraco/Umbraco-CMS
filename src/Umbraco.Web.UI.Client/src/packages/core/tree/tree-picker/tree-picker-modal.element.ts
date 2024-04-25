@@ -65,7 +65,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				.observeRouteBuilder((routeBuilder) => {
 					const oldPath = this._createPath;
 					this._createPath =
-						routeBuilder({}) + createActionData.additionalPathGenerator(createActionData.additionalPathParams);
+						routeBuilder({}) +
+						createActionData.extendWithPathPattern.generateLocal(createActionData.extendWithPathParams);
 					this.requestUpdate('_createPath', oldPath);
 				});
 		}
