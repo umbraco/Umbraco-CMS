@@ -56,7 +56,7 @@ public class MemberPickerPropertyEditor : DataEditor
             return null;
         }
 
-        // the editor value is expected to be the memner key - store it as the member UDI
+        // the editor value is expected to be the member key - store it as the member UDI
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             => editorValue.Value is string stringValue && Guid.TryParse(stringValue, out Guid memberKey)
                 ? new GuidUdi(Constants.UdiEntityType.Member, memberKey)
