@@ -8331,6 +8331,20 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PublicAccessResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -33977,6 +33991,7 @@
       },
       "CreateUserGroupRequestModel": {
         "required": [
+          "alias",
           "documentRootAccess",
           "fallbackPermissions",
           "hasAccessToAllLanguages",
@@ -33989,6 +34004,9 @@
         "type": "object",
         "properties": {
           "name": {
+            "type": "string"
+          },
+          "alias": {
             "type": "string"
           },
           "icon": {
@@ -34052,6 +34070,11 @@
                 }
               ]
             }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -40394,6 +40417,52 @@
         },
         "additionalProperties": false
       },
+      "PublicAccessResponseModel": {
+        "required": [
+          "errorDocument",
+          "groups",
+          "loginDocument",
+          "members"
+        ],
+        "type": "object",
+        "properties": {
+          "loginDocument": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "errorDocument": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MemberItemResponseModel"
+                }
+              ]
+            }
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MemberGroupItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PublishDocumentRequestModel": {
         "required": [
           "publishSchedules"
@@ -42828,6 +42897,7 @@
       },
       "UpdateUserGroupRequestModel": {
         "required": [
+          "alias",
           "documentRootAccess",
           "fallbackPermissions",
           "hasAccessToAllLanguages",
@@ -42840,6 +42910,9 @@
         "type": "object",
         "properties": {
           "name": {
+            "type": "string"
+          },
+          "alias": {
             "type": "string"
           },
           "icon": {
@@ -43147,12 +43220,17 @@
           "icon": {
             "type": "string",
             "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "UserGroupResponseModel": {
         "required": [
+          "alias",
           "documentRootAccess",
           "fallbackPermissions",
           "hasAccessToAllLanguages",
@@ -43167,6 +43245,9 @@
         "type": "object",
         "properties": {
           "name": {
+            "type": "string"
+          },
+          "alias": {
             "type": "string"
           },
           "icon": {
