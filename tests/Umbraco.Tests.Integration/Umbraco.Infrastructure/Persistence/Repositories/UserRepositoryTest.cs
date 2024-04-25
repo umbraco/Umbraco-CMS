@@ -40,6 +40,8 @@ public class UserRepositoryTest : UmbracoIntegrationTest
     private IMediaRepository MediaRepository => GetRequiredService<IMediaRepository>();
     private IEnumerable<IPermissionMapper> PermissionMappers => GetRequiredService<IEnumerable<IPermissionMapper>>();
 
+    private IAppPolicyCache AppPolicyCache => GetRequiredService<IAppPolicyCache>();
+
     private UserRepository CreateRepository(ICoreScopeProvider provider)
     {
         var accessor = (IScopeAccessor)provider;
@@ -54,7 +56,8 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             Options.Create(new UserPasswordConfigurationSettings()),
             new SystemTextJsonSerializer(),
             mockRuntimeState.Object,
-            PermissionMappers);
+            PermissionMappers,
+            AppPolicyCache);
         return repository;
     }
 
@@ -161,7 +164,8 @@ public class UserRepositoryTest : UmbracoIntegrationTest
                 Options.Create(new UserPasswordConfigurationSettings()),
                 new SystemTextJsonSerializer(),
                 mockRuntimeState.Object,
-                PermissionMappers);
+                PermissionMappers,
+                AppPolicyCache);
 
             repository2.Delete(user);
 
