@@ -66,8 +66,8 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 			meta: { icon: '', label: '', folderRepositoryAlias: UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS },
 		});
 	}
-	async #onClick(preset: OptionsPresetType) {
-		switch (preset) {
+	async #onClick(presetAlias: OptionsPresetType) {
+		switch (presetAlias) {
 			case 'folder': {
 				try {
 					await this.#createFolderAction?.execute();
@@ -85,9 +85,9 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 				if (!parentEntityType) throw new Error('Entity type is required to create a document type');
 				const parentUnique = this.data?.parent.unique ?? null;
 				const href = UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.generateAbsolute({
-					entityType: parentEntityType,
-					parentUnique: parentUnique,
-					presetAlias: preset,
+					parentEntityType,
+					parentUnique,
+					presetAlias,
 				});
 				window.history.pushState({}, '', href);
 

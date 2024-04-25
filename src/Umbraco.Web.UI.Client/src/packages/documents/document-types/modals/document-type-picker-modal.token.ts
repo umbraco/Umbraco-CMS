@@ -35,7 +35,7 @@ export const UMB_DOCUMENT_TYPE_PICKER_MODAL = new UmbModalToken<
 			},
 			extendWithPathPattern: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
 			extendWithPathParams: {
-				entityType: 'document-type',
+				parentEntityType: 'document-type-root',
 				parentUnique: null,
 				presetAlias: null,
 			},

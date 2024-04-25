@@ -28,6 +28,7 @@ import type {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbRoutableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbPathPatternTypeAsEncodedParamsType } from '@umbraco-cms/backoffice/router';
 
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -99,9 +100,15 @@ export class UmbDocumentTypeWorkspaceContext
 				path: UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.toString(),
 				component: UmbDocumentTypeWorkspaceEditorElement,
 				setup: (_component, info) => {
-					const parentEntityType = info.match.params.entityType;
-					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-					const presetAlias = info.match.params.presetAlias === 'null' ? null : info.match.params.presetAlias;
+					const params = info.match.params as unknown as UmbPathPatternTypeAsEncodedParamsType<
+						typeof UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.PARAMS
+					>;
+					const parentEntityType = params.parentEntityType;
+					const parentUnique = params.parentUnique === 'null' ? null : params.parentUnique;
+					const presetAlias = params.presetAlias === 'null' ? null : params.presetAlias ?? null;
+					if (parentUnique === undefined) {
+						throw new Error('ParentUnique url parameter is required to create a document type');
+					}
 					this.create({ entityType: parentEntityType, unique: parentUnique }, presetAlias);
 
 					new UmbWorkspaceIsNewRedirectController(

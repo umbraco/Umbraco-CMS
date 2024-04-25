@@ -2,6 +2,12 @@ import { umbUrlPatternToString } from '../utils/path/url-pattern-to-string.funct
 
 export type UmbPathPatternParamsType = { [key: string]: any };
 
+// Replaces property union type null with 'null' [NL]
+type ReplaceNull<T> = T extends null ? 'null' : T;
+export type UmbPathPatternTypeAsEncodedParamsType<T> = {
+	[P in keyof T]: T[P] extends (infer R)[] ? ReplaceNull<R>[] : ReplaceNull<T[P]>;
+};
+
 export class UmbPathPattern<
 	LocalParamsType extends UmbPathPatternParamsType = UmbPathPatternParamsType,
 	BaseParamsType extends UmbPathPatternParamsType = LocalParamsType,

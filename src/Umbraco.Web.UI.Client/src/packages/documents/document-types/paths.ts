@@ -17,13 +17,13 @@ export type UmbCreateDocumentTypeWorkspacePresetType =
 
 export const UMB_DOCUMENT_TYPE_WORKSPACE_PATH = UMB_WORKSPACE_PATH_PATTERN.generateAbsolute({
 	sectionName: UMB_SETTINGS_SECTION_PATHNAME,
-	workspaceAlias: 'documentType',
+	entityType: 'documentType',
 });
 
 export const UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{
-	entityType: UmbDocumentTypeEntityTypeUnion;
+	parentEntityType: UmbDocumentTypeEntityTypeUnion;
 	parentUnique?: string | null;
 	presetAlias?: UmbCreateDocumentTypeWorkspacePresetType | null;
-}>('create/parent/:entityType/:parentUnique/:presetAlias', UMB_DOCUMENT_TYPE_WORKSPACE_PATH);
+}>('create/parent/:parentEntityType/:parentUnique/:presetAlias', UMB_DOCUMENT_TYPE_WORKSPACE_PATH);
 
 export const UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{ id: string }>('edit/:id');
