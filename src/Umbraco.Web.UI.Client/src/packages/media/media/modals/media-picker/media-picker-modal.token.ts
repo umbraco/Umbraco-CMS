@@ -3,7 +3,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 export interface UmbMediaPickerModalData {
 	startNode?: string | null;
 	selectableFolders?: boolean;
-	submitOnSelection?: boolean;
+	selectableNonImages?: boolean;
 	multiple?: boolean;
 }
 

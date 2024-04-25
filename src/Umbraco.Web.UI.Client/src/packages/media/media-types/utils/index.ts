@@ -30,3 +30,13 @@ export function getMediaTypeByFileMimeType(mimetype: string) {
 	if (['pdf', 'docx', 'doc'].includes(extension)) return UmbMediaTypeFileType.ARTICLE;
 	return UmbMediaTypeFileType.FILE;
 }
+
+export function isMediaTypeRenderable(mediaTypeUnique: string) {
+	if (mediaTypeUnique === UmbMediaTypeFileType.IMAGE) return true;
+	if (mediaTypeUnique === UmbMediaTypeFileType.SVG) return true;
+	return false;
+}
+
+export function isMediaTypeFolder(mediaTypeUnique: string) {
+	return mediaTypeUnique === UmbMediaTypeFileType.FOLDER;
+}

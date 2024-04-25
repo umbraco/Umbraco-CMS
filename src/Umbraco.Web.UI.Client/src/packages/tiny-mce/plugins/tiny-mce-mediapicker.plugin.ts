@@ -146,7 +146,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
 			data: {
 				multiple: false,
-				submitOnSelection: true,
+				selectableFolders: false,
+				selectableNonImages: false,
 				//startNodeIsVirtual,
 			},
 			value: {
@@ -168,8 +169,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, { data: { mediaUnique } });
 
-		await modalHandler?.onSubmit().catch(() => undefined);
-		const mediaData = modalHandler?.getValue();
+		const mediaData = await modalHandler?.onSubmit().catch(() => null);
+		if (!mediaData) return;
 
 		const media: MediaPickerTargetData = {
 			altText: mediaData?.altText,
