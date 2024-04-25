@@ -3,10 +3,13 @@ import type {
 	UmbTemplatingPageFieldBuilderModalData,
 	UmbTemplatingPageFieldBuilderModalValue,
 } from './templating-page-field-builder-modal.token.js';
+import type { UmbFieldDropdownListElement } from './components/field-dropdown-list/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbFieldDropdownListElement } from '@umbraco-cms/backoffice/components';
+
+// import of local components
+import './components/field-dropdown-list/index.js';
 
 @customElement('umb-templating-page-field-builder-modal')
 export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseElement<
