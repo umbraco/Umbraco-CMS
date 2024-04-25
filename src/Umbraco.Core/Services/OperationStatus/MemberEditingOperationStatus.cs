@@ -15,5 +15,6 @@ public enum MemberEditingOperationStatus
     InvalidEmail,
     DuplicateUsername,
     DuplicateEmail,
+    CancelledByNotificationHandler,
     Unknown,
 }
