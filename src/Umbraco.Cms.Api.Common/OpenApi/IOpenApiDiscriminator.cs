@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Api.Management.OpenApi;
+namespace Umbraco.Cms.Api.Common.OpenApi;
 
 /// <summary>
 /// Marker interface that ensure the type have a "$type" discriminator in the open api schema.

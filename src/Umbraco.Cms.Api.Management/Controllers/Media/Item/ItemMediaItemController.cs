@@ -29,6 +29,11 @@ public class ItemMediaItemController : MediaItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<MediaItemResponseModel>());
+        }
+
         IEnumerable<IMediaEntitySlim> media = _entityService
             .GetAll(UmbracoObjectTypes.Media, ids.ToArray())
             .OfType<IMediaEntitySlim>();
