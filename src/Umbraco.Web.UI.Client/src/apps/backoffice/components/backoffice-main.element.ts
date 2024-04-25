@@ -65,10 +65,18 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 			});
 
 		if (this._sections.length > 0) {
+			const fallbackSectionPath = UMB_SECTION_PATH_PATTERN.generateLocal({
+				sectionName: this._sections[0].manifest!.meta.pathname,
+			});
 			this._routes.push({
 				alias: '__redirect',
 				path: '/',
-				redirectTo: 'section/content',
+				redirectTo: fallbackSectionPath,
+			});
+			this._routes.push({
+				alias: '__redirect',
+				path: '/section/',
+				redirectTo: fallbackSectionPath,
 			});
 		}
 
