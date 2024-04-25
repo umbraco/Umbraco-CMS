@@ -5,21 +5,21 @@ import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export type UmbTreePickerSource = {
-	type: UmbTreePickerSourceType;
+export type UmbContentPickerSource = {
+	type: UmbContentPickerSourceType;
 	id?: string;
-	dynamicRoot?: UmbTreePickerDynamicRoot;
+	dynamicRoot?: UmbContentPickerDynamicRoot;
 };
 
-export type UmbTreePickerSourceType = 'content' | 'member' | 'media';
+export type UmbContentPickerSourceType = 'content' | 'member' | 'media';
 
-export type UmbTreePickerDynamicRoot = {
+export type UmbContentPickerDynamicRoot = {
 	originAlias: string;
 	originKey?: string;
-	querySteps?: Array<UmbTreePickerDynamicRootQueryStep>;
+	querySteps?: Array<UmbContentPickerDynamicRootQueryStep>;
 };
 
-export type UmbTreePickerDynamicRootQueryStep = {
+export type UmbContentPickerDynamicRootQueryStep = {
 	unique: string;
 	alias: string;
 	anyOfDocTypeKeys?: Array<string>;
@@ -31,10 +31,10 @@ export class UmbInputTreePickerSourceElement extends UUIFormControlMixin(UmbLitE
 		return undefined;
 	}
 
-	#type: UmbTreePickerSourceType = 'content';
+	#type: UmbContentPickerSourceType = 'content';
 
 	@property()
-	public set type(value: UmbTreePickerSourceType) {
+	public set type(value: UmbContentPickerSourceType) {
 		if (value === undefined) {
 			value = this.#type;
 		}
@@ -49,7 +49,7 @@ export class UmbInputTreePickerSourceElement extends UUIFormControlMixin(UmbLitE
 
 		this.requestUpdate('type', oldValue);
 	}
-	public get type(): UmbTreePickerSourceType {
+	public get type(): UmbContentPickerSourceType {
 		return this.#type;
 	}
 
@@ -57,7 +57,7 @@ export class UmbInputTreePickerSourceElement extends UUIFormControlMixin(UmbLitE
 	nodeId?: string;
 
 	@property({ attribute: false })
-	dynamicRoot?: UmbTreePickerDynamicRoot | undefined;
+	dynamicRoot?: UmbContentPickerDynamicRoot | undefined;
 
 	@state()
 	_options: Array<Option> = [
@@ -78,7 +78,7 @@ export class UmbInputTreePickerSourceElement extends UUIFormControlMixin(UmbLitE
 	#onContentTypeChange(event: UUISelectEvent) {
 		event.stopPropagation();
 
-		this.type = event.target.value as UmbTreePickerSourceType;
+		this.type = event.target.value as UmbContentPickerSourceType;
 
 		this.nodeId = undefined;
 		this.dynamicRoot = undefined;
