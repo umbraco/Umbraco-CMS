@@ -25,8 +25,8 @@ export type UmbContentPickerDynamicRootQueryStep = {
 	anyOfDocTypeKeys?: Array<string>;
 };
 
-@customElement('umb-input-tree-picker-source')
-export class UmbInputTreePickerSourceElement extends UUIFormControlMixin(UmbLitElement, '') {
+@customElement('umb-input-content-picker-source')
+export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbLitElement, '') {
 	protected getFormElement() {
 		return undefined;
 	}
@@ -147,10 +147,10 @@ export class UmbInputTreePickerSourceElement extends UUIFormControlMixin(UmbLitE
 	];
 }
 
-export default UmbInputTreePickerSourceElement;
+export default UmbInputContentPickerSourceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-tree-picker-source': UmbInputTreePickerSourceElement;
+		'umb-input-content-picker-source': UmbInputContentPickerSourceElement;
 	}
 }

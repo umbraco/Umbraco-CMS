@@ -1,5 +1,5 @@
 import type {
-	UmbInputTreePickerSourceElement,
+	UmbInputContentPickerSourceElement,
 	UmbContentPickerSource,
 } from './input-tree-picker-source/input-tree-picker-source.element.js';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -28,7 +28,7 @@ export class UmbPropertyEditorUITreePickerSourcePickerElement
 	public config?: UmbPropertyEditorConfigCollection;
 
 	#onChange(event: CustomEvent) {
-		const target = event.target as UmbInputTreePickerSourceElement;
+		const target = event.target as UmbInputContentPickerSourceElement;
 
 		this.value = {
 			type: target.type,
