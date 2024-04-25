@@ -1,9 +1,9 @@
 import { UmbDocumentTypePickerContext } from '../../documents/document-types/components/input-document-type/input-document-type.context.js';
+import type { UmbDynamicRootQueryStep } from '../types.js';
 import type { UmbDynamicRootQueryStepModalData } from './index.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbTreePickerDynamicRootQueryStep } from '@umbraco-cms/backoffice/components';
 import type { ManifestDynamicRootQueryStep } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-dynamic-root-query-step-picker-modal')
@@ -44,7 +44,7 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 		});
 	}
 
-	#submit(value: UmbTreePickerDynamicRootQueryStep) {
+	#submit(value: UmbDynamicRootQueryStep) {
 		this.modalContext?.setValue(value);
 		this.modalContext?.submit();
 	}

@@ -1,9 +1,9 @@
 import { UmbDocumentPickerContext } from '../../documents/documents/components/input-document/input-document.context.js';
+import type { UmbDynamicRoot } from '../types.js';
 import type { UmbDynamicRootOriginModalData } from './index.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestDynamicRootOrigin } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbTreePickerDynamicRoot } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-dynamic-root-origin-picker-modal')
 export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseElement<UmbDynamicRootOriginModalData> {
@@ -57,7 +57,7 @@ export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseEle
 		});
 	}
 
-	#submit(value: UmbTreePickerDynamicRoot) {
+	#submit(value: UmbDynamicRoot) {
 		this.modalContext?.setValue(value);
 		this.modalContext?.submit();
 	}

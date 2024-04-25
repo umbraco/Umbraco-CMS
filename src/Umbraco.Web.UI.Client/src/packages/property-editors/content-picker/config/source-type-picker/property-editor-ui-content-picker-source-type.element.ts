@@ -1,3 +1,4 @@
+import type { UmbContentPickerSource } from '../../types.js';
 import type { UmbInputMemberTypeElement } from '@umbraco-cms/backoffice/member-type';
 import type { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
 import type { UmbInputMediaTypeElement } from '@umbraco-cms/backoffice/media-type';

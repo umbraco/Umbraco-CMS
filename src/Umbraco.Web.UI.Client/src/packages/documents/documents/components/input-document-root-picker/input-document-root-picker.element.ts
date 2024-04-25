@@ -15,7 +15,6 @@ import type {
 	ManifestDynamicRootQueryStep,
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import type { UmbTreePickerDynamicRoot, UmbTreePickerDynamicRootQueryStep } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-input-document-root-picker')
 export class UmbInputDocumentRootPickerElement extends UUIFormControlMixin(UmbLitElement, '') {
