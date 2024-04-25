@@ -931,7 +931,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     // TODO: Remove this once CreatorId gets migrated to a key.
     public IUser? Get(int id)
     {
-        string cacheKey = $"uRepo_{typeof(IUser).Name}_" + id;
+        string cacheKey = RepositoryCacheKeys.GetKey<IUser, int>(id);
         IUser? cachedUser = IsolatedCache.GetCacheItem<IUser>(cacheKey);
         if (cachedUser is not null)
         {

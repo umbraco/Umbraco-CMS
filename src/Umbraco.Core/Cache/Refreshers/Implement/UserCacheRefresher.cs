@@ -53,8 +53,7 @@ public sealed class UserCacheRefresher : CacheRefresherBase<UserCacheRefresherNo
 
     public override void Remove(int id)
     {
-        string cacheKey = $"uRepo_{typeof(IUser).Name}_" + id;
-        AppCaches.RuntimeCache.Clear(cacheKey);
+        AppCaches.RuntimeCache.Clear(RepositoryCacheKeys.GetKey<IUser, int>(id));
         base.Remove(id);
     }
 
