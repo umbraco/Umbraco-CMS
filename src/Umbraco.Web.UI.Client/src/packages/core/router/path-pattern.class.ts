@@ -2,7 +2,10 @@ import { umbUrlPatternToString } from '../utils/path/url-pattern-to-string.funct
 
 export type UmbPathPatternParamsType = { [key: string]: any };
 
-export class UmbPathPattern<LocalParamsType extends UmbPathPatternParamsType = UmbPathPatternParamsType> {
+export class UmbPathPattern<
+	LocalParamsType extends UmbPathPatternParamsType = UmbPathPatternParamsType,
+	BaseParamsType extends UmbPathPatternParamsType = LocalParamsType,
+> {
 	#local: string;
 	#base: string;
 
@@ -13,13 +16,23 @@ export class UmbPathPattern<LocalParamsType extends UmbPathPatternParamsType = U
 	 * @type      {T}
 	 * @memberOf  UmbPathPattern
 	 * @example   `typeof MyPathPattern.PARAMS`
-	 * @returns   undefined
 	 */
 	readonly PARAMS!: LocalParamsType;
 
-	constructor(localPattern: string, basePath?: string) {
+	/**
+	 * Get absolute params type of the path pattern
+	 *
+	 * @public
+	 * @type      {T}
+	 * @memberOf  UmbPathPattern
+	 * @example   `typeof MyPathPattern.ABSOLUTE_PARAMS`
+	 */
+	readonly ABSOLUTE_PARAMS!: LocalParamsType & BaseParamsType;
+
+	constructor(localPattern: string, basePath?: UmbPathPattern | string) {
 		this.#local = localPattern;
-		this.#base = basePath ? (basePath.lastIndexOf('/') !== basePath.length - 1 ? basePath + '/' : basePath) : '';
+		basePath = basePath?.toString() ?? '';
+		this.#base = basePath.lastIndexOf('/') !== basePath.length - 1 ? basePath + '/' : basePath;
 	}
 
 	generateLocal(params: LocalParamsType) {
@@ -28,10 +41,14 @@ export class UmbPathPattern<LocalParamsType extends UmbPathPatternParamsType = U
 	/**
 	 * generate an absolute path from the path pattern
 	 * @param params
+	 * @param baseParams
 	 * @returns
 	 */
-	generateAbsolute(params: LocalParamsType) {
-		return this.#base + umbUrlPatternToString(this.#local, params);
+	generateAbsolute(params: LocalParamsType & BaseParamsType) {
+		return (
+			(this.#base.indexOf(':') !== -1 ? umbUrlPatternToString(this.#base, params) : this.#base) +
+			umbUrlPatternToString(this.#local, params)
+		);
 	}
 
 	toString() {

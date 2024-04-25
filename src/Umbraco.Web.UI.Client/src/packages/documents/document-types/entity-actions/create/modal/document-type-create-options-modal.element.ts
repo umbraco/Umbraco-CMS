@@ -1,16 +1,29 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
 import type { UmbDocumentTypeCreateOptionsModalData } from './index.js';
+import {
+	UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN,
+	type UmbCreateDocumentTypeWorkspacePresetType,
+	type UmbDocumentTypeEntityTypeUnion,
+} from '@umbraco-cms/backoffice/document-type';
 import { html, customElement, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
+
+// Include the types from the DocumentTypeWorkspacePresetType + folder.
+type OptionsPresetType = UmbCreateDocumentTypeWorkspacePresetType | 'folder' | null;
 
 @customElement('umb-document-type-create-options-modal')
 export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<UmbDocumentTypeCreateOptionsModalData> {
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
-	#items: Array<{ preset: string; label: string; description: string; icon: string }> = [
+	#items: Array<{
+		preset: OptionsPresetType;
+		label: string;
+		description: string;
+		icon: string;
+	}> = [
 		{
-			preset: 'null',
+			preset: null,
 			label: this.localize.term('create_documentType'),
 			description: this.localize.term('create_documentTypeDescription'),
 			icon: 'icon-document',
@@ -53,12 +66,13 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 			meta: { icon: '', label: '', folderRepositoryAlias: UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS },
 		});
 	}
-	async #onClick(preset: string) {
+	async #onClick(preset: OptionsPresetType) {
 		switch (preset) {
 			case 'folder': {
 				try {
 					await this.#createFolderAction?.execute();
 					this._submitModal();
+					return;
 				} catch (error) {
 					//console.error(error);
 				}
@@ -67,9 +81,14 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 			}
 
 			default: {
-				const entityType = this.data?.parent.entityType;
-				const unique = this.data?.parent.unique || 'null';
-				const href = `section/settings/workspace/document-type/create/${entityType}/${unique}/${preset}`;
+				const parentEntityType = this.data?.parent.entityType as UmbDocumentTypeEntityTypeUnion;
+				if (!parentEntityType) throw new Error('Entity type is required to create a document type');
+				const parentUnique = this.data?.parent.unique ?? null;
+				const href = UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.generateAbsolute({
+					entityType: parentEntityType,
+					parentUnique: parentUnique,
+					presetAlias: preset,
+				});
 				window.history.pushState({}, '', href);
 
 				this._submitModal();

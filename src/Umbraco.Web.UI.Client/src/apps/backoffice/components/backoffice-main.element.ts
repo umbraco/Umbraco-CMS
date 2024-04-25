@@ -55,7 +55,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 				} else {
 					return {
 						alias: section.alias,
-						path: UMB_SECTION_PATH_PATTERN.generateLocal({ name: section.manifest!.meta.pathname }),
+						path: UMB_SECTION_PATH_PATTERN.generateLocal({ sectionName: section.manifest!.meta.pathname }),
 						component: () => createExtensionElement(section.manifest!, 'umb-section-default'),
 						setup: (component) => {
 							(component as UmbSectionElement).manifest = section.manifest as ManifestSection;
@@ -78,7 +78,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	private _onRouteChange = async (event: UmbRouterSlotChangeEvent) => {
 		const currentPath = event.target.localActiveViewPath || '';
 		const section = this._sections.find(
-			(s) => UMB_SECTION_PATH_PATTERN.generateLocal({ name: s.manifest!.meta.pathname }) === currentPath,
+			(s) => UMB_SECTION_PATH_PATTERN.generateLocal({ sectionName: s.manifest!.meta.pathname }) === currentPath,
 		);
 		if (!section) return;
 		await section.asPromise();
