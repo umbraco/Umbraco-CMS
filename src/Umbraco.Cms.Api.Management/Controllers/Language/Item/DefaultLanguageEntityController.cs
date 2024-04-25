@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 namespace Umbraco.Cms.Api.Management.Controllers.Language.Item;
 
 [ApiVersion("1.0")]
-public class DefaultLanguageEntityController : LanguageEntityControllerBase
+public class DefaultLanguageEntityController : LanguageItemControllerBase
 {
     private readonly ILanguageService _languageService;
     private readonly IUmbracoMapper _mapper;
