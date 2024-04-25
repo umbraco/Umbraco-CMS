@@ -275,9 +275,11 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 	}
 
 	#handleRemove() {
-		this._files = [];
 		const uniques = this._files.map((file) => file.unique);
 		this.#manager.remove(uniques);
+		this._files = [];
+		this.value = '';
+		this.keys = [];
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
