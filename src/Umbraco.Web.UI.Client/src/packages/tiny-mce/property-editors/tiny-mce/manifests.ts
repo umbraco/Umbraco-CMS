@@ -1,6 +1,7 @@
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import { manifest as schemaManifest } from './Umbraco.RichText.js';
+import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUi = {
+const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.TinyMCE',
 	name: 'Rich Text Editor Property Editor UI',
@@ -241,3 +242,5 @@ export const manifest: ManifestPropertyEditorUi = {
 		},
 	},
 };
+
+export const manifests: Array<ManifestTypes> = [manifest, schemaManifest];

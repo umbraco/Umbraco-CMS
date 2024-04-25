@@ -15,7 +15,7 @@ import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
 
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -113,7 +113,7 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 ];
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...createBlueprintManifests,
 	...createManifests,
 	...cultureAndHostnamesManifests,

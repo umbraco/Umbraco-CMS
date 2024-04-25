@@ -1,6 +1,7 @@
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
+	ManifestTypes,
 	ManifestWorkspace,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
@@ -62,4 +63,4 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

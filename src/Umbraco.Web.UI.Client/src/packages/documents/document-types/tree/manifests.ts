@@ -17,6 +17,7 @@ import type {
 	ManifestTree,
 	ManifestTreeItem,
 	ManifestTreeStore,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const treeRepository: ManifestRepository = {
@@ -55,4 +56,11 @@ const treeItem: ManifestTreeItem = {
 	],
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests, ...reloadManifests];
+export const manifests: Array<ManifestTypes> = [
+	treeRepository,
+	treeStore,
+	tree,
+	treeItem,
+	...folderManifests,
+	...reloadManifests,
+];

@@ -19,4 +19,4 @@ const partialViewActions: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...partialViewActions, ...createManifests, ...renameManifests];
+export const manifests: Array<ManifestTypes> = [...partialViewActions, ...createManifests, ...renameManifests];

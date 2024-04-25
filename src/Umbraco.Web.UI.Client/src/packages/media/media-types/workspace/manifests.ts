@@ -2,6 +2,7 @@ import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceViews,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
@@ -78,4 +79,4 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

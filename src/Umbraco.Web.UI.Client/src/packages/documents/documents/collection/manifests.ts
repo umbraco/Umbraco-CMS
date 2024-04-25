@@ -4,7 +4,7 @@ import { manifests as collectionRepositoryManifests } from './repository/manifes
 import { manifests as collectionViewManifests } from './views/manifests.js';
 import { UmbDocumentCollectionContext } from './document-collection.context.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from './index.js';
-import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollection, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const collectionManifest: ManifestCollection = {
 	type: 'collection',
@@ -17,7 +17,7 @@ const collectionManifest: ManifestCollection = {
 	},
 };
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	collectionManifest,
 	...collectionActionManifests,
 	...collectionRepositoryManifests,

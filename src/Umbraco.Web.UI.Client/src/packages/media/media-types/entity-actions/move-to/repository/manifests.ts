@@ -1,6 +1,6 @@
 import { UMB_MOVE_MEDIA_TYPE_REPOSITORY_ALIAS } from './constants.js';
 import { UmbMoveMediaTypeRepository } from './media-type-move.repository.js';
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const moveRepository: ManifestRepository = {
 	type: 'repository',
@@ -9,4 +9,4 @@ const moveRepository: ManifestRepository = {
 	api: UmbMoveMediaTypeRepository,
 };
 
-export const manifests = [moveRepository];
+export const manifests: Array<ManifestTypes> = [moveRepository];

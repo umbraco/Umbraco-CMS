@@ -1,6 +1,7 @@
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import { manifest as schemaManifest } from './Umbraco.MediaPicker.js';
+import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUi = {
+const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.MediaPicker',
 	name: 'Media Picker Property Editor UI',
@@ -12,3 +13,5 @@ export const manifest: ManifestPropertyEditorUi = {
 		group: 'pickers',
 	},
 };
+
+export const manifests: Array<ManifestTypes> = [manifest, schemaManifest];
