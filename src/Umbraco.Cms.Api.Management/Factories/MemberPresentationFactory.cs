@@ -60,20 +60,21 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     }
 
     public MemberItemResponseModel CreateItemResponseModel(IMemberEntitySlim entity)
-    {
-        var responseModel = new MemberItemResponseModel
+        => CreateItemResponseModel<IMemberEntitySlim>(entity);
+
+    public MemberItemResponseModel CreateItemResponseModel(IMember entity)
+        => CreateItemResponseModel<IMember>(entity);
+
+    private MemberItemResponseModel CreateItemResponseModel<T>(T entity)
+        where T : ITreeEntity
+        => new MemberItemResponseModel
         {
             Id = entity.Key,
+            MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!,
+            Variants = CreateVariantsItemResponseModels(entity)
         };
 
-        responseModel.MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!;
-
-        responseModel.Variants = CreateVariantsItemResponseModels(entity);
-
-        return responseModel;
-    }
-
-    public IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(IMemberEntitySlim entity)
+    private static IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(ITreeEntity entity)
         => new[]
         {
             new VariantItemResponseModel
@@ -82,9 +83,6 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
                 Culture = null
             }
         };
-
-    public MemberTypeReferenceResponseModel CreateMemberTypeReferenceResponseModel(IMemberEntitySlim entity)
-        => _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!;
 
     private async Task<MemberResponseModel> RemoveSensitiveDataAsync(IMember member, MemberResponseModel responseModel)
     {
