@@ -152,18 +152,20 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 
 	#renderItems() {
 		if (!this._items) return;
-		return html`<uui-ref-list>
-			${repeat(
-				this._items,
-				(item) => item.unique,
-				(item) => this.#renderRef(item),
-			)}
-		</uui-ref-list>`;
+		return html`
+			<uui-ref-list>
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this.#renderRef(item),
+				)}
+			</uui-ref-list>
+		`;
 	}
 
 	#renderAddButton() {
 		return html`<uui-button
-			id="add-button"
+			id="btn-add"
 			look="placeholder"
 			@click=${this.#addGranularPermission}
 			label=${this.localize.term('general_add')}></uui-button>`;
@@ -232,7 +234,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 
 	static styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 		`,

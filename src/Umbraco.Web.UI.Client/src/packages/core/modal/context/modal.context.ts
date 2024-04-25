@@ -122,7 +122,7 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 	 * @memberof UmbModalContext
 	 */
 	public setValue(value: ModalValue) {
-		this.#value.update(value);
+		this.#value.setValue(value);
 	}
 
 	/**

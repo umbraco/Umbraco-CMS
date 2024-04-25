@@ -116,14 +116,22 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				'_observeIsSorting',
 			);
 		});
-		this.observe(this.#groupStructureHelper.mergedContainers, (groups) => {
-			this._groups = groups;
-			this.#sorter.setModel(this._groups);
-		});
-		this.observe(this.#groupStructureHelper.hasProperties, (hasProperties) => {
-			this._hasProperties = hasProperties;
-			this.requestUpdate('_hasProperties');
-		});
+		this.observe(
+			this.#groupStructureHelper.mergedContainers,
+			(groups) => {
+				this._groups = groups;
+				this.#sorter.setModel(this._groups);
+			},
+			null,
+		);
+		this.observe(
+			this.#groupStructureHelper.hasProperties,
+			(hasProperties) => {
+				this._hasProperties = hasProperties;
+				this.requestUpdate('_hasProperties');
+			},
+			null,
+		);
 	}
 
 	#onAddGroup = () => {

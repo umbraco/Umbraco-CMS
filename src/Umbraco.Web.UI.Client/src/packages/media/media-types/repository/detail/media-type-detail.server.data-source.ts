@@ -9,7 +9,7 @@ import type {
 import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 
 /**
  * A data source for the Media Type that fetches data from the server
@@ -100,7 +100,15 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 					appearance: property.appearance,
 				};
 			}),
-			containers: data.containers as UmbPropertyTypeContainerModel[],
+			containers: data.containers.map((container) => {
+				return {
+					id: container.id,
+					parent: container.parent ? { id: container.parent.id } : null,
+					name: container.name ?? '',
+					type: container.type as UmbPropertyContainerTypes, // TODO: check if the value is valid
+					sortOrder: container.sortOrder,
+				};
+			}),
 			allowedContentTypes: data.allowedMediaTypes.map((allowedMediaType) => {
 				return {
 					contentType: { unique: allowedMediaType.mediaType.id },

@@ -23,16 +23,12 @@ import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
+	type UmbCollectionWorkspaceContext,
+	type UmbPublishableWorkspaceContext,
 	UmbSubmittableWorkspaceContextBase,
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceRouteManager,
 	UmbWorkspaceSplitViewManager,
-} from '@umbraco-cms/backoffice/workspace';
-import type {
-	UmbCollectionWorkspaceContext,
-	UmbVariantDatasetWorkspaceContext,
-	UmbPublishableWorkspaceContext,
-	UmbRoutableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -48,23 +44,25 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import {
 	UmbServerModelValidationContext,
 	UmbVariantValuesValidationMessageTranslator,
 } from '@umbraco-cms/backoffice/validation';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
+import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<EntityType>
 	implements
-		UmbRoutableWorkspaceContext,
-		UmbVariantDatasetWorkspaceContext<UmbDocumentVariantModel>,
+		UmbContentWorkspaceContext<UmbDocumentTypeDetailModel, UmbDocumentVariantModel>,
 		UmbPublishableWorkspaceContext,
 		UmbCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
 {
+	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
+
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 

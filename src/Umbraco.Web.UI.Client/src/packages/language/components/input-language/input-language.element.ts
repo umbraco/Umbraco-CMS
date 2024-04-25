@@ -1,12 +1,30 @@
 import type { UmbLanguageItemModel } from '../../repository/index.js';
 import { UmbLanguagePickerContext } from './input-language.context.js';
-import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-language')
 export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, '') {
+	#sorter = new UmbSorterController<string>(this, {
+		getUniqueOfElement: (element) => {
+			return element.id;
+		},
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry;
+		},
+		identifier: 'Umb.SorterIdentifier.InputLanguage',
+		itemSelector: 'uui-ref-node',
+		containerSelector: 'uui-ref-list',
+		onChange: ({ model }) => {
+			this.selection = model;
+			this.dispatchEvent(new UmbChangeEvent());
+		},
+	});
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -56,8 +74,10 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: Object, attribute: false })
 	public filter: (language: UmbLanguageItemModel) => boolean = () => true;
 
+	@property({ type: Array })
 	public set selection(uniques: Array<string>) {
 		this.#pickerContext.setSelection(uniques);
+		this.#sorter.setModel(uniques);
 	}
 	public get selection(): Array<string> {
 		return this.#pickerContext.getSelection();
@@ -65,7 +85,6 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 
 	@property()
 	public set value(uniques: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selection = splitStringToArray(uniques);
 	}
 	public get value(): string {
@@ -92,8 +111,8 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 	}
 
 	protected getFormElement() {
@@ -106,14 +125,35 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 		});
 	}
 
+	#removeItem(item: UmbLanguageItemModel) {
+		this.#pickerContext.requestRemoveItem(item.unique);
+	}
+
 	render() {
+		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
+	}
+
+	#renderAddButton() {
+		if (this.max > 0 && this.selection.length >= this.max) return nothing;
 		return html`
-			<uui-ref-list> ${this._items.map((item) => this.#renderItem(item))} </uui-ref-list>
 			<uui-button
-				id="add-button"
+				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
-				label=${this.localize.term('general_choose')}></uui-button>
+				label="${this.localize.term('general_choose')}"></uui-button>
+		`;
+	}
+
+	#renderItems() {
+		if (!this._items) return nothing;
+		return html`
+			<uui-ref-list>
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this.#renderItem(item),
+				)}
+			</uui-ref-list>
 		`;
 	}
 
@@ -121,11 +161,9 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 		if (!item.unique) return;
 		return html`
 			<!-- TODO: add language ref element -->
-			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.unique)}>
+			<uui-ref-node name=${item.name} id=${item.unique} detail=${item.unique}>
 				<uui-action-bar slot="actions">
-					<uui-button
-						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
-						label=${this.localize.term('general_remove')}></uui-button>
+					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
@@ -133,7 +171,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 
 	static styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 		`,

@@ -1,22 +1,31 @@
 import type { UmbDocumentTypeItemModel } from '../../repository/index.js';
 import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
-import {
-	css,
-	html,
-	customElement,
-	property,
-	state,
-	ifDefined,
-	repeat,
-	nothing,
-} from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalRouteRegistrationController, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-document-type')
 export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
+	#sorter = new UmbSorterController<string>(this, {
+		getUniqueOfElement: (element) => {
+			return element.id;
+		},
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry;
+		},
+		identifier: 'Umb.SorterIdentifier.InputDocumentType',
+		itemSelector: 'uui-ref-node-document-type',
+		containerSelector: 'uui-ref-list',
+		onChange: ({ model }) => {
+			this.selection = model;
+			this.dispatchEvent(new UmbChangeEvent());
+		},
+	});
+
 	/**
 	 * Limits to only select Element Types
 	 * @type {boolean}
@@ -73,17 +82,17 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
-	public set selection(ids: Array<string> | undefined) {
-		this.#pickerContext.setSelection(ids ?? []);
+	public set selection(uniques: Array<string>) {
+		this.#pickerContext.setSelection(uniques);
+		this.#sorter.setModel(uniques);
 	}
 	public get selection(): Array<string> {
 		return this.#pickerContext.getSelection();
 	}
 
 	@property()
-	public set value(idsString: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selection = splitStringToArray(idsString);
+	public set value(uniques: string) {
+		this.selection = splitStringToArray(uniques);
 	}
 	public get value(): string {
 		return this.selection.join(',');
@@ -93,7 +102,7 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 	private _items?: Array<UmbDocumentTypeItemModel>;
 
 	@state()
-	private _editDocumentTypePath = '';
+	private _editPath = '';
 
 	#pickerContext = new UmbDocumentTypePickerContext(this);
 
@@ -106,7 +115,7 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 				return { data: { entityType: 'document-type', preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this._editDocumentTypePath = routeBuilder({});
+				this._editPath = routeBuilder({});
 			});
 
 		this.addValidator(
@@ -121,8 +130,8 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 	}
 
 	protected getFormElement() {
@@ -130,64 +139,53 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 	}
 
 	#openPicker() {
-		if (this.elementTypesOnly) {
-			this.#pickerContext.openPicker({
-				hideTreeRoot: true,
-				pickableFilter: (x) => x.isElement,
-			});
-		} else {
-			this.#pickerContext.openPicker({
-				hideTreeRoot: true,
-			});
-		}
+		this.#pickerContext.openPicker({
+			hideTreeRoot: true,
+			pickableFilter: this.elementTypesOnly ? (x) => x.isElement : undefined,
+		});
+	}
+
+	#removeItem(item: UmbDocumentTypeItemModel) {
+		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
 	render() {
-		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
-	}
-
-	#renderItems() {
-		if (!this._items) return nothing;
-		return html`
-			<uui-ref-list
-				>${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderItem(item),
-				)}</uui-ref-list
-			>
-		`;
+		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
 	#renderAddButton() {
 		if (this.max > 0 && this.selection.length >= this.max) return nothing;
 		return html`
 			<uui-button
-				id="add-button"
+				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
 				label="${this.localize.term('general_choose')}"></uui-button>
 		`;
 	}
 
+	#renderItems() {
+		if (!this._items) return nothing;
+		return html`
+			<uui-ref-list>
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this.#renderItem(item),
+				)}
+			</uui-ref-list>
+		`;
+	}
+
 	#renderItem(item: UmbDocumentTypeItemModel) {
 		if (!item.unique) return;
+		const href = `${this._editPath}edit/${item.unique}`;
 		return html`
-			<uui-ref-node-document-type name=${ifDefined(item.name)}>
+			<uui-ref-node-document-type name=${item.name} id=${item.unique}>
 				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
-					<uui-button
-						compact
-						href=${this._editDocumentTypePath + 'edit/' + item.unique}
-						label=${this.localize.term('general_edit') + ` ${item.name}`}>
-						<uui-icon name="icon-edit"></uui-icon>
-					</uui-button>
-					<uui-button
-						compact
-						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
-						label="Edit Document Type ${item.name}">
-						<uui-icon name="icon-trash"></uui-icon>
-					</uui-button>
+					<uui-button href=${href} label=${this.localize.term('general_open')}></uui-button>
+					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
 			</uui-ref-node-document-type>
 		`;
@@ -200,7 +198,7 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 
 	static styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 		`,
