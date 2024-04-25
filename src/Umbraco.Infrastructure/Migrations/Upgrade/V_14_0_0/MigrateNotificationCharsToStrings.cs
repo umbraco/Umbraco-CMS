@@ -10,28 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 [Obsolete("Remove in Umbraco 18.")]
 public class MigrateNotificationCharsToStrings : MigrationBase
 {
-    private static Dictionary<string, string> _charToStringPermissionDictionary =
-        new()
-        {
-            ["I"] = ActionAssignDomain.ActionLetter,
-            ["F"] = ActionBrowse.ActionLetter,
-            ["O"] = ActionCopy.ActionLetter,
-            ["ï"] = ActionCreateBlueprintFromContent.ActionLetter,
-            ["D"] = ActionDelete.ActionLetter,
-            ["M"] = ActionMove.ActionLetter,
-            ["C"] = ActionNew.ActionLetter,
-            ["N"] = ActionNotify.ActionLetter,
-            ["P"] = ActionProtect.ActionLetter,
-            ["U"] = ActionPublish.ActionLetter,
-            ["V"] = ActionRestore.ActionLetter,
-            ["R"] = ActionRights.ActionLetter,
-            ["K"] = ActionRollback.ActionLetter,
-            ["S"] = ActionSort.ActionLetter,
-            ["Z"] = ActionUnpublish.ActionLetter,
-            ["A"] = ActionUpdate.ActionLetter,
-        };
-
-    public MigrateNotificationCharsToStrings(IMigrationContext context) : base(context)
+   public MigrateNotificationCharsToStrings(IMigrationContext context) : base(context)
     {
     }
 
@@ -48,7 +27,7 @@ public class MigrateNotificationCharsToStrings : MigrationBase
     private User2NodeNotifyDto ReplaceAction(LegacyUser2NodeNotifyDto dto)
     {
         // Action is non-nullable
-        dto.Action = _charToStringPermissionDictionary.TryGetValue(dto.Action!, out var action) ? action : dto.Action;
+        dto.Action = MigrateCharPermissionsToStrings.CharToStringPermissionDictionary.TryGetValue(dto.Action!.ToCharArray().First(), out var action) ? string.Join(string.Empty, action) : dto.Action;
 
         return new User2NodeNotifyDto
         {
@@ -72,10 +51,10 @@ public class MigrateNotificationCharsToStrings : MigrationBase
         [Column("nodeId")]
         [ForeignKey(typeof(NodeDto))]
         public int NodeId { get; set; }
-
         [Column("action")]
         [SpecialDbType(SpecialDbTypes.NCHAR)]
         [Length(1)]
+
         public string? Action { get; set; }
     }
 }
