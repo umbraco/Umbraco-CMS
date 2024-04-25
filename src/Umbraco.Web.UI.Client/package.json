@@ -70,6 +70,7 @@
 		"./resources": "./dist-cms/packages/core/resources/index.js",
 		"./router": "./dist-cms/packages/core/router/index.js",
 		"./section": "./dist-cms/packages/core/section/index.js",
+		"./settings": "./dist-cms/packages/settings/index.js",
 		"./server-file-system": "./dist-cms/packages/core/server-file-system/index.js",
 		"./sorter": "./dist-cms/packages/core/sorter/index.js",
 		"./static-file": "./dist-cms/packages/static-file/index.js",
