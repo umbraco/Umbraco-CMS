@@ -63,7 +63,9 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 			.onSubmit()
 			.catch(() => undefined);
 
-		this._workspaceContext?.setPropertyEditorUiAlias(value?.selection[0]);
+		if (value) {
+			this._workspaceContext?.setPropertyEditorUiAlias(value.selection[0]);
+		}
 	}
 
 	render() {
