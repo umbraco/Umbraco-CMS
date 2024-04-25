@@ -120,18 +120,18 @@ export class UmbContentTypeStructureManager<
 	 */
 	public async create(parentUnique: string | null) {
 		const contentType = this.getOwnerContentType();
-		if (!contentType || !contentType.unique) return false;
+		if (!contentType || !contentType.unique) {
+			throw new Error('Could not find the Content Type to create');
+		}
 
 		const { data } = await this.#repository.create(contentType, parentUnique);
-		if (!data) return false;
+		if (!data) return Promise.reject();
 
 		// Update state with latest version:
 		this.#contentTypes.updateOne(contentType.unique, data);
 
 		// Start observe the new content type in the store, as we did not do that when it was a scaffold/local-version.
 		this._observeContentType(data);
-
-		return true;
 	}
 
 	private async _loadContentTypeCompositions(contentType: T) {
