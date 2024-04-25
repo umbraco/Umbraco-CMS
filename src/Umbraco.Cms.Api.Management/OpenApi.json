@@ -34953,14 +34953,10 @@
           "allowNonExistingSegmentsCreation",
           "disableDeleteWhenReferenced",
           "disableUnpublishWhenReferenced",
-          "reservedFieldNames",
-          "sanitizeTinyMce"
+          "reservedFieldNames"
         ],
         "type": "object",
         "properties": {
-          "sanitizeTinyMce": {
-            "type": "boolean"
-          },
           "disableDeleteWhenReferenced": {
             "type": "boolean"
           },
@@ -37008,8 +37004,7 @@
         "required": [
           "disableDeleteWhenReferenced",
           "disableUnpublishWhenReferenced",
-          "reservedFieldNames",
-          "sanitizeTinyMce"
+          "reservedFieldNames"
         ],
         "type": "object",
         "properties": {
@@ -37017,9 +37012,6 @@
             "type": "boolean"
           },
           "disableUnpublishWhenReferenced": {
-            "type": "boolean"
-          },
-          "sanitizeTinyMce": {
             "type": "boolean"
           },
           "reservedFieldNames": {
