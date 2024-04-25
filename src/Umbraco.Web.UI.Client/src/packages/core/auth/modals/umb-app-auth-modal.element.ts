@@ -62,10 +62,10 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 					<div id="content">
 						<header id="header">
 							<h1 id="greeting">${this.headline}</h1>
-							${this.data?.userLoginState === 'timedOut'
-								? html`<p style="margin-top:0">${this.localize.term('login_timeout')}</p>`
-								: ''}
 						</header>
+						${this.data?.userLoginState === 'timedOut'
+							? html`<p style="margin-top:0">${this.localize.term('login_timeout')}</p>`
+							: ''}
 						<umb-extension-slot
 							id="providers"
 							type="authProvider"
