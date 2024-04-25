@@ -30,9 +30,9 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	});
 
 	@property({ type: Array })
-	public set value(value: Array<UmbCollectionColumnConfiguration>) {
-		this.#value = value;
-		this.#sorter.setModel(value);
+	public set value(value: Array<UmbCollectionColumnConfiguration> | undefined) {
+		this.#value = value ?? [];
+		this.#sorter.setModel(this.#value);
 	}
 	public get value(): Array<UmbCollectionColumnConfiguration> {
 		return this.#value;
@@ -92,7 +92,10 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	}
 
 	render() {
-		return html`${this.#renderColumns()} ${this.#renderInput()}`;
+		return html`
+			<div id="layout-wrapper">${this.#renderColumns()}</div>
+			${this.#renderInput()}
+		`;
 	}
 
 	#renderInput() {
@@ -106,15 +109,11 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 
 	#renderColumns() {
 		if (!this.value) return nothing;
-		return html`
-			<div id="layout-wrapper">
-				${repeat(
-					this.value,
-					(column) => column.alias,
-					(column) => this.#renderColumn(column),
-				)}
-			</div>
-		`;
+		return repeat(
+			this.value,
+			(column) => column.alias,
+			(column) => this.#renderColumn(column),
+		);
 	}
 
 	#renderColumn(column: UmbCollectionColumnConfiguration) {
