@@ -65,6 +65,21 @@ export interface MetaAuthProvider {
 		 * @default false
 		 */
 		autoRedirect?: boolean;
+
+		/**
+		 * The target of the popup that is opened when the user logs in.
+		 * @default 'umbracoAuthPopup'
+		 * @remarks This is the name of the window that is opened when the user logs in, use `_blank` to open in a new tab.
+		 */
+		popupTarget?: string;
+
+		/**
+		 * The features of the popup that is opened when the user logs in.
+		 * @default 'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no'
+		 * @remarks This is the features of the window that is opened when the user logs in.
+		 * @seehref https://developer.mozilla.org/en-US/docs/Web/API/Window/open#features
+		 */
+		popupFeatures?: string;
 	};
 
 	/**

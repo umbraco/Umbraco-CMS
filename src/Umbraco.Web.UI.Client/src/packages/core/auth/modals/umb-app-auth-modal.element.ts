@@ -1,6 +1,8 @@
+import type { ManifestAuthProvider } from '../../extension-registry/models/auth-provider.model.js';
 import { UmbModalBaseElement } from '../../modal/index.js';
 import { UmbTextStyles } from '../../style/text-style.style.js';
 import { UMB_AUTH_CONTEXT } from '../auth.context.token.js';
+import type { UmbAuthProviderDefaultProps } from '../types.js';
 import type { UmbModalAppAuthConfig, UmbModalAppAuthValue } from './umb-app-auth-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 
@@ -9,7 +11,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 	@state()
 	private _error?: string;
 
-	get props() {
+	get props(): UmbAuthProviderDefaultProps {
 		return {
 			userLoginState: this.data?.userLoginState ?? 'loggingIn',
 			onSubmit: this.onSubmit.bind(this),
@@ -49,9 +51,12 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		`;
 	}
 
-	private onSubmit = async (providerName: string, loginHint?: string) => {
+	private onSubmit = async (providerOrManifest: string | ManifestAuthProvider, loginHint?: string) => {
 		const authContext = await this.getContext(UMB_AUTH_CONTEXT);
-		await authContext.makeAuthorizationRequest(providerName, false, loginHint);
+		const manifest = typeof providerOrManifest === 'string' ? undefined : providerOrManifest;
+		const providerName =
+			typeof providerOrManifest === 'string' ? providerOrManifest : providerOrManifest.forProviderName;
+		await authContext.makeAuthorizationRequest(providerName, false, loginHint, manifest);
 
 		const isAuthed = authContext.getIsAuthorized();
 		this.value = { success: isAuthed };

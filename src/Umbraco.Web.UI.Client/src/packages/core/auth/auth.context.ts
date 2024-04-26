@@ -87,23 +87,29 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	/**
 	 * Initiates the login flow.
 	 * @param identityProvider The provider to use for login. Default is 'Umbraco'.
+	 * @param redirect If true, the user will be redirected to the login page.
 	 * @param usernameHint The username hint to use for login.
+	 * @param manifest The manifest for the registered provider.
 	 */
-	async makeAuthorizationRequest(identityProvider = 'Umbraco', redirect?: boolean, usernameHint?: string) {
+	async makeAuthorizationRequest(
+		identityProvider = 'Umbraco',
+		redirect?: boolean,
+		usernameHint?: string,
+		manifest?: ManifestAuthProvider,
+	) {
 		const redirectUrl = await this.#authFlow.makeAuthorizationRequest(identityProvider, usernameHint);
 		if (redirect) {
 			location.href = redirectUrl;
 			return;
 		}
 
-		const popupTarget = 'umbracoAuthPopup';
+		const popupTarget = manifest?.meta?.behavior?.popupTarget ?? 'umbracoAuthPopup';
+		const popupFeatures =
+			manifest?.meta?.behavior?.popupFeatures ??
+			'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no';
 
 		if (!this.#authWindowProxy || this.#authWindowProxy.closed) {
-			this.#authWindowProxy = window.open(
-				redirectUrl,
-				popupTarget,
-				'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no',
-			);
+			this.#authWindowProxy = window.open(redirectUrl, popupTarget, popupFeatures);
 		} else if (this.#previousAuthUrl !== redirectUrl) {
 			this.#authWindowProxy = window.open(redirectUrl, popupTarget);
 			this.#authWindowProxy?.focus();
