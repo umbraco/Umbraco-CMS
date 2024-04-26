@@ -81,7 +81,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 					<div slot="editor">
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
 						<umb-input-document-type
-							element-types-only
+							.documentTypesOnly=${true}
 							.selection=${this._allowedContentTypeUniques ?? []}
 							@change="${(e: CustomEvent) => {
 								const sortedContentTypesList: Array<UmbContentTypeSortModel> = (
