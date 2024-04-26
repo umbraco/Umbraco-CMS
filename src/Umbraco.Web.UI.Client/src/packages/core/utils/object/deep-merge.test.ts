@@ -53,7 +53,7 @@ describe('UmbDeepMerge', () => {
 			const result = umbDeepMerge(source, defaults);
 
 			expect(result.prop1.name).to.equal('prop1_updatedName');
-			expect(result.prop2.value.join(',')).to.equal(defaults.prop1.value.join(','));
+			expect(result.prop1.value.join(',')).to.equal(defaults.prop1.value.join(','));
 			expect(result.prop2.name).to.equal('prop2_updatedName');
 			expect(result.prop2.value.join(',')).to.equal(source.prop2.value.join(','));
 		});
