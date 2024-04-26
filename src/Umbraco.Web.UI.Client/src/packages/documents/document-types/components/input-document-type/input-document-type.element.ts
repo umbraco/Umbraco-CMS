@@ -1,4 +1,5 @@
 import type { UmbDocumentTypeItemModel } from '../../repository/index.js';
+import { UMB_DOCUMENT_TYPE_WORKSPACE_MODAL } from '../../workspace/document-type-workspace.modal-token.js';
 import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -7,7 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_DOCUMENT_TYPE_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-input-document-type')
 export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
