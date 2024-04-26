@@ -18,7 +18,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 
 			// Observe the user's authorization state and start the authorization flow if the user is not authorized
 			this.observe(
-				context.isTimeout,
+				context.timeoutSignal,
 				() => {
 					this.#firstTimeLoggingIn = false;
 					this.makeAuthorizationRequest('timedOut');

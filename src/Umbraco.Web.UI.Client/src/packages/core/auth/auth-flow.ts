@@ -97,6 +97,10 @@ export class UmbAuthFlow {
 	// tokens
 	#tokenResponse?: TokenResponse;
 
+	/**
+	 * This signal will emit when the authorization flow is complete.
+	 * @remark It will also emit if there is an error during the authorization flow.
+	 */
 	authorizationSignal = new Subject<void>();
 
 	constructor(

@@ -10,33 +10,13 @@ import { ReplaySubject, Subject, firstValueFrom, switchMap } from '@umbraco-cms/
 
 export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
-
-	/**
-	 * Observable that emits true if the user is authorized, otherwise false.
-	 * @remark It will only emit when the authorization state changes.
-	 */
-	readonly isAuthorized = this.#isAuthorized.asObservable();
-
 	// Timeout is different from `isAuthorized` because it can occur repeatedly
 	#isTimeout = new Subject<void>();
-
-	/**
-	 * Observable that emits when the user has timed out, i.e. the token has expired.
-	 * This can be used to show a timeout message to the user.
-	 * @remark It can emit multiple times if more than one request is made after the token has expired.
-	 */
-	readonly isTimeout = this.#isTimeout.asObservable();
-
 	/**
 	 * Observable that emits true when the auth context is initialized.
 	 * @remark It will only emit once and then complete itself.
 	 */
 	#isInitialized = new ReplaySubject<void>(1);
-
-	get authorizationSignal() {
-		return this.#authFlow.authorizationSignal;
-	}
-
 	#isBypassed = false;
 	#serverUrl;
 	#backofficePath;
@@ -44,6 +24,26 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 
 	#authWindowProxy?: WindowProxy | null;
 	#previousAuthUrl?: string;
+
+	/**
+	 * Observable that emits true if the user is authorized, otherwise false.
+	 * @remark It will only emit when the authorization state changes.
+	 */
+	readonly isAuthorized = this.#isAuthorized.asObservable();
+
+	/**
+	 * Observable that acts as a signal and emits when the user has timed out, i.e. the token has expired.
+	 * This can be used to show a timeout message to the user.
+	 * @remark It can emit multiple times if more than one request is made after the token has expired.
+	 */
+	readonly timeoutSignal = this.#isTimeout.asObservable();
+
+	/**
+	 * Observable that acts as a signal for when the authorization state changes.
+	 */
+	get authorizationSignal() {
+		return this.#authFlow.authorizationSignal;
+	}
 
 	constructor(host: UmbControllerHost, serverUrl: string, backofficePath: string, isBypassed: boolean) {
 		super(host, UMB_AUTH_CONTEXT);
