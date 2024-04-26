@@ -49,9 +49,9 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		`;
 	}
 
-	private onSubmit = async (providerName: string) => {
+	private onSubmit = async (providerName: string, loginHint?: string) => {
 		const authContext = await this.getContext(UMB_AUTH_CONTEXT);
-		await authContext.makeAuthorizationRequest(providerName);
+		await authContext.makeAuthorizationRequest(providerName, false, loginHint);
 
 		const isAuthed = authContext.getIsAuthorized();
 		this.value = { success: isAuthed };
