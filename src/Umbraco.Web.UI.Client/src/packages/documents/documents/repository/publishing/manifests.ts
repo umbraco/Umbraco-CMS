@@ -1,5 +1,5 @@
 import { UmbDocumentPublishingRepository } from './document-publishing.repository.js';
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_PUBLISHING_REPOSITORY_ALIAS = 'Umb.Repository.Document.Publishing';
 
@@ -10,4 +10,4 @@ const publishingRepository: ManifestRepository = {
 	api: UmbDocumentPublishingRepository,
 };
 
-export const manifests = [publishingRepository];
+export const manifests: Array<ManifestTypes> = [publishingRepository];

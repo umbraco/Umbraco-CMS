@@ -15,6 +15,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 @customElement('umb-media-workspace-view-info-history')
 export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
@@ -33,9 +34,16 @@ export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	@state()
 	private _currentPage = 1;
 
+	@state()
+	private _serverUrl = '';
+
 	constructor() {
 		super();
 		this.#logRepository = new UmbAuditLogRepository(this);
+
+		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
+			this._serverUrl = instance.getServerUrl();
+		});
 	}
 
 	protected firstUpdated(): void {
@@ -104,12 +112,16 @@ export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
 						(item) => item.timestamp,
 						(item) => {
 							const { text, style } = HistoryTagStyleAndText(item.logType);
+							const avatar = Array.isArray(item.userAvatars) ? item.userAvatars[1] : undefined;
+							// TODO: we need to get the absolute url for the avatars from the server
+							const avatarUrl = avatar ? `${this._serverUrl}${avatar}` : undefined;
 							return html`<umb-history-item
 								.name=${item.userName ?? 'Unknown'}
-								src=${ifDefined(
-									Array.isArray(item.userAvatars) ? item.userAvatars[item.userAvatars.length - 1] : undefined,
-								)}
 								detail=${this.localize.date(item.timestamp, TimeOptions)}>
+								<uui-avatar
+									slot="avatar"
+									.name="${item.userName ?? 'Unknown'}"
+									img-src=${ifDefined(avatarUrl)}></uui-avatar>
 								<span class="log-type">
 									<uui-tag look=${style.look} color=${style.color}> ${this.localize.term(text.label)} </uui-tag>
 									${this.localize.term(text.desc, item.parameters)}

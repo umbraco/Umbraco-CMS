@@ -3,7 +3,7 @@ import { UMB_USER_GROUP_ENTITY_TYPE } from '../entity.js';
 import { UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UmbDeleteUserGroupEntityBulkAction } from './delete/delete.action.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityBulkAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityBulkAction> = [
 	{
@@ -25,4 +25,4 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 	},
 ];
 
-export const manifests = [...entityActions];
+export const manifests: Array<ManifestTypes> = [...entityActions];

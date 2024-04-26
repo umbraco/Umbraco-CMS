@@ -1,6 +1,5 @@
 import type { UmbTemporaryFileModel } from '../../temporary-file/temporary-file-manager.class.js';
 import { UmbTemporaryFileManager } from '../../temporary-file/temporary-file-manager.class.js';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '../../property/property-dataset/property-dataset-context.token.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	css,
@@ -49,20 +48,19 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 		this.#setExtensions(value);
 	}
 	get fileExtensions(): Array<string> | undefined {
-		return this.extensions;
+		return this._extensions;
 	}
 
 	/**
 	 * @description Allows the user to upload multiple files.
-	 * @type {Boolean}
 	 * @default false
 	 * @attr
 	 */
 	@property({ type: Boolean })
-	multiple = false;
+	public multiple = false;
 
 	@state()
-	_files: Array<{
+	private _files: Array<{
 		path: string;
 		unique: string;
 		queueItem?: UmbTemporaryFileModel;
@@ -70,7 +68,7 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 	}> = [];
 
 	@state()
-	extensions?: string[];
+	private _extensions?: string[];
 
 	@query('#dropzone')
 	private _dropzone?: UUIFileDropzoneElement;
@@ -124,8 +122,13 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 	}
 
 	#setExtensions(value: Array<string>) {
+		if (!value) {
+			this._extensions = undefined;
+			return;
+		}
+
 		// TODO: The dropzone uui component does not support file extensions without a dot. Remove this when it does.
-		this.extensions = value.map((extension) => {
+		this._extensions = value?.map((extension) => {
 			return `.${extension}`;
 		});
 	}
@@ -198,7 +201,7 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 				id="dropzone"
 				label="dropzone"
 				@change="${this.#onUpload}"
-				accept="${ifDefined(this.extensions?.join(', '))}"
+				accept="${ifDefined(this._extensions?.join(', '))}"
 				?multiple="${this.multiple}">
 				<uui-button label=${this.localize.term('media_clickToUpload')} @click="${this.#handleBrowse}"></uui-button>
 			</uui-file-dropzone>
@@ -272,9 +275,11 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 	}
 
 	#handleRemove() {
-		this._files = [];
 		const uniques = this._files.map((file) => file.unique);
 		this.#manager.remove(uniques);
+		this._files = [];
+		this.value = '';
+		this.keys = [];
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
