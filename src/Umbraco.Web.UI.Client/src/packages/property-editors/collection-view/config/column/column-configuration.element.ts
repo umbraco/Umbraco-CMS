@@ -1,5 +1,5 @@
 import type { UmbCollectionColumnConfiguration } from '../../../../core/collection/types.js';
-import type { UmbInputContentTypePropertyElement } from './components/input-content-type-property/index.js';
+import type { UmbInputCollectionContentTypePropertyElement } from './components/input-collection-content-type-property/index.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -10,7 +10,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 // import of local components
-import './components/input-content-type-property/index.js';
+import './components/input-collection-content-type-property/index.js';
 
 /**
  * @element umb-property-editor-ui-collection-view-column-configuration
@@ -46,10 +46,10 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	public config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	private _field?: UmbInputContentTypePropertyElement['selectedProperty'];
+	private _field?: UmbInputCollectionContentTypePropertyElement['selectedProperty'];
 
 	#onAdd(e: CustomEvent) {
-		const element = e.target as UmbInputContentTypePropertyElement;
+		const element = e.target as UmbInputCollectionContentTypePropertyElement;
 
 		if (!element.selectedProperty) return;
 
@@ -100,10 +100,10 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 
 	#renderInput() {
 		return html`
-			<umb-input-content-type-property
+			<umb-input-collection-content-type-property
 				document-types
 				media-types
-				@change=${this.#onAdd}></umb-input-content-type-property>
+				@change=${this.#onAdd}></umb-input-collection-content-type-property>
 		`;
 	}
 

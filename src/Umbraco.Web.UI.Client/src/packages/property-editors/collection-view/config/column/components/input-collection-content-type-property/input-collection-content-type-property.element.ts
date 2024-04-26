@@ -31,8 +31,8 @@ type UmbInputContentTypePropertyConfiguration = {
 	memberTypes: UmbInputContentTypePropertyConfigurationItem;
 };
 
-@customElement('umb-input-content-type-property')
-export class UmbInputContentTypePropertyElement extends UUIFormControlMixin(UmbLitElement, undefined) {
+@customElement('umb-input-collection-content-type-property')
+export class UmbInputCollectionContentTypePropertyElement extends UUIFormControlMixin(UmbLitElement, undefined) {
 	#configuration: UmbInputContentTypePropertyConfiguration = {
 		documentTypes: {
 			item: {
@@ -337,10 +337,10 @@ export class UmbInputContentTypePropertyElement extends UUIFormControlMixin(UmbL
 	];
 }
 
-export default UmbInputContentTypePropertyElement;
+export default UmbInputCollectionContentTypePropertyElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-content-type-property': UmbInputContentTypePropertyElement;
+		'umb-input-collection-content-type-property': UmbInputCollectionContentTypePropertyElement;
 	}
 }
