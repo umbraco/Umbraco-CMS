@@ -7,6 +7,7 @@ import {
 	type UmbAllowedMediaTypeModel,
 	UmbMediaTypeStructureRepository,
 	getMediaTypeByFileMimeType,
+	UmbMediaTypeFileType,
 } from '@umbraco-cms/backoffice/media-type';
 import {
 	UmbTemporaryFileManager,
@@ -101,6 +102,7 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 
 		for (const upload of uploads) {
 			const mediaType = this.#getMediaTypeFromMime(upload.file.type);
+			const value = mediaType.unique === UmbMediaTypeFileType.IMAGE ? { src: upload.unique } : upload.unique;
 
 			const preset: Partial<UmbMediaDetailModel> = {
 				mediaType: {
@@ -120,7 +122,7 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 					? [
 							{
 								alias: 'umbracoFile',
-								value: { src: upload.unique },
+								value,
 								culture: null,
 								segment: null,
 							},
