@@ -6,18 +6,32 @@ import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { ReplaySubject, Subject, filter, firstValueFrom, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
+import { ReplaySubject, Subject, firstValueFrom, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
+
+	/**
+	 * Observable that emits true if the user is authorized, otherwise false.
+	 * @remark It will only emit when the authorization state changes.
+	 */
 	readonly isAuthorized = this.#isAuthorized.asObservable();
 
 	// Timeout is different from `isAuthorized` because it can occur repeatedly
 	#isTimeout = new Subject<void>();
+
+	/**
+	 * Observable that emits when the user has timed out, i.e. the token has expired.
+	 * This can be used to show a timeout message to the user.
+	 * @remark It can emit multiple times if more than one request is made after the token has expired.
+	 */
 	readonly isTimeout = this.#isTimeout.asObservable();
 
-	#isInitialized = new ReplaySubject<boolean>(1);
-	readonly isInitialized = this.#isInitialized.asObservable().pipe(filter((isInitialized) => isInitialized));
+	/**
+	 * Observable that emits true when the auth context is initialized.
+	 * @remark It will only emit once and then complete itself.
+	 */
+	#isInitialized = new ReplaySubject<void>(1);
 
 	get authorizationSignal() {
 		return this.#authFlow.authorizationSignal;
@@ -223,11 +237,12 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	}
 
 	setInitialized() {
-		this.#isInitialized.next(true);
+		this.#isInitialized.next();
+		this.#isInitialized.complete();
 	}
 
 	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
-		return this.isInitialized.pipe(
+		return this.#isInitialized.pipe(
 			switchMap(() => extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider')),
 		);
 	}
