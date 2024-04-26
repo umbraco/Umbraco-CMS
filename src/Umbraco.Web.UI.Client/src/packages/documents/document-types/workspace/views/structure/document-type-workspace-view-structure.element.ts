@@ -102,7 +102,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 					<div slot="editor">
 						<umb-input-collection-configuration
 							default-value="c0808dd3-8133-4e4b-8ce8-e2bea84a96a4"
-							.value=${this._collection ?? ''}
+							.value=${this._collection ?? undefined}
 							@change=${(e: CustomEvent) => {
 								const unique = (e.target as UmbInputCollectionConfigurationElement).value as string;
 								this.#workspaceContext?.setCollection({ unique });

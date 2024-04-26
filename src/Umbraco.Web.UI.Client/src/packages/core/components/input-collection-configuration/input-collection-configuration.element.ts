@@ -10,7 +10,7 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/mod
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-collection-configuration')
-export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(UmbLitElement, '') {
+export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
