@@ -52,18 +52,28 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 	}
 
 	private onSubmit = async (providerOrManifest: string | ManifestAuthProvider, loginHint?: string) => {
-		const authContext = await this.getContext(UMB_AUTH_CONTEXT);
-		const manifest = typeof providerOrManifest === 'string' ? undefined : providerOrManifest;
-		const providerName =
-			typeof providerOrManifest === 'string' ? providerOrManifest : providerOrManifest.forProviderName;
-		await authContext.makeAuthorizationRequest(providerName, false, loginHint, manifest);
+		try {
+			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
+			if (!authContext) {
+				throw new Error('Auth context not available');
+			}
 
-		const isAuthed = authContext.getIsAuthorized();
-		this.value = { success: isAuthed };
-		if (isAuthed) {
-			this._submitModal();
-		} else {
-			this._error = 'Failed to authenticate';
+			const manifest = typeof providerOrManifest === 'string' ? undefined : providerOrManifest;
+			const providerName =
+				typeof providerOrManifest === 'string' ? providerOrManifest : providerOrManifest.forProviderName;
+
+			await authContext.makeAuthorizationRequest(providerName, false, loginHint, manifest);
+
+			const isAuthed = authContext.getIsAuthorized();
+			this.value = { success: isAuthed };
+			if (isAuthed) {
+				this._submitModal();
+			} else {
+				this._error = 'Failed to authenticate';
+			}
+		} catch (error) {
+			console.error('[AuthModal] Error submitting auth request', error);
+			this._error = error instanceof Error ? error.message : 'Unknown error (see console)';
 		}
 	};
 
