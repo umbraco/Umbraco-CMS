@@ -1,13 +1,16 @@
 import type { UmbCollectionColumnConfiguration } from '../../../../core/collection/types.js';
+import type { UmbInputContentTypePropertyElement } from './components/input-content-type-property/index.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbInputContentTypePropertyElement } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+
+// import of local components
+import './components/input-content-type-property/index.js';
 
 /**
  * @element umb-property-editor-ui-collection-view-column-configuration
