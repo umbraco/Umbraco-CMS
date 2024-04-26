@@ -74,7 +74,6 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	}
 
 	async #onStorageEvent(evt: StorageEvent) {
-		console.log('[AuthContext] Storage event', evt);
 		if (evt.key === UMB_STORAGE_TOKEN_RESPONSE_NAME) {
 			// Close any open auth windows
 			this.#authWindowProxy?.close();
