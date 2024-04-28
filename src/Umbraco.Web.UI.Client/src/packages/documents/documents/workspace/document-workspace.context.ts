@@ -93,6 +93,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
+	readonly isTrashed = this.#currentData.asObservablePart((data) => data?.isTrashed);
 
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
