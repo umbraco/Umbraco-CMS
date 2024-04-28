@@ -1,20 +1,31 @@
 import { UmbSectionSidebarContext } from './section-sidebar.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-section-sidebar')
 export class UmbSectionSidebarElement extends UmbLitElement {
+	@state()
+	private _isOpen = false;
+
 	#sectionSidebarContext = new UmbSectionSidebarContext(this);
 
+	constructor() {
+		super();
+
+		this.observe(this.#sectionSidebarContext.contextMenuIsOpen, (value) => {
+			this._isOpen = value;
+		});
+	}
+
 	render() {
-		return html`
-			<umb-section-sidebar-context-menu>
-				<uui-scroll-container id="scroll-container">
-					<slot></slot>
-				</uui-scroll-container>
-			</umb-section-sidebar-context-menu>
-		`;
+		return this._isOpen
+			? html` <umb-section-sidebar-context-menu> ${this.#renderScrollContainer()} </umb-section-sidebar-context-menu> `
+			: this.#renderScrollContainer();
+	}
+
+	#renderScrollContainer() {
+		return html` <uui-scroll-container id="scroll-container"> <slot></slot> </uui-scroll-container> `;
 	}
 
 	static styles = [
