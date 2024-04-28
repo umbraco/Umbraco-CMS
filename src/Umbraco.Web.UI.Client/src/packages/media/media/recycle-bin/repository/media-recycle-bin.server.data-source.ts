@@ -16,7 +16,7 @@ export class UmbMediaRecycleBinServerDataSource implements UmbRecycleBinDataSour
 	}
 
 	trash(args: UmbRecycleBinTrashRequestArgs) {
-		return tryExecuteAndNotify(this.#host, MediaService.deleteRecycleBinMediaById({ id: args.unique }));
+		return tryExecuteAndNotify(this.#host, MediaService.putMediaByIdMoveToRecycleBin({ id: args.unique }));
 	}
 
 	restore(args: UmbRecycleBinRestoreRequestArgs) {

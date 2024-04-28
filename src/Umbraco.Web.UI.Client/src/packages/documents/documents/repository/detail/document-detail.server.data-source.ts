@@ -199,6 +199,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdMoveToRecycleBin({ id: unique }));
+		return tryExecuteAndNotify(this.#host, DocumentService.deleteDocumentById({ id: unique }));
 	}
 }

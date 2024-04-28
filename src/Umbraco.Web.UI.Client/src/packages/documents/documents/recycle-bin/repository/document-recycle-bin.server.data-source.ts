@@ -16,7 +16,7 @@ export class UmbDocumentRecycleBinServerDataSource implements UmbRecycleBinDataS
 	}
 
 	trash(args: UmbRecycleBinTrashRequestArgs) {
-		return tryExecuteAndNotify(this.#host, DocumentService.deleteDocumentById({ id: args.unique }));
+		return tryExecuteAndNotify(this.#host, DocumentService.putDocumentByIdMoveToRecycleBin({ id: args.unique }));
 	}
 
 	restore(args: UmbRecycleBinRestoreRequestArgs) {

@@ -175,6 +175,6 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 		if (!unique) throw new Error('Unique is missing');
 
 		// TODO: update to delete when implemented
-		return tryExecuteAndNotify(this.#host, MediaService.putMediaByIdMoveToRecycleBin({ id: unique }));
+		return tryExecuteAndNotify(this.#host, MediaService.deleteMediaById({ id: unique }));
 	}
 }
