@@ -174,7 +174,6 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		// TODO: update to delete when implemented
 		return tryExecuteAndNotify(this.#host, MediaService.deleteMediaById({ id: unique }));
 	}
 }
