@@ -45,7 +45,7 @@ export class UmbSectionSidebarContext extends UmbContextBase<UmbSectionSidebarCo
 		this.#contextElement = undefined;
 	}
 
-	get contextElement() {
+	getContextElement() {
 		return this.#contextElement;
 	}
 }
