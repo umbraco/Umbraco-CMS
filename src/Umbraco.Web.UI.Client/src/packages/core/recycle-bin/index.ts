@@ -12,3 +12,6 @@ export type {
 	UmbRecycleBinTrashRequestArgs,
 	UmbRecycleBinOriginalParentRequestArgs,
 } from './types.js';
+
+export type { IUmbIsTrashedContext } from './contexts/is-trashed/index.js';
+export { UmbIsTrashedContext, UMB_IS_TRASHED_CONTEXT } from './contexts/is-trashed/index.js';
