@@ -180,7 +180,11 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			throw new Error('Could not request children, tree item is not set');
 		}
 
-		this.#sectionSidebarContext?.toggleContextMenu(this.entityType, this.unique, this.getTreeItem()?.name || '');
+		this.#sectionSidebarContext?.toggleContextMenu(this, {
+			entityType: this.entityType,
+			unique: this.unique,
+			headline: this.getTreeItem()?.name || '',
+		});
 	}
 
 	public select() {
