@@ -33,6 +33,9 @@ const entityActions: Array<ManifestEntityAction> = [
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
 			},
+			{
+				alias: 'Umb.Condition.IsTrashed',
+			},
 		],
 	},
 	{
