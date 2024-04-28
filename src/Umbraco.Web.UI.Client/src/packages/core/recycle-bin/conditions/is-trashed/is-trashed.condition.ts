@@ -1,3 +1,4 @@
+import { UMB_IS_TRASHED_CONTEXT } from '../../contexts/is-trashed/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbConditionConfigBase,
@@ -9,8 +10,12 @@ import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 export class UmbIsTrashedCondition extends UmbConditionBase<UmbConditionConfigBase> implements UmbExtensionCondition {
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbConditionConfigBase>) {
 		super(host, args);
-		console.log('UmbIsTrashedCondition');
-		this.permitted = true;
+
+		this.consumeContext(UMB_IS_TRASHED_CONTEXT, (context) => {
+			this.observe(context.isTrashed, (isTrashed) => {
+				this.permitted = isTrashed === true;
+			});
+		});
 	}
 }
 
