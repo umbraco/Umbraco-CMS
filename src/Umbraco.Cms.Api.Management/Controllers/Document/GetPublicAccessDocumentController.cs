@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.ViewModels.PublicAccess;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
@@ -35,6 +34,7 @@ public class GetPublicAccessDocumentController : DocumentControllerBase
 
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}/public-access")]
+    [ProducesResponseType(typeof(PublicAccessResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPublicAccess(CancellationToken cancellationToken, Guid id)
     {
@@ -51,14 +51,9 @@ public class GetPublicAccessDocumentController : DocumentControllerBase
         Attempt<PublicAccessEntry?, PublicAccessOperationStatus> accessAttempt =
             await _publicAccessService.GetEntryByContentKeyAsync(id);
 
-        if (accessAttempt.Success is false)
+        if (accessAttempt.Success is false || accessAttempt.Result is null)
         {
             return PublicAccessOperationStatusResult(accessAttempt.Status);
-        }
-
-        if (accessAttempt.Result is null)
-        {
-            return Ok();
         }
 
         Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus> responseModelAttempt =

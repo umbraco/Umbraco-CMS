@@ -17,8 +17,8 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services;
 /// </summary>
 public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 {
-    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
-    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+    private ConnectionStrings _connectionStrings;
+    private GlobalSettings _globalSettings;
     private readonly ILogger<SqlServerDistributedLockingMechanism> _logger;
     private readonly Lazy<IScopeAccessor> _scopeAccessor; // Hooray it's a circular dependency.
 
@@ -33,25 +33,28 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
     {
         _logger = logger;
         _scopeAccessor = scopeAccessor;
-        _globalSettings = globalSettings;
-        _connectionStrings = connectionStrings;
+        _globalSettings = globalSettings.CurrentValue;
+        _connectionStrings = connectionStrings.CurrentValue;
+        globalSettings.OnChange(x => _globalSettings = x);
+        connectionStrings.OnChange(x => _connectionStrings = x);
+
     }
 
     /// <inheritdoc />
-    public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
-                           string.Equals(_connectionStrings.CurrentValue.ProviderName,Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase);
+    public bool Enabled => _connectionStrings.IsConnectionStringConfigured() &&
+                           string.Equals(_connectionStrings.ProviderName,Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase);
 
     /// <inheritdoc />
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)
     {
-        obtainLockTimeout ??= _globalSettings.CurrentValue.DistributedLockingReadLockDefaultTimeout;
+        obtainLockTimeout ??= _globalSettings.DistributedLockingReadLockDefaultTimeout;
         return new SqlServerDistributedLock(this, lockId, DistributedLockType.ReadLock, obtainLockTimeout.Value);
     }
 
     /// <inheritdoc />
     public IDistributedLock WriteLock(int lockId, TimeSpan? obtainLockTimeout = null)
     {
-        obtainLockTimeout ??= _globalSettings.CurrentValue.DistributedLockingWriteLockDefaultTimeout;
+        obtainLockTimeout ??= _globalSettings.DistributedLockingWriteLockDefaultTimeout;
         return new SqlServerDistributedLock(this, lockId, DistributedLockType.WriteLock, obtainLockTimeout.Value);
     }
 

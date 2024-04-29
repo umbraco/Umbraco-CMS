@@ -78,7 +78,6 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<WebRoutingSettings>()
             .AddUmbracoOptions<UmbracoPluginSettings>()
             .AddUmbracoOptions<UnattendedSettings>()
-            .AddUmbracoOptions<RichTextEditorSettings>()
             .AddUmbracoOptions<BasicAuthSettings>()
             .AddUmbracoOptions<RuntimeMinificationSettings>()
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
