@@ -220,6 +220,8 @@ const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
 		languageIsoCode: item.languageIsoCode,
 		documentStartNodeIds: item.documentStartNodeIds,
 		mediaStartNodeIds: item.mediaStartNodeIds,
+		documentRootAccess: item.documentRootAccess,
+		mediaRootAccess: item.mediaRootAccess,
 		avatarUrls: item.avatarUrls,
 		state: item.state,
 		failedLoginAttempts: item.failedLoginAttempts,
