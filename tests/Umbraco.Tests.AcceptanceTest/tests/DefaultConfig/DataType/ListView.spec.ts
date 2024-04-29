@@ -227,7 +227,11 @@ for (const listViewType of listViewTypes) {
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.clickContentAppIconButton();
-      await umbracoUi.dataType.chooseContentAppIconByValue(iconValue);
+      // TODO: Uncomment one of the possible ways to select the icon. when the helpers are fixed
+      // await umbracoUi.dataType.clickLabelWithName(iconValue, true);
+      // await umbracoUi.dataType.chooseContentAppIconByValue(iconValue);
+      await page.getByLabel(iconValue).click({force: true});
+      await umbracoUi.dataType.clickSubmitButton();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert

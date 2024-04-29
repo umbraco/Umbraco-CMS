@@ -9,12 +9,12 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.Language.Item;
 
 [ApiVersion("1.0")]
-public class ItemsLanguageEntityController : LanguageEntityControllerBase
+public class ItemLanguageItemController : LanguageItemControllerBase
 {
     private readonly ILanguageService _languageService;
     private readonly IUmbracoMapper _mapper;
 
-    public ItemsLanguageEntityController(ILanguageService languageService, IUmbracoMapper mapper)
+    public ItemLanguageItemController(ILanguageService languageService, IUmbracoMapper mapper)
     {
         _languageService = languageService;
         _mapper = mapper;
@@ -23,10 +23,15 @@ public class ItemsLanguageEntityController : LanguageEntityControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<LanguageItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Items(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "isoCode")] HashSet<string> isoCodes)
     {
+        if (isoCodes.Count is 0)
+        {
+            return Ok(Enumerable.Empty<LanguageItemResponseModel>());
+        }
+
         IEnumerable<ILanguage> languages = await _languageService.GetMultipleAsync(isoCodes);
         List<LanguageItemResponseModel> entityResponseModels = _mapper.MapEnumerable<ILanguage, LanguageItemResponseModel>(languages);
         return Ok(entityResponseModels);
