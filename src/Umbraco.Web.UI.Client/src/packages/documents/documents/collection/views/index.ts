@@ -1,4 +1,5 @@
 import type { UmbDocumentCollectionItemModel } from '../types.js';
+import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 
 export { UMB_DOCUMENT_GRID_COLLECTION_VIEW_ALIAS, UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS } from './manifests.js';
 
@@ -13,8 +14,8 @@ export function getPropertyValueByAlias(sortOrder: number, item: UmbDocumentColl
 			return item.creator;
 		case 'name':
 			return item.name;
-		case 'entityState':
-			return item.state.replace(/([A-Z])/g, ' $1');
+		case 'state':
+			return fromCamelCase(item.state);
 		case 'published':
 			return item.state !== 'Draft' ? 'True' : 'False';
 		case 'sortOrder':

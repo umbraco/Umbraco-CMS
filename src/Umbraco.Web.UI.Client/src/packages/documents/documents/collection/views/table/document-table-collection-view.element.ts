@@ -47,9 +47,9 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		},
 		{
 			name: this.localize.term('content_publishStatus'),
-			alias: 'entityState',
+			alias: 'state',
 			elementName: 'umb-document-table-column-state',
-			allowSorting: true,
+			allowSorting: false,
 		},
 	];
 
