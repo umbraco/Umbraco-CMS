@@ -214,8 +214,7 @@ public class RichTextPropertyEditor : DataEditor
                           Constants.Security.SuperUserKey;
 
             var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
-            GuidUdi? mediaParent = config?.MediaParentId;
-            Guid mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
+            Guid mediaParentId = config?.MediaParentId ?? Guid.Empty;
 
             if (string.IsNullOrWhiteSpace(richTextEditorValue.Markup))
             {

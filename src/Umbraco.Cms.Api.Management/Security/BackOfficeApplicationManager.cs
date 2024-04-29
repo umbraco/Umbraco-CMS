@@ -16,6 +16,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     private readonly IRuntimeState _runtimeState;
     private readonly Uri? _backOfficeHost;
     private readonly string _authorizeCallbackPathName;
+    private readonly string _authorizeCallbackLogoutPathName;
 
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
@@ -28,6 +29,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         _runtimeState = runtimeState;
         _backOfficeHost = securitySettings.Value.BackOfficeHost;
         _authorizeCallbackPathName = securitySettings.Value.AuthorizeCallbackPathName;
+        _authorizeCallbackLogoutPathName = securitySettings.Value.AuthorizeCallbackLogoutPathName;
     }
 
     public async Task EnsureBackOfficeApplicationAsync(Uri backOfficeUrl, CancellationToken cancellationToken = default)
@@ -112,7 +114,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
             PostLogoutRedirectUris =
             {
                 CallbackUrl(_authorizeCallbackPathName),
-                CallbackUrl($"{_authorizeCallbackPathName.EnsureEndsWith("/")}logout")
+                CallbackUrl(_authorizeCallbackLogoutPathName),
             },
             Permissions =
             {
@@ -122,8 +124,8 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                 OpenIddictConstants.Permissions.Endpoints.Revocation,
                 OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                 OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                OpenIddictConstants.Permissions.ResponseTypes.Code
-            }
+                OpenIddictConstants.Permissions.ResponseTypes.Code,
+            },
         };
     }
 
