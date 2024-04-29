@@ -453,7 +453,9 @@ userName: string
 name: string
 languageIsoCode?: string | null
 documentStartNodeIds: Array<string>
+documentRootAccess: boolean
 mediaStartNodeIds: Array<string>
+mediaRootAccess: boolean
 avatarUrls: Array<string>
 languages: Array<string>
 hasAccessToAllLanguages: boolean
@@ -625,8 +627,7 @@ updater?: string | null
     };
 
 export type DocumentConfigurationResponseModel = {
-        sanitizeTinyMce: boolean
-disableDeleteWhenReferenced: boolean
+        disableDeleteWhenReferenced: boolean
 disableUnpublishWhenReferenced: boolean
 allowEditInvariantFromNonDefault: boolean
 allowNonExistingSegmentsCreation: boolean
@@ -1124,7 +1125,6 @@ mediaType: MediaTypeCollectionReferenceResponseModel
 export type MediaConfigurationResponseModel = {
         disableDeleteWhenReferenced: boolean
 disableUnpublishWhenReferenced: boolean
-sanitizeTinyMce: boolean
 reservedFieldNames: Array<string>
     };
 
@@ -1788,6 +1788,11 @@ export type PagedSearcherResponseModel = {
 items: Array<SearcherResponseModel>
     };
 
+export type PagedSegmentResponseModel = {
+        total: number
+items: Array<SegmentResponseModel>
+    };
+
 export type PagedTagResponseModel = {
         total: number
 items: Array<TagResponseModel>
@@ -1892,6 +1897,13 @@ export type PublicAccessRequestModel = {
 errorDocument: ReferenceByIdModel
 memberUserNames: Array<string>
 memberGroupNames: Array<string>
+    };
+
+export type PublicAccessResponseModel = {
+        loginDocument: ReferenceByIdModel
+errorDocument: ReferenceByIdModel
+members: Array<MemberItemResponseModel>
+groups: Array<MemberGroupItemResponseModel>
     };
 
 export type PublishDocumentRequestModel = {
@@ -2050,6 +2062,11 @@ export type SearcherResponseModel = {
 
 export type SecurityConfigurationResponseModel = {
         passwordConfiguration: PasswordConfigurationResponseModel
+    };
+
+export type SegmentResponseModel = {
+        name: string
+alias: string
     };
 
 export type ServerConfigurationItemResponseModel = {
@@ -2502,7 +2519,9 @@ name: string
 userGroupIds: Array<string>
 languageIsoCode: string
 documentStartNodeIds: Array<string>
+documentRootAccess: boolean
 mediaStartNodeIds: Array<string>
+mediaRootAccess: boolean
     };
 
 export type UpdateWebhookRequestModel = {
@@ -3397,7 +3416,7 @@ take?: number
                 ,PutDocumentByIdNotifications: string
                 ,PostDocumentByIdPublicAccess: string
                 ,DeleteDocumentByIdPublicAccess: string
-                ,GetDocumentByIdPublicAccess: void
+                ,GetDocumentByIdPublicAccess: PublicAccessResponseModel
                 ,PutDocumentByIdPublicAccess: string
                 ,PutDocumentByIdPublish: string
                 ,PutDocumentByIdPublishWithDescendants: string
@@ -3583,6 +3602,7 @@ requestBody?: UpdateLanguageRequestModel
         
         responses: {
             GetItemLanguage: Array<LanguageItemResponseModel>
+                ,GetItemLanguageDefault: LanguageItemResponseModel
                 ,GetLanguage: PagedLanguageResponseModel
                 ,PostLanguage: string
                 ,GetLanguageByIsoCode: LanguageResponseModel
@@ -3996,10 +4016,10 @@ take?: number
         responses: {
             GetItemMemberGroup: Array<MemberGroupItemResponseModel>
                 ,GetMemberGroup: PagedMemberGroupResponseModel
-                ,PostMemberGroup: MemberGroupResponseModel
+                ,PostMemberGroup: string
                 ,GetMemberGroupById: MemberGroupResponseModel
                 ,DeleteMemberGroupById: string
-                ,PutMemberGroupById: MemberGroupResponseModel
+                ,PutMemberGroupById: string
                 ,GetTreeMemberGroupRoot: PagedNamedEntityTreeItemResponseModel
                 
         }
@@ -4591,6 +4611,24 @@ PostSecurityForgotPasswordVerify: {
         
     }
 
+export type SegmentData = {
+        
+        payloads: {
+            GetSegment: {
+                        skip?: number
+take?: number
+                        
+                    };
+        }
+        
+        
+        responses: {
+            GetSegment: PagedSegmentResponseModel
+                
+        }
+        
+    }
+
 export type ServerData = {
         
         
@@ -4880,15 +4918,15 @@ export type UserDataData = {
                         requestBody?: CreateUserDataRequestModel
                         
                     };
-PutUserData: {
-                        requestBody?: UpdateUserDataRequestModel
-                        
-                    };
 GetUserData: {
                         groups?: Array<string>
 identifiers?: Array<string>
 skip?: number
 take?: number
+                        
+                    };
+PutUserData: {
+                        requestBody?: UpdateUserDataRequestModel
                         
                     };
 GetUserDataById: {
@@ -4900,8 +4938,8 @@ GetUserDataById: {
         
         responses: {
             PostUserData: string
-                ,PutUserData: string
                 ,GetUserData: PagedUserDataResponseModel
+                ,PutUserData: string
                 ,GetUserDataById: UserDataModel
                 
         }
@@ -5152,7 +5190,11 @@ PostUserUnlock: {
 export type WebhookData = {
         
         payloads: {
-            GetWebhook: {
+            GetItemWebhook: {
+                        id?: Array<string>
+                        
+                    };
+GetWebhook: {
                         skip?: number
 take?: number
                         
@@ -5174,20 +5216,16 @@ DeleteWebhookById: {
                         id: string
                         
                     };
-GetWebhookItem: {
-                        ids?: Array<string>
-                        
-                    };
         }
         
         
         responses: {
-            GetWebhook: PagedWebhookResponseModel
+            GetItemWebhook: Array<WebhookItemResponseModel>
+                ,GetWebhook: PagedWebhookResponseModel
                 ,PostWebhook: string
                 ,GetWebhookById: WebhookResponseModel
                 ,PutWebhookById: string
                 ,DeleteWebhookById: string
-                ,GetWebhookItem: Array<WebhookItemResponseModel>
                 
         }
         
