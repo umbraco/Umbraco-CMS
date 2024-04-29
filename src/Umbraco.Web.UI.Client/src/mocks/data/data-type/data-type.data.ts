@@ -804,7 +804,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: [
 					{ alias: 'sortOrder', header: 'Sort order', isSystem: true, nameTemplate: '' },
 					{ alias: 'updateDate', header: 'Last edited', isSystem: true },
-					{ alias: 'owner', header: 'Created by', isSystem: true },
+					{ alias: 'creator', header: 'Created by', isSystem: true },
 				],
 			},
 			{ alias: 'orderBy', value: 'updateDate' },
@@ -849,7 +849,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: [
 					{ alias: 'sortOrder', header: 'Sort order', isSystem: true, nameTemplate: '' },
 					{ alias: 'updateDate', header: 'Last edited', isSystem: true },
-					{ alias: 'owner', header: 'Created by', isSystem: true },
+					{ alias: 'creator', header: 'Created by', isSystem: true },
 				],
 			},
 			{ alias: 'orderBy', value: 'updateDate' },

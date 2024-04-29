@@ -9,13 +9,12 @@ export function getPropertyValueByAlias(sortOrder: number, item: UmbDocumentColl
 		case 'createDate':
 			return item.createDate.toLocaleString();
 		case 'creator':
+		case 'owner':
 			return item.creator;
 		case 'entityName':
 			return item.name;
 		case 'entityState':
 			return item.state.replace(/([A-Z])/g, ' $1');
-		case 'owner':
-			return item.creator;
 		case 'published':
 			return item.state !== 'Draft' ? 'True' : 'False';
 		case 'sortOrder':

@@ -151,6 +151,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				return item.createDate.toLocaleString();
 			case 'entityName':
 				return item.name;
+			case 'creator':
 			case 'owner':
 				return item.creator;
 			case 'sortOrder':
