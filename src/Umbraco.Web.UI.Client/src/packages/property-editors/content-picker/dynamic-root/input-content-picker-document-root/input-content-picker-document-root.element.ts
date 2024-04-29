@@ -1,5 +1,5 @@
-import type { UmbDynamicRoot, UmbDynamicRootQueryStep } from '../types.js';
-import { UMB_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL, UMB_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL } from '../modals/index.js';
+import type { UmbContentPickerDynamicRoot, UmbContentPickerDynamicRootQueryStep } from '../../types.js';
+import { UMB_CONTENT_PICKER_DOCUMENT_ROOT_ORIGIN_PICKER_MODAL, UMB_CONTENT_PICKER_DOCUMENT_ROOT_QUERY_STEP_PICKER_MODAL } from '../modals/index.js';
 import { html, css, customElement, property, ifDefined, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -28,7 +28,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 	private _queryStepManifests: Array<ManifestDynamicRootQueryStep> = [];
 
 	@property({ attribute: false })
-	data?: UmbDynamicRoot | undefined;
+	data?: UmbContentPickerDynamicRoot | undefined;
 
 	#dynamicRootOrigin?: { label: string; icon: string; description?: string };
 
@@ -65,7 +65,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 		this.#updateDynamicRootQuerySteps(this.data?.querySteps);
 	}
 
-	#sorter = new UmbSorterController<UmbDynamicRootQueryStep>(this, {
+	#sorter = new UmbSorterController<UmbContentPickerDynamicRootQueryStep>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
 		},
@@ -85,10 +85,10 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 	});
 
 	#openDynamicRootOriginPicker() {
-		this.#openModal = this.#modalContext?.open(this, UMB_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL, {
+		this.#openModal = this.#modalContext?.open(this, UMB_CONTENT_PICKER_DOCUMENT_ROOT_ORIGIN_PICKER_MODAL, {
 			data: { items: this._originManifests },
 		});
-		this.#openModal?.onSubmit().then((data: UmbDynamicRoot) => {
+		this.#openModal?.onSubmit().then((data: UmbContentPickerDynamicRoot) => {
 			const existingData = { ...this.data };
 			existingData.originKey = undefined;
 			this.data = { ...existingData, ...data };
@@ -98,7 +98,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 	}
 
 	#openDynamicRootQueryStepPicker() {
-		this.#openModal = this.#modalContext?.open(this, UMB_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL, {
+		this.#openModal = this.#modalContext?.open(this, UMB_CONTENT_PICKER_DOCUMENT_ROOT_QUERY_STEP_PICKER_MODAL, {
 			data: { items: this._queryStepManifests },
 		});
 		this.#openModal?.onSubmit().then((step) => {
@@ -110,7 +110,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 		});
 	}
 
-	#updateDynamicRootOrigin(data?: UmbDynamicRoot) {
+	#updateDynamicRootOrigin(data?: UmbContentPickerDynamicRoot) {
 		if (!data) return;
 		const origin = this._originManifests.find((item) => item.meta.originAlias === data.originAlias)?.meta;
 		this.#dynamicRootOrigin = {
@@ -120,7 +120,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 		};
 	}
 
-	#updateDynamicRootQuerySteps(querySteps?: Array<UmbDynamicRootQueryStep>) {
+	#updateDynamicRootQuerySteps(querySteps?: Array<UmbContentPickerDynamicRootQueryStep>) {
 		if (!this.data) return;
 
 		if (querySteps) {
@@ -132,7 +132,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 		this.data = { ...this.data, ...{ querySteps } };
 	}
 
-	#getQueryStepMeta(item: UmbDynamicRootQueryStep): {
+	#getQueryStepMeta(item: UmbContentPickerDynamicRootQueryStep): {
 		unique: string;
 		label: string;
 		icon: string;
@@ -150,7 +150,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 		};
 	}
 
-	#removeDynamicRootQueryStep(item: UmbDynamicRootQueryStep) {
+	#removeDynamicRootQueryStep(item: UmbContentPickerDynamicRootQueryStep) {
 		if (this.data?.querySteps) {
 			const index = this.data.querySteps.indexOf(item);
 			if (index !== -1) {
@@ -221,7 +221,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 		);
 	}
 
-	#renderQueryStep(item: UmbDynamicRootQueryStep) {
+	#renderQueryStep(item: UmbContentPickerDynamicRootQueryStep) {
 		if (!item.alias) return;
 		const step = this.#getQueryStepMeta(item);
 		return html`

@@ -3,7 +3,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { DynamicRootRequestModel, DynamicRootResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbDynamicRootServerDataSource {
+export class UmbContentPickerDynamicRootServerDataSource {
 	#host: UmbControllerHost;
 
 	constructor(host: UmbControllerHost) {

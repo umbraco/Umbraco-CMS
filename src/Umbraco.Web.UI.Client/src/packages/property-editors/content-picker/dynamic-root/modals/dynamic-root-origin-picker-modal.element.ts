@@ -1,12 +1,12 @@
-import { UmbDocumentPickerContext } from '../../documents/documents/components/input-document/input-document.context.js';
-import type { UmbDynamicRoot } from '../types.js';
-import type { UmbDynamicRootOriginModalData } from './index.js';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UmbContentPickerDynamicRoot } from '../../types.js';
+import type { UmbContentPickerDocumentRootOriginModalData } from './index.js';
 import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentPickerContext } from '@umbraco-cms/backoffice/document';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { ManifestDynamicRootOrigin } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-dynamic-root-origin-picker-modal')
-export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseElement<UmbDynamicRootOriginModalData> {
+export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseElement<UmbContentPickerDocumentRootOriginModalData> {
 	@state()
 	private _origins: Array<ManifestDynamicRootOrigin> = [];
 
@@ -57,7 +57,7 @@ export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseEle
 		});
 	}
 
-	#submit(value: UmbDynamicRoot) {
+	#submit(value: UmbContentPickerDynamicRoot) {
 		this.modalContext?.setValue(value);
 		this.modalContext?.submit();
 	}

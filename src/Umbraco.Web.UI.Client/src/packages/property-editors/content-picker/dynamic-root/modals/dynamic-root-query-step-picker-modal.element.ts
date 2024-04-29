@@ -1,13 +1,13 @@
-import { UmbDocumentTypePickerContext } from '../../documents/document-types/components/input-document-type/input-document-type.context.js';
-import type { UmbDynamicRootQueryStep } from '../types.js';
-import type { UmbDynamicRootQueryStepModalData } from './index.js';
+import type { UmbContentPickerDynamicRootQueryStep } from '../../types.js';
+import type { UmbContentPickerDocumentRootQueryStepModalData } from './index.js';
+import { UmbDocumentTypePickerContext } from '@umbraco-cms/backoffice/document-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestDynamicRootQueryStep } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-dynamic-root-query-step-picker-modal')
-export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBaseElement<UmbDynamicRootQueryStepModalData> {
+export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBaseElement<UmbContentPickerDocumentRootQueryStepModalData> {
 	@state()
 	private _querySteps: Array<ManifestDynamicRootQueryStep> = [];
 
@@ -44,7 +44,7 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 		});
 	}
 
-	#submit(value: UmbDynamicRootQueryStep) {
+	#submit(value: UmbContentPickerDynamicRootQueryStep) {
 		this.modalContext?.setValue(value);
 		this.modalContext?.submit();
 	}

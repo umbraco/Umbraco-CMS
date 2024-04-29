@@ -69,10 +69,10 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onDocumentRootChange(event: CustomEvent) {
+	#onDocumentRootChange(event: CustomEvent & { target: UmbInputContentPickerDocumentRootElement }) {
 		switch (this.type) {
 			case 'content':
-				this.dynamicRoot = (event?.target as unknown as UmbInputContentPickerDocumentRootElement).data;
+				this.dynamicRoot = event.target.data;
 
 				// HACK: Workaround consolidating the old content-picker and dynamic-root. [LK:2024-01-24]
 				if (this.dynamicRoot?.originAlias === 'ByKey') {
@@ -115,9 +115,7 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 
 	#renderDocumentSourcePicker() {
 		return html`
-			<umb-input-content-picker-document-root
-				.data=${this.dynamicRoot}
-				@change=${this.#onDocumentRootChange}>
+			<umb-input-content-picker-document-root .data=${this.dynamicRoot} @change=${this.#onDocumentRootChange}>
 			</umb-input-content-picker-document-root>
 		`;
 	}

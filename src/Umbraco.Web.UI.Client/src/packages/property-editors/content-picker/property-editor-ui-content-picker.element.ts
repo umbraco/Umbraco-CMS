@@ -1,8 +1,8 @@
+import { UmbContentPickerDynamicRootRepository } from './dynamic-root/repository/index.js';
 import type { UmbInputContentElement } from './components/input-content/index.js';
 import type { UmbContentPickerSource } from './types.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbDynamicRootRepository } from '@umbraco-cms/backoffice/dynamic-root';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -42,7 +42,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
 
-	#dynamicRootRepository = new UmbDynamicRootRepository(this);
+	#dynamicRootRepository = new UmbContentPickerDynamicRootRepository(this);
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;

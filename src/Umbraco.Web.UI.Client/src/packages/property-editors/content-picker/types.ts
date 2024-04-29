@@ -1,5 +1,3 @@
-import type { UmbDynamicRoot, UmbDynamicRootQueryStep } from '@umbraco-cms/backoffice/dynamic-root';
-
 export type UmbContentPickerSourceType = 'content' | 'member' | 'media';
 
 export type UmbContentPickerSource = {
@@ -8,8 +6,14 @@ export type UmbContentPickerSource = {
 	dynamicRoot?: UmbContentPickerDynamicRoot;
 };
 
-export interface UmbContentPickerDynamicRoot extends UmbDynamicRoot<UmbContentPickerDynamicRootQueryStep> {}
+export interface UmbContentPickerDynamicRoot {
+	originAlias: string;
+	originKey?: string;
+	querySteps?: Array<UmbContentPickerDynamicRootQueryStep>;
+}
 
-export interface UmbContentPickerDynamicRootQueryStep extends UmbDynamicRootQueryStep {
+export interface UmbContentPickerDynamicRootQueryStep {
+	unique: string;
+	alias: string;
 	anyOfDocTypeKeys?: Array<string>;
 }
