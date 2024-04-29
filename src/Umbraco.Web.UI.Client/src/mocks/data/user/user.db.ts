@@ -198,6 +198,8 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		languageIsoCode: null,
 		documentStartNodeIds: [],
 		mediaStartNodeIds: [],
+		documentRootAccess: false,
+		mediaRootAccess: false,
 		avatarUrls: [],
 		state: UserStateModel.INACTIVE,
 		failedLoginAttempts: 0,
