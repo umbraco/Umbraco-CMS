@@ -253,7 +253,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	}
 
 	getRedirectUrl() {
-		return `${window.location.origin}${this.#backofficePath}oauth_complete`;
+		return `${window.location.origin}${this.#backofficePath}`;
 	}
 
 	getPostLogoutRedirectUrl() {
