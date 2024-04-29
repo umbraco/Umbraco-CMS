@@ -11419,6 +11419,41 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/language/default": {
+      "get": {
+        "tags": [
+          "Language"
+        ],
+        "operationId": "GetItemLanguageDefault",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/LanguageItemResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/language": {
       "get": {
         "tags": [
@@ -34918,14 +34953,10 @@
           "allowNonExistingSegmentsCreation",
           "disableDeleteWhenReferenced",
           "disableUnpublishWhenReferenced",
-          "reservedFieldNames",
-          "sanitizeTinyMce"
+          "reservedFieldNames"
         ],
         "type": "object",
         "properties": {
-          "sanitizeTinyMce": {
-            "type": "boolean"
-          },
           "disableDeleteWhenReferenced": {
             "type": "boolean"
           },
@@ -36973,8 +37004,7 @@
         "required": [
           "disableDeleteWhenReferenced",
           "disableUnpublishWhenReferenced",
-          "reservedFieldNames",
-          "sanitizeTinyMce"
+          "reservedFieldNames"
         ],
         "type": "object",
         "properties": {
@@ -36982,9 +37012,6 @@
             "type": "boolean"
           },
           "disableUnpublishWhenReferenced": {
-            "type": "boolean"
-          },
-          "sanitizeTinyMce": {
             "type": "boolean"
           },
           "reservedFieldNames": {
