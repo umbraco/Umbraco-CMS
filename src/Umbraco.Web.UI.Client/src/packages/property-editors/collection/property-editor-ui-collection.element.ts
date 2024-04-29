@@ -11,10 +11,10 @@ import type {
 } from '@umbraco-cms/backoffice/collection';
 
 /**
- * @element umb-property-editor-ui-collection-view
+ * @element umb-property-editor-ui-collection
  */
-@customElement('umb-property-editor-ui-collection-view')
-export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+@customElement('umb-property-editor-ui-collection')
+export class UmbPropertyEditorUICollectionElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property()
 	value?: string;
 
@@ -71,10 +71,10 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 	}
 }
 
-export default UmbPropertyEditorUICollectionViewElement;
+export default UmbPropertyEditorUICollectionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-collection-view': UmbPropertyEditorUICollectionViewElement;
+		'umb-property-editor-ui-collection': UmbPropertyEditorUICollectionElement;
 	}
 }

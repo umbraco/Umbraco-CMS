@@ -1,15 +1,15 @@
 import type { Meta, Story } from '@storybook/web-components';
-import type { UmbPropertyEditorUICollectionViewElement } from './property-editor-ui-collection.element.js';
+import type { UmbPropertyEditorUICollectionElement } from './property-editor-ui-collection.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-collection.element.js';
 
 export default {
-	title: 'Property Editor UIs/Collection View',
-	component: 'umb-property-editor-ui-collection-view',
-	id: 'umb-property-editor-ui-collection-view',
+	title: 'Property Editor UIs/Collection',
+	component: 'umb-property-editor-ui-collection',
+	id: 'umb-property-editor-ui-collection',
 } as Meta;
 
-export const AAAOverview: Story<UmbPropertyEditorUICollectionViewElement> = () =>
-	html`<umb-property-editor-ui-collection-view></umb-property-editor-ui-collection-view>`;
+export const AAAOverview: Story<UmbPropertyEditorUICollectionElement> = () =>
+	html`<umb-property-editor-ui-collection></umb-property-editor-ui-collection>`;
 AAAOverview.storyName = 'Overview';

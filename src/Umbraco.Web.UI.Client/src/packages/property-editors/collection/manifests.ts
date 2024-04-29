@@ -108,6 +108,7 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 const legacyPropertyEditorUiManifest: ManifestPropertyEditorUi = {
 	...propertyEditorUiManifest,
 	alias: 'Umb.PropertyEditorUi.CollectionView',
+	element: () => import('./legacy-property-editor-ui-collection.element.js'),
 };
 
 const config: Array<ManifestPropertyEditorUi> = [
