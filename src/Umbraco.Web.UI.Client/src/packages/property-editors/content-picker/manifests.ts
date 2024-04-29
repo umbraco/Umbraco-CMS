@@ -1,5 +1,5 @@
-import { manifest as sourcePicker } from './config/source/manifests.js';
-import { manifest as sourceTypePicker } from './config/source-type-picker/manifests.js';
+import { manifest as sourceManifest } from './config/source/manifests.js';
+import { manifest as sourceTypeManifest } from './config/source-type/manifests.js';
 import { manifest as schemaManifest } from './Umbraco.MultiNodeTreePicker.js';
 import { manifests as dynamicRootManifests } from './dynamic-root/manifests.js';
 import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
@@ -33,6 +33,6 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
-const config: Array<ManifestPropertyEditorUi> = [sourcePicker, sourceTypePicker];
+const config: Array<ManifestPropertyEditorUi> = [sourceManifest, sourceTypeManifest];
 
 export const manifests: Array<ManifestTypes> = [manifest, ...config, schemaManifest, ...dynamicRootManifests];
