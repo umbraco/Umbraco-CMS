@@ -3,7 +3,6 @@ import type { UmbUserDetailModel } from '../../../types.js';
 import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
@@ -34,6 +33,12 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
+
+			this.observe(
+				this.#workspaceContext.userGroupUniques,
+				(value) => (this._userGroupUniques = value),
+				'_observeUserGroupAccess',
+			);
 
 			this.observe(
 				this.#workspaceContext.documentRootAccess,
