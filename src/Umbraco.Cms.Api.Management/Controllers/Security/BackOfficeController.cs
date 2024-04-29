@@ -374,7 +374,7 @@ public class BackOfficeController : SecurityControllerBase
                 // Update any authentication tokens if succeeded
                 await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
 
-                // sign in the backoffice user associated with the login provider and unique provider id
+                // sign in the backoffice user from the HttpContext, as thas was set doing the ExternalLoginSignInAsync
                 ClaimsPrincipal backOfficePrincipal = HttpContext.User;
                 return await SignInBackOfficeUser(backOfficePrincipal, request);
             }
