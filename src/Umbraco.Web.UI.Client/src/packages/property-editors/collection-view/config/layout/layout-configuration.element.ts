@@ -53,9 +53,9 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	});
 
 	@property({ type: Array })
-	public set value(value: Array<UmbCollectionLayoutConfiguration>) {
-		this.#value = value;
-		this.#sorter.setModel(value);
+	public set value(value: Array<UmbCollectionLayoutConfiguration> | undefined) {
+		this.#value = value ?? [];
+		this.#sorter.setModel(this.#value);
 	}
 	public get value(): Array<UmbCollectionLayoutConfiguration> {
 		return this.#value;
@@ -132,7 +132,10 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	}
 
 	render() {
-		return html`${this.#renderLayouts()} ${this.#renderInput()}`;
+		return html`
+			<div id="layout-wrapper">${this.#renderLayouts()}</div>
+			${this.#renderInput()}
+		`;
 	}
 
 	#renderInput() {
@@ -141,15 +144,11 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 
 	#renderLayouts() {
 		if (!this.value) return nothing;
-		return html`
-			<div id="layout-wrapper">
-				${repeat(
-					this.value,
-					(layout) => this.#getUnique(layout),
-					(layout, index) => this.#renderLayout(layout, index),
-				)}
-			</div>
-		`;
+		return repeat(
+			this.value,
+			(layout) => this.#getUnique(layout),
+			(layout, index) => this.#renderLayout(layout, index),
+		);
 	}
 
 	#renderLayout(layout: UmbCollectionLayoutConfiguration, index: number) {

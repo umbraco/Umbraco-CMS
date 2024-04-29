@@ -116,13 +116,13 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 					</div>
 					<div class="input">
 						<uui-label for="width">Width</uui-label>
-						<uui-input label="Width" id="width" name="width" type="number" autocomplete="false" value="">
+						<uui-input label="Width" id="width" name="width" type="number" autocomplete="false" value="" min="0">
 							<span class="append" slot="append">px</span>
 						</uui-input>
 					</div>
 					<div class="input">
 						<uui-label for="height">Height</uui-label>
-						<uui-input label="Height" id="height" name="height" type="number" autocomplete="false" value="">
+						<uui-input label="Height" id="height" name="height" type="number" autocomplete="false" value="" min="0">
 							<span class="append" slot="append">px</span>
 						</uui-input>
 					</div>

@@ -6,9 +6,13 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
-export class UmbPickerInputContext<ItemType extends { name: string; unique: string }> extends UmbControllerBase {
+type PickerItemBaseType = { name: string; unique: string };
+export class UmbPickerInputContext<
+	ItemType extends PickerItemBaseType,
+	TreeItemType extends PickerItemBaseType = ItemType,
+> extends UmbControllerBase {
 	// TODO: We are way too unsecure about the requirements for the Modal Token, as we have certain expectation for the data and value.
-	modalAlias: string | UmbModalToken<UmbPickerModalData<ItemType>, UmbPickerModalValue>;
+	modalAlias: string | UmbModalToken<UmbPickerModalData<TreeItemType>, UmbPickerModalValue>;
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
 
@@ -44,7 +48,7 @@ export class UmbPickerInputContext<ItemType extends { name: string; unique: stri
 	constructor(
 		host: UmbControllerHost,
 		repositoryAlias: string,
-		modalAlias: string | UmbModalToken<UmbPickerModalData<ItemType>, UmbPickerModalValue>,
+		modalAlias: string | UmbModalToken<UmbPickerModalData<TreeItemType>, UmbPickerModalValue>,
 		getUniqueMethod?: (entry: ItemType) => string | undefined,
 	) {
 		super(host);
@@ -66,7 +70,7 @@ export class UmbPickerInputContext<ItemType extends { name: string; unique: stri
 		this.#itemManager.setUniques(selection.filter((value) => value !== null) as Array<string>);
 	}
 
-	async openPicker(pickerData?: Partial<UmbPickerModalData<ItemType>>) {
+	async openPicker(pickerData?: Partial<UmbPickerModalData<TreeItemType>>) {
 		await this.#itemManager.init;
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this, this.modalAlias, {
