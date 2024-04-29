@@ -30,7 +30,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'startNode',
 					label: 'Node type',
 					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker.SourcePicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker.Source',
 				},
 			],
 			defaultData: [

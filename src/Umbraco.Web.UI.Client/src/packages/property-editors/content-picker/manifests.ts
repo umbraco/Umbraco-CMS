@@ -19,7 +19,7 @@ const manifest: ManifestPropertyEditorUi = {
 					alias: 'filter',
 					label: 'Allow items of type',
 					description: 'Select the applicable types',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker.SourceTypePicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker.SourceType',
 				},
 				{
 					alias: 'showOpenButton',
