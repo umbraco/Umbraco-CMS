@@ -8,10 +8,10 @@ import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backo
 const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.Collection',
-	name: 'Collection View Property Editor UI',
+	name: 'Collection Property Editor UI',
 	element: () => import('./property-editor-ui-collection.element.js'),
 	meta: {
-		label: 'Collection View',
+		label: 'Collection',
 		propertyEditorSchemaAlias: 'Umbraco.ListView',
 		icon: 'icon-layers',
 		group: 'lists',
@@ -106,7 +106,7 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
  * @deprecated Use the property editor UI alias of 'Umb.PropertyEditorUi.Collection' instead.
  */
 const legacyPropertyEditorUiManifest: ManifestPropertyEditorUi = {
-	...legacyPropertyEditorUiManifest,
+	...propertyEditorUiManifest,
 	alias: 'Umb.PropertyEditorUi.CollectionView',
 };
 

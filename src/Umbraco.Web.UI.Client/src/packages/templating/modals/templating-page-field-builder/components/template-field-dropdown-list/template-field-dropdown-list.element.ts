@@ -28,8 +28,8 @@ enum FieldType {
 	SYSTEM = 'system',
 }
 
-@customElement('umb-field-dropdown-list')
-export class UmbFieldDropdownListElement extends UmbLitElement {
+@customElement('umb-template-field-dropdown-list')
+export class UmbTemplateFieldDropdownListElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'exclude-media-type', reflect: true })
 	public excludeMediaType = false;
 
@@ -202,10 +202,10 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 	];
 }
 
-export default UmbFieldDropdownListElement;
+export default UmbTemplateFieldDropdownListElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-field-dropdown-list': UmbFieldDropdownListElement;
+		'umb-template-field-dropdown-list': UmbTemplateFieldDropdownListElement;
 	}
 }

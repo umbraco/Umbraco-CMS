@@ -1,15 +1,15 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbFieldDropdownListElement } from './field-dropdown-list.element.js';
+import { UmbTemplateFieldDropdownListElement } from './template-field-dropdown-list.element.js';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 describe('UmbInputDateElement', () => {
-	let element: UmbFieldDropdownListElement;
+	let element: UmbTemplateFieldDropdownListElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-field-dropdown-list></umb-field-dropdown-list> `);
+		element = await fixture(html` <umb-template-field-dropdown-list></umb-template-field-dropdown-list> `);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbFieldDropdownListElement);
+		expect(element).to.be.instanceOf(UmbTemplateFieldDropdownListElement);
 	});
 
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
