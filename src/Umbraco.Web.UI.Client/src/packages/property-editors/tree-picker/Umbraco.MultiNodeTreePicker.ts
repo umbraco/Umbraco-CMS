@@ -13,12 +13,14 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Minimum number of items',
 					description: '',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					config: [{ alias: 'min', value: 0 }],
 				},
 				{
 					alias: 'maxNumber',
 					label: 'Maximum number of items',
 					description: '',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					config: [{ alias: 'min', value: 0 }],
 				},
 				{
 					alias: 'ignoreUserStartNodes',
@@ -34,14 +36,8 @@ export const manifest: ManifestPropertyEditorSchema = {
 				},
 			],
 			defaultData: [
-				{
-					alias: 'minNumber',
-					value: 0,
-				},
-				{
-					alias: 'maxNumber',
-					value: 0,
-				},
+				{ alias: 'minNumber', value: 0 },
+				{ alias: 'maxNumber', value: 0 },
 			],
 		},
 	},
