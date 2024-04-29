@@ -13,17 +13,16 @@ import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import './components/input-content-type-property/index.js';
 
 /**
- * @element umb-property-editor-ui-collection-view-column-configuration
+ * @element umb-property-editor-ui-collection-column-configuration
  */
-@customElement('umb-property-editor-ui-collection-view-column-configuration')
-export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
+@customElement('umb-property-editor-ui-collection-column-configuration')
+export class UmbPropertyEditorUICollectionColumnConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
 	#sorter = new UmbSorterController<UmbCollectionColumnConfiguration>(this, {
 		getUniqueOfElement: (element) => element.id,
 		getUniqueOfModel: (modelEntry) => modelEntry.alias,
-		identifier: 'Umb.SorterIdentifier.CollectionViewColumnConfiguration',
 		itemSelector: '.layout-item',
 		containerSelector: '#layout-wrapper',
 		onChange: ({ model }) => {
@@ -187,10 +186,10 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	];
 }
 
-export default UmbPropertyEditorUICollectionViewColumnConfigurationElement;
+export default UmbPropertyEditorUICollectionColumnConfigurationElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-collection-view-column-configuration': UmbPropertyEditorUICollectionViewColumnConfigurationElement;
+		'umb-property-editor-ui-collection-column-configuration': UmbPropertyEditorUICollectionColumnConfigurationElement;
 	}
 }

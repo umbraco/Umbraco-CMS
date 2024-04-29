@@ -29,10 +29,10 @@ interface UmbCollectionLayoutConfiguration {
 }
 
 /**
- * @element umb-property-editor-ui-collection-view-layout-configuration
+ * @element umb-property-editor-ui-collection-layout-configuration
  */
-@customElement('umb-property-editor-ui-collection-view-layout-configuration')
-export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
+@customElement('umb-property-editor-ui-collection-layout-configuration')
+export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
@@ -43,7 +43,6 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 		getUniqueOfModel: (modelEntry) => {
 			return this.#getUnique(modelEntry);
 		},
-		identifier: 'Umb.SorterIdentifier.CollectionViewLayouConfiguration',
 		itemSelector: '.layout-item',
 		containerSelector: '#layout-wrapper',
 		onChange: ({ model }) => {
@@ -226,10 +225,10 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	];
 }
 
-export default UmbPropertyEditorUICollectionViewLayoutConfigurationElement;
+export default UmbPropertyEditorUICollectionLayoutConfigurationElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-collection-view-layout-configuration': UmbPropertyEditorUICollectionViewLayoutConfigurationElement;
+		'umb-property-editor-ui-collection-layout-configuration': UmbPropertyEditorUICollectionLayoutConfigurationElement;
 	}
 }

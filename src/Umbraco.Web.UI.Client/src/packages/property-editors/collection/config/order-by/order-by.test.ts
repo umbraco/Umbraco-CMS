@@ -1,18 +1,18 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUICollectionViewOrderByElement } from './order-by.element.js';
+import { UmbPropertyEditorUICollectionOrderByElement } from './order-by.element.js';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
-describe('UmbPropertyEditorUICollectionViewOrderByElement', () => {
-	let element: UmbPropertyEditorUICollectionViewOrderByElement;
+describe('UmbPropertyEditorUICollectionOrderByElement', () => {
+	let element: UmbPropertyEditorUICollectionOrderByElement;
 
 	beforeEach(async () => {
 		element = await fixture(html`
-			<umb-property-editor-ui-collection-view-order-by></umb-property-editor-ui-collection-view-order-by>
+			<umb-property-editor-ui-collection-order-by></umb-property-editor-ui-collection-order-by>
 		`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbPropertyEditorUICollectionViewOrderByElement);
+		expect(element).to.be.instanceOf(UmbPropertyEditorUICollectionOrderByElement);
 	});
 
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {

@@ -3,10 +3,10 @@ import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.Collection.ColumnConfiguration',
-	name: 'Collection View Column Configuration Property Editor UI',
+	name: 'Collection Column Configuration Property Editor UI',
 	element: () => import('./column-configuration.element.js'),
 	meta: {
-		label: 'Collection View Column Configuration',
+		label: 'Collection Column Configuration',
 		icon: 'icon-autofill',
 		group: 'lists',
 	},

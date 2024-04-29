@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUICollectionViewElement } from './property-editor-ui-collection-view.element.js';
+import { UmbPropertyEditorUICollectionViewElement } from './property-editor-ui-collection.element.js';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUICollectionViewElement', () => {

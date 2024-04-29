@@ -6,13 +6,10 @@ import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-ed
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
- * @element umb-property-editor-ui-collection-view-order-by
+ * @element umb-property-editor-ui-collection-order-by
  */
-@customElement('umb-property-editor-ui-collection-view-order-by')
-export class UmbPropertyEditorUICollectionViewOrderByElement
-	extends UmbLitElement
-	implements UmbPropertyEditorUiElement
-{
+@customElement('umb-property-editor-ui-collection-order-by')
+export class UmbPropertyEditorUICollectionOrderByElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	private _value = '';
 	@property()
 	public set value(v: string) {
@@ -43,10 +40,10 @@ export class UmbPropertyEditorUICollectionViewOrderByElement
 	}
 }
 
-export default UmbPropertyEditorUICollectionViewOrderByElement;
+export default UmbPropertyEditorUICollectionOrderByElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-collection-view-order-by': UmbPropertyEditorUICollectionViewOrderByElement;
+		'umb-property-editor-ui-collection-order-by': UmbPropertyEditorUICollectionOrderByElement;
 	}
 }

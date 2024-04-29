@@ -15,10 +15,10 @@ type BulkActionPermissionType =
 	| 'allowBulkUnpublish';
 
 /**
- * @element umb-property-editor-ui-collection-view-permissions
+ * @element umb-property-editor-ui-collection-permissions
  */
-@customElement('umb-property-editor-ui-collection-view-permissions')
-export class UmbPropertyEditorUICollectionViewPermissionsElement
+@customElement('umb-property-editor-ui-collection-permissions')
+export class UmbPropertyEditorUICollectionPermissionsElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
@@ -98,10 +98,10 @@ export class UmbPropertyEditorUICollectionViewPermissionsElement
 	];
 }
 
-export default UmbPropertyEditorUICollectionViewPermissionsElement;
+export default UmbPropertyEditorUICollectionPermissionsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-collection-view-permissions': UmbPropertyEditorUICollectionViewPermissionsElement;
+		'umb-property-editor-ui-collection-permissions': UmbPropertyEditorUICollectionPermissionsElement;
 	}
 }

@@ -1,18 +1,18 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUICollectionViewLayoutConfigurationElement } from './layout-configuration.element.js';
+import { UmbPropertyEditorUICollectionLayoutConfigurationElement } from './layout-configuration.element.js';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
-describe('UmbPropertyEditorUICollectionViewLayoutConfigurationElement', () => {
-	let element: UmbPropertyEditorUICollectionViewLayoutConfigurationElement;
+describe('UmbPropertyEditorUICollectionLayoutConfigurationElement', () => {
+	let element: UmbPropertyEditorUICollectionLayoutConfigurationElement;
 
 	beforeEach(async () => {
 		element = await fixture(html`
-			<umb-property-editor-ui-collection-view-layout-configuration></umb-property-editor-ui-collection-view-layout-configuration>
+			<umb-property-editor-ui-collection-layout-configuration></umb-property-editor-ui-collection-layout-configuration>
 		`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbPropertyEditorUICollectionViewLayoutConfigurationElement);
+		expect(element).to.be.instanceOf(UmbPropertyEditorUICollectionLayoutConfigurationElement);
 	});
 
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
