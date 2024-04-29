@@ -375,11 +375,8 @@ public class BackOfficeController : SecurityControllerBase
                 await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
 
                 // sign in the backoffice user associated with the login provider and unique provider id
-                BackOfficeIdentityUser? backOfficeUser = await _backOfficeUserManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
-                if (backOfficeUser != null)
-                {
-                    return await SignInBackOfficeUser(backOfficeUser, request);
-                }
+                ClaimsPrincipal backOfficePrincipal = HttpContext.User;
+                return await SignInBackOfficeUser(backOfficePrincipal, request);
             }
             else
             {
@@ -392,10 +389,8 @@ public class BackOfficeController : SecurityControllerBase
         return new ChallengeResult(provider, properties);
     }
 
-    private async Task<IActionResult> SignInBackOfficeUser(BackOfficeIdentityUser backOfficeUser, OpenIddictRequest request)
+    private async Task<IActionResult> SignInBackOfficeUser(ClaimsPrincipal backOfficePrincipal, OpenIddictRequest request)
     {
-        ClaimsPrincipal backOfficePrincipal = await _backOfficeSignInManager.CreateUserPrincipalAsync(backOfficeUser);
-
         Claim[] backOfficeClaims = backOfficePrincipal.Claims.ToArray();
         foreach (Claim backOfficeClaim in backOfficeClaims)
         {
@@ -409,6 +404,12 @@ public class BackOfficeController : SecurityControllerBase
         }
 
         return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, backOfficePrincipal);
+    }
+    private async Task<IActionResult> SignInBackOfficeUser(BackOfficeIdentityUser backOfficeUser, OpenIddictRequest request)
+    {
+        ClaimsPrincipal backOfficePrincipal = await _backOfficeSignInManager.CreateUserPrincipalAsync(backOfficeUser);
+
+        return await SignInBackOfficeUser(backOfficePrincipal, request);
     }
 
     private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.BackOfficeAuthenticationType);
