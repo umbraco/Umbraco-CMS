@@ -2629,7 +2629,9 @@ userGroupIds: Array<string>
 id: string
 languageIsoCode?: string | null
 documentStartNodeIds: Array<string>
+documentRootAccess: boolean
 mediaStartNodeIds: Array<string>
+mediaRootAccess: boolean
 avatarUrls: Array<string>
 state: UserStateModel
 failedLoginAttempts: number
