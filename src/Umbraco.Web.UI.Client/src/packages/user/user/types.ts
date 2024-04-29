@@ -13,7 +13,9 @@ export interface UmbUserDetailModel {
 	unique: string;
 	languageIsoCode: string | null;
 	documentStartNodeUniques: Array<string>;
+	documentRootAccess: boolean;
 	mediaStartNodeUniques: Array<string>;
+	mediaRootAccess: boolean;
 	avatarUrls: Array<string>;
 	state: UmbUserStateEnum | null;
 	failedLoginAttempts: number;
