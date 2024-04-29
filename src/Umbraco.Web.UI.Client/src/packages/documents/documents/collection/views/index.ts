@@ -11,7 +11,7 @@ export function getPropertyValueByAlias(sortOrder: number, item: UmbDocumentColl
 		case 'creator':
 		case 'owner':
 			return item.creator;
-		case 'entityName':
+		case 'name':
 			return item.name;
 		case 'entityState':
 			return item.state.replace(/([A-Z])/g, ' $1');

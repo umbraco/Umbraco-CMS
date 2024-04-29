@@ -39,7 +39,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	#systemColumns: Array<UmbTableColumn> = [
 		{
 			name: this.localize.term('general_name'),
-			alias: 'entityName',
+			alias: 'name',
 			elementName: 'umb-media-table-column-name',
 			allowSorting: true,
 		},
@@ -149,7 +149,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		switch (alias) {
 			case 'createDate':
 				return item.createDate.toLocaleString();
-			case 'entityName':
+			case 'name':
 				return item.name;
 			case 'creator':
 			case 'owner':

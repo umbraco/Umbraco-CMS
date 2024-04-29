@@ -41,7 +41,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	#systemColumns: Array<UmbTableColumn> = [
 		{
 			name: this.localize.term('general_name'),
-			alias: 'entityName',
+			alias: 'name',
 			elementName: 'umb-document-table-column-name',
 			allowSorting: true,
 		},
