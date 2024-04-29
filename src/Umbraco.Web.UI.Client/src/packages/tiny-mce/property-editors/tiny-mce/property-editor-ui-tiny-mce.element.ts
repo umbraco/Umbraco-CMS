@@ -1,7 +1,8 @@
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 
@@ -31,19 +32,22 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		return this.#configuration;
 	}
 
-	#onChange(event: InputEvent) {
+	#onChange(event: InputEvent & { target: HTMLInputElement }) {
 		this.value = {
 			blocks: {},
-			markup: (event.target as HTMLInputElement).value,
+			markup: event.target.value,
 		};
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<umb-input-tiny-mce
-			@change=${this.#onChange}
-			.configuration=${this.#configuration}
-			.value=${this.value?.markup ?? ''}></umb-input-tiny-mce>`;
+		return html`
+			<umb-input-tiny-mce
+				.configuration=${this.#configuration}
+				.value=${this.value?.markup ?? ''}
+				@change=${this.#onChange}>
+			</umb-input-tiny-mce>
+		`;
 	}
 }
 

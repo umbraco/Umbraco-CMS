@@ -1,7 +1,6 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
@@ -14,19 +13,8 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 	@property()
 	public value?: string;
 
-	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		if (!config) return;
-
-		const minMax = config?.getValueByAlias<NumberRangeValueType>('validationLimit');
-		this.min = minMax?.min ?? 0;
-		this.max = minMax?.max ?? Infinity;
-	}
-
-	@state()
-	min = 0;
-
-	@state()
-	max = Infinity;
+	@property({ attribute: false })
+	public config?: UmbPropertyEditorConfigCollection;
 
 	#onChange(event: CustomEvent & { target: UmbInputMemberElement }) {
 		this.value = event.target.value;
@@ -35,11 +23,7 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 
 	render() {
 		return html`
-			<umb-input-member
-				.min=${this.min}
-				.max=${this.max}
-				.value=${this.value ?? ''}
-				@change=${this.#onChange}></umb-input-member>
+			<umb-input-member min="0" max="1" .value=${this.value ?? ''} @change=${this.#onChange}></umb-input-member>
 		`;
 	}
 }

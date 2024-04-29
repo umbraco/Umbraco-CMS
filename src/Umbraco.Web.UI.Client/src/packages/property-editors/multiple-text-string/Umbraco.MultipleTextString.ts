@@ -14,23 +14,19 @@ export const manifests: Array<ManifestTypes> = [
 						label: 'Minimum',
 						description: 'Enter the minimum amount of text boxes to be displayed',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+						config: [{ alias: 'min', value: 0 }],
 					},
 					{
 						alias: 'max',
 						label: 'Maximum',
 						description: 'Enter the maximum amount of text boxes to be displayed, enter 0 for unlimited',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+						config: [{ alias: 'min', value: 0 }],
 					},
 				],
 				defaultData: [
-					{
-						alias: 'min',
-						value: 0,
-					},
-					{
-						alias: 'max',
-						value: 0,
-					},
+					{ alias: 'min', value: 0 },
+					{ alias: 'max', value: 0 },
 				],
 			},
 		},
