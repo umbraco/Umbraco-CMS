@@ -13,7 +13,7 @@ const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Collection View',
 		propertyEditorSchemaAlias: 'Umbraco.ListView',
-		icon: 'icon-bulleted-list',
+		icon: 'icon-layers',
 		group: 'lists',
 		settings: {
 			properties: [
@@ -28,6 +28,7 @@ const manifest: ManifestPropertyEditorUi = {
 					label: 'Page Size',
 					description: 'Number of items per page.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					config: [{ alias: 'min', value: 0 }],
 				},
 				{
 					alias: 'orderBy',
@@ -70,6 +71,31 @@ const manifest: ManifestPropertyEditorUi = {
 					description: 'Enable this to use infinite editing to edit the content of the list view.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
+			],
+			defaultData: [
+				{
+					alias: 'includeProperties',
+					value: [
+						{ header: 'Sort', alias: 'sortOrder', isSystem: 1 },
+						{ header: 'Last edited', alias: 'updateDate', isSystem: 1 },
+						{ header: 'Created by', alias: 'creator', isSystem: 1 },
+					],
+				},
+				{
+					alias: 'layouts',
+					value: [
+						{ name: 'Table', icon: 'icon-list', collectionView: 'Umb.CollectionView.Document.Table' },
+						{ name: 'Grid', icon: 'icon-grid', collectionView: 'Umb.CollectionView.Document.Grid' },
+					],
+				},
+				{ alias: 'pageSize', value: 10 },
+				{ alias: 'orderBy', value: 'updateDate' },
+				{ alias: 'orderDirection', value: 'desc' },
+				{
+					alias: 'bulkActionPermissions',
+					value: { allowBulkPublish: true, allowBulkUnpublish: true, allowBulkCopy: true },
+				},
+				{ alias: 'icon', value: 'icon-list' },
 			],
 		},
 	},
