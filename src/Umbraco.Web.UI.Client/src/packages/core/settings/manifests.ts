@@ -8,7 +8,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'section',
 		alias: UMB_SETTINGS_SECTION_ALIAS,
 		name: 'Settings Section',
-		weight: 400,
+		weight: 800,
 		meta: {
 			label: '#sections_settings',
 			pathname: 'settings',

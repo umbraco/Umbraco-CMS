@@ -11,7 +11,7 @@ const section: ManifestSection = {
 	type: 'section',
 	alias: sectionAlias,
 	name: 'Content Section',
-	weight: 600,
+	weight: 1000,
 	meta: {
 		label: '#sections_content',
 		pathname: 'content',
