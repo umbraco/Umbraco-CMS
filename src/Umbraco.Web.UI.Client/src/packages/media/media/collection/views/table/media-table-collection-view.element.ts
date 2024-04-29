@@ -124,16 +124,14 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			this.#createTableHeadings();
 		}
 
-		this._tableItems = items.map((item, rowIndex) => {
+		this._tableItems = items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
-
-			const sortOrder = this._skip + rowIndex;
 
 			const data =
 				this._tableColumns?.map((column) => {
 					return {
 						columnAlias: column.alias,
-						value: column.elementName ? item : this.#getPropertyValueByAlias(sortOrder, item, column.alias),
+						value: column.elementName ? item : this.#getPropertyValueByAlias(item, column.alias),
 					};
 				}) ?? [];
 
@@ -145,7 +143,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	#getPropertyValueByAlias(sortOrder: number, item: UmbMediaCollectionItemModel, alias: string) {
+	#getPropertyValueByAlias(item: UmbMediaCollectionItemModel, alias: string) {
 		switch (alias) {
 			case 'createDate':
 				return item.createDate.toLocaleString();
@@ -155,7 +153,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			case 'owner':
 				return item.creator;
 			case 'sortOrder':
-				return sortOrder;
+				return item.sortOrder;
 			case 'updateDate':
 				return item.updateDate.toLocaleString();
 			default:

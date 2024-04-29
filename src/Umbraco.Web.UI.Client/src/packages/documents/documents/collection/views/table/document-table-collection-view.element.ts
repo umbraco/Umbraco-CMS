@@ -126,16 +126,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#createTableItems(items: Array<UmbDocumentCollectionItemModel>) {
-		this._tableItems = items.map((item, rowIndex) => {
+		this._tableItems = items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
-
-			const sortOrder = this._skip + rowIndex;
 
 			const data =
 				this._tableColumns?.map((column) => {
 					return {
 						columnAlias: column.alias,
-						value: column.elementName ? item : getPropertyValueByAlias(sortOrder, item, column.alias),
+						value: column.elementName ? item : getPropertyValueByAlias(item, column.alias),
 					};
 				}) ?? [];
 

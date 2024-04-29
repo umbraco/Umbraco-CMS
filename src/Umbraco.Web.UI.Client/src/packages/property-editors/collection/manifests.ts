@@ -89,7 +89,7 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 					],
 				},
 				{ alias: 'pageSize', value: 10 },
-				{ alias: 'orderBy', value: 'updateDate' },
+				{ alias: 'orderBy', value: 'sortOrder' },
 				{ alias: 'orderDirection', value: 'desc' },
 				{
 					alias: 'bulkActionPermissions',

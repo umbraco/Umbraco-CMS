@@ -43,6 +43,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					creator: item.creator,
 					icon: item.documentType.icon,
 					name: variant.name,
+					sortOrder: item.sortOrder,
 					state: variant.state,
 					updateDate: new Date(variant.updateDate),
 					updater: item.updater,
