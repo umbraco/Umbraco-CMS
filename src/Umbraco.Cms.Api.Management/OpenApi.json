@@ -43363,11 +43363,13 @@
         "required": [
           "avatarUrls",
           "createDate",
+          "documentRootAccess",
           "documentStartNodeIds",
           "email",
           "failedLoginAttempts",
           "id",
           "isAdmin",
+          "mediaRootAccess",
           "mediaStartNodeIds",
           "name",
           "state",
@@ -43410,6 +43412,9 @@
               "format": "uuid"
             }
           },
+          "documentRootAccess": {
+            "type": "boolean"
+          },
           "mediaStartNodeIds": {
             "uniqueItems": true,
             "type": "array",
@@ -43417,6 +43422,9 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "mediaRootAccess": {
+            "type": "boolean"
           },
           "avatarUrls": {
             "type": "array",
