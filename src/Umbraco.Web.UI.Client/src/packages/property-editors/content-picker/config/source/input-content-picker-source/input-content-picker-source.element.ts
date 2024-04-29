@@ -1,10 +1,12 @@
 import type { UmbContentPickerDynamicRoot, UmbContentPickerSourceType } from '../../../types.js';
-import type { UmbInputDocumentRootPickerElement } from '@umbraco-cms/backoffice/document';
+import type { UmbInputContentPickerDocumentRootElement } from '../../../dynamic-root/input-content-picker-document-root/input-content-picker-document-root.element.js';
 import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+
+import '../../../dynamic-root/input-content-picker-document-root/input-content-picker-document-root.element.js';
 
 @customElement('umb-input-content-picker-source')
 export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -70,7 +72,7 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 	#onDocumentRootChange(event: CustomEvent) {
 		switch (this.type) {
 			case 'content':
-				this.dynamicRoot = (event?.target as unknown as UmbInputDocumentRootPickerElement).data;
+				this.dynamicRoot = (event?.target as unknown as UmbInputContentPickerDocumentRootElement).data;
 
 				// HACK: Workaround consolidating the old content-picker and dynamic-root. [LK:2024-01-24]
 				if (this.dynamicRoot?.originAlias === 'ByKey') {
@@ -112,9 +114,12 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 	}
 
 	#renderDocumentSourcePicker() {
-		return html`<umb-input-document-root-picker
-			@change=${this.#onDocumentRootChange}
-			.data=${this.dynamicRoot}></umb-input-document-root-picker>`;
+		return html`
+			<umb-input-content-picker-document-root
+				.data=${this.dynamicRoot}
+				@change=${this.#onDocumentRootChange}>
+			</umb-input-content-picker-document-root>
+		`;
 	}
 
 	static styles = [

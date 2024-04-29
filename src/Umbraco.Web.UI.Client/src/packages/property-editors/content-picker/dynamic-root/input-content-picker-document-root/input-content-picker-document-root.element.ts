@@ -14,9 +14,9 @@ import type {
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
-const elementName = 'umb-input-dynamic-root';
+const elementName = 'umb-input-content-picker-document-root';
 @customElement(elementName)
-export class UmbInputDynamicRootElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixin(UmbLitElement, '') {
 	protected getFormElement() {
 		return undefined;
 	}
@@ -258,10 +258,10 @@ export class UmbInputDynamicRootElement extends UUIFormControlMixin(UmbLitElemen
 	];
 }
 
-export default UmbInputDynamicRootElement;
+export { UmbInputContentPickerDocumentRootElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputDynamicRootElement;
+		[elementName]: UmbInputContentPickerDocumentRootElement;
 	}
 }
