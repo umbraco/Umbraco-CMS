@@ -6,9 +6,9 @@ const sectionsViews: Array<ManifestSectionView> = [
 		alias: 'Umb.SectionView.Member',
 		name: 'Member Section View',
 		js: () => import('./member-section-view.element.js'),
-		weight: 500,
+		weight: 200,
 		meta: {
-			label: '#sections_member',
+			label: 'Members',
 			pathname: 'members',
 			icon: 'icon-user',
 		},
