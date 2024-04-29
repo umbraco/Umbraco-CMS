@@ -6,8 +6,9 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import '../user-workspace-assign-access/user-workspace-assign-access.element.js';
 
-@customElement('umb-user-workspace-access-settings')
-export class UmbUserWorkspaceAccessSettingsElement extends UmbLitElement {
+const elementName = 'umb-user-workspace-access';
+@customElement(elementName)
+export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	@state()
 	private _user?: UmbUserDetailModel;
 
@@ -23,19 +24,17 @@ export class UmbUserWorkspaceAccessSettingsElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` <umb-user-workspace-assign-access></umb-user-workspace-assign-access>
+		return html` <uui-box id="access" headline=${this.localize.term('user_access')}>
+			<div slot="header" class="faded-text">
+				<umb-localize key="user_accessHelp"
+					>Based on the assigned groups and start nodes, the user has access to the following nodes</umb-localize
+				>
+			</div>
 
-			<uui-box id="access" headline=${this.localize.term('user_access')}>
-				<div slot="header" class="faded-text">
-					<umb-localize key="user_accessHelp"
-						>Based on the assigned groups and start nodes, the user has access to the following nodes</umb-localize
-					>
-				</div>
-
-				${this.#renderDocumentStartNodes()}
-				<hr />
-				${this.#renderMediaStartNodes()}
-			</uui-box>`;
+			${this.#renderDocumentStartNodes()}
+			<hr />
+			${this.#renderMediaStartNodes()}
+		</uui-box>`;
 	}
 
 	#renderDocumentStartNodes() {
@@ -69,10 +68,10 @@ export class UmbUserWorkspaceAccessSettingsElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserWorkspaceAccessSettingsElement;
+export default UmbUserWorkspaceAccessElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-workspace-access-settings': UmbUserWorkspaceAccessSettingsElement;
+		[elementName]: UmbUserWorkspaceAccessElement;
 	}
 }
