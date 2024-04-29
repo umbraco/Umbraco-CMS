@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
-	alias: 'Umb.PropertyEditorUi.CollectionView.LayoutConfiguration',
+	alias: 'Umb.PropertyEditorUi.Collection.LayoutConfiguration',
 	name: 'Collection View Column Configuration Property Editor UI',
 	element: () => import('./layout-configuration.element.js'),
 	meta: {

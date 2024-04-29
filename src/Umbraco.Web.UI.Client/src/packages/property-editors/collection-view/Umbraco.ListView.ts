@@ -5,14 +5,14 @@ export const manifest: ManifestPropertyEditorSchema = {
 	name: 'List View',
 	alias: 'Umbraco.ListView',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.CollectionView',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Collection',
 		settings: {
 			properties: [
 				{
 					alias: 'includeProperties',
 					label: 'Columns Displayed',
 					description: 'The properties that will be displayed for each column.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.CollectionView.ColumnConfiguration',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Collection.ColumnConfiguration',
 				},
 			],
 		},

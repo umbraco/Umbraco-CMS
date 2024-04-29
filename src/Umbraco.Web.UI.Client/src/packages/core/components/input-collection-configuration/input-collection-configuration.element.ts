@@ -17,7 +17,7 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(
 
 	#dataTypeModal: UmbModalRouteRegistrationController;
 
-	#propertyEditorUiAlias = 'Umb.PropertyEditorUi.CollectionView';
+	#propertyEditorUiAlias = 'Umb.PropertyEditorUi.Collection';
 
 	@state()
 	private _dataTypePickerModalPath?: string;

@@ -7,7 +7,7 @@ import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backo
 
 const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
-	alias: 'Umb.PropertyEditorUi.CollectionView',
+	alias: 'Umb.PropertyEditorUi.Collection',
 	name: 'Collection View Property Editor UI',
 	element: () => import('./property-editor-ui-collection-view.element.js'),
 	meta: {
@@ -21,7 +21,7 @@ const manifest: ManifestPropertyEditorUi = {
 					alias: 'layouts',
 					label: 'Layouts',
 					description: 'The properties that will be displayed for each column.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.CollectionView.LayoutConfiguration',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Collection.LayoutConfiguration',
 				},
 				{
 					alias: 'pageSize',
@@ -34,7 +34,7 @@ const manifest: ManifestPropertyEditorUi = {
 					alias: 'orderBy',
 					label: 'Order By',
 					description: 'The default sort order for the list.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.CollectionView.OrderBy',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Collection.OrderBy',
 				},
 				{
 					alias: 'orderDirection',
@@ -45,7 +45,7 @@ const manifest: ManifestPropertyEditorUi = {
 					alias: 'bulkActionPermissions',
 					label: 'Bulk Action Permissions',
 					description: 'The bulk actions that are allowed from the list view.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.CollectionView.BulkActionPermissions',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Collection.BulkActionPermissions',
 				},
 				{
 					alias: 'icon',
