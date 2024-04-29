@@ -70,7 +70,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             State = user.UserState,
             UserGroupIds = new HashSet<Guid>(user.Groups.Select(x => x.Key)),
             DocumentStartNodeIds = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
+            DocumentRootAccess = HasRootAccess(user.StartContentIds),
             MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
+            MediaRootAccess = HasRootAccess(user.StartMediaIds),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
             LastLockoutDate = user.LastLockoutDate,
@@ -187,9 +189,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             AvatarUrls = presentationUser.AvatarUrls,
             LanguageIsoCode = presentationUser.LanguageIsoCode,
             MediaStartNodeIds = mediaStartNodeKeys,
-            MediaRootAccess = mediaStartNodeIds?.Contains(Constants.System.Root) is true,
+            MediaRootAccess = HasRootAccess(mediaStartNodeIds),
             DocumentStartNodeIds = documentStartNodeKeys,
-            DocumentRootAccess = contentStartNodeIds?.Contains(Constants.System.Root) is true,
+            DocumentRootAccess = HasRootAccess(contentStartNodeIds),
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages,
@@ -211,5 +213,6 @@ public class UserPresentationFactory : IUserPresentationFactory
             : new HashSet<Guid>(keys);
     }
 
-
+    private bool HasRootAccess(IEnumerable<int>? startNodeIds)
+        => startNodeIds?.Contains(Constants.System.Root) is true;
 }
