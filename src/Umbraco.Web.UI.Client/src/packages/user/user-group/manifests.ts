@@ -5,8 +5,9 @@ import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as sectionViewManifests } from './section-view/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...collectionManifests,
 	...repositoryManifests,
 	...workspaceManifests,

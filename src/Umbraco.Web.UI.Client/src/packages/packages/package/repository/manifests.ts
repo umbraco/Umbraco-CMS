@@ -1,4 +1,4 @@
-import type { ManifestStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestStore, ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_PACKAGE_REPOSITORY_ALIAS = 'Umb.Repository.Package';
 
@@ -18,4 +18,4 @@ const store: ManifestStore = {
 	api: () => import('./package.store.js'),
 };
 
-export const manifests = [store, repository];
+export const manifests: Array<ManifestTypes> = [store, repository];

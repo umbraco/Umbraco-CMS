@@ -154,7 +154,7 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	#renderItem(item: UmbUserItemModel) {
-		if (!item.unique) return;
+		if (!item.unique) return nothing;
 		return html`
 			<uui-ref-node-user name=${item.name} id=${item.unique}>
 				<uui-action-bar slot="actions">

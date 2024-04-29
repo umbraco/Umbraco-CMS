@@ -21,4 +21,4 @@ export const createManifest: ManifestTypes = {
 	// element: () => import('./create-member-collection-action.element.js'),
 };
 
-export const manifests = [createManifest];
+export const manifests: Array<ManifestTypes> = [createManifest];

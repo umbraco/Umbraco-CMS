@@ -2,10 +2,10 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/exten
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Multi Node Tree Picker',
-	alias: 'Umbraco.MultiNodeTreePicker',
+	name: 'Multi URL Picker',
+	alias: 'Umbraco.MultiUrlPicker',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MultiUrlPicker',
 		settings: {
 			properties: [
 				{
@@ -13,12 +13,14 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Minimum number of items',
 					description: '',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					config: [{ alias: 'min', value: 0 }],
 				},
 				{
 					alias: 'maxNumber',
 					label: 'Maximum number of items',
 					description: '',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					config: [{ alias: 'min', value: 0 }],
 				},
 				{
 					alias: 'ignoreUserStartNodes',
@@ -26,22 +28,10 @@ export const manifest: ManifestPropertyEditorSchema = {
 					description: 'Selecting this option allows a user to choose nodes that they normally dont have access to.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
-				{
-					alias: 'startNode',
-					label: 'Node type',
-					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.SourcePicker',
-				},
 			],
 			defaultData: [
-				{
-					alias: 'minNumber',
-					value: 0,
-				},
-				{
-					alias: 'maxNumber',
-					value: 0,
-				},
+				{ alias: 'minNumber', value: 0 },
+				{ alias: 'maxNumber', value: 0 },
 			],
 		},
 	},

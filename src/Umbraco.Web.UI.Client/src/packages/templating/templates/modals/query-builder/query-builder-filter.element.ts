@@ -51,6 +51,7 @@ export class UmbTemplateQueryBuilderFilterElement extends UmbLitElement {
 
 	#resetFilter() {
 		this.filter = <TemplateQueryExecuteFilterPresentationModel>{};
+		this.dispatchEvent(new Event('remove-filter'));
 	}
 
 	#removeOrReset() {

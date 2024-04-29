@@ -1,4 +1,6 @@
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as decimalSchemaManifests } from './Umbraco.Decimal.js';
+import { manifests as integerSchemaManifests } from './Umbraco.Integer.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 // TODO: we don't really want this config value to be changed from the UI. We need a way to handle hidden config properties.
 const allowDecimalsConfig = {
@@ -7,7 +9,7 @@ const allowDecimalsConfig = {
 	propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 };
 
-export const manifests: Array<ManifestPropertyEditorUi> = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.Integer',
@@ -66,4 +68,6 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 			propertyEditorSchemaAlias: 'Umbraco.Integer',
 		},
 	},
+	...decimalSchemaManifests,
+	...integerSchemaManifests,
 ];

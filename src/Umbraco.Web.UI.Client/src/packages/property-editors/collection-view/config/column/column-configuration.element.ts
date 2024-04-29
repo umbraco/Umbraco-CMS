@@ -1,13 +1,16 @@
 import type { UmbCollectionColumnConfiguration } from '../../../../core/collection/types.js';
+import type { UmbInputContentTypePropertyElement } from './components/input-content-type-property/index.js';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbInputContentTypePropertyElement } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+
+// import of local components
+import './components/input-content-type-property/index.js';
 
 /**
  * @element umb-property-editor-ui-collection-view-column-configuration
@@ -30,9 +33,9 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	});
 
 	@property({ type: Array })
-	public set value(value: Array<UmbCollectionColumnConfiguration>) {
-		this.#value = value;
-		this.#sorter.setModel(value);
+	public set value(value: Array<UmbCollectionColumnConfiguration> | undefined) {
+		this.#value = value ?? [];
+		this.#sorter.setModel(this.#value);
 	}
 	public get value(): Array<UmbCollectionColumnConfiguration> {
 		return this.#value;
@@ -92,7 +95,10 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	}
 
 	render() {
-		return html`${this.#renderColumns()} ${this.#renderInput()}`;
+		return html`
+			<div id="layout-wrapper">${this.#renderColumns()}</div>
+			${this.#renderInput()}
+		`;
 	}
 
 	#renderInput() {
@@ -106,15 +112,11 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 
 	#renderColumns() {
 		if (!this.value) return nothing;
-		return html`
-			<div id="layout-wrapper">
-				${repeat(
-					this.value,
-					(column) => column.alias,
-					(column) => this.#renderColumn(column),
-				)}
-			</div>
-		`;
+		return repeat(
+			this.value,
+			(column) => column.alias,
+			(column) => this.#renderColumn(column),
+		);
 	}
 
 	#renderColumn(column: UmbCollectionColumnConfiguration) {

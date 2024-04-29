@@ -1,5 +1,6 @@
 import type {
 	ManifestModal,
+	ManifestTypes,
 	ManifestWorkspace,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
@@ -68,4 +69,4 @@ const modals: Array<ManifestModal> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions, ...modals];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions, ...modals];

@@ -5,8 +5,9 @@ import { manifests as propertyEditorManifests } from './property-editor/manifest
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as sectionViewManifests } from './section-view/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...collectionManifests,
 	...entityActionManifests,
 	...memberGroupPickerModalManifests,

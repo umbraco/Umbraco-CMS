@@ -1,4 +1,4 @@
-import { manifest as documentPickerUI } from './document-picker/manifests.js';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as documentPickerManifests } from './document-picker/manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestPropertyEditorUi> = [documentPickerUI];
+export const manifests: Array<ManifestTypes> = [...documentPickerManifests];

@@ -81,7 +81,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 					<div slot="editor">
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
 						<umb-input-document-type
-							element-types-only
+							.documentTypesOnly=${true}
 							.selection=${this._allowedContentTypeUniques ?? []}
 							@change="${(e: CustomEvent) => {
 								const sortedContentTypesList: Array<UmbContentTypeSortModel> = (
@@ -102,7 +102,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 					<div slot="editor">
 						<umb-input-collection-configuration
 							default-value="c0808dd3-8133-4e4b-8ce8-e2bea84a96a4"
-							.value=${this._collection ?? ''}
+							.value=${this._collection ?? undefined}
 							@change=${(e: CustomEvent) => {
 								const unique = (e.target as UmbInputCollectionConfigurationElement).value as string;
 								this.#workspaceContext?.setCollection({ unique });

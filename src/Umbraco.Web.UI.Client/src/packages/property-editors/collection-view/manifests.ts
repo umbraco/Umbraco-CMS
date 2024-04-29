@@ -2,7 +2,8 @@ import { manifest as bulkActionPermissions } from './config/bulk-action-permissi
 import { manifest as columnConfiguration } from './config/column/manifests.js';
 import { manifest as layoutConfiguration } from './config/layout/manifests.js';
 import { manifest as orderBy } from './config/order-by/manifests.js';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import { manifest as schema } from './Umbraco.ListView.js';
+import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
@@ -12,7 +13,7 @@ const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Collection View',
 		propertyEditorSchemaAlias: 'Umbraco.ListView',
-		icon: 'icon-bulleted-list',
+		icon: 'icon-layers',
 		group: 'lists',
 		settings: {
 			properties: [
@@ -27,6 +28,7 @@ const manifest: ManifestPropertyEditorUi = {
 					label: 'Page Size',
 					description: 'Number of items per page.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					config: [{ alias: 'min', value: 0 }],
 				},
 				{
 					alias: 'orderBy',
@@ -70,6 +72,31 @@ const manifest: ManifestPropertyEditorUi = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
+			defaultData: [
+				{
+					alias: 'includeProperties',
+					value: [
+						{ header: 'Sort', alias: 'sortOrder', isSystem: 1 },
+						{ header: 'Last edited', alias: 'updateDate', isSystem: 1 },
+						{ header: 'Created by', alias: 'creator', isSystem: 1 },
+					],
+				},
+				{
+					alias: 'layouts',
+					value: [
+						{ name: 'Table', icon: 'icon-list', collectionView: 'Umb.CollectionView.Document.Table' },
+						{ name: 'Grid', icon: 'icon-grid', collectionView: 'Umb.CollectionView.Document.Grid' },
+					],
+				},
+				{ alias: 'pageSize', value: 10 },
+				{ alias: 'orderBy', value: 'updateDate' },
+				{ alias: 'orderDirection', value: 'desc' },
+				{
+					alias: 'bulkActionPermissions',
+					value: { allowBulkPublish: true, allowBulkUnpublish: true, allowBulkCopy: true },
+				},
+				{ alias: 'icon', value: 'icon-list' },
+			],
 		},
 	},
 };
@@ -81,4 +108,4 @@ const config: Array<ManifestPropertyEditorUi> = [
 	orderBy,
 ];
 
-export const manifests = [manifest, ...config];
+export const manifests: Array<ManifestTypes> = [manifest, ...config, schema];

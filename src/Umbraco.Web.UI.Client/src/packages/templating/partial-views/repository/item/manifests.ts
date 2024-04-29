@@ -1,4 +1,4 @@
-import type { ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestItemStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_PARTIAL_VIEW_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.PartialView.Item';
 export const UMB_PARTIAL_VIEW_ITEM_STORE_ALIAS = 'Umb.ItemStore.PartialView';
@@ -17,4 +17,4 @@ const itemStore: ManifestItemStore = {
 	api: () => import('./partial-view-item.store.js'),
 };
 
-export const manifests = [repository, itemStore];
+export const manifests: Array<ManifestTypes> = [repository, itemStore];

@@ -1,5 +1,5 @@
 import { UmbConfigureMfaProvidersApi } from './configure-mfa-providers-action.js';
-import type { ManifestCurrentUserActionDefaultKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCurrentUserActionDefaultKind, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const userProfileApps: Array<ManifestCurrentUserActionDefaultKind> = [
 	{
@@ -21,4 +21,4 @@ export const userProfileApps: Array<ManifestCurrentUserActionDefaultKind> = [
 		],
 	},
 ];
-export const manifests = [...userProfileApps];
+export const manifests: Array<ManifestTypes> = [...userProfileApps];
