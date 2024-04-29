@@ -140,6 +140,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					(icon) => html`
 						<uui-button
 							label="${icon.name}"
+							title="${icon.name}"
 							class="${icon.name === this._currentIcon ? 'selected' : ''}"
 							@click="${this.#changeIcon}"
 							@keyup="${this.#changeIcon}">

@@ -18,6 +18,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'validationLimit',
 					label: 'Amount',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
+					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
 				},
 			],
 			defaultData: [
