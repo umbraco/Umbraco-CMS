@@ -1,7 +1,7 @@
 import {
 	UMB_CONTENT_PICKER_DOCUMENT_ROOT_ORIGIN_PICKER_MODAL_ALIAS,
 	UMB_CONTENT_PICKER_DOCUMENT_ROOT_QUERY_STEP_PICKER_MODAL_ALIAS,
-} from './manifests.js';
+} from './constants.js';
 import type {
 	ManifestDynamicRootOrigin,
 	ManifestDynamicRootQueryStep,
