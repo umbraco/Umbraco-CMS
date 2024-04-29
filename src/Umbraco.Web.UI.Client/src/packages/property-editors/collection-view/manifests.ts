@@ -5,7 +5,7 @@ import { manifest as orderBy } from './config/order-by/manifests.js';
 import { manifest as schema } from './Umbraco.ListView.js';
 import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const manifest: ManifestPropertyEditorUi = {
+const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.Collection',
 	name: 'Collection View Property Editor UI',
@@ -101,6 +101,15 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
+/**
+ * Legacy property editor UI manifest for the collection view property editor.
+ * @deprecated Use the property editor UI alias of 'Umb.PropertyEditorUi.Collection' instead.
+ */
+const legacyPropertyEditorUiManifest: ManifestPropertyEditorUi = {
+	...legacyPropertyEditorUiManifest,
+	alias: 'Umb.PropertyEditorUi.CollectionView',
+};
+
 const config: Array<ManifestPropertyEditorUi> = [
 	bulkActionPermissions,
 	columnConfiguration,
@@ -108,4 +117,9 @@ const config: Array<ManifestPropertyEditorUi> = [
 	orderBy,
 ];
 
-export const manifests: Array<ManifestTypes> = [manifest, ...config, schema];
+export const manifests: Array<ManifestTypes> = [
+	propertyEditorUiManifest,
+	legacyPropertyEditorUiManifest,
+	...config,
+	schema,
+];
