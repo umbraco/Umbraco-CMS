@@ -70,6 +70,7 @@ test.describe(`${dataTypeName} tests`, () => {
     await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
+    await umbracoUi.dataType.clickChooseButton();
     await umbracoUi.dataType.addStartNode(contentName);
     await umbracoUi.dataType.clickSaveButton();
 
@@ -109,7 +110,7 @@ test.describe(`${dataTypeName} tests`, () => {
     await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
-    await umbracoUi.dataType.removeStartNode(contentName);
+    await umbracoUi.dataType.removeContentStartNode(contentName);
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert

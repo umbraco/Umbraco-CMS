@@ -85,14 +85,16 @@ test.describe(`${dataTypeName} tests`, () => {
     await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   });
 
-  // TODO: remove .skip and update expectedDataTypeValues when the frontend is ready. Currently the added dimesions are not saved.
-  test.skip('can add dimensions', async ({umbracoApi, umbracoUi}) => {
+  test('can add dimensions', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const width = 100;
     const height = 10;
     const expectedDataTypeValues = {
       "alias": "dimensions",
-      "value": [width, height],
+      "value": {
+        "width": width,
+        "height": height
+      },
     };
     await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -105,10 +107,9 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-  // TODO: remove .skip and update expectedDataTypeValues when the frontend is ready. Currently the added maximum size are not saved.
-  test.skip('can add maximum size for inserted images', async ({umbracoApi, umbracoUi}) => {
+  test('can add maximum size for inserted images', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const maxImageSize = 0;
+    const maxImageSize = 300;
     const expectedDataTypeValues = {
       "alias": "maxImageSize",
       "value": maxImageSize,
@@ -159,17 +160,48 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-  // TODO: implement this test when the frontend is ready
-  test.skip('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
+  test('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const mediaFolderName = 'TestMediaFolder';
+    await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+    const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
+    const expectedDataTypeValues = {
+      "alias": "mediaParentId",
+      "value": mediaFolderId,
+    };
+    await umbracoUi.dataType.goToDataType(dataTypeName);
 
+    // Act
+    await umbracoUi.dataType.addImageUploadFolder(mediaFolderName);
+    await umbracoUi.dataType.clickSaveButton();
+
+    // Assert
+    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+
+    // Clean
+    await umbracoApi.media.ensureNameNotExists(mediaFolderName);
   });
 
-  // TODO: implement this test when the frontend is ready
-  test.skip('can select mode', async ({umbracoApi, umbracoUi}) => {
+  test('can select mode', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const mode = 'Inline';
+    const expectedDataTypeValues = {
+      "alias": "mode",
+      "value": mode,
+    };
+    await umbracoUi.dataType.goToDataType(dataTypeName);
 
+    // Act
+    await umbracoUi.dataType.clickInlineRadioButton();
+    await umbracoUi.dataType.clickSaveButton();
+
+    // Assert
+    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-  // TODO: implement this test when the frontend is ready
+  // TODO: Implement it when the fron-end is ready
   test.skip('can add available blocks', async ({umbracoApi, umbracoUi}) => {
 
   });

@@ -36,8 +36,20 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-    // TODO: implement this test when the frontend is ready.
-    test.skip('can select storage type', async ({umbracoApi, umbracoUi}) => {
+  test('can select storage type', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const storageType = 'Csv';
+    const expectedDataTypeValues = {
+      "alias": "storageType",
+      "value": [storageType],
+    };
 
-    });
+    // Act
+    await umbracoUi.dataType.selectStorageTypeOption(storageType);
+    await umbracoUi.dataType.clickSaveButton();
+
+    // Assert
+    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+  });
 });

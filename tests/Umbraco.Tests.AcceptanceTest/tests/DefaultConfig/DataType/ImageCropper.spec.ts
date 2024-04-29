@@ -49,7 +49,7 @@ test.describe(`${dataTypeName} tests`, () => {
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    //await umbracoUi.dataType.isSuccessNotificationVisible();
+    await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toEqual(expectedDataTypeValues);
   });
@@ -92,7 +92,7 @@ test.describe(`${dataTypeName} tests`, () => {
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    //await umbracoUi.dataType.isSuccessNotificationVisible();
+    await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toEqual(expectedDataTypeValues);
   });
@@ -121,7 +121,7 @@ test.describe(`${dataTypeName} tests`, () => {
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    //await umbracoUi.dataType.isSuccessNotificationVisible();
+    await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toEqual([]);
   });

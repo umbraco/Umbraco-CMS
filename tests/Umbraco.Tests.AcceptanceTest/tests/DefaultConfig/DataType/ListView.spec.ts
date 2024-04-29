@@ -1,8 +1,6 @@
 ﻿import { test } from "@umbraco/playwright-testhelpers";
 import { expect } from "@playwright/test";
 
-// TODO: Added List View - Members to the list when the front-end is ready
-//const listViewTypes = ['List View - Content', 'List View - Media', 'List View - Members'];
 const listViewTypes = ['List View - Content', 'List View - Media'];
 for (const listViewType of listViewTypes) {
   test.describe(`${listViewType} tests`, () => {
@@ -13,7 +11,6 @@ for (const listViewType of listViewTypes) {
       await umbracoUi.goToBackOffice();
       await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
       dataTypeDefaultData = await umbracoApi.dataType.getByName(listViewType);
-      await umbracoUi.dataType.goToDataType(listViewType);
     });
 
     test.afterEach(async ({ umbracoApi }) => {
@@ -31,6 +28,7 @@ for (const listViewType of listViewTypes) {
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.enterPageSizeValue(pageSizeValue.toString());
       await umbracoUi.dataType.clickSaveButton();
 
@@ -49,6 +47,7 @@ for (const listViewType of listViewTypes) {
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.chooseOrderDirection(isAscending);
       await umbracoUi.dataType.clickSaveButton();
 
@@ -57,18 +56,26 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    //TODO: Uncomment when the frontend works
-    test.skip('can add column displayed', async ({umbracoApi, umbracoUi}) => {
+    test('can add column displayed', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      const columnName = 'Document Type';
+      let columnData: string[];
+      if (listViewType === 'List View - Media') {
+        columnData = ['Document Type', 'TestDocumentType', 'owner', 'Created by'];
+        await umbracoApi.documentType.ensureNameNotExists(columnData[1]);
+        await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(columnData[1]);
+      } else {
+        columnData = ['Media Type', 'Audio', 'owner', 'Created by'];
+      }
+
       const expectedIncludePropertiesValues = {
-        "alias": "contentTypeAlias",
-        "header": "Document Type",
+        "alias": columnData[2],
+        "header": columnData[3],
         "isSystem": 1,
       };
 
       // Act
-      await umbracoUi.dataType.addColumnDisplayed(columnName);
+      await umbracoUi.dataType.goToDataType(listViewType);
+      await umbracoUi.dataType.addColumnDisplayed(columnData[0], columnData[1], columnData[2]);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -77,24 +84,94 @@ for (const listViewType of listViewTypes) {
       expect(includePropertiesData.value).toContainEqual(expectedIncludePropertiesValues);
     });
 
-    //TODO: Uncomment when the frontend works
-    test.skip('can remove column displayed', async ({umbracoApi, umbracoUi}) => {
+    test('can remove column displayed', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      const columnName = 'updateDate';
-      const expectedIncludePropertiesValues = {
-        "alias": "updateDate",
-        "header": "Last edited",
-        "isSystem": 1,
-      };
+      let columnData: string[];
+      if (listViewType === 'List View - Media') {
+        columnData = ['Document Type', 'TestDocumentType', 'owner', 'Created by'];
+        await umbracoApi.documentType.ensureNameNotExists(columnData[1]);
+        await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(columnData[1]);
+      } else {
+        columnData = ['Media Type', 'Audio', 'owner', 'Created by'];
+      }
+
+      const removedDataTypeValues = [{
+        "alias": "includeProperties",
+        "value": [{
+          "alias": columnData[2],
+          "header": columnData[3],
+          "isSystem": 1,
+        }]
+      }];
+  
+      // Remove all existing values and add a column displayed to remove
+      dataTypeData = await umbracoApi.dataType.getByName(listViewType);
+      dataTypeData.values = removedDataTypeValues;
+      await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
 
       // Act
-      await umbracoUi.dataType.removeColumnDisplayed(columnName);
+      await umbracoUi.dataType.goToDataType(listViewType);
+      await umbracoUi.dataType.removeColumnDisplayed(columnData[2]);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
-      const includePropertiesData = dataTypeData.values.find(value => value.alias === "includeProperties");
-      expect(includePropertiesData.value).not.toContainEqual(expectedIncludePropertiesValues);
+      expect(dataTypeData.values).toEqual([]);
+    });
+
+    test('can add layouts', async ({umbracoApi, umbracoUi}) => {
+      // Arrange
+      let layoutsData = ['Document Grid Collection View', 'Umb.CollectionView.Document.Grid'];
+      if (listViewType === 'List View - Media') {
+        layoutsData = ['Media Grid Collection View', 'Umb.CollectionView.Media.Grid'];
+      }
+
+      const expectedIncludePropertiesValues = {
+        "icon": "icon-grid",
+        "name": layoutsData[0],
+        "collectionView": layoutsData[1],
+      };
+
+      // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
+      await umbracoUi.dataType.addLayouts(layoutsData[1]);
+      await umbracoUi.dataType.clickSaveButton();
+
+      // Assert
+      dataTypeData = await umbracoApi.dataType.getByName(listViewType);
+      const includePropertiesData = dataTypeData.values.find(value => value.alias === "layouts");
+      expect(includePropertiesData.value).toContainEqual(expectedIncludePropertiesValues);
+    });
+
+    test('can remove layouts', async ({umbracoApi, umbracoUi}) => {
+      // Arrange
+      let layoutsData = ['Document Grid Collection View', 'Umb.CollectionView.Document.Grid'];
+      if (listViewType === 'List View - Media') {
+        layoutsData = ['Media Grid Collection View', 'Umb.CollectionView.Media.Grid'];
+      }
+
+      const removedDataTypeValues = [{
+        "alias": "layouts",
+        "value": [{
+          "icon": "icon-grid",
+          "name": layoutsData[0],
+          "collectionView": layoutsData[1],
+        }]
+      }];
+  
+      // Remove all existing values and add a layout to remove
+      dataTypeData = await umbracoApi.dataType.getByName(listViewType);
+      dataTypeData.values = removedDataTypeValues;
+      await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
+
+      // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
+      await umbracoUi.dataType.removeLayouts(layoutsData[1]);
+      await umbracoUi.dataType.clickSaveButton();
+
+      // Assert
+      dataTypeData = await umbracoApi.dataType.getByName(listViewType);
+      expect(dataTypeData.values).toEqual([]);
     });
 
     test('can update order by', async ({umbracoApi, umbracoUi}) => {
@@ -106,6 +183,7 @@ for (const listViewType of listViewTypes) {
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.chooseOrderByValue(orderByValue);
       await umbracoUi.dataType.clickSaveButton();
 
@@ -129,6 +207,7 @@ for (const listViewType of listViewTypes) {
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.clickBulkActionPermissionsSliderByValue(bulkActionPermissionValue);
       await umbracoUi.dataType.clickSaveButton();
 
@@ -146,6 +225,7 @@ for (const listViewType of listViewTypes) {
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.clickContentAppIconButton();
       await umbracoUi.dataType.chooseContentAppIconByValue(iconValue);
       await umbracoUi.dataType.clickSaveButton();
@@ -164,6 +244,7 @@ for (const listViewType of listViewTypes) {
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.enterContentAppName(contentAppName);
       await umbracoUi.dataType.clickSaveButton();
 
@@ -180,6 +261,7 @@ for (const listViewType of listViewTypes) {
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.clickShowContentAppFirstSlider();
       await umbracoUi.dataType.clickSaveButton();
 
@@ -196,11 +278,12 @@ for (const listViewType of listViewTypes) {
       };
 
       // Act
+      await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.clickEditInInfiniteEditorSlider();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
+      await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });

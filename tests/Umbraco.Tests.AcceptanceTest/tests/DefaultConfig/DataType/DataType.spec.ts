@@ -28,7 +28,7 @@ test.describe('Data Types basic functionalities tests', () => {
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   });
 
-  test('can update a data type name', async ({umbracoApi, umbracoUi}) => {
+  test('can rename a data type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongDataTypeName = 'Wrong Data Type';
     await umbracoApi.dataType.ensureNameNotExists(wrongDataTypeName);

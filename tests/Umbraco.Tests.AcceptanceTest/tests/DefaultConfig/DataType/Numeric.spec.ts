@@ -69,4 +69,20 @@ test.describe(`${dataTypeName} tests`, () => {
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
+
+  test('can allow decimals', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const expectedDataTypeValues = {
+      "alias": "allowDecimals",
+      "value": true,
+    };
+
+    // Act
+    await umbracoUi.dataType.clickAllowDecimalsSlider();
+    await umbracoUi.dataType.clickSaveButton();
+
+    // Assert
+    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+  });
 });
