@@ -15,7 +15,7 @@ export class UmbContentPickerDynamicRootRepository extends UmbControllerBase {
 		this.#dataSource = new UmbContentPickerDynamicRootServerDataSource(host);
 	}
 
-	async postDynamicRootQuery(query: UmbContentPickerDynamicRoot, entityId: string, parentId?: string) {
+	async requestRoot(query: UmbContentPickerDynamicRoot, entityId: string, parentId?: string) {
 		const model: DynamicRootRequestModel = {
 			context: {
 				id: entityId,
@@ -35,7 +35,7 @@ export class UmbContentPickerDynamicRootRepository extends UmbControllerBase {
 			},
 		};
 
-		const result = await this.#dataSource.postDynamicRootQuery(model);
+		const result = await this.#dataSource.getRoot(model);
 
 		return result?.roots;
 	}

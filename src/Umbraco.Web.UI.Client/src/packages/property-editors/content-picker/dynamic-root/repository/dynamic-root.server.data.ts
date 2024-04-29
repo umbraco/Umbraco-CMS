@@ -10,7 +10,7 @@ export class UmbContentPickerDynamicRootServerDataSource {
 		this.#host = host;
 	}
 
-	async postDynamicRootQuery(args: DynamicRootRequestModel): Promise<DynamicRootResponseModel | undefined> {
+	async getRoot(args: DynamicRootRequestModel): Promise<DynamicRootResponseModel | undefined> {
 		if (!args.context) throw new Error('Dynamic Root context is missing');
 		if (!args.query) throw new Error('Dynamic Root query is missing');
 

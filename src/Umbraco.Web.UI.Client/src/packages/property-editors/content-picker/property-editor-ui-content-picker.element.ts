@@ -76,7 +76,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 		const workspaceContext = await this.getContext(UMB_ENTITY_WORKSPACE_CONTEXT);
 		const unique = workspaceContext.getUnique();
 		if (unique && this.#dynamicRoot) {
-			const result = await this.#dynamicRootRepository.postDynamicRootQuery(this.#dynamicRoot, unique);
+			const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique);
 			if (result && result.length > 0) {
 				this.startNodeId = result[0];
 			}
