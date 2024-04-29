@@ -18265,7 +18265,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
+                      "$ref": "#/components/schemas/PagedMemberTypeTreeItemResponseModel"
                     }
                   ]
                 }
@@ -38268,6 +38268,39 @@
         },
         "additionalProperties": false
       },
+      "MemberTypeTreeItemResponseModel": {
+        "required": [
+          "hasChildren",
+          "icon",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "MemberValueModel": {
         "required": [
           "alias"
@@ -39441,6 +39474,30 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/MemberResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedMemberTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MemberTypeTreeItemResponseModel"
                 }
               ]
             }
