@@ -60,8 +60,16 @@ export class UmbAppElement extends UmbLitElement {
 		},
 		{
 			path: 'oauth_complete',
-			resolve: async () => {
-				// Complete oauth
+			component: () => import('./app-error.element.js'),
+			setup: (component) => {
+				const searchParams = new URLSearchParams(window.location.search);
+				const hasCode = searchParams.has('code');
+				(component as UmbAppErrorElement).errorHeadline = 'Umbraco Authorization';
+				(component as UmbAppErrorElement).errorMessage = hasCode
+					? 'Authorization completed. You may now close this window.'
+					: 'Authorization failed. Please try again.';
+
+				// Complete the authorization request
 				this.#authContext?.completeAuthorizationRequest();
 			},
 		},
@@ -180,18 +188,6 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#redirect() {
-		/** If there is a ?code parameter in the url, then we are in the middle of the oauth flow
-		 * and we need to complete the login (the authorization notifier will redirect after this is done
-		 * essentially hitting this method again)
-		 * @deprecated This is a legacy way of handling oauth flow, it should be removed once the backend starts sending the oauth_complete route
-		 * TODO: Remove this when the backend sends the oauth_complete route
-		 */
-		const queryParams = new URLSearchParams(window.location.search);
-		if (queryParams.has('code')) {
-			this.#authContext?.completeAuthorizationRequest();
-			return;
-		}
-
 		switch (this.#serverConnection?.getStatus()) {
 			case RuntimeLevelModel.INSTALL:
 				history.replaceState(null, '', 'install');
