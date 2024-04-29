@@ -64,6 +64,8 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 					languageIsoCode: item.languageIsoCode || null,
 					documentStartNodeUniques: item.documentStartNodeIds,
 					mediaStartNodeUniques: item.mediaStartNodeIds,
+					documentRootAccess: item.documentRootAccess,
+					mediaRootAccess: item.mediaRootAccess,
 					avatarUrls: item.avatarUrls,
 					state: item.state,
 					failedLoginAttempts: item.failedLoginAttempts,
