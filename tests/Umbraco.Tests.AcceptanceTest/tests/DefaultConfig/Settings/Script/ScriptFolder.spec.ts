@@ -19,6 +19,8 @@ test.describe('Script tests', () => {
     await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.script.clickActionsMenuAtRoot();
     await umbracoUi.script.createFolder(scriptFolderName);
+    // TODO: remove it later
+    await umbracoUi.waitForTimeout(1000);
 
     // Assert
     await umbracoUi.script.isSuccessNotificationVisible();

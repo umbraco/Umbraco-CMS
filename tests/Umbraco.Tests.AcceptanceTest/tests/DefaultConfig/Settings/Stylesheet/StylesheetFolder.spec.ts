@@ -19,6 +19,8 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
     await umbracoUi.stylesheet.createFolder(stylesheetFolderName);
+    // TODO: remove it later
+    await umbracoUi.waitForTimeout(1000);
 
     // Assert
     await umbracoUi.stylesheet.isSuccessNotificationVisible();
