@@ -6,6 +6,12 @@ import type { DynamicRootRequestModel } from '@umbraco-cms/backoffice/external/b
 
 const GUID_EMPTY: string = '00000000-0000-0000-0000-000000000000';
 
+/**
+ * UmbContentPickerDynamicRootRepository
+ * @export
+ * @class UmbContentPickerDynamicRootRepository
+ * @extends {UmbControllerBase}
+ */
 export class UmbContentPickerDynamicRootRepository extends UmbControllerBase {
 	#dataSource: UmbContentPickerDynamicRootServerDataSource;
 
@@ -15,6 +21,14 @@ export class UmbContentPickerDynamicRootRepository extends UmbControllerBase {
 		this.#dataSource = new UmbContentPickerDynamicRootServerDataSource(host);
 	}
 
+	/**
+	 * Request dynamic root
+	 * @param {UmbContentPickerDynamicRoot} query
+	 * @param {string} entityId
+	 * @param {string} [parentId]
+	 * @return {*}
+	 * @memberof UmbContentPickerDynamicRootRepository
+	 */
 	async requestRoot(query: UmbContentPickerDynamicRoot, entityId: string, parentId?: string) {
 		const model: DynamicRootRequestModel = {
 			context: {
