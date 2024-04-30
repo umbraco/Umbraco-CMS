@@ -17,19 +17,19 @@ export class UmbSectionSidebarContext extends UmbContextBase<UmbSectionSidebarCo
 	#headline = new UmbStringState<undefined>(undefined);
 	headline = this.#headline.asObservable();
 
-	#contextElement: HTMLElement | undefined = undefined;
+	#contextElement: Element | undefined = undefined;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_SECTION_SIDEBAR_CONTEXT);
 	}
 
-	toggleContextMenu(host: HTMLElement, args: UmbOpenContextMenuArgs) {
+	toggleContextMenu(host: Element, args: UmbOpenContextMenuArgs) {
 		this.openContextMenu(host, args);
 	}
 
 	// TODO: we wont get notified about tree item name changes because we don't have a subscription
 	// we need to figure out how we best can handle this when we only know the entity and unique id
-	openContextMenu(host: HTMLElement, args: UmbOpenContextMenuArgs) {
+	openContextMenu(host: Element, args: UmbOpenContextMenuArgs) {
 		this.#entityType.setValue(args.entityType);
 		this.#unique.setValue(args.unique);
 		this.#headline.setValue(args.headline);
