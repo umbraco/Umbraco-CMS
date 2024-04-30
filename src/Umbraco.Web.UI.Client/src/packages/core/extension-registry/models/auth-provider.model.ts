@@ -55,12 +55,6 @@ export interface MetaAuthProvider {
 	 */
 	behavior?: {
 		/**
-		 * If true, the Umbraco backoffice login will be disabled.
-		 * @default false
-		 */
-		denyLocalLogin?: boolean;
-
-		/**
 		 * If true, the user will be redirected to the provider's login page immediately.
 		 * @default false
 		 */

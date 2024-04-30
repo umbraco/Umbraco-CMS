@@ -65,7 +65,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 
 		// If the user is timed out, we can show the login modal directly
 		if (userLoginState === 'timedOut') {
-			const selected = await this.#showLoginModal(userLoginState, availableProviders);
+			const selected = await this.#showLoginModal(userLoginState);
 
 			if (!selected) {
 				return false;
@@ -93,7 +93,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 		}
 
 		// Show the provider selection screen
-		const selected = await this.#showLoginModal(userLoginState, availableProviders);
+		const selected = await this.#showLoginModal(userLoginState);
 
 		if (!selected) {
 			return false;
@@ -102,19 +102,9 @@ export class UmbAppAuthController extends UmbControllerBase {
 		return this.#updateState();
 	}
 
-	async #showLoginModal(
-		userLoginState: UmbUserLoginState,
-		availableProviders: Array<ManifestAuthProvider>,
-	): Promise<boolean> {
+	async #showLoginModal(userLoginState: UmbUserLoginState): Promise<boolean> {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
-		}
-
-		// Check if any provider denies local login
-		const denyLocalLogin = availableProviders.some((provider) => provider.meta?.behavior?.denyLocalLogin);
-		if (denyLocalLogin) {
-			// Unregister the Umbraco provider
-			umbExtensionsRegistry.exclude('Umb.AuthProviders.Umbraco');
 		}
 
 		// Show the provider selection screen
