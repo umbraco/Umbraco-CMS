@@ -25,9 +25,6 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	@state()
 	private _items?: Array<UmbDocumentAuditLogModel>;
 
-	@state()
-	private _serverUrl = '';
-
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#auditLogRepository = new UmbDocumentAuditLogRepository(this);
 	#pagination = new UmbPaginationManager();
@@ -41,10 +38,6 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		this.#pagination.setPageSize(10);
 		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number));
 		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number));
-
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this._serverUrl = instance.getServerUrl();
-		});
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
