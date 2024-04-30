@@ -6,7 +6,7 @@ const section: ManifestSection = {
 	type: 'section',
 	alias: UMB_USER_MANAGEMENT_SECTION_ALIAS,
 	name: 'User Management Section',
-	weight: 100,
+	weight: 600,
 	meta: {
 		label: '#sections_users',
 		pathname: 'user-management',
