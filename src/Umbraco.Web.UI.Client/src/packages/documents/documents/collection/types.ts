@@ -17,6 +17,7 @@ export interface UmbDocumentCollectionItemModel {
 	creator?: string | null;
 	icon: string;
 	name: string;
+	sortOrder: number;
 	state: string;
 	updateDate: Date;
 	updater?: string | null;

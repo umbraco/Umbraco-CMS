@@ -14,6 +14,7 @@ export interface UmbMediaCollectionItemModel {
 	creator?: string | null;
 	icon: string;
 	name: string;
+	sortOrder: number;
 	updateDate: Date;
 	values: Array<{ alias: string; value: string }>;
 }
