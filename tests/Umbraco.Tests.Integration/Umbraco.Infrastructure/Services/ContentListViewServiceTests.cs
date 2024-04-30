@@ -193,7 +193,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
             .Done()
             .Build();
 
-        Attempt<IDataType, DataTypeOperationStatus> dataTypeCreateResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        var dataTypeCreateResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
 
         // Guard Assert
         Assert.Multiple(() =>
