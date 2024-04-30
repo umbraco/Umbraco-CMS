@@ -62,6 +62,8 @@ import type { ManifestEntityUserPermission } from './entity-user-permission.mode
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestCollectionAction } from './collection-action.model.js';
 import type { ManifestMfaLoginProvider } from './mfa-login-provider.model.js';
+import type { ManifestSearchProvider } from './search-provider.model.js';
+import type { ManifestSearchResultItem } from './search-result-item.model.js';
 import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
 import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
 import type { ManifestEntryPoint } from './entry-point.model.js';
@@ -96,6 +98,8 @@ export type * from './package-view.model.js';
 export type * from './property-action.model.js';
 export type * from './property-editor.model.js';
 export type * from './repository.model.js';
+export type * from './search-provider.model.js';
+export type * from './search-result-item.model.js';
 export type * from './section-sidebar-app.model.js';
 export type * from './section-view.model.js';
 export type * from './section.model.js';
@@ -145,28 +149,31 @@ export type ManifestTypes =
 	| ManifestAppEntryPoint
 	| ManifestAuthProvider
 	| ManifestBackofficeEntryPoint
-	| ManifestBundle<ManifestTypes>
 	| ManifestBlockEditorCustomView
+	| ManifestBundle<ManifestTypes>
 	| ManifestCollection
-	| ManifestCollectionView
 	| ManifestCollectionAction
+	| ManifestCollectionView
+	| ManifestCondition
 	| ManifestCurrentUserAction
 	| ManifestCurrentUserActionDefaultKind
-	| ManifestCondition
 	| ManifestDashboard
 	| ManifestDashboardCollection
 	| ManifestDynamicRootOrigin
 	| ManifestDynamicRootQueryStep
 	| ManifestEntityActions
 	| ManifestEntityBulkAction
+	| ManifestEntityUserPermission
 	| ManifestEntryPoint
 	| ManifestExternalLoginProvider
 	| ManifestGlobalContext
+	| ManifestGranularUserPermission
 	| ManifestHeaderApp
 	| ManifestHeaderAppButtonKind
 	| ManifestHealthCheck
 	| ManifestIcons
 	| ManifestItemStore
+	| ManifestLocalization
 	| ManifestMenu
 	| ManifestMenuItem
 	| ManifestMenuItemTreeKind
@@ -177,6 +184,8 @@ export type ManifestTypes =
 	| ManifestPropertyEditorSchema
 	| ManifestPropertyEditorUi
 	| ManifestRepository
+	| ManifestSearchProvider
+	| ManifestSearchResultItem
 	| ManifestSection
 	| ManifestSectionSidebarApp
 	| ManifestSectionSidebarAppMenuKind
@@ -184,7 +193,6 @@ export type ManifestTypes =
 	| ManifestStore
 	| ManifestTheme
 	| ManifestTinyMcePlugin
-	| ManifestLocalization
 	| ManifestTree
 	| ManifestTreeItem
 	| ManifestTreeStore
@@ -195,6 +203,4 @@ export type ManifestTypes =
 	| ManifestWorkspaceFooterApps
 	| ManifestWorkspaces
 	| ManifestWorkspaceViews
-	| ManifestEntityUserPermission
-	| ManifestGranularUserPermission
 	| ManifestBase;
