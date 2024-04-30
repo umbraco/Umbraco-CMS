@@ -65,10 +65,10 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true, attribute: 'sort-mode-active' })
 	public sortModeActive = false;
 
-	@property({ type: String, attribute: 'edit-content-type-path' })
+	@property({ attribute: false })
 	public editContentTypePath?: string;
 
-	@state()
+	@property({ type: Boolean, reflect: true, attribute: '_inherited' })
 	public _inherited?: boolean;
 
 	@state()
@@ -213,15 +213,17 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				</div>
 				<div id="editor">
 					${this.renderPropertyTags()}
-					<uui-tag look="default" class="inherited">
-						<uui-icon name="icon-merge"></uui-icon>
-						<span
-							>${this.localize.term('contentTypeEditor_inheritedFrom')}
-							<a href=${this.editContentTypePath + 'edit/' + this._inheritedContentTypeId}>
-								${this._inheritedContentTypeName ?? '??'}
-							</a>
-						</span>
-					</uui-tag>
+					${this._inherited
+						? html`<uui-tag look="default" class="inherited">
+								<uui-icon name="icon-merge"></uui-icon>
+								<span
+									>${this.localize.term('contentTypeEditor_inheritedFrom')}
+									<a href=${this.editContentTypePath + 'edit/' + this._inheritedContentTypeId}>
+										${this._inheritedContentTypeName ?? '??'}
+									</a>
+								</span>
+							</uui-tag>`
+						: nothing}
 				</div>
 			`;
 		}
@@ -276,12 +278,13 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		if (!this.property) return;
 		return html`
 			<div class="sortable">
-				<uui-icon name="${this._inherited ? 'icon-merge' : 'icon-navigation'}"></uui-icon>
-				${this.property.name} <span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
+				<uui-icon name="icon-navigation"></uui-icon>
+				<span>${this.property.name}</span>
+				<span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
 			</div>
 			<uui-input
 				type="number"
-				?readonly=${this._inherited}
+				?disabled=${this._inherited}
 				label="sort order"
 				@change=${(e: UUIInputEvent) =>
 					this.#partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel)}
@@ -373,17 +376,22 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				margin-bottom: 0;
 			}
 
-			:host([sort-mode-active]:not([inherited])) {
+			:host([sort-mode-active]:not([_inherited])) {
 				cursor: grab;
 			}
 
 			:host([sort-mode-active]) .sortable {
 				flex: 1;
 				display: flex;
-				background-color: var(--uui-color-divider);
 				align-items: center;
 				padding: 0 var(--uui-size-3);
 				gap: var(--uui-size-3);
+			}
+			:host([sort-mode-active][_inherited]) .sortable {
+				color: var(--uui-color-disabled-contrast);
+			}
+			:host([sort-mode-active]:not([_inherited])) .sortable {
+				background-color: var(--uui-color-divider);
 			}
 
 			:host([sort-mode-active]) uui-input {

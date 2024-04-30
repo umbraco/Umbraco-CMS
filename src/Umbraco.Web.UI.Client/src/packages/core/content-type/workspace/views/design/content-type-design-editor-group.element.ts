@@ -161,14 +161,19 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	// TODO: impl UMB_EDIT_DOCUMENT_TYPE_PATH_PATTERN
 	#renderContainerHeader() {
 		return html`<div slot="header">
-				<uui-input
-					label=${this.localize.term('contentTypeEditor_group')}
-					placeholder=${this.localize.term('placeholders_entername')}
-					.value=${this._group!.name}
-					?disabled=${!this._hasOwnerContainer}
-					@change=${this.#renameGroup}
-					@blur=${this.#blurGroup}
-					${this._group!.name === '' ? umbFocus() : nothing}></uui-input>
+				<div>
+					${this.sortModeActive && this._hasOwnerContainer ? html`<uui-icon name="icon-navigation"></uui-icon>` : null}
+					<uui-input
+						label=${this.localize.term('contentTypeEditor_group')}
+						placeholder=${this.localize.term('placeholders_entername')}
+						.value=${this._group!.name}
+						?disabled=${!this._hasOwnerContainer}
+						@change=${this.#renameGroup}
+						@blur=${this.#blurGroup}
+						${this._group!.name === '' ? umbFocus() : nothing}></uui-input>
+				</div>
+			</div>
+			<div slot="header-actions">
 				${this._hasOwnerContainer === false && this._inheritedFrom
 					? html`<uui-tag look="default" class="inherited">
 							<uui-icon name="icon-merge"></uui-icon>
@@ -184,13 +189,11 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 							</span>
 						</uui-tag>`
 					: null}
-			</div>
-			<div slot="header-actions">
-				${this._inherited
-					? null
-					: html`<uui-button compact label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
+				${!this._inherited && !this.sortModeActive
+					? html`<uui-button compact label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
 							<uui-icon name="delete"></uui-icon>
-						</uui-button>`}
+						</uui-button>`
+					: nothing}
 				${this.sortModeActive
 					? html` <uui-input
 							type="number"
@@ -199,7 +202,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 								this._singleValueUpdate('sortOrder', parseInt(e.target.value as string) || 0)}
 							.value=${this.group!.sortOrder ?? 0}
 							?disabled=${!this._hasOwnerContainer}></uui-input>`
-					: ''}
+					: nothing}
 			</div> `;
 	}
 
@@ -229,6 +232,10 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 
 			uui-input[type='number'] {
 				max-width: 75px;
+			}
+
+			.inherited uui-icon {
+				vertical-align: sub;
 			}
 
 			:host([sort-mode-active]) div[slot='header'] {
