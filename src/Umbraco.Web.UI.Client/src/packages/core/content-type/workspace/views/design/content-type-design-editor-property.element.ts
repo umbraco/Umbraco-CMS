@@ -258,6 +258,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 				</div>
 				<uui-button
 					id="editor"
+					look="secondary"
 					label=${this.localize.term('contentTypeEditor_editorSettings')}
 					href=${ifDefined(this._modalRoute)}>
 					${this.renderPropertyTags()}
@@ -415,7 +416,6 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 			#editor {
 				position: relative;
-				background-color: var(--uui-color-background);
 			}
 			#alias-input,
 			#label-input,

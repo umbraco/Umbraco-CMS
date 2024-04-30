@@ -1,6 +1,6 @@
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbContentTypeContainerStructureHelper,
 	UmbContentTypeModel,
@@ -8,6 +8,7 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 
 import './content-type-design-editor-properties.element.js';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-content-type-design-editor-group')
 export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
@@ -37,6 +38,9 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'sort-mode-active', reflect: true })
 	sortModeActive = false;
 
+	@property({ attribute: false })
+	editContentTypePath?: string;
+
 	@state()
 	_groupId?: string;
 
@@ -46,6 +50,9 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	@state()
 	_inherited?: boolean;
 
+	@state()
+	_inheritedFrom?: Array<UmbContentTypeModel>;
+
 	#checkInherited() {
 		if (this.groupStructureHelper && this.group) {
 			// Check is this container matches with any other group. If so it is inherited aka. merged with others. [NL]
@@ -54,18 +61,22 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				this.observe(
 					this.groupStructureHelper.containersByNameAndType(this.group.name, 'Group'),
 					(containers) => {
-						const hasAOwnerContainer = containers.some((con) =>
-							this.groupStructureHelper!.isOwnerChildContainer(con.id),
-						);
+						const ownerContainer = containers.find((con) => this.groupStructureHelper!.isOwnerChildContainer(con.id));
+						const hasAOwnerContainer = !!ownerContainer;
 						const pureOwnerContainer = hasAOwnerContainer && containers.length === 1;
 
-						// TODO: Check if requstUpdate is needed here, I do not think it is when i added it, but I just wanted to be safe when debugging [NL]
+						// TODO: Check if requestUpdate is needed here, I do not think it is when i added it, but I just wanted to be safe when debugging [NL]
 						const oldHasOwnerContainer = this._hasOwnerContainer;
 						const oldInherited = this._inherited;
+						const oldInheritedFrom = this._inheritedFrom;
 						this._hasOwnerContainer = hasAOwnerContainer;
 						this._inherited = !pureOwnerContainer;
+						this._inheritedFrom = containers
+							.filter((con) => con.id !== this.group!.id)
+							.map((con) => this.groupStructureHelper!.getContentTypeOfContainer(con.id));
 						this.requestUpdate('_hasOwnerContainer', oldHasOwnerContainer);
 						this.requestUpdate('_inherited', oldInherited);
+						this.requestUpdate('_inheritedFrom', oldInheritedFrom);
 					},
 					'observeGroupContainers',
 				);
@@ -112,6 +123,27 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		}
 	}
 
+	async #requestRemove(e: Event) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		if (!this.groupStructureHelper || !this._group) return;
+
+		// TODO: Do proper localization here: [NL]
+		await umbConfirmModal(this, {
+			headline: `${this.localize.term('actions_delete')} property`,
+			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[
+				this._group.name ?? this._group.id,
+			]}>
+					Are you sure you want to delete the group <strong>${this._group.name ?? this._group.id}</strong>
+				</umb-localize>
+				</div>`,
+			confirmLabel: this.localize.term('actions_delete'),
+			color: 'danger',
+		});
+
+		this.groupStructureHelper.removeContainer(this._group.id);
+	}
+
 	render() {
 		return this._inherited !== undefined && this._groupId
 			? html`
@@ -124,10 +156,9 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 			: '';
 	}
 
+	// TODO: impl UMB_EDIT_DOCUMENT_TYPE_PATH_PATTERN
 	#renderContainerHeader() {
 		return html`<div slot="header">
-			<div>
-				<uui-icon name=${this._inherited ? 'icon-merge' : 'icon-navigation'}></uui-icon>
 				<uui-input
 					label=${this.localize.term('contentTypeEditor_group')}
 					placeholder=${this.localize.term('placeholders_entername')}
@@ -136,17 +167,38 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 					@change=${this.#renameGroup}
 					@blur=${this.#blurGroup}
 					${this._group!.name === '' ? umbFocus() : nothing}></uui-input>
+				${this._inherited && this._inheritedFrom
+					? html`<uui-tag look="default" class="inherited">
+							<uui-icon name="icon-merge"></uui-icon>
+							<span
+								>${this.localize.term('contentTypeEditor_inheritedFrom')}
+								${repeat(
+									this._inheritedFrom,
+									(inherited) => inherited.unique,
+									(inherited) => html`
+										<a href=${this.editContentTypePath + 'edit/' + inherited.unique}>${inherited.name}</a>
+									`,
+								)}
+							</span>
+						</uui-tag>`
+					: null}
 			</div>
-			${this.sortModeActive
-				? html` <uui-input
-						type="number"
-						label=${this.localize.term('sort_sortOrder')}
-						@change=${(e: UUIInputEvent) =>
-							this._singleValueUpdate('sortOrder', parseInt(e.target.value as string) || 0)}
-						.value=${this.group!.sortOrder ?? 0}
-						?disabled=${!this._hasOwnerContainer}></uui-input>`
-				: ''}
-		</div> `;
+			<div slot="header-actions">
+				${this._inherited
+					? null
+					: html`<uui-button compact label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
+							<uui-icon name="delete"></uui-icon>
+						</uui-button>`}
+				${this.sortModeActive
+					? html` <uui-input
+							type="number"
+							label=${this.localize.term('sort_sortOrder')}
+							@change=${(e: UUIInputEvent) =>
+								this._singleValueUpdate('sortOrder', parseInt(e.target.value as string) || 0)}
+							.value=${this.group!.sortOrder ?? 0}
+							?disabled=${!this._hasOwnerContainer}></uui-input>`
+					: ''}
+			</div> `;
 	}
 
 	static styles = [
