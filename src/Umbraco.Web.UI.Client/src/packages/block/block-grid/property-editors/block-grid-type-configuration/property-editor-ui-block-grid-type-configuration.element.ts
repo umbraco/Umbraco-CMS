@@ -19,7 +19,11 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_BLOCK_GRID_TYPE, type UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block-grid';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_PROPERTY_DATASET_CONTEXT, type UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import {
+	UMB_PROPERTY_CONTEXT,
+	UMB_PROPERTY_DATASET_CONTEXT,
+	type UmbPropertyDatasetContext,
+} from '@umbraco-cms/backoffice/property';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
@@ -70,6 +74,9 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		this.#mapValuesToBlockGroups();
 	}
 
+	@state()
+	public _alias?: string;
+
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
@@ -86,8 +93,13 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
-			this.#datasetContext = instance;
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, async (context) => {
+			this._alias = context.getAlias();
+		});
+
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
+			this.#datasetContext = context;
 			//this.#observeBlocks();
 			this.#observeBlockGroups();
 		});
@@ -203,6 +215,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		return html`<div id="groups">
 			${this._notGroupedBlockTypes
 				? html`<umb-input-block-type
+						.propertyAlias=${this._alias}
 						.value=${this._notGroupedBlockTypes}
 						.workspacePath=${this._workspacePath}
 						@change=${this.#onChange}
@@ -217,6 +230,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 						${group.key ? this.#renderGroupInput(group.key, group.name) : nothing}
 						<umb-input-block-type
 							data-umb-group-key=${group.key}
+							.propertyAlias=${this._alias + '_' + group.key}
 							.value=${group.blocks}
 							.workspacePath=${this._workspacePath}
 							@change=${this.#onChange}

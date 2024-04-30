@@ -15,6 +15,10 @@ import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import {
+	UMB_CONTENT_TYPE_WORKSPACE_CONTEXT,
+	UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT,
+} from '@umbraco-cms/backoffice/content-type';
 
 interface GroupedItems<T> {
 	[key: string]: Array<T>;
@@ -24,6 +28,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	UmbDataTypePickerFlowModalData,
 	UmbDataTypePickerFlowModalValue
 > {
+	#initPromise!: Promise<unknown>;
+
 	public set data(value: UmbDataTypePickerFlowModalData) {
 		super.data = value;
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
@@ -41,7 +47,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	@state()
 	private _dataTypePickerModalRouteBuilder?: UmbModalRouteBuilder;
 
-	private _createDataTypeModal: UmbModalRouteRegistrationController;
+	private _createDataTypeModal!: UmbModalRouteRegistrationController;
 
 	#collectionRepository;
 	#dataTypes: Array<UmbDataTypeItemModel> = [];
@@ -52,6 +58,37 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		super();
 
 		this.#collectionRepository = new UmbDataTypeCollectionRepository(this);
+		this.#init();
+	}
+
+	private _createDataType(propertyEditorUiAlias: string) {
+		// TODO: Could be nice with a more pretty way to prepend to the URL:
+		// Open create modal:
+		console.log('_createDataType', propertyEditorUiAlias);
+		this._createDataTypeModal.open(
+			{ uiAlias: propertyEditorUiAlias },
+			`create/parent/${UMB_DATA_TYPE_ENTITY_TYPE}/null`,
+		);
+	}
+
+	async #init() {
+		this.#initPromise = Promise.all([
+			this.observe(
+				(await this.#collectionRepository.requestCollection({ skip: 0, take: 100 })).asObservable(),
+				(dataTypes) => {
+					this.#dataTypes = dataTypes;
+					this._performFiltering();
+				},
+				'_repositoryItemsObserver',
+			).asPromise(),
+			this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
+				// Only include Property Editor UIs which has Property Editor Schema Alias
+				this.#propertyEditorUIs = propertyEditorUIs.filter(
+					(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,
+				);
+				this._performFiltering();
+			}).asPromise(),
+		]);
 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL)
 			.addAdditionalPath(':uiAlias')
@@ -78,43 +115,32 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 		this._createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_DATATYPE_WORKSPACE_MODAL)
 			.addAdditionalPath(':uiAlias')
-			.onSetup((params) => {
-				return { data: { entityType: UMB_DATA_TYPE_ENTITY_TYPE, preset: { editorUiAlias: params.uiAlias } } };
+			.onSetup(async (params) => {
+				const contentContextConsumer = this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, () => {
+					this.removeUmbController(contentContextConsumer);
+				}).passContextAliasMatches();
+				const propContextConsumer = this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, () => {
+					this.removeUmbController(propContextConsumer);
+				}).passContextAliasMatches();
+				const [contentContext, propContext] = await Promise.all([
+					contentContextConsumer.asPromise(),
+					propContextConsumer.asPromise(),
+					this.#initPromise,
+				]);
+				const propertyEditorName = this.#propertyEditorUIs.find((ui) => ui.alias === params.uiAlias)?.name;
+				const dataTypeName = `${contentContext?.getName() ?? ''} - ${propContext.getLabel() ?? ''} - ${propertyEditorName}`;
+
+				return {
+					data: {
+						entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+						preset: { editorUiAlias: params.uiAlias, name: dataTypeName },
+					},
+				};
 			})
 			.onSubmit((value) => {
 				this._select(value?.unique);
 				this._submitModal();
 			});
-
-		this.#init();
-	}
-
-	private _createDataType(propertyEditorUiAlias: string) {
-		// TODO: Could be nice with a more pretty way to prepend to the URL:
-		// Open create modal:
-		this._createDataTypeModal.open(
-			{ uiAlias: propertyEditorUiAlias },
-			`create/parent/${UMB_DATA_TYPE_ENTITY_TYPE}/null`,
-		);
-	}
-
-	async #init() {
-		this.observe(
-			(await this.#collectionRepository.requestCollection({ skip: 0, take: 100 })).asObservable(),
-			(dataTypes) => {
-				this.#dataTypes = dataTypes;
-				this._performFiltering();
-			},
-			'_repositoryItemsObserver',
-		);
-
-		this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
-			// Only include Property Editor UIs which has Property Editor Schema Alias
-			this.#propertyEditorUIs = propertyEditorUIs.filter(
-				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,
-			);
-			this._performFiltering();
-		});
 	}
 
 	private _handleDataTypeClick(dataType: UmbDataTypeItemModel) {
