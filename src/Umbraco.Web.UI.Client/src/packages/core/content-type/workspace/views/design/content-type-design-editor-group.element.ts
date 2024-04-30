@@ -169,7 +169,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 					@change=${this.#renameGroup}
 					@blur=${this.#blurGroup}
 					${this._group!.name === '' ? umbFocus() : nothing}></uui-input>
-				${this._inherited && this._inheritedFrom
+				${this._hasOwnerContainer === false && this._inheritedFrom
 					? html`<uui-tag look="default" class="inherited">
 							<uui-icon name="icon-merge"></uui-icon>
 							<span
