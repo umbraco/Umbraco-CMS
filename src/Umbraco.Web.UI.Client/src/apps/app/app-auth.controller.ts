@@ -1,14 +1,12 @@
 import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH, type UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { filter, firstValueFrom, skip } from '@umbraco-cms/backoffice/external/rxjs';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { ManifestAuthProvider } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
-	#firstTimeLoggingIn = true;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -20,7 +18,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 			this.observe(
 				context.timeoutSignal,
 				() => {
-					this.#firstTimeLoggingIn = false;
 					this.makeAuthorizationRequest('timedOut');
 				},
 				'_authState',
@@ -118,9 +115,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 				},
 				modal: {
 					key: authModalKey,
-					backdropBackground: this.#firstTimeLoggingIn
-						? 'var(--umb-auth-backdrop, rgb(244, 244, 244))'
-						: 'var(--umb-auth-backdrop-timedout, rgba(244, 244, 244, 0.75))',
+					backdropBackground: 'var(--umb-auth-backdrop, rgb(244, 244, 244))',
 				},
 			})
 			.onSubmit()

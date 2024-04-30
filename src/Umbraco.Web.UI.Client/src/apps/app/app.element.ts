@@ -67,7 +67,7 @@ export class UmbAppElement extends UmbLitElement {
 				(component as UmbAppErrorElement).errorHeadline = 'Umbraco Authorization';
 				(component as UmbAppErrorElement).errorMessage = hasCode
 					? 'Authorization completed. You may now close this window.'
-					: 'Authorization failed. Please try again.';
+					: 'Authorization failed. Please close this window and try again.';
 
 				// Complete the authorization request
 				this.#authContext?.completeAuthorizationRequest().finally(() => {

@@ -36,7 +36,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 
 	render() {
 		return html`
-			<div id="layout" modal-on-top=${this.data?.userLoginState === 'timedOut' ? 'true' : 'false'}>
+			<div id="layout">
 				<img
 					id="logo-on-background"
 					src="/umbraco/backoffice/assets/umbraco_logo_blue.svg"
@@ -208,23 +208,6 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-5);
-			}
-
-			#layout[modal-on-top='true'] {
-				width: auto;
-				height: auto;
-				min-height: 327px;
-				background: #fff;
-				border: 1px solid var(--uui-color-border);
-				padding: 0;
-			}
-
-			[modal-on-top='true'] #graphic {
-				display: none;
-			}
-
-			[modal-on-top='true'] #greeting {
-				font-size: 2rem;
 			}
 
 			@media (max-width: 900px) {
