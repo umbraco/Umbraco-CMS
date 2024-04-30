@@ -13,7 +13,7 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
     public override bool CanConvert(Type typeToConvert) => typeToConvert.IsAssignableTo(typeof(BlockValue));
 
     /// <inheritdoc />
-    public override BlockValue? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override BlockValue Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartObject)
         {
@@ -34,9 +34,6 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
         {
             throw new JsonException($"Could not create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}.");
         }
-
-        Type layoutItemType = GetLayoutItemType(typeToConvert);
-        Type layoutItemsType = typeof(List<>).MakeGenericType(layoutItemType);
 
         while (reader.Read())
         {
