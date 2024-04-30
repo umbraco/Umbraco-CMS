@@ -148,6 +148,12 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 	private _areaKey?: string | null;
 
 	@state()
+	private _canCreate?: boolean;
+
+	@state()
+	private _singleBlockTypeName?: string;
+
+	@state()
 	private _styleElement?: HTMLLinkElement;
 
 	@state()
@@ -160,6 +166,21 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 			this.#sorter.setModel(layoutEntries);
 			this._layoutEntries = layoutEntries;
 			this.requestUpdate('layoutEntries', oldValue);
+		});
+
+		this.observe(this.#context.amountOfAllowedBlockTypes, (length) => {
+			this._canCreate = length > 0;
+			if (length === 1) {
+				this.observe(
+					this.#context.firstAllowedBlockTypeName(),
+					(firstAllowedName) => {
+						this._singleBlockTypeName = firstAllowedName;
+					},
+					'observeSingleBlockTypeName',
+				);
+			} else {
+				this.removeUmbControllerByAlias('observeSingleBlockTypeName');
+			}
 		});
 
 		this.#context.getManager().then((manager) => {
@@ -193,12 +214,14 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 						</umb-block-grid-entry>`,
 				)}
 			</div>
-			${this._areaKey === null || this._layoutEntries.length === 0
+			${this._canCreate && (this._areaKey === null || this._layoutEntries.length === 0)
 				? html` <uui-button-group>
 						<uui-button
 							id="add-button"
 							look="placeholder"
-							label=${this.localize.term('blockEditor_addBlock')}
+							label=${this._singleBlockTypeName
+								? this.localize.term('blockEditor_addThis', [this._singleBlockTypeName])
+								: this.localize.term('blockEditor_addBlock')}
 							href=${this.#context.getPathForCreateBlock(-1) ?? ''}></uui-button>
 						${this._areaKey === null
 							? html` <uui-button
