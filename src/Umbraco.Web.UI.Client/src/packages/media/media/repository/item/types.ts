@@ -1,6 +1,8 @@
+import type { UmbMediaEntityType } from '../../entity.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbMediaItemModel {
+	entityType: UmbMediaEntityType;
 	unique: string;
 	isTrashed: boolean;
 	mediaType: {

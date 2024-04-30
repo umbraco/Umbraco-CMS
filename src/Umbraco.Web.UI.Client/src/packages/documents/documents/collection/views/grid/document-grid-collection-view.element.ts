@@ -96,14 +96,13 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				${repeat(
 					this._items,
 					(item) => item.unique,
-					(item, index) => this.#renderCard(index, item),
+					(item) => this.#renderCard(item),
 				)}
 			</div>
 		`;
 	}
 
-	#renderCard(index: number, item: UmbDocumentCollectionItemModel) {
-		const sortOrder = this._skip + index;
+	#renderCard(item: UmbDocumentCollectionItemModel) {
 		return html`
 			<uui-card-content-node
 				.name=${item.name ?? 'Unnamed Document'}
@@ -114,7 +113,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<umb-icon slot="icon" name=${item.icon}></umb-icon>
-				${this.#renderState(item)} ${this.#renderProperties(sortOrder, item)}
+				${this.#renderState(item)} ${this.#renderProperties(item)}
 			</uui-card-content-node>
 		`;
 	}
@@ -142,15 +141,14 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		}
 	}
 
-	#renderProperties(sortOrder: number, item: UmbDocumentCollectionItemModel) {
+	#renderProperties(item: UmbDocumentCollectionItemModel) {
 		if (!this._userDefinedProperties) return;
 		return html`
 			<ul>
 				${repeat(
 					this._userDefinedProperties,
 					(column) => column.alias,
-					(column) =>
-						html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(sortOrder, item, column.alias)}</li>`,
+					(column) => html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(item, column.alias)}</li>`,
 				)}
 			</ul>
 		`;
