@@ -14,6 +14,11 @@ import {
 	UmbDocumentBlueprintItemRepository,
 	type UmbDocumentBlueprintItemBaseModel,
 } from '@umbraco-cms/backoffice/document-blueprint';
+import {
+	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
+	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
+	type UmbDocumentEntityTypeUnion,
+} from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-document-create-options-modal')
 export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
@@ -68,17 +73,29 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 
 	// close the modal when navigating to data type
 	#onNavigate(documentTypeUnique: string, blueprintUnique?: string) {
+		if (!this.data) {
+			throw new Error('Data is not defined');
+		}
 		if (!blueprintUnique) {
 			history.pushState(
 				null,
 				'',
-				`section/content/workspace/document/create/parent/${this.data?.parent.entityType}/${this.data?.parent.unique ?? 'null'}/${documentTypeUnique}`,
+				UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({
+					parentEntityType: this.data.parent.entityType as UmbDocumentEntityTypeUnion,
+					parentUnique: this.data.parent.unique,
+					documentTypeUnique,
+				}),
 			);
 		} else {
 			history.pushState(
 				null,
 				'',
-				`section/content/workspace/document/create/parent/${this.data?.parent.entityType}/${this.data?.parent.unique ?? 'null'}/${documentTypeUnique}/blueprint/${blueprintUnique}`,
+				UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({
+					parentEntityType: this.data.parent.entityType as UmbDocumentEntityTypeUnion,
+					parentUnique: this.data.parent.unique,
+					documentTypeUnique,
+					blueprintUnique,
+				}),
 			);
 		}
 		this._submitModal();

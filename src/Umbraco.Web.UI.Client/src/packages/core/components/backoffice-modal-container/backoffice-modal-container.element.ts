@@ -111,6 +111,11 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 				z-index: 1000;
 			}
 
+			:host([fill-background]) {
+				--uui-modal-dialog-border-radius: 0;
+				--uui-shadow-depth-5: 0;
+			}
+
 			:host([fill-background]) #container::after {
 				background: var(--backdrop-background);
 			}

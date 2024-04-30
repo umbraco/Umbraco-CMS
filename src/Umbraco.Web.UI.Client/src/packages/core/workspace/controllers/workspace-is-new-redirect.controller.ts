@@ -1,8 +1,8 @@
 import type { UmbSubmittableWorkspaceContextBase } from '../contexts/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { createRoutePathBuilder, type UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
-import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
+import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
+import { ensurePathEndsWithSlash, umbUrlPatternToString } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Observe the workspace context to see if the entity is new or not.
@@ -28,7 +28,7 @@ export class UmbWorkspaceIsNewRedirectController extends UmbControllerBase {
 				if (router && unique) {
 					const routerPath = router.absoluteRouterPath;
 					if (routerPath) {
-						const newPath: string = createRoutePathBuilder(ensurePathEndsWithSlash(routerPath) + 'edit/:id')({
+						const newPath: string = umbUrlPatternToString(ensurePathEndsWithSlash(routerPath) + 'edit/:id', {
 							id: unique,
 						});
 						this.destroy();

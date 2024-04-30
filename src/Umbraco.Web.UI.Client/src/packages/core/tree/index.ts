@@ -1,6 +1,5 @@
 import { UmbRequestReloadTreeItemChildrenEvent } from './reload-tree-item-children/index.js';
 
-export * from './components/index.js';
 export * from './tree-item/index.js';
 export * from './default/index.js';
 export * from './data/index.js';

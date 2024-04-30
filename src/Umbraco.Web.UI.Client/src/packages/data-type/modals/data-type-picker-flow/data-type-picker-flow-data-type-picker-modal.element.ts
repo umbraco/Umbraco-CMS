@@ -3,7 +3,7 @@ import type {
 	UmbDataTypePickerFlowDataTypePickerModalData,
 	UmbDataTypePickerFlowDataTypePickerModalValue,
 } from './data-type-picker-flow-data-type-picker-modal.token.js';
-import { css, html, customElement, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
@@ -72,12 +72,8 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 	}
 
 	private _renderDataTypes() {
-		const shouldRender = this._dataTypes && this._dataTypes.length > 0;
-
-		return when(
-			shouldRender,
-			() =>
-				html`<ul id="item-grid">
+		return this._dataTypes && this._dataTypes.length > 0
+			? html`<ul id="item-grid">
 					${repeat(
 						this._dataTypes!,
 						(dataType) => dataType.unique,
@@ -93,8 +89,8 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 									</li>`
 								: '',
 					)}
-				</ul>`,
-		);
+				</ul>`
+			: '';
 	}
 	private _renderCreate() {
 		return html`

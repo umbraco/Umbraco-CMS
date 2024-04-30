@@ -41,19 +41,6 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 				this.removeUmbControllerByAlias('_observeHeadline');
 			}
 		});
-
-		this.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#proxyContextRequests as EventListener);
-	}
-
-	#proxyContextRequests(event: UmbContextRequestEvent) {
-		if (!this.#sectionSidebarContext) return;
-		// Note for this hack (The if-sentence):  [NL]
-		// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
-		// To avoid such this hack just prevents proxying the event if its a request for its own context.
-		if (event.contextAlias !== UMB_SECTION_SIDEBAR_CONTEXT.contextAlias) {
-			event.stopImmediatePropagation();
-			this.#sectionSidebarContext.getContextElement()?.dispatchEvent(event.clone());
-		}
 	}
 
 	#observeEntityModel() {
@@ -81,6 +68,17 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 		this.#closeContextMenu();
 	}
 
+	#proxyContextRequests(event: UmbContextRequestEvent) {
+		if (!this.#sectionSidebarContext) return;
+		// Note for this hack (The if-sentence):  [NL]
+		// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
+		// To avoid such this hack just prevents proxying the event if its a request for its own context.
+		if (event.contextAlias !== UMB_SECTION_SIDEBAR_CONTEXT.contextAlias) {
+			event.stopImmediatePropagation();
+			this.#sectionSidebarContext.getContextElement()?.dispatchEvent(event.clone());
+		}
+	}
+
 	render() {
 		return html`
 			${this.#renderBackdrop()}
@@ -99,7 +97,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 
 	#renderModal() {
 		return this._isOpen && this._unique !== undefined && this._entityType
-			? html`<div id="action-modal">
+			? html`<div id="action-modal" @umb:context-request=${this.#proxyContextRequests}>
 					${this._headline ? html`<h3>${this.localize.string(this._headline)}</h3>` : nothing}
 					<umb-entity-action-list
 						@action-executed=${this.#onActionExecuted}
