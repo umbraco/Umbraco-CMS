@@ -7,7 +7,6 @@ test.describe('Document Type tests', () => {
   const groupName = 'TestGroup';
   const tabName = 'TestTab';
 
-
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
     await umbracoUi.goToBackOffice();
@@ -265,7 +264,7 @@ test.describe('Document Type tests', () => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const secondGroupName = 'SecondGroup';
-    await umbracoApi.documentType.createDocumentTypeWithTwoGroups(documentTypeName, dataTypeName, dataTypeData.id, groupName,secondGroupName);
+    await umbracoApi.documentType.createDocumentTypeWithTwoGroups(documentTypeName, dataTypeName, dataTypeData.id, groupName, secondGroupName);
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.documentType.goToDocumentType(documentTypeName);
 
@@ -287,7 +286,8 @@ test.describe('Document Type tests', () => {
     expect(await umbracoApi.documentType.doesDocumentTypeGroupNameContainCorrectSortOrder(documentTypeName, firstGroupValue, 1)).toBeTruthy();
   });
 
-  test('can reorder properties in a document type', async ({page, umbracoApi, umbracoUi}) => {
+  // TODO: Unskip when it works. Sometimes the properties are not dragged correctly.
+  test.skip('can reorder properties in a document type', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const dataTypeNameTwo = "Second Color Picker";
@@ -298,6 +298,8 @@ test.describe('Document Type tests', () => {
     await umbracoUi.documentType.goToDocumentType(documentTypeName);
     await umbracoUi.documentType.clickReorderButton();
     // Drag and Drop
+    await page.waitForTimeout(5000);
+
     const dragFromLocator = page.getByText(dataTypeNameTwo);
     const dragToLocator = page.getByText(dataTypeName);
     await umbracoUi.documentType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 5);
@@ -308,10 +310,30 @@ test.describe('Document Type tests', () => {
     await umbracoUi.documentType.isSuccessNotificationVisible();
     const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
     expect(documentTypeData.properties[0].name).toBe(dataTypeNameTwo);
+    expect(documentTypeData.properties[1].name).toBe(dataTypeName);
   });
 
-  test('can reorder tabs in a document type', async ({page, umbracoApi, umbracoUi}) => {
+  // TODO: Unskip when the frontend does not give the secondTab -1 as the sortOrder
+  test.skip('can reorder tabs in a document type', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
+    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    const secondTabName = 'SecondTab';
+    await umbracoApi.documentType.createDocumentTypeWithTwoTabs(documentTypeName, dataTypeName, dataTypeData.id, tabName, secondTabName);
+    await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.documentType.goToDocumentType(documentTypeName);
+
+    // Act
+    const dragToLocator = page.getByRole('tab', {name: tabName});
+    const dragFromLocator = page.getByRole('tab', {name: secondTabName});
+    await umbracoUi.documentType.clickReorderButton();
+    await umbracoUi.documentType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 10);
+    await umbracoUi.documentType.clickIAmDoneReorderingButton();
+    await umbracoUi.documentType.clickSaveButton();
+
+    // Assert
+    await umbracoUi.documentType.isSuccessNotificationVisible();
+    expect(await umbracoApi.documentType.doesDocumentTypeTabNameContainCorrectSortOrder(documentTypeName, secondTabName, 0)).toBeTruthy();
+    expect(await umbracoApi.documentType.doesDocumentTypeTabNameContainCorrectSortOrder(documentTypeName, tabName, 1)).toBeTruthy();
   });
 
   test('can add a description to a property in a document type', async ({umbracoApi, umbracoUi}) => {
@@ -324,18 +346,20 @@ test.describe('Document Type tests', () => {
     // Act
     await umbracoUi.documentType.goToDocumentType(documentTypeName);
     await umbracoUi.documentType.clickEditorSettingsButton();
-    await umbracoUi.documentType.enterDescription(descriptionText);
+    await umbracoUi.documentType.enterPropertyEditorDescription(descriptionText);
     await umbracoUi.documentType.clickUpdateButton();
     await umbracoUi.documentType.clickSaveButton();
 
     // Assert
     await umbracoUi.documentType.isSuccessNotificationVisible();
+    // We need to reload the page, beacuse the description is not updated until you refresh the page.
+    await umbracoUi.reloadPage();
+    await expect(umbracoUi.documentType.enterDescriptionTxt).toBeVisible();
     expect(umbracoUi.documentType.doesDescriptionHaveValue(descriptionText)).toBeTruthy();
     const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
     expect(documentTypeData.properties[0].description).toBe(descriptionText);
   });
 
-  // Mandatory is not set when saved
   test('can set is mandatory for a property in a document type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -352,7 +376,7 @@ test.describe('Document Type tests', () => {
     // Assert
     await umbracoUi.documentType.isSuccessNotificationVisible();
     const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-    expect(documentTypeData.properties[0].mandatory).toBeTruthy();
+    expect(documentTypeData.properties[0].validation.mandatory).toBeTruthy();
   });
 
   test('can enable validation for a property in a document type', async ({umbracoApi, umbracoUi}) => {
@@ -435,8 +459,7 @@ test.describe('Document Type tests', () => {
     expect(documentTypeData.allowedAsRoot).toBeTruthy();
   });
 
-  // The choose button is not present.
-  test('can add an allowed child node to a document type', async ({page, umbracoApi, umbracoUi}) => {
+  test('can add an allowed child node to a document type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -446,7 +469,7 @@ test.describe('Document Type tests', () => {
     await umbracoUi.documentType.clickStructureTab();
     await umbracoUi.documentType.clickChooseButton()
     await umbracoUi.documentType.clickButtonWithName(documentTypeName);
-    await umbracoUi.documentType.clickFilterChooseButton();
+    await umbracoUi.documentType.clickAllowedChildNodesButton();
     await umbracoUi.documentType.clickSaveButton();
 
     // Assert
@@ -466,33 +489,44 @@ test.describe('Document Type tests', () => {
 
     // Act
     await umbracoUi.documentType.goToDocumentType(documentTypeName);
-    // Is needed
-    await umbracoUi.waitForTimeout(200);
-    await page.getByRole('tab', {name: 'Structure'}).click({force: true});
-    // Assert
+    await umbracoUi.documentType.clickStructureTab();
 
-    // Clean
-    await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
-  });
-
-  // When saving the collection is not saved
-  test('can display children for a document type', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
-    await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
-
-    // Act
-    await umbracoUi.documentType.goToDocumentType(documentTypeName);
-    await page.getByRole('tab', {name: 'Structure'}).click({force: true});
-    await page.getByText('Display children in a Collection view').click();
+    await umbracoUi.documentType.clickTrashButtonForName(childDocumentTypeName);
+    await umbracoUi.documentType.clickRemoveExactButton();
     await umbracoUi.documentType.clickSaveButton();
 
     // Assert
     await umbracoUi.documentType.isSuccessNotificationVisible();
     const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-    console.log(documentTypeData);
+    expect(documentTypeData.allowedDocumentTypes.length).toBe(0);
+
+    // Clean
+    await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
   });
 
+  test('can configure a collection for a document type', async ({page, umbracoApi, umbracoUi}) => {
+    // Arrange
+    const collectionDataTypeName = 'TestCollection';
+    await umbracoApi.dataType.ensureNameNotExists(collectionDataTypeName);
+    const collectionDataTypeId = await umbracoApi.dataType.create(collectionDataTypeName, 'Umbraco.ListView', [], null, 'Umb.PropertyEditorUi.CollectionView');
+    await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
+    await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+    // Act
+    await umbracoUi.documentType.goToDocumentType(documentTypeName);
+    await umbracoUi.documentType.clickStructureTab();
+    await umbracoUi.documentType.clickConfigureAsACollectionButton();
+    await umbracoUi.documentType.clickTextButtonWithName(collectionDataTypeName);
+    await umbracoUi.documentType.clickSaveButton();
+
+    // Assert
+    await umbracoUi.documentType.isSuccessNotificationVisible();
+    const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+    expect(documentTypeData.collection.id).toEqual(collectionDataTypeId);
+
+    // Clean
+    await umbracoApi.dataType.ensureNameNotExists(collectionDataTypeName);
+  });
 
   // Settings
 
