@@ -15,20 +15,22 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
-    private readonly string _propertyEditorAlias;
     private readonly IJsonSerializer _jsonSerializer;
 
-    [Obsolete("Use the constructor that takes IJsonSerializer. Will be removed in V15.")]
+    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
     protected BlockEditorDataConverter(string propertyEditorAlias)
         : this(propertyEditorAlias, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
     {
     }
 
+    [Obsolete("Use the non-obsolete constructor. Will be removed in V15.")]
     protected BlockEditorDataConverter(string propertyEditorAlias, IJsonSerializer jsonSerializer)
+        : this(jsonSerializer)
     {
-        _propertyEditorAlias = propertyEditorAlias;
-        _jsonSerializer = jsonSerializer;
     }
+
+    protected BlockEditorDataConverter(IJsonSerializer jsonSerializer)
+        => _jsonSerializer = jsonSerializer;
 
     public bool TryDeserialize(string json, [MaybeNullWhen(false)] out BlockEditorData<TValue, TLayout> blockEditorData)
     {
@@ -60,16 +62,15 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
 
     public BlockEditorData<TValue, TLayout> Convert(TValue? value)
     {
-        if (value?.Layout == null)
+        var propertyEditorAlias = new TValue().PropertyEditorAlias;
+        IEnumerable<TLayout>? layouts = value?.GetLayouts(propertyEditorAlias);
+        if (layouts is null)
         {
             return BlockEditorData<TValue, TLayout>.Empty;
         }
 
-        IEnumerable<ContentAndSettingsReference> references =
-            value.Layout.TryGetValue(_propertyEditorAlias, out IEnumerable<TLayout>? layout)
-                ? GetBlockReferences(layout)
-                : Enumerable.Empty<ContentAndSettingsReference>();
+        IEnumerable<ContentAndSettingsReference> references = GetBlockReferences(layouts);
 
-        return new BlockEditorData<TValue, TLayout>(_propertyEditorAlias, references, value);
+        return new BlockEditorData<TValue, TLayout>(propertyEditorAlias, references, value!);
     }
 }
