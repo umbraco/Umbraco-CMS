@@ -39,12 +39,9 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 				<umb-property-layout label="Events" description="The events for which the webhook should be triggered.">
 					<div slot="editor">IMPLEMENT</div>
 				</umb-property-layout>
-				<umb-property
-					label="Content Type"
-					read-only
-					alias="contentElementTypeKey"
-					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
-					.config=${[{ alias: 'onlyPickElementTypes', value: true }]}></umb-property>
+				<umb-property-layout label="Content Type" description="Only trigger the webhook for a specific content type.">
+					<umb-input-document-type slot="editor" ?elementTypesOnly=${true}></umb-input-document-type>
+				</umb-property-layout>
 				<umb-property-layout label="Enabled" description="Is the webhook enabled?">
 					<uui-toggle slot="editor"></uui-toggle>
 				</umb-property-layout>
