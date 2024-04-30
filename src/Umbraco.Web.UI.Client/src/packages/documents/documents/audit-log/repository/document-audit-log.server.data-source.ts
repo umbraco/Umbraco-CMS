@@ -1,5 +1,7 @@
-import type { UmbAuditLogRequestArgs } from '../types.js';
+import type { UmbAuditLogDataSource, UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
+import type { UmbDocumentAuditLogModel } from '../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -8,7 +10,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @export
  * @class UmbAuditLogServerDataSource
  */
-export class UmbDocumentAuditLogServerDataSource {
+export class UmbDocumentAuditLogServerDataSource implements UmbAuditLogDataSource<UmbDocumentAuditLogModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -31,7 +33,7 @@ export class UmbDocumentAuditLogServerDataSource {
 			this.#host,
 			DocumentService.getDocumentByIdAuditLog({
 				id: args.unique,
-				orderDirection: args.orderDirection,
+				orderDirection: args.orderDirection as DirectionModel, // TODO: Fix type cast
 				sinceDate: args.sinceDate,
 				skip: args.skip,
 				take: args.take,
@@ -39,7 +41,7 @@ export class UmbDocumentAuditLogServerDataSource {
 		);
 
 		if (data) {
-			const mappedItems = data.items.map((item) => {
+			const mappedItems: Array<UmbDocumentAuditLogModel> = data.items.map((item) => {
 				return {
 					user: item.user ? { unique: item.user.id } : null,
 					timestamp: item.timestamp,
