@@ -23,7 +23,7 @@ public class ItemDatatypeItemController : DatatypeItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {

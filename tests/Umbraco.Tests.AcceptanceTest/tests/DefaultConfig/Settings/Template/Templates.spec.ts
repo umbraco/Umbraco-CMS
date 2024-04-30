@@ -14,7 +14,7 @@ test.describe('Template tests', () => {
     await umbracoApi.template.ensureNameNotExists(templateName);
   });
 
-  test('can create a template', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a template @smoke', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
@@ -30,7 +30,7 @@ test.describe('Template tests', () => {
     await umbracoUi.template.isTemplateRootTreeItemVisible(templateName);
   });
 
-  test('can update content of a template', async ({umbracoApi, umbracoUi}) => {
+  test('can update content of a template @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const updatedTemplateContent =
       defaultTemplateContent + '\r\n' + '<p>AcceptanceTests</p>';

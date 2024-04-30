@@ -25,7 +25,7 @@ public class ItemMediaItemController : MediaItemControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MediaItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
