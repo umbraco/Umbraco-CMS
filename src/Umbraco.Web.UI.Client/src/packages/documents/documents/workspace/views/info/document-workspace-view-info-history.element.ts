@@ -38,7 +38,7 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.#pagination.setPageSize(2);
+		this.#pagination.setPageSize(10);
 		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number));
 		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number));
 
