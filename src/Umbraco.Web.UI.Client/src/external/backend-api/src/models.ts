@@ -1379,6 +1379,14 @@ id: string
 compositions: Array<MemberTypeCompositionModel>
     };
 
+export type MemberTypeTreeItemResponseModel = {
+        hasChildren: boolean
+id: string
+parent?: ReferenceByIdModel | null
+name: string
+icon: string
+    };
+
 export type MemberValueModel = {
         culture?: string | null
 segment?: string | null
@@ -1458,6 +1466,10 @@ export type NotificationHeaderModel = {
         message: string
 category: string
 type: EventMessageTypeModel
+    };
+
+export type OEmbedResponseModel = {
+        markup: string
     };
 
 export type ObjectTypeResponseModel = {
@@ -1657,6 +1669,11 @@ items: Array<MemberGroupResponseModel>
 export type PagedMemberResponseModel = {
         total: number
 items: Array<MemberResponseModel>
+    };
+
+export type PagedMemberTypeTreeItemResponseModel = {
+        total: number
+items: Array<MemberTypeTreeItemResponseModel>
     };
 
 export type PagedModelDataTypeItemResponseModel = {
@@ -2571,6 +2588,7 @@ readonly subscribeToNewsletter: boolean
 export type UserItemResponseModel = {
         id: string
 name: string
+avatarUrls: Array<string>
     };
 
 export enum UserOrderModel {
@@ -3648,6 +3666,12 @@ export type MediaTypeData = {
                         id?: Array<string>
                         
                     };
+GetItemMediaTypeAllowed: {
+                        fileExtension?: string
+skip?: number
+take?: number
+                        
+                    };
 GetItemMediaTypeSearch: {
                         query?: string
 skip?: number
@@ -3739,6 +3763,7 @@ take?: number
         
         responses: {
             GetItemMediaType: Array<MediaTypeItemResponseModel>
+                ,GetItemMediaTypeAllowed: PagedModelMediaTypeItemResponseModel
                 ,GetItemMediaTypeSearch: PagedModelMediaTypeItemResponseModel
                 ,PostMediaType: string
                 ,GetMediaTypeById: MediaTypeResponseModel
@@ -4041,7 +4066,7 @@ take?: number
                 ,GetMemberTypeByIdCompositionReferences: Array<MemberTypeCompositionResponseModel>
                 ,PostMemberTypeByIdCopy: string
                 ,PostMemberTypeAvailableCompositions: Array<AvailableMemberTypeCompositionResponseModel>
-                ,GetTreeMemberTypeRoot: PagedNamedEntityTreeItemResponseModel
+                ,GetTreeMemberTypeRoot: PagedMemberTypeTreeItemResponseModel
                 
         }
         
@@ -4142,6 +4167,25 @@ take?: number
         
         responses: {
             GetObjectTypes: PagedObjectTypeResponseModel
+                
+        }
+        
+    }
+
+export type OembedData = {
+        
+        payloads: {
+            GetOembedQuery: {
+                        maxHeight?: number
+maxWidth?: number
+url?: string
+                        
+                    };
+        }
+        
+        
+        responses: {
+            GetOembedQuery: OEmbedResponseModel
                 
         }
         
@@ -4904,7 +4948,13 @@ GetUserDataById: {
 export type UserGroupData = {
         
         payloads: {
-            GetItemUserGroup: {
+            GetFilterUserGroup: {
+                        filter?: string
+skip?: number
+take?: number
+                        
+                    };
+GetItemUserGroup: {
                         id?: Array<string>
                         
                     };
@@ -4948,7 +4998,8 @@ requestBody?: Array<string>
         
         
         responses: {
-            GetItemUserGroup: Array<UserGroupItemResponseModel>
+            GetFilterUserGroup: PagedUserGroupResponseModel
+                ,GetItemUserGroup: Array<UserGroupItemResponseModel>
                 ,DeleteUserGroup: string
                 ,PostUserGroup: string
                 ,GetUserGroup: PagedUserGroupResponseModel
