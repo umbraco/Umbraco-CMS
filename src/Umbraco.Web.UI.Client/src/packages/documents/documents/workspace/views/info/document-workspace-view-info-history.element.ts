@@ -105,19 +105,19 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 
 	render() {
 		return html`<uui-box>
-				<div id="rollback" slot="header">
-					<h2><umb-localize key="general_history">History</umb-localize></h2>
-					<uui-button
-						label=${this.localize.term('actions_rollback')}
-						look="secondary"
-						slot="actions"
-						@click=${this.#onRollbackModalOpen}>
-						<uui-icon name="icon-undo"></uui-icon>
-					</uui-button>
-				</div>
-				${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
-			</uui-box>
-			${this.#renderPagination()}`;
+			<div id="rollback" slot="header">
+				<h2><umb-localize key="general_history">History</umb-localize></h2>
+				<uui-button
+					label=${this.localize.term('actions_rollback')}
+					look="secondary"
+					slot="actions"
+					@click=${this.#onRollbackModalOpen}>
+					<uui-icon name="icon-undo"></uui-icon>
+				</uui-button>
+			</div>
+			${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
+			${this.#renderPagination()}
+		</uui-box> `;
 	}
 
 	#renderHistory() {
@@ -156,6 +156,7 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 			${this._totalPages > 1
 				? html`
 						<uui-pagination
+							class="pagination"
 							.current=${this._currentPageNumber}
 							.total=${this._totalPages}
 							@change=${this.#onPageChange}></uui-pagination>
@@ -196,10 +197,11 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 				flex: 1;
 				display: inline-block;
 			}
+
 			.pagination {
 				display: flex;
 				justify-content: center;
-				margin-top: var(--uui-size-space-4);
+				margin-top: var(--uui-size-layout-1);
 			}
 		`,
 	];
