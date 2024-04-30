@@ -9,6 +9,7 @@ import type {
 
 import './content-type-design-editor-properties.element.js';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-content-type-design-editor-group')
 export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
@@ -72,8 +73,9 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 						this._hasOwnerContainer = hasAOwnerContainer;
 						this._inherited = !pureOwnerContainer;
 						this._inheritedFrom = containers
-							.filter((con) => con.id !== this.group!.id)
-							.map((con) => this.groupStructureHelper!.getContentTypeOfContainer(con.id));
+							.filter((con) => con.id !== ownerContainer?.id)
+							.map((con) => this.groupStructureHelper!.getContentTypeOfContainer(con.id))
+							.filter((contentType) => contentType !== undefined) as Array<UmbContentTypeModel>;
 						this.requestUpdate('_hasOwnerContainer', oldHasOwnerContainer);
 						this.requestUpdate('_inherited', oldInherited);
 						this.requestUpdate('_inheritedFrom', oldInheritedFrom);
@@ -202,6 +204,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	}
 
 	static styles = [
+		UmbTextStyles,
 		css`
 			:host([drag-placeholder]) {
 				opacity: 0.5;
