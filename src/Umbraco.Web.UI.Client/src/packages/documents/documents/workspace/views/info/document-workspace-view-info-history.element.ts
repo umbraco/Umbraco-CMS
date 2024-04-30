@@ -2,13 +2,12 @@ import { UMB_ROLLBACK_MODAL } from '../../../modals/rollback/index.js';
 import type { UmbDocumentAuditLogModel } from '../../../audit-log/types.js';
 import { UmbDocumentAuditLogRepository } from '../../../audit-log/index.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
-import { HistoryTagStyleAndText, TimeOptions } from './utils.js';
-import { css, html, customElement, state, nothing, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { TimeOptions, getDocumentHistoryTagStyleAndText } from './utils.js';
+import { css, html, customElement, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
@@ -23,7 +22,7 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	_totalPages = 1;
 
 	@state()
-	private _items?: Array<UmbDocumentAuditLogModel>;
+	private _items: Array<UmbDocumentAuditLogModel> = [];
 
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#auditLogRepository = new UmbDocumentAuditLogRepository(this);
@@ -121,7 +120,7 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 						this._items,
 						(item) => item.timestamp,
 						(item) => {
-							const { text, style } = HistoryTagStyleAndText(item.logType);
+							const { text, style } = getDocumentHistoryTagStyleAndText(item.logType);
 							const user = this.#userMap.get(item.user.unique);
 							//const avatar = Array.isArray(user.avatarUrls) ? user.avatarUrls[1] : undefined;
 							// TODO: we need to get the absolute url for the avatars from the server

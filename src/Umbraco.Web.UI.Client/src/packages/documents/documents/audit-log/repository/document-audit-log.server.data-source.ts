@@ -44,7 +44,7 @@ export class UmbDocumentAuditLogServerDataSource implements UmbAuditLogDataSourc
 		if (data) {
 			const mappedItems: Array<UmbDocumentAuditLogModel> = data.items.map((item) => {
 				return {
-					user: item.user ? { unique: item.user.id } : null,
+					user: { unique: item.user.id },
 					timestamp: item.timestamp,
 					logType: item.logType as UmbDocumentAuditLogType, // TODO: Fix type cast
 					comment: item.comment,

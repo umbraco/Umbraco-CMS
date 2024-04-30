@@ -2,7 +2,7 @@ import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbDirectionType } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbAuditLogModel<LogType> {
-	user: UmbReferenceByUnique | null;
+	user: UmbReferenceByUnique;
 	timestamp: string;
 	logType: LogType;
 	comment?: string | null;

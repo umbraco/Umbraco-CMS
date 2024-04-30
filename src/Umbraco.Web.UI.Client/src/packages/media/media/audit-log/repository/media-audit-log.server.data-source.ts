@@ -1,6 +1,6 @@
 import type { UmbAuditLogDataSource, UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbMediaAuditLogModel } from '../types.js';
-import type { UmbMediaAuditLogType } from '../utils.js';
+import type { UmbMediaAuditLogType } from '../utils/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -44,7 +44,7 @@ export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<U
 		if (data) {
 			const mappedItems: Array<UmbMediaAuditLogModel> = data.items.map((item) => {
 				return {
-					user: item.user ? { unique: item.user.id } : null,
+					user: { unique: item.user.id },
 					timestamp: item.timestamp,
 					logType: item.logType as UmbMediaAuditLogType, // TODO: fix this type cast
 					comment: item.comment,
