@@ -7,6 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-document-grid-collection-view')
@@ -144,27 +145,24 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		`;
 	}
 
-	#renderState(item: UmbDocumentCollectionItemModel) {
-		switch (item.state) {
+	#getStateTagConfig(state: string): { color: UUIInterfaceColor; label: string } {
+		switch (state) {
 			case 'Published':
-				return html`<uui-tag slot="tag" color="positive" look="secondary"
-					>${this.localize.term('content_published')}</uui-tag
-				>`;
+				return { color: 'positive', label: this.localize.term('content_published') };
 			case 'PublishedPendingChanges':
-				return html`<uui-tag slot="tag" color="warning" look="secondary"
-					>${this.localize.term('content_publishedPendingChanges')}</uui-tag
-				>`;
+				return { color: 'warning', label: this.localize.term('content_publishedPendingChanges') };
 			case 'Draft':
-				return html`<uui-tag slot="tag" color="default" look="secondary"
-					>${this.localize.term('content_unpublished')}</uui-tag
-				>`;
+				return { color: 'default', label: this.localize.term('content_unpublished') };
 			case 'NotCreated':
-				return html`<uui-tag slot="tag" color="danger" look="secondary"
-					>${this.localize.term('content_notCreated')}</uui-tag
-				>`;
+				return { color: 'danger', label: this.localize.term('content_notCreated') };
 			default:
-				return html`<uui-tag slot="tag" color="danger" look="secondary">${fromCamelCase(item.state)}</uui-tag>`;
+				return { color: 'danger', label: fromCamelCase(state) };
+		}
 	}
+
+	#renderState(item: UmbDocumentCollectionItemModel) {
+		const tagConfig = this.#getStateTagConfig(item.state);
+		return html`<uui-tag slot="tag" color=${tagConfig.color} look="secondary">${tagConfig.label}</uui-tag>`;
 	}
 
 	#renderProperties(item: UmbDocumentCollectionItemModel) {
