@@ -1,7 +1,7 @@
 import { getPropertyValueByAlias } from '../index.js';
 import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -98,26 +98,37 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	}
 
 	render() {
-		if (this._loading) {
-			return html`<div class="container"><uui-loader></uui-loader></div>`;
-		}
+		return this._items.length === 0 ? this.#renderEmpty() : this.#renderItems();
+	}
 
-		if (this._items.length === 0) {
-			return html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`;
-		}
-
+	#renderEmpty() {
+		if (this._items.length > 0) return nothing;
 		return html`
-			<div id="document-grid">
-				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderCard(item),
+			<div class="container">
+				${when(
+					this._loading,
+					() => html`<uui-loader></uui-loader>`,
+					() => html`<p>${this.localize.term('content_listViewNoItems')}</p>`,
 				)}
 			</div>
 		`;
 	}
 
-	#renderCard(item: UmbDocumentCollectionItemModel) {
+	#renderItems() {
+		if (this._items.length === 0) return nothing;
+		return html`
+			<div id="document-grid">
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this.#renderItem(item),
+				)}
+			</div>
+			${when(this._loading, () => html`<uui-loader-bar></uui-loader-bar>`)}
+		`;
+	}
+
+	#renderItem(item: UmbDocumentCollectionItemModel) {
 		return html`
 			<uui-card-content-node
 				.name=${item.name ?? 'Unnamed Document'}
@@ -153,7 +164,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				>`;
 			default:
 				return html`<uui-tag slot="tag" color="danger" look="secondary">${fromCamelCase(item.state)}</uui-tag>`;
-		}
+	}
 	}
 
 	#renderProperties(item: UmbDocumentCollectionItemModel) {

@@ -2,7 +2,7 @@ import { getPropertyValueByAlias } from '../index.js';
 import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
 import type { UmbDocumentCollectionItemModel } from '../../types.js';
 import type { UmbDocumentCollectionContext } from '../../document-collection.context.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
@@ -193,23 +193,34 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	}
 
 	render() {
-		if (this._loading) {
-			return html`<div class="container"><uui-loader></uui-loader></div>`;
-		}
+		return this._tableItems.length === 0 ? this.#renderEmpty() : this.#renderItems();
+	}
 
-		if (this._tableItems.length === 0) {
-			return html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`;
-		}
+	#renderEmpty() {
+		if (this._tableItems.length > 0) return nothing;
+		return html`
+			<div class="container">
+				${when(
+					this._loading,
+					() => html`<uui-loader></uui-loader>`,
+					() => html`<p>${this.localize.term('content_listViewNoItems')}</p>`,
+				)}
+			</div>
+		`;
+	}
 
+	#renderItems() {
+		if (this._tableItems.length === 0) return nothing;
 		return html`
 			<umb-table
 				.config=${this._tableConfig}
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
-				@selected="${this.#handleSelect}"
-				@deselected="${this.#handleDeselect}"
-				@ordered="${this.#handleOrdering}"></umb-table>
+				@selected=${this.#handleSelect}
+				@deselected=${this.#handleDeselect}
+				@ordered=${this.#handleOrdering}></umb-table>
+			${when(this._loading, () => html`<uui-loader-bar></uui-loader-bar>`)}
 		`;
 	}
 
