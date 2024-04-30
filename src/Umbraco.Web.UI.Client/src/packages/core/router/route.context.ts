@@ -70,10 +70,8 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 	}
 
 	#removeModalPath(info: IRoutingInfo) {
-		// Reset the URL to the routerBasePath + routerActiveLocalPath
+		// Reset the URL to the routerBasePath + routerActiveLocalPath [NL]
 		const folderToRemove = info.match.fragments.consumed;
-		console.log('removeModalPath?', folderToRemove, info);
-		console.log('href', window.location.href);
 		if (folderToRemove && window.location.href.includes(folderToRemove)) {
 			window.history.pushState({}, '', this.#routerBasePath + '/' + this.#routerActiveLocalPath);
 		}
