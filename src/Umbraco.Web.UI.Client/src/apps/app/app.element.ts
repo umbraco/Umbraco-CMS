@@ -64,6 +64,7 @@ export class UmbAppElement extends UmbLitElement {
 			setup: (component) => {
 				const searchParams = new URLSearchParams(window.location.search);
 				const hasCode = searchParams.has('code');
+				(component as UmbAppErrorElement).hideBackButton = true;
 				(component as UmbAppErrorElement).errorHeadline = this.localize.term('general_login');
 				(component as UmbAppErrorElement).errorMessage = hasCode
 					? this.localize.term('errors_externalLoginSuccess')
