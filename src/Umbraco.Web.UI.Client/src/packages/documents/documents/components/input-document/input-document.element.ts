@@ -238,8 +238,6 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 	];
 }
 
-export default UmbInputDocumentElement;
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-input-document': UmbInputDocumentElement;
