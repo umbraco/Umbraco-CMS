@@ -712,7 +712,9 @@ export default {
 		unauthorized: 'Du har ikke tilladelse til at udføre denne handling',
 		userNotFound: 'Den angivne bruger blev ikke fundet i databasen',
 		externalInfoNotFound: 'Serveren kunne ikke kommunikere med den eksterne loginudbyder',
-		externalLoginFailed: 'Serveren mislykkedes i at logge ind med den eksterne loginudbyder',
+		externalLoginFailed:
+			'Serveren mislykkedes i at logge ind med den eksterne loginudbyder. Luk dette vindue og prøv igen.',
+		externalLoginSuccess: 'Du er nu logget ind. Du kan nu lukke dette vindue.',
 	},
 	openidErrors: {
 		accessDenied: 'Access denied',

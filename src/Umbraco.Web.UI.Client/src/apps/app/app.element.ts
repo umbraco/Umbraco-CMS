@@ -64,16 +64,16 @@ export class UmbAppElement extends UmbLitElement {
 			setup: (component) => {
 				const searchParams = new URLSearchParams(window.location.search);
 				const hasCode = searchParams.has('code');
-				(component as UmbAppErrorElement).errorHeadline = 'Umbraco Authorization';
+				(component as UmbAppErrorElement).errorHeadline = this.localize.term('general_login');
 				(component as UmbAppErrorElement).errorMessage = hasCode
-					? 'Authorization completed. You may now close this window.'
-					: 'Authorization failed. Please close this window and try again.';
+					? this.localize.term('errors_externalLoginSuccess')
+					: this.localize.term('errors_externalLoginFailed');
 
 				// Complete the authorization request
 				this.#authContext?.completeAuthorizationRequest().finally(() => {
 					// If we don't have an opener, redirect to the root
 					if (!window.opener) {
-						history.replaceState(null, '', '/');
+						//history.replaceState(null, '', '');
 					}
 				});
 			},
