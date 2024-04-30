@@ -1,6 +1,8 @@
+import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { html, customElement, property, state, type PropertyValueMap, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 function getNumberOrUndefined(value: string) {
@@ -40,6 +42,9 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		return this._maxValue;
 	}
 
+	@property({ type: Object })
+	validationRange?: NumberRangeValueType;
+
 	private updateValue() {
 		const newValue =
 			this._minValue || this._maxValue ? (this._minValue ?? '') + ',' + (this._maxValue ?? '') : undefined;
@@ -78,8 +83,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		);
 	}
 
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.firstUpdated(_changedProperties);
+	firstUpdated() {
 		this.shadowRoot?.querySelectorAll<UUIInputElement>('uui-input').forEach((x) => this.addFormControlElement(x));
 	}
 
@@ -87,31 +91,38 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		return this.shadowRoot?.querySelector<UUIInputElement>('uui-input')?.focus();
 	}
 
-	private _onMinInput(e: InputEvent) {
-		const value = Number((e.target as HTMLInputElement).value);
+	#onMinInput(e: InputEvent & { target: HTMLInputElement }) {
+		const value = e.target.value;
 		this.minValue = value ? Number(value) : undefined;
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	private _onMaxInput(e: InputEvent) {
-		const value = (e.target as HTMLInputElement).value;
+	#onMaxInput(e: InputEvent & { target: HTMLInputElement }) {
+		const value = e.target.value;
 		this.maxValue = value ? Number(value) : undefined;
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	render() {
-		return html`<uui-input
+		return html`
+			<uui-input
 				type="number"
+				label=${this.minLabel}
+				min=${ifDefined(this.validationRange?.min)}
+				max=${ifDefined(this.validationRange?.max)}
+				placeholder=${this.validationRange?.min ?? ''}
 				.value=${this._minValue}
-				@input=${this._onMinInput}
-				label=${this.minLabel}></uui-input>
+				@input=${this.#onMinInput}></uui-input>
 			<b>–</b>
 			<uui-input
 				type="number"
-				.value=${this._maxValue}
-				@input=${this._onMaxInput}
 				label=${this.maxLabel}
-				placeholder="&infin;"></uui-input>`;
+				min=${ifDefined(this.validationRange?.min)}
+				max=${ifDefined(this.validationRange?.max)}
+				placeholder=${this.validationRange?.max === Infinity ? '∞' : this.validationRange?.max ?? ''}
+				.value=${this._maxValue}
+				@input=${this.#onMaxInput}></uui-input>
+		`;
 	}
 
 	static styles = css`

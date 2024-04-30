@@ -1,6 +1,6 @@
 import type { UmbMemberItemModel } from '../../repository/index.js';
 import { UmbMemberPickerContext } from './input-member.context.js';
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -164,7 +164,7 @@ export class UmbInputMemberElement extends UUIFormControlMixin(UmbLitElement, ''
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this._items) return nothing;
 		return html`
 			<uui-ref-list>
 				${repeat(
@@ -177,7 +177,7 @@ export class UmbInputMemberElement extends UUIFormControlMixin(UmbLitElement, ''
 	}
 
 	#renderAddButton() {
-		if (this.max === 1 && this.selection.length >= this.max) return;
+		if (this.max === 1 && this.selection.length >= this.max) return nothing;
 		return html`<uui-button
 			id="btn-add"
 			look="placeholder"
@@ -186,7 +186,7 @@ export class UmbInputMemberElement extends UUIFormControlMixin(UmbLitElement, ''
 	}
 
 	#renderItem(item: UmbMemberItemModel) {
-		if (!item.unique) return;
+		if (!item.unique) return nothing;
 		return html`
 			<uui-ref-node name=${item.name} id=${item.unique}>
 				<uui-action-bar slot="actions">
@@ -198,7 +198,7 @@ export class UmbInputMemberElement extends UUIFormControlMixin(UmbLitElement, ''
 	}
 
 	#renderOpenButton(item: UmbMemberItemModel) {
-		if (!this.showOpenButton) return;
+		if (!this.showOpenButton) return nothing;
 		return html`
 			<uui-button
 				href="${this._editMemberPath}edit/${item.unique}"

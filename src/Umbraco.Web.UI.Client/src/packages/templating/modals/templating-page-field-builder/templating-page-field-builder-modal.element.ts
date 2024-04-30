@@ -3,14 +3,14 @@ import type {
 	UmbTemplatingPageFieldBuilderModalData,
 	UmbTemplatingPageFieldBuilderModalValue,
 } from './templating-page-field-builder-modal.token.js';
-import type { UmbFieldDropdownListElement } from './components/field-dropdown-list/index.js';
+import type { UmbTemplateFieldDropdownListElement } from './components/template-field-dropdown-list/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 // import of local components
-import './components/field-dropdown-list/index.js';
+import './components/template-field-dropdown-list/index.js';
 
 @customElement('umb-templating-page-field-builder-modal')
 export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseElement<
@@ -42,7 +42,7 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 	/** TODO: Implement "Choose field" */
 
 	#onChangeFieldValue(e: Event) {
-		this._field = (e.target as UmbFieldDropdownListElement).value?.alias;
+		this._field = (e.target as UmbTemplateFieldDropdownListElement).value?.alias;
 	}
 
 	render() {
@@ -53,7 +53,9 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 						<uui-label for="page-field-value">
 							<umb-localize key="templateEditor_chooseField">Choose field</umb-localize>
 						</uui-label>
-						<umb-field-dropdown-list @change=${this.#onChangeFieldValue} exclude-media-type></umb-field-dropdown-list>
+						<umb-template-field-dropdown-list
+							@change=${this.#onChangeFieldValue}
+							exclude-media-type></umb-template-field-dropdown-list>
 
 						<uui-label for="page-field-default-value">
 							<umb-localize key="templateEditor_defaultValue">Default value</umb-localize>
