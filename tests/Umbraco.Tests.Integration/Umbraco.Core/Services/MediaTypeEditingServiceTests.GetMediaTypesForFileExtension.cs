@@ -23,18 +23,18 @@ public partial class MediaTypeEditingServiceTests
     [TestCase("123", Constants.Conventions.MediaTypes.File)]
     public async Task Can_Get_Default_Allowed_Media_Types(string fileExtension, string expectedMediaTypeAlias)
     {
-        var allowedMediaTypes = await MediaTypeEditingService.GetMediaTypesForFileExtension(fileExtension);
-        Assert.AreEqual(1, allowedMediaTypes.Count());
-        Assert.AreEqual(expectedMediaTypeAlias, allowedMediaTypes.First().Alias);
+        var allowedMediaTypes = await MediaTypeEditingService.GetMediaTypesForFileExtensionAsync(fileExtension, 0, 100);
+        Assert.AreEqual(1, allowedMediaTypes.Total);
+        Assert.AreEqual(expectedMediaTypeAlias, allowedMediaTypes.Items.First().Alias);
     }
 
     [TestCase("jpg")]
     [TestCase(".jpg")]
-    public async Task Ignores_Trailing_Period_For_Allowed_Media_Types(string fileExtension)
+    public async Task Ignores_Heading_Period_For_Allowed_Media_Types(string fileExtension)
     {
-        var allowedMediaTypes = await MediaTypeEditingService.GetMediaTypesForFileExtension(fileExtension);
-        Assert.AreEqual(1, allowedMediaTypes.Count());
-        Assert.AreEqual(Constants.Conventions.MediaTypes.Image, allowedMediaTypes.First().Alias);
+        var allowedMediaTypes = await MediaTypeEditingService.GetMediaTypesForFileExtensionAsync(fileExtension, 0, 100);
+        Assert.AreEqual(1, allowedMediaTypes.Total);
+        Assert.AreEqual(Constants.Conventions.MediaTypes.Image, allowedMediaTypes.Items.First().Alias);
     }
 
     [Test]
@@ -48,9 +48,31 @@ public partial class MediaTypeEditingServiceTests
         dataType.ConfigurationData["fileExtensions"] = new[] { "pdf", "jpg" };
         await dataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
 
-        var allowedMediaTypes = await MediaTypeEditingService.GetMediaTypesForFileExtension("jpg");
-        Assert.AreEqual(2, allowedMediaTypes.Count());
-        Assert.AreEqual(Constants.Conventions.MediaTypes.Image, allowedMediaTypes.First().Alias);
-        Assert.AreEqual(Constants.Conventions.MediaTypes.ArticleAlias, allowedMediaTypes.Last().Alias);
+        var allowedMediaTypes = await MediaTypeEditingService.GetMediaTypesForFileExtensionAsync("jpg", 0, 100);
+        Assert.AreEqual(2, allowedMediaTypes.Total);
+        Assert.AreEqual(Constants.Conventions.MediaTypes.Image, allowedMediaTypes.Items.First().Alias);
+        Assert.AreEqual(Constants.Conventions.MediaTypes.ArticleAlias, allowedMediaTypes.Items.Last().Alias);
+    }
+
+    [Test]
+    public async Task Get_Get_Media_Types_For_FileExtensions_Using_Skip_Take()
+    {
+        var mediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.ArticleAlias)!;
+        var uploadPropertyType = mediaType.PropertyTypes.Single(pt => pt.Alias == Constants.Conventions.Media.File);
+
+        var dataTypeService = GetRequiredService<IDataTypeService>();
+        var dataType = (await dataTypeService.GetAsync(uploadPropertyType.DataTypeKey))!;
+        dataType.ConfigurationData["fileExtensions"] = new[] { "pdf", "jpg" };
+        await dataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
+
+        var allowedMediaTypes = await MediaTypeEditingService.GetMediaTypesForFileExtensionAsync("jpg", 0, 1);
+        Assert.AreEqual(2, allowedMediaTypes.Total);
+        Assert.AreEqual(1, allowedMediaTypes.Items.Count());
+        Assert.AreEqual(Constants.Conventions.MediaTypes.Image, allowedMediaTypes.Items.First().Alias);
+
+        allowedMediaTypes = await MediaTypeEditingService.GetMediaTypesForFileExtensionAsync("jpg", 1, 1);
+        Assert.AreEqual(2, allowedMediaTypes.Total);
+        Assert.AreEqual(1, allowedMediaTypes.Items.Count());
+        Assert.AreEqual(Constants.Conventions.MediaTypes.ArticleAlias, allowedMediaTypes.Items.First().Alias);
     }
 }

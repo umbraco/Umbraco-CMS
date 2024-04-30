@@ -15,5 +15,5 @@ public interface IMediaTypeEditingService
         IEnumerable<Guid> currentCompositeKeys,
         IEnumerable<string> currentPropertyAliases);
 
-    Task<IEnumerable<IMediaType>> GetMediaTypesForFileExtension(string fileExtension);
+    Task<PagedModel<IMediaType>> GetMediaTypesForFileExtensionAsync(string fileExtension, int skip, int take);
 }

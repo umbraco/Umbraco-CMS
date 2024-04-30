@@ -58,7 +58,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         IEnumerable<string> currentPropertyAliases) =>
         await FindAvailableCompositionsAsync(key, currentCompositeKeys, currentPropertyAliases);
 
-    public async Task<IEnumerable<IMediaType>> GetMediaTypesForFileExtension(string fileExtension)
+    public async Task<PagedModel<IMediaType>> GetMediaTypesForFileExtensionAsync(string fileExtension, int skip, int take)
     {
         fileExtension = fileExtension.TrimStart(Constants.CharArrays.Period);
 
@@ -79,7 +79,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
 
         // find media types that have an explicit allow-list of file extensions
         // - NOTE: an empty allow-list should be interpreted as "all file extensions are allowed"
-        IDictionary<IMediaType, IEnumerable<string>> allowedFileExtensionsByMediaType = await FetchAllowedFileExtensionsByMediaType(candidateMediaTypes);
+        IDictionary<IMediaType, IEnumerable<string>> allowedFileExtensionsByMediaType = await FetchAllowedFileExtensionsByMediaTypeAsync(candidateMediaTypes);
 
         // add all media types where the file extension is explicitly allowed
         allowedMediaTypes.AddRange(allowedFileExtensionsByMediaType
@@ -94,7 +94,12 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
                 .Select(kvp => kvp.Key));
         }
 
-        return allowedMediaTypes;
+        return new PagedModel<IMediaType>()
+        {
+            Items = allowedMediaTypes.Skip(skip).Take(take),
+            Total = allowedMediaTypes.Count
+        };
+
     }
 
     protected override IMediaType CreateContentType(IShortStringHelper shortStringHelper, int parentId)
@@ -106,7 +111,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
 
     protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.MediaTypeContainer;
 
-    private async Task<IDictionary<IMediaType, IEnumerable<string>>> FetchAllowedFileExtensionsByMediaType(IEnumerable<IMediaType> mediaTypes)
+    private async Task<IDictionary<IMediaType, IEnumerable<string>>> FetchAllowedFileExtensionsByMediaTypeAsync(IEnumerable<IMediaType> mediaTypes)
     {
         var allowedFileExtensionsByMediaType = new Dictionary<IMediaType, IEnumerable<string>>();
         foreach (IMediaType mediaType in mediaTypes)

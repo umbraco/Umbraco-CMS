@@ -25,12 +25,12 @@ public class AllowedMediaTypeItemController : MediaTypeItemControllerBase
     [ProducesResponseType(typeof(PagedModel<MediaTypeItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item(CancellationToken cancellationToken, string fileExtension, int skip = 0, int take = 100)
     {
-        IMediaType[] mediaTypes = (await _mediaTypeEditingService.GetMediaTypesForFileExtension(fileExtension)).ToArray();
+        PagedModel<IMediaType> mediaTypes = await _mediaTypeEditingService.GetMediaTypesForFileExtensionAsync(fileExtension, skip, take);
 
         var result = new PagedModel<MediaTypeItemResponseModel>
         {
-            Items = _mapper.MapEnumerable<IMediaType, MediaTypeItemResponseModel>(mediaTypes.Skip(skip).Take(take)),
-            Total = mediaTypes.Length
+            Items = _mapper.MapEnumerable<IMediaType, MediaTypeItemResponseModel>(mediaTypes.Items),
+            Total = mediaTypes.Total
         };
         return Ok(result);
     }
