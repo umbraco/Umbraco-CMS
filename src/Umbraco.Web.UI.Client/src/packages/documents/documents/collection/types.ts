@@ -6,7 +6,7 @@ export interface UmbDocumentCollectionFilterModel extends UmbCollectionFilterMod
 	orderBy?: string;
 	orderCulture?: string;
 	orderDirection?: 'asc' | 'desc';
-	userDefinedProperties: Array<{alias: string, header: string, isSystem: boolean}>;
+	userDefinedProperties: Array<{ alias: string; header: string; isSystem: boolean }>;
 }
 
 export interface UmbDocumentCollectionItemModel {

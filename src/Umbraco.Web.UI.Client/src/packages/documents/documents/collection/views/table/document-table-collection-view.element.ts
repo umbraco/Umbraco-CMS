@@ -61,15 +61,13 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	@state()
-	private _skip: number = 0;
-
 	#collectionContext?: UmbDocumentCollectionContext;
 
 	#routeBuilder?: UmbModalRouteBuilder;
 
 	constructor() {
 		super();
+
 		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
 		});
@@ -109,7 +107,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				this._userDefinedProperties = userDefinedProperties;
 				this.#createTableHeadings();
 			},
-			'umbCollectionUserDefinedPropertiesObserver',
+			'_observeUserDefinedProperties',
 		);
 
 		this.observe(
@@ -118,7 +116,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				this._items = items;
 				this.#createTableItems(this._items);
 			},
-			'umbCollectionItemsObserver',
+			'_observeItems',
 		);
 
 		this.observe(
@@ -126,15 +124,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			(selection) => {
 				this._selection = selection as string[];
 			},
-			'umbCollectionSelectionObserver',
-		);
-
-		this.observe(
-			this.#collectionContext.pagination.skip,
-			(skip) => {
-				this._skip = skip;
-			},
-			'umbCollectionSkipObserver',
+			'_observeSelection',
 		);
 	}
 

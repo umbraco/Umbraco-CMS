@@ -57,7 +57,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		return html`
 			<umb-body-layout header-transparent>
 				${this.renderToolbar()}
-				<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>
+				<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>
 				${this.renderPagination()} ${this.renderSelectionActions()}
 			</umb-body-layout>
 		`;

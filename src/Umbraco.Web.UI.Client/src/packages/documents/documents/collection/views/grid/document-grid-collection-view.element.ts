@@ -59,15 +59,15 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 			(userDefinedProperties) => {
 				this._userDefinedProperties = userDefinedProperties;
 			},
-			'umbCollectionUserDefinedPropertiesObserver',
+			'_observeUserDefinedProperties',
 		);
 
-		this.observe(this.#collectionContext.items, (items) => (this._items = items), 'umbCollectionItemsObserver');
+		this.observe(this.#collectionContext.items, (items) => (this._items = items), '_observeItems');
 
 		this.observe(
 			this.#collectionContext.selection.selection,
 			(selection) => (this._selection = selection),
-			'umbCollectionSelectionObserver',
+			'_observeSelection',
 		);
 
 		this.observe(
@@ -75,7 +75,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 			(skip) => {
 				this._skip = skip;
 			},
-			'umbCollectionSkipObserver',
+			'_observePaginationSkip',
 		);
 	}
 
