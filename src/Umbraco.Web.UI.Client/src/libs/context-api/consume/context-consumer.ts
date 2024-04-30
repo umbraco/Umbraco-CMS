@@ -91,9 +91,10 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 
 	protected setInstance(instance: ResultType): void {
 		this.#instance = instance;
-		this.#callback?.(instance);
-		if (instance !== undefined) {
-			this.#promiseResolver?.(instance);
+		const promiseResolver = this.#promiseResolver; // Get the promise resolver, as it might be destroyed as a reaction of the callback [NL]
+		this.#callback?.(instance); // Resolve callback first as it might perform something you like completed before resolving the promise, as the promise might be used to determine when things are ready/initiated [NL]
+		if (promiseResolver && instance !== undefined) {
+			promiseResolver(instance);
 			this.#promise = undefined;
 		}
 	}
