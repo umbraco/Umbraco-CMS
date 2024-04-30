@@ -143,8 +143,8 @@ export class UmbAppAuthController extends UmbControllerBase {
 				modal: {
 					key: 'umbAuthModal',
 					backdropBackground: this.#firstTimeLoggingIn
-						? 'var(--umb-auth-backdrop, url("/umbraco/backoffice/assets/umbraco_logo_white.svg") 20px 20px / 200px no-repeat, radial-gradient(circle, rgba(2,0,36,1) 0%, rgba(40,58,151,.9) 50%, rgba(0,212,255,1) 100%))'
-						: 'var(--umb-auth-backdrop-timedout, rgba(0,0,0,0.75))',
+						? 'var(--umb-auth-backdrop, rgb(244, 244, 244))'
+						: 'var(--umb-auth-backdrop-timedout, rgba(244, 244, 244, 0.75))',
 				},
 			})
 			.onSubmit()

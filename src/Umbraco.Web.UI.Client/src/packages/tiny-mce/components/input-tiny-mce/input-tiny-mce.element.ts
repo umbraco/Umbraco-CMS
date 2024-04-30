@@ -1,19 +1,20 @@
 import { loadManifestApi } from '../../../../libs/extension-api/functions/load-manifest-api.function.js';
-import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
-import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
+import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
+import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import type { TinyMcePluginArguments, UmbTinyMcePluginBase } from './tiny-mce-plugin.js';
-import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { EditorEvent, Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
-import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
+import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { EditorEvent, Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
+import type { ManifestTinyMcePlugin } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * Handles the resize event

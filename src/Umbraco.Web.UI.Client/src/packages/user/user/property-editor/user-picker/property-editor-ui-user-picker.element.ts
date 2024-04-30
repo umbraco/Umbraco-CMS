@@ -17,12 +17,14 @@ export class UmbPropertyEditorUIUserPickerElement extends UmbLitElement implemen
 	public config?: UmbPropertyEditorConfigCollection;
 
 	#onChange(event: CustomEvent & { target: UmbUserInputElement }) {
-		this.value = event.target.selection.join(',');
+		this.value = event.target.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<umb-user-input max="1" .value=${this.value ?? ''} @change=${this.#onChange}></umb-user-input>`;
+		return html`
+			<umb-user-input min="0" max="1" .value=${this.value ?? ''} @change=${this.#onChange}></umb-user-input>
+		`;
 	}
 }
 
