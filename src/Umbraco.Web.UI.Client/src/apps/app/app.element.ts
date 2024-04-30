@@ -17,7 +17,7 @@ import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { filter, first } from '@umbraco-cms/backoffice/external/rxjs';
+import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -118,7 +118,6 @@ export class UmbAppElement extends UmbLitElement {
 		OpenAPI.BASE = window.location.origin;
 
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
-		new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		new UUIIconRegistryEssential().attach(this);
 
@@ -141,6 +140,8 @@ export class UmbAppElement extends UmbLitElement {
 
 		// Register public extensions (login extensions)
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
+		const initializer = new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+		await firstValueFrom(initializer.loaded);
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
