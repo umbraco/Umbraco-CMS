@@ -231,6 +231,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	async #requestDeleteTab(tab: UmbPropertyTypeContainerModel | undefined) {
 		if (!tab) return;
+		// TODO: Localize this:
 		const tabName = tab.name === '' ? 'Unnamed' : tab.name;
 		// TODO: Localize this:
 		const modalData: UmbConfirmModalData = {
