@@ -2,4 +2,5 @@
 
 public class BlockGridValue : BlockValue<BlockGridLayoutItem>
 {
+    public override string PropertyEditorAlias => Constants.PropertyEditors.Aliases.BlockGrid;
 }

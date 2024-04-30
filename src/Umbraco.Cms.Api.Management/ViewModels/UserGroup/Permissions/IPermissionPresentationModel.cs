@@ -1,4 +1,4 @@
-using Umbraco.Cms.Api.Management.OpenApi;
+using Umbraco.Cms.Api.Common.OpenApi;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 
