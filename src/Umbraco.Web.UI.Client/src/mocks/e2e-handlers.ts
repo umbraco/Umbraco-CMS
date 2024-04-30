@@ -20,7 +20,6 @@ export const handlers = [
 	serverHandlers.serverRunningHandler,
 	serverHandlers.serverInformationHandler,
 	...manifestsHandlers.manifestEmptyHandlers,
-	...auditLogHandlers,
 	...installHandlers,
 	...upgradeHandlers,
 	...userHandlers,
