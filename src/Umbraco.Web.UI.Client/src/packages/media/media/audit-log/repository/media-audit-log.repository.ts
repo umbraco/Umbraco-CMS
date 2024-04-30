@@ -1,4 +1,5 @@
-import type { UmbAuditLogRequestArgs } from '../types.js';
+import type { UmbAuditLogRepository, UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
+import type { UmbMediaAuditLogModel } from '../types.js';
 import { UmbMediaAuditLogServerDataSource } from './media-audit-log.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
@@ -9,7 +10,10 @@ import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
  * @class UmbMediaAuditLogRepository
  * @extends {UmbRepositoryBase}
  */
-export class UmbMediaAuditLogRepository extends UmbRepositoryBase {
+export class UmbMediaAuditLogRepository
+	extends UmbRepositoryBase
+	implements UmbAuditLogRepository<UmbMediaAuditLogModel>
+{
 	#dataSource: UmbMediaAuditLogServerDataSource;
 
 	/**

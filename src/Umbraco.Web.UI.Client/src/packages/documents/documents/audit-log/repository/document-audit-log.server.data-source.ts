@@ -1,5 +1,6 @@
 import type { UmbAuditLogDataSource, UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbDocumentAuditLogModel } from '../types.js';
+import type { UmbDocumentAuditLogType } from '../utils.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -45,7 +46,7 @@ export class UmbDocumentAuditLogServerDataSource implements UmbAuditLogDataSourc
 				return {
 					user: item.user ? { unique: item.user.id } : null,
 					timestamp: item.timestamp,
-					logType: item.logType,
+					logType: item.logType as UmbDocumentAuditLogType, // TODO: Fix type cast
 					comment: item.comment,
 					parameters: item.parameters,
 				};

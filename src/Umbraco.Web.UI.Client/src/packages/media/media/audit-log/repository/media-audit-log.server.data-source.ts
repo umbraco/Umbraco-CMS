@@ -1,5 +1,8 @@
-import type { UmbAuditLogRequestArgs } from '../types.js';
+import type { UmbAuditLogDataSource, UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
+import type { UmbMediaAuditLogModel } from '../types.js';
+import type { UmbMediaAuditLogType } from '../utils.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -8,7 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @export
  * @class UmbAuditLogServerDataSource
  */
-export class UmbMediaAuditLogServerDataSource {
+export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<UmbMediaAuditLogModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -31,7 +34,7 @@ export class UmbMediaAuditLogServerDataSource {
 			this.#host,
 			MediaService.getMediaByIdAuditLog({
 				id: args.unique,
-				orderDirection: args.orderDirection,
+				orderDirection: args.orderDirection as DirectionModel, // TODO: fix this type cast
 				sinceDate: args.sinceDate,
 				skip: args.skip,
 				take: args.take,
@@ -39,11 +42,11 @@ export class UmbMediaAuditLogServerDataSource {
 		);
 
 		if (data) {
-			const mappedItems = data.items.map((item) => {
+			const mappedItems: Array<UmbMediaAuditLogModel> = data.items.map((item) => {
 				return {
 					user: item.user ? { unique: item.user.id } : null,
 					timestamp: item.timestamp,
-					logType: item.logType,
+					logType: item.logType as UmbMediaAuditLogType, // TODO: fix this type cast
 					comment: item.comment,
 					parameters: item.parameters,
 				};

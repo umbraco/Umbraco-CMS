@@ -1,19 +1,4 @@
-import type { AuditTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { UmbDirectionType } from '@umbraco-cms/backoffice/utils';
+import type { UmbAuditLogModel } from '@umbraco-cms/backoffice/audit-log';
+import type { UmbMediaAuditLogType } from './utils.js';
 
-export interface UmbAuditLogRequestArgs {
-	unique: string;
-	orderDirection?: UmbDirectionType;
-	sinceDate?: string;
-	skip?: number;
-	take?: number;
-}
-
-export interface UmbMediaAuditLogModel {
-	user: UmbReferenceByUnique;
-	timestamp: string;
-	logType: AuditTypeModel;
-	comment?: string | null;
-	parameters?: string | null;
-}
+export interface UmbMediaAuditLogModel extends UmbAuditLogModel<UmbMediaAuditLogType> {}

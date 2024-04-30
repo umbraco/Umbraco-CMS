@@ -15,7 +15,6 @@ const documentId = documentData[0].id;
 export const logs: Array<AuditLogResponseModel> = [
 	{
 		user: { id: userId },
-		entity: { id: documentId, type: 'document' },
 		timestamp: '2021-09-14T09:32:49.0000000Z',
 		logType: AuditTypeModel.SAVE,
 		comment: null,
@@ -23,7 +22,6 @@ export const logs: Array<AuditLogResponseModel> = [
 	},
 	{
 		user: { id: userId },
-		entity: { id: documentId, type: 'document' },
 		timestamp: '2022-09-14T11:30:49.0000000Z',
 		logType: AuditTypeModel.SAVE,
 		comment: null,
@@ -31,7 +29,6 @@ export const logs: Array<AuditLogResponseModel> = [
 	},
 	{
 		user: { id: userId },
-		entity: { id: documentId, type: 'document' },
 		timestamp: '2022-09-15T09:35:49.0000000Z',
 		logType: AuditTypeModel.SAVE,
 		comment: null,
@@ -39,7 +36,6 @@ export const logs: Array<AuditLogResponseModel> = [
 	},
 	{
 		user: { id: userId },
-		entity: { id: documentId, type: 'document' },
 		timestamp: '2023-01-09T12:00:00.0000000Z',
 		logType: AuditTypeModel.PUBLISH,
 		comment: null,
