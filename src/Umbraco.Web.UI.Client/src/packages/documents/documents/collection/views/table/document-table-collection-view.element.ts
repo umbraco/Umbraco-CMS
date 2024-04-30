@@ -75,6 +75,8 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	#observeCollectionContext() {
 		if (!this.#collectionContext) return;
 
+		this.observe(this.#collectionContext.loading, (loading) => (this._loading = loading), '_observeLoading');
+
 		this.observe(
 			this.#collectionContext.userDefinedProperties,
 			(userDefinedProperties) => {

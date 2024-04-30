@@ -31,6 +31,9 @@ export class UmbDefaultCollectionContext<
 	#manifest?: ManifestCollection;
 	#repository?: UmbCollectionRepository;
 
+	#loading = new UmbObjectState<boolean>(false);
+	public readonly loading = this.#loading.asObservable();
+
 	#items = new UmbArrayState<CollectionItemType>([], (x) => x);
 	public readonly items = this.#items.asObservable();
 
@@ -176,6 +179,8 @@ export class UmbDefaultCollectionContext<
 
 		if (!this.#repository) throw new Error(`Missing repository for ${this.#manifest}`);
 
+		this.#loading.setValue(true);
+
 		const filter = this.#filter.getValue();
 		const { data } = await this.#repository.requestCollection(filter);
 
@@ -184,6 +189,8 @@ export class UmbDefaultCollectionContext<
 			this.#totalItems.setValue(data.total);
 			this.pagination.setTotalItems(data.total);
 		}
+
+		this.#loading.setValue(false);
 	}
 
 	/**
