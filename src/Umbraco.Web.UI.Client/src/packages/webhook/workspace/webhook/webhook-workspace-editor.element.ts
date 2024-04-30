@@ -34,16 +34,6 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
-	#handleInput(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.setName(target.value);
-			}
-		}
-	}
-
 	render() {
 		return html`<umb-workspace-editor
 			alias="Umb.Workspace.Webhook"
