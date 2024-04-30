@@ -1,25 +1,42 @@
 import type { UmbModalToken } from '../token/index.js';
 import type { UmbModalConfig, UmbModalContext, UmbModalManagerContext, UmbModalRouteRegistration } from '../index.js';
+import type { UmbModalContextClassArgs } from '../context/modal.context.js';
 import { type Params, type IRouterSlot, UMB_ROUTE_CONTEXT, encodeFolderName } from '@umbraco-cms/backoffice/router';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
 export type UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> = UmbModalTokenValue extends undefined
-	? {
-			modal?: UmbModalConfig;
-			data: UmbModalTokenData;
-			value?: UmbModalTokenValue;
-		}
-	: {
-			modal?: UmbModalConfig;
-			data: UmbModalTokenData;
-			value: UmbModalTokenValue;
-		};
-export class UmbModalRouteRegistrationController<UmbModalTokenData extends object = object, UmbModalTokenValue = any>
+	? UmbModalTokenValue extends undefined
+		? {
+				modal?: UmbDeepPartialObject<UmbModalConfig>;
+				data?: UmbDeepPartialObject<UmbModalTokenData>;
+				value?: UmbModalTokenValue;
+			}
+		: {
+				modal?: UmbDeepPartialObject<UmbModalConfig>;
+				data?: UmbDeepPartialObject<UmbModalTokenData>;
+				value: UmbModalTokenValue;
+			}
+	: UmbModalTokenValue extends undefined
+		? {
+				modal?: UmbDeepPartialObject<UmbModalConfig>;
+				data: UmbDeepPartialObject<UmbModalTokenData>;
+				value?: UmbModalTokenValue;
+			}
+		: {
+				modal?: UmbDeepPartialObject<UmbModalConfig>;
+				data: UmbDeepPartialObject<UmbModalTokenData>;
+				value: UmbModalTokenValue;
+			};
+export class UmbModalRouteRegistrationController<
+		UmbModalTokenData extends { [key: string]: any } = { [key: string]: any },
+		UmbModalTokenValue = any,
+	>
 	extends UmbControllerBase
 	implements UmbModalRouteRegistration<UmbModalTokenData, UmbModalTokenValue>
 {
@@ -293,8 +310,8 @@ export class UmbModalRouteRegistrationController<UmbModalTokenData extends objec
 				modal: {},
 				...modalData,
 				router,
-			};
-			args.modal.key = this.#key;
+			} as UmbModalContextClassArgs<UmbModalToken<UmbModalTokenData, UmbModalTokenValue>>;
+			args.modal!.key = this.#key;
 
 			this.#modalContext = modalManagerContext.open(this, this.#modalAlias, args);
 			this.#modalContext.onSubmit().then(this.#onSubmit, this.#onReject);

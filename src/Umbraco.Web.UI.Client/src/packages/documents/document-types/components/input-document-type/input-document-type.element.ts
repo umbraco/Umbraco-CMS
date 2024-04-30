@@ -1,11 +1,12 @@
 import type { UmbDocumentTypeItemModel } from '../../repository/index.js';
+import { UMB_DOCUMENT_TYPE_WORKSPACE_MODAL } from '../../workspace/document-type-workspace.modal-token.js';
 import type { UmbDocumentTypeTreeItemModel } from '../../tree/types.js';
 import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbModalRouteRegistrationController, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
@@ -107,7 +108,6 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 	public get value(): string {
 		return this.selection.join(',');
 	}
-
 	@state()
 	private _items?: Array<UmbDocumentTypeItemModel>;
 
@@ -119,10 +119,10 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 	constructor() {
 		super();
 
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_DOCUMENT_TYPE_WORKSPACE_MODAL)
 			.addAdditionalPath('document-type')
 			.onSetup(() => {
-				return { data: { entityType: 'document-type', preset: {} } };
+				return {};
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editPath = routeBuilder({});

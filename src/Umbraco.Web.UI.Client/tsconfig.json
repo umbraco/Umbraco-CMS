@@ -87,6 +87,7 @@
 			"@umbraco-cms/backoffice/resources": ["./src/packages/core/resources/index.ts"],
 			"@umbraco-cms/backoffice/router": ["./src/packages/core/router/index.ts"],
 			"@umbraco-cms/backoffice/section": ["./src/packages/core/section/index.ts"],
+			"@umbraco-cms/backoffice/settings": ["./src/packages/settings/index.ts"],
 			"@umbraco-cms/backoffice/server-file-system": ["./src/packages/core/server-file-system/index.ts"],
 			"@umbraco-cms/backoffice/sorter": ["./src/packages/core/sorter/index.ts"],
 			"@umbraco-cms/backoffice/static-file": ["./src/packages/static-file/index.ts"],
