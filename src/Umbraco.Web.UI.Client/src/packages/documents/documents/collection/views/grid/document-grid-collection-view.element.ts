@@ -6,9 +6,9 @@ import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-document-grid-collection-view')
 export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
@@ -23,9 +23,6 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 
 	@state()
 	private _selection: Array<string | null> = [];
-
-	@state()
-	private _skip: number = 0;
 
 	@state()
 	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
@@ -44,6 +41,12 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 			.addAdditionalPath('document')
 			.onSetup(() => {
 				return { data: { entityType: 'document', preset: {} } };
+			})
+			.onReject(() => {
+				this.#collectionContext?.requestCollection();
+			})
+			.onSubmit(() => {
+				this.#collectionContext?.requestCollection();
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editDocumentPath = routeBuilder({});
@@ -69,14 +72,6 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 			this.#collectionContext.selection.selection,
 			(selection) => (this._selection = selection),
 			'_observeSelection',
-		);
-
-		this.observe(
-			this.#collectionContext.pagination.skip,
-			(skip) => {
-				this._skip = skip;
-			},
-			'_observePaginationSkip',
 		);
 	}
 
@@ -136,7 +131,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
-				@open=${(event: Event) => this.#onOpen(event, item.unique ?? '')}
+				@open=${(event: Event) => this.#onOpen(event, item.unique)}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<umb-icon slot="icon" name=${item.icon}></umb-icon>
