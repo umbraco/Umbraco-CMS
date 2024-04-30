@@ -1,3 +1,4 @@
+import { UmbPropertyTypeContext } from './content-type-design-editor-property.context.js';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -25,6 +26,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 	#settingsModal;
 	#dataTypeUnique?: string;
+	#context = new UmbPropertyTypeContext(this);
 
 	@property({ attribute: false })
 	public set propertyStructureHelper(value: UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined) {
@@ -51,6 +53,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		const oldValue = this._property;
 		if (value === oldValue) return;
 		this._property = value;
+		this.#context.setAlias(value?.alias);
+		this.#context.setLabel(value?.name);
 		this.#checkInherited();
 		this.#settingsModal.setUniquePathValue('propertyId', value?.id);
 		this.#setDataType(this._property?.dataType?.unique);
