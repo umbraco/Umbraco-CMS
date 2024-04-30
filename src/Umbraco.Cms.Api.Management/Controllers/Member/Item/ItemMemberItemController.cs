@@ -29,6 +29,11 @@ public class ItemMemberItemController : MemberItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<MemberItemResponseModel>());
+        }
+
         IEnumerable<IMemberEntitySlim> members = _entityService
             .GetAll(UmbracoObjectTypes.Member, ids.ToArray())
             .OfType<IMemberEntitySlim>();

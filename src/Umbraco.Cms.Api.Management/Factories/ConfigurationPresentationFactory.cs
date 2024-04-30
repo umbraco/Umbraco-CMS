@@ -10,18 +10,15 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public class ConfigurationPresentationFactory : IConfigurationPresentationFactory
 {
     private readonly IReservedFieldNamesService _reservedFieldNamesService;
-    private readonly GlobalSettings _globalSettings;
     private readonly ContentSettings _contentSettings;
     private readonly SegmentSettings _segmentSettings;
 
     public ConfigurationPresentationFactory(
         IReservedFieldNamesService reservedFieldNamesService,
-        IOptions<GlobalSettings> globalSettings,
         IOptions<ContentSettings> contentSettings,
         IOptions<SegmentSettings> segmentSettings)
     {
         _reservedFieldNamesService = reservedFieldNamesService;
-        _globalSettings = globalSettings.Value;
         _contentSettings = contentSettings.Value;
         _segmentSettings = segmentSettings.Value;
     }
@@ -31,7 +28,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         {
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-            SanitizeTinyMce = _globalSettings.SanitizeTinyMce,
             AllowEditInvariantFromNonDefault = _contentSettings.AllowEditInvariantFromNonDefault,
             AllowNonExistingSegmentsCreation = _segmentSettings.AllowCreation,
             ReservedFieldNames = _reservedFieldNamesService.GetDocumentReservedFieldNames(),
@@ -48,7 +44,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         {
             DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-            SanitizeTinyMce = _globalSettings.SanitizeTinyMce,
             ReservedFieldNames = _reservedFieldNamesService.GetMediaReservedFieldNames(),
         };
 }
