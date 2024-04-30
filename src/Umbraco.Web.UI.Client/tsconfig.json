@@ -114,6 +114,7 @@
 			"@umbraco-cms/backoffice/external/dompurify": ["./src/external/dompurify/index.ts"],
 			"@umbraco-cms/backoffice/external/lit": ["./src/external/lit/index.ts"],
 			"@umbraco-cms/backoffice/external/marked": ["./src/external/marked/index.ts"],
+			"@umbraco-cms/backoffice/external/mime-types": ["./src/external/mime-types/index.ts"],
 			"@umbraco-cms/backoffice/external/monaco-editor": ["./src/external/monaco-editor/index.ts"],
 			"@umbraco-cms/backoffice/external/openid": ["./src/external/openid/index.ts"],
 			"@umbraco-cms/backoffice/external/router-slot": ["./src/external/router-slot/index.ts"],
