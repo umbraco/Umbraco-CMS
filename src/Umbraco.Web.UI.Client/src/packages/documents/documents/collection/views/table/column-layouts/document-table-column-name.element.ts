@@ -3,6 +3,7 @@ import { css, customElement, html, property, state } from '@umbraco-cms/backoffi
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
+import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-table-column-name')
 export class UmbDocumentTableColumnNameElement extends UmbLitElement implements UmbTableColumnLayoutElement {
@@ -31,20 +32,20 @@ export class UmbDocumentTableColumnNameElement extends UmbLitElement implements 
 			});
 	}
 
-	#onClick(event: Event) {
-		// TODO: [LK] Review the `stopPropagation` usage, as it causes a page reload.
-		// But we still need a say to prevent the `umb-table` from triggering a selection event.
+	#onClick(event: Event & { target: UUIButtonElement }) {
+		event.preventDefault();
 		event.stopPropagation();
+		window.history.pushState({}, '', event.target.href);
 	}
 
 	render() {
-		return html`<uui-button
-			look="default"
-			color="default"
-			compact
-			href="${this._editDocumentPath}edit/${this.value.unique}"
-			label="${this.value.name}"
-			@click=${this.#onClick}></uui-button>`;
+		return html`
+			<uui-button
+				compact
+				href="${this._editDocumentPath}edit/${this.value.unique}"
+				label=${this.value.name}
+				@click=${this.#onClick}></uui-button>
+		`;
 	}
 
 	static styles = [

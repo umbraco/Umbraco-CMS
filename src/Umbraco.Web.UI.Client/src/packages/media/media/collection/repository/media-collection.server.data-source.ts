@@ -36,6 +36,7 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 					creator: item.creator,
 					icon: item.mediaType.icon,
 					name: variant.name,
+					sortOrder: item.sortOrder,
 					updateDate: new Date(variant.updateDate),
 					values: item.values.map((item) => {
 						return { alias: item.alias, value: item.value as string };

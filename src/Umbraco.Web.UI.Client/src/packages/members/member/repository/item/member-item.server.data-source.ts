@@ -1,3 +1,4 @@
+import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMemberItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { MemberItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -32,6 +33,7 @@ const getItems = (uniques: Array<string>) => MemberService.getItemMember({ id: u
 
 const mapper = (item: MemberItemResponseModel): UmbMemberItemModel => {
 	return {
+		entityType: UMB_MEMBER_ENTITY_TYPE,
 		unique: item.id,
 		name: item.variants[0].name || '',
 		memberType: {

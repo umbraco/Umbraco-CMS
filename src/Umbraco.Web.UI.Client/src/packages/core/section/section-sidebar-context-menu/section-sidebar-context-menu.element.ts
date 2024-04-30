@@ -107,11 +107,6 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 			: nothing;
 	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this.removeEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#proxyContextRequests as EventListener);
-	}
-
 	static styles = [
 		UmbTextStyles,
 		css`
