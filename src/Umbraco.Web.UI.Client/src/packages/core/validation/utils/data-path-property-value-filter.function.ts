@@ -1,4 +1,4 @@
-import type { PartialSome } from '@umbraco-cms/backoffice/utils';
+import type { UmbPartialSome } from '@umbraco-cms/backoffice/utils';
 import type { UmbVariantPropertyValueModel } from '@umbraco-cms/backoffice/variant';
 
 /**
@@ -9,7 +9,7 @@ import type { UmbVariantPropertyValueModel } from '@umbraco-cms/backoffice/varia
  * @returns
  */
 export function UmbDataPathPropertyValueFilter(
-	value: PartialSome<Omit<UmbVariantPropertyValueModel, 'value'>, 'culture' | 'segment'>,
+	value: UmbPartialSome<Omit<UmbVariantPropertyValueModel, 'value'>, 'culture' | 'segment'>,
 ): string {
 	// write a array of strings for each property, where alias must be present and culture and segment are optional
 	const filters: Array<string> = [`@.alias = '${value.alias}'`];

@@ -37,6 +37,9 @@ export class UmbMemberTypeWorkspaceContext
 	readonly data;
 	readonly unique;
 	readonly name;
+	getName(): string | undefined {
+		return this.structure.getOwnerContentType()?.name;
+	}
 	readonly alias;
 	readonly description;
 	readonly icon;
