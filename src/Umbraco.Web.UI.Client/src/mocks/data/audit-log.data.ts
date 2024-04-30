@@ -1,16 +1,8 @@
 import { data as userData } from './user/user.data.js';
-import { data as documentData } from './document/document.data.js';
-import type {
-	AuditLogResponseModel,
-	AuditLogWithUsernameResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+import type { AuditLogResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { AuditTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const userId = userData[0].id;
-const userName = userData[0].name;
-const userAvatars = userData[0].avatarUrls;
-
-const documentId = documentData[0].id;
 
 export const logs: Array<AuditLogResponseModel> = [
 	{
@@ -42,9 +34,3 @@ export const logs: Array<AuditLogResponseModel> = [
 		parameters: null,
 	},
 ];
-
-export const logsWithUser: Array<AuditLogWithUsernameResponseModel> = logs.map((log) => ({
-	...log,
-	userName: userName,
-	userAvatars: userAvatars,
-}));

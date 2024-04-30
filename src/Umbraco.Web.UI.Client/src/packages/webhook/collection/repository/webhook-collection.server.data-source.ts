@@ -30,7 +30,7 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 	 * @memberof UmbWebhookCollectionServerDataSource
 	 */
 	async getCollection(_filter: UmbWebhookCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookService.getWebhookItem({}));
+		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookService.getItemWebhook({}));
 
 		if (data) {
 			const items = data.map((item) => {
