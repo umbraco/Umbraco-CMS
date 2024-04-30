@@ -230,11 +230,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	async #requestDeleteTab(tab: UmbPropertyTypeContainerModel | undefined) {
+		if (!tab) return;
+		const tabName = tab.name === '' ? 'Unnamed' : tab.name;
 		// TODO: Localize this:
 		const modalData: UmbConfirmModalData = {
 			headline: 'Delete tab',
-			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}>
-					Are you sure you want to delete the tab <strong>${tab?.name ?? tab?.id}</strong>
+			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tabName]}>
+					Are you sure you want to delete the tab <strong>${tabName}</strong>
 				</umb-localize>
 				<div style="color:var(--uui-color-danger-emphasis)">
 					<umb-localize key="contentTypeEditor_confirmDeleteTabNotice">
