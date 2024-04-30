@@ -7,9 +7,13 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-document-grid-collection-view')
 export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
+	@state()
+	private _editDocumentPath = '';
+
 	@state()
 	private _items: Array<UmbDocumentCollectionItemModel> = [];
 
@@ -34,6 +38,15 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
 		});
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('document')
+			.onSetup(() => {
+				return { data: { entityType: 'document', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editDocumentPath = routeBuilder({});
+			});
 	}
 
 	#observeCollectionContext() {
@@ -66,10 +79,10 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		);
 	}
 
-	// TODO: How should we handle url stuff? [?]
-	#onOpen(id: string) {
-		// TODO: this will not be needed when cards works as links with href [?]
-		history.pushState(null, '', 'section/content/workspace/document/edit/' + id);
+	#onOpen(event: Event, id: string) {
+		event.preventDefault();
+		event.stopPropagation();
+		window.history.pushState(null, '', this._editDocumentPath + 'edit/' + id);
 	}
 
 	#onSelect(item: UmbDocumentCollectionItemModel) {
@@ -111,7 +124,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				selectable
 				?select-only=${this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
-				@open=${() => this.#onOpen(item.unique ?? '')}
+				@open=${(event: Event) => this.#onOpen(event, item.unique ?? '')}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<umb-icon slot="icon" name=${item.icon}></umb-icon>

@@ -23,3 +23,8 @@ export interface UmbDocumentCollectionItemModel {
 	updater?: string | null;
 	values: Array<{ alias: string; value: string }>;
 }
+
+export interface UmbEditableDocumentCollectionItemModel {
+	item: UmbDocumentCollectionItemModel;
+	editPath: string;
+}
