@@ -70,7 +70,12 @@ export class UmbAppElement extends UmbLitElement {
 					: 'Authorization failed. Please try again.';
 
 				// Complete the authorization request
-				this.#authContext?.completeAuthorizationRequest();
+				this.#authContext?.completeAuthorizationRequest().then(() => {
+					// If we don't have an opener, redirect to the root
+					if (!window.opener) {
+						history.replaceState(null, '', '/');
+					}
+				});
 			},
 		},
 		{
