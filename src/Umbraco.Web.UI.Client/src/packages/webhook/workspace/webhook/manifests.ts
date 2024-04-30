@@ -7,9 +7,9 @@ import type {
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
+	kind: 'routable',
 	alias: UMB_WEBHOOK_WORKSPACE,
 	name: 'Webhook Root Workspace',
-	element: () => import('./webhook-workspace.element.js'),
 	api: () => import('./webhook-workspace.context.js'),
 	meta: {
 		entityType: UMB_WEBHOOK_ENTITY_TYPE,
@@ -19,32 +19,14 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Webhook.Overview',
-		name: 'Webhook Root Workspace Overview View',
-		js: () => import('../views/overview/webhook-overview-view.element.js'),
+		alias: 'Umb.WorkspaceView.Webhook.Details',
+		name: 'Webhook Root Workspace Details View',
+		js: () => import('./views/webhook-details-workspace-view.element.js'),
 		weight: 300,
 		meta: {
 			label: 'Overview',
 			pathname: 'overview',
 			icon: 'icon-webhook',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
-			},
-		],
-	},
-	{
-		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Webhook.Search',
-		name: 'Webhook Root Workspace Logs View',
-		js: () => import('../views/overview/webhook-overview-view.element.js'),
-		weight: 200,
-		meta: {
-			label: 'Logs',
-			pathname: 'logs',
-			icon: 'icon-box-alt',
 		},
 		conditions: [
 			{
