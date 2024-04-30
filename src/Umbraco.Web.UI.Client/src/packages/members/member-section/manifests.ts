@@ -4,7 +4,7 @@ const section: ManifestSection = {
 	type: 'section',
 	alias: 'Umb.Section.Members',
 	name: 'Members Section',
-	weight: 300,
+	weight: 500,
 	meta: {
 		label: '#sections_member',
 		pathname: 'member-management',

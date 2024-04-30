@@ -1,5 +1,6 @@
 import type { UmbDocumentTypeItemModel } from '../../repository/index.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_MODAL } from '../../workspace/document-type-workspace.modal-token.js';
+import type { UmbDocumentTypeTreeItemModel } from '../../tree/types.js';
 import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -33,8 +34,17 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 	 * @attr
 	 * @default false
 	 */
-	@property({ type: Boolean })
+	@property({ attribute: false })
 	elementTypesOnly: boolean = false;
+
+	/**
+	 * Limits to only select Document Types
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ attribute: false })
+	documentTypesOnly: boolean = false;
 
 	/**
 	 * This is a minimum amount of selected items in this input.
@@ -138,10 +148,20 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 		return undefined;
 	}
 
+	#getPickableFilter() {
+		if (this.documentTypesOnly) {
+			return (x: UmbDocumentTypeTreeItemModel) => x.isFolder === false && x.isElement === false;
+		}
+		if (this.elementTypesOnly) {
+			return (x: UmbDocumentTypeTreeItemModel) => x.isElement;
+		}
+		return undefined;
+	}
+
 	#openPicker() {
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
-			pickableFilter: this.elementTypesOnly ? (x) => x.isElement : undefined,
+			pickableFilter: this.#getPickableFilter(),
 		});
 	}
 
