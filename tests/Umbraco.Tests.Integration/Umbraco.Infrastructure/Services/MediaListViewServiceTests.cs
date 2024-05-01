@@ -86,8 +86,7 @@ public class MediaListViewServiceTests : ContentListViewServiceTestsBase
             Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
             Assert.IsNotNull(result.Result);
 
-            await VerifyListViewConfiguration(result.Result.ListViewConfiguration,
-                Constants.DataTypes.Guids.ListViewMediaGuid);
+            await AssertListViewConfiguration(result.Result.ListViewConfiguration, Constants.DataTypes.Guids.ListViewMediaGuid);
         });
     }
 

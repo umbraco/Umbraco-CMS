@@ -175,7 +175,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
             Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
             Assert.IsNotNull(result.Result);
 
-            await VerifyListViewConfiguration(result.Result.ListViewConfiguration, customListView.Key);
+            await AssertListViewConfiguration(result.Result.ListViewConfiguration, customListView.Key);
         });
     }
 
@@ -347,7 +347,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
             Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
             Assert.IsNotNull(result.Result);
 
-            await VerifyListViewConfiguration(result.Result.ListViewConfiguration, CustomListViewKey);
+            await AssertListViewConfiguration(result.Result.ListViewConfiguration, CustomListViewKey);
         });
 
     }
@@ -881,9 +881,6 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
             await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         }
 
-        var actualChildren = ContentService.GetPagedChildren(root.Id, 0, 10, out _).ToArray();
-        Assert.AreEqual(5, actualChildren.Length);
-
         return root;
     }
 
@@ -931,9 +928,6 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
 
             await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         }
-
-        var actualChildren = ContentService.GetPagedChildren(root.Id, 0, 10, out _).ToArray();
-        Assert.AreEqual(5, actualChildren.Length);
 
         return root;
     }

@@ -22,7 +22,7 @@ public abstract class ContentListViewServiceTestsBase : UmbracoIntegrationTest
     protected async Task<IUser> GetSuperUser()
         => await UserService.GetAsync(Constants.Security.SuperUserKey);
 
-    protected async Task VerifyListViewConfiguration(ListViewConfiguration actualConfiguration, Guid expectedListViewDataTypeKey)
+    protected async Task AssertListViewConfiguration(ListViewConfiguration actualConfiguration, Guid expectedListViewDataTypeKey)
     {
         var actualCollectionPropertyAliases = actualConfiguration
             .IncludeProperties
