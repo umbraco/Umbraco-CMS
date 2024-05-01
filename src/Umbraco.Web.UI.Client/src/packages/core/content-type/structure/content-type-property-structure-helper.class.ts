@@ -77,7 +77,6 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		if (!this.#structure || this._containerId === undefined) return;
 
 		if (this._containerId === null) {
-			//this.#observePropertyStructureOf(null);
 			this.observe(
 				this.#structure.propertyStructuresOf(null),
 				(properties) => {
@@ -164,25 +163,6 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 			'_observeContainers',
 		);
 	}
-	/*
-	#observePropertyStructureOf(groupId?: string | null) {
-		if (!this.#structure || groupId === undefined) return;
-
-		this.observe(
-			this.#structure.propertyStructuresOf(groupId),
-			(properties) => {
-				// Lets remove the properties that does not exists any longer: [NL]
-				const uniquesToRemove = this.#propertyStructure
-					.getValue()
-					.filter((x) => !(x.container?.id === groupId && !properties.some((y) => y.id === x.id)))
-					.map((X) => X.id);
-
-				this.#propertyStructure.remove(uniquesToRemove);
-				this.#propertyStructure.append(properties);
-			},
-			'_observePropertyStructureOfGroup' + groupId,
-		);
-	}*/
 
 	async isOwnerProperty(propertyId: UmbPropertyTypeId) {
 		await this.#init;
