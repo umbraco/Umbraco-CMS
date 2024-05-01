@@ -37,7 +37,6 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
             return true;
         }
 
-        var applies = true;
         foreach (Endpoint endpoint in endpoints)
         {
             ControllerActionDescriptor? actionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
@@ -49,11 +48,10 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
                 continue;
             }
 
-            applies = false;
-            break;
+            return false;
         }
 
-        return applies;
+        return true;
     }
 
     public Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
