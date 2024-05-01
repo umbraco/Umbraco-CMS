@@ -2,7 +2,7 @@ import type { UmbContentTypeModel, UmbPropertyContainerTypes, UmbPropertyTypeCon
 import type { UmbContentTypeStructureManager } from './content-type-structure-manager.class.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * This class is a helper class for managing the structure of containers in a content type.
@@ -152,7 +152,6 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			(containers) => {
 				// We want to remove hasProperties of groups that does not exist anymore.:
 				// this.#removeHasPropertiesOfGroup()
-				console.log('containers', containers);
 				this.#hasProperties.setValue([]);
 				this.#childContainers.setValue([]);
 
