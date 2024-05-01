@@ -69,7 +69,7 @@ export class UmbTemplateFieldDropdownListElement extends UmbLitElement {
 		{ alias: 'updateDate', name: this.localize.term('content_updateDate') },
 		{ alias: 'updater', name: this.localize.term('content_updatedBy') },
 		{ alias: 'createDate', name: this.localize.term('content_createDate') },
-		{ alias: 'owner', name: this.localize.term('content_createBy') },
+		{ alias: 'creator', name: this.localize.term('content_createBy') },
 		{ alias: 'published', name: this.localize.term('content_isPublished') },
 		{ alias: 'contentTypeAlias', name: this.localize.term('content_documentType') },
 	];
