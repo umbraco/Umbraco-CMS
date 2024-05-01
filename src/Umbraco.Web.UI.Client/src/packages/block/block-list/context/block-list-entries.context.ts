@@ -3,6 +3,7 @@ import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/i
 import type { UmbBlockListWorkspaceData } from '../index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
 import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context.js';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
@@ -14,6 +15,9 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 > {
 	//
 	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
+
+	// We will just say its always allowed for list for now: [NL]
+	public readonly canCreate = new UmbBooleanState(true).asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT);

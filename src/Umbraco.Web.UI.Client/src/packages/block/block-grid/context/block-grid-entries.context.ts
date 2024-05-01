@@ -34,6 +34,7 @@ export class UmbBlockGridEntriesContext
 	#allowedBlockTypes = new UmbArrayState<UmbBlockGridTypeModel>([], (x) => x.contentElementTypeKey);
 	public readonly allowedBlockTypes = this.#allowedBlockTypes.asObservable();
 	public readonly amountOfAllowedBlockTypes = this.#allowedBlockTypes.asObservablePart((x) => x.length);
+	public readonly canCreate = this.#allowedBlockTypes.asObservablePart((x) => x.length > 0);
 
 	firstAllowedBlockTypeName() {
 		if (!this._manager) {
