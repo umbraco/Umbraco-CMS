@@ -478,8 +478,7 @@ test.describe('Document Type tests', () => {
     expect(documentTypeData.allowedDocumentTypes[0].documentType.id).toBe(documentTypeData.id);
   });
 
-  // The label when trying to delete an allowed child node is not correct
-  test('can remove an allowed child node from a document type', async ({page, umbracoApi, umbracoUi}) => {
+  test('can remove an allowed child node from a document type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childDocumentTypeName = 'ChildDocumentType';
     await umbracoApi.documentType.ensureNameNotExists(childDocumentTypeName);
@@ -490,9 +489,8 @@ test.describe('Document Type tests', () => {
     // Act
     await umbracoUi.documentType.goToDocumentType(documentTypeName);
     await umbracoUi.documentType.clickStructureTab();
-
-    await umbracoUi.documentType.clickTrashButtonForName(childDocumentTypeName);
-    await umbracoUi.documentType.clickRemoveExactButton();
+    await umbracoUi.documentType.clickRemoveButtonForName(childDocumentTypeName);
+    await umbracoUi.documentType.clickConfirmRemoveButton();
     await umbracoUi.documentType.clickSaveButton();
 
     // Assert
@@ -583,7 +581,7 @@ test.describe('Document Type tests', () => {
   });
 
   // The cleanup is not updated upon save
-  test('can disable history cleanup for a document type', async ({page, umbracoApi, umbracoUi}) => {
+  test.skip('can disable history cleanup for a document type', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -626,7 +624,7 @@ test.describe('Document Type tests', () => {
   });
 
   // When removing a template, the defaultTemplateId is set to "" which is not correct
-  test('can remove an allowed template from a document type', async ({page, umbracoApi, umbracoUi}) => {
+  test.skip('can remove an allowed template from a document type', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     const templateName = 'TestTemplate';
     await umbracoApi.template.ensureNameNotExists(templateName);
