@@ -64,8 +64,7 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 		super.connectedCallback();
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
-			if (!this.data?.contentTypeId) return;
-			if (instance.getUnique() !== this.data.contentTypeId) {
+			if (!this.data?.contentTypeId || instance.getUnique() !== this.data.contentTypeId) {
 				// We can currently only edit properties that are part of a content type workspace, which has to be present outside of the modal. [NL]
 				throw new Error(
 					'The content type workspace context does not match the content type id of the property type settings modal.',

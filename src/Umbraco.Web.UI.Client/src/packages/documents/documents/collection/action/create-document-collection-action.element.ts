@@ -1,8 +1,13 @@
 import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import {
+	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
+	UMB_DOCUMENT_ENTITY_TYPE,
+	UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+	UMB_DOCUMENT_WORKSPACE_CONTEXT,
+} from '@umbraco-cms/backoffice/document';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbAllowedDocumentTypeModel } from '@umbraco-cms/backoffice/document-type';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
@@ -53,7 +58,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 			});
 		});
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (collectionContext) => {
 			this.observe(collectionContext.filter, (filter) => {
 				this._useInfiniteEditor = filter.useInfiniteEditor == true;
 			});
@@ -83,9 +88,19 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 
 	#getCreateUrl(item: UmbAllowedDocumentTypeModel) {
 		// TODO: [LK] I need help with this. I don't know what the infinity editor URL should be.
+		// TODO: Yes, revisit the path extension of the routable modal, cause this is not pretty...? [NL]
 		return this._useInfiniteEditor
-			? `${this._createDocumentPath}create/${this._documentUnique ?? 'null'}/${item.unique}`
-			: `section/content/workspace/document/create/${this._documentUnique ?? 'null'}/${item.unique}`;
+			? this._createDocumentPath +
+					UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
+						parentEntityType: this._documentUnique ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+						parentUnique: this._documentUnique ?? 'null',
+						documentTypeUnique: item.unique,
+					})
+			: UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({
+					parentEntityType: this._documentUnique ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+					parentUnique: this._documentUnique ?? 'null',
+					documentTypeUnique: item.unique,
+				});
 	}
 
 	render() {

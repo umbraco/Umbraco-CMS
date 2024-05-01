@@ -1,3 +1,4 @@
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMediaTypeItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { MediaTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -32,6 +33,7 @@ const getItems = (uniques: Array<string>) => MediaTypeService.getItemMediaType({
 
 const mapper = (item: MediaTypeItemResponseModel): UmbMediaTypeItemModel => {
 	return {
+		entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 		icon: item.icon || null,
 		name: item.name,
 		unique: item.id,

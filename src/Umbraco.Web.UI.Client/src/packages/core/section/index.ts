@@ -1,4 +1,5 @@
 export * from './components/index.js';
+export * from './paths.js';
 export * from './section-default.element.js';
 export * from './section-main/index.js';
 export * from './section-picker-modal/section-picker-modal.token.js';

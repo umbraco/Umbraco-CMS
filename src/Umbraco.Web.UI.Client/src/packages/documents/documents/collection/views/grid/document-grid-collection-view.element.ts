@@ -5,7 +5,7 @@ import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 
 @customElement('umb-document-grid-collection-view')
@@ -30,7 +30,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
 		});
@@ -96,14 +96,13 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				${repeat(
 					this._items,
 					(item) => item.unique,
-					(item, index) => this.#renderCard(index, item),
+					(item) => this.#renderCard(item),
 				)}
 			</div>
 		`;
 	}
 
-	#renderCard(index: number, item: UmbDocumentCollectionItemModel) {
-		const sortOrder = this._skip + index;
+	#renderCard(item: UmbDocumentCollectionItemModel) {
 		return html`
 			<uui-card-content-node
 				.name=${item.name ?? 'Unnamed Document'}
@@ -114,7 +113,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<umb-icon slot="icon" name=${item.icon}></umb-icon>
-				${this.#renderState(item)} ${this.#renderProperties(sortOrder, item)}
+				${this.#renderState(item)} ${this.#renderProperties(item)}
 			</uui-card-content-node>
 		`;
 	}
@@ -142,15 +141,14 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		}
 	}
 
-	#renderProperties(sortOrder: number, item: UmbDocumentCollectionItemModel) {
+	#renderProperties(item: UmbDocumentCollectionItemModel) {
 		if (!this._userDefinedProperties) return;
 		return html`
 			<ul>
 				${repeat(
 					this._userDefinedProperties,
 					(column) => column.alias,
-					(column) =>
-						html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(sortOrder, item, column.alias)}</li>`,
+					(column) => html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(item, column.alias)}</li>`,
 				)}
 			</ul>
 		`;
