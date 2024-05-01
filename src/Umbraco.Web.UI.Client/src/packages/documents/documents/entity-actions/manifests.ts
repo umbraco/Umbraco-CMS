@@ -16,6 +16,10 @@ import { manifests as publicAccessManifests } from './public-access/manifests.js
 import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
 
 import type { ManifestEntityAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	UMB_IS_NOT_TRASHED_CONDITION_ALIAS,
+	UMB_IS_TRASHED_CONDITION_ALIAS,
+} from '@umbraco-cms/backoffice/recycle-bin';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -34,7 +38,7 @@ const entityActions: Array<ManifestEntityAction> = [
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
 			},
 			{
-				alias: 'Umb.Condition.IsTrashed',
+				alias: UMB_IS_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -56,7 +60,7 @@ const entityActions: Array<ManifestEntityAction> = [
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
 			},
 			{
-				alias: 'Umb.Condition.IsNotTrashed',
+				alias: UMB_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -78,7 +82,7 @@ const entityActions: Array<ManifestEntityAction> = [
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH],
 			},
 			{
-				alias: 'Umb.Condition.IsNotTrashed',
+				alias: UMB_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -100,7 +104,7 @@ const entityActions: Array<ManifestEntityAction> = [
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS],
 			},
 			{
-				alias: 'Umb.Condition.IsNotTrashed',
+				alias: UMB_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -122,7 +126,7 @@ const entityActions: Array<ManifestEntityAction> = [
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS],
 			},
 			{
-				alias: 'Umb.Condition.IsNotTrashed',
+				alias: UMB_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
