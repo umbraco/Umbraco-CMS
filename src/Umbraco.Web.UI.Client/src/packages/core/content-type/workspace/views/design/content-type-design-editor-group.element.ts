@@ -132,8 +132,8 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 
 		// TODO: Do proper localization here: [NL]
 		await umbConfirmModal(this, {
-			headline: `${this.localize.term('actions_delete')} property`,
-			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[
+			headline: `${this.localize.term('actions_delete')} group`,
+			content: html`<umb-localize key="contentTypeEditor_confirmDeleteGroupMessage" .args=${[
 				this._group.name ?? this._group.id,
 			]}>
 					Are you sure you want to delete the group <strong>${this._group.name ?? this._group.id}</strong>
