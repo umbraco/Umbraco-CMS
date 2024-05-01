@@ -3,7 +3,6 @@
     <thead>
       <tr>
         <th></th>
-        <th><localize key="webhooks_webhookKey">Webhook key</localize></th>
         <th><localize key="general_date">Date</localize></th>
         <th><localize key="webhooks_url">Url</localize></th>
         <th><localize key="webhooks_event">Event</localize></th>
@@ -21,7 +20,6 @@
           </umb-checkmark>
           <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="!log.isSuccessStatusCode" title="{{ log.statusCode }}"></umb-icon>
         </td>
-        <td>{{ log.webhookKey }}</td>
         <td>{{ log.formattedLogDate }}</td>
         <td>{{ log.url }}</td>
         <td>{{ log.eventAlias }}</td>

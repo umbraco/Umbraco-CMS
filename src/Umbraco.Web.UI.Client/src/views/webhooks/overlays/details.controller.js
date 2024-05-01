@@ -5,6 +5,7 @@
 
     vm.close = close;
     vm.formatData = formatData;
+    vm.detectLanguage = detectLanguage;
 
     function formatData(data) {
 
@@ -12,13 +13,28 @@
 
       if (data.detectIsJson()) {
         try {
-          obj = Utilities.fromJson(data)
+          obj = JSON.stringify(Utilities.fromJson(data), null, 2);
         } catch (err) {
           obj = data;
         }
       }
 
       return obj;
+    }
+
+    function detectLanguage(headers, defaultLanguage) {
+      const matches = headers.match(/^Content-Type:\s*(?<type>[a-z\/+.-]+)(\;?.*?)$/mi)
+      if (matches) {
+        const contentType = matches.groups["type"];
+        if (contentType === "application/json")
+          return "JSON";
+        if (contentType === "text/html")
+          return "HTML";
+        if (contentType === "application/xml" || contentType === "text/xml")
+          return "XML";
+      }
+
+      return defaultLanguage || "TEXT";
     }
 
     function close() {

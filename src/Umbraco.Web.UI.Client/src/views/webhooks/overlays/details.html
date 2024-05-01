@@ -45,6 +45,10 @@
             <div>{{model.log.retryCount}}</div>
           </umb-control-group>
 
+          <umb-control-group label="Webhook key">
+            <div>{{model.log.webhookKey}}</div>
+          </umb-control-group>
+
         </umb-box-content>
 
       </umb-box>
@@ -53,16 +57,14 @@
         <umb-box-header title="Request"></umb-box-header>
         <umb-box-content class="block-form">
           <pre class="code">{{model.log.requestHeaders}}</pre>
-          <umb-code-snippet language="'JSON'" wrap="true">{{vm.formatData(model.log.requestBody) | json}}
-          </umb-code-snippet>
+          <umb-code-snippet language="vm.detectLanguage(model.log.requestHeaders, 'JSON')" wrap="true">{{vm.formatData(model.log.requestBody)}}</umb-code-snippet>
         </umb-box-content>
       </umb-box>
         <umb-box>
           <umb-box-header title="Response"></umb-box-header>
           <umb-box-content class="block-form">
             <pre class="code">{{model.log.responseHeaders}}</pre>
-            <umb-code-snippet language="'TEXT'" wrap="true">{{vm.formatData(model.log.responseBody) | json}}
-            </umb-code-snippet>
+            <umb-code-snippet language="vm.detectLanguage(model.log.responseHeaders)" wrap="true">{{vm.formatData(model.log.responseBody)}}</umb-code-snippet>
           </umb-box-content>
         </umb-box>
       <div ng-if="model.log.exceptionOccured">
