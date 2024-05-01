@@ -4,7 +4,7 @@ export interface UmbContentTypeCompositionReferenceModel {
 	icon: string;
 }
 
-export interface UmbContentTypeCompositionRequestModel {
+export interface UmbContentTypeAvailableCompositionRequestModel {
 	unique: string | null;
 	currentPropertyAliases: Array<string>;
 	currentCompositeUniques: Array<string>;

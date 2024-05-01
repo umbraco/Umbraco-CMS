@@ -1,7 +1,7 @@
 import type {
 	UmbContentTypeCompositionCompatibleModel,
 	UmbContentTypeCompositionReferenceModel,
-	UmbContentTypeCompositionRequestModel,
+	UmbContentTypeAvailableCompositionRequestModel,
 } from './types.js';
 import type { UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -11,7 +11,7 @@ export interface UmbContentTypeCompositionRepository {
 	): Promise<UmbRepositoryResponse<Array<ResponseType>>>;
 	availableCompositions<
 		ResponseType extends UmbContentTypeCompositionCompatibleModel,
-		ArgsType extends UmbContentTypeCompositionRequestModel,
+		ArgsType extends UmbContentTypeAvailableCompositionRequestModel,
 	>(
 		args: ArgsType,
 	): Promise<UmbRepositoryResponse<Array<ResponseType>>>;
