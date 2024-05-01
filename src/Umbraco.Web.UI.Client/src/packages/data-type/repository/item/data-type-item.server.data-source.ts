@@ -1,3 +1,4 @@
+import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDataTypeItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -43,6 +44,7 @@ const getItems = (uniques: Array<string>) => DataTypeService.getItemDataType({ i
 
 const mapper = (item: DataTypeItemResponseModel): UmbDataTypeItemModel => {
 	return {
+		entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 		unique: item.id,
 		name: item.name,
 		propertyEditorUiAlias: item.editorUiAlias || '', // TODO: why can this be undefined or null on the server?

@@ -5,7 +5,7 @@ import type { UmbDocumentCollectionContext } from '../../document-collection.con
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -41,15 +41,15 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	#systemColumns: Array<UmbTableColumn> = [
 		{
 			name: this.localize.term('general_name'),
-			alias: 'entityName',
+			alias: 'name',
 			elementName: 'umb-document-table-column-name',
 			allowSorting: true,
 		},
 		{
 			name: this.localize.term('content_publishStatus'),
-			alias: 'entityState',
+			alias: 'state',
 			elementName: 'umb-document-table-column-state',
-			allowSorting: true,
+			allowSorting: false,
 		},
 	];
 
@@ -66,7 +66,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
 		});
@@ -126,16 +126,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#createTableItems(items: Array<UmbDocumentCollectionItemModel>) {
-		this._tableItems = items.map((item, rowIndex) => {
+		this._tableItems = items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
-
-			const sortOrder = this._skip + rowIndex;
 
 			const data =
 				this._tableColumns?.map((column) => {
 					return {
 						columnAlias: column.alias,
-						value: column.elementName ? item : getPropertyValueByAlias(sortOrder, item, column.alias),
+						value: column.elementName ? item : getPropertyValueByAlias(item, column.alias),
 					};
 				}) ?? [];
 

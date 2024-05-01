@@ -3,7 +3,7 @@ import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from 
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
@@ -39,7 +39,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	#systemColumns: Array<UmbTableColumn> = [
 		{
 			name: this.localize.term('general_name'),
-			alias: 'entityName',
+			alias: 'name',
 			elementName: 'umb-media-table-column-name',
 			allowSorting: true,
 		},
@@ -58,7 +58,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
 		});
@@ -124,16 +124,14 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			this.#createTableHeadings();
 		}
 
-		this._tableItems = items.map((item, rowIndex) => {
+		this._tableItems = items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
-
-			const sortOrder = this._skip + rowIndex;
 
 			const data =
 				this._tableColumns?.map((column) => {
 					return {
 						columnAlias: column.alias,
-						value: column.elementName ? item : this.#getPropertyValueByAlias(sortOrder, item, column.alias),
+						value: column.elementName ? item : this.#getPropertyValueByAlias(item, column.alias),
 					};
 				}) ?? [];
 
@@ -145,16 +143,17 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	#getPropertyValueByAlias(sortOrder: number, item: UmbMediaCollectionItemModel, alias: string) {
+	#getPropertyValueByAlias(item: UmbMediaCollectionItemModel, alias: string) {
 		switch (alias) {
 			case 'createDate':
 				return item.createDate.toLocaleString();
-			case 'entityName':
+			case 'name':
 				return item.name;
+			case 'creator':
 			case 'owner':
 				return item.creator;
 			case 'sortOrder':
-				return sortOrder;
+				return item.sortOrder;
 			case 'updateDate':
 				return item.updateDate.toLocaleString();
 			default:
