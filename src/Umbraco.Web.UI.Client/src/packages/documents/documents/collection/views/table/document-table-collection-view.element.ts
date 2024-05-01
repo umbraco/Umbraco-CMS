@@ -5,7 +5,7 @@ import type { UmbDocumentCollectionContext } from '../../document-collection.con
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -66,7 +66,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (collectionContext) => {
 			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
 		});

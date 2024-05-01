@@ -61,7 +61,7 @@ export class UmbDefaultCollectionContext<
 	});
 
 	constructor(host: UmbControllerHost, defaultViewAlias: string, defaultFilter: Partial<FilterModelType> = {}) {
-		super(host, UMB_DEFAULT_COLLECTION_CONTEXT);
+		super(host, UMB_COLLECTION_CONTEXT);
 
 		this.#defaultViewAlias = defaultViewAlias;
 		this.#defaultFilter = defaultFilter;
@@ -217,4 +217,9 @@ export class UmbDefaultCollectionContext<
 	}
 }
 
-export const UMB_DEFAULT_COLLECTION_CONTEXT = new UmbContextToken<UmbDefaultCollectionContext>('UmbCollectionContext');
+export const UMB_COLLECTION_CONTEXT = new UmbContextToken<UmbDefaultCollectionContext>('UmbCollectionContext');
+
+/**
+ * @deprecated Use UMB_COLLECTION_CONTEXT instead.
+ */
+export { UMB_COLLECTION_CONTEXT as UMB_DEFAULT_COLLECTION_CONTEXT };
