@@ -48,7 +48,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 					<uui-toggle slot="editor"></uui-toggle>
 				</umb-property-layout>
 				<umb-property-layout label="Headers" description="Custom headers to include in the webhook request.">
-					<umb-input-webhook-headers slot="editor"></umb-input-webhook-headers>
+					<umb-input-webhook-headers .headers=${this._webhook.headers} slot="editor"></umb-input-webhook-headers>
 				</umb-property-layout>
 			</uui-box>
 		`;

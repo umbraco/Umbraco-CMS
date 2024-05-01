@@ -7,26 +7,40 @@ import '@umbraco-cms/backoffice/culture';
 
 @customElement('umb-input-webhook-headers')
 export class UmbInputWebhookHeadersElement extends UmbLitElement implements UmbWorkspaceViewElement {
+	@property()
+	public headers: { [key: string]: string } = {};
+
 	@state()
-	headers: Array<{ name: string; value: string }> = [];
+	private _headers: Array<{ name: string; value: string }> = [];
+
+	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+
+		this._headers = Object.entries(this.headers).map(([name, value]) => ({ name, value }));
+	}
 
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
-		if (_changedProperties.has('headers')) {
-			console.log('Headers changed', this.headers);
+		if (_changedProperties.has('_headers')) {
+			this.headers = this._headers.reduce(
+				(acc, header) => {
+					acc[header.name as string] = header.value;
+					return acc;
+				},
+				{} as { [key: string]: string },
+			);
 		}
 	}
 
 	#removeHeader(index: number) {
-		this.headers = this.headers.filter((_, i) => i !== index);
+		this._headers = this._headers.filter((_, i) => i !== index);
 	}
 
-	#onInput(event: Event, prop: keyof (typeof this.headers)[number], index: number) {
+	#onInput(event: Event, prop: keyof (typeof this._headers)[number], index: number) {
 		const value = (event.target as HTMLInputElement).value;
-
-		this.headers[index][prop] = value;
-		this.requestUpdate('headers');
+		this._headers[index][prop] = value;
+		this.requestUpdate('_headers');
 	}
 
 	#renderHeaderInput(header: { name: string; value: string }, index: number) {
@@ -38,14 +52,14 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement implements UmbW
 	}
 
 	#renderHeaders() {
-		if (!this.headers.length) return nothing;
+		if (!this._headers.length) return nothing;
 
 		return html`
 			<span>Name</span>
 			<span>Value</span>
 			<span></span>
 			${repeat(
-				this.headers,
+				this._headers,
 				(_, index) => index,
 				(header, index) => this.#renderHeaderInput(header, index),
 			)}
@@ -53,7 +67,7 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement implements UmbW
 	}
 
 	#addHeader() {
-		this.headers = [...this.headers, { name: '', value: '' }];
+		this._headers = [...this._headers, { name: '', value: '' }];
 	}
 
 	render() {
