@@ -1,3 +1,4 @@
+import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserItemModel } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UserItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -29,7 +30,9 @@ const getItems = (uniques: Array<string>) => UserService.getItemUser({ id: uniqu
 
 const mapper = (item: UserItemResponseModel): UmbUserItemModel => {
 	return {
-		unique: item.id,
+		avatarUrls: item.avatarUrls,
+		entityType: UMB_USER_ENTITY_TYPE,
 		name: item.name,
+		unique: item.id,
 	};
 };
