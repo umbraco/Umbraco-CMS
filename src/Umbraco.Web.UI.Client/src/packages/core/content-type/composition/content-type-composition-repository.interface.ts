@@ -5,14 +5,16 @@ import type {
 } from './types.js';
 import type { UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 
-export interface UmbContentTypeCompositionRepository {
-	getReferences<ResponseType extends UmbContentTypeCompositionReferenceModel>(
-		unique: string,
-	): Promise<UmbRepositoryResponse<Array<ResponseType>>>;
-	availableCompositions<
-		ResponseType extends UmbContentTypeCompositionCompatibleModel,
-		ArgsType extends UmbContentTypeAvailableCompositionRequestModel,
-	>(
-		args: ArgsType,
-	): Promise<UmbRepositoryResponse<Array<ResponseType>>>;
+export interface UmbContentTypeCompositionRepository<
+	CompositionReferenceModelType extends
+		UmbContentTypeCompositionReferenceModel = UmbContentTypeCompositionReferenceModel,
+	CompositionCompatibleModelType extends
+		UmbContentTypeCompositionCompatibleModel = UmbContentTypeCompositionCompatibleModel,
+	AvailableCompositionsRequestType extends
+		UmbContentTypeAvailableCompositionRequestModel = UmbContentTypeAvailableCompositionRequestModel,
+> {
+	getReferences(unique: string): Promise<UmbRepositoryResponse<Array<CompositionReferenceModelType>>>;
+	availableCompositions(
+		args: AvailableCompositionsRequestType,
+	): Promise<UmbRepositoryResponse<Array<CompositionCompatibleModelType>>>;
 }
