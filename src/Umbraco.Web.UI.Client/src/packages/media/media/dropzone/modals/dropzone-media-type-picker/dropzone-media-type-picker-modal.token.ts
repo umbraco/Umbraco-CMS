@@ -3,6 +3,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDropzoneMediaTypePickerModalData {
 	options: Array<UmbAllowedMediaTypeModel>;
+	files?: Array<File>;
 }
 
 export type UmbDropzoneMediaTypePickerModalValue = {

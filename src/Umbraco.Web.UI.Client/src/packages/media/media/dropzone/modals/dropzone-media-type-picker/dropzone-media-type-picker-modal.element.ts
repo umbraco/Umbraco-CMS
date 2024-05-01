@@ -2,10 +2,11 @@ import type {
 	UmbDropzoneMediaTypePickerModalData,
 	UmbDropzoneMediaTypePickerModalValue,
 } from './dropzone-media-type-picker-modal.token.js';
-import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
+import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-dropzone-media-type-picker-modal')
 export class UmbDropzoneMediaTypePickerModalElement extends UmbModalBaseElement<
@@ -15,20 +16,30 @@ export class UmbDropzoneMediaTypePickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _options: Array<UmbAllowedMediaTypeModel> = [];
 
+	@query('#auto')
+	private _buttonAuto!: UUIButtonElement;
+
 	connectedCallback() {
 		super.connectedCallback();
 		this._options = this.data?.options ?? [];
+		requestAnimationFrame(() => this._buttonAuto.focus());
 	}
 
-	#onMediaTypePick(unique?: string) {
+	#onMediaTypePick(unique: string | undefined) {
 		this.value = { mediaTypeUnique: unique };
 		this._submitModal();
 	}
 
 	render() {
-		return html`<uui-button look="secondary" @click=${() => this.#onMediaTypePick()} label="Automatically" compact>
-				<umb-icon name="icon-wand"></umb-icon
-			></uui-button>
+		return html` <div id="options">
+			<uui-button
+				id="auto"
+				look="secondary"
+				@click=${() => this.#onMediaTypePick(undefined)}
+				label="Automatically"
+				compact>
+				<umb-icon name="icon-wand"></umb-icon> Auto pick
+			</uui-button>
 			${repeat(
 				this._options,
 				(option) => option.unique,
@@ -38,12 +49,30 @@ export class UmbDropzoneMediaTypePickerModalElement extends UmbModalBaseElement<
 						@click=${() => this.#onMediaTypePick(option.unique)}
 						label=${option.name}
 						compact>
-						<umb-icon .name=${option.icon ?? 'icon-circle-dotted'}></umb-icon>
+						<umb-icon .name=${option.icon ?? 'icon-circle-dotted'}></umb-icon>${option.name}
 					</uui-button>`,
-			)}`;
+			)}
+		</div>`;
 	}
 
-	static styles = [UmbTextStyles, css``];
+	static styles = [
+		UmbTextStyles,
+		css`
+			#options {
+				display: flex;
+				margin: var(--uui-size-layout-1);
+				gap: var(--uui-size-3);
+			}
+			uui-button {
+				width: 150px;
+				height: 150px;
+			}
+			umb-icon {
+				font-size: var(--uui-size-10);
+				margin-bottom: var(--uui-size-2);
+			}
+		`,
+	];
 }
 
 export default UmbDropzoneMediaTypePickerModalElement;

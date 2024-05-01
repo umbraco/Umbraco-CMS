@@ -18,7 +18,7 @@ interface UmbUploadableFileModel {
 	mediaTypeUnique: string;
 }
 
-interface UmbUploadableFileExtensionModel {
+export interface UmbUploadableFileExtensionModel {
 	fileExtension: string;
 	mediaTypes: Array<UmbAllowedMediaTypeModel>;
 }
@@ -39,52 +39,32 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 	#parentUnique: string | null;
 
-	#getExtensionFromMimeType(mimeType: string): string {
-		return getExtensionFromMime(mimeType) || '';
-	}
-
-	async #buildOptionsArrayFrom(fileExtensions: Array<string>): Promise<Array<UmbUploadableFileExtensionModel>> {
-		// Getting all media types allowed in our current position based on parent unique.
-		const { data: allAllowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(this.#parentUnique);
-		if (!allAllowedMediaTypes?.items.length) return [];
-
-		const allowedByParent = allAllowedMediaTypes.items;
-
-		// Building an array of options the files can be uploaded as.
-		const options: Array<UmbUploadableFileExtensionModel> = [];
-
-		for (const fileExtension of fileExtensions) {
-			const extensionOptions = await this.#mediaTypeStructure.requestMediaTypesOf({ fileExtension });
-			const mediaTypes = extensionOptions.filter((option) => allowedByParent.includes(option));
-			options.push({ fileExtension, mediaTypes });
-		}
-
-		return options;
-	}
-
 	constructor(host: UmbControllerHost, parentUnique: string | null) {
 		super(host);
 		this.#host = host;
 		this.#parentUnique = parentUnique;
 	}
 
-	async #showDialogMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this.#host, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } });
-		const value = await modalContext.onSubmit().catch(() => undefined);
-
-		return value?.mediaTypeUnique;
+	public setParentUnique(parentUnique: string | null) {
+		this.#parentUnique = parentUnique;
+	}
+	public getParentUnique() {
+		return this.#parentUnique;
 	}
 
 	public async dropOneFile(file: File) {
 		const extension = this.#getExtensionFromMimeType(file.type);
-		if (!extension) return; // Extension doesn't exist.
+
+		if (!extension) {
+			// Folders have no extension on file drop. We assume it is a folder being uploaded.
+			this.#handleFolder(file);
+			return;
+		}
 
 		const optionsArray = await this.#buildOptionsArrayFrom([extension]);
-		if (!optionsArray.length) return; // File not allowed in current dropzone.
+		if (!optionsArray.length) throw new Error('File not allowed here.'); // Parent does not allow this file type here.
 
-		const mediaTypes = optionsArray[0].mediaTypes; // Because we are only uploading one file.
-
+		const mediaTypes = optionsArray[0].mediaTypes;
 		if (mediaTypes.length === 1) {
 			// Only one allowed option, upload file using that option.
 			const uploadableFile: UmbUploadableFileModel = {
@@ -93,7 +73,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 				mediaTypeUnique: mediaTypes[0].unique,
 			};
 
-			console.log('you made it!', uploadableFile);
+			await this.#uploadOne(uploadableFile);
 			return;
 		}
 
@@ -104,9 +84,9 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		const uploadableFile: UmbUploadableFileModel = {
 			unique: UmbId.new(),
 			file,
-			mediaTypeUnique: mediaType,
+			mediaTypeUnique: mediaType.unique,
 		};
-		console.log('you made it!', uploadableFile);
+		await this.#uploadOne(uploadableFile);
 	}
 
 	public async dropFiles(files: Array<File>) {
@@ -123,6 +103,11 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 		for (const file of files) {
 			const extension = this.#getExtensionFromMimeType(file.type);
+			if (!extension) {
+				// Folders have no extension on file drop. We assume it is a folder being uploaded.
+				this.#handleFolder(file);
+				return;
+			}
 			const options = optionsArray.find((option) => option.fileExtension === extension)?.mediaTypes;
 
 			if (!options) return; // Dropped file not allowed in current dropzone.
@@ -133,7 +118,50 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			uploadableFiles.push({ unique: UmbId.new(), file, mediaTypeUnique: mediaType.unique });
 		}
 
-		console.log('you made it!', uploadableFiles);
+		await this.#upload(uploadableFiles);
+	}
+
+	#getExtensionFromMimeType(mimeType: string): string {
+		return getExtensionFromMime(mimeType) || '';
+	}
+
+	async #buildOptionsArrayFrom(fileExtensions: Array<string>): Promise<Array<UmbUploadableFileExtensionModel>> {
+		// Getting all media types allowed in our current position based on parent unique.
+		const { data: allAllowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(this.#parentUnique);
+		if (!allAllowedMediaTypes?.items.length) return [];
+
+		const allowedByParent = allAllowedMediaTypes.items;
+
+		// Building an array of options the files can be uploaded as.
+		const options: Array<UmbUploadableFileExtensionModel> = [];
+
+		for (const fileExtension of fileExtensions) {
+			const extensionOptions = await this.#mediaTypeStructure.requestMediaTypesOf({ fileExtension });
+			const mediaTypes = extensionOptions.filter((option) => {
+				return allowedByParent.find((allowed) => option.unique === allowed.unique);
+			});
+			options.push({ fileExtension, mediaTypes });
+		}
+		return options;
+	}
+
+	async #showDialogMediaTypePicker(options: Array<UmbAllowedMediaTypeModel>) {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this.#host, UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL, { data: { options } });
+		const value = await modalContext.onSubmit().catch(() => undefined);
+		return value ? { unique: value.mediaTypeUnique ?? options[0].unique } : null;
+	}
+
+	async #upload(files: Array<UmbUploadableFileModel>) {
+		await this.#tempFileManager.upload(files);
+	}
+
+	async #uploadOne(file: UmbUploadableFileModel) {
+		await this.#tempFileManager.uploadOne(file);
+	}
+
+	async #handleFolder(file: File) {
+		throw new Error('Not implemented: Folders coming soon!');
 	}
 
 	private _reset() {
