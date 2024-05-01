@@ -32820,6 +32820,7 @@
       "CreateDataTypeRequestModel": {
         "required": [
           "editorAlias",
+          "editorUiAlias",
           "name",
           "values"
         ],
@@ -32834,8 +32835,7 @@
             "type": "string"
           },
           "editorUiAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "values": {
             "type": "array",
@@ -34622,6 +34622,7 @@
         "required": [
           "canIgnoreStartNodes",
           "editorAlias",
+          "editorUiAlias",
           "id",
           "isDeletable",
           "name",
@@ -34638,8 +34639,7 @@
             "type": "string"
           },
           "editorUiAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "values": {
             "type": "array",
@@ -42047,6 +42047,7 @@
       "UpdateDataTypeRequestModel": {
         "required": [
           "editorAlias",
+          "editorUiAlias",
           "name",
           "values"
         ],
@@ -42061,8 +42062,7 @@
             "type": "string"
           },
           "editorUiAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "values": {
             "type": "array",
