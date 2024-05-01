@@ -74,6 +74,9 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 		const { data } = await this.#compositionRepository.availableCompositions({
 			unique: this.#unique,
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			// TODO: isElement is not available on all types that can be composed.
 			isElement: isElement ?? false,
 			currentCompositeUniques: this._selection,
 			currentPropertyAliases: currentPropertyAliases ?? [],
