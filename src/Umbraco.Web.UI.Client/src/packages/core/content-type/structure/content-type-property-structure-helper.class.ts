@@ -23,6 +23,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 
 	private _containerId?: string | null;
 
+	// State which holds all the properties of the current container, this is a composition of all properties from the containers that matches our target [NL]
 	#propertyStructure = new UmbArrayState<UmbPropertyTypeModel>([], (x) => x.id);
 	readonly propertyStructure = this.#propertyStructure.asObservable();
 
@@ -86,7 +87,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 						this._containerName = container.name ?? '';
 						this._containerType = container.type;
 						if (container.parent) {
-							// We have a parent for our main container, so lets observe that one as well:
+							// We have a parent for our main container, so lets observe that one as well: [NL]
 							this.observe(
 								this.#structure!.containerById(container.parent.id),
 								(parent) => {
@@ -152,20 +153,14 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this.observe(
 			this.#structure.propertyStructuresOf(groupId),
 			(properties) => {
-				// Lets remove the properties that does not exists any longer:
-				const _propertyStructure = this.#propertyStructure
+				// Lets remove the properties that does not exists any longer: [NL]
+				const uniquesToRemove = this.#propertyStructure
 					.getValue()
-					.filter((x) => !(x.container?.id === groupId && !properties.some((y) => y.id === x.id)));
+					.filter((x) => !(x.container?.id === groupId && !properties.some((y) => y.id === x.id)))
+					.map((X) => X.id);
 
-				// Lets append the properties that does not exists already:
-				properties?.forEach((property) => {
-					if (!_propertyStructure.find((x) => x.id === property.id)) {
-						_propertyStructure.push(property);
-					}
-				});
-
-				// Fire update to subscribers:
-				this.#propertyStructure.setValue(_propertyStructure);
+				this.#propertyStructure.remove(uniquesToRemove);
+				this.#propertyStructure.append(properties);
 			},
 			'_observePropertyStructureOfGroup' + groupId,
 		);
