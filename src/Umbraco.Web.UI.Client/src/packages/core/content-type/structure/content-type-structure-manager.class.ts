@@ -704,6 +704,12 @@ export class UmbContentTypeStructureManager<
 		});
 	}
 
+	getContentTypeOfContainer(containerId: string) {
+		return this.#contentTypes
+			.getValue()
+			.find((contentType) => contentType.containers.some((c) => c.id === containerId));
+	}
+
 	contentTypeOfProperty(propertyId: UmbPropertyTypeId) {
 		return this.#contentTypes.asObservablePart((contentTypes) =>
 			contentTypes.find((contentType) => contentType.properties.some((p) => p.id === propertyId)),

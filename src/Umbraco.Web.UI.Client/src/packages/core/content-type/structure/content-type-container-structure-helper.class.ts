@@ -240,6 +240,11 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		return this.#ownerChildContainers.some((x) => x.id === containerId);
 	}
 
+	getContentTypeOfContainer(containerId?: string) {
+		if (!this.#structure || !containerId) return;
+		return this.#structure.getContentTypeOfContainer(containerId);
+	}
+
 	containersByNameAndType(name: string, type: UmbPropertyContainerTypes) {
 		return this.#childContainers.asObservablePart((cons) => cons.filter((x) => x.name === name && x.type === type));
 	}

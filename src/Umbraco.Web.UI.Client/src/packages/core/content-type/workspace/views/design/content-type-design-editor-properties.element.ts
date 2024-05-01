@@ -104,6 +104,9 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 
 	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 
+	@property({ attribute: false })
+	editContentTypePath?: string;
+
 	@state()
 	private _propertyStructure: Array<UmbPropertyTypeModel> = [];
 
@@ -112,9 +115,6 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 
 	@state()
 	private _modalRouteBuilderNewProperty?: UmbModalRouteBuilder;
-
-	@state()
-	private _editContentTypePath?: string;
 
 	@state()
 	private _sortModeActive?: boolean;
@@ -141,18 +141,6 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this.#propertyStructureHelper.setStructureManager(workspaceContext.structure);
-
-			const entityType = workspaceContext.getEntityType();
-
-			this.#workspaceModal?.destroy();
-			this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-				.addAdditionalPath(entityType)
-				.onSetup(async () => {
-					return { data: { entityType: entityType, preset: {} } };
-				})
-				.observeRouteBuilder((routeBuilder) => {
-					this._editContentTypePath = routeBuilder({});
-				});
 
 			this.observe(
 				workspaceContext.structure.ownerContentType,
@@ -208,7 +196,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 								return html`
 									<umb-content-type-design-editor-property
 										data-umb-property-id=${property.id}
-										.editContentTypePath=${this._editContentTypePath}
+										.editContentTypePath=${this.editContentTypePath}
 										?sort-mode-active=${this._sortModeActive}
 										.propertyStructureHelper=${this.#propertyStructureHelper}
 										.property=${property}>
