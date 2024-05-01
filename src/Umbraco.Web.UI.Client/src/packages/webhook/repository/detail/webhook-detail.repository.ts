@@ -1,3 +1,4 @@
+import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbWebhookDetailModel } from '../../types.js';
 import { UmbWebhookServerDataSource } from './webhook-detail.server.data-source.js';
 import { UMB_WEBHOOK_DETAIL_STORE_CONTEXT } from './webhook-detail.store.js';
@@ -11,6 +12,21 @@ export class UmbWebhookDetailRepository extends UmbDetailRepositoryBase<UmbWebho
 
 	async create(model: UmbWebhookDetailModel) {
 		return super.create(model, null);
+	}
+
+	async requestEvents(): Promise<{ data: { items: string[]; total: number }; error: any }> {
+		//TODO Use service when available
+
+		const items = ['Content Deleted', 'Content Published', 'Content Unpublished', 'Media Deleted', 'Media Saved'];
+
+		const result = {
+			data: { items, total: items.length },
+			error: null,
+		};
+
+		return new Promise((resolve) => {
+			setTimeout(() => resolve(result), 10);
+		});
 	}
 }
 
