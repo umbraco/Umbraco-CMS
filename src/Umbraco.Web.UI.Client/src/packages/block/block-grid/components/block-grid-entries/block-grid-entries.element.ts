@@ -7,7 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
-import { html, customElement, state, repeat, css, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, repeat, css, property, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../block-grid-entry/index.js';
 import { UmbSorterController, type UmbSorterConfig, type resolvePlacementArgs } from '@umbraco-cms/backoffice/sorter';
@@ -148,6 +148,12 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 	private _areaKey?: string | null;
 
 	@state()
+	private _canCreate?: boolean;
+
+	@state()
+	private _singleBlockTypeName?: string;
+
+	@state()
 	private _styleElement?: HTMLLinkElement;
 
 	@state()
@@ -160,6 +166,21 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 			this.#sorter.setModel(layoutEntries);
 			this._layoutEntries = layoutEntries;
 			this.requestUpdate('layoutEntries', oldValue);
+		});
+
+		this.observe(this.#context.amountOfAllowedBlockTypes, (length) => {
+			this._canCreate = length > 0;
+			if (length === 1) {
+				this.observe(
+					this.#context.firstAllowedBlockTypeName(),
+					(firstAllowedName) => {
+						this._singleBlockTypeName = firstAllowedName;
+					},
+					'observeSingleBlockTypeName',
+				);
+			} else {
+				this.removeUmbControllerByAlias('observeSingleBlockTypeName');
+			}
 		});
 
 		this.#context.getManager().then((manager) => {
@@ -193,28 +214,36 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 						</umb-block-grid-entry>`,
 				)}
 			</div>
-			${this._areaKey === null || this._layoutEntries.length === 0
-				? html` <uui-button-group>
-						<uui-button
-							id="add-button"
-							look="placeholder"
-							label=${this.localize.term('blockEditor_addBlock')}
-							href=${this.#context.getPathForCreateBlock(-1) ?? ''}></uui-button>
-						${this._areaKey === null
-							? html` <uui-button
-									label=${this.localize.term('content_createFromClipboard')}
-									look="placeholder"
-									href=${this.#context.getPathForClipboard(-1) ?? ''}>
-									<uui-icon name="icon-paste-in"></uui-icon>
-								</uui-button>`
-							: ''}
-					</uui-button-group>`
-				: html`
-						<uui-button-inline-create
-							href=${this.#context.getPathForCreateBlock(-1) ?? ''}
-							label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
-					`}
+			${this._canCreate ? this.#renderCreateButton() : nothing}
 		`;
+	}
+
+	#renderCreateButton() {
+		if (this._areaKey === null || this._layoutEntries.length === 0) {
+			return html`<uui-button-group>
+				<uui-button
+					id="add-button"
+					look="placeholder"
+					label=${this._singleBlockTypeName
+						? this.localize.term('blockEditor_addThis', [this._singleBlockTypeName])
+						: this.localize.term('blockEditor_addBlock')}
+					href=${this.#context.getPathForCreateBlock(-1) ?? ''}></uui-button>
+				${this._areaKey === null
+					? html` <uui-button
+							label=${this.localize.term('content_createFromClipboard')}
+							look="placeholder"
+							href=${this.#context.getPathForClipboard(-1) ?? ''}>
+							<uui-icon name="icon-paste-in"></uui-icon>
+						</uui-button>`
+					: nothing}
+			</uui-button-group>`;
+		} else {
+			return html`
+				<uui-button-inline-create
+					href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+					label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
+			`;
+		}
 	}
 
 	static styles = [
