@@ -2,7 +2,7 @@ import type { UmbDocumentTypeEntityType } from './entity.js';
 import type {
 	UmbContentTypeCompositionCompatibleModel,
 	UmbContentTypeCompositionReferenceModel,
-	UmbContentTypeCompositionRequestModel,
+	UmbContentTypeAvailableCompositionRequestModel,
 	UmbContentTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
 
@@ -19,7 +19,8 @@ export type UmbDocumentTypeCleanupModel = {
 	keepLatestVersionPerDayForDays?: number | null;
 };
 
-export interface UmbDocumentTypeCompositionRequestModel extends UmbContentTypeCompositionRequestModel {
+export interface UmbDocumentTypeAvailableCompositionRequestModel
+	extends UmbContentTypeAvailableCompositionRequestModel {
 	isElement: boolean;
 }
 
