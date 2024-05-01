@@ -27,6 +27,7 @@ test.describe('Document Type Folder tests', () => {
     const folder = await umbracoApi.documentType.getByName(documentFolderName);
     expect(folder.name).toBe(documentFolderName);
     // Checks if the folder is in the root
+    await umbracoUi.documentType.reloadTree('Document Types');
     await umbracoUi.documentType.isDocumentTreeItemVisible(documentFolderName);
   });
 
@@ -67,8 +68,6 @@ test.describe('Document Type Folder tests', () => {
     await umbracoUi.documentType.isDocumentTreeItemVisible(documentFolderName);
   });
 
-
-  // Currently it is not possible to create a folder in a folder
   test('can create a document type folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolder';
@@ -94,5 +93,37 @@ test.describe('Document Type Folder tests', () => {
 
     // Clean
     await umbracoApi.documentType.ensureNameNotExists(childFolderName);
+  });
+
+  test('can create a folder in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const grandParentFolderName = 'TheGrandFolder';
+    const parentFolderName = 'TheParentFolder';
+    await umbracoApi.documentType.ensureNameNotExists(grandParentFolderName);
+    await umbracoApi.documentType.ensureNameNotExists(parentFolderName);
+    const grandParentFolderId = await umbracoApi.documentType.createFolder(grandParentFolderName);
+    const parentFolderId = await umbracoApi.documentType.createFolder(parentFolderName, grandParentFolderId);
+
+    // Act
+    await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.documentType.clickRootFolderCaretButton();
+    await umbracoUi.documentType.clickCaretButtonForName(grandParentFolderName);
+    await umbracoUi.documentType.clickActionsMenuForName(parentFolderName);
+    await umbracoUi.documentType.clickCreateButton();
+    await umbracoUi.documentType.clickCreateDocumentFolderButton();
+    await umbracoUi.documentType.enterFolderName(documentFolderName);
+    await umbracoUi.documentType.clickCreateFolderButton();
+
+    // Assert
+    await umbracoUi.documentType.reloadTree(parentFolderName);
+    await umbracoUi.documentType.isDocumentTreeItemVisible(documentFolderName);
+    const grandParentChildren = await umbracoApi.documentType.getChildren(grandParentFolderId);
+    expect(grandParentChildren[0].name).toBe(parentFolderName);
+    const parentChildren = await umbracoApi.documentType.getChildren(parentFolderId);
+    expect(parentChildren[0].name).toBe(documentFolderName);
+
+    // Clean
+    await umbracoApi.documentType.ensureNameNotExists(grandParentFolderName);
+    await umbracoApi.documentType.ensureNameNotExists(parentFolderName);
   });
 });
