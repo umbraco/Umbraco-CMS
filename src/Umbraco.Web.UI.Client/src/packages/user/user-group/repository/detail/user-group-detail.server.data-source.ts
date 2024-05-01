@@ -36,20 +36,21 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	 */
 	async createScaffold() {
 		const data: UmbUserGroupDetailModel = {
-			entityType: UMB_USER_GROUP_ENTITY_TYPE,
-			unique: UmbId.new(),
-			isSystemGroup: false,
-			name: '',
-			icon: 'icon-users',
-			sections: [],
-			languages: [],
-			hasAccessToAllLanguages: false,
-			documentStartNode: null,
+			alias: '',
 			documentRootAccess: false,
-			mediaStartNode: null,
-			mediaRootAccess: false,
+			documentStartNode: null,
+			entityType: UMB_USER_GROUP_ENTITY_TYPE,
 			fallbackPermissions: [],
+			hasAccessToAllLanguages: false,
+			icon: 'icon-users',
+			isSystemGroup: false,
+			languages: [],
+			mediaRootAccess: false,
+			mediaStartNode: null,
+			name: '',
 			permissions: [],
+			sections: [],
+			unique: UmbId.new(),
 		};
 
 		return { data };

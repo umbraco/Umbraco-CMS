@@ -60,6 +60,7 @@ const itemMapper = (item: UmbMockUserGroupModel): UserGroupItemResponseModel => 
 
 const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupModel => {
 	return {
+		alias: item.alias,
 		documentRootAccess: item.documentRootAccess,
 		documentStartNode: item.documentStartNode,
 		hasAccessToAllLanguages: item.hasAccessToAllLanguages,

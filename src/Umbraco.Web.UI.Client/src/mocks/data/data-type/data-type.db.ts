@@ -44,6 +44,7 @@ const createFolderMockMapper = (request: CreateFolderRequestModel): UmbMockDataT
 		isFolder: true,
 		hasChildren: false,
 		editorAlias: '',
+		editorUiAlias: '',
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		values: [],
