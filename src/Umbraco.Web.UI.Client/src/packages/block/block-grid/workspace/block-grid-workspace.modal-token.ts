@@ -1,5 +1,5 @@
 import type { UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
-import type { UmbWorkspaceData, UmbWorkspaceValue } from '@umbraco-cms/backoffice/modal';
+import type { UmbWorkspaceModalData, UmbWorkspaceModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbBlockGridWorkspaceData
@@ -9,7 +9,7 @@ export interface UmbBlockGridWorkspaceData
 		areaKey?: string;
 	}> {}
 
-export const UMB_BLOCK_GRID_WORKSPACE_MODAL = new UmbModalToken<UmbBlockGridWorkspaceData, UmbWorkspaceValue>(
+export const UMB_BLOCK_GRID_WORKSPACE_MODAL = new UmbModalToken<UmbBlockGridWorkspaceData, UmbWorkspaceModalValue>(
 	'Umb.Modal.Workspace',
 	{
 		modal: {
@@ -19,4 +19,4 @@ export const UMB_BLOCK_GRID_WORKSPACE_MODAL = new UmbModalToken<UmbBlockGridWork
 		data: { entityType: 'block', preset: {}, originData: { index: -1, parentUnique: null } },
 		// Recast the type, so the entityType data prop is not required:
 	},
-) as UmbModalToken<Omit<UmbWorkspaceData, 'entityType'>, UmbWorkspaceValue>;
+) as UmbModalToken<Omit<UmbWorkspaceModalData, 'entityType'>, UmbWorkspaceModalValue>;

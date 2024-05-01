@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDocumentTypeItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -29,6 +30,7 @@ const getItems = (uniques: Array<string>) => DocumentTypeService.getItemDocument
 
 const mapper = (item: DocumentTypeItemResponseModel): UmbDocumentTypeItemModel => {
 	return {
+		entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 		isElement: item.isElement,
 		icon: item.icon,
 		unique: item.id,

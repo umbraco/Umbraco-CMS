@@ -62,7 +62,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	#onAliasChange(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
-
 			if (typeof target?.value === 'string') {
 				this.#workspaceContext?.setAlias(target.value);
 			}

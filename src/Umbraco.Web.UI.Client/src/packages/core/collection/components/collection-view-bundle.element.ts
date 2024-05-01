@@ -1,5 +1,5 @@
 import type { UmbDefaultCollectionContext } from '../default/collection-default.context.js';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '../default/collection-default.context.js';
+import { UMB_COLLECTION_CONTEXT } from '../default/collection-default.context.js';
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
 import { css, html, customElement, state, nothing, repeat, query } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
@@ -35,7 +35,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (context) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
 			this.#collectionContext = context;
 			this.#observeCollection();
 		});
