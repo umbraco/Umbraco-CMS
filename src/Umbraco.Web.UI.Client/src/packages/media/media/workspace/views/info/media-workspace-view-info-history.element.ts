@@ -103,7 +103,7 @@ export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
 							const { text, style } = getMediaHistoryTagStyleAndText(item.logType);
 							const user = this.#userMap.get(item.user.unique);
 							const userName = user?.name ?? 'Unknown';
-							const avatarUrl = Array.isArray(user?.avatarUrls) ? user.avatarUrls[1] : undefined;
+							const avatarUrl = user && Array.isArray(user.avatarUrls) ? user.avatarUrls[1] : undefined;
 
 							return html`<umb-history-item
 								.name=${user?.name ?? 'Unknown'}
