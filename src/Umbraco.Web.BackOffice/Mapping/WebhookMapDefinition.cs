@@ -67,6 +67,7 @@ public class WebhookMapDefinition : IMapDefinition
         target.Url = source.Url;
         target.RequestHeaders = source.RequestHeaders;
         target.WebhookKey = source.WebhookKey;
+        target.IsSuccessStatusCode = source.IsSuccessStatusCode;
 
         if (_hostingEnvironment.IsDebugMode)
         {

@@ -14,11 +14,12 @@
       <tr ng-repeat="log in vm.logs track by log.key" ng-click="vm.openLogOverlay(log)" style="cursor: pointer;">
         <td style="width: 20px;">
           <umb-checkmark
-            ng-if="vm.isChecked(log)"
-            checked="vm.isChecked(log)"
-            size="m">
+            ng-if="log.isSuccessStatusCode"
+            checked="true"
+            size="m"
+            title="{{ log.statusCode }}">
           </umb-checkmark>
-          <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="!vm.isChecked(log)"></umb-icon>
+          <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="!log.isSuccessStatusCode" title="{{ log.statusCode }}"></umb-icon>
         </td>
         <td>{{ log.webhookKey }}</td>
         <td>{{ log.formattedLogDate }}</td>

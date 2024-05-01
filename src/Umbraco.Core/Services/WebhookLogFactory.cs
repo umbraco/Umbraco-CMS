@@ -24,6 +24,7 @@ public class WebhookLogFactory : IWebhookLogFactory
         if (httpResponseMessage is not null)
         {
             log.StatusCode = MapStatusCodeToMessage(httpResponseMessage.StatusCode);
+            log.IsSuccessStatusCode = httpResponseMessage.IsSuccessStatusCode;
             log.ResponseHeaders = $"{httpResponseMessage.Content.Headers}{httpResponseMessage.Headers}";
             log.ResponseBody = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
         }
