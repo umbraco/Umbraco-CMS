@@ -3,7 +3,7 @@ import type { UmbMemberTypeItemModel } from '../../member-type/repository/item/t
 import type { UmbMemberCollectionContext } from './member-collection.context.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 
 @customElement('umb-member-collection-header')
 export class UmbMemberCollectionHeaderElement extends UmbLitElement {
@@ -23,7 +23,7 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbMemberCollectionContext;
 		});
 

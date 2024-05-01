@@ -34,7 +34,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - run: npm ci --no-audit --no-fund --prefer-offline
-      - run: npm run lint
+      - run: npm run lint:errors
       - run: npm run build
       - run: npm run generate:jsonschema:dist
       - run: npx playwright install --with-deps

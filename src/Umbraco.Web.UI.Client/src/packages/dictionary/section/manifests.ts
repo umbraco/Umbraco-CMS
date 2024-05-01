@@ -12,7 +12,7 @@ const section: ManifestSection = {
 	type: 'section',
 	alias: UMB_DICTIONARY_SECTION_ALIAS,
 	name: 'Dictionary Section',
-	weight: 100,
+	weight: 400,
 	meta: {
 		label: '#sections_translation',
 		pathname: 'dictionary',

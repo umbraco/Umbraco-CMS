@@ -3,7 +3,10 @@ import type { UmbModalContext, UmbModalRouteBuilder } from '../index.js';
 import type { UmbModalToken } from '../token/modal-token.js';
 import type { IRouterSlot, Params } from '@umbraco-cms/backoffice/router';
 
-export interface UmbModalRouteRegistration<UmbModalTokenData extends object = object, UmbModalTokenValue = any> {
+export interface UmbModalRouteRegistration<
+	UmbModalTokenData extends { [key: string]: any } = { [key: string]: any },
+	UmbModalTokenValue = any,
+> {
 	key: string;
 	alias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string;
 

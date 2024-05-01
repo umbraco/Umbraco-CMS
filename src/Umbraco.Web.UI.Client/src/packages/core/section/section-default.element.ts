@@ -13,6 +13,7 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
 
 /**
  * @export
@@ -58,7 +59,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	#createRoutes() {
 		this._routes = [
 			{
-				path: 'workspace/:entityType',
+				path: UMB_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('../workspace/workspace.element.js'),
 				setup: (element, info) => {
 					(element as UmbWorkspaceElement).entityType = info.match.params.entityType;

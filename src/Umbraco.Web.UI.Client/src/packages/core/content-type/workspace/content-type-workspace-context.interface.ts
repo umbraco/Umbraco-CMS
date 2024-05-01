@@ -8,6 +8,7 @@ export interface UmbContentTypeWorkspaceContext<ContentTypeType extends UmbConte
 	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT: true;
 
 	readonly name: Observable<string | undefined>;
+	getName(): string | undefined;
 	readonly alias: Observable<string | undefined>;
 	readonly description: Observable<string | undefined>;
 	readonly icon: Observable<string | undefined>;
