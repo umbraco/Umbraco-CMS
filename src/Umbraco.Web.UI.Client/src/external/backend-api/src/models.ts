@@ -113,7 +113,7 @@ export type CopyMediaTypeRequestModel = {
 export type CreateDataTypeRequestModel = {
         name: string
 editorAlias: string
-editorUiAlias?: string | null
+editorUiAlias: string
 values: Array<DataTypePropertyPresentationModel>
 id?: string | null
 parent?: ReferenceByIdModel | null
@@ -384,6 +384,7 @@ key?: string | null
 
 export type CreateUserGroupRequestModel = {
         name: string
+alias: string
 icon?: string | null
 sections: Array<string>
 languages: Array<string>
@@ -394,6 +395,7 @@ mediaStartNode?: ReferenceByIdModel | null
 mediaRootAccess: boolean
 fallbackPermissions: Array<string>
 permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>
+id?: string | null
     };
 
 export type CreateUserRequestModel = {
@@ -479,7 +481,7 @@ properties: Array<DataTypePropertyReferenceModel>
 export type DataTypeResponseModel = {
         name: string
 editorAlias: string
-editorUiAlias?: string | null
+editorUiAlias: string
 values: Array<DataTypePropertyPresentationModel>
 id: string
 isDeletable: boolean
@@ -2263,7 +2265,7 @@ export type UnpublishDocumentRequestModel = {
 export type UpdateDataTypeRequestModel = {
         name: string
 editorAlias: string
-editorUiAlias?: string | null
+editorUiAlias: string
 values: Array<DataTypePropertyPresentationModel>
     };
 
@@ -2488,6 +2490,7 @@ key: string
 
 export type UpdateUserGroupRequestModel = {
         name: string
+alias: string
 icon?: string | null
 sections: Array<string>
 languages: Array<string>
@@ -2560,10 +2563,12 @@ export type UserGroupItemResponseModel = {
         id: string
 name: string
 icon?: string | null
+alias?: string | null
     };
 
 export type UserGroupResponseModel = {
         name: string
+alias: string
 icon?: string | null
 sections: Array<string>
 languages: Array<string>
@@ -5222,6 +5227,11 @@ DeleteWebhookById: {
                         id: string
                         
                     };
+GetWebhookEvents: {
+                        skip?: number
+take?: number
+                        
+                    };
         }
         
         
@@ -5232,6 +5242,7 @@ DeleteWebhookById: {
                 ,GetWebhookById: WebhookResponseModel
                 ,PutWebhookById: string
                 ,DeleteWebhookById: string
+                ,GetWebhookEvents: PagedWebhookResponseModel
                 
         }
         
