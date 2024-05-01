@@ -5222,6 +5222,11 @@ DeleteWebhookById: {
                         id: string
                         
                     };
+GetWebhookEvents: {
+                        skip?: number
+take?: number
+                        
+                    };
         }
         
         
@@ -5232,6 +5237,7 @@ DeleteWebhookById: {
                 ,GetWebhookById: WebhookResponseModel
                 ,PutWebhookById: string
                 ,DeleteWebhookById: string
+                ,GetWebhookEvents: PagedWebhookResponseModel
                 
         }
         
