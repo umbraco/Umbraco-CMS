@@ -1,4 +1,8 @@
+import type { UmbUserEntityType } from '../../entity.js';
+
 export interface UmbUserItemModel {
-	unique: string;
+	avatarUrls: Array<string>;
+	entityType: UmbUserEntityType;
 	name: string;
+	unique: string;
 }
