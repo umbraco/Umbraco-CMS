@@ -32,7 +32,7 @@
 			"@umbraco-cms/backoffice/localization-api": ["./src/libs/localization-api/index.ts"],
 			"@umbraco-cms/backoffice/observable-api": ["./src/libs/observable-api/index.ts"],
 			"@umbraco-cms/backoffice/action": ["./src/packages/core/action/index.ts"],
-			"@umbraco-cms/backoffice/audit-log": ["./src/packages/audit-log/index.ts"],
+			"@umbraco-cms/backoffice/audit-log": ["./src/packages/core/audit-log/index.ts"],
 			"@umbraco-cms/backoffice/auth": ["./src/packages/core/auth/index.ts"],
 			"@umbraco-cms/backoffice/block-grid": ["./src/packages/block/block-grid/index.ts"],
 			"@umbraco-cms/backoffice/block-list": ["./src/packages/block/block-list/index.ts"],
