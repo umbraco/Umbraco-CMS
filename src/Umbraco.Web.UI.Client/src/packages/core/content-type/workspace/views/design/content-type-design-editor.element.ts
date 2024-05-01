@@ -230,11 +230,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	async #requestDeleteTab(tab: UmbPropertyTypeContainerModel | undefined) {
+		if (!tab) return;
+		// TODO: Localize this:
+		const tabName = tab.name === '' ? 'Unnamed' : tab.name;
 		// TODO: Localize this:
 		const modalData: UmbConfirmModalData = {
 			headline: 'Delete tab',
-			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}>
-					Are you sure you want to delete the tab <strong>${tab?.name ?? tab?.id}</strong>
+			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tabName]}>
+					Are you sure you want to delete the tab <strong>${tabName}</strong>
 				</umb-localize>
 				<div style="color:var(--uui-color-danger-emphasis)">
 					<umb-localize key="contentTypeEditor_confirmDeleteTabNotice">
@@ -276,7 +279,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (tab) {
 			const path = this._routerPath + '/tab/' + encodeFolderName(tab.name && tab.name !== '' ? tab.name : '-');
 			window.history.replaceState(null, '', path);
-			console.log('new tab', path);
 			this.#focusInput();
 		}
 	}
@@ -525,20 +527,20 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	static styles = [
 		UmbTextStyles,
 		css`
-			#buttons-wrapper {
-				flex: 1;
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				align-items: stretch;
-			}
-
 			:host {
 				position: relative;
 				display: flex;
 				flex-direction: column;
 				height: 100%;
 				--uui-tab-background: var(--uui-color-surface);
+			}
+
+			#buttons-wrapper {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				align-items: stretch;
 			}
 
 			[drag-placeholder] {
@@ -553,6 +555,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			#header {
 				width: 100%;
+				min-height: var(--uui-size-15);
 				display: flex;
 				align-items: center;
 				justify-content: space-between;

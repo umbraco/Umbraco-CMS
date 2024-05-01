@@ -1,7 +1,7 @@
 import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_DOCUMENT_ENTITY_TYPE,
@@ -58,7 +58,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 			});
 		});
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (collectionContext) => {
 			this.observe(collectionContext.filter, (filter) => {
 				this._useInfiniteEditor = filter.useInfiniteEditor == true;
 			});
