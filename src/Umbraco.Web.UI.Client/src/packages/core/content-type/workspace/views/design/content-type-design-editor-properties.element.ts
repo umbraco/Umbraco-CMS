@@ -96,7 +96,6 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	}
 
 	#addPropertyModal: UmbModalRouteRegistrationController;
-	#workspaceModal?: UmbModalRouteRegistrationController;
 
 	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 
