@@ -16,7 +16,14 @@ import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffic
  * @export
  * @class UmbDocumentTypeCompositionServerDataSource
  */
-export class UmbDocumentTypeCompositionServerDataSource implements UmbContentTypeCompositionDataSource {
+export class UmbDocumentTypeCompositionServerDataSource
+	implements
+		UmbContentTypeCompositionDataSource<
+			UmbDocumentTypeCompositionReferenceModel,
+			UmbDocumentTypeCompositionCompatibleModel,
+			UmbDocumentTypeAvailableCompositionRequestModel
+		>
+{
 	#host: UmbControllerHost;
 
 	/**
