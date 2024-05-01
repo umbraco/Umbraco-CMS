@@ -92,6 +92,10 @@ export class UmbWebhookWorkspaceContext
 		this.#data.update({ name });
 	}
 
+	setHeaders(headers: { [key: string]: string }) {
+		this.#data.update({ headers });
+	}
+
 	async submit() {
 		const newData = this.getData();
 		if (!newData) {

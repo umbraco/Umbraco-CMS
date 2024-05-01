@@ -1,5 +1,5 @@
 import { UMB_WEBHOOK_WORKSPACE_CONTEXT } from '../webhook-workspace.context-token.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -7,6 +7,8 @@ import '@umbraco-cms/backoffice/culture';
 import type { UmbWebhookDetailModel } from '@umbraco-cms/backoffice/webhook';
 
 import '../../../components/input-webhook-headers-view.element.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import UmbInputWebhookHeadersElement from '../../../components/input-webhook-headers-view.element.js';
 
 @customElement('umb-webhook-details-workspace-view')
 export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -32,7 +34,16 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 		});
 	}
 
+	#onHeadersChange(event: UmbChangeEvent) {
+		if (!this._webhook) return;
+
+		const headers = (event.target as UmbInputWebhookHeadersElement).headers;
+		this.#webhookWorkspaceContext?.setHeaders(headers);
+	}
+
 	render() {
+		if (!this._webhook) return nothing;
+
 		return html`
 			<uui-box>
 				<umb-property-layout label="Url" description="The url to call when the webhook is triggered.">
@@ -48,7 +59,10 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 					<uui-toggle slot="editor"></uui-toggle>
 				</umb-property-layout>
 				<umb-property-layout label="Headers" description="Custom headers to include in the webhook request.">
-					<umb-input-webhook-headers .headers=${this._webhook.headers} slot="editor"></umb-input-webhook-headers>
+					<umb-input-webhook-headers
+						@change=${this.#onHeadersChange}
+						.headers=${this._webhook.headers}
+						slot="editor"></umb-input-webhook-headers>
 				</umb-property-layout>
 			</uui-box>
 		`;

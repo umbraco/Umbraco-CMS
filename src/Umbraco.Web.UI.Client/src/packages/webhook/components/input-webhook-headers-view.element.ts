@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '@umbraco-cms/backoffice/culture';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-webhook-headers')
 export class UmbInputWebhookHeadersElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -30,6 +31,8 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement implements UmbW
 				},
 				{} as { [key: string]: string },
 			);
+
+			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}
 
@@ -74,7 +77,7 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement implements UmbW
 		return html`
 			${this.#renderHeaders()}
 
-			<uui-button id="add" look="primary" @click=${this.#addHeader}>Add</uui-button>
+			<uui-button id="add" look="placeholder" @click=${this.#addHeader}>Add</uui-button>
 		`;
 	}
 
