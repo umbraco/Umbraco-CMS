@@ -7,7 +7,7 @@ import type {
 import type { UmbContentTypeStructureManager } from './content-type-structure-manager.class.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
 
@@ -77,7 +77,14 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		if (!this.#structure || this._containerId === undefined) return;
 
 		if (this._containerId === null) {
-			this.#observePropertyStructureOf(null);
+			//this.#observePropertyStructureOf(null);
+			this.observe(
+				this.#structure.propertyStructuresOf(null),
+				(properties) => {
+					this.#propertyStructure.setValue(properties);
+				},
+				'observePropertyStructures',
+			);
 			this.removeUmbControllerByAlias('_observeContainers');
 		} else {
 			this.observe(
@@ -140,13 +147,24 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 					this.#propertyStructure.setValue(_propertyStructure);
 				}
 
-				groupContainers.forEach((group) => this.#observePropertyStructureOf(group.id));
+				this.observe(
+					mergeObservables(
+						groupContainers.map((group) => this.#structure!.propertyStructuresOf(group.id)),
+						(sources) => {
+							return sources.flatMap((x) => x);
+						},
+					),
+					(properties) => {
+						this.#propertyStructure.setValue(properties);
+					},
+					'observePropertyStructures',
+				);
 				this.#containers = groupContainers;
 			},
 			'_observeContainers',
 		);
 	}
-
+	/*
 	#observePropertyStructureOf(groupId?: string | null) {
 		if (!this.#structure || groupId === undefined) return;
 
@@ -164,7 +182,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 			},
 			'_observePropertyStructureOfGroup' + groupId,
 		);
-	}
+	}*/
 
 	async isOwnerProperty(propertyId: UmbPropertyTypeId) {
 		await this.#init;
