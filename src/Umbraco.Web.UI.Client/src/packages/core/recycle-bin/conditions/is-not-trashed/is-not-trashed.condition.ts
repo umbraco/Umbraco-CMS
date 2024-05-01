@@ -14,6 +14,10 @@ export class UmbIsNotTrashedCondition
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbConditionConfigBase>) {
 		super(host, args);
 
+		// this is a "negative/not" condition, so we assume the default value is that the context is not trashed
+		// and therefore the condition is permitted
+		this.permitted = true;
+
 		this.consumeContext(UMB_IS_TRASHED_CONTEXT, (context) => {
 			this.observe(context.isTrashed, (isTrashed) => {
 				this.permitted = isTrashed === false;
