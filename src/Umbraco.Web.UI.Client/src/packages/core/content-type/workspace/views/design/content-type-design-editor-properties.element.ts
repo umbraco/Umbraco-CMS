@@ -11,11 +11,7 @@ import {
 	UMB_PROPERTY_TYPE_SETTINGS_MODAL,
 } from '@umbraco-cms/backoffice/content-type';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import {
-	type UmbModalRouteBuilder,
-	UmbModalRouteRegistrationController,
-	UMB_WORKSPACE_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeDesignEditorPropertyElement> = {
 	getUniqueOfElement: (element) => {
@@ -160,8 +156,8 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			.addUniquePaths(['container-id'])
 			.addAdditionalPath('add-property/:sortOrder')
 			.onSetup(async (params) => {
-				if (!this._ownerContentType || !this._containerId) return false;
-
+				// TODO: Make a onInit promise, that can be awaited here.
+				if (!this._ownerContentType || this._containerId === undefined) return false;
 				const propertyData = await this.#propertyStructureHelper.createPropertyScaffold(this._containerId);
 				if (propertyData === undefined) return false;
 				if (params.sortOrder !== undefined) {

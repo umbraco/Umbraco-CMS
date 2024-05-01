@@ -28,8 +28,8 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	// Owner containers are containers owned by the owner Content Type (The specific one up for editing)
 	#ownerChildContainers: UmbPropertyTypeContainerModel[] = [];
 
-	#hasProperties = new UmbBooleanState(false);
-	readonly hasProperties = this.#hasProperties.asObservable();
+	#hasProperties = new UmbArrayState<{ id: string | null; has: boolean }>([], (x) => x.id);
+	readonly hasProperties = this.#hasProperties.asObservablePart((x) => x.some((y) => y.has));
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -132,7 +132,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 						this.#containerName = undefined;
 						this.#containerType = undefined;
 						// TODO: reset has Properties.
-						this.#hasProperties.setValue(false);
+						this.#hasProperties.setValue([]);
 					}
 				},
 				'_observeMainContainer',
@@ -152,7 +152,8 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			(containers) => {
 				// We want to remove hasProperties of groups that does not exist anymore.:
 				// this.#removeHasPropertiesOfGroup()
-				this.#hasProperties.setValue(false);
+				console.log('containers', containers);
+				this.#hasProperties.setValue([]);
 				this.#childContainers.setValue([]);
 
 				containers.forEach((container) => {
@@ -203,8 +204,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this.observe(
 			this.#structure.hasPropertyStructuresOf(groupId),
 			(hasProperties) => {
-				// TODO: Make this an array/map/state, so we only change the groupId. then hasProperties should be a observablePart that checks the array for true. [NL]
-				this.#hasProperties.setValue(hasProperties);
+				this.#hasProperties.appendOne({ id: groupId, has: hasProperties });
 			},
 			'_observePropertyStructureOfGroup' + groupId,
 		);

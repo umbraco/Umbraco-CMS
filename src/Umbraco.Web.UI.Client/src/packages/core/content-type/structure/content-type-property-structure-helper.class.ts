@@ -188,7 +188,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	// TODO: consider moving this to another class, to separate 'viewer' from 'manipulator':
 	/** Manipulate methods: */
 
-	async createPropertyScaffold(ownerId?: string) {
+	async createPropertyScaffold(ownerId?: string | null) {
 		await this.#init;
 		if (!this.#structure) return;
 
