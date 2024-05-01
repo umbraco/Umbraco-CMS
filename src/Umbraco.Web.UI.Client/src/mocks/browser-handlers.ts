@@ -1,4 +1,3 @@
-import { handlers as auditLogHandlers } from './handlers/audit-log.handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
 import { handlers as cultureHandlers } from './handlers/culture.handlers.js';
 import { handlers as dataTypeHandlers } from './handlers/data-type/index.js';
@@ -39,7 +38,6 @@ import * as serverHandlers from './handlers/server.handlers.js';
 import { handlers as documentBlueprintHandlers } from './handlers/document-blueprint/index.js';
 
 const handlers = [
-	...auditLogHandlers,
 	...configHandlers,
 	...cultureHandlers,
 	...dataTypeHandlers,
