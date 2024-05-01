@@ -1,12 +1,10 @@
 ﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
+namespace Umbraco.Cms.Api.Management.ViewModels.AuditLog;
 
-public class AuditLogBaseModel
+public class AuditLogResponseModel
 {
     public ReferenceByIdModel User { get; set; } = new();
-
-    public AuditLogEntity? Entity { get; set; }
 
     public DateTimeOffset Timestamp { get; set; }
 

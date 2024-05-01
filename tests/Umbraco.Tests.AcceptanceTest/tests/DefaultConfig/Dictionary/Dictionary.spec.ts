@@ -47,7 +47,7 @@ test.describe('Dictionary tests', () => {
     // TODO: when frontend is ready, verify the new dictionary item is NOT displayed in list view and in tree
   });
 
-  test.skip('can create a dictionary item in a dictionary', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a dictionary item in a dictionary @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
     let parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
@@ -82,7 +82,7 @@ test.describe('Dictionary tests', () => {
   });
 
   // Remove skip when export function works
-  test.skip('can export a dictionary item with descendants', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can export a dictionary item with descendants @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
     let parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
@@ -117,7 +117,7 @@ test.describe('Dictionary tests', () => {
   });
 
   // Remove skip when import function works
-  test.skip('can import a dictionary item with descendants', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can import a dictionary item with descendants @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const udtFilePath = './fixtures/dictionary/TestDictionaryWithDescendants.udt';
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);

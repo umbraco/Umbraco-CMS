@@ -6,220 +6,6 @@
     "version": "Latest"
   },
   "paths": {
-    "/umbraco/management/api/v1/audit-log": {
-      "get": {
-        "tags": [
-          "Audit Log"
-        ],
-        "operationId": "GetAuditLog",
-        "parameters": [
-          {
-            "name": "orderDirection",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/DirectionModel"
-            }
-          },
-          {
-            "name": "sinceDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/PagedAuditLogWithUsernameResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/audit-log/{id}": {
-      "get": {
-        "tags": [
-          "Audit Log"
-        ],
-        "operationId": "GetAuditLogById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "orderDirection",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/DirectionModel"
-            }
-          },
-          {
-            "name": "sinceDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/PagedAuditLogResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user do not have access to this resource"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/audit-log/type/{logType}": {
-      "get": {
-        "tags": [
-          "Audit Log"
-        ],
-        "operationId": "GetAuditLogTypeByLogType",
-        "parameters": [
-          {
-            "name": "logType",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/AuditTypeModel"
-            }
-          },
-          {
-            "name": "sinceDate",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/PagedAuditLogResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/culture": {
       "get": {
         "tags": [
@@ -7340,6 +7126,85 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document/{id}/audit-log": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByIdAuditLog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DirectionModel"
+            }
+          },
+          {
+            "name": "sinceDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedAuditLogResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document/{id}/copy": {
       "post": {
         "tags": [
@@ -12794,6 +12659,68 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/media-type/allowed": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "GetItemMediaTypeAllowed",
+        "parameters": [
+          {
+            "name": "fileExtension",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedModelMediaTypeItemResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/media-type/search": {
       "get": {
         "tags": [
@@ -15205,6 +15132,85 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media/{id}/audit-log": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetMediaByIdAuditLog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DirectionModel"
+            }
+          },
+          {
+            "name": "sinceDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedAuditLogResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -18279,7 +18285,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
+                      "$ref": "#/components/schemas/PagedMemberTypeTreeItemResponseModel"
                     }
                   ]
                 }
@@ -19484,6 +19490,67 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/oembed/query": {
+      "get": {
+        "tags": [
+          "oEmbed"
+        ],
+        "operationId": "GetOembedQuery",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          {
+            "name": "maxWidth",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "maxHeight",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OEmbedResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -27511,6 +27578,97 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/filter/user-group": {
+      "get": {
+        "tags": [
+          "User Group"
+        ],
+        "operationId": "GetFilterUserGroup",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedUserGroupResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProblemDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/user-group": {
       "get": {
         "tags": [
@@ -32252,21 +32410,6 @@
         },
         "additionalProperties": false
       },
-      "AuditLogEntityModel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "type": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "AuditLogResponseModel": {
         "required": [
           "logType",
@@ -32282,14 +32425,6 @@
               }
             ]
           },
-          "entity": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/AuditLogEntityModel"
-              }
-            ],
-            "nullable": true
-          },
           "timestamp": {
             "type": "string",
             "format": "date-time"
@@ -32304,58 +32439,6 @@
           "parameters": {
             "type": "string",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "AuditLogWithUsernameResponseModel": {
-        "required": [
-          "logType",
-          "timestamp",
-          "user",
-          "userAvatars"
-        ],
-        "type": "object",
-        "properties": {
-          "user": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
-              }
-            ]
-          },
-          "entity": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/AuditLogEntityModel"
-              }
-            ],
-            "nullable": true
-          },
-          "timestamp": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "logType": {
-            "$ref": "#/components/schemas/AuditTypeModel"
-          },
-          "comment": {
-            "type": "string",
-            "nullable": true
-          },
-          "parameters": {
-            "type": "string",
-            "nullable": true
-          },
-          "userName": {
-            "type": "string",
-            "nullable": true
-          },
-          "userAvatars": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
           }
         },
         "additionalProperties": false
@@ -32606,6 +32689,7 @@
       "CreateDataTypeRequestModel": {
         "required": [
           "editorAlias",
+          "editorUiAlias",
           "name",
           "values"
         ],
@@ -32620,8 +32704,7 @@
             "type": "string"
           },
           "editorUiAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "values": {
             "type": "array",
@@ -34417,6 +34500,7 @@
         "required": [
           "canIgnoreStartNodes",
           "editorAlias",
+          "editorUiAlias",
           "id",
           "isDeletable",
           "name",
@@ -34433,8 +34517,7 @@
             "type": "string"
           },
           "editorUiAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "values": {
             "type": "array",
@@ -38291,6 +38374,39 @@
         },
         "additionalProperties": false
       },
+      "MemberTypeTreeItemResponseModel": {
+        "required": [
+          "hasChildren",
+          "icon",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "MemberValueModel": {
         "required": [
           "alias"
@@ -38563,6 +38679,18 @@
         },
         "additionalProperties": false
       },
+      "OEmbedResponseModel": {
+        "required": [
+          "markup"
+        ],
+        "type": "object",
+        "properties": {
+          "markup": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "ObjectTypeResponseModel": {
         "required": [
           "id"
@@ -38810,30 +38938,6 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/AuditLogResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedAuditLogWithUsernameResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/AuditLogWithUsernameResponseModel"
                 }
               ]
             }
@@ -39464,6 +39568,30 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/MemberResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedMemberTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MemberTypeTreeItemResponseModel"
                 }
               ]
             }
@@ -41773,6 +41901,7 @@
       "UpdateDataTypeRequestModel": {
         "required": [
           "editorAlias",
+          "editorUiAlias",
           "name",
           "values"
         ],
@@ -41787,8 +41916,7 @@
             "type": "string"
           },
           "editorUiAlias": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "values": {
             "type": "array",

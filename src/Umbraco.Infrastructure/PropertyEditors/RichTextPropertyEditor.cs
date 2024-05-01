@@ -274,6 +274,6 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         private BlockEditorValues<RichTextBlockValue, RichTextBlockLayoutItem> CreateBlockEditorValues()
-            => new(new RichTextEditorBlockDataConverter(), _contentTypeService, _logger);
+            => new(new RichTextEditorBlockDataConverter(_jsonSerializer), _contentTypeService, _logger);
     }
 }
