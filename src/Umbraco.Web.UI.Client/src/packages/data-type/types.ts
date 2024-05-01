@@ -5,7 +5,7 @@ export interface UmbDataTypeDetailModel {
 	unique: string;
 	name: string;
 	editorAlias: string | undefined;
-	editorUiAlias: string;
+	editorUiAlias: string | null;
 	values: Array<UmbDataTypePropertyModel>;
 }
 
