@@ -38,11 +38,8 @@ public abstract class ContentListViewServiceTestsBase : UmbracoIntegrationTest
             .WhereNotNull()
             .ToArray();
 
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual(expectedCollectionPropertyAliases.Length, actualCollectionPropertyAliases.Length);
-            Assert.IsTrue(expectedCollectionPropertyAliases.SequenceEqual(actualCollectionPropertyAliases));
-        });
+        Assert.AreEqual(expectedCollectionPropertyAliases.Length, actualCollectionPropertyAliases.Length);
+        Assert.IsTrue(expectedCollectionPropertyAliases.SequenceEqual(actualCollectionPropertyAliases));
     }
 
     private async Task<ListViewConfiguration> GetListViewConfigurationFromListViewDataType(Guid dataTypeKey)

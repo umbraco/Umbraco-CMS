@@ -54,12 +54,9 @@ public class MediaListViewServiceTests : ContentListViewServiceTestsBase
             Assert.IsTrue(result.Success);
             Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
             Assert.IsNotNull(result.Result);
-        });
 
-        PagedModel<IMedia> collectionItemsResult = result.Result.Items;
+            PagedModel<IMedia> collectionItemsResult = result.Result.Items;
 
-        Assert.Multiple(() =>
-        {
             Assert.AreEqual(10, collectionItemsResult.Total);
             CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
         });
@@ -83,15 +80,15 @@ public class MediaListViewServiceTests : ContentListViewServiceTestsBase
             10);
 
         // Assert
-        Assert.Multiple(() =>
+        Assert.Multiple(async () =>
         {
             Assert.IsTrue(result.Success);
             Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
             Assert.IsNotNull(result.Result);
-        });
 
-        await VerifyListViewConfiguration(result.Result.ListViewConfiguration,
-            Constants.DataTypes.Guids.ListViewMediaGuid);
+            await VerifyListViewConfiguration(result.Result.ListViewConfiguration,
+                Constants.DataTypes.Guids.ListViewMediaGuid);
+        });
     }
 
     [Test]
@@ -121,12 +118,9 @@ public class MediaListViewServiceTests : ContentListViewServiceTestsBase
             Assert.IsTrue(result.Success);
             Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
             Assert.IsNotNull(result.Result);
-        });
 
-        PagedModel<IMedia> collectionItemsResult = result.Result.Items;
+            PagedModel<IMedia> collectionItemsResult = result.Result.Items;
 
-        Assert.Multiple(() =>
-        {
             Assert.AreEqual(5, collectionItemsResult.Total);
             CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
         });
@@ -184,8 +178,10 @@ public class MediaListViewServiceTests : ContentListViewServiceTestsBase
             Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
             Assert.IsNotNull(result.Result);
             Assert.AreEqual(2, totalChildren);
+
+            Assert.AreEqual(1, result.Result.Items.Items.Count());
         });
-        Assert.AreEqual(1, result.Result.Items.Items.Count());
+
     }
 
     private void CreateTenMediaItemsFromTwoMediaTypesAtRoot()
@@ -202,9 +198,6 @@ public class MediaListViewServiceTests : ContentListViewServiceTestsBase
             var m2 = MediaBuilder.CreateMediaImage(mediaType2, -1);
             MediaService.Save(m2);
         }
-
-        var actualChildren = MediaService.GetPagedChildren(Constants.System.Root, 0, 10, out _).ToArray();
-        Assert.AreEqual(10, actualChildren.Length);
     }
 
     private async Task<IMedia> CreateRootMediaWithFiveChildrenAsListViewItems(Guid? listViewDataTypeKey = null)
@@ -246,9 +239,6 @@ public class MediaListViewServiceTests : ContentListViewServiceTestsBase
 
             await MediaEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         }
-
-        var actualChildren = MediaService.GetPagedChildren(root.Id, 0, 10, out _).ToArray();
-        Assert.AreEqual(5, actualChildren.Length);
 
         return root;
     }

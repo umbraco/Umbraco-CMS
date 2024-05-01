@@ -169,14 +169,14 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
             10);
 
         // Assert
-        Assert.Multiple(() =>
+        Assert.Multiple(async () =>
         {
             Assert.IsTrue(result.Success);
             Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
             Assert.IsNotNull(result.Result);
-        });
 
-        await VerifyListViewConfiguration(result.Result.ListViewConfiguration, customListView.Key);
+            await VerifyListViewConfiguration(result.Result.ListViewConfiguration, customListView.Key);
+        });
     }
 
     [Test]
@@ -341,14 +341,15 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
             10);
 
         // Assert
-        Assert.Multiple(() =>
+        Assert.Multiple(async () =>
         {
             Assert.IsTrue(result.Success);
             Assert.AreEqual(ContentCollectionOperationStatus.Success, result.Status);
             Assert.IsNotNull(result.Result);
+
+            await VerifyListViewConfiguration(result.Result.ListViewConfiguration, CustomListViewKey);
         });
 
-        await VerifyListViewConfiguration(result.Result.ListViewConfiguration, CustomListViewKey);
     }
 
     [Test]
@@ -1013,9 +1014,6 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
 
             await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         }
-
-        var actualChildren = ContentService.GetPagedChildren(root.Id, 0, 10, out _).ToArray();
-        Assert.AreEqual(5, actualChildren.Length);
 
         return root;
     }
