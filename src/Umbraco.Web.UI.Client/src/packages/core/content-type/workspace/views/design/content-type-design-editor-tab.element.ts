@@ -2,7 +2,7 @@ import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace
 import type { UmbContentTypeWorkspaceViewEditGroupElement } from './content-type-design-editor-group.element.js';
 import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbContentTypeContainerStructureHelper,
 	type UmbContentTypeModel,
@@ -160,16 +160,17 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 
 	render() {
 		return html`
-		${
-			this._hasProperties
-				? html`
-						<uui-box>
-							<umb-content-type-design-editor-properties
-								container-id=${this.containerId!}></umb-content-type-design-editor-properties>
-						</uui-box>
-					`
-				: ''
-		}
+			${
+				this.#containerId
+					? html`
+							<uui-box class="${this._hasProperties ? '' : 'opaque'}">
+								<umb-content-type-design-editor-properties
+									.containerId=${this.containerId}></umb-content-type-design-editor-properties>
+							</uui-box>
+						`
+					: nothing
+			}
+
 				<div class="container-list" ?sort-mode-active=${this._sortModeActive}>
 					${repeat(
 						this._groups,
@@ -222,6 +223,10 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			uui-box,
 			umb-content-type-design-editor-group {
 				margin-bottom: var(--uui-size-layout-1);
+			}
+			uui-box.opaque {
+				background-color: transparent;
+				border-color: transparent;
 			}
 
 			.container-list {
