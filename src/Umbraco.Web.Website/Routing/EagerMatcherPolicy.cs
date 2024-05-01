@@ -1,17 +1,60 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
 using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Web.Website.Routing;
 
-public class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
+
+/**
+ * A matcher policy that discards the catch-all (slug) route if there are any other valid routes with a lower order.
+ *
+ * The purpose of this is to skip our expensive <see cref="UmbracoRouteValueTransformer"/> if it's not required,
+ * for instance if there's a statically routed endpoint registered before the dynamic route,
+ * for more information see: https://github.com/umbraco/Umbraco-CMS/issues/16015.
+ * The core reason why this is necessary is that ALL routes get evaluated:
+ * "
+ * all routes get evaluated, they get to produce candidates and then the best candidate is selected.
+ * Since you have a dynamic route, it needs to run to produce the final endpoints and
+ * then those are ranked in along with the rest of the candidates to choose the final endpoint.
+ * "
+ * From: https://github.com/dotnet/aspnetcore/issues/45175#issuecomment-1322497958
+ *
+ */
+
+internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
 {
     // We want this to run as the very first policy, so we can discard the UmbracoRouteValueTransformer before the framework runs it.
     public override int Order => int.MinValue + 10;
 
-    // We want to run this against all endpoints.
-    public bool AppliesToEndpoints(IReadOnlyList<Endpoint> endpoints) => true;
+    // We know we don't have to run this matcher against the backoffice endpoints.
+    public bool AppliesToEndpoints(IReadOnlyList<Endpoint> endpoints)
+    {
+        // If there's only one candidate it's the dynamic route
+        if (endpoints.Count < 2)
+        {
+            return true;
+        }
+
+        var applies = true;
+        foreach (Endpoint endpoint in endpoints)
+        {
+            ControllerActionDescriptor? actionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
+
+            var namespaceName = actionDescriptor?.ControllerTypeInfo.Namespace;
+
+            if (namespaceName is null || namespaceName.StartsWith("Umbraco.Cms") is false || namespaceName.StartsWith("Umbraco.Cms.Web.UI"))
+            {
+                continue;
+            }
+
+            applies = false;
+            break;
+        }
+
+        return applies;
+    }
 
     public Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
     {
@@ -64,7 +107,7 @@ public class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
         }
 
         // Invalidate the dynamic route if another route has a lower order.
-        // This means that if you register your static route after the dynamic "catch all" route, the dynamic route will take precedence
+        // This means that if you register your static route after the dynamic route, the dynamic route will take precedence
         // This more closely resembles the existing behaviour.
         if (dynamicEndpoint is not null && dynamicId is not null && dynamicEndpoint.Order > lowestOrder)
         {
