@@ -90,7 +90,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 		);
 
 		if (data) {
-			return this.read(data.id);
+			return this.read(data);
 		}
 
 		return { error };
