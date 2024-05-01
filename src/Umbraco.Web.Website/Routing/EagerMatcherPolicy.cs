@@ -39,6 +39,18 @@ public class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
 
             if (routeEndpoint.Order < lowestOrder)
             {
+                // We have to ensure that the route is valid for the current request method.
+                // This is because attribute routing will always have an order of 0.
+                // This means that you could attribute route a POST to /example, but also have an umbraco page at /example
+                // This would then result in a 404, because we'd see the attribute route with order 0, and always consider that the lowest order
+                // We'd then disable the dynamic endpoint since another endpoint has a lower order, and end up with only 1 invalid endpoint.
+                // (IsValidCandidate does not take this into account since the candidate itself is still valid)
+                HttpMethodMetadata? methodMetaData = routeEndpoint.Metadata.GetMetadata<HttpMethodMetadata>();
+                if (methodMetaData?.HttpMethods.Contains(httpContext.Request.Method) is false)
+                {
+                    continue;
+                }
+
                 lowestOrder = routeEndpoint.Order;
             }
 
@@ -51,7 +63,9 @@ public class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
             dynamicId = i;
         }
 
-        // Invalidate the dynamic route if a static route has a lower order.
+        // Invalidate the dynamic route if another route has a lower order.
+        // This means that if you register your static route after the dynamic "catch all" route, the dynamic route will take precedence
+        // This more closely resembles the existing behaviour.
         if (dynamicEndpoint is not null && dynamicId is not null && dynamicEndpoint.Order > lowestOrder)
         {
             candidates.SetValidity(dynamicId.Value, false);
