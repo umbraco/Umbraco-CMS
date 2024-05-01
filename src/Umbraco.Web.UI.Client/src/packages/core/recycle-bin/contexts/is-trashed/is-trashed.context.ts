@@ -1,5 +1,4 @@
 import { UMB_IS_TRASHED_CONTEXT } from './is-trashed.context-token.js';
-import type { IUmbIsTrashedContext } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -11,7 +10,7 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
  * @extends {UmbContextBase<UmbIsTrashedContext>}
  * @implements {UmbIsTrashedContext}
  */
-export class UmbIsTrashedContext extends UmbContextBase<IUmbIsTrashedContext> implements IUmbIsTrashedContext {
+export class UmbIsTrashedContext extends UmbContextBase<UmbIsTrashedContext> {
 	#isTrashed = new UmbBooleanState(false);
 	isTrashed = this.#isTrashed.asObservable();
 

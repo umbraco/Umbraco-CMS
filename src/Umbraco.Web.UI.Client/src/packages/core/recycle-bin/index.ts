@@ -15,3 +15,6 @@ export type {
 
 export type { IUmbIsTrashedContext } from './contexts/is-trashed/index.js';
 export { UmbIsTrashedContext, UMB_IS_TRASHED_CONTEXT } from './contexts/is-trashed/index.js';
+
+export { UMB_IS_NOT_TRASHED_CONDITION_ALIAS } from './conditions/is-not-trashed/constants.js';
+export { UMB_IS_TRASHED_CONDITION_ALIAS } from './conditions/is-trashed/constants.js';
