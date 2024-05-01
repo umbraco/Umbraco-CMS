@@ -29,4 +29,16 @@
       </tr>
     </tbody>
   </table>
+
+  <umb-empty-state ng-hide="vm.logs.length" position="center">
+    <localize key="content_listViewNoItems">There are no items show in the list.</localize>
+  </umb-empty-state>
+
+  <umb-pagination
+    page-number="vm.pagination.pageNumber"
+    total-pages="vm.pagination.totalPages"
+    on-next="vm.nextPage"
+    on-prev="vm.previousPage"
+    on-go-to-page="vm.goToPage">
+  </umb-pagination>
 </div>
