@@ -6,6 +6,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '@umbraco-cms/backoffice/culture';
 import type { UmbWebhookDetailModel } from '@umbraco-cms/backoffice/webhook';
 
+import '../../../components/input-webhook-headers-view.element.js';
+
 @customElement('umb-webhook-details-workspace-view')
 export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
@@ -46,7 +48,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 					<uui-toggle slot="editor"></uui-toggle>
 				</umb-property-layout>
 				<umb-property-layout label="Headers" description="Custom headers to include in the webhook request.">
-					<uui-input slot="editor"></uui-input>
+					<umb-input-webhook-headers slot="editor"></umb-input-webhook-headers>
 				</umb-property-layout>
 			</uui-box>
 		`;
@@ -58,6 +60,13 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 			:host {
 				display: block;
 				padding: var(--uui-size-space-6);
+			}
+
+			umb-property-layout:first-child {
+				padding-top: 0;
+			}
+			umb-property-layout:last-child {
+				padding-bottom: 0;
 			}
 		`,
 	];
