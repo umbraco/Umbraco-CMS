@@ -92,8 +92,24 @@ export class UmbWebhookWorkspaceContext
 		this.#data.update({ name });
 	}
 
+	setEvents(events: string[]) {
+		this.#data.update({ events });
+	}
+
 	setHeaders(headers: { [key: string]: string }) {
 		this.#data.update({ headers });
+	}
+
+	setTypes(types: string[]) {
+		this.#data.update({ types });
+	}
+
+	setUrl(url: string) {
+		this.#data.update({ url });
+	}
+
+	setEnabled(enabled: boolean) {
+		this.#data.update({ enabled });
 	}
 
 	async submit() {

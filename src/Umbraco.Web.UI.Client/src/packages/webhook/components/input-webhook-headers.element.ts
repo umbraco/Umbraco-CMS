@@ -1,13 +1,12 @@
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state, property, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '@umbraco-cms/backoffice/culture';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-webhook-headers')
-export class UmbInputWebhookHeadersElement extends UmbLitElement implements UmbWorkspaceViewElement {
+export class UmbInputWebhookHeadersElement extends UmbLitElement {
 	@property()
 	public headers: { [key: string]: string } = {};
 
@@ -16,6 +15,8 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement implements UmbW
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
+
+		if (!this.headers) return;
 
 		this._headers = Object.entries(this.headers).map(([name, value]) => ({ name, value }));
 	}
