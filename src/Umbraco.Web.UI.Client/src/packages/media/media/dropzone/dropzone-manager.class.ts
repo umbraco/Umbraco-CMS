@@ -37,31 +37,20 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	#mediaDetailRepository = new UmbMediaDetailRepository(this);
 	#mediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 
-	#parentUnique: string | null;
-
-	constructor(host: UmbControllerHost, parentUnique: string | null) {
+	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#host = host;
-		this.#parentUnique = parentUnique;
 	}
 
-	public setParentUnique(parentUnique: string | null) {
-		this.#parentUnique = parentUnique;
-	}
-	public getParentUnique() {
-		return this.#parentUnique;
-	}
-
-	public async dropOneFile(file: File) {
+	public async dropOneFile(file: File, parentUnique: string | null) {
 		const extension = this.#getExtensionFromMimeType(file.type);
 
 		if (!extension) {
-			// Folders have no extension on file drop. We assume it is a folder being uploaded.
-			this.#handleFolder(file);
+			// TODO Folders have no extension on file drop. Assume it is a folder being uploaded.
 			return;
 		}
 
-		const optionsArray = await this.#buildOptionsArrayFrom([extension]);
+		const optionsArray = await this.#buildOptionsArrayFrom([extension], parentUnique);
 		if (!optionsArray.length) throw new Error('File not allowed here.'); // Parent does not allow this file type here.
 
 		const mediaTypes = optionsArray[0].mediaTypes;
@@ -89,11 +78,12 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		await this.#uploadOne(uploadableFile);
 	}
 
-	public async dropFiles(files: Array<File>) {
+	public async dropFiles(files: Array<File>, parentUnique: string | null) {
 		// removes duplicate file types so we don't call endpoints unnecessarily when building options.
 		const mimeTypes = [...new Set(files.map<string>((file) => file.type))];
 		const optionsArray = await this.#buildOptionsArrayFrom(
 			mimeTypes.map((mimetype) => this.#getExtensionFromMimeType(mimetype)),
+			parentUnique,
 		);
 
 		if (!optionsArray.length) return; // None of the files are allowed in current dropzone.
@@ -105,7 +95,6 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			const extension = this.#getExtensionFromMimeType(file.type);
 			if (!extension) {
 				// Folders have no extension on file drop. We assume it is a folder being uploaded.
-				this.#handleFolder(file);
 				return;
 			}
 			const options = optionsArray.find((option) => option.fileExtension === extension)?.mediaTypes;
@@ -125,9 +114,12 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		return getExtensionFromMime(mimeType) || '';
 	}
 
-	async #buildOptionsArrayFrom(fileExtensions: Array<string>): Promise<Array<UmbUploadableFileExtensionModel>> {
+	async #buildOptionsArrayFrom(
+		fileExtensions: Array<string>,
+		parentUnique: string | null,
+	): Promise<Array<UmbUploadableFileExtensionModel>> {
 		// Getting all media types allowed in our current position based on parent unique.
-		const { data: allAllowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(this.#parentUnique);
+		const { data: allAllowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(parentUnique);
 		if (!allAllowedMediaTypes?.items.length) return [];
 
 		const allowedByParent = allAllowedMediaTypes.items;
@@ -158,10 +150,6 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 	async #uploadOne(file: UmbUploadableFileModel) {
 		await this.#tempFileManager.uploadOne(file);
-	}
-
-	async #handleFolder(file: File) {
-		throw new Error('Not implemented: Folders coming soon!');
 	}
 
 	private _reset() {
