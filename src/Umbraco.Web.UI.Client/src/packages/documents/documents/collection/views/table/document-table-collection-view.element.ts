@@ -1,4 +1,5 @@
 import { getPropertyValueByAlias } from '../index.js';
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
 import type { UmbDocumentCollectionItemModel } from '../../types.js';
 import type { UmbDocumentCollectionContext } from '../../document-collection.context.js';
@@ -150,7 +151,8 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			const data =
 				this._tableColumns?.map((column) => {
 					const editPath = this.#routeBuilder
-						? this.#routeBuilder({ entityType: item.entityType }) + `edit/${item.unique}`
+						? this.#routeBuilder({ entityType: item.entityType }) +
+							UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique })
 						: '';
 
 					return {

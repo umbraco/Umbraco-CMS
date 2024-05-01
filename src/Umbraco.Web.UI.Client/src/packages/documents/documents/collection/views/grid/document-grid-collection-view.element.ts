@@ -1,4 +1,5 @@
 import { getPropertyValueByAlias } from '../index.js';
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -75,10 +76,12 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		);
 	}
 
-	#onOpen(event: Event, id: string) {
+	#onOpen(event: Event, unique: string) {
 		event.preventDefault();
 		event.stopPropagation();
-		window.history.pushState(null, '', this._editDocumentPath + 'edit/' + id);
+
+		const url = this._editDocumentPath + UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique });
+		window.history.pushState(null, '', url);
 	}
 
 	#onSelect(item: UmbDocumentCollectionItemModel) {
