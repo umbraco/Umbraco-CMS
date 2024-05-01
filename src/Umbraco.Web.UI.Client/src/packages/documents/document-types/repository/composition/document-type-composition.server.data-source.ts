@@ -1,7 +1,7 @@
 import type {
 	UmbDocumentTypeCompositionCompatibleModel,
 	UmbDocumentTypeCompositionReferenceModel,
-	UmbDocumentTypeCompositionRequestModel,
+	UmbDocumentTypeAvailableCompositionRequestModel,
 } from '../../types.js';
 import {
 	type DocumentTypeCompositionRequestModel,
