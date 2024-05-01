@@ -3,11 +3,7 @@ import type { UmbMediaDetailModel } from '../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	type UmbAllowedMediaTypeModel,
-	UmbMediaTypeStructureRepository,
-	getMediaTypeByFileMimeType,
-} from '@umbraco-cms/backoffice/media-type';
+import { type UmbAllowedMediaTypeModel, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import {
 	UmbTemporaryFileManager,
 	type UmbTemporaryFileQueueModel,
@@ -66,11 +62,12 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 		if (!data) return;
 		this.#allowedMediaTypes = data.items;
 	}
-
-	#getMediaTypeFromMime(mimetype: string): UmbAllowedMediaTypeModel {
-		const mediaTypeName = getMediaTypeByFileMimeType(mimetype);
-		return this.#allowedMediaTypes.find((type) => type.name === mediaTypeName)!;
+	/*
+	#getMediaTypeFromMime(mimetype: string): UmbAllowedMediaTypeModel | undefined {
+		//const mediaTypeName = getMediaTypeByFileMimeType(mimetype);
+		//return this.#allowedMediaTypes.find((type) => type.name === mediaTypeName)!;
 	}
+	*/
 
 	async #uploadHandler(files: Array<File>) {
 		const queue = files.map((file): UmbTemporaryFileQueueModel => ({ file }));
@@ -84,11 +81,11 @@ export class UmbDropzoneMediaElement extends UmbLitElement {
 		const uploads = await this.#uploadHandler(files);
 
 		for (const upload of uploads) {
-			const mediaType = this.#getMediaTypeFromMime(upload.file.type);
+			//const mediaType = this.#getMediaTypeFromMime(upload.file.type);
 
 			const preset: Partial<UmbMediaDetailModel> = {
 				mediaType: {
-					unique: mediaType.unique,
+					unique: /*mediaType.unique*/ '123',
 					collection: null,
 				},
 				variants: [

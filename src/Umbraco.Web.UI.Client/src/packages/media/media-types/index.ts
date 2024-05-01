@@ -7,6 +7,4 @@ export * from './repository/index.js';
 export * from './tree/types.js';
 export * from './types.js';
 
-export * from './utils/index.js';
-
 export { UMB_MEDIA_TYPE_PICKER_MODAL } from './tree/index.js';

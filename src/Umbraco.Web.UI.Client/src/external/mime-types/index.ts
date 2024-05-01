@@ -1,1 +1,1 @@
-export * as mime from 'mime-types';
+export { extension as mimeToExtension } from 'mime-types';

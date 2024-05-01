@@ -1,91 +1,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { AuditLogData, CultureData, DataTypeData, DictionaryData, DocumentBlueprintData, DocumentTypeData, DocumentVersionData, DocumentData, DynamicRootData, HealthCheckData, HelpData, IndexerData, InstallData, LanguageData, LogViewerData, ManifestData, MediaTypeData, MediaData, MemberGroupData, MemberTypeData, MemberData, ModelsBuilderData, ObjectTypesData, PackageData, PartialViewData, PreviewData, ProfilingData, PropertyTypeData, PublishedCacheData, RedirectManagementData, RelationTypeData, RelationData, ScriptData, SearcherData, SecurityData, SegmentData, ServerData, StaticFileData, StylesheetData, TagData, TelemetryData, TemplateData, TemporaryFileData, UpgradeData, UserDataData, UserGroupData, UserData, WebhookData } from './models';
-
-export class AuditLogService {
-
-	/**
-	 * @returns unknown Success
-	 * @throws ApiError
-	 */
-	public static getAuditLog(data: AuditLogData['payloads']['GetAuditLog'] = {}): CancelablePromise<AuditLogData['responses']['GetAuditLog']> {
-		const {
-                    
-                    orderDirection,
-sinceDate,
-skip,
-take
-                } = data;
-		return __request(OpenAPI, {
-			method: 'GET',
-			url: '/umbraco/management/api/v1/audit-log',
-			query: {
-				orderDirection, sinceDate, skip, take
-			},
-			errors: {
-				401: `The resource is protected and requires an authentication token`,
-			},
-		});
-	}
-
-	/**
-	 * @returns unknown Success
-	 * @throws ApiError
-	 */
-	public static getAuditLogById(data: AuditLogData['payloads']['GetAuditLogById']): CancelablePromise<AuditLogData['responses']['GetAuditLogById']> {
-		const {
-                    
-                    id,
-orderDirection,
-sinceDate,
-skip,
-take
-                } = data;
-		return __request(OpenAPI, {
-			method: 'GET',
-			url: '/umbraco/management/api/v1/audit-log/{id}',
-			path: {
-				id
-			},
-			query: {
-				orderDirection, sinceDate, skip, take
-			},
-			errors: {
-				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
-			},
-		});
-	}
-
-	/**
-	 * @returns unknown Success
-	 * @throws ApiError
-	 */
-	public static getAuditLogTypeByLogType(data: AuditLogData['payloads']['GetAuditLogTypeByLogType']): CancelablePromise<AuditLogData['responses']['GetAuditLogTypeByLogType']> {
-		const {
-                    
-                    logType,
-sinceDate,
-skip,
-take
-                } = data;
-		return __request(OpenAPI, {
-			method: 'GET',
-			url: '/umbraco/management/api/v1/audit-log/type/{logType}',
-			path: {
-				logType
-			},
-			query: {
-				sinceDate, skip, take
-			},
-			errors: {
-				401: `The resource is protected and requires an authentication token`,
-			},
-		});
-	}
-
-}
+import type { CultureData, DataTypeData, DictionaryData, DocumentBlueprintData, DocumentTypeData, DocumentVersionData, DocumentData, DynamicRootData, HealthCheckData, HelpData, IndexerData, InstallData, LanguageData, LogViewerData, ManifestData, MediaTypeData, MediaData, MemberGroupData, MemberTypeData, MemberData, ModelsBuilderData, ObjectTypesData, OembedData, PackageData, PartialViewData, PreviewData, ProfilingData, PropertyTypeData, PublishedCacheData, RedirectManagementData, RelationTypeData, RelationData, ScriptData, SearcherData, SecurityData, SegmentData, ServerData, StaticFileData, StylesheetData, TagData, TelemetryData, TemplateData, TemporaryFileData, UpgradeData, UserDataData, UserGroupData, UserData, WebhookData } from './models';
 
 export class CultureService {
 
@@ -1983,6 +1899,35 @@ requestBody
 				401: `The resource is protected and requires an authentication token`,
 				403: `The authenticated user do not have access to this resource`,
 				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getDocumentByIdAuditLog(data: DocumentData['payloads']['GetDocumentByIdAuditLog']): CancelablePromise<DocumentData['responses']['GetDocumentByIdAuditLog']> {
+		const {
+                    
+                    id,
+orderDirection,
+sinceDate,
+skip,
+take
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/document/{id}/audit-log',
+			path: {
+				id
+			},
+			query: {
+				orderDirection, sinceDate, skip, take
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4214,6 +4159,35 @@ requestBody
 	}
 
 	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getMediaByIdAuditLog(data: MediaData['payloads']['GetMediaByIdAuditLog']): CancelablePromise<MediaData['responses']['GetMediaByIdAuditLog']> {
+		const {
+                    
+                    id,
+orderDirection,
+sinceDate,
+skip,
+take
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/media/{id}/audit-log',
+			path: {
+				id
+			},
+			query: {
+				orderDirection, sinceDate, skip, take
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+			},
+		});
+	}
+
+	/**
 	 * @returns string Success
 	 * @throws ApiError
 	 */
@@ -5408,6 +5382,34 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
+			},
+		});
+	}
+
+}
+
+export class OEmbedService {
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getOembedQuery(data: OembedData['payloads']['GetOembedQuery'] = {}): CancelablePromise<OembedData['responses']['GetOembedQuery']> {
+		const {
+                    
+                    url,
+maxWidth,
+maxHeight
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/oembed/query',
+			query: {
+				url, maxWidth, maxHeight
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7869,6 +7871,32 @@ take
 }
 
 export class UserGroupService {
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getFilterUserGroup(data: UserGroupData['payloads']['GetFilterUserGroup'] = {}): CancelablePromise<UserGroupData['responses']['GetFilterUserGroup']> {
+		const {
+                    
+                    skip,
+take,
+filter
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/filter/user-group',
+			query: {
+				skip, take, filter
+			},
+			errors: {
+				400: `Bad Request`,
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
 
 	/**
 	 * @returns unknown Success

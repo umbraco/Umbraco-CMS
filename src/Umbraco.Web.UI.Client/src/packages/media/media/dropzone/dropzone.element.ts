@@ -1,5 +1,6 @@
-import { UmbMediaDetailRepository } from '../../repository/index.js';
-import type { UmbMediaDetailModel } from '../../types.js';
+import { UmbMediaDetailRepository } from '../repository/index.js';
+import type { UmbMediaDetailModel } from '../types.js';
+import { UmbDropzoneManager } from './dropzone-manager.class.js';
 import { css, html, customElement, state, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -7,7 +8,6 @@ import {
 	type UmbAllowedMediaTypeModel,
 	UmbMediaTypeStructureRepository,
 	UmbMediaTypeDetailRepository,
-	getExtensionFromMime,
 } from '@umbraco-cms/backoffice/media-type';
 import {
 	UmbTemporaryFileManager,
@@ -35,13 +35,22 @@ export class UmbDropzoneElement extends UmbLitElement {
 	#mediaDetailRepository = new UmbMediaDetailRepository(this);
 	#mediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 
+	#parentUnique: string | null = null;
+	#dropzoneManager = new UmbDropzoneManager(this, null);
+
 	#allowedMediaTypes: Array<UmbAllowedMediaTypeModel> = [];
 
 	@state()
 	private queue: Array<UmbTemporaryFileModel> = [];
 
 	@property({ attribute: false })
-	parentUnique: string | null = null;
+	public set parentUnique(value: string | null) {
+		this.#parentUnique = value;
+		//this.#dropzoneManager.setParentUnique(value);
+	}
+	public get parentUnique(): string | null {
+		return this.#parentUnique;
+	}
 
 	public browse() {
 		const element = this.shadowRoot?.querySelector('#dropzone') as UUIFileDropzoneElement;
@@ -92,17 +101,13 @@ export class UmbDropzoneElement extends UmbLitElement {
 		const files: Array<File> = event.detail.files;
 		if (!files.length) return;
 
-		this.#allowedMediaTypes = await this.#getAllowedMediaTypes();
-		if (!this.#allowedMediaTypes.length) return;
-		// If we have files that are not allowed to be uploaded, we show those in a dialog to the user?
-
 		if (files.length === 1) {
-			this.#handleOneFile(files[0]);
+			this.#dropzoneManager.dropOneFile(files[0]);
 		} else {
-			this.#handleMultipleFiles(files);
+			this.#dropzoneManager.dropFiles(files);
 		}
 	}
-
+	/*
 	async #handleOneFile(file: File) {
 		const extension = getExtensionFromMime(file.type);
 		if (!extension) return; // Extension doesn't exist.
@@ -201,6 +206,7 @@ export class UmbDropzoneElement extends UmbLitElement {
 		return [...folders, ...uploaded];
 	}
 
+	
 	async #onFileUpload(event: UUIFileDropzoneEvent) {
 		const files: Array<File> = event.detail.files;
 
@@ -208,7 +214,7 @@ export class UmbDropzoneElement extends UmbLitElement {
 		const uploads = await this.#uploadHandler(files);
 
 		for (const upload of uploads) {
-			const mediaType = /*this.#getMediaTypeFromMime(upload.file.type); */ '' as any;
+			const mediaType = this.#getMediaTypeFromMime(upload.file.type);
 			const value = mediaType.unique === UmbMediaTypeFileType.IMAGE ? { src: upload.unique } : upload.unique;
 
 			const preset: Partial<UmbMediaDetailModel> = {
@@ -246,11 +252,13 @@ export class UmbDropzoneElement extends UmbLitElement {
 		}
 	}
 
+	*/
+
 	render() {
 		return html`<uui-file-dropzone
 			id="dropzone"
 			multiple
-			@change=${this.#onFileUpload}
+			@change=${this.#onDropFiles}
 			label="${this.localize.term('media_dragAndDropYourFilesIntoTheArea')}"
 			accept=""></uui-file-dropzone>`;
 	}

@@ -1,4 +1,5 @@
 import { manifests as collectionManifests } from './collection/manifests.js';
+import { manifests as dropzoneManifests } from './dropzone/manifests.js';
 import { manifests as entityActionsManifests } from './entity-actions/manifests.js';
 import { manifests as entityBulkActionsManifests } from './entity-bulk-actions/manifests.js';
 import { manifests as menuManifests } from './menu/manifests.js';
@@ -12,6 +13,7 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
 	...collectionManifests,
+	...dropzoneManifests,
 	...entityActionsManifests,
 	...entityBulkActionsManifests,
 	...menuManifests,
