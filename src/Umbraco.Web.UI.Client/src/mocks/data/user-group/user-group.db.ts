@@ -78,6 +78,7 @@ const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupMo
 
 const detailResponseMapper = (item: UmbMockUserGroupModel): UserGroupResponseModel => {
 	return {
+		alias: item.alias,
 		documentRootAccess: item.documentRootAccess,
 		documentStartNode: item.documentStartNode,
 		hasAccessToAllLanguages: item.hasAccessToAllLanguages,
