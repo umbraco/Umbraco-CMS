@@ -55,7 +55,7 @@ export class UmbDocumentTypeCompositionServerDataSource implements UmbContentTyp
 	 * @return {*}
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
-	async availableCompositions(args: UmbDocumentTypeCompositionRequestModel) {
+	async availableCompositions(args: UmbDocumentTypeAvailableCompositionRequestModel) {
 		const requestBody: DocumentTypeCompositionRequestModel = {
 			id: args.unique,
 			isElement: args.isElement,
