@@ -1,3 +1,4 @@
+import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbMediaCollectionItemModel } from '../../types.js';
 import type { UmbMediaCollectionContext } from '../../media-collection.context.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -59,10 +60,12 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		);
 	}
 
-	#onOpen(event: Event, id: string) {
+	#onOpen(event: Event, unique: string) {
 		event.preventDefault();
 		event.stopPropagation();
-		window.history.pushState(null, '', this._editMediaPath + 'edit/' + id);
+
+		const url = this._editMediaPath + UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({ unique });
+		window.history.pushState(null, '', url);
 	}
 
 	#onSelect(item: UmbMediaCollectionItemModel) {

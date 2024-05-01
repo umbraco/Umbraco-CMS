@@ -1,3 +1,4 @@
+import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
 import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from '../../types.js';
 import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
@@ -147,7 +148,8 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			const data =
 				this._tableColumns?.map((column) => {
 					const editPath = this.#routeBuilder
-						? this.#routeBuilder({ entityType: item.entityType }) + `edit/${item.unique}`
+						? this.#routeBuilder({ entityType: item.entityType }) +
+							UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique })
 						: '';
 
 					return {
