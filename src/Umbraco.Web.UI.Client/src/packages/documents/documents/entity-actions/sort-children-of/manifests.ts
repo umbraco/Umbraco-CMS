@@ -24,6 +24,9 @@ export const manifests: Array<ManifestTypes> = [
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_SORT],
 			},
+			{
+				alias: 'Umb.Condition.IsNotTrashed',
+			},
 		],
 	},
 ];

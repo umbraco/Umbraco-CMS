@@ -21,6 +21,9 @@ const entityActions: Array<ManifestTypes> = [
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES],
 			},
+			{
+				alias: 'Umb.Condition.IsNotTrashed',
+			},
 		],
 	},
 ];

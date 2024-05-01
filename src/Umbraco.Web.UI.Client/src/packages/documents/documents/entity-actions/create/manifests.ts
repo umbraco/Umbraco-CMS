@@ -21,7 +21,7 @@ const entityActions: Array<ManifestTypes> = [
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
 			},
 			{
-				alias: 'Umb.Condition.IsTrashed',
+				alias: 'Umb.Condition.IsNotTrashed',
 			},
 		],
 	},

@@ -16,6 +16,11 @@ export const manifests: Array<ManifestTypes> = [
 			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 			recycleBinRepositoryAlias: UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.IsNotTrashed',
+			},
+		],
 	},
 	{
 		type: 'entityAction',
@@ -28,6 +33,11 @@ export const manifests: Array<ManifestTypes> = [
 			recycleBinRepositoryAlias: UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 			pickerModal: UMB_DOCUMENT_PICKER_MODAL,
 		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.IsTrashed',
+			},
+		],
 	},
 	{
 		type: 'entityAction',
