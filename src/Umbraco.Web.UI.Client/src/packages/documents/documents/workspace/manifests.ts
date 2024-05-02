@@ -4,7 +4,7 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 } from '../user-permissions/index.js';
-import { UMB_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
@@ -104,7 +104,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 				match: workspace.alias,
 			},
 			{
-				alias: UMB_IS_NOT_TRASHED_CONDITION_ALIAS,
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -126,7 +126,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 				match: workspace.alias,
 			},
 			{
-				alias: UMB_IS_NOT_TRASHED_CONDITION_ALIAS,
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -146,7 +146,7 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 				match: workspace.alias,
 			},
 			{
-				alias: UMB_IS_NOT_TRASHED_CONDITION_ALIAS,
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -171,7 +171,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH],
 			},
 			{
-				alias: UMB_IS_NOT_TRASHED_CONDITION_ALIAS,
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -193,7 +193,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
 			},
 			{
-				alias: UMB_IS_NOT_TRASHED_CONDITION_ALIAS,
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -215,7 +215,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
 			},
 			{
-				alias: UMB_IS_NOT_TRASHED_CONDITION_ALIAS,
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},

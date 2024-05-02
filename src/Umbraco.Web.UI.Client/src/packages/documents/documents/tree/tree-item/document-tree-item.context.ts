@@ -1,10 +1,10 @@
 import type { UmbDocumentTreeItemModel } from '../types.js';
 import { UmbDefaultTreeItemContext } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbIsTrashedContext } from '@umbraco-cms/backoffice/recycle-bin';
+import { UmbEntityIsTrashedContext } from '@umbraco-cms/backoffice/recycle-bin';
 
 export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<UmbDocumentTreeItemModel> {
-	#isTrashedContext = new UmbIsTrashedContext(this);
+	#isTrashedContext = new UmbEntityIsTrashedContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host);

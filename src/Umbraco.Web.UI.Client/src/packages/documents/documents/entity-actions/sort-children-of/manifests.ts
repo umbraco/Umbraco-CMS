@@ -1,4 +1,4 @@
-import { UMB_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UMB_DOCUMENT_TREE_REPOSITORY_ALIAS } from '../../tree/index.js';
@@ -26,7 +26,7 @@ export const manifests: Array<ManifestTypes> = [
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_SORT],
 			},
 			{
-				alias: UMB_IS_NOT_TRASHED_CONDITION_ALIAS,
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
