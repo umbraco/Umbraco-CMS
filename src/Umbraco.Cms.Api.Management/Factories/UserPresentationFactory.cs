@@ -4,6 +4,7 @@ using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Api.Management.ViewModels.User.Item;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
@@ -82,6 +83,15 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         return responseModel;
     }
+
+    public UserItemResponseModel CreateItemResponseModel(IUser user) =>
+        new()
+        {
+            Id = user.Key,
+            Name = user.Name ?? user.Username,
+            AvatarUrls = user.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator)
+                .Select(url => _absoluteUrlBuilder.ToAbsoluteUrl(url).ToString()),
+        };
 
     public async Task<UserCreateModel> CreateCreationModelAsync(CreateUserRequestModel requestModel)
     {
