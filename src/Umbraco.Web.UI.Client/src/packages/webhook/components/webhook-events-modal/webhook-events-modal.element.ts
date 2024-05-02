@@ -1,4 +1,5 @@
-import { UmbWebhookDetailRepository } from '../../repository/index.js';
+import { UmbWebhookEventRepository } from '../../repository/event/webhook-event.repository.js';
+import type { UmbWebhookEventModel } from '../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -12,12 +13,12 @@ export class UmbWebhookEventsModalElement extends UmbLitElement {
 	modalContext?: UmbModalContext;
 
 	@property({ attribute: false })
-	events: Array<string> = [];
+	events: Array<UmbWebhookEventModel> = [];
 
 	@state()
-	_events: Array<string> = [];
+	_events: Array<UmbWebhookEventModel> = [];
 
-	#webhookRepository = new UmbWebhookDetailRepository(this);
+	#repository = new UmbWebhookEventRepository(this);
 
 	#selectionManager = new UmbSelectionManager(this);
 
@@ -31,7 +32,7 @@ export class UmbWebhookEventsModalElement extends UmbLitElement {
 		super.connectedCallback();
 		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(true);
-		this.#selectionManager.setSelection(this.events);
+		this.#selectionManager.setSelection(this.events.map((item) => item.alias));
 
 		this.observe(this.#selectionManager.selection, (selection) => {
 			this.modalContext?.setValue(selection);
@@ -39,7 +40,7 @@ export class UmbWebhookEventsModalElement extends UmbLitElement {
 	}
 
 	async #requestEvents() {
-		const { data } = await this.#webhookRepository.requestEvents();
+		const { data } = await this.#repository.requestEvents();
 
 		if (!data) return;
 
@@ -59,14 +60,14 @@ export class UmbWebhookEventsModalElement extends UmbLitElement {
 			<uui-box>
 				${repeat(
 					this._events,
-					(item) => item,
+					(item) => item.alias,
 					(item) => html`
 						<uui-menu-item
-							label=${item}
+							label=${item.eventName}
 							selectable
-							@selected=${() => this.#selectionManager.select(item)}
-							@deselected=${() => this.#selectionManager.deselect(item)}
-							?selected=${this.events.includes(item)}>
+							@selected=${() => this.#selectionManager.select(item.alias)}
+							@deselected=${() => this.#selectionManager.deselect(item.alias)}
+							?selected=${this.events.includes(item)}></uui-menu-item>
 							<uui-icon slot="icon" name="icon-globe"></uui-icon>
 						</uui-menu-item>
 					`,
