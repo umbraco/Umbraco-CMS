@@ -44,6 +44,17 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 		}
 	}
 
+	#addHeader() {
+		this._headers = [...this._headers, { name: '', value: '' }];
+
+		requestAnimationFrame(() => {
+			// Focus newly added input
+			const inputs = this.shadowRoot?.querySelectorAll('input[type="text"]');
+			const lastInput = inputs?.[inputs.length - 2] as HTMLInputElement | undefined;
+			lastInput?.focus();
+		});
+	}
+
 	#removeHeader(index: number) {
 		this._headers = this._headers.filter((_, i) => i !== index);
 	}
@@ -95,10 +106,6 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 				<option value="application/json"></option>
 			</datalist>
 		`;
-	}
-
-	#addHeader() {
-		this._headers = [...this._headers, { name: '', value: '' }];
 	}
 
 	render() {
