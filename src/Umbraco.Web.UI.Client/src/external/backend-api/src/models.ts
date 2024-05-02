@@ -1811,6 +1811,11 @@ export type PagedUserResponseModel = {
 items: Array<UserResponseModel>
     };
 
+export type PagedWebhookEventModel = {
+        total: number
+items: Array<WebhookEventModel>
+    };
+
 export type PagedWebhookResponseModel = {
         total: number
 items: Array<WebhookResponseModel>
@@ -2674,6 +2679,12 @@ export type VerifyResetPasswordResponseModel = {
 export type VerifyResetPasswordTokenRequestModel = {
         user: ReferenceByIdModel
 resetCode: string
+    };
+
+export type WebhookEventModel = {
+        eventName: string
+eventType: string
+alias: string
     };
 
 export type WebhookEventResponseModel = {
@@ -5237,7 +5248,7 @@ take?: number
                 ,GetWebhookById: WebhookResponseModel
                 ,PutWebhookById: string
                 ,DeleteWebhookById: string
-                ,GetWebhookEvents: PagedWebhookResponseModel
+                ,GetWebhookEvents: PagedWebhookEventModel
                 
         }
         
