@@ -70,9 +70,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             State = user.UserState,
             UserGroupIds = new HashSet<Guid>(user.Groups.Select(x => x.Key)),
             DocumentStartNodeIds = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
-            DocumentRootAccess = HasRootAccess(user.StartContentIds),
+            HasDocumentRootAccess = HasRootAccess(user.StartContentIds),
             MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
-            MediaRootAccess = HasRootAccess(user.StartMediaIds),
+            HasMediaRootAccess = HasRootAccess(user.StartMediaIds),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
             LastLockoutDate = user.LastLockoutDate,
@@ -152,9 +152,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             UserName = updateModel.UserName,
             LanguageIsoCode = updateModel.LanguageIsoCode,
             ContentStartNodeKeys = updateModel.DocumentStartNodeIds,
-            ContentRootAccess = updateModel.DocumentRootAccess,
+            HasContentRootAccess = updateModel.HasDocumentRootAccess,
             MediaStartNodeKeys = updateModel.MediaStartNodeIds,
-            MediaRootAccess = updateModel.MediaRootAccess
+            HasMediaRootAccess = updateModel.HasMediaRootAccess
         };
 
         model.UserGroupKeys = updateModel.UserGroupIds;
@@ -189,9 +189,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             AvatarUrls = presentationUser.AvatarUrls,
             LanguageIsoCode = presentationUser.LanguageIsoCode,
             MediaStartNodeIds = mediaStartNodeKeys,
-            MediaRootAccess = HasRootAccess(mediaStartNodeIds),
+            HasMediaRootAccess = HasRootAccess(mediaStartNodeIds),
             DocumentStartNodeIds = documentStartNodeKeys,
-            DocumentRootAccess = HasRootAccess(contentStartNodeIds),
+            HasDocumentRootAccess = HasRootAccess(contentStartNodeIds),
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages,

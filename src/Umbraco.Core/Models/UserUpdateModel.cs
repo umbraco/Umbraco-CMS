@@ -14,11 +14,11 @@ public class UserUpdateModel
 
     public ISet<Guid> ContentStartNodeKeys { get; set; } = new HashSet<Guid>();
 
-    public bool ContentRootAccess { get; set; }
+    public bool HasContentRootAccess { get; set; }
 
     public ISet<Guid> MediaStartNodeKeys { get; set; } = new HashSet<Guid>();
 
-    public bool MediaRootAccess { get; set; }
+    public bool HasMediaRootAccess { get; set; }
 
     public ISet<Guid> UserGroupKeys { get; set; } = new HashSet<Guid>();
 }

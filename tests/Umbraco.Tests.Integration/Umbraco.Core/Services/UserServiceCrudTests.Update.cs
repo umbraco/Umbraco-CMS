@@ -243,6 +243,7 @@ public partial class UserServiceCrudTests
         Assert.AreEqual(isoCode, updatedUser.Language);
     }
 
+    // todo Ideally we would test content and media separately and together (Introduce Testcases for switching permutations)
     [Test]
     public async Task Can_Assign_User_Start_Nodes()
     {
@@ -280,8 +281,8 @@ public partial class UserServiceCrudTests
         var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
 
         var (updateModel, createdUser) = await CreateUserForUpdate(userService);
-        updateModel.ContentRootAccess = contentRootAccess;
-        updateModel.MediaRootAccess = mediaRootAccess;
+        updateModel.HasContentRootAccess = contentRootAccess;
+        updateModel.HasMediaRootAccess = mediaRootAccess;
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 
@@ -312,6 +313,7 @@ public partial class UserServiceCrudTests
         }
     }
 
+    // todo Ideally we would test content and media separately and together (Introduce Testcases for switching permutations)
     [Test]
     public async Task Can_Unassign_User_Start_Nodes()
     {
@@ -350,14 +352,15 @@ public partial class UserServiceCrudTests
         Assert.IsEmpty(updatedUser.StartMediaIds);
     }
 
+    // todo Ideally we would test content and media separately and together (Introduce Testcases for switching permutations)
     [Test]
     public async Task Can_Unassign_Root_As_User_Start_Node()
     {
         var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
 
         var (updateModel, createdUser) = await CreateUserForUpdate(userService);
-        updateModel.ContentRootAccess = true;
-        updateModel.MediaRootAccess = true;
+        updateModel.HasContentRootAccess = true;
+        updateModel.HasMediaRootAccess = true;
 
         await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
         var updatedUser = await userService.GetAsync(createdUser.Key);
@@ -366,8 +369,8 @@ public partial class UserServiceCrudTests
         Assert.IsNotEmpty(updatedUser.StartMediaIds!);
 
         updateModel = await MapUserToUpdateModel(updatedUser);
-        updateModel.ContentRootAccess = false;
-        updateModel.MediaRootAccess = false;
+        updateModel.HasContentRootAccess = false;
+        updateModel.HasMediaRootAccess = false;
 
         var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
 

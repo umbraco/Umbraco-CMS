@@ -1000,12 +1000,12 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MediaStartNodeNotFound, existingUser);
         }
 
-        if (model.ContentRootAccess)
+        if (model.HasContentRootAccess)
         {
             startContentIds.Add(Constants.System.Root);
         }
 
-        if (model.MediaRootAccess)
+        if (model.HasMediaRootAccess)
         {
             startMediaIds.Add(Constants.System.Root);
         }

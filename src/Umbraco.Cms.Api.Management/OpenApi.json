@@ -8331,6 +8331,20 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PublicAccessResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -34198,16 +34212,16 @@
         "required": [
           "allowedSections",
           "avatarUrls",
-          "documentRootAccess",
           "documentStartNodeIds",
           "email",
           "fallbackPermissions",
           "hasAccessToAllLanguages",
           "hasAccessToSensitiveData",
+          "hasDocumentRootAccess",
+          "hasMediaRootAccess",
           "id",
           "isAdmin",
           "languages",
-          "mediaRootAccess",
           "mediaStartNodeIds",
           "name",
           "permissions",
@@ -34240,7 +34254,7 @@
               "format": "uuid"
             }
           },
-          "documentRootAccess": {
+          "hasDocumentRootAccess": {
             "type": "boolean"
           },
           "mediaStartNodeIds": {
@@ -34251,7 +34265,7 @@
               "format": "uuid"
             }
           },
-          "mediaRootAccess": {
+          "hasMediaRootAccess": {
             "type": "boolean"
           },
           "avatarUrls": {
@@ -40402,6 +40416,52 @@
         },
         "additionalProperties": false
       },
+      "PublicAccessResponseModel": {
+        "required": [
+          "errorDocument",
+          "groups",
+          "loginDocument",
+          "members"
+        ],
+        "type": "object",
+        "properties": {
+          "loginDocument": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "errorDocument": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MemberItemResponseModel"
+                }
+              ]
+            }
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MemberGroupItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PublishDocumentRequestModel": {
         "required": [
           "publishSchedules"
@@ -42943,11 +43003,11 @@
       },
       "UpdateUserRequestModel": {
         "required": [
-          "documentRootAccess",
           "documentStartNodeIds",
           "email",
+          "hasDocumentRootAccess",
+          "hasMediaRootAccess",
           "languageIsoCode",
-          "mediaRootAccess",
           "mediaStartNodeIds",
           "name",
           "userGroupIds",
@@ -42983,7 +43043,7 @@
               "format": "uuid"
             }
           },
-          "documentRootAccess": {
+          "hasDocumentRootAccess": {
             "type": "boolean"
           },
           "mediaStartNodeIds": {
@@ -42994,7 +43054,7 @@
               "format": "uuid"
             }
           },
-          "mediaRootAccess": {
+          "hasMediaRootAccess": {
             "type": "boolean"
           }
         },
@@ -43363,13 +43423,13 @@
         "required": [
           "avatarUrls",
           "createDate",
-          "documentRootAccess",
           "documentStartNodeIds",
           "email",
           "failedLoginAttempts",
+          "hasDocumentRootAccess",
+          "hasMediaRootAccess",
           "id",
           "isAdmin",
-          "mediaRootAccess",
           "mediaStartNodeIds",
           "name",
           "state",
@@ -43412,7 +43472,7 @@
               "format": "uuid"
             }
           },
-          "documentRootAccess": {
+          "hasDocumentRootAccess": {
             "type": "boolean"
           },
           "mediaStartNodeIds": {
@@ -43423,7 +43483,7 @@
               "format": "uuid"
             }
           },
-          "mediaRootAccess": {
+          "hasMediaRootAccess": {
             "type": "boolean"
           },
           "avatarUrls": {

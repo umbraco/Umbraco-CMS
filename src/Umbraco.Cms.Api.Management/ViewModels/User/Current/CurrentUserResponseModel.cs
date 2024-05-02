@@ -16,11 +16,11 @@ public class CurrentUserResponseModel
 
     public required ISet<Guid> DocumentStartNodeIds { get; init; } = new HashSet<Guid>();
 
-    public required bool DocumentRootAccess { get; init; }
+    public required bool HasDocumentRootAccess { get; init; }
 
     public required ISet<Guid> MediaStartNodeIds { get; init; } = new HashSet<Guid>();
 
-    public required bool MediaRootAccess { get; init; }
+    public required bool HasMediaRootAccess { get; init; }
 
     public required IEnumerable<string> AvatarUrls { get; init; } = Enumerable.Empty<string>();
 
