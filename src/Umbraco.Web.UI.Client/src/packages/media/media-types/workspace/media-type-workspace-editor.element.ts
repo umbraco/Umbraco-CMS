@@ -19,7 +19,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	private _icon?: string;
 
 	@state()
-	private _isNew?: string;
+	private _isNew?: boolean;
 
 	#workspaceContext?: UmbMediaTypeWorkspaceContext;
 

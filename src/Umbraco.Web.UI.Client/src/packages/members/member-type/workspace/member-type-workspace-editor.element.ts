@@ -15,7 +15,7 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 	private _icon?: string;
 
 	@state()
-	private _isNew?: string;
+	private _isNew?: boolean;
 
 	@state()
 	private _iconColorAlias?: string;

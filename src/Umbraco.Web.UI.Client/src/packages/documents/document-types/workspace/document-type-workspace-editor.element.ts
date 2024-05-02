@@ -16,7 +16,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	private _icon?: string;
 
 	@state()
-	private _isNew?: string;
+	private _isNew?: boolean;
 
 	#workspaceContext?: typeof UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
