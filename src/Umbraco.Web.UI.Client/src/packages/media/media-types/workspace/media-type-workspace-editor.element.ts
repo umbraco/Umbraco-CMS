@@ -1,11 +1,8 @@
 import type { UmbMediaTypeWorkspaceContext } from './media-type-workspace.context.js';
 import { UMB_MEDIA_TYPE_WORKSPACE_CONTEXT } from './media-type-workspace.context-token.js';
-import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { generateAlias } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-media-type-workspace-editor')
 export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
@@ -76,7 +73,8 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 					label="name"
 					value=${this._name}
 					alias=${this._alias}
-					@change="${this.#onNameAndAliasChange}"></umb-input-with-alias>
+					@change="${this.#onNameAndAliasChange}"
+					${umbFocus()}></umb-input-with-alias>
 			</div>
 		</umb-workspace-editor>`;
 	}
