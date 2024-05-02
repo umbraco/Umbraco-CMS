@@ -105,9 +105,9 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 		if (!this._headers.length) return nothing;
 
 		return html`
-			<span>Name</span>
-			<span>Value</span>
-			<span></span>
+			<span class="grid-top">KEY</span>
+			<span class="grid-top">VALUE</span>
+			<span class="grid-top"></span>
 			${repeat(
 				this._headers,
 				(_, index) => index,
@@ -132,6 +132,10 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 				border: 1px solid var(--uui-color-border);
 				margin-bottom: var(--uui-size-space-3);
 				border-radius: var(--uui-border-radius);
+			}
+
+			.grid-top {
+				background-color: var(--uui-color-surface-alt);
 			}
 
 			#grid > * {
@@ -163,6 +167,7 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 				width: 100%;
 				border: none;
 				font: inherit;
+				color: inherit;
 				display: flex;
 				box-sizing: border-box;
 				background-color: transparent;
