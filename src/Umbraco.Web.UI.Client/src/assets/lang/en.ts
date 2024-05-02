@@ -727,7 +727,9 @@ export default {
 		unauthorized: 'You were not authorized before performing this action',
 		userNotFound: 'The local user was not found in the database',
 		externalInfoNotFound: 'The server did not succeed in communicating with the external login provider',
-		externalLoginFailed: 'The server failed to authorize you against the external login provider',
+		externalLoginFailed:
+			'The server failed to authorize you against the external login provider. Please close the window and try again.',
+		externalLoginSuccess: 'You have successfully logged in. You may now close this window.',
 	},
 	openidErrors: {
 		accessDenied: 'Access denied',

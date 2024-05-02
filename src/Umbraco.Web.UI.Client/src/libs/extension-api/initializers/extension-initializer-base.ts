@@ -4,6 +4,7 @@ import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * Base class for extension initializers, which are responsible for loading and unloading extensions.
@@ -15,12 +16,14 @@ export abstract class UmbExtensionInitializerBase<
 	protected host;
 	protected extensionRegistry;
 	#extensionMap = new Map();
+	#loaded = new ReplaySubject<void>(1);
+	loaded = this.#loaded.asObservable();
 
 	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<T>, manifestType: Key) {
 		super(host);
 		this.host = host;
 		this.extensionRegistry = extensionRegistry;
-		this.observe(extensionRegistry.byType<Key, T>(manifestType), (extensions) => {
+		this.observe(extensionRegistry.byType<Key, T>(manifestType), async (extensions) => {
 			this.#extensionMap.forEach((existingExt) => {
 				if (!extensions.find((b) => b.alias === existingExt.alias)) {
 					this.unloadExtension(existingExt);
@@ -28,11 +31,15 @@ export abstract class UmbExtensionInitializerBase<
 				}
 			});
 
-			extensions.forEach((extension) => {
-				if (this.#extensionMap.has(extension.alias)) return;
-				this.#extensionMap.set(extension.alias, extension);
-				this.instantiateExtension(extension);
-			});
+			await Promise.all(
+				extensions.map((extension) => {
+					if (this.#extensionMap.has(extension.alias)) return;
+					this.#extensionMap.set(extension.alias, extension);
+					return this.instantiateExtension(extension);
+				}),
+			);
+
+			this.#loaded.next();
 		});
 	}
 

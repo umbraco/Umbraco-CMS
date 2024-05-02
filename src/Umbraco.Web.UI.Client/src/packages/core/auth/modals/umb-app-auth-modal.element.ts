@@ -1,14 +1,20 @@
+import type { ManifestAuthProvider } from '../../extension-registry/models/auth-provider.model.js';
 import { UmbModalBaseElement } from '../../modal/index.js';
 import { UmbTextStyles } from '../../style/text-style.style.js';
+import { UMB_AUTH_CONTEXT } from '../auth.context.token.js';
+import type { UmbAuthProviderDefaultProps } from '../types.js';
 import type { UmbModalAppAuthConfig, UmbModalAppAuthValue } from './umb-app-auth-modal.token.js';
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-app-auth-modal')
 export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthConfig, UmbModalAppAuthValue> {
-	get props() {
+	@state()
+	private _error?: string;
+
+	get props(): UmbAuthProviderDefaultProps {
 		return {
 			userLoginState: this.data?.userLoginState ?? 'loggingIn',
-			onSubmit: this.onSubmit,
+			onSubmit: this.onSubmit.bind(this),
 		};
 	}
 
@@ -30,7 +36,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 
 	render() {
 		return html`
-			<div id="layout" modal-on-top=${this.data?.userLoginState === 'timedOut' ? 'true' : 'false'}>
+			<div id="layout">
 				<img
 					id="logo-on-background"
 					src="/umbraco/backoffice/assets/umbraco_logo_blue.svg"
@@ -63,6 +69,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 						<header id="header">
 							<h1 id="greeting">${this.headline}</h1>
 						</header>
+						${this._error ? html`<p style="margin-top:0;color:red">${this._error}</p>` : ''}
 						${this.data?.userLoginState === 'timedOut'
 							? html`<p style="margin-top:0">${this.localize.term('login_timeout')}</p>`
 							: ''}
@@ -77,9 +84,30 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		`;
 	}
 
-	private onSubmit = (providerName: string, loginHint?: string) => {
-		this.value = { providerName, loginHint };
-		this._submitModal();
+	private onSubmit = async (providerOrManifest: string | ManifestAuthProvider, loginHint?: string) => {
+		try {
+			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
+			if (!authContext) {
+				throw new Error('Auth context not available');
+			}
+
+			const manifest = typeof providerOrManifest === 'string' ? undefined : providerOrManifest;
+			const providerName =
+				typeof providerOrManifest === 'string' ? providerOrManifest : providerOrManifest.forProviderName;
+
+			await authContext.makeAuthorizationRequest(providerName, false, loginHint, manifest);
+
+			const isAuthed = authContext.getIsAuthorized();
+			this.value = { success: isAuthed };
+			if (isAuthed) {
+				this._submitModal();
+			} else {
+				this._error = 'Failed to authenticate';
+			}
+		} catch (error) {
+			console.error('[AuthModal] Error submitting auth request', error);
+			this._error = error instanceof Error ? error.message : 'Unknown error (see console)';
+		}
 	};
 
 	static styles = [
@@ -180,23 +208,6 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-5);
-			}
-
-			#layout[modal-on-top='true'] {
-				width: auto;
-				height: auto;
-				min-height: 327px;
-				background: #fff;
-				border: 1px solid var(--uui-color-border);
-				padding: 0;
-			}
-
-			[modal-on-top='true'] #graphic {
-				display: none;
-			}
-
-			[modal-on-top='true'] #greeting {
-				font-size: 2rem;
 			}
 
 			@media (max-width: 900px) {
