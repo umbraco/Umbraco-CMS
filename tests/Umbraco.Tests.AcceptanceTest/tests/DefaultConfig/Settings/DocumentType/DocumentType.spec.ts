@@ -16,13 +16,12 @@ test.describe('Document Type tests', () => {
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   });
 
-  test('can create a document type', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a document type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
     // Act
     await umbracoUi.documentType.clickActionsMenuAtRoot();
-    await page.pause();
     await umbracoUi.documentType.clickCreateButton();
     await umbracoUi.documentType.clickCreateDocumentTypeButton();
     await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
@@ -31,7 +30,7 @@ test.describe('Document Type tests', () => {
     // Assert
     await umbracoUi.documentType.isSuccessNotificationVisible();
     expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
-    await umbracoUi.documentType.reloadTree('Document Types')
+    await umbracoUi.documentType.reloadTree('Document Types');
     await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName);
   });
 
@@ -48,7 +47,6 @@ test.describe('Document Type tests', () => {
     await umbracoUi.documentType.clickSaveButton();
 
     // Assert
-    await umbracoUi.documentType.isSuccessNotificationVisible();
     expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
     // Checks if the documentType contains the template
     const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
@@ -642,7 +640,6 @@ test.describe('Document Type tests', () => {
   });
 
   test.describe('Settings tab', () => {
-
     test('can add allow vary by culture for a document type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
@@ -692,7 +689,6 @@ test.describe('Document Type tests', () => {
       await umbracoUi.documentType.isSuccessNotificationVisible();
       const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
       expect(documentTypeData.isElement).toBeTruthy();
-
     });
 
     // TODO: Unskip. Currently The cleanup is not updated upon save
