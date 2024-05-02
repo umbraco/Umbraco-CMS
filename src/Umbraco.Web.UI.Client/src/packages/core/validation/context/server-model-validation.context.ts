@@ -60,9 +60,12 @@ export class UmbServerModelValidationContext
 		if (!this.#isValid) {
 			// We are missing some typing here, but we will just go wild with 'as any': [NL]
 			const readErrorBody = (error as any).body;
-			Object.keys(readErrorBody.errors).forEach((path) => {
-				this.#serverFeedback.push({ path, messages: readErrorBody.errors[path] });
-			});
+			// Check if there are validation errors, since the error might be a generic ApiError
+			if (readErrorBody?.errors) {
+				Object.keys(readErrorBody.errors).forEach((path) => {
+					this.#serverFeedback.push({ path, messages: readErrorBody.errors[path] });
+				});
+			}
 		}
 
 		this.#validatePromiseResolve?.();

@@ -32,6 +32,14 @@ export class UmbAppErrorElement extends UmbLitElement {
 	@property()
 	error?: unknown;
 
+	/**
+	 * Hide the back button
+	 *
+	 * @attr
+	 */
+	@property({ type: Boolean, attribute: 'hide-back-button' })
+	hideBackButton = false;
+
 	constructor() {
 		super();
 
@@ -168,11 +176,15 @@ export class UmbAppErrorElement extends UmbLitElement {
 
 		<div id="container" class="uui-text">
 			<uui-box id="box" headline-variant="h1">
-				<uui-button
-					slot="header-actions"
-					label=${this.localize.term('general_back')}
-					look="secondary"
-					@click=${() => (location.href = '')}></uui-button>
+				${this.hideBackButton
+					? nothing
+					: html`
+							<uui-button
+								slot="header-actions"
+								label=${this.localize.term('general_back')}
+								look="secondary"
+								@click=${() => (location.href = '')}></uui-button>
+						`}
 				<div slot="headline">
 					${this.errorHeadline
 						? this.errorHeadline

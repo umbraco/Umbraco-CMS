@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-import { UMB_STORAGE_REDIRECT_URL, UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
+import { UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
 import type { LocationLike, StringMap } from '@umbraco-cms/backoffice/external/openid';
 import {
 	BaseTokenRequestHandler,
@@ -30,6 +30,7 @@ import {
 	TokenRequest,
 	TokenResponse,
 } from '@umbraco-cms/backoffice/external/openid';
+import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
 
 const requestor = new FetchRequestor();
 
@@ -92,19 +93,28 @@ export class UmbAuthFlow {
 	readonly #postLogoutRedirectUri: string;
 	readonly #clientId: string;
 	readonly #scope: string;
+	readonly #timeoutSignal;
 
 	// tokens
 	#tokenResponse?: TokenResponse;
+
+	/**
+	 * This signal will emit when the authorization flow is complete.
+	 * @remark It will also emit if there is an error during the authorization flow.
+	 */
+	readonly authorizationSignal = new Subject<void>();
 
 	constructor(
 		openIdConnectUrl: string,
 		redirectUri: string,
 		postLogoutRedirectUri: string,
+		timeoutSignal: Subject<void>,
 		clientId = 'umbraco-back-office',
 		scope = 'offline_access',
 	) {
 		this.#redirectUri = redirectUri;
 		this.#postLogoutRedirectUri = postLogoutRedirectUri;
+		this.#timeoutSignal = timeoutSignal;
 		this.#clientId = clientId;
 		this.#scope = scope;
 
@@ -118,11 +128,7 @@ export class UmbAuthFlow {
 		this.#notifier = new AuthorizationNotifier();
 		this.#tokenHandler = new BaseTokenRequestHandler(requestor);
 		this.#storageBackend = new LocalStorageBackend();
-		this.#authorizationHandler = new RedirectRequestHandler(
-			this.#storageBackend,
-			new UmbNoHashQueryStringUtils(),
-			window.location,
-		);
+		this.#authorizationHandler = new RedirectRequestHandler(this.#storageBackend, new UmbNoHashQueryStringUtils());
 
 		// set notifier to deliver responses
 		this.#authorizationHandler.setAuthorizationNotifier(this.#notifier);
@@ -131,6 +137,7 @@ export class UmbAuthFlow {
 		this.#notifier.setAuthorizationListener(async (request, response, error) => {
 			if (error) {
 				console.error('Authorization error', error);
+				this.authorizationSignal.next();
 				throw error;
 			}
 
@@ -143,16 +150,9 @@ export class UmbAuthFlow {
 				await this.#makeTokenRequest(response.code, codeVerifier);
 				await this.performWithFreshTokens();
 				await this.#saveTokenState();
-
-				// Redirect to the saved state or root
-				let currentRoute = '/';
-				const savedRoute = sessionStorage.getItem(UMB_STORAGE_REDIRECT_URL);
-				if (savedRoute) {
-					sessionStorage.removeItem(UMB_STORAGE_REDIRECT_URL);
-					currentRoute = savedRoute;
-				}
-				history.replaceState(null, '', currentRoute);
 			}
+
+			this.authorizationSignal.next();
 		});
 	}
 
@@ -173,8 +173,6 @@ export class UmbAuthFlow {
 			const response = new TokenResponse(JSON.parse(tokenResponseJson));
 			if (response.isValid()) {
 				this.#tokenResponse = response;
-			} else {
-				this.signOut();
 			}
 		}
 	}
@@ -196,7 +194,7 @@ export class UmbAuthFlow {
 	 * @param identityProvider The identity provider to use for the authorization request.
 	 * @param usernameHint (Optional) The username to use for the authorization request. It will be provided to the OpenID server as a hint.
 	 */
-	makeAuthorizationRequest(identityProvider: string, usernameHint?: string): void {
+	makeAuthorizationRequest(identityProvider: string, usernameHint?: string) {
 		const extras: StringMap = { prompt: 'consent', access_type: 'offline' };
 
 		// If the identity provider is not 'Umbraco', we will add it to the extras.
@@ -223,7 +221,7 @@ export class UmbAuthFlow {
 			true,
 		);
 
-		this.#authorizationHandler.performAuthorizationRequest(this.#configuration, request);
+		return this.#authorizationHandler.performAuthorizationRequest(this.#configuration, request);
 	}
 
 	/**
@@ -311,9 +309,9 @@ export class UmbAuthFlow {
 			return Promise.resolve(this.#tokenResponse.accessToken);
 		}
 
-		// if the refresh token is not set (maybe the provider doesn't support them), sign out
+		// if the refresh token is not set (maybe the provider doesn't support them)
 		if (!this.#tokenResponse?.refreshToken) {
-			this.signOut();
+			this.#timeoutSignal.next();
 			return Promise.reject('Missing refreshToken.');
 		}
 
@@ -328,9 +326,12 @@ export class UmbAuthFlow {
 
 		await this.#performTokenRequest(request);
 
-		return this.#tokenResponse
-			? Promise.resolve(this.#tokenResponse.accessToken)
-			: Promise.reject('Missing accessToken.');
+		if (!this.#tokenResponse) {
+			this.#timeoutSignal.next();
+			return Promise.reject('Missing tokenResponse.');
+		}
+
+		return Promise.resolve(this.#tokenResponse.accessToken);
 	}
 
 	/**
@@ -373,9 +374,8 @@ export class UmbAuthFlow {
 		try {
 			this.#tokenResponse = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
 		} catch (error) {
-			// If the token request fails, it means the refresh token is invalid, so we sign the user out.
+			// If the token request fails, it means the refresh token is invalid
 			console.error('Token request error', error);
-			this.signOut();
 		}
 	}
 }

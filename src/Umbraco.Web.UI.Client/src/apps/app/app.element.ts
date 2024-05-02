@@ -17,6 +17,7 @@ import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -58,6 +59,27 @@ export class UmbAppElement extends UmbLitElement {
 			component: () => import('../installer/installer.element.js'),
 		},
 		{
+			path: 'oauth_complete',
+			component: () => import('./app-error.element.js'),
+			setup: (component) => {
+				const searchParams = new URLSearchParams(window.location.search);
+				const hasCode = searchParams.has('code');
+				(component as UmbAppErrorElement).hideBackButton = true;
+				(component as UmbAppErrorElement).errorHeadline = this.localize.term('general_login');
+				(component as UmbAppErrorElement).errorMessage = hasCode
+					? this.localize.term('errors_externalLoginSuccess')
+					: this.localize.term('errors_externalLoginFailed');
+
+				// Complete the authorization request
+				this.#authContext?.completeAuthorizationRequest().finally(() => {
+					// If we don't have an opener, redirect to the root
+					if (!window.opener) {
+						//history.replaceState(null, '', '');
+					}
+				});
+			},
+		},
+		{
 			path: 'upgrade',
 			component: () => import('../upgrader/upgrader.element.js'),
 			guards: [this.#isAuthorizedGuard()],
@@ -67,6 +89,17 @@ export class UmbAppElement extends UmbLitElement {
 			resolve: () => {
 				this.#authContext?.clearTokenStorage();
 				this.#authController.makeAuthorizationRequest('loggedOut');
+
+				// Listen for the user to be authorized
+				this.#authContext?.isAuthorized
+					.pipe(
+						filter((x) => !!x),
+						first(),
+					)
+					.subscribe(() => {
+						// Redirect to the root
+						history.replaceState(null, '', '');
+					});
 			},
 		},
 		{
@@ -86,7 +119,6 @@ export class UmbAppElement extends UmbLitElement {
 		OpenAPI.BASE = window.location.origin;
 
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
-		new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		new UUIIconRegistryEssential().attach(this);
 
@@ -109,6 +141,8 @@ export class UmbAppElement extends UmbLitElement {
 
 		// Register public extensions (login extensions)
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
+		const initializer = new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+		await firstValueFrom(initializer.loaded);
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
@@ -161,15 +195,6 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#redirect() {
-		// If there is a ?code parameter in the url, then we are in the middle of the oauth flow
-		// and we need to complete the login (the authorization notifier will redirect after this is done
-		// essentially hitting this method again)
-		const queryParams = new URLSearchParams(window.location.search);
-		if (queryParams.has('code')) {
-			this.#authContext?.completeAuthorizationRequest();
-			return;
-		}
-
 		switch (this.#serverConnection?.getStatus()) {
 			case RuntimeLevelModel.INSTALL:
 				history.replaceState(null, '', 'install');
