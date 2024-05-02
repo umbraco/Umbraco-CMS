@@ -1,8 +1,7 @@
 import type { UmbUserGroupDetailModel } from '../index.js';
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context-token.js';
-import type { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -15,14 +14,21 @@ import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 
 import './components/user-group-entity-user-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
+import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
+	@state()
+	private _isNew?: boolean = false;
+
 	@state()
 	private _unique?: UmbUserGroupDetailModel['unique'];
 
 	@state()
 	private _name?: UmbUserGroupDetailModel['name'];
+
+	@state()
+	private _alias?: UmbUserGroupDetailModel['alias'];
 
 	@state()
 	private _icon: UmbUserGroupDetailModel['icon'] = null;
@@ -61,8 +67,10 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 	#observeUserGroup() {
 		if (!this.#workspaceContext) return;
+		this.observe(this.#workspaceContext.isNew, (value) => (this._isNew = value), '_observeIsNew');
 		this.observe(this.#workspaceContext.unique, (value) => (this._unique = value), '_observeUnique');
 		this.observe(this.#workspaceContext.name, (value) => (this._name = value), '_observeName');
+		this.observe(this.#workspaceContext.alias, (value) => (this._alias = value), '_observeAlias');
 		this.observe(this.#workspaceContext.icon, (value) => (this._icon = value), '_observeIcon');
 		this.observe(this.#workspaceContext.sections, (value) => (this._sections = value), '_observeSections');
 		this.observe(this.#workspaceContext.languages, (value) => (this._languages = value), '_observeLanguages');
@@ -150,16 +158,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.updateProperty('mediaStartNode', selected ? { unique: selected } : null);
 	}
 
-	#onNameChange(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.updateProperty('name', target.value);
-			}
-		}
-	}
-
 	render() {
 		if (!this._unique) return nothing;
 
@@ -196,19 +194,26 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
+	#onNameAndAliasChange(event: InputEvent & { target: UmbInputWithAliasElement }) {
+		this.#workspaceContext?.updateProperty('name', event.target.value ?? '');
+		this.#workspaceContext?.updateProperty('alias', event.target.alias ?? '');
+	}
+
 	#renderHeader() {
 		return html`
 			<div id="header" slot="header">
 				<uui-button id="icon" @click=${this.#onIconClick} label="icon" compact>
-					<umb-icon name=${ifDefined(ifDefined(this._icon))}></umb-icon>
+					<umb-icon name=${this._icon || ''}></umb-icon>
 				</uui-button>
 
-				<uui-input
+				<umb-input-with-alias
 					id="name"
 					label=${this.localize.term('general_name')}
 					.value=${this._name}
-					@input="${this.#onNameChange}"
-					${umbFocus()}></uui-input>
+					alias=${ifDefined(this._alias)}
+					?auto-generate-alias=${this._isNew}
+					@change="${this.#onNameAndAliasChange}"
+					${umbFocus()}></umb-input-with-alias>
 			</div>
 		`;
 	}
