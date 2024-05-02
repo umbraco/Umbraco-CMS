@@ -28,15 +28,14 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 		if (!modal) return;
 
 		await modal.onSubmit();
-		this.events = modal.getValue() as Array<string>;
+		this.events = modal.getValue() as Array<UmbWebhookEventModel>;
 
 		modal.destroy();
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#removeEvent(index: number) {
-		this.events = this.events.filter((_, i) => i !== index);
-		this.dispatchEvent(new UmbChangeEvent());
+	#removeEvent(alias: string) {
+		this.events = this.events.filter((item) => item.alias !== alias);
 	}
 
 	#renderEvents() {
@@ -45,10 +44,10 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 		return html`
 			${repeat(
 				this.events,
-				(item) => item,
-				(item, index) => html`
-					<span>${item}</span>
-					<uui-button @click=${() => this.#removeEvent(index)} label="remove"></uui-button>
+				(item) => item.alias,
+				(item) => html`
+					<span>${item.eventName}</span>
+					<uui-button @click=${() => this.#removeEvent(item.alias)} label="remove"></uui-button>
 				`,
 			)}
 		`;

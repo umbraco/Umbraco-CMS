@@ -35,7 +35,8 @@ export class UmbWebhookEventsModalElement extends UmbLitElement {
 		this.#selectionManager.setSelection(this.events.map((item) => item.alias));
 
 		this.observe(this.#selectionManager.selection, (selection) => {
-			this.modalContext?.setValue(selection);
+			const selectedEvents = this._events.filter((item) => selection.includes(item.alias));
+			this.modalContext?.setValue(selectedEvents);
 		});
 	}
 
