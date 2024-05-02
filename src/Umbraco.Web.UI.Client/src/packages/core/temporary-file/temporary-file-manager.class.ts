@@ -14,16 +14,12 @@ export enum TemporaryFileStatus {
 
 export interface UmbTemporaryFileModel {
 	file: File;
-	unique: string;
-	status: TemporaryFileStatus;
-}
-
-export interface UmbTemporaryFileQueueModel extends Partial<UmbTemporaryFileModel> {
-	file: File;
+	unique?: string;
+	status?: TemporaryFileStatus;
 }
 
 export class UmbTemporaryFileManager<
-	UploadableItem extends UmbTemporaryFileQueueModel = UmbTemporaryFileQueueModel,
+	UploadableItem extends UmbTemporaryFileModel = UmbTemporaryFileModel,
 > extends UmbControllerBase {
 	#temporaryFileRepository;
 
@@ -76,7 +72,7 @@ export class UmbTemporaryFileManager<
 			if (!item.unique) throw new Error(`Unique is missing for item ${item}`);
 
 			const { error } = await this.#temporaryFileRepository.upload(item.unique, item.file);
-			await new Promise((resolve) => setTimeout(resolve, (Math.random() + 0.5) * 1000)); // simulate small delay so that the upload badge is properly shown
+			//await new Promise((resolve) => setTimeout(resolve, (Math.random() + 0.5) * 1000)); // simulate small delay so that the upload badge is properly shown
 
 			let status: TemporaryFileStatus;
 			if (error) {
