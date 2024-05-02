@@ -173,8 +173,6 @@ export class UmbAuthFlow {
 			const response = new TokenResponse(JSON.parse(tokenResponseJson));
 			if (response.isValid()) {
 				this.#tokenResponse = response;
-			} else {
-				this.signOut();
 			}
 		}
 	}
@@ -376,9 +374,8 @@ export class UmbAuthFlow {
 		try {
 			this.#tokenResponse = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
 		} catch (error) {
-			// If the token request fails, it means the refresh token is invalid, so we sign the user out.
+			// If the token request fails, it means the refresh token is invalid
 			console.error('Token request error', error);
-			this.signOut();
 		}
 	}
 }
