@@ -62,7 +62,6 @@ export default {
 		unlock: 'Lås op',
 		createblueprint: 'Opret indholdsskabelon',
 		resendInvite: 'Gensend Invitation',
-		defaultValue: 'Standard værdi',
 		editContent: 'Edit content',
 		chooseWhereToImport: 'Choose where to import',
 	},
