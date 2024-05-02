@@ -65,19 +65,4 @@ public class OAuthOptionsHelper
         context.Response.Redirect(callbackPath);
         return context;
     }
-
-    /// <summary>
-    /// Sets the callbackPath for the RemoteAuthenticationOptions based on the configured Umbraco path and the path supplied.
-    /// By default this will result in "/umbraco/your-supplied-path".
-    /// </summary>
-    /// <param name="options">The options object to set the path on.</param>
-    /// <param name="path">The path that should go after the umbraco path, will add a leading slash if it's missing.</param>
-    /// <returns></returns>
-    public RemoteAuthenticationOptions SetUmbracoBasedCallbackPath(RemoteAuthenticationOptions options, string path)
-    {
-        var umbracoCallbackPath = _securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackPathName;
-
-        options.CallbackPath = umbracoCallbackPath + path.EnsureStartsWith("/");
-        return options;
-    }
 }
