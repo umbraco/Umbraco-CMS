@@ -33936,6 +33936,11 @@
             "items": {
               "type": "string"
             }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false
