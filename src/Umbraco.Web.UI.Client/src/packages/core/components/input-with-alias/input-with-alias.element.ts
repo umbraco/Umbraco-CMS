@@ -1,4 +1,4 @@
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -12,6 +12,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string>(UmbLit
 
 	@property({ type: String, reflect: false })
 	alias?: string;
+
+	@property({ type: Boolean, reflect: true, attribute: 'alias-readonly' })
+	aliasReadonly = false;
 
 	@property({ type: Boolean, attribute: 'auto-generate-alias' })
 	autoGenerateAlias?: boolean;
@@ -75,11 +78,14 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string>(UmbLit
 					@input=${this.#onAliasChange}
 					.value=${this.alias}
 					placeholder="Enter alias..."
-					?disabled=${this._aliasLocked}>
+					?disabled=${this._aliasLocked && !this.aliasReadonly}
+					?readonly=${this.aliasReadonly}>
 					<!-- TODO: validation for bad characters -->
-					<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
-						<uui-icon name=${this._aliasLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
-					</div>
+					${this.aliasReadonly
+						? nothing
+						: html`<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
+								<uui-icon name=${this._aliasLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
+							</div>`}
 				</uui-input>
 			</uui-input>
 		`;
@@ -105,6 +111,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string>(UmbLit
 			justify-content: center;
 			cursor: pointer;
 		}
+
 		#alias-lock uui-icon {
 			margin-bottom: 2px;
 		}
