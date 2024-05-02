@@ -17,7 +17,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.LinkPicker',
 		name: 'Link Picker Modal',
-		element: () => import('./link-picker/link-picker-modal.element.js'),
+		element: () => import('../../../property-editors/multi-url-picker/link-picker/link-picker-modal.element.js'),
 	},
 	{
 		type: 'modal',
