@@ -8,7 +8,7 @@ import {
 	UmbMediaTypeDetailRepository,
 	UmbMediaTypeStructureRepository,
 } from '@umbraco-cms/backoffice/media-type';
-import { UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
@@ -62,7 +62,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 				mediaTypeUnique: mediaTypes[0].unique,
 			};
 
-			await this.#uploadOne(uploadableFile);
+			await this.#handleUpload([uploadableFile]);
 			return;
 		}
 
@@ -75,7 +75,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			file,
 			mediaTypeUnique: mediaType.unique,
 		};
-		await this.#uploadOne(uploadableFile);
+		await this.#handleUpload([uploadableFile]);
 	}
 
 	public async dropFiles(files: Array<File>, parentUnique: string | null) {
@@ -107,7 +107,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			uploadableFiles.push({ unique: UmbId.new(), file, mediaTypeUnique: mediaType.unique });
 		}
 
-		await this.#upload(uploadableFiles);
+		await this.#handleUpload(uploadableFiles);
 	}
 
 	#getExtensionFromMimeType(mimeType: string): string {
@@ -144,12 +144,12 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		return value ? { unique: value.mediaTypeUnique ?? options[0].unique } : null;
 	}
 
-	async #upload(files: Array<UmbUploadableFileModel>) {
-		await this.#tempFileManager.upload(files);
-	}
-
-	async #uploadOne(file: UmbUploadableFileModel) {
-		await this.#tempFileManager.uploadOne(file);
+	async #handleUpload(files: Array<UmbUploadableFileModel>) {
+		const uploads = await this.#tempFileManager.upload(files);
+		for (const upload of uploads) {
+			if (upload.status !== TemporaryFileStatus.SUCCESS) return;
+			// TODO: Create item
+		}
 	}
 
 	private _reset() {
