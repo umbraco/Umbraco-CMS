@@ -287,18 +287,18 @@ export class UmbDocumentTypeWorkspaceContext
 				this.setDefaultTemplate(templateEntity);
 			}
 
-			if ((await this.structure.create(parent.unique)) === true) {
-				// TODO: this might not be the right place to alert the tree, but it works for now
-				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-				const event = new UmbRequestReloadTreeItemChildrenEvent({
-					entityType: parent.entityType,
-					unique: parent.unique,
-				});
-				eventContext.dispatchEvent(event);
+			await this.structure.create(parent.unique);
 
-				this.setIsNew(false);
-				this.createTemplateMode = false;
-			}
+			// TODO: this might not be the right place to alert the tree, but it works for now
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadTreeItemChildrenEvent({
+				entityType: parent.entityType,
+				unique: parent.unique,
+			});
+			eventContext.dispatchEvent(event);
+
+			this.setIsNew(false);
+			this.createTemplateMode = false;
 		} else {
 			await this.structure.save();
 

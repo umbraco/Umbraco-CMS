@@ -258,10 +258,10 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	}
 
 	getRedirectUrl() {
-		return `${window.location.origin}${this.#backofficePath}oauth_complete`;
+		return `${window.location.origin}${this.#backofficePath}${this.#backofficePath.endsWith('/') ? '' : '/'}oauth_complete`;
 	}
 
 	getPostLogoutRedirectUrl() {
-		return `${window.location.origin}${this.#backofficePath.endsWith('/') ? this.#backofficePath : this.#backofficePath + '/'}logout`;
+		return `${window.location.origin}${this.#backofficePath}${this.#backofficePath.endsWith('/') ? '' : '/'}logout`;
 	}
 }
