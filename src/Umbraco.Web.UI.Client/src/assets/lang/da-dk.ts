@@ -482,7 +482,7 @@ export default {
 		confirmlogout: 'Er du sikker på at du vil forlade Umbraco?',
 		confirmSure: 'Er du sikker?',
 		cut: 'Klip',
-		editdictionary: 'Rediger ordbogsnøgle',
+		editDictionary: 'Rediger ordbogsnøgle',
 		editlanguage: 'Rediger sprog',
 		editSelectedMedia: 'Rediger det valgte medie',
 		insertAnchor: 'Indsæt lokalt link',

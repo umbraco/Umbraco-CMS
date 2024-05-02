@@ -221,7 +221,7 @@ export default {
 		confirmlogout: '您确定吗?',
 		confirmSure: '您确定吗？',
 		cut: '剪切',
-		editdictionary: '编辑字典项',
+		editDictionary: '编辑字典项',
 		editlanguage: '编辑语言',
 		insertAnchor: '插入本地链接',
 		insertCharacter: '插入字符',

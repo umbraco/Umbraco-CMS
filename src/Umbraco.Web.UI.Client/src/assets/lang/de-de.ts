@@ -487,7 +487,7 @@ export default {
 		confirmlogout: 'Sind Sie sich wirklich abmelden?',
 		confirmSure: 'Sind Sie sicher?',
 		cut: 'Ausschneiden',
-		editdictionary: 'Wörterbucheintrag bearbeiten',
+		editDictionary: 'Wörterbucheintrag bearbeiten',
 		editlanguage: 'Sprache bearbeiten',
 		editSelectedMedia: 'Ausgewähltes Medien',
 		insertAnchor: 'Anker einfügen',

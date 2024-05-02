@@ -413,7 +413,7 @@ export default {
 		confirmlogout: 'Jste si jistí?',
 		confirmSure: 'Jste si jistí?',
 		cut: 'Vyjmout',
-		editdictionary: 'Editovat položku slovníku',
+		editDictionary: 'Editovat položku slovníku',
 		editlanguage: 'Editovat jazyk',
 		editSelectedMedia: 'Edit selected media',
 		insertAnchor: 'Vložit místní odkaz',

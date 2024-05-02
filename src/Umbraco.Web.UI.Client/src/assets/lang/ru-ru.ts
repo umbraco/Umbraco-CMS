@@ -347,7 +347,7 @@ export default {
 		confirmlogout: 'Вы уверены?',
 		confirmSure: 'Вы уверены?',
 		cut: 'Вырезать',
-		editdictionary: 'Править статью словаря',
+		editDictionary: 'Править статью словаря',
 		editlanguage: 'Изменить язык',
 		insertAnchor: 'Вставить локальную ссылку (якорь)',
 		insertCharacter: 'Вставить символ',

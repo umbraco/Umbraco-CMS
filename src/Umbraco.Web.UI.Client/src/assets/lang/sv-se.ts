@@ -360,7 +360,7 @@ export default {
 		confirmlogout: 'Är du säker?',
 		confirmSure: 'Är du säker?',
 		cut: 'Klipp ut',
-		editdictionary: 'Redigera ord i ordboken',
+		editDictionary: 'Redigera ord i ordboken',
 		editlanguage: 'Redigera språk',
 		insertAnchor: 'Infoga ankarlänk',
 		insertCharacter: 'Infoga tecken',

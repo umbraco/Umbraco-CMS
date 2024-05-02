@@ -421,7 +421,7 @@ export default {
 		confirmlogout: 'Emin misiniz?',
 		confirmSure: 'Emin misiniz?',
 		cut: 'Kes',
-		editdictionary: 'Sözlük Öğesini Düzenle',
+		editDictionary: 'Sözlük Öğesini Düzenle',
 		editlanguage: 'Dili Düzenle',
 		editSelectedMedia: 'Seçili medyayı düzenle',
 		insertAnchor: 'Yerel bağlantı ekle',

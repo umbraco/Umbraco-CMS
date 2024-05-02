@@ -479,7 +479,7 @@ export default {
 		confirmlogout: 'Sei sicuro?',
 		confirmSure: 'Sei sicuro?',
 		cut: 'Taglia',
-		editdictionary: 'Modifica elemento del Dizionario',
+		editDictionary: 'Modifica elemento del Dizionario',
 		editlanguage: 'Modifica la lingua',
 		editSelectedMedia: 'Modifica il media selezionato',
 		insertAnchor: 'Inserisci il link locale',

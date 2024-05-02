@@ -166,7 +166,7 @@ export default {
 		confirmlogout: 'האם הינך בטוח?',
 		confirmSure: 'האם אתה בטוח?',
 		cut: 'גזור',
-		editdictionary: 'ערוך פרט מילון',
+		editDictionary: 'ערוך פרט מילון',
 		editlanguage: 'ערוך שפה',
 		insertAnchor: 'הוסף קישור מקומי',
 		insertCharacter: 'הוסף תו',

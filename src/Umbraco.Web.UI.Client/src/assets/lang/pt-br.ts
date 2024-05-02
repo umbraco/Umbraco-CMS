@@ -166,7 +166,7 @@ export default {
 		confirmlogout: 'Tem certeza',
 		confirmSure: 'Tem certeza?',
 		cut: 'Cortar',
-		editdictionary: 'Editar Item de Dicionário',
+		editDictionary: 'Editar Item de Dicionário',
 		editlanguage: 'Editar Linguagem',
 		insertAnchor: 'Inserir link local',
 		insertCharacter: 'Inserir charactere',

@@ -215,7 +215,7 @@ export default {
 		confirmlogout: 'ログアウトしますか？',
 		confirmSure: '本当にいいですか？',
 		cut: '切り取り',
-		editdictionary: 'ディクショナリのアイテムの編集',
+		editDictionary: 'ディクショナリのアイテムの編集',
 		editlanguage: '言語の編集',
 		insertAnchor: 'アンカーの挿入',
 		insertCharacter: '文字の挿入',

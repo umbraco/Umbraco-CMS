@@ -290,7 +290,7 @@ export default {
 		confirmlogout: 'Jesteś pewny?',
 		confirmSure: 'Jesteś pewny?',
 		cut: 'Wytnij',
-		editdictionary: 'Edytuj element słownika',
+		editDictionary: 'Edytuj element słownika',
 		editlanguage: 'Edytuj język',
 		insertAnchor: 'Wstaw link wewnętrzny',
 		insertCharacter: 'Wstaw znak',

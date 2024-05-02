@@ -210,7 +210,7 @@ export default {
 		confirmlogout: 'Er du sikker på at du vil forlate Umbraco?',
 		confirmSure: 'Er du sikker?',
 		cut: 'Klipp ut',
-		editdictionary: 'Rediger ordboksnøkkel',
+		editDictionary: 'Rediger ordboksnøkkel',
 		editlanguage: 'Rediger språk',
 		insertAnchor: 'Sett inn lokal link',
 		insertCharacter: 'Sett inn spesialtegn',

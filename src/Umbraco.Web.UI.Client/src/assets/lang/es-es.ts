@@ -288,7 +288,7 @@ export default {
 		confirmlogout: '¿Estás seguro?',
 		confirmSure: '¿Estás seguro?',
 		cut: 'Cortar',
-		editdictionary: 'Editar entrada del Diccionario',
+		editDictionary: 'Editar entrada del Diccionario',
 		editlanguage: 'Editar idioma',
 		insertAnchor: 'Agregar enlace interno',
 		insertCharacter: 'Insertar carácter',

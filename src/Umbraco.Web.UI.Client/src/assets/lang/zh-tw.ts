@@ -220,7 +220,7 @@ export default {
 		confirmlogout: '您確定嗎?',
 		confirmSure: '您確定嗎？',
 		cut: '剪切',
-		editdictionary: '編輯字典項',
+		editDictionary: '編輯字典項',
 		editlanguage: '編輯語言',
 		insertAnchor: '插入本地連結',
 		insertCharacter: '插入字元',

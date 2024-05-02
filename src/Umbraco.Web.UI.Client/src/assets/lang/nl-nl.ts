@@ -436,7 +436,7 @@ export default {
 		confirmlogout: 'Weet je het zeker?',
 		confirmSure: 'Weet je het zeker?',
 		cut: 'Knippen',
-		editdictionary: 'Pas woordenboekitem aan',
+		editDictionary: 'Pas woordenboekitem aan',
 		editlanguage: 'Taal aanpassen',
 		editSelectedMedia: 'Geselecteerde media bewerken',
 		insertAnchor: 'Lokale link invoegen',

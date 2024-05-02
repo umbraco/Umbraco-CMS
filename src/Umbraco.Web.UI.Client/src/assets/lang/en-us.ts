@@ -488,7 +488,7 @@ export default {
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
 		cut: 'Cut',
-		editdictionary: 'Edit Dictionary Item',
+		editDictionary: 'Edit Dictionary Item',
 		editlanguage: 'Edit Language',
 		editSelectedMedia: 'Edit selected media',
 		insertAnchor: 'Insert local link',
