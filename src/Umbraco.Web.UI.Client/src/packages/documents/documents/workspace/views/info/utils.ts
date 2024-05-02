@@ -1,4 +1,4 @@
-import { AuditTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDocumentAuditLog, type UmbDocumentAuditLogType } from '../../../audit-log/utils/index.js';
 
 interface HistoryStyleMap {
 	look: 'default' | 'primary' | 'secondary' | 'outline' | 'placeholder';
@@ -22,27 +22,27 @@ interface HistoryData {
  * @param type AuditTypeModel
  * @returns {HistoricData}
  */
-export function HistoryTagStyleAndText(type: AuditTypeModel): HistoryData {
+export function getDocumentHistoryTagStyleAndText(type: UmbDocumentAuditLogType): HistoryData {
 	switch (type) {
-		case AuditTypeModel.SAVE:
+		case UmbDocumentAuditLog.SAVE:
 			return {
 				style: { look: 'primary', color: 'default' },
 				text: { label: 'auditTrails_smallSave', desc: 'auditTrails_save' },
 			};
 
-		case AuditTypeModel.PUBLISH:
+		case UmbDocumentAuditLog.PUBLISH:
 			return {
 				style: { look: 'primary', color: 'positive' },
 				text: { label: 'content_publish', desc: 'auditTrails_publish' },
 			};
 
-		case AuditTypeModel.UNPUBLISH:
+		case UmbDocumentAuditLog.UNPUBLISH:
 			return {
 				style: { look: 'primary', color: 'warning' },
 				text: { label: 'content_unpublish', desc: 'auditTrails_unpublish' },
 			};
 
-		case AuditTypeModel.CONTENT_VERSION_ENABLE_CLEANUP:
+		case UmbDocumentAuditLog.CONTENT_VERSION_ENABLE_CLEANUP:
 			return {
 				style: { look: 'secondary', color: 'default' },
 				text: {
@@ -51,7 +51,7 @@ export function HistoryTagStyleAndText(type: AuditTypeModel): HistoryData {
 				},
 			};
 
-		case AuditTypeModel.CONTENT_VERSION_PREVENT_CLEANUP:
+		case UmbDocumentAuditLog.CONTENT_VERSION_PREVENT_CLEANUP:
 			return {
 				style: { look: 'secondary', color: 'default' },
 				text: {

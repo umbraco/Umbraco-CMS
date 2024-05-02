@@ -115,7 +115,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 						label=${this.localize.term('general_search')}
 						placeholder=${this.localize.term('placeholders_search')}>
 						<uui-icon name="icon-search" slot="prepend"></uui-icon>
-				  </uui-input>`
+					</uui-input>`
 				: nothing}
 			${this._filtered.map(
 				(group) => html`
@@ -126,7 +126,6 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 							(block) => block.contentElementTypeKey,
 							(block) => html`
 								<umb-block-type-card
-									.name=${block.label}
 									.iconColor=${block.iconColor}
 									.backgroundColor=${block.backgroundColor}
 									.contentElementTypeKey=${block.contentElementTypeKey}

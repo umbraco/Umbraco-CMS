@@ -185,6 +185,7 @@ const itemMapper = (item: UmbMockUserModel): UserItemResponseModel => {
 	return {
 		id: item.id,
 		name: item.name,
+		avatarUrls: item.avatarUrls,
 	};
 };
 

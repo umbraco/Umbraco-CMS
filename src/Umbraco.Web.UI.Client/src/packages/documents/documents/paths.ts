@@ -24,4 +24,7 @@ export const UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{
 	documentTypeUnique: string;
 }>('create/parent/:parentEntityType/:parentUnique/:documentTypeUnique', UMB_DOCUMENT_WORKSPACE_PATH);
 
-export const UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{ unique: string }>('edit/:unique');
+export const UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN = new UmbPathPattern<{ unique: string }>(
+	'edit/:unique',
+	UMB_DOCUMENT_WORKSPACE_PATH,
+);

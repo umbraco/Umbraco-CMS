@@ -5,7 +5,12 @@ import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbNumberState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbNumberState,
+	UmbObjectState,
+	UmbStringState,
+	observeMultiple,
+} from '@umbraco-cms/backoffice/observable-api';
 import { encodeFilePath } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -180,10 +185,12 @@ export abstract class UmbBlockEntryContext<
 		const index = this.#index.value;
 		if (this._entries && index !== undefined) {
 			this.observe(
-				this._entries.catalogueRouteBuilder,
-				(catalogueRouteBuilder) => {
-					if (catalogueRouteBuilder) {
+				observeMultiple([this._entries.catalogueRouteBuilder, this._entries.canCreate]),
+				([catalogueRouteBuilder, canCreate]) => {
+					if (catalogueRouteBuilder && canCreate) {
 						this.#createPath.setValue(this._entries!.getPathForCreateBlock(index));
+					} else {
+						this.#createPath.setValue(undefined);
 					}
 				},
 				'observeRouteBuilderCreate',

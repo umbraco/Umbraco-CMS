@@ -14,29 +14,12 @@ description?: string | null
 icon?: string | null
     };
 
-export type AuditLogEntityModel = {
-        id?: string | null
-type?: string | null
-    };
-
 export type AuditLogResponseModel = {
         user: ReferenceByIdModel
-entity?: AuditLogEntityModel | null
 timestamp: string
 logType: AuditTypeModel
 comment?: string | null
 parameters?: string | null
-    };
-
-export type AuditLogWithUsernameResponseModel = {
-        user: ReferenceByIdModel
-entity?: AuditLogEntityModel | null
-timestamp: string
-logType: AuditTypeModel
-comment?: string | null
-parameters?: string | null
-userName?: string | null
-userAvatars: Array<string>
     };
 
 export enum AuditTypeModel {
@@ -1398,6 +1381,14 @@ id: string
 compositions: Array<MemberTypeCompositionModel>
     };
 
+export type MemberTypeTreeItemResponseModel = {
+        hasChildren: boolean
+id: string
+parent?: ReferenceByIdModel | null
+name: string
+icon: string
+    };
+
 export type MemberValueModel = {
         culture?: string | null
 segment?: string | null
@@ -1479,6 +1470,10 @@ category: string
 type: EventMessageTypeModel
     };
 
+export type OEmbedResponseModel = {
+        markup: string
+    };
+
 export type ObjectTypeResponseModel = {
         name?: string | null
 id: string
@@ -1546,11 +1541,6 @@ items: Array<AllowedMediaTypeModel>
 export type PagedAuditLogResponseModel = {
         total: number
 items: Array<AuditLogResponseModel>
-    };
-
-export type PagedAuditLogWithUsernameResponseModel = {
-        total: number
-items: Array<AuditLogWithUsernameResponseModel>
     };
 
 export type PagedCultureReponseModel = {
@@ -1681,6 +1671,11 @@ items: Array<MemberGroupResponseModel>
 export type PagedMemberResponseModel = {
         total: number
 items: Array<MemberResponseModel>
+    };
+
+export type PagedMemberTypeTreeItemResponseModel = {
+        total: number
+items: Array<MemberTypeTreeItemResponseModel>
     };
 
 export type PagedModelDataTypeItemResponseModel = {
@@ -2597,6 +2592,7 @@ readonly subscribeToNewsletter: boolean
 export type UserItemResponseModel = {
         id: string
 name: string
+avatarUrls: Array<string>
     };
 
 export enum UserOrderModel {
@@ -2708,43 +2704,6 @@ headers: Record<string, string>
 id: string
 events: Array<WebhookEventResponseModel>
     };
-
-export type AuditLogData = {
-        
-        payloads: {
-            GetAuditLog: {
-                        orderDirection?: DirectionModel
-sinceDate?: string
-skip?: number
-take?: number
-                        
-                    };
-GetAuditLogById: {
-                        id: string
-orderDirection?: DirectionModel
-sinceDate?: string
-skip?: number
-take?: number
-                        
-                    };
-GetAuditLogTypeByLogType: {
-                        logType: AuditTypeModel
-sinceDate?: string
-skip?: number
-take?: number
-                        
-                    };
-        }
-        
-        
-        responses: {
-            GetAuditLog: PagedAuditLogWithUsernameResponseModel
-                ,GetAuditLogById: PagedAuditLogResponseModel
-                ,GetAuditLogTypeByLogType: PagedAuditLogResponseModel
-                
-        }
-        
-    }
 
 export type CultureData = {
         
@@ -3249,6 +3208,14 @@ PutDocumentById: {
 requestBody?: UpdateDocumentRequestModel
                         
                     };
+GetDocumentByIdAuditLog: {
+                        id: string
+orderDirection?: DirectionModel
+sinceDate?: string
+skip?: number
+take?: number
+                        
+                    };
 PostDocumentByIdCopy: {
                         id: string
 requestBody?: CopyDocumentRequestModel
@@ -3409,6 +3376,7 @@ take?: number
                 ,GetDocumentById: DocumentResponseModel
                 ,DeleteDocumentById: string
                 ,PutDocumentById: string
+                ,GetDocumentByIdAuditLog: PagedAuditLogResponseModel
                 ,PostDocumentByIdCopy: string
                 ,GetDocumentByIdDomains: DomainsResponseModel
                 ,PutDocumentByIdDomains: string
@@ -3704,6 +3672,12 @@ export type MediaTypeData = {
                         id?: Array<string>
                         
                     };
+GetItemMediaTypeAllowed: {
+                        fileExtension?: string
+skip?: number
+take?: number
+                        
+                    };
 GetItemMediaTypeSearch: {
                         query?: string
 skip?: number
@@ -3795,6 +3769,7 @@ take?: number
         
         responses: {
             GetItemMediaType: Array<MediaTypeItemResponseModel>
+                ,GetItemMediaTypeAllowed: PagedModelMediaTypeItemResponseModel
                 ,GetItemMediaTypeSearch: PagedModelMediaTypeItemResponseModel
                 ,PostMediaType: string
                 ,GetMediaTypeById: MediaTypeResponseModel
@@ -3856,6 +3831,14 @@ DeleteMediaById: {
 PutMediaById: {
                         id: string
 requestBody?: UpdateMediaRequestModel
+                        
+                    };
+GetMediaByIdAuditLog: {
+                        id: string
+orderDirection?: DirectionModel
+sinceDate?: string
+skip?: number
+take?: number
                         
                     };
 PutMediaByIdMove: {
@@ -3954,6 +3937,7 @@ take?: number
                 ,GetMediaById: MediaResponseModel
                 ,DeleteMediaById: string
                 ,PutMediaById: string
+                ,GetMediaByIdAuditLog: PagedAuditLogResponseModel
                 ,PutMediaByIdMove: string
                 ,PutMediaByIdMoveToRecycleBin: string
                 ,GetMediaByIdReferencedBy: PagedIReferenceResponseModel
@@ -4088,7 +4072,7 @@ take?: number
                 ,GetMemberTypeByIdCompositionReferences: Array<MemberTypeCompositionResponseModel>
                 ,PostMemberTypeByIdCopy: string
                 ,PostMemberTypeAvailableCompositions: Array<AvailableMemberTypeCompositionResponseModel>
-                ,GetTreeMemberTypeRoot: PagedNamedEntityTreeItemResponseModel
+                ,GetTreeMemberTypeRoot: PagedMemberTypeTreeItemResponseModel
                 
         }
         
@@ -4189,6 +4173,25 @@ take?: number
         
         responses: {
             GetObjectTypes: PagedObjectTypeResponseModel
+                
+        }
+        
+    }
+
+export type OembedData = {
+        
+        payloads: {
+            GetOembedQuery: {
+                        maxHeight?: number
+maxWidth?: number
+url?: string
+                        
+                    };
+        }
+        
+        
+        responses: {
+            GetOembedQuery: OEmbedResponseModel
                 
         }
         
@@ -4951,7 +4954,13 @@ GetUserDataById: {
 export type UserGroupData = {
         
         payloads: {
-            GetItemUserGroup: {
+            GetFilterUserGroup: {
+                        filter?: string
+skip?: number
+take?: number
+                        
+                    };
+GetItemUserGroup: {
                         id?: Array<string>
                         
                     };
@@ -4995,7 +5004,8 @@ requestBody?: Array<string>
         
         
         responses: {
-            GetItemUserGroup: Array<UserGroupItemResponseModel>
+            GetFilterUserGroup: PagedUserGroupResponseModel
+                ,GetItemUserGroup: Array<UserGroupItemResponseModel>
                 ,DeleteUserGroup: string
                 ,PostUserGroup: string
                 ,GetUserGroup: PagedUserGroupResponseModel
