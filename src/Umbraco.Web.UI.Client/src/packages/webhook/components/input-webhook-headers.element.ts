@@ -70,13 +70,11 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 		return html`
 			<input
 				type="text"
-				placeholder="Name..."
 				.value=${header.name}
 				@input=${(e: InputEvent) => this.#onInput(e, 'name', index)}
 				list="nameList" />
 			<input
 				type="text"
-				placeholder="Value..."
 				.value=${header.value}
 				@input=${(e: InputEvent) => this.#onInput(e, 'value', index)}
 				list="valueList" />
@@ -134,10 +132,6 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 				border: 1px solid var(--uui-color-border);
 				margin-bottom: var(--uui-size-space-3);
 				border-radius: var(--uui-border-radius);
-			}
-
-			#add {
-				grid-column: -1 / 1;
 			}
 
 			#grid > * {
