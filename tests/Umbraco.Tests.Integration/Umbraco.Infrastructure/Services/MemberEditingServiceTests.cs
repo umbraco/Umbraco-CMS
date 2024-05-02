@@ -25,6 +25,8 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
 
     private IUserService UserService => GetRequiredService<IUserService>();
 
+    private IMemberGroupService MemberGroupService => GetRequiredService<IMemberGroupService>();
+
     [Test]
     public async Task Can_Create_Member()
     {
@@ -129,6 +131,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
     {
         MemberService.AddRole("RoleTwo");
         MemberService.AddRole("RoleThree");
+        var groups = new[] { MemberGroupService.GetByName("RoleTwo"), MemberGroupService.GetByName("RoleThree") };
 
         var member = await CreateMemberAsync();
 
@@ -138,7 +141,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Username = member.Username,
             IsApproved = true,
             InvariantName = member.Name,
-            Roles = new [] { "RoleTwo", "RoleThree" }
+            Roles = groups.Select(x => x.Key),
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
@@ -432,6 +435,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
         memberType.SetIsSensitiveProperty("title", titleIsSensitive);
         MemberTypeService.Save(memberType);
         MemberService.AddRole("RoleOne");
+        var group = MemberGroupService.GetByName("RoleOne");
 
         var createModel = new MemberCreateModel
         {
@@ -441,7 +445,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Password = "SuperSecret123",
             IsApproved = true,
             ContentTypeKey = memberType.Key,
-            Roles = new [] { "RoleOne" },
+            Roles = new [] { group.Key },
             InvariantName = "T. Est",
             InvariantProperties = new[]
             {

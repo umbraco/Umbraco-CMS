@@ -14,7 +14,7 @@ internal class MigrateCharPermissionsToStrings : MigrationBase
 {
     private readonly IIdKeyMap _idKeyMap;
 
-    private static Dictionary<char, IEnumerable<string>> _charToStringPermissionDictionary =
+    internal static Dictionary<char, IEnumerable<string>> CharToStringPermissionDictionary { get; } =
         new()
         {
             ['I'] = new []{ActionAssignDomain.ActionLetter},
@@ -110,5 +110,5 @@ internal class MigrateCharPermissionsToStrings : MigrationBase
         Delete.Table(Constants.DatabaseSchema.Tables.UserGroup2Node).Do();
     }
 
-    private IEnumerable<string> ReplacePermissionValue(char oldPermission) => _charToStringPermissionDictionary.TryGetValue(oldPermission, out IEnumerable<string>? newPermission) ? newPermission : oldPermission.ToString().Yield();
+    private IEnumerable<string> ReplacePermissionValue(char oldPermission) => CharToStringPermissionDictionary.TryGetValue(oldPermission, out IEnumerable<string>? newPermission) ? newPermission : oldPermission.ToString().Yield();
 }

@@ -22,6 +22,11 @@ public class ItemStaticFileItemController : StaticFileItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "path")] HashSet<string> paths)
     {
+        if (paths.Count is 0)
+        {
+            return Ok(Enumerable.Empty<StaticFileItemResponseModel>());
+        }
+
         paths = paths.Select(path => path.VirtualPathToSystemPath()).ToHashSet();
         IEnumerable<StaticFileItemResponseModel> responseModels = _fileItemPresentationFactory.CreateStaticFileItemResponseModels(paths);
         return await Task.FromResult(Ok(responseModels));

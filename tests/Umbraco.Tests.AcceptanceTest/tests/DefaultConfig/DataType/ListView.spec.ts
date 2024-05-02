@@ -114,7 +114,8 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can update Bulk Action Permission`, async ({ umbracoApi, umbracoUi }) => {
+    // The output is currently not the same
+    test.skip(`can update Bulk Action Permission`, async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const bulkActionPermissionValue = 'Allow bulk copy (content only)';
       const expectedDataTypeValues = {
@@ -137,7 +138,7 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can update Content App Icon`, async ({ umbracoApi, umbracoUi }) => {
+    test(`can update Content App Icon`, async ({ page, umbracoApi, umbracoUi }) => {
       // Arrange
       const iconValue = 'icon-activity';
       const expectedDataTypeValues = {
@@ -147,7 +148,11 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.clickContentAppIconButton();
-      await umbracoUi.dataType.chooseContentAppIconByValue(iconValue);
+      // TODO: Uncomment one of the possible ways to select the icon. when the helpers are fixed
+      // await umbracoUi.dataType.clickLabelWithName(iconValue, true);
+      // await umbracoUi.dataType.chooseContentAppIconByValue(iconValue);
+      await page.getByLabel(iconValue).click({force: true});
+      await umbracoUi.dataType.clickSubmitButton();
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert

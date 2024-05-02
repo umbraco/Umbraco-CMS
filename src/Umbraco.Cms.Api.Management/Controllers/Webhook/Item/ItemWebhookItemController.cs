@@ -9,24 +9,29 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook.Item;
 
 [ApiVersion("1.0")]
-public class ItemsWebhookEntityController : WebhookEntityControllerBase
+public class ItemWebhookItemController : WebhookItemControllerBase
 {
     private readonly IWebhookService _webhookService;
     private readonly IUmbracoMapper _mapper;
 
-    public ItemsWebhookEntityController(IWebhookService webhookService, IUmbracoMapper mapper)
+    public ItemWebhookItemController(IWebhookService webhookService, IUmbracoMapper mapper)
     {
         _webhookService = webhookService;
         _mapper = mapper;
     }
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<WebhookItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Items(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
-        [FromQuery(Name = "ids")] HashSet<Guid> ids)
+        [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<WebhookItemResponseModel>());
+        }
+
         IEnumerable<IWebhook?> webhooks = await _webhookService.GetMultipleAsync(ids);
         List<WebhookItemResponseModel> entityResponseModels = _mapper.MapEnumerable<IWebhook?, WebhookItemResponseModel>(webhooks);
         return Ok(entityResponseModels);
