@@ -2284,6 +2284,10 @@ export default {
 		labelUsedByItems: 'Referenced by the following items',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
+		labelMoreReferences: (count: number) => {
+			if (count === 1) return '...and one more item';
+			return `...and ${count} more items`;
+		},
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',
