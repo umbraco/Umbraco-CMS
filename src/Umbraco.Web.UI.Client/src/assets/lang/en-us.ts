@@ -2305,10 +2305,12 @@ export default {
 		documentationHeader: 'Documentation',
 		documentationDescription: 'Read more about working with the items in Settings in our Documentation.',
 		communityHeader: 'Community',
+		communitytDescription: 'Ask a question in the community forum or our Discord community.',
+
 		trainingHeader: 'Training',
 		trainingDescription: 'Find out about real-life training and certification opportunities',
 		supportHeader: 'Support',
-		supportDescription: 'Ask a question in the community forum or our Discord community.',
+		supportDescription: 'Extend your team with a highly skilled and passionate bunch of Umbraco know-it-alls.',
 		videosHeader: 'Videos',
 		videosDescription:
 			'Watch our free tutorial videos on the Umbraco Learning Base YouTube channel, to get up to speed quickly with Umbraco.',
