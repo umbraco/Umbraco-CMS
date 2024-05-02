@@ -2,6 +2,7 @@ import { html, customElement, property } from '@umbraco-cms/backoffice/external/
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-slider')
 export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -30,7 +31,7 @@ export class UmbInputSliderElement extends UUIFormControlMixin(UmbLitElement, ''
 	#onChange(e: UUISliderEvent) {
 		e.stopPropagation();
 		this.value = e.target.value as string;
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	render() {
