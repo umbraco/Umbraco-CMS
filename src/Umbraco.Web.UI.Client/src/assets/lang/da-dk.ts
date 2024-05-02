@@ -2470,6 +2470,7 @@ export default {
 		trainingHeader: 'Træning',
 		trainingDescription: 'Se mulighederne for real-life træning og certificering',
 		supportHeader: 'Support',
+		supportDescription: 'Udvid dit team med en højt kvalificeret og passioneret flok Umbraco-vidende mennesker.',
 		videosHeader: 'Videoer',
 		videosDescription:
 			'Se vores gratis tutortial videoer på Umbraco Learning Base YouTube-kanel, for hurtigt at komme i gang med Umbraco.',
