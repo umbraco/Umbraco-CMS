@@ -13,16 +13,16 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Webhook that fetches data from the server
  * @export
- * @class UmbWebhookServerDataSource
+ * @class UmbWebhookDetailServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbWebhookServerDataSource implements UmbDetailDataSource<UmbWebhookDetailModel> {
+export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<UmbWebhookDetailModel> {
 	#host: UmbControllerHost;
 
 	/**
-	 * Creates an instance of UmbWebhookServerDataSource.
+	 * Creates an instance of UmbWebhookDetailServerDataSource.
 	 * @param {UmbControllerHost} host
-	 * @memberof UmbWebhookServerDataSource
+	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -32,7 +32,7 @@ export class UmbWebhookServerDataSource implements UmbDetailDataSource<UmbWebhoo
 	 * Creates a new Webhook scaffold
 	 * @param {Partial<UmbWebhookDetailModel>} [preset]
 	 * @return { CreateWebhookRequestModel }
-	 * @memberof UmbWebhookServerDataSource
+	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbWebhookDetailModel> = {}) {
 		const data: UmbWebhookDetailModel = {
@@ -53,7 +53,7 @@ export class UmbWebhookServerDataSource implements UmbDetailDataSource<UmbWebhoo
 	 * Fetches a Webhook with the given id from the server
 	 * @param {string} unique
 	 * @return {*}
-	 * @memberof UmbWebhookServerDataSource
+	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
@@ -82,7 +82,7 @@ export class UmbWebhookServerDataSource implements UmbDetailDataSource<UmbWebhoo
 	 * Inserts a new Webhook on the server
 	 * @param {UmbWebhookDetailModel} model
 	 * @return {*}
-	 * @memberof UmbWebhookServerDataSource
+	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async create(model: UmbWebhookDetailModel) {
 		if (!model) throw new Error('Webhook is missing');
@@ -115,7 +115,7 @@ export class UmbWebhookServerDataSource implements UmbDetailDataSource<UmbWebhoo
 	 * Updates a Webhook on the server
 	 * @param {UmbWebhookDetailModel} Webhook
 	 * @return {*}
-	 * @memberof UmbWebhookServerDataSource
+	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async update(model: UmbWebhookDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
@@ -148,7 +148,7 @@ export class UmbWebhookServerDataSource implements UmbDetailDataSource<UmbWebhoo
 	 * Deletes a Webhook on the server
 	 * @param {string} unique
 	 * @return {*}
-	 * @memberof UmbWebhookServerDataSource
+	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
