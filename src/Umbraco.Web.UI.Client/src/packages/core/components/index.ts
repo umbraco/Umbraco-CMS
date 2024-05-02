@@ -19,7 +19,6 @@ export * from './input-dropdown/index.js';
 export * from './input-entity/index.js';
 export * from './input-eye-dropper/index.js';
 export * from './input-manifest/index.js';
-export * from '../../property-editors/multi-url-picker/input-multi-url/index.js';
 export * from './input-number-range/index.js';
 export * from './input-radio-button-list/index.js';
 export * from './input-slider/index.js';
