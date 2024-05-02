@@ -93,6 +93,7 @@ export class UmbAuthFlow {
 	readonly #postLogoutRedirectUri: string;
 	readonly #clientId: string;
 	readonly #scope: string;
+	readonly #timeoutSignal;
 
 	// tokens
 	#tokenResponse?: TokenResponse;
@@ -101,17 +102,19 @@ export class UmbAuthFlow {
 	 * This signal will emit when the authorization flow is complete.
 	 * @remark It will also emit if there is an error during the authorization flow.
 	 */
-	authorizationSignal = new Subject<void>();
+	readonly authorizationSignal = new Subject<void>();
 
 	constructor(
 		openIdConnectUrl: string,
 		redirectUri: string,
 		postLogoutRedirectUri: string,
+		timeoutSignal: Subject<void>,
 		clientId = 'umbraco-back-office',
 		scope = 'offline_access',
 	) {
 		this.#redirectUri = redirectUri;
 		this.#postLogoutRedirectUri = postLogoutRedirectUri;
+		this.#timeoutSignal = timeoutSignal;
 		this.#clientId = clientId;
 		this.#scope = scope;
 
@@ -310,7 +313,8 @@ export class UmbAuthFlow {
 
 		// if the refresh token is not set (maybe the provider doesn't support them)
 		if (!this.#tokenResponse?.refreshToken) {
-			return Promise.resolve('Missing refreshToken.');
+			this.#timeoutSignal.next();
+			return Promise.reject('Missing refreshToken.');
 		}
 
 		const request = new TokenRequest({
@@ -324,9 +328,12 @@ export class UmbAuthFlow {
 
 		await this.#performTokenRequest(request);
 
-		return this.#tokenResponse
-			? Promise.resolve(this.#tokenResponse.accessToken)
-			: Promise.reject('Missing accessToken.');
+		if (!this.#tokenResponse) {
+			this.#timeoutSignal.next();
+			return Promise.reject('Missing tokenResponse.');
+		}
+
+		return Promise.resolve(this.#tokenResponse.accessToken);
 	}
 
 	/**
