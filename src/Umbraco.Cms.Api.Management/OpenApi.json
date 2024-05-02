@@ -32356,6 +32356,58 @@
           }
         ]
       }
+    },
+    "/umbraco/management/api/v1/webhook/events": {
+      "get": {
+        "tags": [
+          "Webhook"
+        ],
+        "operationId": "GetWebhookEvents",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedWebhookResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -33884,6 +33936,11 @@
             "items": {
               "type": "string"
             }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -43461,6 +43518,7 @@
       },
       "UserItemResponseModel": {
         "required": [
+          "avatarUrls",
           "id",
           "name"
         ],
@@ -43472,6 +43530,12 @@
           },
           "name": {
             "type": "string"
+          },
+          "avatarUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
