@@ -2,11 +2,16 @@ import type { UmbWebhookEntityType } from './entity.js';
 
 export interface UmbWebhookDetailModel {
 	entityType: UmbWebhookEntityType;
-	headers: { [key: string]: string };
+	headers: Record<string, string>;
 	unique: string;
-	name: string;
 	enabled: boolean;
 	url: string;
-	events: string[] | null;
-	types: string[] | null;
+	events: Array<WebhookEventModel>;
+	contentTypes: Array<string>;
+}
+
+export interface WebhookEventModel {
+	eventName: string;
+	eventType: string;
+	alias: string;
 }
