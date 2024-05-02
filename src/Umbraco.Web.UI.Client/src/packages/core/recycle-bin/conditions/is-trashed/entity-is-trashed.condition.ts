@@ -1,4 +1,4 @@
-import { UMB_IS_TRASHED_CONTEXT } from '../../contexts/is-trashed/index.js';
+import { UMB_ENTITY_IS_TRASHED_CONTEXT } from '../../contexts/is-trashed/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	UmbConditionConfigBase,
@@ -11,7 +11,7 @@ export class UmbIsTrashedCondition extends UmbConditionBase<UmbConditionConfigBa
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbConditionConfigBase>) {
 		super(host, args);
 
-		this.consumeContext(UMB_IS_TRASHED_CONTEXT, (context) => {
+		this.consumeContext(UMB_ENTITY_IS_TRASHED_CONTEXT, (context) => {
 			this.observe(context.isTrashed, (isTrashed) => {
 				this.permitted = isTrashed === true;
 			});
