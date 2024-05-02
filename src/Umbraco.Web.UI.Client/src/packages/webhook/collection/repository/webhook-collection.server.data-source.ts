@@ -39,7 +39,7 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 		const items = data.items.map((item) => {
 			const model: UmbWebhookDetailModel = {
 				entityType: UMB_WEBHOOK_ENTITY_TYPE,
-				unique: item.url,
+				unique: item.id,
 				url: item.url,
 				enabled: item.enabled,
 				headers: item.headers,

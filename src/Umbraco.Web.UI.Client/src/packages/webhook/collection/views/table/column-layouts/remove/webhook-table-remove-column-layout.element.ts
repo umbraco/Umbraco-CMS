@@ -4,6 +4,9 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-webhook-table-remove-column-layout')
 export class UmbWebhookTableRemoveColumnLayoutElement extends UmbLitElement {
+	@property()
+	value = '';
+
 	render() {
 		return html` <uui-button label="remove"></uui-button> `;
 	}

@@ -20,6 +20,11 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableColumns: Array<UmbTableColumn> = [
 		{
+			name: 'Name',
+			alias: 'name',
+			elementName: 'umb-webhook-table-name-column-layout',
+		},
+		{
 			name: 'Enabled',
 			alias: 'enabled',
 			elementName: 'umb-webhook-table-boolean-column-layout',
@@ -63,18 +68,24 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#createTableItems(webhooks: Array<UmbWebhookDetailModel>) {
-		this._tableItems = webhooks.map((webhook) => {
+		console.log(webhooks);
+		this._tableItems = webhooks.map((webhook, index) => {
 			return {
 				id: webhook.unique,
 				icon: 'icon-webhook',
 				data: [
 					{
-						columnAlias: 'enabled',
-						value: webhook.enabled,
+						columnAlias: 'name',
+						value: { name: `Webhook ${index + 1}`, unique: webhook.unique },
 					},
 					{
 						columnAlias: 'url',
 						value: webhook.url,
+						path: webhook.url,
+					},
+					{
+						columnAlias: 'enabled',
+						value: webhook.enabled,
 					},
 					{
 						columnAlias: 'events',
@@ -86,7 +97,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'remove',
-						value: '',
+						value: webhook.unique,
 					},
 				],
 			};
