@@ -41,7 +41,7 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 					url: item.url,
 					enabled: item.enabled,
 					events: item.events.split(','),
-					types: item.types.split(','),
+					contentTypes: item.types.split(','),
 				};
 
 				return model;

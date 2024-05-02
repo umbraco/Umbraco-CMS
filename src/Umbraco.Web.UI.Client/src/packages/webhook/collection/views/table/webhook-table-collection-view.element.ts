@@ -82,7 +82,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'types',
-						value: webhook.types,
+						value: webhook.contentTypes,
 					},
 					{
 						columnAlias: 'entityActions',

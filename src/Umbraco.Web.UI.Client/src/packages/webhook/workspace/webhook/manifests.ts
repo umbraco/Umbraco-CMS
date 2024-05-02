@@ -1,7 +1,9 @@
 import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE } from '../../entity.js';
+import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestTypes,
 	ManifestWorkspace,
+	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -37,4 +39,25 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
-export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews];
+const workspaceActions: Array<ManifestWorkspaceActions> = [
+	{
+		type: 'workspaceAction',
+		kind: 'default',
+		alias: 'Umb.WorkspaceAction.Webhook.Save',
+		name: 'Save Webhook Workspace Action',
+		api: UmbSubmitWorkspaceAction,
+		meta: {
+			look: 'primary',
+			color: 'positive',
+			label: '#buttons_save',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
+	},
+];
+
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceViews, ...workspaceActions];

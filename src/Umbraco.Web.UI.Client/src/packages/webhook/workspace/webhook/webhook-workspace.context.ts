@@ -101,7 +101,7 @@ export class UmbWebhookWorkspaceContext
 	}
 
 	setTypes(types: string[]) {
-		this.#data.update({ types });
+		this.#data.update({ contentTypes: types });
 	}
 
 	setUrl(url: string) {

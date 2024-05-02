@@ -37,11 +37,12 @@ export class UmbWebhookServerDataSource implements UmbDetailDataSource<UmbWebhoo
 	async createScaffold(preset: Partial<UmbWebhookDetailModel> = {}) {
 		const data: UmbWebhookDetailModel = {
 			entityType: UMB_WEBHOOK_ENTITY_TYPE,
-			fallbackIsoCode: null,
-			isDefault: false,
-			isMandatory: false,
-			name: '',
-			unique: '',
+			unique: UmbId.new(),
+			headers: {},
+			events: [],
+			enabled: true,
+			url: '',
+			contentTypes: [],
 			...preset,
 		};
 
@@ -57,10 +58,7 @@ export class UmbWebhookServerDataSource implements UmbDetailDataSource<UmbWebhoo
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
-			WebhookService.getWebhookByIsoCode({ isoCode: unique }),
-		);
+		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookService.getWebhookById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -69,11 +67,12 @@ export class UmbWebhookServerDataSource implements UmbDetailDataSource<UmbWebhoo
 		// TODO: make data mapper to prevent errors
 		const dataType: UmbWebhookDetailModel = {
 			entityType: UMB_WEBHOOK_ENTITY_TYPE,
-			fallbackIsoCode: data.fallbackIsoCode?.toLowerCase() || null,
-			isDefault: data.isDefault,
-			isMandatory: data.isMandatory,
-			name: data.name,
-			unique: data.isoCode.toLowerCase(),
+			unique: data.id,
+			headers: data.headers,
+			events: data.events,
+			enabled: data.enabled,
+			url: data.url,
+			contentTypes: data.contentTypeKeys,
 		};
 
 		return { data: dataType };
@@ -90,11 +89,12 @@ export class UmbWebhookServerDataSource implements UmbDetailDataSource<UmbWebhoo
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateWebhookRequestModel = {
-			fallbackIsoCode: model.fallbackIsoCode?.toLowerCase(),
-			isDefault: model.isDefault,
-			isMandatory: model.isMandatory,
-			isoCode: model.unique.toLowerCase(),
-			name: model.name,
+			id: model.unique,
+			headers: model.headers,
+			events: model.events.map((event) => event.alias),
+			enabled: model.enabled,
+			url: model.url,
+			contentTypeKeys: model.contentTypes,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -122,16 +122,17 @@ export class UmbWebhookServerDataSource implements UmbDetailDataSource<UmbWebhoo
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateWebhookRequestModel = {
-			fallbackIsoCode: model.fallbackIsoCode?.toLowerCase(),
-			isDefault: model.isDefault,
-			isMandatory: model.isMandatory,
-			name: model.name,
+			headers: model.headers,
+			events: model.events.map((event) => event.alias),
+			enabled: model.enabled,
+			url: model.url,
+			contentTypeKeys: model.contentTypes,
 		};
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			WebhookService.putWebhookByIsoCode({
-				isoCode: model.unique.toLowerCase(),
+			WebhookService.putWebhookById({
+				id: model.unique,
 				requestBody,
 			}),
 		);
@@ -154,8 +155,8 @@ export class UmbWebhookServerDataSource implements UmbDetailDataSource<UmbWebhoo
 
 		return tryExecuteAndNotify(
 			this.#host,
-			WebhookService.deleteWebhookByIsoCode({
-				isoCode: unique,
+			WebhookService.deleteWebhookById({
+				id: unique,
 			}),
 		);
 	}
