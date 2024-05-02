@@ -310,6 +310,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		id: 'dt-datePicker-time',
 		parent: null,
 		editorAlias: 'Umbraco.DateTime',
+		editorUiAlias: 'Umb.PropertyEditorUi.DatePicker',
 		hasChildren: false,
 		isFolder: false,
 		isDeletable: true,

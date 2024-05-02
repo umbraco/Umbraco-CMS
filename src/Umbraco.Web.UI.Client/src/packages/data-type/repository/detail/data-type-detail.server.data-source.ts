@@ -120,6 +120,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	async update(model: UmbDataTypeDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
+		if (!model.editorUiAlias) throw new Error('Property Editor UI Alias is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateDataTypeRequestModel = {
