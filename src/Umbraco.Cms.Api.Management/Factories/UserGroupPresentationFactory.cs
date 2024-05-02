@@ -64,7 +64,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             FallbackPermissions = userGroup.Permissions,
             Permissions = await _permissionPresentationFactory.CreateAsync(userGroup.GranularPermissions),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
-            IsSystemGroup = userGroup.IsSystemUserGroup(),
+            IsDeletable = !userGroup.IsSystemUserGroup(),
+            AliasCanBeChanged = !userGroup.IsSystemUserGroup(),
         };
     }
 
@@ -95,6 +96,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             FallbackPermissions = userGroup.Permissions,
             Permissions = await _permissionPresentationFactory.CreateAsync(userGroup.GranularPermissions),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
+            IsDeletable = !userGroup.IsSystemUserGroup(),
+            AliasCanBeChanged = !userGroup.IsSystemUserGroup(),
         };
     }
 
