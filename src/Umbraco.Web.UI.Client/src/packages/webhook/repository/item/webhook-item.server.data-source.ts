@@ -1,23 +1,23 @@
-import type { UmbWebhookItemModel } from './types.js';
+import type { UmbLanguageItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import type { WebhookItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { LanguageItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { LanguageService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- * A server data source for Webhook items
+ * A server data source for Language items
  * @export
- * @class UmbWebhookItemServerDataSource
+ * @class UmbLanguageItemServerDataSource
  * @implements {DocumentTreeDataSource}
  */
-export class UmbWebhookItemServerDataSource extends UmbItemServerDataSourceBase<
-	WebhookItemResponseModel,
-	UmbWebhookItemModel
+export class UmbLanguageItemServerDataSource extends UmbItemServerDataSourceBase<
+	LanguageItemResponseModel,
+	UmbLanguageItemModel
 > {
 	/**
-	 * Creates an instance of UmbWebhookItemServerDataSource.
+	 * Creates an instance of UmbLanguageItemServerDataSource.
 	 * @param {UmbControllerHost} host
-	 * @memberof UmbWebhookItemServerDataSource
+	 * @memberof UmbLanguageItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -28,9 +28,9 @@ export class UmbWebhookItemServerDataSource extends UmbItemServerDataSourceBase<
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => WebhookService.getItemWebhook({ isoCode: uniques });
+const getItems = (uniques: Array<string>) => LanguageService.getItemLanguage({ isoCode: uniques });
 
-const mapper = (item: WebhookItemResponseModel): UmbWebhookItemModel => {
+const mapper = (item: LanguageItemResponseModel): UmbLanguageItemModel => {
 	return {
 		unique: item.isoCode,
 		name: item.name,
