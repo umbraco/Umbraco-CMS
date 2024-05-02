@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './column-layouts/boolean/webhook-table-boolean-column-layout.element.js';
 import './column-layouts/name/webhook-table-name-column-layout.element.js';
-import './column-layouts/remove/webhook-table-remove-column-layout.element.js';
+import './column-layouts/entity-actions/webhook-table-entity-actions-column-layout.element.js';
 
 @customElement('umb-webhook-table-collection-view')
 export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
@@ -43,8 +43,8 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 		},
 		{
 			name: '',
-			alias: 'remove',
-			elementName: 'umb-webhook-table-remove-column-layout',
+			alias: 'entityActions',
+			elementName: 'umb-webhook-table-entity-actions-column-layout',
 		},
 	];
 
@@ -68,7 +68,6 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#createTableItems(webhooks: Array<UmbWebhookDetailModel>) {
-		console.log(webhooks);
 		this._tableItems = webhooks.map((webhook, index) => {
 			return {
 				id: webhook.unique,
@@ -96,8 +95,8 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 						value: webhook.contentTypes,
 					},
 					{
-						columnAlias: 'remove',
-						value: webhook.unique,
+						columnAlias: 'entityActions',
+						value: webhook,
 					},
 				],
 			};

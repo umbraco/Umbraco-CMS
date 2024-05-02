@@ -1,4 +1,4 @@
-import type { UmbWebhookDetailModel } from '../../types.js';
+import type { UmbWebhookDetailModel, UmbWebhookEventModel } from '../../types.js';
 import { UmbWebhookDetailRepository } from '../../repository/index.js';
 import { UmbWebhookWorkspaceEditorElement } from './webhook-workspace-editor.element.js';
 import {
@@ -21,7 +21,6 @@ export class UmbWebhookWorkspaceContext
 	readonly data = this.#data.asObservable();
 
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
-	readonly name = this.#data.asObservablePart((data) => data?.name);
 
 	readonly routes = new UmbWorkspaceRouteManager(this);
 
@@ -88,11 +87,7 @@ export class UmbWebhookWorkspaceContext
 		return this.#data.getValue()?.unique;
 	}
 
-	setName(name: string) {
-		this.#data.update({ name });
-	}
-
-	setEvents(events: string[]) {
+	setEvents(events: Array<UmbWebhookEventModel>) {
 		this.#data.update({ events });
 	}
 
