@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -17,13 +18,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 public class CreateWebhookController : WebhookControllerBase
 {
     private readonly IWebhookService _webhookService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IWebhookPresentationFactory _webhookPresentationFactory;
 
     public CreateWebhookController(
-        IWebhookService webhookService, IUmbracoMapper umbracoMapper)
+        IWebhookService webhookService, IWebhookPresentationFactory webhookPresentationFactory)
     {
         _webhookService = webhookService;
-        _umbracoMapper = umbracoMapper;
+        _webhookPresentationFactory = webhookPresentationFactory;
     }
 
     [HttpPost]
@@ -35,7 +36,7 @@ public class CreateWebhookController : WebhookControllerBase
         CancellationToken cancellationToken,
         CreateWebhookRequestModel createWebhookRequestModel)
     {
-        IWebhook created = _umbracoMapper.Map<IWebhook>(createWebhookRequestModel)!;
+        IWebhook created = _webhookPresentationFactory.CreateWebhook(createWebhookRequestModel);
 
         Attempt<IWebhook, WebhookOperationStatus> result = await _webhookService.CreateAsync(created);
 
