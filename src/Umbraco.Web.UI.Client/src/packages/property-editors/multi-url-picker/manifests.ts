@@ -1,5 +1,6 @@
 import { manifest as schemaManifest } from './Umbraco.MultiUrlPicker.js';
 import { manifests as modalManifests } from './link-picker-modal/manifests.js';
+import { manifests as tinyMcePluginManifests } from './tiny-mce/manifests.js';
 import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUi = {
@@ -31,4 +32,4 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
-export const manifests: Array<ManifestTypes> = [manifest, schemaManifest, ...modalManifests];
+export const manifests: Array<ManifestTypes> = [manifest, schemaManifest, ...modalManifests, ...tinyMcePluginManifests];
