@@ -125,7 +125,7 @@ test.describe('Stylesheets tests', () => {
     expect(await umbracoApi.stylesheet.doesNameExist(wrongStylesheetName)).toBeFalsy();
   });
 
-  test.skip('can edit rich text editor styles', async ({umbracoApi, umbracoUi}) => {
+  test('can edit rich text editor styles', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const newStyleName = 'TestNewStyleName';
     const newStyleSelector = 'h2';
