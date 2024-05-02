@@ -27,9 +27,9 @@ export class UmbUserWorkspaceContext
 	readonly documentStartNodeUniques = this.#currentData.asObservablePart(
 		(data) => data?.documentStartNodeUniques || [],
 	);
-	readonly documentRootAccess = this.#currentData.asObservablePart((data) => data?.documentRootAccess || false);
+	readonly hasDocumentRootAccess = this.#currentData.asObservablePart((data) => data?.hasDocumentRootAccess || false);
 	readonly mediaStartNodeUniques = this.#currentData.asObservablePart((data) => data?.mediaStartNodeUniques || []);
-	readonly mediaRootAccess = this.#currentData.asObservablePart((data) => data?.mediaRootAccess || false);
+	readonly hasMediaRootAccess = this.#currentData.asObservablePart((data) => data?.hasMediaRootAccess || false);
 
 	readonly routes = new UmbWorkspaceRouteManager(this);
 

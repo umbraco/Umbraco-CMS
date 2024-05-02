@@ -18,13 +18,13 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 	private _documentStartNodeUniques: UmbUserDetailModel['documentStartNodeUniques'] = [];
 
 	@state()
-	private _documentRootAccess: UmbUserDetailModel['documentRootAccess'] = false;
+	private _documentRootAccess: UmbUserDetailModel['hasDocumentRootAccess'] = false;
 
 	@state()
 	private _mediaStartNodeUniques: UmbUserDetailModel['documentStartNodeUniques'] = [];
 
 	@state()
-	private _mediaRootAccess: UmbUserDetailModel['mediaRootAccess'] = false;
+	private _mediaRootAccess: UmbUserDetailModel['hasMediaRootAccess'] = false;
 
 	#workspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
 
@@ -41,7 +41,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 			);
 
 			this.observe(
-				this.#workspaceContext.documentRootAccess,
+				this.#workspaceContext.hasDocumentRootAccess,
 				(value) => (this._documentRootAccess = value),
 				'_observeDocumentRootAccess',
 			);
@@ -53,7 +53,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 			);
 
 			this.observe(
-				this.#workspaceContext.mediaRootAccess,
+				this.#workspaceContext.hasMediaRootAccess,
 				(value) => (this._mediaRootAccess = value),
 				'_observeMediaRootAccess',
 			);
@@ -78,7 +78,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		event.stopPropagation();
 		const target = event.target;
 		// TODO make contexts method
-		this.#workspaceContext?.updateProperty('documentRootAccess', target.checked);
+		this.#workspaceContext?.updateProperty('hasDocumentRootAccess', target.checked);
 		this.#workspaceContext?.updateProperty('documentStartNodeUniques', []);
 	}
 
@@ -94,7 +94,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		event.stopPropagation();
 		const target = event.target;
 		// TODO make contexts method
-		this.#workspaceContext?.updateProperty('mediaRootAccess', target.checked);
+		this.#workspaceContext?.updateProperty('hasMediaRootAccess', target.checked);
 		this.#workspaceContext?.updateProperty('mediaStartNodeUniques', []);
 	}
 
