@@ -1,15 +1,13 @@
+import type { UmbLinkPickerLink } from '../link-picker-modal/types.js';
+import { UMB_LINK_PICKER_MODAL } from '../link-picker-modal/link-picker-modal.token.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	umbConfirmModal,
-	UmbModalRouteRegistrationController,
-	UMB_LINK_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbModalRouteBuilder, UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
