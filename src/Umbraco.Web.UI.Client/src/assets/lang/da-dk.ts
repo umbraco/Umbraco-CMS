@@ -2466,10 +2466,11 @@ export default {
 	},
 	settingsDashboard: {
 		communityHeader: 'Community',
+		communityDescription: 'Stil et spørgsmål i community forummet eller i vores Discord community',
 		trainingHeader: 'Træning',
 		trainingDescription: 'Se mulighederne for real-life træning og certificering',
 		supportHeader: 'Support',
-		supportDescription: 'Stil et spørgsmål i community forummet eller i vores Discord community',
+		supportDescription: 'Udvid dit team med en højt kvalificeret og passioneret flok Umbraco-vidende mennesker.',
 		videosHeader: 'Videoer',
 		videosDescription:
 			'Se vores gratis tutortial videoer på Umbraco Learning Base YouTube-kanel, for hurtigt at komme i gang med Umbraco.',
