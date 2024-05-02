@@ -69,11 +69,11 @@ export class RedirectRequestHandler extends AuthorizationRequestHandler {
 			this.storageBackend.setItem(authorizationServiceConfigurationKey(handle), JSON.stringify(configuration.toJson())),
 		]);
 
-		persisted.then(() => {
+		return persisted.then(() => {
 			// make the redirect request
 			const url = this.buildRequestUrl(configuration, request);
 			log('Making a request to ', request, url);
-			this.locationLike.assign(url);
+			return url;
 		});
 	}
 
