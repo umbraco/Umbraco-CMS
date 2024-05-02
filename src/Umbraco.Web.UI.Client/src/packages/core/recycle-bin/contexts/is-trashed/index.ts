@@ -1,2 +1,2 @@
-export { UmbEntityIsTrashedContext } from './entity-is-trashed.context.js';
-export { UMB_ENTITY_IS_TRASHED_CONTEXT } from './entity-is-trashed.context-token.js';
+export { UmbIsTrashedEntityContext } from './is-trashed.entity-context.js';
+export { UMB_IS_TRASHED_ENTITY_CONTEXT } from './is-trashed.entity-context-token.js';

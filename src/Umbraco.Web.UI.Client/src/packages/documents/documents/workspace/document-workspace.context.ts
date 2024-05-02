@@ -58,7 +58,7 @@ import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/do
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
-import { UmbEntityIsTrashedContext } from '@umbraco-cms/backoffice/recycle-bin';
+import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -157,7 +157,7 @@ export class UmbDocumentWorkspaceContext
 	// TODO: this should be set up for all entity workspace contexts in a base class
 	#entityContext = new UmbEntityContext(this);
 	// TODO: this might not be the correct place to spin this up
-	#isTrashedContext = new UmbEntityIsTrashedContext(this);
+	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);

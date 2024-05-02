@@ -1,21 +1,21 @@
-import { UMB_ENTITY_IS_TRASHED_CONTEXT } from './entity-is-trashed.context-token.js';
+import { UMB_IS_TRASHED_ENTITY_CONTEXT } from './is-trashed.entity-context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
- * Represents the context for the isTrashed state
+ * A entity context for the isTrashed state.
  * @export
- * @class UmbIsTrashedContext
- * @extends {UmbContextBase<UmbEntityIsTrashedContext>}
- * @implements {UmbEntityIsTrashedContext}
+ * @class UmbIsTrashedEntityContext
+ * @extends {UmbContextBase<UmbIsTrashedEntityContext>}
+ * @implements {UmbIsTrashedEntityContext}
  */
-export class UmbEntityIsTrashedContext extends UmbContextBase<UmbEntityIsTrashedContext> {
+export class UmbIsTrashedEntityContext extends UmbContextBase<UmbIsTrashedEntityContext> {
 	#isTrashed = new UmbBooleanState(false);
 	isTrashed = this.#isTrashed.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_ENTITY_IS_TRASHED_CONTEXT);
+		super(host, UMB_IS_TRASHED_ENTITY_CONTEXT);
 	}
 
 	/**

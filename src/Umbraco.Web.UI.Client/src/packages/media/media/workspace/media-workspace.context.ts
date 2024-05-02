@@ -26,7 +26,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
-import { UmbEntityIsTrashedContext } from '@umbraco-cms/backoffice/recycle-bin';
+import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
@@ -112,7 +112,7 @@ export class UmbMediaWorkspaceContext
 	// TODO: this should be set up for all entity workspace contexts in a base class
 	#entityContext = new UmbEntityContext(this);
 	// TODO: this might not be the correct place to spin this up
-	#isTrashedContext = new UmbEntityIsTrashedContext(this);
+	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Media');
