@@ -74,7 +74,7 @@ export class UmbAppElement extends UmbLitElement {
 				this.#authContext?.completeAuthorizationRequest().finally(() => {
 					// If we don't have an opener, redirect to the root
 					if (!window.opener) {
-						//history.replaceState(null, '', '');
+						history.replaceState(null, '', '');
 					}
 				});
 			},
