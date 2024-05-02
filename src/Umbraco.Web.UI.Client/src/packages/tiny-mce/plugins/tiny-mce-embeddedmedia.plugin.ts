@@ -44,17 +44,18 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 	#insertInEditor(embed: UmbEmbeddedMediaModalValue, activeElement: HTMLElement) {
 		// Wrap HTML preview content here in a DIV with non-editable class of .mceNonEditable
 		// This turns it into a selectable/cutable block to move about
+
 		const wrapper = this.editor.dom.create(
 			'div',
 			{
 				class: 'mceNonEditable umb-embed-holder',
 				'data-embed-url': embed.url ?? '',
-				'data-embed-height': embed.height,
-				'data-embed-width': embed.width,
+				'data-embed-height': embed.height!,
+				'data-embed-width': embed.width!,
 				'data-embed-constrain': embed.constrain ?? false,
 				contenteditable: false,
 			},
-			embed.preview,
+			embed.markup,
 		);
 
 		// Only replace if activeElement is an Embed element.

@@ -1,6 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import type { OEmbedResult} from '@umbraco-cms/backoffice/modal';
-import { OEmbedStatus } from '@umbraco-cms/backoffice/modal';
+import type { OEmbedResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
@@ -11,12 +10,8 @@ export const handlers = [
 		const heightParam = req.url.searchParams.get('height');
 		const height = heightParam ? parseInt(heightParam) : 240;
 
-		const response: OEmbedResult = {
-			supportsDimensions: true,
+		const response: OEmbedResponseModel = {
 			markup: `<iframe width="${width}" height="${height}" src="https://www.youtube.com/embed/wJNbtYdr-Hg?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen title="Sleep Token - The Summoning"></iframe>`,
-			oEmbedStatus: OEmbedStatus.Success,
-			width,
-			height,
 		};
 
 		return res(ctx.status(200), ctx.json(response));
