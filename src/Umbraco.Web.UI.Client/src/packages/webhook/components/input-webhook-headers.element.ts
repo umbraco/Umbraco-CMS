@@ -66,6 +66,7 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 	}
 
 	#renderHeaderInput(header: { name: string; value: string }, index: number) {
+		//TODO: Use uui-input when it supports datalist
 		return html`
 			<input
 				type="text"
@@ -79,7 +80,26 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 				.value=${header.value}
 				@input=${(e: InputEvent) => this.#onInput(e, 'value', index)}
 				list="valueList" />
-			<button @click=${() => this.#removeHeader(index)}>Remove</button>
+			<uui-button @click=${() => this.#removeHeader(index)} label="Remove"></uui-button>
+		`;
+	}
+
+	#renderGrid() {
+		if (!this._headers.length) return nothing;
+
+		return html`
+			<div id="grid">${this.#renderHeaders()}</div>
+
+			<datalist id="nameList">
+				${repeat(
+					this.#filterHeaderNames,
+					(name) => name,
+					(name) => html`<option value=${name}></option>`,
+				)}
+			</datalist>
+			<datalist id="valueList">
+				<option value="application/json"></option>
+			</datalist>
 		`;
 	}
 
@@ -95,23 +115,12 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 				(_, index) => index,
 				(header, index) => this.#renderHeaderInput(header, index),
 			)}
-			<datalist id="nameList">
-				${repeat(
-					this.#filterHeaderNames,
-					(name) => name,
-					(name) => html`<option value=${name}></option>`,
-				)}
-			</datalist>
-			<datalist id="valueList">
-				<option value="application/json"></option>
-			</datalist>
 		`;
 	}
 
 	render() {
 		return html`
-			${this.#renderHeaders()}
-
+			${this.#renderGrid()}
 			<uui-button id="add" look="placeholder" @click=${this.#addHeader}>Add</uui-button>
 		`;
 	}
@@ -119,20 +128,55 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
-			:host {
+			#grid {
 				display: grid;
 				grid-template-columns: 1fr 1fr auto;
-				gap: var(--uui-size-space-2) var(--uui-size-space-2);
+				border: 1px solid var(--uui-color-border);
+				margin-bottom: var(--uui-size-space-3);
+				border-radius: var(--uui-border-radius);
 			}
 
 			#add {
 				grid-column: -1 / 1;
 			}
 
+			#grid > * {
+				border-right: 1px solid var(--uui-color-border);
+				border-bottom: 1px solid var(--uui-color-border);
+			}
+
+			/* Remove borders from last column */
+			#grid > *:nth-child(3n) {
+				border-right: none;
+			}
+
+			/* Remove borders from last row */
+			#grid > *:nth-child(3n + 1):nth-last-child(-n + 3),
+			#grid > *:nth-child(3n + 1):nth-last-child(-n + 3) ~ * {
+				border-bottom: none;
+			}
+
+			#grid > *:not(uui-button) {
+				padding: var(--uui-size-2) var(--uui-size-space-4);
+			}
+
+			uui-button {
+				width: 100%;
+				box-sizing: border-box;
+			}
+
 			input {
 				width: 100%;
 				border: none;
 				font: inherit;
+				display: flex;
+				box-sizing: border-box;
+				background-color: transparent;
+			}
+
+			input:focus,
+			uui-button:focus {
+				z-index: 1;
 			}
 
 			/* Remove arrow in inputs linked to a datalist */
