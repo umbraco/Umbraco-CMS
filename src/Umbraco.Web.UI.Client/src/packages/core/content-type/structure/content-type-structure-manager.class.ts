@@ -425,10 +425,15 @@ export class UmbContentTypeStructureManager<
 			throw new Error('Could not find the Content Type to remove container from');
 		}
 		const frozenContainers = contentType.containers ?? [];
+		const removedContainerIds = frozenContainers
+			.filter((x) => x.id === containerId || x.parent?.id === containerId)
+			.map((x) => x.id);
 		const containers = frozenContainers.filter((x) => x.id !== containerId && x.parent?.id !== containerId);
 
-		const frozenProperties = contentType.properties ?? [];
-		const properties = frozenProperties.filter((x) => x.container?.id !== containerId);
+		const frozenProperties = contentType.properties;
+		const properties = frozenProperties.filter((x) =>
+			x.container ? !removedContainerIds.some((ids) => ids === x.container?.id) : true,
+		);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore

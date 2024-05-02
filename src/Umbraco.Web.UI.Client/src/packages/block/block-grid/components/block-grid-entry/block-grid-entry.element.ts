@@ -1,6 +1,6 @@
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
@@ -48,6 +48,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	_showContentEdit = false;
 	@state()
 	_hasSettings = false;
+
+	// If _createPath is undefined, its because no blocks are allowed to be created here[NL]
 	@state()
 	_createPath?: string;
 
@@ -123,12 +125,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		});
 	}
 
-	/*
-	createRenderRoot() {
-		return this;
-	}
-	*/
-
 	connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
@@ -173,9 +169,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderBlock() {
-		return this.contentUdi && this._createPath
+		return this.contentUdi
 			? html`
-					<uui-button-inline-create href=${this._createPath}></uui-button-inline-create>
+					${this._createPath
+						? html`<uui-button-inline-create href=${this._createPath}></uui-button-inline-create>`
+						: nothing}
 					<div class="umb-block-grid__block" part="umb-block-grid__block">
 						<umb-extension-slot
 							type="blockEditorCustomView"
@@ -187,13 +185,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							${this._showContentEdit && this._workspaceEditContentPath
 								? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
 										<uui-icon name="icon-edit"></uui-icon>
-								  </uui-button>`
-								: ''}
+									</uui-button>`
+								: nothing}
 							${this._hasSettings && this._workspaceEditSettingsPath
 								? html`<uui-button label="Edit settings" compact href=${this._workspaceEditSettingsPath}>
 										<uui-icon name="icon-settings"></uui-icon>
-								  </uui-button>`
-								: ''}
+									</uui-button>`
+								: nothing}
 							<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
 								<uui-icon name="icon-remove"></uui-icon>
 							</uui-button>
@@ -203,11 +201,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							? html` <umb-block-scale-handler
 									@mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
 									${this._columnSpan}x${this._rowSpan}
-							  </umb-block-scale-handler>`
-							: ''}
+								</umb-block-scale-handler>`
+							: nothing}
 					</div>
-			  `
-			: '';
+				`
+			: nothing;
 	}
 
 	render() {
