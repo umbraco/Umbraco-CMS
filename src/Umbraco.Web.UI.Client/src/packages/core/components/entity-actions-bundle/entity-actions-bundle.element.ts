@@ -31,6 +31,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	#sectionSidebarContext?: UmbSectionSidebarContext;
 
+	// TODO: provide the entity context on a higher level, like the root element of this entity, tree-item/workspace/... [NL]
 	#entityContext = new UmbEntityContext(this);
 
 	constructor() {

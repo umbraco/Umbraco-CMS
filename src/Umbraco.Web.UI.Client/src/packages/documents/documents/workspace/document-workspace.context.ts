@@ -58,6 +58,7 @@ import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/do
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -99,6 +100,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
+	readonly isTrashed = this.#currentData.asObservablePart((data) => data?.isTrashed);
 
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
@@ -154,6 +156,8 @@ export class UmbDocumentWorkspaceContext
 
 	// TODO: this should be set up for all entity workspace contexts in a base class
 	#entityContext = new UmbEntityContext(this);
+	// TODO: this might not be the correct place to spin this up
+	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
@@ -230,6 +234,7 @@ export class UmbDocumentWorkspaceContext
 		if (data) {
 			this.#entityContext.setEntityType(UMB_DOCUMENT_ENTITY_TYPE);
 			this.#entityContext.setUnique(unique);
+			this.#isTrashedContext.setIsTrashed(data.isTrashed);
 			this.setIsNew(false);
 			this.#persistedData.setValue(data);
 			this.#currentData.setValue(data);
