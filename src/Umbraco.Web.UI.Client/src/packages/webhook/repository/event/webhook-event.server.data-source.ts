@@ -1,4 +1,3 @@
-import type { UmbWebhookEventModel } from '../../types.js';
 import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -28,8 +27,7 @@ export class UmbWebhookEventServerDataSource {
 			return { error };
 		}
 
-		// TODO: remove this when the API is fixed
-		const items: Array<UmbWebhookEventModel> = (data.items as unknown as Array<UmbWebhookEventModel>).map((item) => {
+		const items = data.items.map((item) => {
 			return {
 				eventName: item.eventName,
 				eventType: item.eventType,
