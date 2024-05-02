@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './column-layouts/boolean/webhook-table-boolean-column-layout.element.js';
 import './column-layouts/name/webhook-table-name-column-layout.element.js';
-import './column-layouts/entity-actions/webhook-table-entity-actions-column-layout.element.js';
+import './column-layouts/remove/webhook-table-remove-column-layout.element.js';
 
 @customElement('umb-webhook-table-collection-view')
 export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
@@ -38,8 +38,8 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 		},
 		{
 			name: '',
-			alias: 'entityActions',
-			elementName: 'umb-webhook-table-entity-actions-column-layout',
+			alias: 'remove',
+			elementName: 'umb-webhook-table-remove-column-layout',
 		},
 	];
 
@@ -78,15 +78,15 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'events',
-						value: webhook.events,
+						value: webhook.events.map((event) => event.eventName).join(', ') || 'None',
 					},
 					{
 						columnAlias: 'types',
 						value: webhook.contentTypes,
 					},
 					{
-						columnAlias: 'entityActions',
-						value: webhook,
+						columnAlias: 'remove',
+						value: '',
 					},
 				],
 			};
