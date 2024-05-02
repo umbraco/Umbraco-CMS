@@ -7,7 +7,7 @@ import type {
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbIsNotTrashedCondition
+export class UmbEntityIsNotTrashedCondition
 	extends UmbConditionBase<UmbConditionConfigBase>
 	implements UmbExtensionCondition
 {
@@ -26,4 +26,4 @@ export class UmbIsNotTrashedCondition
 	}
 }
 
-export { UmbIsNotTrashedCondition as api };
+export { UmbEntityIsNotTrashedCondition as api };
