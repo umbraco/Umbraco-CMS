@@ -211,7 +211,7 @@ export default {
 		confirmSure: 'Er du sikker?',
 		cut: 'Klipp ut',
 		editDictionary: 'Rediger ordboksnøkkel',
-		editlanguage: 'Rediger språk',
+		editLanguage: 'Rediger språk',
 		insertAnchor: 'Sett inn lokal link',
 		insertCharacter: 'Sett inn spesialtegn',
 		insertgraphicheadline: 'Sett inn grafisk overskrift',

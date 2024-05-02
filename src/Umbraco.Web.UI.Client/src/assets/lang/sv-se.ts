@@ -361,7 +361,7 @@ export default {
 		confirmSure: 'Är du säker?',
 		cut: 'Klipp ut',
 		editDictionary: 'Redigera ord i ordboken',
-		editlanguage: 'Redigera språk',
+		editLanguage: 'Redigera språk',
 		insertAnchor: 'Infoga ankarlänk',
 		insertCharacter: 'Infoga tecken',
 		insertgraphicheadline: 'Infoga grafisk rubrik',

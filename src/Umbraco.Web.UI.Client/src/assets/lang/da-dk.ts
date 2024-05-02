@@ -483,7 +483,7 @@ export default {
 		confirmSure: 'Er du sikker?',
 		cut: 'Klip',
 		editDictionary: 'Rediger ordbogsnøgle',
-		editlanguage: 'Rediger sprog',
+		editLanguage: 'Rediger sprog',
 		editSelectedMedia: 'Rediger det valgte medie',
 		insertAnchor: 'Indsæt lokalt link',
 		insertCharacter: 'Indsæt tegn',

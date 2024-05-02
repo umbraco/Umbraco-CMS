@@ -291,7 +291,7 @@ export default {
 		confirmSure: 'Jesteś pewny?',
 		cut: 'Wytnij',
 		editDictionary: 'Edytuj element słownika',
-		editlanguage: 'Edytuj język',
+		editLanguage: 'Edytuj język',
 		insertAnchor: 'Wstaw link wewnętrzny',
 		insertCharacter: 'Wstaw znak',
 		insertgraphicheadline: 'Wstaw graficzny nagłówek',

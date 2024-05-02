@@ -167,7 +167,7 @@ export default {
 		confirmSure: 'האם אתה בטוח?',
 		cut: 'גזור',
 		editDictionary: 'ערוך פרט מילון',
-		editlanguage: 'ערוך שפה',
+		editLanguage: 'ערוך שפה',
 		insertAnchor: 'הוסף קישור מקומי',
 		insertCharacter: 'הוסף תו',
 		insertgraphicheadline: 'הוסף פס גרפי',

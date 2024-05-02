@@ -488,7 +488,7 @@ export default {
 		confirmSure: 'Sind Sie sicher?',
 		cut: 'Ausschneiden',
 		editDictionary: 'Wörterbucheintrag bearbeiten',
-		editlanguage: 'Sprache bearbeiten',
+		editLanguage: 'Sprache bearbeiten',
 		editSelectedMedia: 'Ausgewähltes Medien',
 		insertAnchor: 'Anker einfügen',
 		insertCharacter: 'Zeichen einfügen',

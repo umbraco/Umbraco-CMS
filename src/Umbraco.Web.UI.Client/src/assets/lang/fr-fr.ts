@@ -427,7 +427,7 @@ export default {
 		confirmSure: 'Êtes-vous certain(e)?',
 		cut: 'Couper',
 		editDictionary: 'Editer une entrée du Dictionnaire',
-		editlanguage: 'Modifier la langue',
+		editLanguage: 'Modifier la langue',
 		editSelectedMedia: 'Modifier le media sélectionné',
 		insertAnchor: 'Insérer un lien local (ancre)',
 		insertCharacter: 'Insérer un caractère',

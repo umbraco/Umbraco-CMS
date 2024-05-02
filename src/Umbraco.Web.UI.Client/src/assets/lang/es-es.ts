@@ -289,7 +289,7 @@ export default {
 		confirmSure: '¿Estás seguro?',
 		cut: 'Cortar',
 		editDictionary: 'Editar entrada del Diccionario',
-		editlanguage: 'Editar idioma',
+		editLanguage: 'Editar idioma',
 		insertAnchor: 'Agregar enlace interno',
 		insertCharacter: 'Insertar carácter',
 		insertgraphicheadline: 'Insertar titular gráfico',

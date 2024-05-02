@@ -216,7 +216,7 @@ export default {
 		confirmSure: '本当にいいですか？',
 		cut: '切り取り',
 		editDictionary: 'ディクショナリのアイテムの編集',
-		editlanguage: '言語の編集',
+		editLanguage: '言語の編集',
 		insertAnchor: 'アンカーの挿入',
 		insertCharacter: '文字の挿入',
 		insertgraphicheadline: 'ヘッドライン画像の挿入',

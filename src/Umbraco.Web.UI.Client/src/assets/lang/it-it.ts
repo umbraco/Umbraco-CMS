@@ -480,7 +480,7 @@ export default {
 		confirmSure: 'Sei sicuro?',
 		cut: 'Taglia',
 		editDictionary: 'Modifica elemento del Dizionario',
-		editlanguage: 'Modifica la lingua',
+		editLanguage: 'Modifica la lingua',
 		editSelectedMedia: 'Modifica il media selezionato',
 		insertAnchor: 'Inserisci il link locale',
 		insertCharacter: 'Inserisci carattere',

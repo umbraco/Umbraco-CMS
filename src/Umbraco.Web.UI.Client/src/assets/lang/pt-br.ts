@@ -167,7 +167,7 @@ export default {
 		confirmSure: 'Tem certeza?',
 		cut: 'Cortar',
 		editDictionary: 'Editar Item de Dicionário',
-		editlanguage: 'Editar Linguagem',
+		editLanguage: 'Editar Linguagem',
 		insertAnchor: 'Inserir link local',
 		insertCharacter: 'Inserir charactere',
 		insertgraphicheadline: 'Inserir manchete de gráfico',

@@ -489,7 +489,7 @@ export default {
 		confirmSure: 'Are you sure?',
 		cut: 'Cut',
 		editDictionary: 'Edit Dictionary Item',
-		editlanguage: 'Edit Language',
+		editLanguage: 'Edit Language',
 		editSelectedMedia: 'Edit selected media',
 		insertAnchor: 'Insert local link',
 		insertCharacter: 'Insert character',

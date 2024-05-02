@@ -347,7 +347,7 @@ export default {
 		confirmSure: 'Ви впевнені?',
 		cut: 'Вирізати',
 		editDictionary: 'Редагувати статтю словника',
-		editlanguage: 'Змінити мову',
+		editLanguage: 'Змінити мову',
 		insertAnchor: 'Вставити локальне посилання (якір)',
 		insertCharacter: 'Вставити символ',
 		insertgraphicheadline: 'Вставити графічний заголовок',

@@ -348,7 +348,7 @@ export default {
 		confirmSure: 'Вы уверены?',
 		cut: 'Вырезать',
 		editDictionary: 'Править статью словаря',
-		editlanguage: 'Изменить язык',
+		editLanguage: 'Изменить язык',
 		insertAnchor: 'Вставить локальную ссылку (якорь)',
 		insertCharacter: 'Вставить символ',
 		insertgraphicheadline: 'Вставить графический заголовок',

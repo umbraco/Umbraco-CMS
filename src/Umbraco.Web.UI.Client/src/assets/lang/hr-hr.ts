@@ -468,7 +468,7 @@ export default {
 		confirmSure: 'Jeste li sigurni?',
 		cut: 'Izreži',
 		editDictionary: 'Uredi stavku iz rječnika',
-		editlanguage: 'Uredi jezik',
+		editLanguage: 'Uredi jezik',
 		editSelectedMedia: 'Uredite odabrane medije',
 		editWebhook: 'Uredi webhook',
 		insertAnchor: 'Umetni lokalnu vezu',

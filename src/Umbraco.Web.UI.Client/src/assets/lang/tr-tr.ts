@@ -422,7 +422,7 @@ export default {
 		confirmSure: 'Emin misiniz?',
 		cut: 'Kes',
 		editDictionary: 'Sözlük Öğesini Düzenle',
-		editlanguage: 'Dili Düzenle',
+		editLanguage: 'Dili Düzenle',
 		editSelectedMedia: 'Seçili medyayı düzenle',
 		insertAnchor: 'Yerel bağlantı ekle',
 		insertCharacter: 'Karakter ekle',

@@ -414,7 +414,7 @@ export default {
 		confirmSure: 'Jste si jistí?',
 		cut: 'Vyjmout',
 		editDictionary: 'Editovat položku slovníku',
-		editlanguage: 'Editovat jazyk',
+		editLanguage: 'Editovat jazyk',
 		editSelectedMedia: 'Edit selected media',
 		insertAnchor: 'Vložit místní odkaz',
 		insertCharacter: 'Vložit znak',

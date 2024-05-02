@@ -167,7 +167,7 @@ export default {
 		confirmSure: '확실합니까?',
 		cut: "TRANSLATE ME: 'Cut'",
 		editDictionary: '사전 항목 편집',
-		editlanguage: '언어 편집',
+		editLanguage: '언어 편집',
 		insertAnchor: '내부 링크삽입',
 		insertCharacter: '문자열 삽입',
 		insertgraphicheadline: '그래픽 헤드라인 삽입',

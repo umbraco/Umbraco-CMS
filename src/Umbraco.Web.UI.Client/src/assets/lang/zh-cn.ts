@@ -222,7 +222,7 @@ export default {
 		confirmSure: '您确定吗？',
 		cut: '剪切',
 		editDictionary: '编辑字典项',
-		editlanguage: '编辑语言',
+		editLanguage: '编辑语言',
 		insertAnchor: '插入本地链接',
 		insertCharacter: '插入字符',
 		insertgraphicheadline: '插入图片标题',
