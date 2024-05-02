@@ -1273,18 +1273,13 @@ export default {
 	},
 	sections: {
 		content: 'Indhold',
-		developer: 'Udvikler',
-		installer: 'Umbraco konfigurationsguide',
 		media: 'Mediearkiv',
 		member: 'Medlemmer',
 		packages: 'Pakker',
 		marketplace: 'Marketplace',
-		newsletters: 'Nyhedsbreve',
 		settings: 'Indstillinger',
-		statistics: 'Statistik',
 		translation: 'Oversættelse',
 		users: 'Brugere',
-		help: 'Hjælp',
 	},
 	help: {
 		tours: 'Tours',
