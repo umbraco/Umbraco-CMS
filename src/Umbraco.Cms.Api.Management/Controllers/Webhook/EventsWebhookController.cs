@@ -22,7 +22,7 @@ public class EventsWebhookController : WebhookControllerBase
 
     [HttpGet("events")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<WebhookResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<WebhookEventViewModel>), StatusCodes.Status200OK)]
     public Task<ActionResult<PagedViewModel<WebhookEventViewModel>>> All(
         CancellationToken cancellationToken,
         int skip = 0,

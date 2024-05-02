@@ -32356,6 +32356,58 @@
           }
         ]
       }
+    },
+    "/umbraco/management/api/v1/webhook/events": {
+      "get": {
+        "tags": [
+          "Webhook"
+        ],
+        "operationId": "GetWebhookEvents",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PagedWebhookEventModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -40238,6 +40290,30 @@
         },
         "additionalProperties": false
       },
+      "PagedWebhookEventModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/WebhookEventModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedWebhookResponseModel": {
         "required": [
           "items",
@@ -43461,6 +43537,7 @@
       },
       "UserItemResponseModel": {
         "required": [
+          "avatarUrls",
           "id",
           "name"
         ],
@@ -43472,6 +43549,12 @@
           },
           "name": {
             "type": "string"
+          },
+          "avatarUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
@@ -43772,6 +43855,26 @@
             ]
           },
           "resetCode": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WebhookEventModel": {
+        "required": [
+          "alias",
+          "eventName",
+          "eventType"
+        ],
+        "type": "object",
+        "properties": {
+          "eventName": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "string"
+          },
+          "alias": {
             "type": "string"
           }
         },
