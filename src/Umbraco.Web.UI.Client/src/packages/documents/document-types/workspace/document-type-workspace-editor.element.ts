@@ -15,6 +15,9 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _icon?: string;
 
+	@state()
+	private _isNew?: string;
+
 	#workspaceContext?: typeof UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -31,6 +34,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeName');
 		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias), '_observeAlias');
 		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon), '_observeIcon');
+		this.observe(this.#workspaceContext.isNew, (isNew) => (this._isNew = isNew), '_observeIsNew');
 	}
 
 	private async _handleIconClick() {
@@ -70,6 +74,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 						label="name"
 						value=${this._name}
 						alias=${this._alias}
+						?auto-generate-alias=${this._isNew}
 						@change="${this.#onNameAndAliasChange}"
 						${umbFocus()}></umb-input-with-alias>
 				</div>

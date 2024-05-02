@@ -208,17 +208,15 @@ export class UmbMediaTypeWorkspaceContext
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
 
-			if ((await this.structure.create(parent.unique)) === true) {
-				if (!parent) throw new Error('Parent is not set');
+			await this.structure.create(parent.unique);
 
-				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-				const event = new UmbRequestReloadTreeItemChildrenEvent({
-					entityType: parent.entityType,
-					unique: parent.unique,
-				});
-				eventContext.dispatchEvent(event);
-				this.setIsNew(false);
-			}
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadTreeItemChildrenEvent({
+				entityType: parent.entityType,
+				unique: parent.unique,
+			});
+			eventContext.dispatchEvent(event);
+			this.setIsNew(false);
 		} else {
 			await this.structure.save();
 

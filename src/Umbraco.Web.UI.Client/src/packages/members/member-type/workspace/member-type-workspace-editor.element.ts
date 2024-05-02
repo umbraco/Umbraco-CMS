@@ -15,6 +15,9 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 	private _icon?: string;
 
 	@state()
+	private _isNew?: string;
+
+	@state()
 	private _iconColorAlias?: string;
 	// TODO: Color should be using an alias, and look up in some dictionary/key/value) of project-colors.
 
@@ -34,18 +37,7 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeName');
 		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias), '_observeAlias');
 		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon), '_observeIcon');
-
-		this.observe(
-			this.#workspaceContext.isNew,
-			(isNew) => {
-				if (isNew) {
-					// TODO: Would be good with a more general way to bring focus to the name input.
-					(this.shadowRoot?.querySelector('#name') as HTMLElement)?.focus();
-				}
-				this.removeUmbControllerByAlias('_observeIsNew');
-			},
-			'_observeIsNew',
-		);
+		this.observe(this.#workspaceContext.isNew, (isNew) => (this._isNew = isNew), '_observeIsNew');
 	}
 
 	private async _handleIconClick() {
@@ -85,6 +77,7 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 						label="name"
 						value=${this._name}
 						alias=${this._alias}
+						?auto-generate-alias=${this._isNew}
 						@change="${this.#onNameAndAliasChange}"
 						${umbFocus()}></umb-input-with-alias>
 				</div>
