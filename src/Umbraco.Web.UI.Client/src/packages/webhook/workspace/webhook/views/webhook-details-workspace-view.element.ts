@@ -106,6 +106,10 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 				padding: var(--uui-size-space-6);
 			}
 
+			uui-input {
+				width: 100%;
+			}
+
 			umb-property-layout:first-child {
 				padding-top: 0;
 			}

@@ -13,6 +13,13 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 	@state()
 	private _headers: Array<{ name: string; value: string }> = [];
 
+	@state()
+	private _headerNames: string[] = ['Accept', 'Content-Type', 'User-Agent', 'Content-Length'];
+
+	get #filterHeaderNames() {
+		return this._headerNames.filter((name) => !this._headers.find((header) => header.name === name));
+	}
+
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 
@@ -49,8 +56,18 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 
 	#renderHeaderInput(header: { name: string; value: string }, index: number) {
 		return html`
-			<input type="text" .value=${header.name} @input=${(e: InputEvent) => this.#onInput(e, 'name', index)} />
-			<input type="text" .value=${header.value} @input=${(e: InputEvent) => this.#onInput(e, 'value', index)} />
+			<input
+				type="text"
+				placeholder="Name..."
+				.value=${header.name}
+				@input=${(e: InputEvent) => this.#onInput(e, 'name', index)}
+				list="nameList" />
+			<input
+				type="text"
+				placeholder="Value..."
+				.value=${header.value}
+				@input=${(e: InputEvent) => this.#onInput(e, 'value', index)}
+				list="valueList" />
 			<button @click=${() => this.#removeHeader(index)}>Remove</button>
 		`;
 	}
@@ -67,6 +84,16 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 				(_, index) => index,
 				(header, index) => this.#renderHeaderInput(header, index),
 			)}
+			<datalist id="nameList">
+				${repeat(
+					this.#filterHeaderNames,
+					(name) => name,
+					(name) => html`<option value=${name}></option>`,
+				)}
+			</datalist>
+			<datalist id="valueList">
+				<option value="application/json"></option>
+			</datalist>
 		`;
 	}
 
@@ -93,6 +120,17 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 
 			#add {
 				grid-column: -1 / 1;
+			}
+
+			input {
+				width: 100%;
+				border: none;
+				font: inherit;
+			}
+
+			/* Remove arrow in inputs linked to a datalist */
+			input[type='text']::-webkit-calendar-picker-indicator {
+				display: none !important;
 			}
 		`,
 	];
