@@ -1,4 +1,5 @@
 import { UmbModalToken } from '../../../core/modal/token/modal-token.js';
+import { UMB_MULTI_URL_PICKER_MODAL_ALIAS } from './constants.js';
 import type { UmbLinkPickerLink } from './types.js';
 
 export interface UmbLinkPickerModalData {
@@ -15,7 +16,7 @@ export interface UmbLinkPickerConfig {
 }
 
 export const UMB_LINK_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalValue>(
-	'Umb.Modal.LinkPicker',
+	UMB_MULTI_URL_PICKER_MODAL_ALIAS,
 	{
 		modal: {
 			type: 'sidebar',

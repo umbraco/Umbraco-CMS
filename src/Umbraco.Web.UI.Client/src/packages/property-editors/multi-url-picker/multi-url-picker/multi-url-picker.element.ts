@@ -17,8 +17,9 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
  * @fires blur - when the input loses focus
  * @fires focus - when the input gains focus
  */
-@customElement('umb-input-multi-url')
-export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, '') {
+const elementName = 'umb-multi-url-picker';
+@customElement(elementName)
+export class UmbMultiUrlPickerElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<UmbLinkPickerLink>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -298,6 +299,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-multi-url': UmbInputMultiUrlElement;
+		[elementName]: UmbMultiUrlPickerElement;
 	}
 }
