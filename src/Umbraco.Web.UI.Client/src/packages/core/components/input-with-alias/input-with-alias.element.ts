@@ -13,6 +13,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string>(UmbLit
 	@property({ type: String, reflect: false })
 	alias?: string;
 
+	@property({ type: Boolean, attribute: 'auto-generate-alias' })
+	autoGenerateAlias?: boolean;
+
 	@state()
 	private _aliasLocked = true;
 
@@ -32,7 +35,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string>(UmbLit
 				const oldName = this.value;
 				const oldAlias = this.alias ?? '';
 				this.value = event.target.value.toString();
-				if (this._aliasLocked) {
+				if (this.autoGenerateAlias && this._aliasLocked) {
 					// If locked we will update the alias, but only if it matches the generated alias of the old name [NL]
 					const expectedOldAlias = generateAlias(oldName ?? '');
 					// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.) [NL]
