@@ -63,6 +63,19 @@ public interface IUserGroupService
     Task<IEnumerable<IUserGroup>> GetAsync(IEnumerable<Guid> keys);
 
     /// <summary>
+    /// Performs filtering for user groups
+    /// </summary>
+    /// <param name="userKey">The key of the performing (current) user.</param>
+    /// <param name="filter">The filter to apply.</param>
+    /// <param name="skip">The amount of user groups to skip.</param>
+    /// <param name="take">The amount of user groups to take.</param>
+    /// <returns>All matching user groups as an enumerable list of <see cref="IUserGroup"/>.</returns>
+    /// <remarks>
+    /// If the performing user is not an administrator, this method only returns groups that the performing user is a member of.
+    /// </remarks>
+    Task<Attempt<PagedModel<IUserGroup>, UserGroupOperationStatus>> FilterAsync(Guid userKey, string? filter, int skip, int take);
+
+    /// <summary>
     /// Persists a new user group.
     /// </summary>
     /// <param name="userGroup">The user group to create.</param>

@@ -3,11 +3,9 @@
 
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -23,16 +21,6 @@ internal sealed class BlockValuePropertyIndexValueFactory :
     {
     }
 
-    [Obsolete("Use constructor that doesn't take IContentTypeService, scheduled for removal in V15")]
-    public BlockValuePropertyIndexValueFactory(
-        PropertyEditorCollection propertyEditorCollection,
-        IContentTypeService contentTypeService,
-        IJsonSerializer jsonSerializer,
-        IOptionsMonitor<IndexingSettings> indexingSettings)
-        : this(propertyEditorCollection, jsonSerializer, indexingSettings)
-    {
-    }
-
     protected override IContentType? GetContentTypeOfNestedItem(BlockItemData input, IDictionary<Guid, IContentType> contentTypeDictionary)
         => contentTypeDictionary.TryGetValue(input.ContentTypeKey, out var result) ? result : null;
 
@@ -41,14 +29,9 @@ internal sealed class BlockValuePropertyIndexValueFactory :
 
     protected override IEnumerable<BlockItemData> GetDataItems(IndexValueFactoryBlockValue input) => input.ContentData;
 
-    internal class IndexValueFactoryBlockValue : BlockValue<IndexValueFactoryBlockLayoutItem>
+    // we only care about the content data when extracting values for indexing - not the layouts nor the settings
+    internal class IndexValueFactoryBlockValue
     {
-    }
-
-    internal class IndexValueFactoryBlockLayoutItem : IBlockLayoutItem
-    {
-        public Udi? ContentUdi { get; set; }
-
-        public Udi? SettingsUdi { get; set; }
+        public List<BlockItemData> ContentData { get; set; } = new();
     }
 }
