@@ -195,6 +195,15 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#redirect() {
+		const pathname = pathWithoutBasePath({ start: true, end: false });
+
+		// If we are on the oauth_complete or error page, we should not redirect
+		if (pathname === '/oauth_complete' || pathname === '/error') {
+			// Initialize the router
+			history.replaceState(null, '', location.href);
+			return;
+		}
+
 		switch (this.#serverConnection?.getStatus()) {
 			case RuntimeLevelModel.INSTALL:
 				history.replaceState(null, '', 'install');
@@ -209,8 +218,6 @@ export class UmbAppElement extends UmbLitElement {
 				break;
 
 			case RuntimeLevelModel.RUN: {
-				const pathname = pathWithoutBasePath({ start: true, end: false });
-
 				// If we are on installer or upgrade page, redirect to the root since we are in the RUN state
 				if (pathname === '/install' || pathname === '/upgrade') {
 					history.replaceState(null, '', '/');
