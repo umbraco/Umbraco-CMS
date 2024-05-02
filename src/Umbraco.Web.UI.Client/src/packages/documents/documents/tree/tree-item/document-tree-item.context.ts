@@ -7,11 +7,13 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<UmbDoc
 	// TODO: Provide this together with the EntityContext, ideally this takes part via a extension-type [NL]
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 
+	readonly isTrashed = this._treeItem.asObservablePart((item) => item?.isTrashed ?? false);
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.observe(this.treeItem, (item) => {
-			this.#isTrashedContext.setIsTrashed(item?.isTrashed || false);
+		this.observe(this.isTrashed, (isTrashed) => {
+			this.#isTrashedContext.setIsTrashed(isTrashed);
 		});
 	}
 }
