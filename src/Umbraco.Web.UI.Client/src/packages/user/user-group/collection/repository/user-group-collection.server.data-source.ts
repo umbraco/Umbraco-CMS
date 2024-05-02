@@ -34,13 +34,14 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 			const mappedItems = data.items.map((item) => {
 				const userGroup: UmbUserGroupDetailModel = {
 					alias: item.alias,
+					canChangeAlias: item.canChangeAlias,
 					documentRootAccess: item.documentRootAccess,
 					documentStartNode: item.documentStartNode ? { unique: item.documentStartNode.id } : null,
 					entityType: UMB_USER_GROUP_ENTITY_TYPE,
 					fallbackPermissions: item.fallbackPermissions,
 					hasAccessToAllLanguages: item.hasAccessToAllLanguages,
 					icon: item.icon || null,
-					isSystemGroup: item.isSystemGroup,
+					isDeletable: item.isDeletable,
 					languages: item.languages,
 					mediaRootAccess: item.mediaRootAccess,
 					mediaStartNode: item.mediaStartNode ? { unique: item.mediaStartNode.id } : null,

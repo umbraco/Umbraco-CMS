@@ -31,6 +31,9 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	private _alias?: UmbUserGroupDetailModel['alias'];
 
 	@state()
+	private _canChangeAlias: UmbUserGroupDetailModel['canChangeAlias'] = true;
+
+	@state()
 	private _icon: UmbUserGroupDetailModel['icon'] = null;
 
 	@state()
@@ -71,6 +74,11 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		this.observe(this.#workspaceContext.unique, (value) => (this._unique = value), '_observeUnique');
 		this.observe(this.#workspaceContext.name, (value) => (this._name = value), '_observeName');
 		this.observe(this.#workspaceContext.alias, (value) => (this._alias = value), '_observeAlias');
+		this.observe(
+			this.#workspaceContext.canChangeAlias,
+			(value) => (this._canChangeAlias = value),
+			'_observeCanChangeAlias',
+		);
 		this.observe(this.#workspaceContext.icon, (value) => (this._icon = value), '_observeIcon');
 		this.observe(this.#workspaceContext.sections, (value) => (this._sections = value), '_observeSections');
 		this.observe(this.#workspaceContext.languages, (value) => (this._languages = value), '_observeLanguages');
@@ -212,6 +220,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					.value=${this._name}
 					alias=${ifDefined(this._alias)}
 					?auto-generate-alias=${this._isNew}
+					alias-readonly=${!this._canChangeAlias}
 					@change="${this.#onNameAndAliasChange}"
 					${umbFocus()}></umb-input-with-alias>
 			</div>
