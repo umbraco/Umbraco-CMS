@@ -2307,8 +2307,7 @@ export default {
 		documentationHeader: 'Documentation',
 		documentationDescription: 'Read more about working with the items in Settings in our Documentation.',
 		communityHeader: 'Community',
-		communitytDescription: 'Ask a question in the community forum or our Discord community.',
-
+		communityDescription: 'Ask a question in the community forum or our Discord community.',
 		trainingHeader: 'Training',
 		trainingDescription: 'Find out about real-life training and certification opportunities',
 		supportHeader: 'Support',
