@@ -2,6 +2,7 @@ import { html, customElement, property, css, repeat, state } from '@umbraco-cms/
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 
 export type UmbCrop = {
 	label: string;
@@ -27,7 +28,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 
 	#onRemove(alias: string) {
 		this.value = [...this.value.filter((item) => item.alias !== alias)];
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onEdit(crop: UmbCrop) {
@@ -88,7 +89,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		} else {
 			this.value = [...this.value, newCrop];
 		}
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 
 		form.reset();
 	}

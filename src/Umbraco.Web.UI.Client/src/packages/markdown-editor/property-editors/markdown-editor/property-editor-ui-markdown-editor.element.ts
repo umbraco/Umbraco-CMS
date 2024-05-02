@@ -29,7 +29,7 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 
 	#onChange(e: Event) {
 		this.value = (e.target as UmbInputMarkdownElement).value as string;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
