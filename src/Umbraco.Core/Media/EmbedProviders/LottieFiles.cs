@@ -19,10 +19,16 @@ public class LottieFiles : OEmbedProviderBase
 
     public override Dictionary<string, string> RequestParams => new();
 
+    [Obsolete("Use GetMarkupAsync instead. This will be removed in Umbraco 15.")]
     public override string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
     {
+        return GeOEmbedDataAsync(url, maxWidth, maxHeight, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    public override async Task<string?> GeOEmbedDataAsync(string url, int? maxWidth, int? maxHeight, CancellationToken cancellationToken)
+    {
         var requestUrl = this.GetEmbedProviderUrl(url, maxWidth, maxHeight);
-        OEmbedResponse? oembed = this.GetJsonResponse<OEmbedResponse>(requestUrl);
+        OEmbedResponse? oembed = await this.GetJsonResponseAsync<OEmbedResponse>(requestUrl, cancellationToken);
         var html = oembed?.GetHtml();
 
         // LottieFiles doesn't seem to support maxwidth and maxheight via oembed
