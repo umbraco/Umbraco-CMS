@@ -1,7 +1,9 @@
 ﻿import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
-test.describe('Document Type tests', () => {
+//TODO: Remove this before merging, this way we can test all these test on the smoketest pipeline
+//TODO: Define which test we want to smoke test
+test.describe('Document Type tests @smoke', () => {
   const documentTypeName = 'TestDocumentType';
   const dataTypeName = 'Approved Color';
   const groupName = 'TestGroup';
@@ -47,11 +49,11 @@ test.describe('Document Type tests', () => {
     await umbracoUi.documentType.clickSaveButton();
 
     // Assert
-    expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
     // Checks if the documentType contains the template
     const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
     const templateData = await umbracoApi.template.getByName(documentTypeName);
     expect(documentTypeData.allowedTemplates[0].id).toEqual(templateData.id);
+    expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
 
     // Clean
     await umbracoApi.template.ensureNameNotExists(documentTypeName);
