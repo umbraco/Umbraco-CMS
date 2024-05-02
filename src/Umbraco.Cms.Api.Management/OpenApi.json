@@ -32391,7 +32391,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PagedWebhookResponseModel"
+                      "$ref": "#/components/schemas/PagedWebhookEventModel"
                     }
                   ]
                 }
@@ -40295,6 +40295,30 @@
         },
         "additionalProperties": false
       },
+      "PagedWebhookEventModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/WebhookEventModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedWebhookResponseModel": {
         "required": [
           "items",
@@ -43836,6 +43860,26 @@
             ]
           },
           "resetCode": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WebhookEventModel": {
+        "required": [
+          "alias",
+          "eventName",
+          "eventType"
+        ],
+        "type": "object",
+        "properties": {
+          "eventName": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "string"
+          },
+          "alias": {
             "type": "string"
           }
         },
