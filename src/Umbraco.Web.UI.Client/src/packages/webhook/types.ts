@@ -6,11 +6,11 @@ export interface UmbWebhookDetailModel {
 	unique: string;
 	enabled: boolean;
 	url: string;
-	events: Array<WebhookEventModel>;
+	events: Array<UmbWebhookEventModel>;
 	contentTypes: Array<string>;
 }
 
-export interface WebhookEventModel {
+export interface UmbWebhookEventModel {
 	eventName: string;
 	eventType: string;
 	alias: string;

@@ -1,3 +1,4 @@
+import type { UmbWebhookEventModel } from '../types.js';
 import { UMB_WEBHOOK_EVENTS_MODAL } from './webhook-events-modal/webhook-events-modal.token.js';
 import { css, html, customElement, property, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -10,7 +11,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 @customElement('umb-input-webhook-events')
 export class UmbInputWebhookEventsElement extends UmbLitElement {
 	@property({ attribute: false })
-	public events: Array<string> = [];
+	public events: Array<UmbWebhookEventModel> = [];
 
 	private _modalContext?: UmbModalManagerContext;
 
