@@ -8,6 +8,9 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
+// import of local component
+import './input-multi-url/input-multi-url.element.js';
+
 /**
  * @element umb-property-editor-ui-multi-url-picker
  */
