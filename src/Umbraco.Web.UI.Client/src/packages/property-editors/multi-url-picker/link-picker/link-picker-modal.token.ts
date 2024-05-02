@@ -1,4 +1,5 @@
-import { UmbModalToken } from './modal-token.js';
+import { UmbModalToken } from '../../../core/modal/token/modal-token.js';
+import type { UmbLinkPickerLink } from './types.js';
 
 export interface UmbLinkPickerModalData {
 	config: UmbLinkPickerConfig;
@@ -6,20 +7,6 @@ export interface UmbLinkPickerModalData {
 }
 
 export type UmbLinkPickerModalValue = { link: UmbLinkPickerLink };
-
-export interface UmbLinkPickerLink {
-	icon?: string | null;
-	name?: string | null;
-	published?: boolean | null;
-	queryString?: string | null;
-	target?: string | null;
-	trashed?: boolean | null;
-	type?: UmbLinkPickerLinkType | null;
-	unique?: string | null;
-	url?: string | null;
-}
-
-export type UmbLinkPickerLinkType = 'document' | 'external' | 'media';
 
 // TODO: investigate: this looks more like a property editor configuration. Is this used in the correct way?
 export interface UmbLinkPickerConfig {
