@@ -31,7 +31,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		identifier: 'content-type-tabs-sorter',
 		itemSelector: 'uui-tab',
 		containerSelector: 'uui-tab-group',
-		disabledItemSelector: '#root-tab',
+		disabledItemSelector: ':not([sortable])',
 		resolvePlacement: (args) => args.relatedRect.left + args.relatedRect.width * 0.5 > args.pointerX,
 		onChange: ({ model }) => {
 			this._tabs = model;
@@ -458,7 +458,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			label=${tab.name && tab.name !== '' ? tab.name : 'unnamed'}
 			.active=${tabActive}
 			href=${path}
-			data-umb-tab-id=${ifDefined(tab.id)}>
+			data-umb-tab-id=${ifDefined(tab.id)}
+			?sortable=${ownedTab}>
 			${this.renderTabInner(tab, tabActive, ownedTab)}
 		</uui-tab>`;
 	}
@@ -581,6 +582,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				position: relative;
 				border-left: 1px hidden transparent;
 				border-right: 1px solid var(--uui-color-border);
+				background-color: var(--uui-color-surface);
 			}
 
 			.not-active uui-button {
