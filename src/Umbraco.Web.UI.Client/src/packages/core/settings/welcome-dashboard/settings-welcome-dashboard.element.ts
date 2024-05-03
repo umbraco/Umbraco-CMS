@@ -25,7 +25,7 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 				<uui-box>
 					<h1 class="uui-h3"><umb-localize key="settingsDashboard_communityHeader">Community</umb-localize></h1>
 					<p>
-						<umb-localize key="settingsDashboard_supportDescription">
+						<umb-localize key="settingsDashboard_communityDescription">
 							Ask a question in the community forum or our Discord community
 						</umb-localize>
 					</p>
@@ -64,7 +64,7 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 
 					<p>
 						<umb-localize key="settingsDashboard_supportDescription">
-							Ask a question in the community forum or our Discord community.
+						Extend your team with a highly skilled and passionate bunch of Umbraco know-it-alls
 						</umb-localize>
 					</p>
 					<uui-button

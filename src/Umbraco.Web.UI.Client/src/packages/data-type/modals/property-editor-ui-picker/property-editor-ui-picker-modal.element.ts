@@ -30,14 +30,13 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
+		// TODO: We never parse on a submit label, so this seem weird as we don't enable this of other places.
+		//this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 
 		this.#usePropertyEditorUIs();
 	}
 
 	#usePropertyEditorUIs() {
-		if (!this.data) return;
-
 		this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
 			// Only include Property Editor UIs which has Property Editor Schema Alias
 			this._propertyEditorUIs = propertyEditorUIs.filter(

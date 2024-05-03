@@ -712,7 +712,9 @@ export default {
 		unauthorized: 'Du har ikke tilladelse til at udføre denne handling',
 		userNotFound: 'Den angivne bruger blev ikke fundet i databasen',
 		externalInfoNotFound: 'Serveren kunne ikke kommunikere med den eksterne loginudbyder',
-		externalLoginFailed: 'Serveren mislykkedes i at logge ind med den eksterne loginudbyder',
+		externalLoginFailed:
+			'Serveren mislykkedes i at logge ind med den eksterne loginudbyder. Luk dette vindue og prøv igen.',
+		externalLoginSuccess: 'Du er nu logget ind. Du kan nu lukke dette vindue.',
 	},
 	openidErrors: {
 		accessDenied: 'Access denied',
@@ -2464,10 +2466,11 @@ export default {
 	},
 	settingsDashboard: {
 		communityHeader: 'Community',
+		communityDescription: 'Stil et spørgsmål i community forummet eller i vores Discord community',
 		trainingHeader: 'Træning',
 		trainingDescription: 'Se mulighederne for real-life træning og certificering',
 		supportHeader: 'Support',
-		supportDescription: 'Stil et spørgsmål i community forummet eller i vores Discord community',
+		supportDescription: 'Udvid dit team med en højt kvalificeret og passioneret flok Umbraco-vidende mennesker.',
 		videosHeader: 'Videoer',
 		videosDescription:
 			'Se vores gratis tutortial videoer på Umbraco Learning Base YouTube-kanel, for hurtigt at komme i gang med Umbraco.',

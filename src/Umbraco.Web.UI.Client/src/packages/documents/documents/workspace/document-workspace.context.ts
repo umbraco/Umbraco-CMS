@@ -18,6 +18,12 @@ import {
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UmbDocumentValidationRepository } from '../repository/validation/document-validation.repository.js';
+import {
+	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
+	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
+	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
+} from '../paths.js';
+import { UMB_DOCUMENTS_SECTION_PATH } from '../../paths.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -52,6 +58,7 @@ import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/do
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -93,6 +100,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
+	readonly isTrashed = this.#currentData.asObservablePart((data) => data?.isTrashed);
 
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
@@ -148,6 +156,8 @@ export class UmbDocumentWorkspaceContext
 
 	// TODO: this should be set up for all entity workspace contexts in a base class
 	#entityContext = new UmbEntityContext(this);
+	// TODO: this might not be the correct place to spin this up
+	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
@@ -159,10 +169,10 @@ export class UmbDocumentWorkspaceContext
 
 		this.routes.setRoutes([
 			{
-				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique/blueprint/:blueprintUnique',
+				path: UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('./document-workspace-editor.element.js'),
 				setup: async (_component, info) => {
-					const parentEntityType = info.match.params.entityType;
+					const parentEntityType = info.match.params.parentEntityType;
 					const parentUnique: string | null =
 						info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const documentTypeUnique = info.match.params.documentTypeUnique;
@@ -177,10 +187,10 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 			{
-				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique',
+				path: UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('./document-workspace-editor.element.js'),
 				setup: async (_component, info) => {
-					const parentEntityType = info.match.params.entityType;
+					const parentEntityType = info.match.params.parentEntityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const documentTypeUnique = info.match.params.documentTypeUnique;
 					this.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
@@ -193,7 +203,7 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 			{
-				path: 'edit/:unique',
+				path: UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
 				component: () => import('./document-workspace-editor.element.js'),
 				setup: (_component, info) => {
 					const unique = info.match.params.unique;
@@ -224,6 +234,7 @@ export class UmbDocumentWorkspaceContext
 		if (data) {
 			this.#entityContext.setEntityType(UMB_DOCUMENT_ENTITY_TYPE);
 			this.#entityContext.setUnique(unique);
+			this.#isTrashedContext.setIsTrashed(data.isTrashed);
 			this.setIsNew(false);
 			this.#persistedData.setValue(data);
 			this.#currentData.setValue(data);
@@ -235,7 +246,7 @@ export class UmbDocumentWorkspaceContext
 	#onStoreChange(entity: EntityType | undefined) {
 		if (!entity) {
 			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
-			history.pushState(null, '', 'section/content');
+			history.pushState(null, '', UMB_DOCUMENTS_SECTION_PATH);
 		}
 	}
 

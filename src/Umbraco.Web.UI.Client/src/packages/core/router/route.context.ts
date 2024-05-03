@@ -1,5 +1,5 @@
 import type { UmbRoute } from './route.interface.js';
-import { createRoutePathBuilder } from './generate-route-path-builder.function.js';
+import { umbGenerateRoutePathBuilder } from './generate-route-path-builder.function.js';
 import type { IRoutingInfo, IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -70,8 +70,8 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 	}
 
 	#removeModalPath(info: IRoutingInfo) {
-		// Reset the URL to the routerBasePath + routerActiveLocalPath
-		const folderToRemove = info.match.match.input;
+		// Reset the URL to the routerBasePath + routerActiveLocalPath [NL]
+		const folderToRemove = info.match.fragments.consumed;
 		if (folderToRemove && window.location.href.includes(folderToRemove)) {
 			window.history.pushState({}, '', this.#routerBasePath + '/' + this.#routerActiveLocalPath);
 		}
@@ -147,7 +147,7 @@ export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 				: this.#routerActiveLocalPath + '/'
 			: '';
 		const localPath = routeBasePath + routeActiveLocalPath + modalRegistration.generateModalPath();
-		const urlBuilder = createRoutePathBuilder(localPath);
+		const urlBuilder = umbGenerateRoutePathBuilder(localPath);
 
 		modalRegistration._internal_setRouteBuilder(urlBuilder);
 	};

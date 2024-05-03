@@ -23,6 +23,8 @@ export class UmbUserGroupWorkspaceContext
 
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name || '');
+	readonly alias = this.#data.asObservablePart((data) => data?.alias || '');
+	readonly aliasCanBeChanged = this.#data.asObservablePart((data) => data?.aliasCanBeChanged);
 	readonly icon = this.#data.asObservablePart((data) => data?.icon || null);
 	readonly sections = this.#data.asObservablePart((data) => data?.sections || []);
 	readonly languages = this.#data.asObservablePart((data) => data?.languages || []);

@@ -1,5 +1,6 @@
 import './components/index.js';
 
+export { UmbMediaAuditLogRepository } from './audit-log/index.js';
 export * from './repository/index.js';
 export * from './workspace/index.js';
 export * from './reference/index.js';

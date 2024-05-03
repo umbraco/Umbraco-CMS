@@ -120,18 +120,18 @@ export class UmbContentTypeStructureManager<
 	 */
 	public async create(parentUnique: string | null) {
 		const contentType = this.getOwnerContentType();
-		if (!contentType || !contentType.unique) return false;
+		if (!contentType || !contentType.unique) {
+			throw new Error('Could not find the Content Type to create');
+		}
 
 		const { data } = await this.#repository.create(contentType, parentUnique);
-		if (!data) return false;
+		if (!data) return Promise.reject();
 
 		// Update state with latest version:
 		this.#contentTypes.updateOne(contentType.unique, data);
 
 		// Start observe the new content type in the store, as we did not do that when it was a scaffold/local-version.
 		this._observeContentType(data);
-
-		return true;
 	}
 
 	private async _loadContentTypeCompositions(contentType: T) {
@@ -425,10 +425,15 @@ export class UmbContentTypeStructureManager<
 			throw new Error('Could not find the Content Type to remove container from');
 		}
 		const frozenContainers = contentType.containers ?? [];
+		const removedContainerIds = frozenContainers
+			.filter((x) => x.id === containerId || x.parent?.id === containerId)
+			.map((x) => x.id);
 		const containers = frozenContainers.filter((x) => x.id !== containerId && x.parent?.id !== containerId);
 
-		const frozenProperties = contentType.properties ?? [];
-		const properties = frozenProperties.filter((x) => x.container?.id !== containerId);
+		const frozenProperties = contentType.properties;
+		const properties = frozenProperties.filter((x) =>
+			x.container ? !removedContainerIds.some((ids) => ids === x.container?.id) : true,
+		);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
@@ -702,6 +707,12 @@ export class UmbContentTypeStructureManager<
 							x.parent === null), // it parentName === null then we expect the container parent to be null.
 			);
 		});
+	}
+
+	getContentTypeOfContainer(containerId: string) {
+		return this.#contentTypes
+			.getValue()
+			.find((contentType) => contentType.containers.some((c) => c.id === containerId));
 	}
 
 	contentTypeOfProperty(propertyId: UmbPropertyTypeId) {
