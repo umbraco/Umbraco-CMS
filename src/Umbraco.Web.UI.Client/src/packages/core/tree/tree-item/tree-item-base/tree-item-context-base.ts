@@ -7,7 +7,7 @@ import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/b
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import type { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbArrayState, UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -31,37 +31,37 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	#manifest?: ManifestTreeItem;
 
-	#treeItem = new UmbDeepState<TreeItemType | undefined>(undefined);
-	treeItem = this.#treeItem.asObservable();
+	protected readonly _treeItem = new UmbObjectState<TreeItemType | undefined>(undefined);
+	readonly treeItem = this._treeItem.asObservable();
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
 	#childItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
-	childItems = this.#childItems.asObservable();
+	readonly childItems = this.#childItems.asObservable();
 
 	#hasChildren = new UmbBooleanState(false);
-	hasChildren = this.#hasChildren.asObservable();
+	readonly hasChildren = this.#hasChildren.asObservable();
 
 	#isLoading = new UmbBooleanState(false);
-	isLoading = this.#isLoading.asObservable();
+	readonly isLoading = this.#isLoading.asObservable();
 
 	#isSelectable = new UmbBooleanState(false);
-	isSelectable = this.#isSelectable.asObservable();
+	readonly isSelectable = this.#isSelectable.asObservable();
 
 	#isSelectableContext = new UmbBooleanState(false);
-	isSelectableContext = this.#isSelectableContext.asObservable();
+	readonly isSelectableContext = this.#isSelectableContext.asObservable();
 
 	#isSelected = new UmbBooleanState(false);
-	isSelected = this.#isSelected.asObservable();
+	readonly isSelected = this.#isSelected.asObservable();
 
 	#isActive = new UmbBooleanState(false);
-	isActive = this.#isActive.asObservable();
+	readonly isActive = this.#isActive.asObservable();
 
 	#hasActions = new UmbBooleanState(false);
-	hasActions = this.#hasActions.asObservable();
+	readonly hasActions = this.#hasActions.asObservable();
 
 	#path = new UmbStringState('');
-	path = this.#path.asObservable();
+	readonly path = this.#path.asObservable();
 
 	treeContext?: UmbDefaultTreeContext<TreeItemType>;
 	#sectionContext?: UmbSectionContext;
@@ -130,7 +130,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	public setTreeItem(treeItem: TreeItemType | undefined) {
 		if (!treeItem) {
-			this.#treeItem.setValue(undefined);
+			this._treeItem.setValue(undefined);
 			return;
 		}
 
@@ -143,7 +143,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.entityType = treeItem.entityType;
 
 		this.#hasChildren.setValue(treeItem.hasChildren || false);
-		this.#treeItem.setValue(treeItem);
+		this._treeItem.setValue(treeItem);
 
 		// Update observers:
 		this.#observeActions();
@@ -239,7 +239,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	}
 
 	getTreeItem() {
-		return this.#treeItem.getValue();
+		return this._treeItem.getValue();
 	}
 
 	#observeIsSelectable() {

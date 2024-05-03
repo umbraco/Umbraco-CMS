@@ -34,15 +34,18 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	async createScaffold() {
 		const data: UmbUserDetailModel = {
 			avatarUrls: [],
-			documentStartNodeUniques: [],
 			createDate: null,
+			hasDocumentRootAccess: false,
+			documentStartNodeUniques: [],
 			email: '',
 			entityType: UMB_USER_ENTITY_TYPE,
 			failedLoginAttempts: 0,
+			isAdmin: false,
 			languageIsoCode: '',
 			lastLockoutDate: null,
 			lastLoginDate: null,
 			lastPasswordChangeDate: null,
+			hasMediaRootAccess: false,
 			mediaStartNodeUniques: [],
 			name: '',
 			state: null,
@@ -50,7 +53,6 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			updateDate: null,
 			userGroupUniques: [],
 			userName: '',
-			isAdmin: false,
 		};
 
 		return { data };
@@ -72,17 +74,20 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		}
 
 		// TODO: make data mapper to prevent errors
-		const dataType: UmbUserDetailModel = {
+		const user: UmbUserDetailModel = {
 			avatarUrls: data.avatarUrls,
-			documentStartNodeUniques: data.documentStartNodeIds,
 			createDate: data.createDate,
+			hasDocumentRootAccess: data.hasDocumentRootAccess,
+			documentStartNodeUniques: data.documentStartNodeIds,
 			email: data.email,
 			entityType: UMB_USER_ENTITY_TYPE,
 			failedLoginAttempts: data.failedLoginAttempts,
+			isAdmin: data.isAdmin,
 			languageIsoCode: data.languageIsoCode || null,
 			lastLockoutDate: data.lastLockoutDate || null,
 			lastLoginDate: data.lastLoginDate || null,
 			lastPasswordChangeDate: data.lastPasswordChangeDate || null,
+			hasMediaRootAccess: data.hasMediaRootAccess,
 			mediaStartNodeUniques: data.mediaStartNodeIds,
 			name: data.name,
 			state: data.state,
@@ -90,10 +95,9 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			updateDate: data.updateDate,
 			userGroupUniques: data.userGroupIds,
 			userName: data.userName,
-			isAdmin: data.isAdmin,
 		};
 
-		return { data: dataType };
+		return { data: user };
 	}
 
 	/**
@@ -140,6 +144,8 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		const requestBody: UpdateUserRequestModel = {
 			documentStartNodeIds: model.documentStartNodeUniques,
 			email: model.email,
+			hasDocumentRootAccess: model.hasDocumentRootAccess,
+			hasMediaRootAccess: model.hasMediaRootAccess,
 			languageIsoCode: model.languageIsoCode || '',
 			mediaStartNodeIds: model.mediaStartNodeUniques,
 			name: model.name,
