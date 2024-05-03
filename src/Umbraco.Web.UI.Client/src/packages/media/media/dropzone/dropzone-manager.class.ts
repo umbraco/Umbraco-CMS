@@ -12,7 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export interface UmbUploadableFileModel extends UmbTemporaryFileModel {
 	unique: string;
@@ -33,25 +33,12 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	#mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
 	#mediaDetailRepository = new UmbMediaDetailRepository(this);
 
-	#progress = new UmbNumberState<number | undefined>(undefined);
-	public readonly progress = this.#progress.asObservable();
+	#completed = new UmbArrayState<UmbUploadableFileModel>([], (upload) => upload.unique);
+	public readonly completed = this.#completed.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#host = host;
-
-		this.observe(
-			this.#tempFileManager.queue,
-			(queue) => {
-				// TODO Reconsider how the progress bar should be handled. Here we are just showing the progress of the queue, rather than the progress of the files getting created as a media item.
-				// Maybe we want to create the media item right away after the corresponding file is uploaded as temp file and set the progress, then continue on to the next file...
-				if (!queue.length) return;
-				const waiting = queue.filter((item) => item.status === TemporaryFileStatus.WAITING);
-				const progress = waiting.length ? waiting.length / queue.length : 0;
-				this.#progress.setValue(progress);
-			},
-			'_observeQueue',
-		);
 	}
 
 	public async dropFiles(files: Array<File>, parentUnique: string | null) {
@@ -60,7 +47,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 		// Handler for multiple files dropped
 
-		this.#progress.setValue(0);
+		this.#completed.setValue([]);
 		// removes duplicate file types so we don't call endpoints unnecessarily when building options.
 		const mimeTypes = [...new Set(files.map<string>((file) => file.type))];
 		const optionsArray = await this.#buildOptionsArrayFrom(
@@ -93,7 +80,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	async #handleOneOneFile(file: File, parentUnique: string | null) {
-		this.#progress.setValue(0);
+		this.#completed.setValue([]);
 		const extension = this.#getExtensionFromMimeType(file.type);
 
 		if (!extension) {
@@ -199,8 +186,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			}
 			// TODO Find a good way to show files that ended up as TemporaryFileStatus.ERROR. Notice that they were allowed in current area
 
-			const progress = Math.floor((index / files.length) * 100);
-			this.#progress.setValue(progress);
+			this.#completed.setValue([...this.#completed.getValue(), upload]);
 		}
 	}
 
@@ -210,7 +196,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 	public destroy() {
 		this.#tempFileManager.destroy();
-		this.#progress.destroy();
+		this.#completed.destroy();
 		super.destroy();
 	}
 }

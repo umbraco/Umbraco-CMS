@@ -49,12 +49,13 @@ export class UmbDropzoneElement extends UmbLitElement {
 
 		const dropzoneManager = new UmbDropzoneManager(this);
 		this.observe(
-			dropzoneManager.progress,
-			(progress) => {
-				if (progress === undefined) return;
+			dropzoneManager.completed,
+			(completed) => {
+				if (!completed.length) return;
+				const progress = Math.floor(completed.length / files.length);
 				this.dispatchEvent(new UmbProgressEvent(progress));
 			},
-			'_observeProgress',
+			'_observeCompleted',
 		);
 
 		await dropzoneManager.dropFiles(files, this.parentUnique);
