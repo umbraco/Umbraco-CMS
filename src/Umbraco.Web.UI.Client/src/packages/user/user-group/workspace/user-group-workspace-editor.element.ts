@@ -31,7 +31,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	private _alias?: UmbUserGroupDetailModel['alias'];
 
 	@state()
-	private _canChangeAlias: UmbUserGroupDetailModel['canChangeAlias'] = true;
+	private _canChangeAlias: UmbUserGroupDetailModel['aliasCanBeChanged'] = true;
 
 	@state()
 	private _icon: UmbUserGroupDetailModel['icon'] = null;

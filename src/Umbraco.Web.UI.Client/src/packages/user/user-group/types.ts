@@ -2,7 +2,7 @@ import type { UmbUserGroupEntityType } from './entity.js';
 
 export interface UmbUserGroupDetailModel {
 	alias: string;
-	canChangeAlias: boolean;
+	aliasCanBeChanged: boolean;
 	documentRootAccess: boolean;
 	documentStartNode: { unique: string } | null;
 	entityType: UmbUserGroupEntityType;

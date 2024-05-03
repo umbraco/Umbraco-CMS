@@ -37,7 +37,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 	async createScaffold() {
 		const data: UmbUserGroupDetailModel = {
 			alias: '',
-			canChangeAlias: true,
+			aliasCanBeChanged: true,
 			documentRootAccess: false,
 			documentStartNode: null,
 			entityType: UMB_USER_GROUP_ENTITY_TYPE,
@@ -82,7 +82,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			hasAccessToAllLanguages: data.hasAccessToAllLanguages,
 			icon: data.icon || null,
 			isDeletable: false,
-			canChangeAlias: false,
+			aliasCanBeChanged: false,
 			languages: data.languages,
 			mediaRootAccess: data.mediaRootAccess,
 			mediaStartNode: data.mediaStartNode ? { unique: data.mediaStartNode.id } : null,

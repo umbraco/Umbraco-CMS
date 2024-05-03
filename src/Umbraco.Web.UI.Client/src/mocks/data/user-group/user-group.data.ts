@@ -6,7 +6,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 	{
 		id: 'user-group-administrators-id',
 		name: 'Administrators',
-		alias: 'administrators',
+		alias: 'admin',
 		icon: 'icon-medal',
 		documentStartNode: { id: 'all-property-editors-document-id' },
 		fallbackPermissions: [
@@ -46,7 +46,8 @@ export const data: Array<UmbMockUserGroupModel> = [
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
 		mediaRootAccess: true,
-		isSystemGroup: true,
+		aliasCanBeChanged: false,
+		isDeletable: false,
 	},
 	{
 		id: 'user-group-editors-id',
@@ -75,7 +76,8 @@ export const data: Array<UmbMockUserGroupModel> = [
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
 		mediaRootAccess: true,
-		isSystemGroup: true,
+		aliasCanBeChanged: true,
+		isDeletable: true,
 	},
 	{
 		id: 'user-group-sensitive-data-id',
@@ -90,7 +92,8 @@ export const data: Array<UmbMockUserGroupModel> = [
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
 		mediaRootAccess: true,
-		isSystemGroup: true,
+		aliasCanBeChanged: false,
+		isDeletable: false,
 	},
 	{
 		id: 'user-group-translators-id',
@@ -105,7 +108,8 @@ export const data: Array<UmbMockUserGroupModel> = [
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
 		mediaRootAccess: true,
-		isSystemGroup: true,
+		aliasCanBeChanged: true,
+		isDeletable: true,
 	},
 	{
 		id: 'user-group-writers-id',
@@ -125,6 +129,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
 		mediaRootAccess: true,
-		isSystemGroup: false,
+		aliasCanBeChanged: true,
+		isDeletable: true,
 	},
 ];

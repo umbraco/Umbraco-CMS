@@ -66,7 +66,6 @@ const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupMo
 		hasAccessToAllLanguages: item.hasAccessToAllLanguages,
 		icon: item.icon,
 		id: UmbId.new(),
-		isSystemGroup: false,
 		languages: item.languages,
 		mediaRootAccess: item.mediaRootAccess,
 		mediaStartNode: item.mediaStartNode,
@@ -74,6 +73,8 @@ const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupMo
 		fallbackPermissions: item.fallbackPermissions,
 		permissions: item.permissions,
 		sections: item.sections,
+		aliasCanBeChanged: true,
+		isDeletable: true,
 	};
 };
 
@@ -85,7 +86,6 @@ const detailResponseMapper = (item: UmbMockUserGroupModel): UserGroupResponseMod
 		hasAccessToAllLanguages: item.hasAccessToAllLanguages,
 		icon: item.icon,
 		id: item.id,
-		isSystemGroup: item.isSystemGroup,
 		languages: item.languages,
 		mediaRootAccess: item.mediaRootAccess,
 		mediaStartNode: item.mediaStartNode,
@@ -93,6 +93,8 @@ const detailResponseMapper = (item: UmbMockUserGroupModel): UserGroupResponseMod
 		fallbackPermissions: item.fallbackPermissions,
 		permissions: item.permissions,
 		sections: item.sections,
+		aliasCanBeChanged: item.aliasCanBeChanged,
+		isDeletable: item.isDeletable,
 	};
 };
 

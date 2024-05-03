@@ -34,7 +34,7 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 			const mappedItems = data.items.map((item) => {
 				const userGroup: UmbUserGroupDetailModel = {
 					alias: item.alias,
-					canChangeAlias: item.canChangeAlias,
+					aliasCanBeChanged: item.aliasCanBeChanged,
 					documentRootAccess: item.documentRootAccess,
 					documentStartNode: item.documentStartNode ? { unique: item.documentStartNode.id } : null,
 					entityType: UMB_USER_GROUP_ENTITY_TYPE,
