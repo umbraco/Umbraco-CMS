@@ -52,16 +52,19 @@ export class UmbDropzoneElement extends UmbLitElement {
 			dropzoneManager.completed,
 			(completed) => {
 				if (!completed.length) return;
+
 				const progress = Math.floor(completed.length / files.length);
 				this.dispatchEvent(new UmbProgressEvent(progress));
+
+				if (completed.length === files.length) {
+					this.dispatchEvent(new UmbChangeEvent());
+					dropzoneManager.destroy();
+				}
 			},
 			'_observeCompleted',
 		);
-
+		//TODO Create some placeholder items while files are being uploaded? Could update them as they get completed.
 		await dropzoneManager.dropFiles(files, this.parentUnique);
-
-		this.dispatchEvent(new UmbChangeEvent()); // complete
-		dropzoneManager.destroy();
 	}
 
 	render() {
