@@ -34131,6 +34131,7 @@
       },
       "CreateUserGroupRequestModel": {
         "required": [
+          "alias",
           "documentRootAccess",
           "fallbackPermissions",
           "hasAccessToAllLanguages",
@@ -34143,6 +34144,9 @@
         "type": "object",
         "properties": {
           "name": {
+            "type": "string"
+          },
+          "alias": {
             "type": "string"
           },
           "icon": {
@@ -34206,6 +34210,11 @@
                 }
               ]
             }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -43105,6 +43114,7 @@
       },
       "UpdateUserGroupRequestModel": {
         "required": [
+          "alias",
           "documentRootAccess",
           "fallbackPermissions",
           "hasAccessToAllLanguages",
@@ -43117,6 +43127,9 @@
         "type": "object",
         "properties": {
           "name": {
+            "type": "string"
+          },
+          "alias": {
             "type": "string"
           },
           "icon": {
@@ -43432,12 +43445,17 @@
           "icon": {
             "type": "string",
             "nullable": true
+          },
+          "alias": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "UserGroupResponseModel": {
         "required": [
+          "alias",
           "documentRootAccess",
           "fallbackPermissions",
           "hasAccessToAllLanguages",
@@ -43452,6 +43470,9 @@
         "type": "object",
         "properties": {
           "name": {
+            "type": "string"
+          },
+          "alias": {
             "type": "string"
           },
           "icon": {
