@@ -641,6 +641,7 @@ export default {
 		entername: 'Enter a name...',
 		enteremail: 'Enter an email...',
 		enterusername: 'Enter a username...',
+		enterdate: 'Set a date...',
 		label: 'Label...',
 		enterDescription: 'Enter a description...',
 		search: 'Type to search...',
