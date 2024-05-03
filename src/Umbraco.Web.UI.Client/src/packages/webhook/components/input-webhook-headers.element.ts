@@ -143,6 +143,14 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 				border-bottom: 1px solid var(--uui-color-border);
 			}
 
+			#grid > *:nth-child(3) {
+				border-top-right-radius: var(--uui-border-radius);
+			}
+
+			#grid > *:nth-child(1) {
+				border-top-left-radius: var(--uui-border-radius);
+			}
+
 			/* Remove borders from last column */
 			#grid > *:nth-child(3n) {
 				border-right: none;
