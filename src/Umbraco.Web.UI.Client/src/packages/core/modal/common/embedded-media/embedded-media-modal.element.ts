@@ -25,14 +25,11 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	@state()
 	private _url = '';
 
-	@state()
-	private _constrain = false;
-
 	connectedCallback() {
 		super.connectedCallback();
 		if (this.data?.width) this._width = this.data.width;
 		if (this.data?.height) this._height = this.data.height;
-		if (this.data?.constrain) this._constrain = this.data.constrain;
+		if (this.data?.constrain) this.value = { ...this.value, constrain: this.data.constrain };
 
 		if (this.data?.url) {
 			this._url = this.data.url;
@@ -74,8 +71,8 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	}
 
 	#onConstrainChange() {
-		this._constrain = !this._constrain;
-		this.value = { ...this.value, constrain: this._constrain };
+		const constrain = !this.value?.constrain;
+		this.value = { ...this.value, constrain };
 	}
 
 	render() {
@@ -125,7 +122,10 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 					</umb-property-layout>
 
 					<umb-property-layout label="Constrain" orientation="vertical">
-						<uui-toggle slot="editor" @change=${this.#onConstrainChange} .checked=${this._constrain}></uui-toggle>
+						<uui-toggle
+							slot="editor"
+							@change=${this.#onConstrainChange}
+							.checked=${this.value?.constrain ?? false}></uui-toggle>
 					</umb-property-layout>
 				</uui-box>
 
