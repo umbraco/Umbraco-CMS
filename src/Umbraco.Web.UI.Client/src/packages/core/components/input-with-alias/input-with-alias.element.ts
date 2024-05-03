@@ -30,14 +30,14 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string>(UmbLit
 		return this.shadowRoot?.querySelector<UUIInputElement>('uui-input')?.focus();
 	}
 
-	#onNameChange(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
+	#onNameChange(e: UUIInputEvent) {
+		if (e instanceof UUIInputEvent) {
+			const target = e.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
 				const oldName = this.value;
 				const oldAlias = this.alias ?? '';
-				this.value = event.target.value.toString();
+				this.value = e.target.value.toString();
 				if (this.autoGenerateAlias && this._aliasLocked) {
 					// If locked we will update the alias, but only if it matches the generated alias of the old name [NL]
 					const expectedOldAlias = generateAlias(oldName ?? '');
@@ -52,10 +52,11 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string>(UmbLit
 	}
 
 	#onAliasChange(e: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
+		if (e instanceof UUIInputEvent) {
+			const target = e.composedPath()[0] as UUIInputElement;
 			if (typeof target?.value === 'string') {
 				this.alias = target.value;
+				console.log(this.alias);
 				this.dispatchEvent(new UmbChangeEvent());
 			}
 		}

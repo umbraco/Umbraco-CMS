@@ -9071,4 +9071,26 @@ requestBody
 		});
 	}
 
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getWebhookEvents(data: WebhookData['payloads']['GetWebhookEvents'] = {}): CancelablePromise<WebhookData['responses']['GetWebhookEvents']> {
+		const {
+                    
+                    skip,
+take
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/webhook/events',
+			query: {
+				skip, take
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+			},
+		});
+	}
+
 }
