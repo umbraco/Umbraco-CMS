@@ -5,24 +5,26 @@ export type UmbUserStateEnum = UserStateModel;
 export const UmbUserStateEnum = UserStateModel;
 
 export interface UmbUserDetailModel {
-	entityType: UmbUserEntityType;
-	email: string;
-	userName: string;
-	name: string;
-	userGroupUniques: Array<string>;
-	unique: string;
-	languageIsoCode: string | null;
-	documentStartNodeUniques: Array<string>;
-	mediaStartNodeUniques: Array<string>;
 	avatarUrls: Array<string>;
-	state: UmbUserStateEnum | null;
-	failedLoginAttempts: number;
 	createDate: string | null;
-	updateDate: string | null;
-	lastLoginDate: string | null;
-	lastLockoutDate: string | null;
-	lastPasswordChangeDate: string | null;
+	documentStartNodeUniques: Array<string>;
+	email: string;
+	entityType: UmbUserEntityType;
+	failedLoginAttempts: number;
+	hasDocumentRootAccess: boolean;
+	hasMediaRootAccess: boolean;
 	isAdmin: boolean;
+	languageIsoCode: string | null;
+	lastLockoutDate: string | null;
+	lastLoginDate: string | null;
+	lastPasswordChangeDate: string | null;
+	mediaStartNodeUniques: Array<string>;
+	name: string;
+	state: UmbUserStateEnum | null;
+	unique: string;
+	updateDate: string | null;
+	userGroupUniques: Array<string>;
+	userName: string;
 }
 
 export type UmbUserMfaProviderModel = UserTwoFactorProviderModel;
