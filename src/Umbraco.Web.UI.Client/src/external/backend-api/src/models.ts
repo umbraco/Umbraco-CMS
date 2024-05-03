@@ -439,7 +439,9 @@ userName: string
 name: string
 languageIsoCode?: string | null
 documentStartNodeIds: Array<string>
+hasDocumentRootAccess: boolean
 mediaStartNodeIds: Array<string>
+hasMediaRootAccess: boolean
 avatarUrls: Array<string>
 languages: Array<string>
 hasAccessToAllLanguages: boolean
@@ -2521,7 +2523,9 @@ name: string
 userGroupIds: Array<string>
 languageIsoCode: string
 documentStartNodeIds: Array<string>
+hasDocumentRootAccess: boolean
 mediaStartNodeIds: Array<string>
+hasMediaRootAccess: boolean
     };
 
 export type UpdateWebhookRequestModel = {
@@ -2633,7 +2637,9 @@ userGroupIds: Array<string>
 id: string
 languageIsoCode?: string | null
 documentStartNodeIds: Array<string>
+hasDocumentRootAccess: boolean
 mediaStartNodeIds: Array<string>
+hasMediaRootAccess: boolean
 avatarUrls: Array<string>
 state: UserStateModel
 failedLoginAttempts: number
