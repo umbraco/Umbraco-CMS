@@ -43,7 +43,6 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	set value(value: string | undefined) {
 		// Replace the potential time demoninator 'T' with a whitespace for backwards compatibility
 		this.#value = value?.replace('T', ' ');
-		console.log('got value', value, 'translated to', this.#value);
 	}
 	get value() {
 		return this.#value;
@@ -68,9 +67,14 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 		this._max = config.getValueByAlias('max');
 		this._step = config.getValueByAlias('step');
 
-		// If the inputType is only 'date' we need to make sure the value doesn't have a time
+		// If the inputType is 'date', we need to make sure the value doesn't have a time
 		if (this._inputType === 'date' && this.value?.includes(' ')) {
 			this.value = this.value.split(' ')[0];
+		}
+
+		// If the inputType is 'time', we need to remove the date part of the value
+		if (this._inputType === 'time' && this.value?.includes(' ')) {
+			this.value = this.value.split(' ')[1];
 		}
 	}
 
