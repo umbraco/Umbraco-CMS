@@ -4,7 +4,7 @@
 
 import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
-import { mimeToExtension } from '@umbraco-cms/backoffice/external/mime-types';
+import { mime } from '@umbraco-cms/backoffice/external/mime';
 
 /**
  * Sizes an image in the editor
@@ -126,7 +126,7 @@ export async function uploadBlobImages(editor: Editor, newContent?: string) {
 
 /** Converts the mime type into the corresponding file extension. Returns null if can't convert. */
 export function getExtensionFromMime(mimeType: string): string | null {
-	const extension = mimeToExtension(mimeType);
+	const extension = mime.getExtension(mimeType);
 	if (!extension) return null; // extension doesn't exist.
 	return extension;
 }
