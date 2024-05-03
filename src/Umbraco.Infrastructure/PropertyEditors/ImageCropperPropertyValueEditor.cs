@@ -149,7 +149,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         using IScope scope = _scopeProvider.CreateScope();
 
         TemporaryFileModel? file = null;
-        Guid? temporaryFileKey = TryParseTemporaryFileKey(editorImageCropperValue);
+        Guid? temporaryFileKey = editorImageCropperValue?.TemporaryFileId;
         if (temporaryFileKey.HasValue)
         {
             file = TryGetTemporaryFile(temporaryFileKey.Value);
@@ -196,6 +196,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         }
 
         editorImageCropperValue.Src = filepath is null ? string.Empty : _mediaFileManager.FileSystem.GetUrl(filepath);
+        editorImageCropperValue.TemporaryFileId = null;
         return _jsonSerializer.Serialize(editorImageCropperValue);
     }
 
@@ -231,6 +232,13 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             }
 
             imageCropperValue.Prune();
+
+            if(Guid.TryParse(imageCropperValue.Src, out Guid temporaryFileId))
+            {
+                imageCropperValue.TemporaryFileId = temporaryFileId;
+                imageCropperValue.Src = null;
+            }
+
             return imageCropperValue;
         }
         catch (Exception ex)

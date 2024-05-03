@@ -1,11 +1,15 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.TemporaryFile;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -21,11 +25,14 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class FileUploadPropertyValueEditor : DataValueEditor
 {
     private readonly MediaFileManager _mediaFileManager;
+    private readonly IJsonSerializer _jsonSerializer;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
+    private readonly ILogger<FileUploadPropertyValueEditor> _logger;
     private ContentSettings _contentSettings;
 
+    [Obsolete("Use the non-obsolete constructor, scheduled for removal in V15")]
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
         MediaFileManager mediaFileManager,
@@ -37,12 +44,30 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         ITemporaryFileService temporaryFileService,
         IScopeProvider scopeProvider,
         IFileStreamSecurityValidator fileStreamSecurityValidator)
+    :this(attribute, mediaFileManager, localizedTextService, shortStringHelper, contentSettings, jsonSerializer, ioHelper, temporaryFileService, scopeProvider, fileStreamSecurityValidator, StaticServiceProvider.Instance.GetRequiredService<ILogger<FileUploadPropertyValueEditor>>())
+    {
+
+    }
+
+    public FileUploadPropertyValueEditor(
+        DataEditorAttribute attribute,
+        MediaFileManager mediaFileManager,
+        ILocalizedTextService localizedTextService,
+        IShortStringHelper shortStringHelper,
+        IOptionsMonitor<ContentSettings> contentSettings,
+        IJsonSerializer jsonSerializer,
+        IIOHelper ioHelper,
+        ITemporaryFileService temporaryFileService,
+        IScopeProvider scopeProvider,
+        IFileStreamSecurityValidator fileStreamSecurityValidator, ILogger<FileUploadPropertyValueEditor> logger)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
+        _jsonSerializer = jsonSerializer;
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
+        _logger = logger;
         _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
         contentSettings.OnChange(x => _contentSettings = x);
 
@@ -70,39 +95,46 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     /// </remarks>
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        var currentStringValue = currentValue as string;
-        currentStringValue = currentStringValue.NullOrWhiteSpaceAsNull();
 
-        var editorStringValue = editorValue.Value as string;
-        editorStringValue = editorStringValue.NullOrWhiteSpaceAsNull();
+        FileUploadValue? currentModelValue = null;
+        var currentPath = string.Empty;
+        try
+        {
+            if (currentValue is string currentStringValue)
+            {
+                currentModelValue = TryParseFileUploadValue(currentStringValue);
+            }
+        }
+        catch (Exception ex)
+        {
+            // For some reason the value is invalid so continue as if there was no value there
+            _logger.LogWarning(ex, "Could not parse current db value to an ImageCropperValue object.");
+        }
+
 
         // no change?
-        if (editorStringValue == currentStringValue)
+        FileUploadValue? editorModelValue = TryParseFileUploadValue(editorValue.Value as string);
+
+        if (Equals(editorModelValue, currentModelValue))
         {
             return currentValue;
         }
 
-        var currentPath = currentStringValue;
         if (currentPath.IsNullOrWhiteSpace() == false)
         {
             currentPath = _mediaFileManager.FileSystem.GetRelativePath(currentPath);
         }
 
         // resetting the current value?
-        if (editorStringValue is null && currentPath.IsNullOrWhiteSpace() is false)
+        if (editorModelValue is null && currentPath.IsNullOrWhiteSpace() is false)
         {
             // delete the current file and clear the value of this property
             _mediaFileManager.FileSystem.DeleteFile(currentPath);
             return null;
         }
 
-        // uploading a file?
-        if (Guid.TryParse(editorStringValue, out Guid temporaryFileKey) == false)
-        {
-            return editorStringValue;
-        }
-
-        TemporaryFileModel? file = TryGetTemporaryFile(temporaryFileKey);
+        var temporaryFileKey = editorModelValue?.TemporaryFileId;
+        TemporaryFileModel? file = temporaryFileKey is null ? null : TryGetTemporaryFile(temporaryFileKey!.Value);
         if (file == null)
         {
             // at this point the temporary file *should* have been validated by TemporaryFileUploadValidator, so we
@@ -113,7 +145,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
         // schedule temporary file for deletion
         using IScope scope = _scopeProvider.CreateScope();
-        _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey, _scopeProvider);
+        _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey!.Value, _scopeProvider);
 
         // ensure we have the required guids
         Guid contentKey = editorValue.ContentKey;
@@ -139,7 +171,51 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
         scope.Complete();
 
-        return filepath == null ? null : _mediaFileManager.FileSystem.GetUrl(filepath);
+        return
+            _jsonSerializer.Serialize(new FileUploadValue()
+            {
+                TemporaryFileId = null,
+                Src = filepath == null ? null : _mediaFileManager.FileSystem.GetUrl(filepath)
+            });
+
+    }
+
+    private FileUploadValue? TryParseFileUploadValue(string? value)
+    {
+        try
+        {
+            if (value is null)
+            {
+                return null;
+            }
+
+            if(_jsonSerializer.TryDeserialize(value, out FileUploadValue? modelValue))
+            {
+                return modelValue;
+            }
+
+            if(Guid.TryParse(value, out Guid temporaryFileId))
+            {
+                return new FileUploadValue()
+                {
+                    TemporaryFileId = temporaryFileId,
+                    Src = null,
+                };
+            }
+
+            return new FileUploadValue()
+            {
+                TemporaryFileId = null,
+                Src = value,
+            };
+        }
+        catch (Exception ex)
+        {
+            // For some reason the value is invalid - log error and continue as if no value was saved
+            _logger.LogWarning(ex, "Could not parse editor value to an FileUploadValue object.");
+        }
+
+        return null;
     }
 
     private Guid? TryParseTemporaryFileKey(object? editorValue)
