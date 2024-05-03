@@ -23,14 +23,13 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 	label = '';
 
 	#serverUrl = '';
-	#serverUrlPromise;
 
 	/**
 	 *
 	 */
 	constructor() {
 		super();
-		this.#serverUrlPromise = this.consumeContext(UMB_APP_CONTEXT, (instance) => {
+		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
 			this.#serverUrl = instance.getServerUrl();
 		}).asPromise();
 	}
