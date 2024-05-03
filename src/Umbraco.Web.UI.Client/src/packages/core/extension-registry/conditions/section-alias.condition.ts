@@ -25,7 +25,7 @@ export class UmbSectionAliasCondition
 		if (permissionCheck !== undefined) {
 			this.consumeContext(UMB_SECTION_CONTEXT, (context) => {
 				this.observe(context.alias, (sectionAlias) => {
-					this.permitted = sectionAlias ? permissionCheck(sectionAlias) : false;
+					this.permitted = sectionAlias ? permissionCheck!(sectionAlias) : false;
 				});
 			});
 		}
