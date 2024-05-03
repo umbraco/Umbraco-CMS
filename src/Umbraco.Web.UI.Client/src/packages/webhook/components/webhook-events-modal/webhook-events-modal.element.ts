@@ -1,20 +1,19 @@
 import { UmbWebhookEventRepository } from '../../repository/event/webhook-event.repository.js';
 import type { UmbWebhookEventModel } from '../../types.js';
+import type { UmbWebhookPickerModalData, UmbWebhookPickerModalValue } from './webhook-events-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-webhook-events-modal')
-export class UmbWebhookEventsModalElement extends UmbLitElement {
-	@property({ attribute: false })
-	modalContext?: UmbModalContext;
-
-	@property({ attribute: false })
-	events: Array<UmbWebhookEventModel> = [];
-
+export class UmbWebhookEventsModalElement extends UmbModalBaseElement<
+	UmbWebhookPickerModalData,
+	UmbWebhookPickerModalValue
+> {
 	@state()
 	_events: Array<UmbWebhookEventModel> = [];
 
@@ -22,27 +21,35 @@ export class UmbWebhookEventsModalElement extends UmbLitElement {
 
 	#selectionManager = new UmbSelectionManager(this);
 
-	constructor() {
-		super();
-
-		this.#requestEvents();
-	}
+	#eventsRequest?: Promise<any>;
 
 	connectedCallback(): void {
 		super.connectedCallback();
+
 		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(true);
-		this.#selectionManager.setSelection(this.events.map((item) => item.alias));
+		this.#selectionManager.setSelection(this.data?.events.map((item) => item.alias) ?? []);
+
+		this.#requestEvents();
+		this.#observeSelection();
+	}
+
+	async #observeSelection() {
+		await this.#eventsRequest;
+
+		console.log('this.#selectionManager.selection', this.#selectionManager.selection);
 
 		this.observe(this.#selectionManager.selection, (selection) => {
-			const selectedEvents = this._events.filter((item) => selection.includes(item.alias));
-			this.modalContext?.setValue(selectedEvents);
-			this.requestUpdate();
+			this.value = { events: this._events.filter((item) => selection.includes(item.alias)) };
+			// const selectedEvents = this._events.filter((item) => selection.includes(item.alias));
+			// this.modalContext?.setValue(selectedEvents);
+			// this.requestUpdate();
 		});
 	}
 
 	async #requestEvents() {
-		const { data } = await this.#repository.requestEvents();
+		this.#eventsRequest = this.#repository.requestEvents();
+		const { data } = await this.#eventsRequest;
 
 		if (!data) return;
 
@@ -79,7 +86,7 @@ export class UmbWebhookEventsModalElement extends UmbLitElement {
 							selectable
 							@selected=${() => this.#selectionManager.select(item.alias)}
 							@deselected=${() => this.#selectionManager.deselect(item.alias)}
-							?selected=${this.events.includes(item)}></uui-menu-item>
+							?selected=${this.value.events.includes(item)}></uui-menu-item>
 							<uui-icon slot="icon" name="icon-globe"></uui-icon>
 						</uui-menu-item>
 					`,

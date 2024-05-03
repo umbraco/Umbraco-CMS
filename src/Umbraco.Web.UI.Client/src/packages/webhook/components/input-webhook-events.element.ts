@@ -24,11 +24,15 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 	}
 
 	async #openModal() {
-		const modal = this._modalContext?.open(this, UMB_WEBHOOK_EVENTS_MODAL, { modal: { type: 'sidebar' } });
+		const modal = this._modalContext?.open(this, UMB_WEBHOOK_EVENTS_MODAL, {
+			modal: { type: 'sidebar' },
+			data: { events: this.events },
+		});
 		if (!modal) return;
 
 		await modal.onSubmit();
-		this.events = modal.getValue() as Array<UmbWebhookEventModel>;
+
+		this.events = modal.getValue().events;
 
 		modal.destroy();
 		this.dispatchEvent(new UmbChangeEvent());
