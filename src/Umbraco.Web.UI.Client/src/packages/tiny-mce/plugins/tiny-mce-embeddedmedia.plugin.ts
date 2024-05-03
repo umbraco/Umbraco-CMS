@@ -6,10 +6,22 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		this.editor.ui.registry.addButton('umbembeddialog', {
+		this.editor.ui.registry.addToggleButton('umbembeddialog', {
 			icon: 'embed',
 			tooltip: 'Embed',
 			onAction: () => this.#onAction(),
+			onSetup: (api) => {
+				const editor = this.editor;
+				const onNodeChange = () => {
+					const selectedElm = editor.selection.getNode();
+					api.setActive(
+						selectedElm.nodeName.toUpperCase() === 'DIV' && selectedElm.classList.contains('umb-embed-holder'),
+					);
+				};
+
+				editor.on('NodeChange', onNodeChange);
+				return () => editor.off('NodeChange', onNodeChange);
+			},
 		});
 	}
 
@@ -44,17 +56,18 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 	#insertInEditor(embed: UmbEmbeddedMediaModalValue, activeElement: HTMLElement) {
 		// Wrap HTML preview content here in a DIV with non-editable class of .mceNonEditable
 		// This turns it into a selectable/cutable block to move about
+
 		const wrapper = this.editor.dom.create(
 			'div',
 			{
 				class: 'mceNonEditable umb-embed-holder',
 				'data-embed-url': embed.url ?? '',
-				'data-embed-height': embed.height,
-				'data-embed-width': embed.width,
+				'data-embed-height': embed.height!,
+				'data-embed-width': embed.width!,
 				'data-embed-constrain': embed.constrain ?? false,
 				contenteditable: false,
 			},
-			embed.preview,
+			embed.markup,
 		);
 
 		// Only replace if activeElement is an Embed element.
