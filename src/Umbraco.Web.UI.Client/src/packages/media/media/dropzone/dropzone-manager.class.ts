@@ -1,7 +1,7 @@
+import { getExtensionFromMime } from '../utils/index.js';
 import type { UmbMediaDetailModel } from '../types.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
 import { UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL } from './modals/dropzone-media-type-picker/dropzone-media-type-picker-modal.token.js';
-import { mimeToExtension } from '@umbraco-cms/backoffice/external/mime-types';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { type UmbAllowedMediaTypeModel, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
@@ -23,12 +23,6 @@ export interface UmbUploadableFileModel extends UmbTemporaryFileModel {
 export interface UmbUploadableExtensionModel {
 	fileExtension: string;
 	mediaTypes: Array<UmbAllowedMediaTypeModel>;
-}
-
-export function getExtensionFromMime(mimeType: string): string | undefined {
-	const extension = mimeToExtension(mimeType);
-	if (!extension) return; // extension doesn't exist.
-	return extension;
 }
 
 export class UmbDropzoneManager extends UmbControllerBase {
@@ -60,7 +54,45 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		);
 	}
 
-	public async dropOneFile(file: File, parentUnique: string | null) {
+	public async dropFiles(files: Array<File>, parentUnique: string | null) {
+		if (!files.length) return;
+		if (files.length === 1) return this.#handleOneOneFile(files[0], parentUnique);
+
+		// Handler for multiple files dropped
+
+		this.#progress.setValue(0);
+		// removes duplicate file types so we don't call endpoints unnecessarily when building options.
+		const mimeTypes = [...new Set(files.map<string>((file) => file.type))];
+		const optionsArray = await this.#buildOptionsArrayFrom(
+			mimeTypes.map((mimetype) => this.#getExtensionFromMimeType(mimetype)),
+			parentUnique,
+		);
+
+		if (!optionsArray.length) return; // None of the files are allowed in current dropzone.
+
+		// Building an array of uploadable files. Do we want to build an array of failed files to let the user know which ones?
+		const uploadableFiles: Array<UmbUploadableFileModel> = [];
+
+		for (const file of files) {
+			const extension = this.#getExtensionFromMimeType(file.type);
+			if (!extension) {
+				// Folders have no extension on file drop. We assume it is a folder being uploaded.
+				return;
+			}
+			const options = optionsArray.find((option) => option.fileExtension === extension)?.mediaTypes;
+
+			if (!options) return; // TODO Current dropped file not allowed in this area. Find a good way to show this to the user after we finish uploading the rest of the files.
+
+			// Since we are uploading multiple files, we will pick first allowed option.
+			// Consider a way we can handle this differently in the future to let the user choose. Maybe a list of all files with an allowed media type dropdown?
+			const mediaType = options[0];
+			uploadableFiles.push({ unique: UmbId.new(), file, mediaTypeUnique: mediaType.unique });
+		}
+
+		await this.#handleUpload(uploadableFiles, parentUnique);
+	}
+
+	async #handleOneOneFile(file: File, parentUnique: string | null) {
 		this.#progress.setValue(0);
 		const extension = this.#getExtensionFromMimeType(file.type);
 
@@ -95,39 +127,6 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			mediaTypeUnique: mediaType.unique,
 		};
 		await this.#handleUpload([uploadableFile], parentUnique);
-	}
-
-	public async dropFiles(files: Array<File>, parentUnique: string | null) {
-		this.#progress.setValue(0);
-		// removes duplicate file types so we don't call endpoints unnecessarily when building options.
-		const mimeTypes = [...new Set(files.map<string>((file) => file.type))];
-		const optionsArray = await this.#buildOptionsArrayFrom(
-			mimeTypes.map((mimetype) => this.#getExtensionFromMimeType(mimetype)),
-			parentUnique,
-		);
-
-		if (!optionsArray.length) return; // None of the files are allowed in current dropzone.
-
-		// Building an array of uploadable files. Do we want to build an array of failed files to let the user know which ones?
-		const uploadableFiles: Array<UmbUploadableFileModel> = [];
-
-		for (const file of files) {
-			const extension = this.#getExtensionFromMimeType(file.type);
-			if (!extension) {
-				// Folders have no extension on file drop. We assume it is a folder being uploaded.
-				return;
-			}
-			const options = optionsArray.find((option) => option.fileExtension === extension)?.mediaTypes;
-
-			if (!options) return; // Dropped file not allowed in current dropzone.
-
-			// Since we are uploading multiple files, we will pick first allowed option.
-			// Consider a way we can handle this differently in the future to let the user choose. Maybe a list of all files with an allowed media type dropdown?
-			const mediaType = options[0];
-			uploadableFiles.push({ unique: UmbId.new(), file, mediaTypeUnique: mediaType.unique });
-		}
-
-		await this.#handleUpload(uploadableFiles, parentUnique);
 	}
 
 	#getExtensionFromMimeType(mimeType: string): string {
@@ -165,38 +164,43 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	async #handleUpload(files: Array<UmbUploadableFileModel>, parentUnique: string | null) {
-		const uploads = (await this.#tempFileManager.upload(files)) as Array<UmbUploadableFileModel>;
-		for (const upload of uploads) {
-			if (upload.status !== TemporaryFileStatus.SUCCESS) return; // Upload failed. In what way do we let the user know?
-			const preset: Partial<UmbMediaDetailModel> = {
-				mediaType: {
-					unique: upload.mediaTypeUnique,
-					collection: null,
-				},
-				variants: [
-					{
-						culture: null,
-						segment: null,
-						name: upload.file.name,
-						createDate: null,
-						updateDate: null,
-					},
-				],
-				values: [
-					{
-						alias: 'umbracoFile',
-						//value: { temporaryFileId: upload.unique },
-						value: { src: upload.unique },
-						culture: null,
-						segment: null,
-					},
-				],
-			};
+		let index: number = 0;
+		for (const file of files) {
+			index++;
+			const upload = (await this.#tempFileManager.uploadOne(file)) as UmbUploadableFileModel;
 
-			const { data } = await this.#mediaDetailRepository.createScaffold(preset);
-			if (!data) return;
+			if (upload.status === TemporaryFileStatus.SUCCESS) {
+				// Upload successful. Create media item.
+				const preset: Partial<UmbMediaDetailModel> = {
+					mediaType: {
+						unique: upload.mediaTypeUnique,
+						collection: null,
+					},
+					variants: [
+						{
+							culture: null,
+							segment: null,
+							name: upload.file.name,
+							createDate: null,
+							updateDate: null,
+						},
+					],
+					values: [
+						{
+							alias: 'umbracoFile',
+							value: { temporaryFileId: upload.unique },
+							culture: null,
+							segment: null,
+						},
+					],
+				};
+				const { data } = await this.#mediaDetailRepository.createScaffold(preset);
+				await this.#mediaDetailRepository.create(data!, parentUnique);
+			}
+			// TODO Find a good way to show files that ended up as TemporaryFileStatus.ERROR. Notice that they were allowed in current area
 
-			await this.#mediaDetailRepository.create(data, parentUnique);
+			const progress = Math.floor((index / files.length) * 100);
+			this.#progress.setValue(progress);
 		}
 	}
 
