@@ -249,8 +249,7 @@ public class BackOfficeUserStore :
 
         try
         {
-            IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => x.Id == id);
-            return Task.FromResult(_userRepository.Get(query).FirstOrDefault());
+            return Task.FromResult(_userRepository.Get(id));
         }
         catch (DbException)
         {

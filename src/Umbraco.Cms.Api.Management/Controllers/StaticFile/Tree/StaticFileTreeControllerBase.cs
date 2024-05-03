@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 [ApiExplorerSettings(GroupName = "Static File")]
 public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 {
-    private static readonly string[] _allowedRootFolders = { "App_Plugins", "wwwroot" };
+    private static readonly string[] _allowedRootFolders = { $"{Path.DirectorySeparatorChar}App_Plugins", $"{Path.DirectorySeparatorChar}wwwroot" };
 
     public StaticFileTreeControllerBase(IPhysicalFileSystem physicalFileSystem)
         => FileSystem = physicalFileSystem;
@@ -35,7 +35,7 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
             ? base.GetAncestorModels(path, includeSelf)
             : Array.Empty<FileSystemTreeItemPresentationModel>();
 
-    private bool IsTreeRootPath(string path) => string.IsNullOrWhiteSpace(path);
+    private bool IsTreeRootPath(string path) => path == Path.DirectorySeparatorChar.ToString();
 
     private bool IsAllowedPath(string path) => _allowedRootFolders.Contains(path) || _allowedRootFolders.Any(folder => path.StartsWith($"{folder}{Path.DirectorySeparatorChar}"));
 }

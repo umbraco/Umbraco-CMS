@@ -1,6 +1,4 @@
-using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
-using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.User.Current;
 
@@ -18,7 +16,11 @@ public class CurrentUserResponseModel
 
     public required ISet<Guid> DocumentStartNodeIds { get; init; } = new HashSet<Guid>();
 
+    public required bool HasDocumentRootAccess { get; init; }
+
     public required ISet<Guid> MediaStartNodeIds { get; init; } = new HashSet<Guid>();
+
+    public required bool HasMediaRootAccess { get; init; }
 
     public required IEnumerable<string> AvatarUrls { get; init; } = Enumerable.Empty<string>();
 

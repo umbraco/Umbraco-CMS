@@ -135,6 +135,35 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     }
 
     /// <inheritdoc/>
+    public async Task<Attempt<PagedModel<IUserGroup>, UserGroupOperationStatus>> FilterAsync(Guid userKey, string? filter, int skip, int take)
+    {
+        IUser? requestingUser = await _userService.GetAsync(userKey);
+        if (requestingUser is null)
+        {
+            return Attempt.FailWithStatus(UserGroupOperationStatus.MissingUser, new PagedModel<IUserGroup>());
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        var groups = _userGroupRepository
+            .GetMany()
+            .Where(group => filter.IsNullOrWhiteSpace() || group.Name?.InvariantContains(filter) is true)
+            .OrderBy(group => group.Name)
+            .ToList();
+
+        if (requestingUser.IsAdmin() is false)
+        {
+            var requestingUserGroups = requestingUser.Groups.Select(group => group.Alias).ToArray();
+            groups.RemoveAll(group =>
+                group.Alias is Constants.Security.AdminGroupAlias
+                || requestingUserGroups.Contains(group.Alias) is false);
+        }
+
+        return Attempt.SucceedWithStatus(
+            UserGroupOperationStatus.Success,
+            new PagedModel<IUserGroup> { Items = groups.Skip(skip).Take(take), Total = groups.Count });
+    }
+
+    /// <inheritdoc/>
     public async Task<Attempt<UserGroupOperationStatus>> DeleteAsync(ISet<Guid> keys)
     {
         if (keys.Any() is false)

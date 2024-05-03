@@ -58,8 +58,7 @@ internal class UmbracoCmsSchema
 
         public required UnattendedSettings Unattended { get; set; }
 
-        public required RichTextEditorSettings RichTextEditor { get; set; }
-
+        [Obsolete("Runtime minification is no longer supported. Will be removed entirely in V16.")]
         public required RuntimeMinificationSettings RuntimeMinification { get; set; }
 
         public required BasicAuthSettings BasicAuth { get; set; }
