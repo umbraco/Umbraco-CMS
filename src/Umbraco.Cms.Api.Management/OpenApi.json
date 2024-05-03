@@ -34357,6 +34357,8 @@
           "fallbackPermissions",
           "hasAccessToAllLanguages",
           "hasAccessToSensitiveData",
+          "hasDocumentRootAccess",
+          "hasMediaRootAccess",
           "id",
           "isAdmin",
           "languages",
@@ -34392,6 +34394,9 @@
               "format": "uuid"
             }
           },
+          "hasDocumentRootAccess": {
+            "type": "boolean"
+          },
           "mediaStartNodeIds": {
             "uniqueItems": true,
             "type": "array",
@@ -34399,6 +34404,9 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "hasMediaRootAccess": {
+            "type": "boolean"
           },
           "avatarUrls": {
             "type": "array",
@@ -43206,6 +43214,8 @@
         "required": [
           "documentStartNodeIds",
           "email",
+          "hasDocumentRootAccess",
+          "hasMediaRootAccess",
           "languageIsoCode",
           "mediaStartNodeIds",
           "name",
@@ -43242,6 +43252,9 @@
               "format": "uuid"
             }
           },
+          "hasDocumentRootAccess": {
+            "type": "boolean"
+          },
           "mediaStartNodeIds": {
             "uniqueItems": true,
             "type": "array",
@@ -43249,6 +43262,9 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "hasMediaRootAccess": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -43626,6 +43642,8 @@
           "documentStartNodeIds",
           "email",
           "failedLoginAttempts",
+          "hasDocumentRootAccess",
+          "hasMediaRootAccess",
           "id",
           "isAdmin",
           "mediaStartNodeIds",
@@ -43670,6 +43688,9 @@
               "format": "uuid"
             }
           },
+          "hasDocumentRootAccess": {
+            "type": "boolean"
+          },
           "mediaStartNodeIds": {
             "uniqueItems": true,
             "type": "array",
@@ -43677,6 +43698,9 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "hasMediaRootAccess": {
+            "type": "boolean"
           },
           "avatarUrls": {
             "type": "array",

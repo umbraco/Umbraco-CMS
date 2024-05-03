@@ -16,10 +16,6 @@ public abstract class RequireTreeRootAccessAttribute : ActionFilterAttribute
         IUser? user = backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
 
         var startNodeIds = user != null ? GetUserStartNodeIds(user, context) : Array.Empty<int>();
-
-        // TODO: remove this once we have backoffice auth in place
-        startNodeIds = new[] { Constants.System.Root };
-
         if (startNodeIds.Contains(Constants.System.Root))
         {
             return;
