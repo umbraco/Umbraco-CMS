@@ -11,6 +11,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	UmbEmbeddedMediaModalValue
 > {
 	#oEmbedRepository = new UmbOEmbedRepository(this);
+	#validUrl?: string;
 
 	@state()
 	private _loading?: UUIButtonState;
@@ -48,13 +49,14 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 			maxHeight: this._height,
 		});
 
-		if (!data) {
+		if (data) {
+			this.#validUrl = this._url;
+			this.value = { ...this.value, markup: data.markup, url: this.#validUrl };
+			this._loading = 'success';
+		} else {
+			this.#validUrl = undefined;
 			this._loading = 'failed';
-			return;
 		}
-
-		this.value = { ...this.value, markup: data.markup, url: this._url };
-		this._loading = 'success';
 	}
 
 	#onUrlChange(e: UUIInputEvent) {
@@ -63,14 +65,12 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 	#onWidthChange(e: UUIInputEvent) {
 		this._width = parseInt(e.target.value as string, 10);
-		//this.#getPreview();
-		//this.#changeSize('width');
+		this.#getPreview();
 	}
 
 	#onHeightChange(e: UUIInputEvent) {
 		this._height = parseInt(e.target.value as string, 10);
-		//this.#getPreview();
-		//this.#changeSize('height');
+		this.#getPreview();
 	}
 
 	#onConstrainChange() {
@@ -78,39 +78,13 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 		this.value = { ...this.value, constrain: this._constrain };
 	}
 
-	/**
-	 * Calculates the width or height axis dimension when the other is changed.
-	 * If constrain is false, axis change independently
-	 * @param axis {string}
-	 */
-	/*
-	#changeSize(axis: 'width' | 'height') {
-		const resize = this._model.originalWidth !== this._model.width || this._model.originalHeight !== this._model.height;
-
-		if (this._model.constrain) {
-			if (axis === 'width') {
-				this._model.height = Math.round((this._model.width / this._model.originalWidth) * this._model.height);
-			} else {
-				this._model.width = Math.round((this._model.height / this._model.originalHeight) * this._model.width);
-			}
-		}
-
-		this._model.originalWidth = this._model.width;
-		this._model.originalHeight = this._model.height;
-
-		if (this._model.url !== '' && resize) {
-			this.#getPreview();
-		}
-	}
-	*/
-
 	render() {
 		return html`
 			<umb-body-layout headline="Embed">
 				<uui-box>
 					<umb-property-layout label="URL" orientation="vertical">
 						<div slot="editor">
-							<uui-input .value=${this._url} type="text" @input=${this.#onUrlChange} required="true">
+							<uui-input id="url" .value=${this._url} @input=${this.#onUrlChange} required="true">
 								<uui-button
 									slot="append"
 									look="primary"
@@ -122,7 +96,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 					</umb-property-layout>
 
 					${when(
-						this._loading !== undefined,
+						this.#validUrl !== undefined,
 						() =>
 							html` <umb-property-layout label="Preview" orientation="vertical">
 								<div slot="editor">
@@ -133,11 +107,21 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 					)}
 
 					<umb-property-layout label="Max width" orientation="vertical">
-						<uui-input slot="editor" .value=${this._width} type="number" @change=${this.#onWidthChange}></uui-input>
+						<uui-input
+							slot="editor"
+							.value=${this._width}
+							type="number"
+							@change=${this.#onWidthChange}
+							?disabled=${this.#validUrl ? false : true}></uui-input>
 					</umb-property-layout>
 
 					<umb-property-layout label="Max height" orientation="vertical">
-						<uui-input slot="editor" .value=${this._height} type="number" @change=${this.#onHeightChange}></uui-input>
+						<uui-input
+							slot="editor"
+							.value=${this._height}
+							type="number"
+							@change=${this.#onHeightChange}
+							?disabled=${this.#validUrl ? false : true}></uui-input>
 					</umb-property-layout>
 
 					<umb-property-layout label="Constrain" orientation="vertical">
@@ -164,25 +148,9 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	static styles = [
 		UmbTextStyles,
 		css`
-			h3 {
-				margin-left: var(--uui-size-space-5);
-				margin-right: var(--uui-size-space-5);
-			}
-
 			uui-input {
 				width: 100%;
 				--uui-button-border-radius: 0;
-			}
-
-			.sr-only {
-				clip: rect(0, 0, 0, 0);
-				border: 0;
-				height: 1px;
-				margin: -1px;
-				overflow: hidden;
-				padding: 0;
-				position: absolute;
-				width: 1px;
 			}
 
 			umb-property-layout:first-child {
@@ -191,10 +159,6 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 
 			umb-property-layout:last-child {
 				padding-bottom: 0;
-			}
-
-			p {
-				margin-bottom: 0;
 			}
 		`,
 	];

@@ -3,11 +3,11 @@ import type { OEmbedResponseModel } from '@umbraco-cms/backoffice/external/backe
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
-	rest.get(umbracoPath('/rteembed'), (req, res, ctx) => {
-		const widthParam = req.url.searchParams.get('width');
+	rest.get(umbracoPath('/oembed/query'), (req, res, ctx) => {
+		const widthParam = req.url.searchParams.get('maxWidth');
 		const width = widthParam ? parseInt(widthParam) : 360;
 
-		const heightParam = req.url.searchParams.get('height');
+		const heightParam = req.url.searchParams.get('maxHeight');
 		const height = heightParam ? parseInt(heightParam) : 240;
 
 		const response: OEmbedResponseModel = {
