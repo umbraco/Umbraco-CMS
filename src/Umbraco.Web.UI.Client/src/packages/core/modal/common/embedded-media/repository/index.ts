@@ -1,2 +1,2 @@
-export { UmbDocumentCultureAndHostnamesRepository } from './oembed.repository.js';
-export { UMB_DOCUMENT_CULTURE_AND_HOSTNAMES_REPOSITORY_ALIAS } from './manifests.js';
+export { UmbOEmbedRepository } from './oembed.repository.js';
+export { UMB_OEMBED_REPOSITORY_ALIAS } from './manifests.js';
