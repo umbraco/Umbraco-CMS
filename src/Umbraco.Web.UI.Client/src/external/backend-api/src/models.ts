@@ -333,6 +333,7 @@ stylesheets: Array<string>
 scripts: Array<string>
 languages: Array<string>
 dictionaryItems: Array<string>
+id?: string | null
     };
 
 export type CreatePartialViewFolderRequestModel = {
@@ -1813,6 +1814,11 @@ export type PagedUserResponseModel = {
 items: Array<UserResponseModel>
     };
 
+export type PagedWebhookEventModel = {
+        total: number
+items: Array<WebhookEventModel>
+    };
+
 export type PagedWebhookResponseModel = {
         total: number
 items: Array<WebhookResponseModel>
@@ -2580,7 +2586,8 @@ mediaRootAccess: boolean
 fallbackPermissions: Array<string>
 permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>
 id: string
-isSystemGroup: boolean
+isDeletable: boolean
+aliasCanBeChanged: boolean
     };
 
 export type UserInstallRequestModel = {
@@ -2679,6 +2686,12 @@ export type VerifyResetPasswordResponseModel = {
 export type VerifyResetPasswordTokenRequestModel = {
         user: ReferenceByIdModel
 resetCode: string
+    };
+
+export type WebhookEventModel = {
+        eventName: string
+eventType: string
+alias: string
     };
 
 export type WebhookEventResponseModel = {
@@ -5242,7 +5255,7 @@ take?: number
                 ,GetWebhookById: WebhookResponseModel
                 ,PutWebhookById: string
                 ,DeleteWebhookById: string
-                ,GetWebhookEvents: PagedWebhookResponseModel
+                ,GetWebhookEvents: PagedWebhookEventModel
                 
         }
         
