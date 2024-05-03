@@ -74,6 +74,13 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	 * Formats the value depending on the input type.
 	 */
 	#formatValue(value: string) {
+		// Check that the value is a valid date
+		const valueToDate = new Date(value);
+		if (isNaN(valueToDate.getTime())) {
+			console.warn('[Umbraco.DatePicker] The value is not a valid date.', value);
+			return;
+		}
+
 		// Replace the potential time demoninator 'T' with a whitespace for backwards compatibility
 		value = value.replace('T', ' ');
 
