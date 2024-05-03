@@ -52,6 +52,9 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 		this._inputType = hasTime ? 'datetime-local' : 'date';
 
 		// Based on the type of format string change the UUI-input type
+		// Note: The format string is not validated, so it's possible to have an invalid format string,
+		// but we do not use the format string for anything else than to determine the input type.
+		// The format string is not used to validate the value and is only used on the frontend.
 		const timeFormatPattern = /^h{1,2}:m{1,2}(:s{1,2})?\s?a?$/gim;
 		if (format?.toLowerCase().match(timeFormatPattern)) {
 			this._inputType = 'time';
