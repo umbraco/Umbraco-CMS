@@ -14,7 +14,7 @@ export enum TemporaryFileStatus {
 
 export interface UmbTemporaryFileModel {
 	file: File;
-	unique?: string;
+	unique: string;
 	status?: TemporaryFileStatus;
 }
 
@@ -35,7 +35,6 @@ export class UmbTemporaryFileManager<
 		this.#queue.setValue([]);
 
 		const item: UploadableItem = {
-			unique: UmbId.new(),
 			status: TemporaryFileStatus.WAITING,
 			...uploadableItem,
 		};
@@ -47,9 +46,7 @@ export class UmbTemporaryFileManager<
 	async upload(queueItems: Array<UploadableItem>): Promise<Array<UploadableItem>> {
 		this.#queue.setValue([]);
 
-		const items = queueItems.map(
-			(item): UploadableItem => ({ unique: UmbId.new(), status: TemporaryFileStatus.WAITING, ...item }),
-		);
+		const items = queueItems.map((item): UploadableItem => ({ status: TemporaryFileStatus.WAITING, ...item }));
 		this.#queue.append(items);
 		return this.#handleQueue();
 	}

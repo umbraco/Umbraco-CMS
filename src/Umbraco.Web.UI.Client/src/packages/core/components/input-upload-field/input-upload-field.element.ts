@@ -147,12 +147,11 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 			(file): UmbTemporaryFileModel => ({
 				unique: UmbId.new(),
 				file,
-				status: 'waiting',
 			}),
 		);
 		this.#manager.upload(items);
 
-		this.keys = items.map((item) => item.unique);
+		this.keys = items.map((item) => item.unique!);
 		this.value = this.keys.join(',');
 
 		this.dispatchEvent(new UmbChangeEvent());
