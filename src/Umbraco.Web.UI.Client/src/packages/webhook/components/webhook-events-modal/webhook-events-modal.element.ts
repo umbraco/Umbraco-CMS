@@ -37,6 +37,7 @@ export class UmbWebhookEventsModalElement extends UmbLitElement {
 		this.observe(this.#selectionManager.selection, (selection) => {
 			const selectedEvents = this._events.filter((item) => selection.includes(item.alias));
 			this.modalContext?.setValue(selectedEvents);
+			this.requestUpdate();
 		});
 	}
 
@@ -56,8 +57,17 @@ export class UmbWebhookEventsModalElement extends UmbLitElement {
 		this.modalContext?.reject();
 	}
 
+	#getItemDisabled(item: UmbWebhookEventModel) {
+		const selection = this.#selectionManager.getSelection();
+
+		if (!selection.length) return false;
+
+		const selectedEvents = this._events.filter((item) => selection.includes(item.alias));
+		return selectedEvents[0].eventType !== item.eventType;
+	}
+
 	render() {
-		return html`<umb-body-layout headline="Select languages">
+		return html`<umb-body-layout headline="Select events">
 			<uui-box>
 				${repeat(
 					this._events,
@@ -65,6 +75,7 @@ export class UmbWebhookEventsModalElement extends UmbLitElement {
 					(item) => html`
 						<uui-menu-item
 							label=${item.eventName}
+							?disabled=${this.#getItemDisabled(item)}
 							selectable
 							@selected=${() => this.#selectionManager.select(item.alias)}
 							@deselected=${() => this.#selectionManager.deselect(item.alias)}
