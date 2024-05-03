@@ -40,14 +40,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	private _step?: number;
 
 	@property()
-	set value(value: string | undefined) {
-		// Replace the potential time demoninator 'T' with a whitespace for backwards compatibility
-		this.#value = value?.replace('T', ' ');
-	}
-	get value() {
-		return this.#value;
-	}
-	#value?: string;
+	value?: string;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -67,20 +60,37 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 		this._max = config.getValueByAlias('max');
 		this._step = config.getValueByAlias('step');
 
-		// If the inputType is 'date', we need to make sure the value doesn't have a time
-		if (this._inputType === 'date' && this.value?.includes(' ')) {
-			this.value = this.value.split(' ')[0];
-		}
-
-		// If the inputType is 'time', we need to remove the date part of the value
-		if (this._inputType === 'time' && this.value?.includes(' ')) {
-			this.value = this.value.split(' ')[1];
+		if (this.value) {
+			this.#formatValue(this.value);
 		}
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputDateElement }) {
-		this.value = event.target.value.toString();
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		this.#formatValue(event.target.value.toString());
+	}
+
+	/**
+	 * Formats the value depending on the input type.
+	 */
+	#formatValue(value: string) {
+		// Replace the potential time demoninator 'T' with a whitespace for backwards compatibility
+		value = value.replace('T', ' ');
+
+		// If the inputType is 'date', we need to make sure the value doesn't have a time
+		if (this._inputType === 'date' && value.includes(' ')) {
+			value = value.split(' ')[0];
+		}
+
+		// If the inputType is 'time', we need to remove the date part of the value
+		if (this._inputType === 'time' && value.includes(' ')) {
+			value = value.split(' ')[1];
+		}
+
+		const valueHasChanged = this.value !== value;
+		if (valueHasChanged) {
+			this.value = value;
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		}
 	}
 
 	render() {
