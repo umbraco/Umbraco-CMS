@@ -11,10 +11,5 @@ setup('authenticate', async ({page}) => {
   await umbracoUi.login.enterPassword(process.env.UMBRACO_USER_PASSWORD);
   await umbracoUi.login.clickLoginButton();
   await umbracoUi.login.goToSection(ConstantHelper.sections.settings);
-<<<<<<< HEAD
-  await page.context().storageState({path: STORAGE_STATE});
-});
-=======
   await umbracoUi.page.context().storageState({path: STORAGE_STATE});
 });
->>>>>>> v14/dev
