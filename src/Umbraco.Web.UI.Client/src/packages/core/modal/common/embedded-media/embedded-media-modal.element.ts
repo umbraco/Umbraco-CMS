@@ -79,7 +79,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline="Embed">
 				<uui-box>
-					<umb-property-layout label="URL" orientation="vertical">
+					<umb-property-layout label=${this.localize.term('general_url')} orientation="vertical">
 						<div slot="editor">
 							<uui-input id="url" .value=${this._url} @input=${this.#onUrlChange} required="true">
 								<uui-button
@@ -87,7 +87,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 									look="primary"
 									color="positive"
 									@click=${this.#getPreview}
-									label="Retrieve"></uui-button>
+									label=${this.localize.term('general_retrieve')}></uui-button>
 							</uui-input>
 						</div>
 					</umb-property-layout>
@@ -95,7 +95,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 					${when(
 						this.#validUrl !== undefined,
 						() =>
-							html` <umb-property-layout label="Preview" orientation="vertical">
+							html` <umb-property-layout label=${this.localize.term('general_preview')} orientation="vertical">
 								<div slot="editor">
 									${when(this._loading === 'waiting', () => html`<uui-loader-circle></uui-loader-circle>`)}
 									${when(this.value?.markup, () => html`${unsafeHTML(this.value.markup)}`)}
@@ -103,7 +103,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 							</umb-property-layout>`,
 					)}
 
-					<umb-property-layout label="Max width" orientation="vertical">
+					<umb-property-layout label=${this.localize.term('general_width')} orientation="vertical">
 						<uui-input
 							slot="editor"
 							.value=${this._width}
@@ -112,7 +112,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 							?disabled=${this.#validUrl ? false : true}></uui-input>
 					</umb-property-layout>
 
-					<umb-property-layout label="Max height" orientation="vertical">
+					<umb-property-layout label=${this.localize.term('general_height')} orientation="vertical">
 						<uui-input
 							slot="editor"
 							.value=${this._height}
@@ -121,7 +121,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 							?disabled=${this.#validUrl ? false : true}></uui-input>
 					</umb-property-layout>
 
-					<umb-property-layout label="Constrain" orientation="vertical">
+					<umb-property-layout label=${this.localize.term('general_constrainProportions')} orientation="vertical">
 						<uui-toggle
 							slot="editor"
 							@change=${this.#onConstrainChange}
