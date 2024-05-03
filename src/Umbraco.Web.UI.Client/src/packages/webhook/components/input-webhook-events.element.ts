@@ -40,6 +40,7 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 
 	#removeEvent(alias: string) {
 		this.events = this.events.filter((item) => item.alias !== alias);
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#renderEvents() {

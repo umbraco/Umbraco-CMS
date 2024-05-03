@@ -2,11 +2,9 @@ import { UmbWebhookEventRepository } from '../../repository/event/webhook-event.
 import type { UmbWebhookEventModel } from '../../types.js';
 import type { UmbWebhookPickerModalData, UmbWebhookPickerModalValue } from './webhook-events-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 
-import { UmbModalBaseElement, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-webhook-events-modal')
@@ -37,13 +35,8 @@ export class UmbWebhookEventsModalElement extends UmbModalBaseElement<
 	async #observeSelection() {
 		await this.#eventsRequest;
 
-		console.log('this.#selectionManager.selection', this.#selectionManager.selection);
-
 		this.observe(this.#selectionManager.selection, (selection) => {
 			this.value = { events: this._events.filter((item) => selection.includes(item.alias)) };
-			// const selectedEvents = this._events.filter((item) => selection.includes(item.alias));
-			// this.modalContext?.setValue(selectedEvents);
-			// this.requestUpdate();
 		});
 	}
 

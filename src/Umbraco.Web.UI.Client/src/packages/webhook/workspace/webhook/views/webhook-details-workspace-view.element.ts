@@ -23,6 +23,9 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 	@state()
 	_isNew?: boolean;
 
+	@state()
+	contentType?: string;
+
 	#webhookWorkspaceContext?: typeof UMB_WEBHOOK_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -32,6 +35,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 			this.#webhookWorkspaceContext = instance;
 			this.observe(this.#webhookWorkspaceContext.data, (webhook) => {
 				this._webhook = webhook;
+				this.contentType = this._webhook?.events[0]?.eventType ?? undefined;
 			});
 			this.observe(this.#webhookWorkspaceContext.isNew, (isNew) => {
 				this._isNew = isNew;
@@ -41,6 +45,9 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 
 	#onEventsChange(event: UmbChangeEvent) {
 		const events = (event.target as UmbInputWebhookEventsElement).events;
+		if (events[0].eventType !== this.contentType) {
+			this.#webhookWorkspaceContext?.setTypes([]);
+		}
 		this.#webhookWorkspaceContext?.setEvents(events);
 	}
 
@@ -64,6 +71,34 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 	#onEnabledChange(event: UUIBooleanInputEvent) {
 		this.#webhookWorkspaceContext?.setEnabled(event.target.checked);
 	}
+	#renderContentTypePicker() {
+		if (this.contentType !== 'Content' && this.contentType !== 'Media') return nothing;
+
+		return html`
+			<umb-property-layout label="Content Type" description="Only trigger the webhook for a specific content type.">
+				${this.#renderContentTypePickerEditor()}
+			</umb-property-layout>
+		`;
+	}
+
+	#renderContentTypePickerEditor() {
+		switch (this.contentType) {
+			case 'Content':
+				return html`<umb-input-document-type
+					@change=${this.#onTypesChange}
+					.selection=${this._webhook?.contentTypes ?? []}
+					slot="editor"
+					?elementTypesOnly=${true}></umb-input-document-type>`;
+			case 'Media':
+				return html`<umb-input-media-type
+					@change=${this.#onTypesChange}
+					.selection=${this._webhook?.contentTypes ?? []}
+					slot="editor"
+					?elementTypesOnly=${true}></umb-input-media-type>`;
+			default:
+				return nothing;
+		}
+	}
 
 	render() {
 		if (!this._webhook) return nothing;
@@ -71,7 +106,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 		return html`
 			<uui-box>
 				<umb-property-layout label="Url" description="The url to call when the webhook is triggered.">
-					<uui-input @input=${this.#onUrlChange} slot="editor"></uui-input>
+					<uui-input @input=${this.#onUrlChange} .value=${this._webhook.url} slot="editor"></uui-input>
 				</umb-property-layout>
 				<umb-property-layout label="Events" description="The events for which the webhook should be triggered.">
 					<umb-input-webhook-events
@@ -79,14 +114,9 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 						.events=${this._webhook.events ?? []}
 						slot="editor"></umb-input-webhook-events>
 				</umb-property-layout>
-				<umb-property-layout label="Content Type" description="Only trigger the webhook for a specific content type.">
-					<umb-input-document-type
-						@change=${this.#onTypesChange}
-						slot="editor"
-						?elementTypesOnly=${true}></umb-input-document-type>
-				</umb-property-layout>
+				${this.#renderContentTypePicker()}
 				<umb-property-layout label="Enabled" description="Is the webhook enabled?">
-					<uui-toggle slot="editor" @input=${this.#onEnabledChange}></uui-toggle>
+					<uui-toggle slot="editor" .checked=${this._webhook.enabled} @input=${this.#onEnabledChange}></uui-toggle>
 				</umb-property-layout>
 				<umb-property-layout label="Headers" description="Custom headers to include in the webhook request.">
 					<umb-input-webhook-headers
