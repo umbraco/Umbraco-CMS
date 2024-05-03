@@ -48,6 +48,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 		// Format string prevalue/config
 		const format = config.getValueByAlias<string>('format');
 		const hasTime = format?.includes('H') || format?.includes('m');
+		const hasSeconds = format?.includes('s');
 		this._inputType = hasTime ? 'datetime-local' : 'date';
 
 		// Based on the type of format string change the UUI-input type
@@ -58,7 +59,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 
 		this._min = config.getValueByAlias('min');
 		this._max = config.getValueByAlias('max');
-		this._step = config.getValueByAlias('step');
+		this._step = config.getValueByAlias('step') ?? hasSeconds ? 1 : undefined;
 
 		if (this.value) {
 			this.#formatValue(this.value);
