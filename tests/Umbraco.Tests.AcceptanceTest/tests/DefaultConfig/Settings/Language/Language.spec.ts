@@ -1,7 +1,8 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-test.describe('Language tests', () => {
+// TODO: Remove @smoke tag before merging
+test.describe('Language tests @smoke', () => {
   const languageName = 'Arabic';
   const isoCode = 'ar';
   const defaultLanguageName = 'English (United States)';
@@ -27,7 +28,7 @@ test.describe('Language tests', () => {
 
     // Assert
     expect(await umbracoApi.language.doesExist(isoCode)).toBeTruthy();
-    // verify the created language displays in the list
+    // Verify the created language displays in the list
     await umbracoUi.language.clickLanguageRoot();
     await umbracoUi.language.isLanguageNameVisible(languageName, true);
   });
