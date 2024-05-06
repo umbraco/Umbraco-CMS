@@ -193,30 +193,31 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
         }
 
         // Check if maintenance page should be shown
-        if (_runtimeState.Level == RuntimeLevel.Upgrade && _globalSettings.ShowMaintenancePageWhenInUpgradeState)
+        if (_runtimeState.Level != RuntimeLevel.Upgrade || _globalSettings.ShowMaintenancePageWhenInUpgradeState is false)
         {
-            // When upgrading you get redirected to /umbraco, and the API calls are considered installer requests
-            // So we need to not mess with these.
-            // This check relatively expensive, however,
-            // since this is only done when in upgrade state and when the maintenance page is enabled
-            // I think it's fine, since the site is really not expected to be under load while in this state.
-            if (_umbracoRequestPaths.IsBackOfficeRequest(httpContext.Request.Path)
-                || _umbracoRequestPaths.IsInstallerRequest(httpContext.Request.Path))
-            {
-                return Task.FromResult(true);
-            }
+            return Task.FromResult(false);
+        }
 
-            // Otherwise we'll re-route to the render controller (this will in turn show the maintenance page through a filter)
-            // With this approach however this could really just be a plain old endpoint instead of a filter.
-            SetEndpoint(candidates, _renderEndpoint.Value, new RouteValueDictionary
-                {
-                    [Constants.Web.Routing.ControllerToken] = ControllerExtensions.GetControllerName<RenderController>(),
-                    [Constants.Web.Routing.ActionToken] = nameof(RenderController.Index),
-                });
-
+        // When upgrading you get redirected to /umbraco, and the API calls are considered installer requests
+        // So we need to not mess with these.
+        // This check relatively expensive, however,
+        // since this is only done when in upgrade state and when the maintenance page is enabled
+        // I think it's fine, since the site is really not expected to be under load while in this state.
+        if (_umbracoRequestPaths.IsBackOfficeRequest(httpContext.Request.Path)
+            || _umbracoRequestPaths.IsInstallerRequest(httpContext.Request.Path))
+        {
             return Task.FromResult(true);
         }
 
-        return Task.FromResult(false);
+        // Otherwise we'll re-route to the render controller (this will in turn show the maintenance page through a filter)
+        // With this approach however this could really just be a plain old endpoint instead of a filter.
+        SetEndpoint(candidates, _renderEndpoint.Value, new RouteValueDictionary
+        {
+            [Constants.Web.Routing.ControllerToken] = ControllerExtensions.GetControllerName<RenderController>(),
+            [Constants.Web.Routing.ActionToken] = nameof(RenderController.Index),
+        });
+
+        return Task.FromResult(true);
+
     }
 }
