@@ -158,12 +158,20 @@ public class MemberController : DeliveryApiControllerBase
         {
             claim.SetDestinations(OpenIddictConstants.Destinations.AccessToken);
         }
+        var scopes = new List<string>();
+
+        if (request.GetScopes().Contains(OpenIddictConstants.Scopes.OpenId))
+        {
+            scopes.Add(OpenIddictConstants.Scopes.OpenId);
+        }
 
         if (request.GetScopes().Contains(OpenIddictConstants.Scopes.OfflineAccess))
         {
             // "offline_access" scope is required to use refresh tokens
-            memberPrincipal.SetScopes(OpenIddictConstants.Scopes.OfflineAccess);
+            scopes.Add(OpenIddictConstants.Scopes.OfflineAccess);
         }
+
+        memberPrincipal.SetScopes(scopes);
 
         return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, memberPrincipal);
     }
