@@ -21,7 +21,8 @@ describe('UmbPropertyEditorUIDatePickerElement', () => {
 		expect(inputElement).to.exist;
 	});
 
-	it('should show a datetime-local input by default', () => {
+	it('should show a datetime-local input by default', async () => {
+		await element.updateComplete;
 		expect(inputElement.type).to.equal('datetime-local');
 	});
 
