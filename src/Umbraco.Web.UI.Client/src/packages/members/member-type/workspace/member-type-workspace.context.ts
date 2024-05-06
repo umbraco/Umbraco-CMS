@@ -173,31 +173,30 @@ export class UmbMemberTypeWorkspaceContext
 		}
 	}
 
+	/**
+	 * Save or creates the member type, based on wether its a new one or existing.
+	 */
 	async submit() {
 		const data = this.getData();
-		if (data === undefined) throw new Error('Cannot save, no data');
+		if (!data) {
+			throw new Error('Something went wrong, there is no data for media type you want to save...');
+		}
 
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
-			const { error } = await this.repository.create(data, parent.unique);
-			if (error) {
-				throw new Error(error.message);
-			}
-			this.setIsNew(false);
 
-			// TODO: this might not be the right place to alert the tree, but it works for now
+			await this.structure.create(parent.unique);
+
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadTreeItemChildrenEvent({
 				entityType: parent.entityType,
 				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
+			this.setIsNew(false);
 		} else {
-			const { error } = await this.structure.save();
-			if (error) {
-				throw new Error(error.message);
-			}
+			await this.structure.save();
 
 			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbRequestReloadStructureForEntityEvent({

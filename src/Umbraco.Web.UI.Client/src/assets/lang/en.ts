@@ -727,7 +727,9 @@ export default {
 		unauthorized: 'You were not authorized before performing this action',
 		userNotFound: 'The local user was not found in the database',
 		externalInfoNotFound: 'The server did not succeed in communicating with the external login provider',
-		externalLoginFailed: 'The server failed to authorize you against the external login provider',
+		externalLoginFailed:
+			'The server failed to authorize you against the external login provider. Please close the window and try again.',
+		externalLoginSuccess: 'You have successfully logged in. You may now close this window.',
 	},
 	openidErrors: {
 		accessDenied: 'Access denied',
@@ -2379,10 +2381,11 @@ export default {
 		documentationHeader: 'Documentation',
 		documentationDescription: 'Read more about working with the items in Settings in our Documentation.',
 		communityHeader: 'Community',
+		communityDescription: 'Ask a question in the community forum or our Discord community.',
 		trainingHeader: 'Training',
 		trainingDescription: 'Find out about real-life training and certification opportunities',
 		supportHeader: 'Support',
-		supportDescription: 'Ask a question in the community forum or our Discord community.',
+		supportDescription: 'Extend your team with a highly skilled and passionate bunch of Umbraco know-it-alls',
 		videosHeader: 'Videos',
 		videosDescription:
 			'Watch our free tutorial videos on the Umbraco Learning Base YouTube channel, to get up to speed quickly with Umbraco.',

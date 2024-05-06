@@ -113,7 +113,7 @@ export type CopyMediaTypeRequestModel = {
 export type CreateDataTypeRequestModel = {
         name: string
 editorAlias: string
-editorUiAlias?: string | null
+editorUiAlias: string
 values: Array<DataTypePropertyPresentationModel>
 id?: string | null
 parent?: ReferenceByIdModel | null
@@ -333,6 +333,7 @@ stylesheets: Array<string>
 scripts: Array<string>
 languages: Array<string>
 dictionaryItems: Array<string>
+id?: string | null
     };
 
 export type CreatePartialViewFolderRequestModel = {
@@ -384,6 +385,7 @@ key?: string | null
 
 export type CreateUserGroupRequestModel = {
         name: string
+alias: string
 icon?: string | null
 sections: Array<string>
 languages: Array<string>
@@ -394,6 +396,7 @@ mediaStartNode?: ReferenceByIdModel | null
 mediaRootAccess: boolean
 fallbackPermissions: Array<string>
 permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>
+id?: string | null
     };
 
 export type CreateUserRequestModel = {
@@ -436,7 +439,9 @@ userName: string
 name: string
 languageIsoCode?: string | null
 documentStartNodeIds: Array<string>
+hasDocumentRootAccess: boolean
 mediaStartNodeIds: Array<string>
+hasMediaRootAccess: boolean
 avatarUrls: Array<string>
 languages: Array<string>
 hasAccessToAllLanguages: boolean
@@ -479,7 +484,7 @@ properties: Array<DataTypePropertyReferenceModel>
 export type DataTypeResponseModel = {
         name: string
 editorAlias: string
-editorUiAlias?: string | null
+editorUiAlias: string
 values: Array<DataTypePropertyPresentationModel>
 id: string
 isDeletable: boolean
@@ -2268,7 +2273,7 @@ export type UnpublishDocumentRequestModel = {
 export type UpdateDataTypeRequestModel = {
         name: string
 editorAlias: string
-editorUiAlias?: string | null
+editorUiAlias: string
 values: Array<DataTypePropertyPresentationModel>
     };
 
@@ -2493,6 +2498,7 @@ key: string
 
 export type UpdateUserGroupRequestModel = {
         name: string
+alias: string
 icon?: string | null
 sections: Array<string>
 languages: Array<string>
@@ -2517,7 +2523,9 @@ name: string
 userGroupIds: Array<string>
 languageIsoCode: string
 documentStartNodeIds: Array<string>
+hasDocumentRootAccess: boolean
 mediaStartNodeIds: Array<string>
+hasMediaRootAccess: boolean
     };
 
 export type UpdateWebhookRequestModel = {
@@ -2565,10 +2573,12 @@ export type UserGroupItemResponseModel = {
         id: string
 name: string
 icon?: string | null
+alias?: string | null
     };
 
 export type UserGroupResponseModel = {
         name: string
+alias: string
 icon?: string | null
 sections: Array<string>
 languages: Array<string>
@@ -2580,7 +2590,8 @@ mediaRootAccess: boolean
 fallbackPermissions: Array<string>
 permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>
 id: string
-isSystemGroup: boolean
+isDeletable: boolean
+aliasCanBeChanged: boolean
     };
 
 export type UserInstallRequestModel = {
@@ -2626,7 +2637,9 @@ userGroupIds: Array<string>
 id: string
 languageIsoCode?: string | null
 documentStartNodeIds: Array<string>
+hasDocumentRootAccess: boolean
 mediaStartNodeIds: Array<string>
+hasMediaRootAccess: boolean
 avatarUrls: Array<string>
 state: UserStateModel
 failedLoginAttempts: number

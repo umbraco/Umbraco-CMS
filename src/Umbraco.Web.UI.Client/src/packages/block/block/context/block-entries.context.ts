@@ -6,7 +6,7 @@ import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { type Observable, UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 export abstract class UmbBlockEntriesContext<
@@ -28,6 +28,8 @@ export abstract class UmbBlockEntriesContext<
 
 	#workspacePath = new UmbStringState(undefined);
 	workspacePath = this.#workspacePath.asObservable();
+
+	public abstract readonly canCreate: Observable<boolean>;
 
 	protected _layoutEntries = new UmbArrayState<BlockLayoutType>([], (x) => x.contentUdi);
 	readonly layoutEntries = this._layoutEntries.asObservable();
