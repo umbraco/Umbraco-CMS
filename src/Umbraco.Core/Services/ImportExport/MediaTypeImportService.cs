@@ -46,7 +46,7 @@ public class MediaTypeImportService : IMediaTypeImportService
             packageEntityTypeAttempt.Result is not UmbracoEntityTypes.MediaType)
         {
             return Attempt.FailWithStatus<IMediaType?, MediaTypeImportOperationStatus>(
-                MediaTypeImportOperationStatus.TypeMisMatch,
+                MediaTypeImportOperationStatus.TypeMismatch,
                 null);
         }
 

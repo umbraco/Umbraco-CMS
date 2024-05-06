@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Import;
 [ApiExplorerSettings(GroupName = "Import")]
 public abstract class ImportControllerBase : ManagementApiControllerBase
 {
-    protected static IActionResult TemporaryFileXmlImportperationStatusResult(TemporaryFileXmlImportOperationStatus operationStatus) =>
+    protected static IActionResult TemporaryFileXmlImportOperationStatusResult(TemporaryFileXmlImportOperationStatus operationStatus) =>
         OperationStatusResult(operationStatus, problemDetailsBuilder => operationStatus switch
         {
             TemporaryFileXmlImportOperationStatus.TemporaryFileNotFound => new NotFoundObjectResult(problemDetailsBuilder

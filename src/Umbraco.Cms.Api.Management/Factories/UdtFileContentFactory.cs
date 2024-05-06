@@ -13,27 +13,23 @@ public class UdtFileContentFactory : IUdtFileContentFactory
     private readonly IEntityXmlSerializer _entityXmlSerializer;
 
     public UdtFileContentFactory(IEntityXmlSerializer entityXmlSerializer)
-    {
-        _entityXmlSerializer = entityXmlSerializer;
-    }
+        => _entityXmlSerializer = entityXmlSerializer;
 
     public FileContentResult Create(IContentType contentType)
     {
         XElement xml = _entityXmlSerializer.Serialize(contentType);
-        var fileName = $"{contentType.Alias}.udt";
-        return XmlTofile(fileName, xml);
+        return XmlTofile(contentType, xml);
     }
 
     public FileContentResult Create(IMediaType mediaType)
     {
         XElement xml = _entityXmlSerializer.Serialize(mediaType);
-        var fileName = $"{mediaType.Alias}.udt";
-        return XmlTofile(fileName, xml);
+        return XmlTofile(mediaType, xml);
     }
 
-    private static FileContentResult XmlTofile(string fileName, XElement xml) =>
+    private static FileContentResult XmlTofile(IContentTypeBase contentTypeBase, XElement xml) =>
         new(Encoding.UTF8.GetBytes(xml.ToDataString()), MediaTypeNames.Application.Octet)
         {
-            FileDownloadName = fileName
+            FileDownloadName = $"{contentTypeBase.Alias}.udt"
         };
 }

@@ -33,7 +33,7 @@ public class AnalyzeImportController : ImportControllerBase
         Attempt<EntityXmlAnalysis?, TemporaryFileXmlImportOperationStatus> analyzeResult = await _temporaryFileToXmlImportService.AnalyzeAsync(temporaryFileId);
 
         return analyzeResult.Success is false
-            ? TemporaryFileXmlImportperationStatusResult(analyzeResult.Status)
+            ? TemporaryFileXmlImportOperationStatusResult(analyzeResult.Status)
             : Ok(_mapper.Map<EntityImportAnalysisResponseModel>(analyzeResult.Result));
     }
 }

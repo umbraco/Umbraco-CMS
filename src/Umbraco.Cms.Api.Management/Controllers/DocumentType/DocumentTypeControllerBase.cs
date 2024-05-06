@@ -109,29 +109,29 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 _ => new ObjectResult("Unknown content type structure operation status") { StatusCode = StatusCodes.Status500InternalServerError }
             });
 
-    protected static IActionResult ContentTypeImportOperationStatusResult(ContentTypeImportOperationStatus operationStatus) =>
+    protected IActionResult ContentTypeImportOperationStatusResult(ContentTypeImportOperationStatus operationStatus) =>
         OperationStatusResult(operationStatus, problemDetailsBuilder => operationStatus switch
         {
-            ContentTypeImportOperationStatus.TemporaryFileNotFound => new NotFoundObjectResult(problemDetailsBuilder
+            ContentTypeImportOperationStatus.TemporaryFileNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("Temporary file not found")
                 .Build()),
-            ContentTypeImportOperationStatus.TemporaryFileConversionFailure => new BadRequestObjectResult(problemDetailsBuilder
+            ContentTypeImportOperationStatus.TemporaryFileConversionFailure => BadRequest(problemDetailsBuilder
                 .WithTitle("Failed to convert the specified file")
                 .WithDetail("The import failed due to not being able to convert the file into proper xml")
                 .Build()),
-            ContentTypeImportOperationStatus.DocumentTypeExists => new BadRequestObjectResult(problemDetailsBuilder
+            ContentTypeImportOperationStatus.DocumentTypeExists => BadRequest(problemDetailsBuilder
                 .WithTitle("Failed to import because document type exits")
                 .WithDetail("The import failed because the document type that was being imported already exits")
                 .Build()),
-            ContentTypeImportOperationStatus.TypeMisMatch => new BadRequestObjectResult(problemDetailsBuilder
+            ContentTypeImportOperationStatus.TypeMismatch => BadRequest(problemDetailsBuilder
                 .WithTitle("Type Mismatch")
                 .WithDetail("The import failed because the file contained an entity that is not a content type.")
                 .Build()),
-            ContentTypeImportOperationStatus.IdMismatch => new BadRequestObjectResult(problemDetailsBuilder
+            ContentTypeImportOperationStatus.IdMismatch => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid Id")
-                .WithDetail("The import failed because the id of the content type you are trying to update did not match the id in the file.")
+                .WithDetail("The import failed because the id of the document type you are trying to update did not match the id in the file.")
                 .Build()),
-            _ => new ObjectResult("Unknown content type import operation status") { StatusCode = StatusCodes.Status500InternalServerError },
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown document type import operation status.")
         });
 
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status) =>

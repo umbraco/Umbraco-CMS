@@ -53,7 +53,7 @@ public class ContentTypeImportService : IContentTypeImportService
             packageEntityTypeAttempt.Result is not UmbracoEntityTypes.DocumentType)
         {
             return Attempt.FailWithStatus<IContentType?, ContentTypeImportOperationStatus>(
-                ContentTypeImportOperationStatus.TypeMisMatch,
+                ContentTypeImportOperationStatus.TypeMismatch,
                 null);
         }
 

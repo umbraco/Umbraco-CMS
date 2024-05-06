@@ -8,5 +8,5 @@ public enum ContentTypeImportOperationStatus
     TemporaryFileConversionFailure,
     DocumentTypeExists,
     IdMismatch,
-    TypeMisMatch,
+    TypeMismatch,
 }

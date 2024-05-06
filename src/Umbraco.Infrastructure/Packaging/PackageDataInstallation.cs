@@ -745,10 +745,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         }
 
         public Guid GetContentTypeKey(XElement contentType)
-        => Guid.Parse(contentType.Element("Info")!.Element("Key")!.Value);
+            => Guid.Parse(contentType.Element("Info")!.Element("Key")!.Value);
 
         public string? GetEntityTypeAlias(XElement entityType)
-        => entityType.Element("Info")?.Element("Alias")?.Value;
+            => entityType.Element("Info")?.Element("Alias")?.Value;
 
         private T CreateContentTypeFromXml<T>(
             XElement documentType,

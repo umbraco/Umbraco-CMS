@@ -21,28 +21,28 @@ public abstract class MediaTypeControllerBase : ManagementApiControllerBase
     protected IActionResult StructureOperationStatusResult(ContentTypeStructureOperationStatus status)
         => DocumentTypeControllerBase.ContentTypeStructureOperationStatusResult(status, "media");
 
-    protected static IActionResult MediaTypeImportOperationStatusResult(MediaTypeImportOperationStatus operationStatus) =>
+    protected IActionResult MediaTypeImportOperationStatusResult(MediaTypeImportOperationStatus operationStatus) =>
         OperationStatusResult(operationStatus, problemDetailsBuilder => operationStatus switch
         {
-            MediaTypeImportOperationStatus.TemporaryFileNotFound => new NotFoundObjectResult(problemDetailsBuilder
+            MediaTypeImportOperationStatus.TemporaryFileNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("Temporary file not found")
                 .Build()),
-            MediaTypeImportOperationStatus.TemporaryFileConversionFailure => new BadRequestObjectResult(problemDetailsBuilder
+            MediaTypeImportOperationStatus.TemporaryFileConversionFailure => BadRequest(problemDetailsBuilder
                 .WithTitle("Failed to convert the specified file")
                 .WithDetail("The import failed due to not being able to convert the file into proper xml.")
                 .Build()),
-            MediaTypeImportOperationStatus.MediaTypeExists => new BadRequestObjectResult(problemDetailsBuilder
+            MediaTypeImportOperationStatus.MediaTypeExists => BadRequest(problemDetailsBuilder
                 .WithTitle("Failed to import because media type exits")
                 .WithDetail("The import failed because the media type that was being imported already exits.")
                 .Build()),
-            MediaTypeImportOperationStatus.TypeMisMatch => new BadRequestObjectResult(problemDetailsBuilder
+            MediaTypeImportOperationStatus.TypeMismatch => BadRequest(problemDetailsBuilder
                 .WithTitle("Type Mismatch")
                 .WithDetail("The import failed because the file contained an entity that is not a media type.")
                 .Build()),
-            MediaTypeImportOperationStatus.IdMismatch => new BadRequestObjectResult(problemDetailsBuilder
+            MediaTypeImportOperationStatus.IdMismatch => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid Id")
                 .WithDetail("The import failed because the id of the media type you are trying to update did not match the id in the file.")
                 .Build()),
-            _ => new ObjectResult("Unknown content type import operation status") { StatusCode = StatusCodes.Status500InternalServerError },
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown media type import operation status.")
         });
 }

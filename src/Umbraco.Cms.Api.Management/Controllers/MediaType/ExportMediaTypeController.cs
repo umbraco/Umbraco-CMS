@@ -22,7 +22,7 @@ public class ExportMediaTypeController : MediaTypeControllerBase
         _fileContentFactory = fileContentFactory;
     }
 
-    [HttpGet("{id}/export")]
+    [HttpGet("{id:guid}/export")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
