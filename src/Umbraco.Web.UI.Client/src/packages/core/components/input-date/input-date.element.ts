@@ -45,11 +45,11 @@ export class UmbInputDateElement extends UUIFormControlMixin(UmbLitElement, '') 
 	render() {
 		return html`<uui-input
 			id="datetime"
-			label=${this.localize.term('placeholders_enterdate')}
-			min=${ifDefined(this.min)}
-			max=${ifDefined(this.max)}
-			step=${ifDefined(this.step)}
-			type=${this.type}
+			.label=${this.localize.term('placeholders_enterdate')}
+			.min=${this.min}
+			.max=${this.max}
+			.step=${this.step}
+			.type=${this.type}
 			value=${ifDefined(this.value)}
 			@change=${this.#onChange}>
 		</uui-input>`;
