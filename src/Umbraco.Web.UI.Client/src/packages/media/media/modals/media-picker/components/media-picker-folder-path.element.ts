@@ -1,3 +1,4 @@
+import type { UmbMediaPathModel } from '../types.js';
 import type { UmbMediaDetailModel } from '../../../types.js';
 import { UmbMediaDetailRepository } from '../../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../../tree/media-tree.repository.js';
@@ -6,13 +7,8 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { css, html, customElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbMediaTypeFileType } from '@umbraco-cms/backoffice/media-type';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-
-interface MediaPath {
-	name: string;
-	unique: string | null;
-}
+import { getUmbracoFolderUnique } from '@umbraco-cms/backoffice/media-type';
 
 const root = { name: 'Media', unique: null };
 
@@ -40,7 +36,7 @@ export class UmbMediaPickerFolderPathElement extends UmbModalBaseElement<
 	private _currentPath: string | null = null;
 
 	@state()
-	private _paths: Array<MediaPath> = [root];
+	private _paths: Array<UmbMediaPathModel> = [root];
 
 	@state()
 	private _typingNewFolder = false;
@@ -89,7 +85,7 @@ export class UmbMediaPickerFolderPathElement extends UmbModalBaseElement<
 		const preset: Partial<UmbMediaDetailModel> = {
 			unique: newUnique,
 			mediaType: {
-				unique: UmbMediaTypeFileType.FOLDER,
+				unique: getUmbracoFolderUnique(),
 				collection: null,
 			},
 			variants: [
