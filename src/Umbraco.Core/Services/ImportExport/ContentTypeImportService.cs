@@ -1,6 +1,7 @@
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.ImportExport;
@@ -10,15 +11,18 @@ public class ContentTypeImportService : IContentTypeImportService
     private readonly IPackageDataInstallation _packageDataInstallation;
     private readonly IEntityService _entityService;
     private readonly ITemporaryFileToXmlImportService _temporaryFileToXmlImportService;
+    private readonly ICoreScopeProvider _coreScopeProvider;
 
     public ContentTypeImportService(
         IPackageDataInstallation packageDataInstallation,
         IEntityService entityService,
-        ITemporaryFileToXmlImportService temporaryFileToXmlImportService)
+        ITemporaryFileToXmlImportService temporaryFileToXmlImportService,
+        ICoreScopeProvider coreScopeProvider)
     {
         _packageDataInstallation = packageDataInstallation;
         _entityService = entityService;
         _temporaryFileToXmlImportService = temporaryFileToXmlImportService;
+        _coreScopeProvider = coreScopeProvider;
     }
 
     /// <summary>
@@ -60,6 +64,8 @@ public class ContentTypeImportService : IContentTypeImportService
                 ContentTypeImportOperationStatus.IdMismatch,
                 null);
         }
+
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
         var entityExits = _entityService.Exists(packageEntityKey, UmbracoObjectTypes.DocumentType);
         if (entityExits && contentTypeId is null)

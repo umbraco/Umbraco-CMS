@@ -1,6 +1,7 @@
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.ImportExport;
@@ -10,15 +11,18 @@ public class MediaTypeImportService : IMediaTypeImportService
     private readonly IPackageDataInstallation _packageDataInstallation;
     private readonly IEntityService _entityService;
     private readonly ITemporaryFileToXmlImportService _temporaryFileToXmlImportService;
+    private readonly ICoreScopeProvider _coreScopeProvider;
 
     public MediaTypeImportService(
         IPackageDataInstallation packageDataInstallation,
         IEntityService entityService,
-        ITemporaryFileToXmlImportService temporaryFileToXmlImportService)
+        ITemporaryFileToXmlImportService temporaryFileToXmlImportService,
+        ICoreScopeProvider coreScopeProvider)
     {
         _packageDataInstallation = packageDataInstallation;
         _entityService = entityService;
         _temporaryFileToXmlImportService = temporaryFileToXmlImportService;
+        _coreScopeProvider = coreScopeProvider;
     }
 
     public async Task<Attempt<IMediaType?, MediaTypeImportOperationStatus>> Import(
@@ -45,6 +49,8 @@ public class MediaTypeImportService : IMediaTypeImportService
                 MediaTypeImportOperationStatus.TypeMisMatch,
                 null);
         }
+
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
         Guid packageEntityKey = _packageDataInstallation.GetContentTypeKey(loadXmlAttempt.Result!);
         if (mediaTypeId is not null && mediaTypeId.Equals(packageEntityKey) is false)
