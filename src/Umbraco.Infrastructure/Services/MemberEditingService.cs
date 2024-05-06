@@ -329,6 +329,9 @@ internal sealed class MemberEditingService : IMemberEditingService
                 case nameof(IdentityErrorDescriber.DuplicateEmail):
                     createStatus = MemberEditingOperationStatus.DuplicateEmail;
                     break;
+                case MemberUserStore.CancelledIdentityErrorCode:
+                    createStatus = MemberEditingOperationStatus.CancelledByNotificationHandler;
+                    break;
             }
 
             if (createStatus is not MemberEditingOperationStatus.Unknown)

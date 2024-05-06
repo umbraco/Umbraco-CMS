@@ -72,12 +72,6 @@ public class BackOfficeController : SecurityControllerBase
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     public async Task<IActionResult> Login(CancellationToken cancellationToken, LoginRequestModel model)
     {
-        var validated = await _backOfficeUserManager.ValidateCredentialsAsync(model.Username, model.Password);
-        if (validated is false)
-        {
-            return Unauthorized();
-        }
-
         IdentitySignInResult result = await _backOfficeSignInManager.PasswordSignInAsync(
             model.Username, model.Password, true, true);
 
@@ -357,12 +351,9 @@ public class BackOfficeController : SecurityControllerBase
                 // Update any authentication tokens if succeeded
                 await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
 
-                // sign in the backoffice user associated with the login provider and unique provider id
-                BackOfficeIdentityUser? backOfficeUser = await _backOfficeUserManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
-                if (backOfficeUser != null)
-                {
-                    return await SignInBackOfficeUser(backOfficeUser, request);
-                }
+                // sign in the backoffice user from the HttpContext, as thas was set doing the ExternalLoginSignInAsync
+                ClaimsPrincipal backOfficePrincipal = HttpContext.User;
+                return await SignInBackOfficeUser(backOfficePrincipal, request);
             }
             else
             {
@@ -375,10 +366,8 @@ public class BackOfficeController : SecurityControllerBase
         return new ChallengeResult(provider, properties);
     }
 
-    private async Task<IActionResult> SignInBackOfficeUser(BackOfficeIdentityUser backOfficeUser, OpenIddictRequest request)
+    private async Task<IActionResult> SignInBackOfficeUser(ClaimsPrincipal backOfficePrincipal, OpenIddictRequest request)
     {
-        ClaimsPrincipal backOfficePrincipal = await _backOfficeSignInManager.CreateUserPrincipalAsync(backOfficeUser);
-
         Claim[] backOfficeClaims = backOfficePrincipal.Claims.ToArray();
         foreach (Claim backOfficeClaim in backOfficeClaims)
         {
@@ -392,6 +381,13 @@ public class BackOfficeController : SecurityControllerBase
         }
 
         return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, backOfficePrincipal);
+    }
+
+    private async Task<IActionResult> SignInBackOfficeUser(BackOfficeIdentityUser backOfficeUser, OpenIddictRequest request)
+    {
+        ClaimsPrincipal backOfficePrincipal = await _backOfficeSignInManager.CreateUserPrincipalAsync(backOfficeUser);
+
+        return await SignInBackOfficeUser(backOfficePrincipal, request);
     }
 
     private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.BackOfficeAuthenticationType);

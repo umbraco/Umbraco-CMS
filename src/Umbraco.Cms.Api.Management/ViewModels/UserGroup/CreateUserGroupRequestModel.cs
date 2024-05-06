@@ -2,5 +2,5 @@
 
 public class CreateUserGroupRequestModel : UserGroupBase
 {
-
+    public Guid? Id { get; set; }
 }

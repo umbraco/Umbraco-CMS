@@ -1,9 +1,7 @@
 using System.Linq.Expressions;
 using System.Net;
-using System.Net.Http.Headers;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Controllers.AuditLog;
-using Umbraco.Cms.Core;
+using Umbraco.Cms.Api.Management.Controllers.Culture;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Policies;
 
@@ -11,10 +9,10 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Policies;
 ///
 /// </summary>
 [TestFixture]
-public class ByKeyAuditLogControllerTests : ManagementApiTest<ByKeyAuditLogController>
+public class AllCultureControllerTests : ManagementApiTest<AllCultureController>
 {
-    protected override Expression<Func<ByKeyAuditLogController, object>> MethodSelector =>
-        x => x.ByKey(CancellationToken.None, Constants.Security.SuperUserKey, Direction.Ascending, null, 0, 100);
+    protected override Expression<Func<AllCultureController, object>> MethodSelector =>
+        x => x.GetAll(CancellationToken.None, 0, 100);
 
     [Test]
     public virtual async Task As_Admin_I_Have_Access()

@@ -20,7 +20,8 @@ public sealed class SystemTextJsonSerializer : SystemTextJsonSerializerBase
                 new JsonStringEnumConverter(),
                 new JsonUdiConverter(),
                 new JsonUdiRangeConverter(),
-                new JsonObjectConverter() // Required for block editor values
+                new JsonObjectConverter(), // Required for block editor values
+                new JsonBlockValueConverter()
             }
         };
 

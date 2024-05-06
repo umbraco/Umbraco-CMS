@@ -56,7 +56,7 @@ internal class TemporaryFileUploadValidator : IValueValidator
             }
 
             ContentSettings contentSettings = _getContentSettings();
-            if (contentSettings.IsFileAllowedForUpload(extension) || (_validateFileType != null && _validateFileType(extension, dataTypeConfiguration) == false))
+            if (contentSettings.IsFileAllowedForUpload(extension) is false || (_validateFileType != null && _validateFileType(extension, dataTypeConfiguration) == false))
             {
                 yield return new ValidationResult(
                     $"The file type for file name \"{temporaryFile.FileName}\" is not valid for upload",
