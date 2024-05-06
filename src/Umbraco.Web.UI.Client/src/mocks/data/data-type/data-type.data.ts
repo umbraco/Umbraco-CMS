@@ -236,7 +236,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		id: 'dt-multiNodeTreePicker',
 		parent: null,
 		editorAlias: 'Umbraco.MultiNodeTreePicker',
-		editorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.ContentPicker',
 		hasChildren: false,
 		isFolder: false,
 		isDeletable: true,
