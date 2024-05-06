@@ -35,7 +35,7 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 	render() {
 		return html`<umb-input-upload-field
 			@change="${this.#onChange}"
-			.fileExtensions="${this._fileExtensions}"
+			.allowedFileExtensions="${this._fileExtensions}"
 			.value=${this.value}></umb-input-upload-field>`;
 	}
 }

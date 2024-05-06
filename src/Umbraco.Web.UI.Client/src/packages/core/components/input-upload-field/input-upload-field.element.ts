@@ -34,10 +34,10 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	 * @default undefined
 	 */
 	@property({ type: Array })
-	set fileExtensions(value: Array<string>) {
+	set allowedFileExtensions(value: Array<string>) {
 		this.#setExtensions(value);
 	}
-	get fileExtensions(): Array<string> | undefined {
+	get allowedFileExtensions(): Array<string> | undefined {
 		return this._extensions;
 	}
 
