@@ -46,8 +46,6 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 		this.observe(this.#paginationManager.currentPage, (number) => (this._currentPageNumber = number));
 		this.observe(this.#paginationManager.totalPages, (number) => (this._totalPages = number));
 
-		this.#paginationManager.addEventListener('change', () => {});
-
 		this.consumeContext(UMB_RELATION_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#requestRelations();

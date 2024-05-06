@@ -18,4 +18,5 @@ export {
 	filter,
 	startWith,
 	skip,
+	first,
 } from 'rxjs';

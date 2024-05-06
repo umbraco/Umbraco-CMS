@@ -1,5 +1,5 @@
 import type { ManifestAuthProvider } from '../../extension-registry/models/index.js';
-import type { UmbAuthProviderDefaultProps } from '../types.js';
+import type { UmbAuthProviderDefaultProps, UmbUserLoginState } from '../types.js';
 import { UmbLitElement } from '../../lit-element/lit-element.element.js';
 import { UmbTextStyles } from '../../style/index.js';
 import { css, customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
@@ -7,10 +7,11 @@ import { css, customElement, html, nothing, property } from '@umbraco-cms/backof
 @customElement('umb-auth-provider-default')
 export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbAuthProviderDefaultProps {
 	@property({ attribute: false })
-	manifest!: ManifestAuthProvider;
-
+	userLoginState?: UmbUserLoginState | undefined;
 	@property({ attribute: false })
-	onSubmit!: (providerName: string, loginHint?: string) => void;
+	manifest!: ManifestAuthProvider;
+	@property({ attribute: false })
+	onSubmit!: (manifestOrProviderName: string | ManifestAuthProvider, loginHint?: string) => void;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -21,7 +22,7 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 		return html`
 			<uui-button
 				type="button"
-				@click=${() => this.onSubmit(this.manifest.forProviderName)}
+				@click=${() => this.onSubmit(this.manifest)}
 				id="auth-provider-button"
 				.label=${this.manifest.meta?.label ?? this.manifest.forProviderName}
 				.look=${this.manifest.meta?.defaultView?.look ?? 'outline'}

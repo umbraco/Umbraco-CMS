@@ -11,12 +11,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import './components/index.js';
 
 const CORE_PACKAGES = [
-	import('../../packages/audit-log/umbraco-package.js'),
 	import('../../packages/block/umbraco-package.js'),
 	import('../../packages/data-type/umbraco-package.js'),
 	import('../../packages/dictionary/umbraco-package.js'),
 	import('../../packages/documents/umbraco-package.js'),
-	import('../../packages/dynamic-root/umbraco-package.js'),
 	import('../../packages/health-check/umbraco-package.js'),
 	import('../../packages/language/umbraco-package.js'),
 	import('../../packages/log-viewer/umbraco-package.js'),

@@ -2,7 +2,10 @@ import { html, customElement, property, state, query } from '@umbraco-cms/backof
 import type { UUISelectElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-value-type
@@ -46,7 +49,7 @@ export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implement
 
 	#onChange(e: UUISelectEvent) {
 		this.value = e.target.value as string;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {

@@ -24,8 +24,8 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 			orderCulture: query.orderCulture ?? 'en-US',
 			orderDirection: query.orderDirection === 'asc' ? DirectionModel.ASCENDING : DirectionModel.DESCENDING,
 			filter: query.filter,
-			skip: query.skip ?? 0,
-			take: query.take ?? 100,
+			skip: query.skip || 0,
+			take: query.take || 100,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(this.#host, DocumentService.getCollectionDocumentById(params));
@@ -43,6 +43,7 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					creator: item.creator,
 					icon: item.documentType.icon,
 					name: variant.name,
+					sortOrder: item.sortOrder,
 					state: variant.state,
 					updateDate: new Date(variant.updateDate),
 					updater: item.updater,

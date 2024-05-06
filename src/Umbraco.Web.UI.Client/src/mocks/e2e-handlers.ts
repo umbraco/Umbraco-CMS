@@ -1,4 +1,3 @@
-import { handlers as auditLogHandlers } from './handlers/audit-log.handlers.js';
 import { handlers as dataTypeHandlers } from './handlers/data-type/index.js';
 import { handlers as documentTypeHandlers } from './handlers/document-type/index.js';
 import { handlers as installHandlers } from './handlers/install.handlers.js';
@@ -21,7 +20,6 @@ export const handlers = [
 	serverHandlers.serverRunningHandler,
 	serverHandlers.serverInformationHandler,
 	...manifestsHandlers.manifestEmptyHandlers,
-	...auditLogHandlers,
 	...installHandlers,
 	...upgradeHandlers,
 	...userHandlers,

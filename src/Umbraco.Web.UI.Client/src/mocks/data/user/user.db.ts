@@ -68,6 +68,8 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			languages: [],
 			documentStartNodeIds: firstUser.documentStartNodeIds,
 			mediaStartNodeIds: firstUser.mediaStartNodeIds,
+			hasDocumentRootAccess: firstUser.hasDocumentRootAccess,
+			hasMediaRootAccess: firstUser.hasMediaRootAccess,
 			fallbackPermissions: [],
 			permissions,
 			allowedSections,
@@ -183,6 +185,7 @@ const itemMapper = (item: UmbMockUserModel): UserItemResponseModel => {
 	return {
 		id: item.id,
 		name: item.name,
+		avatarUrls: item.avatarUrls,
 	};
 };
 
@@ -196,6 +199,8 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		languageIsoCode: null,
 		documentStartNodeIds: [],
 		mediaStartNodeIds: [],
+		hasDocumentRootAccess: false,
+		hasMediaRootAccess: false,
 		avatarUrls: [],
 		state: UserStateModel.INACTIVE,
 		failedLoginAttempts: 0,
@@ -218,6 +223,8 @@ const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
 		languageIsoCode: item.languageIsoCode,
 		documentStartNodeIds: item.documentStartNodeIds,
 		mediaStartNodeIds: item.mediaStartNodeIds,
+		hasDocumentRootAccess: item.hasDocumentRootAccess,
+		hasMediaRootAccess: item.hasMediaRootAccess,
 		avatarUrls: item.avatarUrls,
 		state: item.state,
 		failedLoginAttempts: item.failedLoginAttempts,

@@ -25,6 +25,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Amount',
 					description: 'Set a required range of medias',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
+					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
 				},
 				{
 					alias: 'startNodeId',
