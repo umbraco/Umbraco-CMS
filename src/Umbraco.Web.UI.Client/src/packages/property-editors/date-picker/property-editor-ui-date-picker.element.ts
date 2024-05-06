@@ -108,10 +108,10 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 		return html`
 			<umb-input-date
 				value="${ifDefined(this.value)}"
-				min=${ifDefined(this._min)}
-				max=${ifDefined(this._max)}
-				step=${ifDefined(this._step)}
-				type=${this._inputType}
+				.min=${this._min}
+				.max=${this._max}
+				.step=${this._step}
+				.type=${this._inputType}
 				@change=${this.#onChange}>
 			</umb-input-date>
 		`;
