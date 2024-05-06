@@ -22,8 +22,6 @@ public class EntitySlim : IEntitySlim
     /// </summary>
     public static readonly IEntitySlim Root = new EntitySlim { Path = "-1", Name = "root", HasChildren = true };
 
-    private IDictionary<string, object?>? _additionalData;
-
     // implement IEntity
 
     /// <inheritdoc />
@@ -83,17 +81,6 @@ public class EntitySlim : IEntitySlim
     /// <inheritdoc />
     [DataMember]
     public bool Trashed { get; set; }
-
-    // implement IUmbracoEntity
-
-    /// <inheritdoc />
-    [DataMember]
-    public IDictionary<string, object?>? AdditionalData =>
-_additionalData ??= new Dictionary<string, object?>();
-
-    /// <inheritdoc />
-    [IgnoreDataMember]
-    public bool HasAdditionalData => _additionalData != null;
 
     // implement IEntitySlim
 

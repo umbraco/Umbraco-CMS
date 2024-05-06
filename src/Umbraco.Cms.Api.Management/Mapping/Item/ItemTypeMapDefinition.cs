@@ -3,7 +3,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Dictionary.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Language.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
-using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.RelationType.Item;
@@ -32,7 +31,6 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<ITemplate, TemplateItemResponseModel>((_, _) => new TemplateItemResponseModel { Alias = string.Empty }, Map);
         mapper.Define<IMemberType, MemberTypeItemResponseModel>((_, _) => new MemberTypeItemResponseModel(), Map);
         mapper.Define<IRelationType, RelationTypeItemResponseModel>((_, _) => new RelationTypeItemResponseModel(), Map);
-        mapper.Define<IUser, UserItemResponseModel>((_, _) => new UserItemResponseModel(), Map);
         mapper.Define<IUserGroup, UserGroupItemResponseModel>((_, _) => new UserGroupItemResponseModel(), Map);
         mapper.Define<IWebhook, WebhookItemResponseModel>((_, _) => new WebhookItemResponseModel(), Map);
     }
@@ -105,13 +103,7 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
-    }
-
-    // Umbraco.Code.MapAll
-    private static void Map(IUser source, UserItemResponseModel target, MapperContext context)
-    {
-        target.Id = source.Key;
-        target.Name = source.Name ?? source.Username;
+        target.IsDeletable = source.IsDeletableRelationType();
     }
 
     // Umbraco.Code.MapAll
@@ -120,6 +112,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Id = source.Key;
         target.Name = source.Name ?? source.Alias;
         target.Icon = source.Icon;
+        target.Alias = source.Alias;
     }
 
     // Umbraco.Code.MapAll

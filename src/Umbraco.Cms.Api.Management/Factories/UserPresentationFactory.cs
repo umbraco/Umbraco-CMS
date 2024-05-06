@@ -1,7 +1,10 @@
 using Umbraco.Cms.Api.Management.Routing;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Api.Management.ViewModels.User.Item;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
@@ -10,6 +13,7 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -24,6 +28,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
     private readonly IEmailSender _emailSender;
     private readonly IPasswordConfigurationPresentationFactory _passwordConfigurationPresentationFactory;
+    private readonly IBackOfficeExternalLoginProviders _externalLoginProviders;
     private readonly SecuritySettings _securitySettings;
 
     public UserPresentationFactory(
@@ -35,7 +40,8 @@ public class UserPresentationFactory : IUserPresentationFactory
         IAbsoluteUrlBuilder absoluteUrlBuilder,
         IEmailSender emailSender,
         IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory,
-        IOptionsSnapshot<SecuritySettings> securitySettings)
+        IOptionsSnapshot<SecuritySettings> securitySettings,
+        IBackOfficeExternalLoginProviders externalLoginProviders)
     {
         _entityService = entityService;
         _appCaches = appCaches;
@@ -44,6 +50,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         _userGroupPresentationFactory = userGroupPresentationFactory;
         _emailSender = emailSender;
         _passwordConfigurationPresentationFactory = passwordConfigurationPresentationFactory;
+        _externalLoginProviders = externalLoginProviders;
         _securitySettings = securitySettings.Value;
         _absoluteUrlBuilder = absoluteUrlBuilder;
     }
@@ -64,15 +71,27 @@ public class UserPresentationFactory : IUserPresentationFactory
             State = user.UserState,
             UserGroupIds = new HashSet<Guid>(user.Groups.Select(x => x.Key)),
             DocumentStartNodeIds = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
+            HasDocumentRootAccess = HasRootAccess(user.StartContentIds),
             MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
+            HasMediaRootAccess = HasRootAccess(user.StartMediaIds),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
             LastLockoutDate = user.LastLockoutDate,
             LastPasswordChangeDate = user.LastPasswordChangeDate,
+            IsAdmin = user.IsAdmin(),
         };
 
         return responseModel;
     }
+
+    public UserItemResponseModel CreateItemResponseModel(IUser user) =>
+        new()
+        {
+            Id = user.Key,
+            Name = user.Name ?? user.Username,
+            AvatarUrls = user.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator)
+                .Select(url => _absoluteUrlBuilder.ToAbsoluteUrl(url).ToString()),
+        };
 
     public async Task<UserCreateModel> CreateCreationModelAsync(CreateUserRequestModel requestModel)
     {
@@ -128,7 +147,8 @@ public class UserPresentationFactory : IUserPresentationFactory
     public Task<UserConfigurationResponseModel> CreateUserConfigurationModelAsync() =>
         Task.FromResult(new UserConfigurationResponseModel
         {
-            CanInviteUsers = _emailSender.CanSendRequiredEmail(),
+            // You should not be able to invite users if any providers has deny local login set.
+            CanInviteUsers = _emailSender.CanSendRequiredEmail() && _externalLoginProviders.HasDenyLocalLogin() is false,
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
         });
 
@@ -142,7 +162,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             UserName = updateModel.UserName,
             LanguageIsoCode = updateModel.LanguageIsoCode,
             ContentStartNodeKeys = updateModel.DocumentStartNodeIds,
+            HasContentRootAccess = updateModel.HasDocumentRootAccess,
             MediaStartNodeKeys = updateModel.MediaStartNodeIds,
+            HasMediaRootAccess = updateModel.HasMediaRootAccess
         };
 
         model.UserGroupKeys = updateModel.UserGroupIds;
@@ -155,8 +177,10 @@ public class UserPresentationFactory : IUserPresentationFactory
         var presentationUser = CreateResponseModel(user);
         var presentationGroups = await _userGroupPresentationFactory.CreateMultipleAsync(user.Groups);
         var languages = presentationGroups.SelectMany(x => x.Languages).Distinct().ToArray();
-        var mediaStartNodeKeys = GetKeysFromIds(user.CalculateMediaStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Media);
-        var documentStartNodeKeys = GetKeysFromIds(user.CalculateContentStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Document);
+        var mediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+        var mediaStartNodeKeys = GetKeysFromIds(mediaStartNodeIds, UmbracoObjectTypes.Media);
+        var contentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
+        var documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
 
         var permissions = presentationGroups.SelectMany(x => x.Permissions).ToHashSet();
         var fallbackPermissions = presentationGroups.SelectMany(x => x.FallbackPermissions).ToHashSet();
@@ -164,6 +188,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         var hasAccessToAllLanguages = presentationGroups.Any(x => x.HasAccessToAllLanguages);
 
         var allowedSections = presentationGroups.SelectMany(x => x.Sections).ToHashSet();
+
         return await Task.FromResult(new CurrentUserResponseModel()
         {
             Id = presentationUser.Id,
@@ -174,11 +199,15 @@ public class UserPresentationFactory : IUserPresentationFactory
             AvatarUrls = presentationUser.AvatarUrls,
             LanguageIsoCode = presentationUser.LanguageIsoCode,
             MediaStartNodeIds = mediaStartNodeKeys,
+            HasMediaRootAccess = HasRootAccess(mediaStartNodeIds),
             DocumentStartNodeIds = documentStartNodeKeys,
+            HasDocumentRootAccess = HasRootAccess(contentStartNodeIds),
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages,
-            AllowedSections = allowedSections
+            HasAccessToSensitiveData = user.HasAccessToSensitiveData(),
+            AllowedSections = allowedSections,
+            IsAdmin = user.IsAdmin()
         });
     }
 
@@ -194,5 +223,6 @@ public class UserPresentationFactory : IUserPresentationFactory
             : new HashSet<Guid>(keys);
     }
 
-
+    private bool HasRootAccess(IEnumerable<int>? startNodeIds)
+        => startNodeIds?.Contains(Constants.System.Root) is true;
 }

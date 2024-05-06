@@ -1,10 +1,8 @@
-﻿using Umbraco.Cms.Api.Common.Attributes;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Member;
 
-[ShortGenericSchemaName<MemberValueModel, MemberVariantResponseModel>("ContentForMemberResponseModel")]
 public class MemberResponseModel : ContentResponseModelBase<MemberValueModel, MemberVariantResponseModel>
 {
     public string Email { get; set; } = string.Empty;
@@ -27,5 +25,5 @@ public class MemberResponseModel : ContentResponseModelBase<MemberValueModel, Me
 
     public DateTime? LastPasswordChangeDate { get; set; }
 
-    public IEnumerable<string> Groups { get; set; } = [];
+    public IEnumerable<Guid> Groups { get; set; } = [];
 }

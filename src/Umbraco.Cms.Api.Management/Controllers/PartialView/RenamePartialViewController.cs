@@ -31,7 +31,10 @@ public class RenamePartialViewController : PartialViewControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Rename(string path, RenamePartialViewRequestModel requestModel)
+    public async Task<IActionResult> Rename(
+        CancellationToken cancellationToken,
+        string path,
+        RenamePartialViewRequestModel requestModel)
     {
         PartialViewRenameModel renameModel = _umbracoMapper.Map<PartialViewRenameModel>(requestModel)!;
 

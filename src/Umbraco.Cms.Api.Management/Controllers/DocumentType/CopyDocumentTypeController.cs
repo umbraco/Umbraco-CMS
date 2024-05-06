@@ -22,7 +22,10 @@ public class CopyDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Copy(Guid id, CopyDocumentTypeRequestModel copyDocumentTypeRequestModel)
+    public async Task<IActionResult> Copy(
+        CancellationToken cancellationToken,
+        Guid id,
+        CopyDocumentTypeRequestModel copyDocumentTypeRequestModel)
     {
         Attempt<IContentType?, ContentTypeStructureOperationStatus> result = await _contentTypeService.CopyAsync(id, copyDocumentTypeRequestModel.Target?.Id);
 

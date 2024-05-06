@@ -86,24 +86,21 @@ stages:
             inputs:
               versionSpec: $(nodeVersion)
           - script: npm ci --no-fund --no-audit --prefer-offline
+            displayName: Run npm ci (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - script: npm run generate:api-local
+            displayName: Generate API models (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.Client
+            enabled: false
+          - script: npm run build:for:cms
+            displayName: Run build (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - script: npm ci --no-fund --no-audit --prefer-offline
             displayName: Run npm ci (Login)
             workingDirectory: src/Umbraco.Web.UI.Login
           - script: npm run build
             displayName: Run npm build (Login)
             workingDirectory: src/Umbraco.Web.UI.Login
-          - script: npm ci --no-fund --no-audit --prefer-offline
-            displayName: Run npm ci (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.New.Client
-          - script: npm run generate:api-local
-            displayName: Generate API models (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.New.Client
-            enabled: false
-          - script: npm run build:for:cms
-            displayName: Run build (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.New.Client
-          - script: npm run build
-            displayName: Run Login Build (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.New.Client/apps/auth
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
@@ -142,7 +139,7 @@ stages:
             displayName: Prepare Bellissima npm package
             env:
               PACKAGE_VERSION: $(build.NBGV_NpmPackageVersion)
-            workingDirectory: src/Umbraco.Web.UI.New.Client
+            workingDirectory: src/Umbraco.Web.UI.Client
           - task: PublishPipelineArtifact@1
             displayName: Publish Bellissima npm artifact
             inputs:
@@ -225,26 +222,26 @@ stages:
           - task: Cache@2
             displayName: Cache node_modules
             inputs:
-              key: '"npm_client" | "$(Agent.OS)"| $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/package-lock.json'
+              key: '"npm_client" | "$(Agent.OS)"| $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/package-lock.json'
               restoreKeys: |
                 "npm_client" | "$(Agent.OS)"
                 "npm_client"
               path: $(npm_config_cache)
           - script: npm ci --no-fund --no-audit --prefer-offline
-            workingDirectory:  src/Umbraco.Web.UI.New.Client
+            workingDirectory:  src/Umbraco.Web.UI.Client
             displayName: Run npm ci
           - script: npm run storybook:build
             displayName: Build Storybook
             env:
               VITE_BASE_PATH: $(BASE_PATH)/
-            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client
+            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client
           - script: sed -i "s|/umbraco/backoffice|$(BASE_PATH)/umbraco/backoffice|" assets/*.js
             displayName: Replace BASE_PATH on assets
-            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/storybook-static
+            workingDirectory: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/storybook-static
           - task: ArchiveFiles@2
             displayName: Archive js Docs
             inputs:
-              rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/storybook-static
+              rootFolderOrFile: $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/storybook-static
               includeRootFolder: false
               archiveFile: $(Build.ArtifactStagingDirectory)/ui-docs.zip
           - task: PublishPipelineArtifact@1
@@ -469,7 +466,8 @@ stages:
           - pwsh: |
               "UMBRACO_USER_LOGIN=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL)
               UMBRACO_USER_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              URL=$(ASPNETCORE_URLS)" | Out-File .env
+              URL=$(ASPNETCORE_URLS)
+              STORAGE_STAGE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json" | Out-File .env
             displayName: Generate .env
             workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
@@ -527,7 +525,10 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: npm run test --ignore-certificate-errors
+          - ${{ if eq(parameters.isNightly, true) }}:
+              pwsh: npm run test --ignore-certificate-errors
+            ${{ else }}:
+              pwsh: npm run smokeTest --ignore-certificate-errors           
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -667,7 +668,10 @@ stages:
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
 
           # Test
-          - pwsh: npm run test --ignore-certificate-errors
+          - ${{ if eq(parameters.isNightly, true) }}:
+              pwsh: npm run test --ignore-certificate-errors
+            ${{ else }}:
+              pwsh: npm run smokeTest --ignore-certificate-errors
             displayName: Run Playwright tests
             continueOnError: true
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -718,7 +722,7 @@ stages:
     dependsOn:
       - Unit
       - Integration
-      # - E2E
+#      - E2E
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:
@@ -771,7 +775,7 @@ stages:
 
               # Find the first .tgz file in the current directory and publish it
               files=( ./*.tgz )
-              npm publish --access public "${files[0]}"
+              npm publish "${files[0]}"
             displayName: Push to npm (MyGet)
             workingDirectory: $(Pipeline.Workspace)/npm
 
@@ -825,7 +829,7 @@ stages:
 
               # Find the first .tgz file in the current directory and publish it
               files=( ./*.tgz )
-              npm publish --tag $npmTag --access public "${files[0]}"
+              npm publish "${files[0]}"
             displayName: Push to npm
             workingDirectory: $(Pipeline.Workspace)/npm
 
@@ -837,7 +841,7 @@ stages:
     displayName: Upload API Documentation
     dependsOn:
       - Build
-      - Deploy_MyGet # Change to "Deploy_Nuget" after release of v14
+      - Deploy_NuGet
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
       - job:

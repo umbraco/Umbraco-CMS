@@ -51,8 +51,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
         return new UserGroupResponseModel
         {
-            Name = userGroup.Name ?? string.Empty,
             Id = userGroup.Key,
+            Name = userGroup.Name ?? string.Empty,
+            Alias = userGroup.Alias,
             DocumentStartNode = ReferenceByIdModel.ReferenceOrNull(contentStartNodeKey),
             DocumentRootAccess = contentRootAccess,
             MediaStartNode = ReferenceByIdModel.ReferenceOrNull(mediaStartNodeKey),
@@ -63,7 +64,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             FallbackPermissions = userGroup.Permissions,
             Permissions = await _permissionPresentationFactory.CreateAsync(userGroup.GranularPermissions),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
-            IsSystemGroup = userGroup.IsSystemUserGroup()
+            IsDeletable = !userGroup.IsSystemUserGroup(),
+            AliasCanBeChanged = !userGroup.IsSystemUserGroup(),
         };
     }
 
@@ -83,8 +85,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
         return new UserGroupResponseModel
         {
-            Name = userGroup.Name ?? string.Empty,
             Id = userGroup.Key,
+            Name = userGroup.Name ?? string.Empty,
+            Alias = userGroup.Alias,
             DocumentStartNode = ReferenceByIdModel.ReferenceOrNull(contentStartNodeKey),
             MediaStartNode = ReferenceByIdModel.ReferenceOrNull(mediaStartNodeKey),
             Icon = userGroup.Icon,
@@ -93,6 +96,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             FallbackPermissions = userGroup.Permissions,
             Permissions = await _permissionPresentationFactory.CreateAsync(userGroup.GranularPermissions),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
+            IsDeletable = !userGroup.IsSystemUserGroup(),
+            AliasCanBeChanged = !userGroup.IsSystemUserGroup(),
         };
     }
 
@@ -107,6 +112,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
         return userGroupViewModels;
     }
+
     /// <inheritdoc />
     public async Task<IEnumerable<UserGroupResponseModel>> CreateMultipleAsync(IEnumerable<IReadOnlyUserGroup> userGroups)
     {
@@ -122,17 +128,20 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     /// <inheritdoc />
     public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(CreateUserGroupRequestModel requestModel)
     {
-        var cleanedName = requestModel.Name.CleanForXss('[', ']', '(', ')', ':');
-
         var group = new UserGroup(_shortStringHelper)
         {
-            Name = cleanedName,
-            Alias = cleanedName,
+            Name = CleanUserGroupNameOrAliasForXss(requestModel.Name),
+            Alias = CleanUserGroupNameOrAliasForXss(requestModel.Alias),
             Icon = requestModel.Icon,
             HasAccessToAllLanguages = requestModel.HasAccessToAllLanguages,
             Permissions = requestModel.FallbackPermissions,
-            GranularPermissions = await _permissionPresentationFactory.CreatePermissionSetsAsync(requestModel.Permissions)
+            GranularPermissions = await _permissionPresentationFactory.CreatePermissionSetsAsync(requestModel.Permissions),
         };
+
+        if (requestModel.Id.HasValue)
+        {
+            group.Key = requestModel.Id.Value;
+        }
 
         Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(requestModel, group);
         if (assignmentAttempt.Success is false)
@@ -186,7 +195,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             current.AddAllowedSection(SectionMapper.GetAlias(sectionName));
         }
 
-        current.Name = request.Name.CleanForXss('[', ']', '(', ')', ':');
+        current.Name = CleanUserGroupNameOrAliasForXss(request.Name);
+        current.Alias = CleanUserGroupNameOrAliasForXss(request.Alias);
         current.Icon = request.Icon;
         current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
 
@@ -195,6 +205,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, current);
     }
+
+    private static string CleanUserGroupNameOrAliasForXss(string input)
+        => input.CleanForXss('[', ']', '(', ')', ':');
 
     private async Task<Attempt<IEnumerable<string>, UserGroupOperationStatus>> MapLanguageIdsToIsoCodeAsync(IEnumerable<int> ids)
     {

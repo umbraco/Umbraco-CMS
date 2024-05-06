@@ -7,10 +7,11 @@
     "ui": "npx playwright test --headed DefaultConfig",
     "test": "npx playwright test DefaultConfig",
     "all": "npx playwright test",
-    "createTest": "node createTest.js"
+    "createTest": "node createTest.js",
+    "smokeTest": "npx playwright test DefaultConfig --grep \"@smoke\""
   },
   "devDependencies": {
-    "@playwright/test": "^1.38",
+    "@playwright/test": "^1.43",
     "@types/node": "^20.9.0",
     "del": "^6.0.0",
     "ncp": "^2.0.0",
@@ -20,8 +21,8 @@
     "wait-on": "^7.2.0"
   },
   "dependencies": {
-    "@umbraco/json-models-builders": "^2.0.1 ",
-    "@umbraco/playwright-testhelpers": "^2.0.0-beta.21",
+    "@umbraco/json-models-builders": "^2.0.5",
+    "@umbraco/playwright-testhelpers": "^2.0.0-beta.40",
     "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
     "faker": "^4.1.0",

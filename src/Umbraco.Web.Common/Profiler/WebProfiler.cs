@@ -38,6 +38,7 @@ public class WebProfiler : IProfiler
 
     public IDisposable? Step(string name) =>
         MiniProfiler.Current?.Step(name);
+    bool IsEnabled => true;
 
     public void Start()
     {

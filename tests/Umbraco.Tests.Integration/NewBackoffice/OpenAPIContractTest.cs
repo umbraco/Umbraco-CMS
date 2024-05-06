@@ -1,13 +1,10 @@
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management;
 using Umbraco.Cms.Api.Management.Controllers.Install;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Persistence.EFCore.Composition;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
@@ -47,16 +44,13 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
 
         var urlToContract = $"{officePath}/management/api/openapi.json";
         var swaggerPath = $"{officePath}/swagger/management/swagger.json";
-        var apiContract = JObject.Parse(await Client.GetStringAsync(urlToContract));
+        var apiContract = JsonNode.Parse(await Client.GetStringAsync(urlToContract)).AsObject();
 
         var generatedJsonString = await Client.GetStringAsync(swaggerPath);
-        var mergedContract = JObject.Parse(generatedJsonString);
-        var originalGeneratedContract = JObject.Parse(generatedJsonString);
+        var mergedContract = JsonNode.Parse(generatedJsonString).AsObject();
+        var originalGeneratedContract = JsonNode.Parse(generatedJsonString).AsObject();
 
-        mergedContract.Merge(apiContract, new JsonMergeSettings
-        {
-            MergeArrayHandling = MergeArrayHandling.Merge
-        });
+        mergedContract.MergeLeft(apiContract);
 
         foreach (var key in keysToIgnore)
         {
@@ -64,6 +58,6 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
             mergedContract.Remove(key);
         }
 
-        Assert.AreEqual(originalGeneratedContract.ToString(Formatting.Indented), mergedContract.ToString(Formatting.Indented), $"Generated API do not respect the contract.");
+        Assert.AreEqual(originalGeneratedContract.ToJsonString(), mergedContract.ToJsonString(), $"Generated API do not respect the contract.");
     }
 }

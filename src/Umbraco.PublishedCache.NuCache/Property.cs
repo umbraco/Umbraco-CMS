@@ -293,29 +293,6 @@ internal class Property : PublishedPropertyBase
         return value;
     }
 
-    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
-    public override object? GetXPathValue(string? culture = null, string? segment = null)
-    {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
-
-        lock (_locko)
-        {
-            CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
-
-            // initial reference cache level always is .Content
-            const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
-
-            if (cacheValues.XPathInitialized)
-            {
-                return cacheValues.XPathValue;
-            }
-
-            cacheValues.XPathValue = PropertyType.ConvertInterToXPath(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
-            cacheValues.XPathInitialized = true;
-            return cacheValues.XPathValue;
-        }
-    }
-
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
         _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);

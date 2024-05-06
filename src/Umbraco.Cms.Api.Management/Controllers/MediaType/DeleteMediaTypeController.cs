@@ -24,7 +24,7 @@ public class DeleteMediaTypeController : MediaTypeControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
         ContentTypeOperationStatus status = await _mediaTypeService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
         return OperationStatusResult(status);

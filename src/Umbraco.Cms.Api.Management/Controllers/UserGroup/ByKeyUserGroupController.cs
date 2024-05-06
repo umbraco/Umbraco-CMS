@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security.Authorization;
@@ -34,7 +33,7 @@ public class ByKeyUserGroupController : UserGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UserGroupResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByKey(Guid id)
+    public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,

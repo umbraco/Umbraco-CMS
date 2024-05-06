@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Controllers.Content;
@@ -7,13 +8,13 @@ using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
 
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Member)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Member))]
-// FIXME: implement authorization
-// [Authorize(Policy = AuthorizationPolicies.SectionAccessMembers)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessMembers)]
 public class MemberControllerBase : ContentControllerBase
 {
     protected IActionResult MemberNotFound() => OperationStatusResult(MemberEditingOperationStatus.MemberNotFound, MemberNotFound);
@@ -69,6 +70,9 @@ public class MemberControllerBase : ContentControllerBase
             MemberEditingOperationStatus.DuplicateEmail => BadRequest(problemDetailsBuilder
                 .WithTitle("Duplicate email detected")
                 .WithDetail("The supplied email is already in use by another member.")
+                .Build()),
+            MemberEditingOperationStatus.CancelledByNotificationHandler => BadRequest(problemDetailsBuilder
+                .WithTitle("Cancelled")
                 .Build()),
             MemberEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,

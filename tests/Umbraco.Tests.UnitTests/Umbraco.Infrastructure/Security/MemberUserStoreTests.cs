@@ -123,8 +123,9 @@ public class MemberUserStoreTests
         _mockMemberService
             .Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(mockMember);
-        _mockMemberService.Setup(x => x.Save(mockMember, Constants.Security.SuperUserId));
-
+        _mockMemberService
+            .Setup(x => x.Save(mockMember, Constants.Security.SuperUserId))
+            .Returns(Attempt.Succeed<OperationResult?>(null));
         // act
         var identityResult = await sut.CreateAsync(fakeUser, CancellationToken.None);
 

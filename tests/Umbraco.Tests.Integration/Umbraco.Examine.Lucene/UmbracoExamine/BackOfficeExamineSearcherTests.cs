@@ -85,8 +85,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     private async Task SetupUserIdentity(string userId)
     {
-        var identity =
-            await BackOfficeUserStore.FindByIdAsync(userId, CancellationToken.None);
+        var identity = await BackOfficeUserStore.FindByIdAsync(userId, CancellationToken.None);
         await BackOfficeSignInManager.SignInAsync(identity, false);
         var principal = await BackOfficeSignInManager.CreateUserPrincipalAsync(identity);
         HttpContextAccessor.HttpContext.SetPrincipalForRequest(principal);
@@ -595,7 +594,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     public async Task Check_All_Indexed_Values_For_Published_Content_With_No_Properties()
     {
         // Arrange
-        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserKey.ToString());
 
         const string contentName = "TestContent";
 

@@ -2,6 +2,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,14 @@ using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -32,34 +37,35 @@ public class BackOfficeController : SecurityControllerBase
     private readonly IBackOfficeUserManager _backOfficeUserManager;
     private readonly IOptions<SecuritySettings> _securitySettings;
     private readonly ILogger<BackOfficeController> _logger;
+    private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
+    private readonly IUserTwoFactorLoginService _userTwoFactorLoginService;
+    private readonly IBackOfficeExternalLoginProviders _backOfficeExternalLoginProviders;
 
     public BackOfficeController(
         IHttpContextAccessor httpContextAccessor,
         IBackOfficeSignInManager backOfficeSignInManager,
         IBackOfficeUserManager backOfficeUserManager,
         IOptions<SecuritySettings> securitySettings,
-        ILogger<BackOfficeController> logger)
+        ILogger<BackOfficeController> logger,
+        IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
+        IUserTwoFactorLoginService userTwoFactorLoginService,
+        IBackOfficeExternalLoginProviders backOfficeExternalLoginProviders)
     {
         _httpContextAccessor = httpContextAccessor;
         _backOfficeSignInManager = backOfficeSignInManager;
         _backOfficeUserManager = backOfficeUserManager;
         _securitySettings = securitySettings;
         _logger = logger;
+        _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
+        _userTwoFactorLoginService = userTwoFactorLoginService;
+        _backOfficeExternalLoginProviders = backOfficeExternalLoginProviders;
     }
 
-    // FIXME: this is a temporary solution to get the new backoffice auth rolling.
-    //        once the old backoffice auth is no longer necessary, clean this up and merge with 2FA handling etc.
-    // [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [HttpPost("login")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> Login(LoginRequestModel model)
+    [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
+    public async Task<IActionResult> Login(CancellationToken cancellationToken, LoginRequestModel model)
     {
-        var validated = await _backOfficeUserManager.ValidateCredentialsAsync(model.Username, model.Password);
-        if (validated is false)
-        {
-            return Unauthorized();
-        }
-
         IdentitySignInResult result = await _backOfficeSignInManager.PasswordSignInAsync(
             model.Username, model.Password, true, true);
 
@@ -79,17 +85,22 @@ public class BackOfficeController : SecurityControllerBase
         }
         if(result.RequiresTwoFactor)
         {
-            return StatusCode(StatusCodes.Status402PaymentRequired, new ProblemDetailsBuilder()
-                .WithTitle("2FA Required")
-                .WithDetail("The user is protected by 2FA. Please continue the login process and verify a 2FA code.")
-                .Build());
+            string? twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(model.Username);
+            BackOfficeIdentityUser? attemptingUser = await _backOfficeUserManager.FindByNameAsync(model.Username);
+            IEnumerable<string> enabledProviders = (await _userTwoFactorLoginService.GetProviderNamesAsync(attemptingUser!.Key)).Result.Where(x=>x.IsEnabledOnUser).Select(x=>x.ProviderName);
+            return StatusCode(StatusCodes.Status402PaymentRequired, new RequiresTwoFactorResponseModel()
+            {
+                TwoFactorLoginView = twofactorView,
+                EnabledTwoFactorProviderNames = enabledProviders
+            });
         }
         return Ok();
     }
 
+    [AllowAnonymous]
     [HttpPost("verify-2fa")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> Verify2FACode(Verify2FACodeModel model)
+    public async Task<IActionResult> Verify2FACode(CancellationToken cancellationToken, Verify2FACodeModel model)
     {
         if (ModelState.IsValid == false)
         {
@@ -130,17 +141,10 @@ public class BackOfficeController : SecurityControllerBase
             .Build());
     }
 
-    public class LoginRequestModel
-    {
-        public required string Username { get; init; }
-
-        public required string Password { get; init; }
-    }
-
-    // [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
+    [AllowAnonymous]
     [HttpGet("authorize")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> Authorize()
+    public async Task<IActionResult> Authorize(CancellationToken cancellationToken)
     {
         HttpContext context = _httpContextAccessor.GetRequiredHttpContext();
         OpenIddictRequest? request = context.GetOpenIddictServerRequest();
@@ -160,9 +164,10 @@ public class BackOfficeController : SecurityControllerBase
             : await AuthorizeExternal(request);
     }
 
+    [AllowAnonymous]
     [HttpGet("signout")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> Signout()
+    public async Task<IActionResult> Signout(CancellationToken cancellationToken)
     {
         var userName = await GetUserNameFromAuthCookie();
 
@@ -174,6 +179,145 @@ public class BackOfficeController : SecurityControllerBase
         // Returning a SignOutResult will ask OpenIddict to redirect the user agent
         // to the post_logout_redirect_uri specified by the client application.
         return SignOut(Constants.Security.BackOfficeAuthenticationType, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+    }
+
+    /// <summary>
+    ///     Called when a user links an external login provider in the back office
+    /// </summary>
+    /// <param name="provider"></param>
+    /// <returns></returns>
+    [HttpPost("link-login")]
+    [MapToApiVersion("1.0")]
+    public IActionResult LinkLogin(string provider)
+    {
+        // Request a redirect to the external login provider to link a login for the current user
+        var redirectUrl = Url.Action(nameof(ExternalLinkLoginCallback), this.GetControllerName());
+
+        // Configures the redirect URL and user identifier for the specified external login including xsrf data
+        AuthenticationProperties properties =
+            _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, _backOfficeUserManager.GetUserId(User));
+
+        return Challenge(properties, provider);
+    }
+
+    /// <summary>
+    ///     Callback path when the user initiates a link login request from the back office to the external provider from the
+    ///     <see cref="LinkLogin(string)" /> action
+    /// </summary>
+    /// <remarks>
+    ///     An example of this is here
+    ///     https://github.com/dotnet/aspnetcore/blob/main/src/Identity/samples/IdentitySample.Mvc/Controllers/AccountController.cs#L155
+    ///     which this is based on
+    /// </remarks>
+    [HttpGet("ExternalLinkLoginCallback")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> ExternalLinkLoginCallback()
+    {
+        var cookieAuthenticatedUserAttempt =
+            await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+
+        if (cookieAuthenticatedUserAttempt.Succeeded == false)
+        {
+            return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+                "flow=external-login-callback",
+                "status=unauthorized"));
+        }
+
+        BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(cookieAuthenticatedUserAttempt.Principal);
+        if (user == null)
+        {
+            return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+                "flow=external-login-callback",
+                "status=user-not-found"));
+        }
+
+        ExternalLoginInfo? info =
+            await _backOfficeSignInManager.GetExternalLoginInfoAsync();
+
+        if (info == null)
+        {
+            return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+                "flow=external-login-callback",
+                "status=external-info-not-found"));
+        }
+
+        IdentityResult addLoginResult = await _backOfficeUserManager.AddLoginAsync(user, info);
+        if (addLoginResult.Succeeded)
+        {
+            // Update any authentication tokens if succeeded
+            await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(info);
+            return Redirect("/umbraco"); // todo shouldn't this come from configuration
+        }
+
+        // Add errors and redirect for it to be displayed
+        // TempData[ViewDataExtensions.TokenExternalSignInError] = addLoginResult.Errors;
+        // return RedirectToLogin(new { flow = "external-login", status = "failed", logout = "true" });
+        // todo
+        return Redirect(_securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+            "flow=external-login-callback",
+            "status=failed"));
+    }
+
+    // todo cleanup unhappy responses
+    [HttpPost("unlink-login")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginRequestModel unlinkLoginRequestModel)
+    {
+        var userId = User.Identity?.GetUserId();
+        if (userId is null)
+        {
+            throw new InvalidOperationException("Could not find userId");
+        }
+
+        BackOfficeIdentityUser? user = await _backOfficeUserManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            throw new InvalidOperationException("Could not find user");
+        }
+
+        AuthenticationScheme? authType = (await _backOfficeSignInManager.GetExternalAuthenticationSchemesAsync())
+            .FirstOrDefault(x => x.Name == unlinkLoginRequestModel.LoginProvider);
+
+        if (authType == null)
+        {
+            _logger.LogWarning("Could not find the supplied external authentication provider");
+        }
+        else
+        {
+            BackOfficeExternaLoginProviderScheme? opt = await _backOfficeExternalLoginProviders.GetAsync(authType.Name);
+            if (opt == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
+                    .WithTitle("Missing Authentication options")
+                    .WithDetail($"Could not find external authentication options registered for provider {authType.Name}")
+                    .Build());
+            }
+
+            if (!opt.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking)
+            {
+                // If AllowManualLinking is disabled for this provider we cannot unlink
+                return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
+                    .WithTitle("Unlinking disabled")
+                    .WithDetail($"Manual linking is disabled for provider {authType.Name}")
+                    .Build());
+            }
+        }
+
+        IdentityResult result = await _backOfficeUserManager.RemoveLoginAsync(
+            user,
+            unlinkLoginRequestModel.LoginProvider,
+            unlinkLoginRequestModel.ProviderKey);
+
+        if (result.Succeeded)
+        {
+            await _backOfficeSignInManager.SignInAsync(user, true);
+            return Ok();
+        }
+
+        return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
+            .WithTitle("Unlinking failed")
+            .Build());
     }
 
     /// <summary>
@@ -224,12 +368,9 @@ public class BackOfficeController : SecurityControllerBase
                 // Update any authentication tokens if succeeded
                 await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
 
-                // sign in the backoffice user associated with the login provider and unique provider id
-                BackOfficeIdentityUser? backOfficeUser = await _backOfficeUserManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
-                if (backOfficeUser != null)
-                {
-                    return await SignInBackOfficeUser(backOfficeUser, request);
-                }
+                // sign in the backoffice user from the HttpContext, as thas was set doing the ExternalLoginSignInAsync
+                ClaimsPrincipal backOfficePrincipal = HttpContext.User;
+                return await SignInBackOfficeUser(backOfficePrincipal, request);
             }
             else
             {
@@ -242,11 +383,8 @@ public class BackOfficeController : SecurityControllerBase
         return new ChallengeResult(provider, properties);
     }
 
-    private async Task<IActionResult> SignInBackOfficeUser(BackOfficeIdentityUser backOfficeUser, OpenIddictRequest request)
+    private async Task<IActionResult> SignInBackOfficeUser(ClaimsPrincipal backOfficePrincipal, OpenIddictRequest request)
     {
-        ClaimsPrincipal backOfficePrincipal = await _backOfficeSignInManager.CreateUserPrincipalAsync(backOfficeUser);
-        backOfficePrincipal.SetClaim(OpenIddictConstants.Claims.Subject, backOfficeUser.Key.ToString());
-
         Claim[] backOfficeClaims = backOfficePrincipal.Claims.ToArray();
         foreach (Claim backOfficeClaim in backOfficeClaims)
         {
@@ -260,6 +398,13 @@ public class BackOfficeController : SecurityControllerBase
         }
 
         return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, backOfficePrincipal);
+    }
+
+    private async Task<IActionResult> SignInBackOfficeUser(BackOfficeIdentityUser backOfficeUser, OpenIddictRequest request)
+    {
+        ClaimsPrincipal backOfficePrincipal = await _backOfficeSignInManager.CreateUserPrincipalAsync(backOfficeUser);
+
+        return await SignInBackOfficeUser(backOfficePrincipal, request);
     }
 
     private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.BackOfficeAuthenticationType);

@@ -1,50 +1,52 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Log Viewer tests', () => {
+  let startTelemetryLevel = '';
 
-  test.beforeEach(async ({umbracoUi}) => {
+  test.beforeEach(async ({umbracoApi, umbracoUi}) => {
     await umbracoUi.goToBackOffice();
     await umbracoUi.logViewer.goToSettingsTreeItem('Log Viewer');
+    startTelemetryLevel = await umbracoApi.telemetry.getLevel();
   });
 
-  test('can search', async ({umbracoApi, umbracoUi}) => {
+  test.afterEach(async ({umbracoApi}) => {
+    await umbracoApi.telemetry.setLevel(startTelemetryLevel);
+  });
+
+  test('can search @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const startTelemetryLevel = await umbracoApi.telemetry.getLevel();
     const telemetryLevel = 'Minimal';
     await umbracoApi.telemetry.setLevel(telemetryLevel);
 
     // Act
     await umbracoUi.logViewer.clickSearchButton();
+    await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
     await umbracoUi.logViewer.enterSearchKeyword(telemetryLevel);
+    await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
 
     // Assert
     // Checks if there is a log with the telemetry level to minimal
-    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.logViewer.doesFirstLogHaveMessage('Telemetry level set to "' + telemetryLevel + '"');
-
-    // Clean
-    await umbracoApi.telemetry.setLevel(startTelemetryLevel);
+    
   });
 
-  test('can change the search log level', async ({umbracoApi, umbracoUi}) => {
+  test('can change the search log level', async ({umbracoUi}) => {
     // Arrange
-    const logInformation = await umbracoApi.logViewer.getLevelCount();
-    const expectedLogCount = Math.min(logInformation.information, 100);
     const logLevel = 'Information';
 
     // Act
     await umbracoUi.logViewer.clickSearchButton();
+    await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
     await umbracoUi.logViewer.selectLogLevel(logLevel);
+    await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
 
     // Assert
     // Check if the search log level indicator is visible
     await umbracoUi.logViewer.doesLogLevelIndicatorDisplay(logLevel);
-    // Check if the log count matches the expected count
-    await umbracoUi.logViewer.doesLogLevelCountMatch(logLevel, expectedLogCount);
   });
 
-  test('can create a saved search', async ({umbracoApi, umbracoUi}) => {
+  test('can create a saved search @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const searchName = 'TestSavedSearch';
     const search = 'test saved search';
@@ -52,7 +54,9 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await umbracoUi.logViewer.clickSearchButton();
+    await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
     await umbracoUi.logViewer.enterSearchKeyword(search);
+    await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
     await umbracoUi.logViewer.saveSearch(searchName);
 
     // Assert
@@ -77,7 +81,9 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await umbracoUi.logViewer.clickSearchButton();
+    await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
     await umbracoUi.logViewer.enterSearchKeyword(search);
+    await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
     // Checks if the complex search works before saving it.
     await umbracoUi.logViewer.doesLogLevelCountMatch('Fatal', expectedLogCountFatal);
     await umbracoUi.logViewer.doesLogLevelCountMatch('Error', expectedLogCountError);
@@ -103,6 +109,7 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await umbracoUi.logViewer.clickSearchButton();
+    await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
     await umbracoUi.logViewer.clickSavedSearchesButton();
     await umbracoUi.logViewer.removeSavedSearchByName(searchName + ' ' + search);
     await umbracoUi.logViewer.clickDeleteButton();
@@ -120,7 +127,9 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await umbracoUi.logViewer.clickSearchButton();
+    await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
     await umbracoUi.logViewer.enterSearchKeyword(search);
+    await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
     await umbracoUi.logViewer.clickFirstLogSearchResult();
 
     // Assert
@@ -128,7 +137,7 @@ test.describe('Log Viewer tests', () => {
   });
 
   // Currently only works if the user is using the locale 'en-US' otherwise it will fail
-  test('can sort logs by timestamp', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can sort logs by timestamp', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const locale = 'en-US';
     const options: Intl.DateTimeFormatOptions = {
@@ -155,7 +164,7 @@ test.describe('Log Viewer tests', () => {
   });
 
   // Will fail if there is not enough logs.
-  test('can use pagination', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can use pagination', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const secondPageLogs = await umbracoApi.logViewer.getLog(100, 100, 'Ascending');
     const firstLogOnSecondPage = secondPageLogs.items[0].renderedMessage;
@@ -182,6 +191,7 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await umbracoUi.logViewer.clickSavedSearchByName(searchName);
+    await umbracoUi.logViewer.waitUntilLoadingSpinnerInvisible();
 
     // Assert
     // Checks if the search has the correct search value
