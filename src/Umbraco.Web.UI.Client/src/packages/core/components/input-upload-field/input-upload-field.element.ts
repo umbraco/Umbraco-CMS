@@ -14,7 +14,6 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { mime } from '@umbraco-cms/backoffice/external/mime';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import './input-upload-field-file.element.js';
 

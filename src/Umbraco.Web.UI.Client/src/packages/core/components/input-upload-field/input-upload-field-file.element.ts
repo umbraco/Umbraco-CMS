@@ -2,6 +2,7 @@ import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { mime } from '@umbraco-cms/backoffice/external/mime';
 
 @customElement('umb-input-upload-field-file')
 export class UmbInputUploadFieldFileElement extends UmbLitElement {
@@ -36,9 +37,9 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
-		if (_changedProperties.has('file')) {
-			this.extension = this.file?.name.split('.').pop() || '';
-			this.label = this.file?.name || 'loading...';
+		if (_changedProperties.has('file') && this.file) {
+			this.extension = mime.getExtension(this.file.type) ?? '';
+			this.label = this.file.name || 'loading...';
 		}
 
 		if (_changedProperties.has('path')) {
@@ -52,7 +53,10 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 	}
 
 	#renderLabel() {
-		if (this.path) return html`<a id="label" href=${this.path}>${this.label}</a>`;
+		if (this.path) {
+			// Don't make it a link if it's a temp file upload.
+			return this.file ? this.label : html`<a id="label" href=${this.path} target="_blank">${this.label}</a>`;
+		}
 
 		return html`<span id="label">${this.label}</span>`;
 	}
