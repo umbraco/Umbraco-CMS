@@ -36,7 +36,7 @@ test.describe('Partial View Folder tests', () => {
   test('can add a partial view folder in another', async ({umbracoApi}) => {
     // Arrange
     const childFolderName = 'childFolder';
-    await umbracoApi.partialView.createFolder(partialViewFolderName);
+    partialViewFolderPath = await umbracoApi.partialView.createFolder(partialViewFolderName);
 
     // Act
     await umbracoApi.partialView.createFolder(childFolderName, partialViewFolderPath);
@@ -50,10 +50,9 @@ test.describe('Partial View Folder tests', () => {
     // Arrange
     const childFolderName = 'childFolder';
     const childOfChildFolderName = 'childOfChildFolder';
-    const childFolderPath = partialViewFolderName + '/' + childFolderName;
 
     // Creates parent folder
-    await umbracoApi.partialView.createFolder(partialViewFolderName);
+    partialViewFolderPath = await umbracoApi.partialView.createFolder(partialViewFolderName);
 
     // Creates child folder in parent folder
     const childFolderPath = await umbracoApi.partialView.createFolder(childFolderName, partialViewFolderPath);

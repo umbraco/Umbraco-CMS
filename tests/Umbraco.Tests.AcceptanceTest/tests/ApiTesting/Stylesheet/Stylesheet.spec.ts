@@ -17,7 +17,7 @@ test.describe('Stylesheet tests', () => {
 
   test('can create a stylesheet', async ({umbracoApi}) => {
     // Act
-    await umbracoApi.stylesheet.create(stylesheetName, 'content');
+    stylesheetPath = await umbracoApi.stylesheet.create(stylesheetName, 'content');
 
     // Assert
     expect(await umbracoApi.stylesheet.doesExist(stylesheetPath)).toBeTruthy();
