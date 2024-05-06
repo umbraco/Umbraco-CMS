@@ -1,6 +1,6 @@
 import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
-import { type InputType, type UUIFormLayoutItemElement, type UUILabelElement } from "@umbraco-cms/backoffice/external/uui";
+import type { InputType, UUIFormLayoutItemElement } from "@umbraco-cms/backoffice/external/uui";
 import { umbExtensionsRegistry } from "@umbraco-cms/backoffice/extension-registry";
 
 import { UMB_AUTH_CONTEXT, UmbAuthContext } from "./contexts";
@@ -17,36 +17,33 @@ const createInput = (opts: {
   type: InputType;
   name: string;
   autocomplete: AutoFill;
-  requiredMessage: string;
   label: string;
   inputmode: string;
 }) => {
-  const input = document.createElement('umb-login-input');
+  const input = document.createElement('input');
   input.type = opts.type;
   input.name = opts.name;
   input.autocomplete = opts.autocomplete;
   input.id = opts.id;
   input.required = true;
-  input.requiredMessage = opts.requiredMessage;
-  input.label = opts.label;
-  input.spellcheck = false;
   input.inputMode = opts.inputmode;
+  input.ariaLabel = opts.label;
 
   return input;
 };
 
 const createLabel = (opts: { forId: string; localizeAlias: string; localizeFallback: string; }) => {
-  const label = document.createElement('uui-label');
+  const label = document.createElement('label');
   const umbLocalize = document.createElement('umb-localize');
   umbLocalize.key = opts.localizeAlias;
   umbLocalize.innerHTML = opts.localizeFallback;
-  label.for = opts.forId;
+  label.htmlFor = opts.forId;
   label.appendChild(umbLocalize);
 
   return label;
 };
 
-const createFormLayoutItem = (label: UUILabelElement, input: UmbLoginInputElement) => {
+const createFormLayoutItem = (label: HTMLLabelElement, input: HTMLInputElement) => {
   const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
   formLayoutItem.appendChild(label);
   formLayoutItem.appendChild(input);
@@ -60,7 +57,7 @@ const createForm = (elements: HTMLElement[]) => {
   const form = document.createElement('form');
   form.id = 'umb-login-form';
   form.name = 'login-form';
-  form.noValidate = true;
+  form.spellcheck = false;
 
   elements.push(styles);
   elements.forEach((element) => form.appendChild(element));
@@ -112,10 +109,10 @@ export default class UmbAuthElement extends UmbLitElement {
   _form?: HTMLFormElement;
   _usernameLayoutItem?: UUIFormLayoutItemElement;
   _passwordLayoutItem?: UUIFormLayoutItemElement;
-  _usernameInput?: UmbLoginInputElement;
-  _passwordInput?: UmbLoginInputElement;
-  _usernameLabel?: UUILabelElement;
-  _passwordLabel?: UUILabelElement;
+  _usernameInput?: HTMLInputElement;
+  _passwordInput?: HTMLInputElement;
+  _usernameLabel?: HTMLLabelElement;
+  _passwordLabel?: HTMLLabelElement;
 
   #authContext = new UmbAuthContext(this, UMB_AUTH_CONTEXT);
 
@@ -173,7 +170,6 @@ export default class UmbAuthElement extends UmbLitElement {
       type: 'text',
       name: 'username',
       autocomplete: 'username',
-      requiredMessage,
       label: labelUsername,
       inputmode: this.usernameIsEmail ? 'email' : '',
     });
@@ -182,7 +178,6 @@ export default class UmbAuthElement extends UmbLitElement {
       type: 'password',
       name: 'password',
       autocomplete: 'current-password',
-      requiredMessage,
       label: labelPassword,
       inputmode: '',
     });
