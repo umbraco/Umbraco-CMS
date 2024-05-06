@@ -31,7 +31,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		identifier: 'content-type-tabs-sorter',
 		itemSelector: 'uui-tab',
 		containerSelector: 'uui-tab-group',
-		disabledItemSelector: '#root-tab',
+		disabledItemSelector: ':not([sortable])',
 		resolvePlacement: (args) => args.relatedRect.left + args.relatedRect.width * 0.5 > args.pointerX,
 		onChange: ({ model }) => {
 			this._tabs = model;
@@ -47,30 +47,30 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			// Doesn't exist in model
 			if (newIndex === -1) return;
 
-			// First in list
-			if (newIndex === 0 && model.length > 1) {
-				this.#tabsStructureHelper.partialUpdateContainer(item.id, { sortOrder: model[1].sortOrder - 1 });
-				return;
+			// As origin we set prev sort order to -1, so if no other then our item will become 0
+			let prevSortOrder = -1;
+
+			// If not first in list, then get the sortOrder of the item before.  [NL]
+			if (newIndex > 0 && model.length > 0) {
+				prevSortOrder = model[newIndex - 1].sortOrder;
 			}
 
-			// Not first in list
-			if (newIndex > 0 && model.length > 1) {
-				const prevItemSortOrder = model[newIndex - 1].sortOrder;
+			// increase the prevSortOrder and use it for the moved item,
+			this.#tabsStructureHelper.partialUpdateContainer(item.id, {
+				sortOrder: ++prevSortOrder,
+			});
 
-				let weight = 1;
-				this.#tabsStructureHelper.partialUpdateContainer(item.id, { sortOrder: prevItemSortOrder + weight });
-
-				// Check for overlaps
-				// TODO: Make sure this take inheritance into considerations.
-				model.some((entry, index) => {
-					if (index <= newIndex) return;
-					if (entry.sortOrder === prevItemSortOrder + weight) {
-						weight++;
-						this.#tabsStructureHelper.partialUpdateContainer(entry.id, { sortOrder: prevItemSortOrder + weight });
-					}
-					// Break the loop
-					return true;
+			// Adjust everyone right after, until there is a gap between the sortOrders: [NL]
+			let i = newIndex + 1;
+			let entry: UmbPropertyTypeContainerModel | undefined;
+			// As long as there is an item with the index & the sortOrder is less or equal to the prevSortOrder, we will update the sortOrder:
+			while ((entry = model[i]) !== undefined && entry.sortOrder <= prevSortOrder) {
+				// Increase the prevSortOrder and use it for the item:
+				this.#tabsStructureHelper.partialUpdateContainer(entry.id, {
+					sortOrder: ++prevSortOrder,
 				});
+
+				i++;
 			}
 		},
 	});
@@ -399,7 +399,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			? this.localize.term('general_reorderDone')
 			: this.localize.term('general_reorder');
 
-		return html`<div class="tab-actions">
+		return html`<div>
 			${this._compositionRepositoryAlias
 				? html`<uui-button
 						look="outline"
@@ -458,7 +458,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			label=${tab.name && tab.name !== '' ? tab.name : 'unnamed'}
 			.active=${tabActive}
 			href=${path}
-			data-umb-tab-id=${ifDefined(tab.id)}>
+			data-umb-tab-id=${ifDefined(tab.id)}
+			?sortable=${ownedTab}>
 			${this.renderTabInner(tab, tabActive, ownedTab)}
 		</uui-tab>`;
 	}
@@ -581,6 +582,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				position: relative;
 				border-left: 1px hidden transparent;
 				border-right: 1px solid var(--uui-color-border);
+				background-color: var(--uui-color-surface);
 			}
 
 			.not-active uui-button {

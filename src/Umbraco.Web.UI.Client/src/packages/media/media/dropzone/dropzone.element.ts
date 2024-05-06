@@ -64,7 +64,7 @@ export class UmbDropzoneElement extends UmbLitElement {
 			'_observeCompleted',
 		);
 		//TODO Create some placeholder items while files are being uploaded? Could update them as they get completed.
-		await dropzoneManager.dropFiles(files, this.parentUnique);
+		await dropzoneManager.createFilesAsMedia(files, this.parentUnique);
 	}
 
 	render() {

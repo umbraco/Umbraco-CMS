@@ -25,6 +25,12 @@ export interface UmbUploadableExtensionModel {
 	mediaTypes: Array<UmbAllowedMediaTypeModel>;
 }
 
+/**
+ * Manages the dropzone and uploads files to the server.
+ * @method createFilesAsMedia - Upload files to the server and creates the items using corresponding media type.
+ * @method createFilesAsTemporary - Upload the files as temporary files and returns the data.
+ * @observable completed - Emits an array of completed uploads.
+ */
 export class UmbDropzoneManager extends UmbControllerBase {
 	#host;
 
@@ -33,7 +39,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	#mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
 	#mediaDetailRepository = new UmbMediaDetailRepository(this);
 
-	#completed = new UmbArrayState<UmbUploadableFileModel>([], (upload) => upload.unique);
+	#completed = new UmbArrayState<UmbUploadableFileModel | UmbTemporaryFileModel>([], (upload) => upload.unique);
 	public readonly completed = this.#completed.asObservable();
 
 	constructor(host: UmbControllerHost) {
@@ -41,7 +47,31 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		this.#host = host;
 	}
 
-	public async dropFiles(files: Array<File>, parentUnique: string | null) {
+	/**
+	 * Uploads the files as temporary files and returns the data.
+	 * @param files
+	 * @returns Promise<Array<UmbUploadableFileModel>>
+	 */
+	public async createFilesAsTemporary(files: Array<File>): Promise<Array<UmbTemporaryFileModel>> {
+		this.#completed.setValue([]);
+		const temporaryFiles: Array<UmbTemporaryFileModel> = [];
+
+		for (const file of files) {
+			const uploaded = await this.#tempFileManager.uploadOne({ unique: UmbId.new(), file });
+			this.#completed.setValue([...this.#completed.getValue(), uploaded]);
+			temporaryFiles.push(uploaded);
+		}
+
+		return temporaryFiles;
+	}
+
+	/**
+	 * Uploads files to the server and creates the items with corresponding media type.
+	 * Allows the user to pick a media type option if multiple types are allowed.
+	 * @param files
+	 * @param parentUnique
+	 */
+	public async createFilesAsMedia(files: Array<File>, parentUnique: string | null) {
 		if (!files.length) return;
 		if (files.length === 1) return this.#handleOneOneFile(files[0], parentUnique);
 
@@ -151,9 +181,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	}
 
 	async #handleUpload(files: Array<UmbUploadableFileModel>, parentUnique: string | null) {
-		let index: number = 0;
 		for (const file of files) {
-			index++;
 			const upload = (await this.#tempFileManager.uploadOne(file)) as UmbUploadableFileModel;
 
 			if (upload.status === TemporaryFileStatus.SUCCESS) {
