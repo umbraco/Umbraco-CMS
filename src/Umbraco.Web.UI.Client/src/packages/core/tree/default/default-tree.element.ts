@@ -73,11 +73,12 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this.#treeContext!.selection.setSelection(this._selectionConfiguration.selection ?? []);
 		}
 
+		if (_changedProperties.has('startFrom')) {
+			this.#treeContext!.setStartFrom(this.startFrom);
+		}
+
 		if (_changedProperties.has('hideTreeRoot')) {
-			if (this.hideTreeRoot === true) {
-				await this.#init;
-				this.#treeContext!.loadRootItems();
-			}
+			this.#treeContext!.setHideTreeRoot(this.hideTreeRoot);
 		}
 
 		if (_changedProperties.has('selectableFilter')) {
@@ -86,10 +87,6 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 		if (_changedProperties.has('filter')) {
 			this.#treeContext!.filter = this.filter;
-		}
-
-		if (_changedProperties.has('startFrom')) {
-			this.#treeContext!.startFrom = this.startFrom;
 		}
 	}
 

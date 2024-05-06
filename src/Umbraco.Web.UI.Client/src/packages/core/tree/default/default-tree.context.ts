@@ -1,5 +1,5 @@
 import { UmbRequestReloadTreeItemChildrenEvent } from '../reload-tree-item-children/index.js';
-import type { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeItemModelBase, UmbTreeStartFrom } from '../types.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -11,9 +11,9 @@ import {
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbPaginationManager, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -33,6 +33,12 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	public filter?: (item: TreeItemType) => boolean = () => true;
 	public readonly selection = new UmbSelectionManager(this._host);
 	public readonly pagination = new UmbPaginationManager();
+
+	#hideTreeRoot = new UmbBooleanState(false);
+	hideTreeRoot = this.#hideTreeRoot.asObservable();
+
+	#startFrom = new UmbObjectState<UmbTreeStartFrom | undefined>(undefined);
+	startFrom = this.#startFrom.asObservable();
 
 	#manifest?: ManifestTree;
 	#repository?: UmbTreeRepository<TreeItemType>;
@@ -72,11 +78,9 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 			const unique = treeRoot.unique;
 			if (event.detail.unique === unique) {
 				event.stopPropagation();
-				this.loadRootItems();
+				this.#loadRootItems();
 			}
 		});
-
-		this.loadTreeRoot();
 	}
 
 	// TODO: find a generic way to do this
@@ -115,18 +119,40 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		return this.#repository;
 	}
 
-	public async loadTreeRoot() {
+	// TODO: debouncing the load tree method because multiple props can be set at the same time
+	// that would trigger multiple loadTree calls. This is a temporary solution to avoid that.
+	public loadTree = debounce(() => this.#debouncedLoadTree(), 50);
+
+	#debouncedLoadTree() {
+		const startFrom = this.getStartFrom();
+		if (startFrom?.unique) {
+			this.#loadTreeFrom(startFrom);
+			return;
+		}
+
+		const hideTreeRoot = this.getHideTreeRoot();
+		if (hideTreeRoot) {
+			this.#loadRootItems();
+			return;
+		}
+
+		this.#loadTreeRoot();
+	}
+
+	async #loadTreeRoot() {
 		await this.#init;
+
 		const { data } = await this.#repository!.requestTreeRoot();
 
 		if (data) {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			this.#treeRoot.setValue(data);
+			this.pagination.setTotalItems(1);
 		}
 	}
 
-	public async loadRootItems() {
+	async #loadRootItems() {
 		await this.#init;
 
 		const { data } = await this.#repository!.requestRootTreeItems({
@@ -138,6 +164,39 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 			this.#rootItems.setValue(data.items);
 			this.pagination.setTotalItems(data.total);
 		}
+	}
+
+	async #loadTreeFrom(startFrom: UmbTreeStartFrom) {
+		await this.#init;
+
+		const { data } = await this.#repository!.requestTreeItemsOf({
+			parentUnique: startFrom.unique,
+			skip: this.#paging.skip,
+			take: this.#paging.take,
+		});
+
+		if (data) {
+			this.#rootItems.setValue(data.items);
+			this.pagination.setTotalItems(data.total);
+		}
+	}
+
+	setHideTreeRoot(hideTreeRoot: boolean) {
+		this.#hideTreeRoot.setValue(hideTreeRoot);
+		this.loadTree();
+	}
+
+	getHideTreeRoot() {
+		return this.#hideTreeRoot.getValue();
+	}
+
+	setStartFrom(startFrom: UmbTreeStartFrom | undefined) {
+		this.#startFrom.setValue(startFrom);
+		this.loadTree();
+	}
+
+	getStartFrom() {
+		return this.#startFrom.getValue();
 	}
 
 	#consumeContexts() {
@@ -157,7 +216,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
 		this.#paging.skip = target.getSkip();
-		this.loadRootItems();
+		this.#loadRootItems();
 	};
 
 	#observeRepository(repositoryAlias?: string) {
@@ -183,7 +242,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		// @ts-ignore
 		if (event.getUnique() !== treeRoot.unique) return;
 		if (event.getEntityType() !== treeRoot.entityType) return;
-		this.loadRootItems();
+		this.#loadRootItems();
 	};
 
 	destroy(): void {
