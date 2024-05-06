@@ -8,13 +8,14 @@ import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@um
 
 type PickerItemBaseType = { name: string; unique: string };
 export class UmbPickerInputContext<
-	ItemType extends PickerItemBaseType,
-	TreeItemType extends PickerItemBaseType = ItemType,
+	PickedItemType extends PickerItemBaseType,
+	PickerItemType extends PickerItemBaseType = PickedItemType,
+	PickerModalConfigType extends UmbPickerModalData<PickerItemType> = UmbPickerModalData<PickerItemType>,
+	PickerModalValueType extends UmbPickerModalValue = UmbPickerModalValue,
 > extends UmbControllerBase {
-	// TODO: We are way too unsecure about the requirements for the Modal Token, as we have certain expectation for the data and value.
-	modalAlias: string | UmbModalToken<UmbPickerModalData<TreeItemType>, UmbPickerModalValue>;
-	repository?: UmbItemRepository<ItemType>;
-	#getUnique: (entry: ItemType) => string | undefined;
+	modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
+	repository?: UmbItemRepository<PickedItemType>;
+	#getUnique: (entry: PickedItemType) => string | undefined;
 
 	#itemManager;
 
@@ -48,14 +49,14 @@ export class UmbPickerInputContext<
 	constructor(
 		host: UmbControllerHost,
 		repositoryAlias: string,
-		modalAlias: string | UmbModalToken<UmbPickerModalData<TreeItemType>, UmbPickerModalValue>,
-		getUniqueMethod?: (entry: ItemType) => string | undefined,
+		modalAlias: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>,
+		getUniqueMethod?: (entry: PickedItemType) => string | undefined,
 	) {
 		super(host);
 		this.modalAlias = modalAlias;
 		this.#getUnique = getUniqueMethod || ((entry) => entry.unique);
 
-		this.#itemManager = new UmbRepositoryItemsManager<ItemType>(this, repositoryAlias, this.#getUnique);
+		this.#itemManager = new UmbRepositoryItemsManager<PickedItemType>(this, repositoryAlias, this.#getUnique);
 
 		this.selection = this.#itemManager.uniques;
 		this.selectedItems = this.#itemManager.items;
@@ -70,7 +71,7 @@ export class UmbPickerInputContext<
 		this.#itemManager.setUniques(selection.filter((value) => value !== null) as Array<string>);
 	}
 
-	async openPicker(pickerData?: Partial<UmbPickerModalData<TreeItemType>>) {
+	async openPicker(pickerData?: Partial<PickerModalConfigType>) {
 		await this.#itemManager.init;
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this, this.modalAlias, {
