@@ -20,3 +20,7 @@ export type UmbTreeSelectionConfiguration = {
 	selectable?: boolean;
 	selection?: Array<string | null>;
 };
+
+export interface UmbTreeStartFrom {
+	unique: string;
+}
