@@ -110,6 +110,7 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
                 lowestOrder = routeEndpoint.Order;
             }
 
+            // We only want to consider our dynamic route, this way it's still possible to register your own custom route before ours.
             if (routeEndpoint.DisplayName != Constants.Web.Routing.DynamicRoutePattern)
             {
                 continue;
@@ -183,7 +184,6 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
 
             SetEndpoint(candidates, _installEndpoint.Value, new RouteValueDictionary
             {
-                //TODO: figure out constants
                 [Constants.Web.Routing.ControllerToken] = "Install",
                 [Constants.Web.Routing.ActionToken] = "Index",
                 [Constants.Web.Routing.AreaToken] = Constants.Web.Mvc.InstallArea,
