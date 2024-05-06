@@ -10,5 +10,10 @@ public class UserGroupResponseModel : UserGroupBase
     /// <summary>
     /// Whether this user group is required at system level (thus cannot be removed)
     /// </summary>
-    public bool IsSystemGroup { get; set; }
+    public bool IsDeletable { get; set; }
+
+    /// <summary>
+    /// Whether this user group is required at system level (thus alias needs to be fixed)
+    /// </summary>
+    public bool AliasCanBeChanged { get; set; }
 }
