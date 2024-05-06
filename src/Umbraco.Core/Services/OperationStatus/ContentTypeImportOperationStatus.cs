@@ -6,5 +6,7 @@ public enum ContentTypeImportOperationStatus
     SuccessUpdated,
     TemporaryFileNotFound,
     TemporaryFileConversionFailure,
-    DocumentTypeExists
+    DocumentTypeExists,
+    IdMismatch,
+    TypeMisMatch,
 }

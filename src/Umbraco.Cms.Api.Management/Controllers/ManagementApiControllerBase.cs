@@ -44,22 +44,6 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
         return new EmptyCreatedAtActionResult(actionName, controllerName, routeValues, resourceIdentifier);
     }
 
-    protected IActionResult AvailableAtId<T>(Expression<Func<T, string>> action, Guid id)
-        => AvailableAtAction(action, new { id = id }, id.ToString());
-
-    protected IActionResult AvailableAtAction<T>(Expression<Func<T, string>> action, object routeValues, string resourceIdentifier)
-    {
-        if (action.Body is not ConstantExpression constantExpression)
-        {
-            throw new ArgumentException("Expression must be a constant expression.");
-        }
-
-        var controllerName = ManagementApiRegexes.ControllerTypeToNameRegex().Replace(typeof(T).Name, string.Empty);
-        var actionName = constantExpression.Value?.ToString() ?? throw new ArgumentException("Expression does not have a value.");
-
-        return new EmptyAvailableAtActionResult(actionName, controllerName, routeValues, resourceIdentifier);
-    }
-
     protected static Guid CurrentUserKey(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         => CurrentUser(backOfficeSecurityAccessor).Key;
 

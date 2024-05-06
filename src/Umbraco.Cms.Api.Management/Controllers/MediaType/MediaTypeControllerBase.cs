@@ -29,11 +29,19 @@ public abstract class MediaTypeControllerBase : ManagementApiControllerBase
                 .Build()),
             MediaTypeImportOperationStatus.TemporaryFileConversionFailure => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("Failed to convert the specified file")
-                .WithDetail($"The import failed due to not being able to convert the file into proper xml")
+                .WithDetail("The import failed due to not being able to convert the file into proper xml.")
                 .Build()),
             MediaTypeImportOperationStatus.MediaTypeExists => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("Failed to import because media type exits")
-                .WithDetail($"The import failed because the media type that was being imported already exits and the {nameof(ImportMediaTypeRequestModel.OverWriteExisting)} flag was disabled")
+                .WithDetail("The import failed because the media type that was being imported already exits.")
+                .Build()),
+            MediaTypeImportOperationStatus.TypeMisMatch => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("Type Mismatch")
+                .WithDetail("The import failed because the file contained an entity that is not a media type.")
+                .Build()),
+            MediaTypeImportOperationStatus.IdMismatch => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("Invalid Id")
+                .WithDetail("The import failed because the id of the media type you are trying to update did not match the id in the file.")
                 .Build()),
             _ => new ObjectResult("Unknown content type import operation status") { StatusCode = StatusCodes.Status500InternalServerError },
         });

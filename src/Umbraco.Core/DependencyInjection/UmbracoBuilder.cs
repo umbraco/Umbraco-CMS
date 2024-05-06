@@ -393,6 +393,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<IUserPermissionAuthorizer, UserPermissionAuthorizer>();
 
             // definition Import/export
+            Services.AddUnique<ITemporaryFileToXmlImportService, TemporaryFileToXmlImportService>();
             Services.AddUnique<IContentTypeImportService, ContentTypeImportService>();
             Services.AddUnique<IMediaTypeImportService, MediaTypeImportService>();
         }

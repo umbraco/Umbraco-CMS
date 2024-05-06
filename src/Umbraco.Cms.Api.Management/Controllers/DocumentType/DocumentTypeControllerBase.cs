@@ -117,11 +117,19 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 .Build()),
             ContentTypeImportOperationStatus.TemporaryFileConversionFailure => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("Failed to convert the specified file")
-                .WithDetail($"The import failed due to not being able to convert the file into proper xml")
+                .WithDetail("The import failed due to not being able to convert the file into proper xml")
                 .Build()),
             ContentTypeImportOperationStatus.DocumentTypeExists => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("Failed to import because document type exits")
-                .WithDetail($"The import failed because the document type that was being imported already exits and the {nameof(ImportDocumentTypeRequestModel.OverWriteExisting)} flag was disabled")
+                .WithDetail("The import failed because the document type that was being imported already exits")
+                .Build()),
+            ContentTypeImportOperationStatus.TypeMisMatch => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("Type Mismatch")
+                .WithDetail("The import failed because the file contained an entity that is not a content type.")
+                .Build()),
+            ContentTypeImportOperationStatus.IdMismatch => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("Invalid Id")
+                .WithDetail("The import failed because the id of the content type you are trying to update did not match the id in the file.")
                 .Build()),
             _ => new ObjectResult("Unknown content type import operation status") { StatusCode = StatusCodes.Status500InternalServerError },
         });

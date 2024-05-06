@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Core.Services.ImportExport;
 
 public interface IContentTypeImportService
 {
-    Task<Attempt<IContentType?, ContentTypeImportOperationStatus>> Import(Guid temporaryFileId, int userId, bool overwrite = false);
+    Task<Attempt<IContentType?, ContentTypeImportOperationStatus>> Import(Guid temporaryFileId, int userId, Guid? contentTypeId = null);
 }

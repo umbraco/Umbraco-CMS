@@ -590,7 +590,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             //Iterate the sorted document types and create them as IContentType objects
             foreach (XElement documentType in documentTypes)
             {
-                var alias = documentType.Element("Info")?.Element("Alias")?.Value;
+                var alias = GetEntityTypeAlias(documentType);
 
                 if (alias is not null && importedContentTypes.ContainsKey(alias) == false)
                 {
@@ -623,7 +623,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 //Update the structure here - we can't do it until all DocTypes have been created
                 foreach (XElement documentType in documentTypes)
                 {
-                    var alias = documentType.Element("Info")?.Element("Alias")?.Value;
+                    var alias = GetEntityTypeAlias(documentType);
                     XElement? structureElement = documentType.Element("Structure");
                     //Ensure that we only update ContentTypes which has actual structure-elements
                     if (structureElement == null || structureElement.Elements().Any() == false || alias is null)
@@ -661,7 +661,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                                              // exist which contains it's folders
                                              && ((string?)infoElement.Element("Master")).IsNullOrWhiteSpace())
                 {
-                    var alias = documentType.Element("Info")?.Element("Alias")?.Value;
+                    var alias = GetEntityTypeAlias(documentType);
                     var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
 
                     XAttribute? folderKeysAttribute = documentType.Attribute("FolderKeys");
@@ -746,6 +746,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         public Guid GetContentTypeKey(XElement contentType)
         => Guid.Parse(contentType.Element("Info")!.Element("Key")!.Value);
+
+        public string? GetEntityTypeAlias(XElement entityType)
+        => entityType.Element("Info")?.Element("Alias")?.Value;
 
         private T CreateContentTypeFromXml<T>(
             XElement documentType,

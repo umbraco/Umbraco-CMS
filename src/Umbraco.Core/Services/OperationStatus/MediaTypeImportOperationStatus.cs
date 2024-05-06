@@ -6,5 +6,7 @@ public enum MediaTypeImportOperationStatus
     SuccessUpdated,
     TemporaryFileNotFound,
     TemporaryFileConversionFailure,
-    MediaTypeExists
+    MediaTypeExists,
+    TypeMisMatch,
+    IdMismatch
 }

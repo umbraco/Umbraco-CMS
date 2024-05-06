@@ -12,12 +12,12 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
 [ApiVersion("1.0")]
-public class ImportDocumentTypeController : DocumentTypeControllerBase
+public class ImportExistingDocumentTypeController : DocumentTypeControllerBase
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IContentTypeImportService _contentTypeImportService;
 
-    public ImportDocumentTypeController(
+    public ImportExistingDocumentTypeController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IContentTypeImportService contentTypeImportService)
     {
@@ -25,14 +25,14 @@ public class ImportDocumentTypeController : DocumentTypeControllerBase
         _contentTypeImportService = contentTypeImportService;
     }
 
-    [HttpPost("import")]
+    [HttpPut("{id:guid}/import")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Import(
         CancellationToken cancellationToken,
+        Guid id,
         ImportDocumentTypeRequestModel model)
     {
         IUser? user = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
@@ -41,12 +41,10 @@ public class ImportDocumentTypeController : DocumentTypeControllerBase
             return Unauthorized();
         }
 
-        Attempt<IContentType?, ContentTypeImportOperationStatus> importAttempt = await _contentTypeImportService.Import(model.File.Id, user.Id, model.OverWriteExisting);
+        Attempt<IContentType?, ContentTypeImportOperationStatus> importAttempt = await _contentTypeImportService.Import(model.File.Id, user.Id, id);
 
         return importAttempt.Success is false
             ? ContentTypeImportOperationStatusResult(importAttempt.Status)
-            : importAttempt.Status == ContentTypeImportOperationStatus.SuccessCreated
-                ? CreatedAtId<ByKeyDocumentTypeController>(controller => nameof(controller.ByKey), importAttempt.Result!.Key)
-                : AvailableAtId<ByKeyDocumentTypeController>(controller => nameof(controller.ByKey), importAttempt.Result!.Key);
+            : Ok();
     }
 }

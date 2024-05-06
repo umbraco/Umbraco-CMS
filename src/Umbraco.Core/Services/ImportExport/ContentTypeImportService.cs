@@ -1,40 +1,68 @@
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.ImportExport;
 
-public class ContentTypeImportService : TemporaryFileToXmlImportServiceBase, IContentTypeImportService
+public class ContentTypeImportService : IContentTypeImportService
 {
     private readonly IPackageDataInstallation _packageDataInstallation;
     private readonly IEntityService _entityService;
+    private readonly ITemporaryFileToXmlImportService _temporaryFileToXmlImportService;
 
     public ContentTypeImportService(
-        ITemporaryFileService temporaryFileService,
         IPackageDataInstallation packageDataInstallation,
-        IEntityService entityService) : base(temporaryFileService)
+        IEntityService entityService,
+        ITemporaryFileToXmlImportService temporaryFileToXmlImportService)
     {
         _packageDataInstallation = packageDataInstallation;
         _entityService = entityService;
+        _temporaryFileToXmlImportService = temporaryFileToXmlImportService;
     }
 
-    public async Task<Attempt<IContentType?, ContentTypeImportOperationStatus>> Import(Guid temporaryFileId, int userId,
-        bool overwrite = false)
+    /// <summary>
+    /// Imports the contentType
+    /// </summary>
+    /// <param name="temporaryFileId"></param>
+    /// <param name="userId"></param>
+    /// <param name="contentTypeId">the id of the contentType to overwrite, null if a new contentType should be created</param>
+    /// <returns></returns>
+    public async Task<Attempt<IContentType?, ContentTypeImportOperationStatus>> Import(
+        Guid temporaryFileId,
+        int userId,
+        Guid? contentTypeId = null)
     {
-        Attempt<XElement?, TemporaryFileOperationStatus> loadXmlAttempt =
-            await LoadXElementFromTemporaryFileAsync(temporaryFileId);
+        Attempt<XElement?, TemporaryFileXmlImportOperationStatus> loadXmlAttempt =
+            await _temporaryFileToXmlImportService.LoadXElementFromTemporaryFileAsync(temporaryFileId);
         if (loadXmlAttempt.Success is false)
         {
             return Attempt.FailWithStatus<IContentType?, ContentTypeImportOperationStatus>(
-                loadXmlAttempt.Status is TemporaryFileOperationStatus.NotFound
+                loadXmlAttempt.Status is TemporaryFileXmlImportOperationStatus.TemporaryFileNotFound
                     ? ContentTypeImportOperationStatus.TemporaryFileNotFound
                     : ContentTypeImportOperationStatus.TemporaryFileConversionFailure,
                 null);
         }
 
-        var entityExits = _entityService.Exists(_packageDataInstallation.GetContentTypeKey(loadXmlAttempt.Result!),
-            UmbracoObjectTypes.DocumentType);
-        if (overwrite is false && entityExits)
+        Attempt<UmbracoEntityTypes> packageEntityTypeAttempt = _temporaryFileToXmlImportService.GetEntityType(loadXmlAttempt.Result!);
+        if (packageEntityTypeAttempt.Success is false ||
+            packageEntityTypeAttempt.Result is not UmbracoEntityTypes.DocumentType)
+        {
+            return Attempt.FailWithStatus<IContentType?, ContentTypeImportOperationStatus>(
+                ContentTypeImportOperationStatus.TypeMisMatch,
+                null);
+        }
+
+        Guid packageEntityKey = _packageDataInstallation.GetContentTypeKey(loadXmlAttempt.Result!);
+        if (contentTypeId is not null && contentTypeId.Equals(packageEntityKey) is false)
+        {
+            return Attempt.FailWithStatus<IContentType?, ContentTypeImportOperationStatus>(
+                ContentTypeImportOperationStatus.IdMismatch,
+                null);
+        }
+
+        var entityExits = _entityService.Exists(packageEntityKey, UmbracoObjectTypes.DocumentType);
+        if (entityExits && contentTypeId is null)
         {
             return Attempt.FailWithStatus<IContentType?, ContentTypeImportOperationStatus>(
                 ContentTypeImportOperationStatus.DocumentTypeExists,

@@ -13,12 +13,12 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
 [ApiVersion("1.0")]
-public class ImportMediaTypeController : MediaTypeControllerBase
+public class ImportNewMediaTypeController : MediaTypeControllerBase
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IMediaTypeImportService _mediaTypeImportService;
 
-    public ImportMediaTypeController(
+    public ImportNewMediaTypeController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IMediaTypeImportService mediaTypeImportService)
     {
@@ -28,7 +28,6 @@ public class ImportMediaTypeController : MediaTypeControllerBase
 
     [HttpPost("import")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -42,12 +41,10 @@ public class ImportMediaTypeController : MediaTypeControllerBase
             return Unauthorized();
         }
 
-        Attempt<IMediaType?, MediaTypeImportOperationStatus> importAttempt = await _mediaTypeImportService.Import(model.File.Id, user.Id, model.OverWriteExisting);
+        Attempt<IMediaType?, MediaTypeImportOperationStatus> importAttempt = await _mediaTypeImportService.Import(model.File.Id, user.Id);
 
         return importAttempt.Success is false
             ? MediaTypeImportOperationStatusResult(importAttempt.Status)
-            : importAttempt.Status == MediaTypeImportOperationStatus.SuccessCreated
-                ? CreatedAtId<ByKeyMediaTypeController>(controller => nameof(controller.ByKey), importAttempt.Result!.Key)
-                : AvailableAtId<ByKeyMediaTypeController>(controller => nameof(controller.ByKey), importAttempt.Result!.Key);
+            : CreatedAtId<ByKeyMediaTypeController>(controller => nameof(controller.ByKey), importAttempt.Result!.Key);
     }
 }
