@@ -107,8 +107,8 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		`;
 	}
 
-	#renderFile(src: string, tempFile?: File) {
-		const extension = tempFile ? mime.getExtension(tempFile.type) : this.#getFileExtensionFromPath(src);
+	#renderFile(src: string, file?: File) {
+		const extension = this.#getFileExtensionFromPath(src);
 
 		return html`
 			<div style="position:relative; display: flex; width: fit-content; max-width: 100%">
@@ -131,12 +131,22 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 				case 'svg':
 					return html`<umb-input-upload-field-svg .path=${src}></umb-input-upload-field-svg>`;
 				default:
-					return html`<umb-input-upload-field-file .path=${src} .file=${tempFile}></umb-input-upload-field-file>`;
+					return html`<umb-input-upload-field-file .path=${src} .file=${file}></umb-input-upload-field-file>`;
 			}
 		}
 	}
 
 	#getFileExtensionFromPath(path: string): 'audio' | 'video' | 'image' | 'svg' | 'file' {
+		// Extract the MIME type from the data URL
+		if (path.startsWith('data:')) {
+			const mimeType = path.substring(5, path.indexOf(';'));
+			if (mimeType === 'image/svg+xml') return 'svg';
+			if (mimeType.startsWith('image/')) return 'image';
+			if (mimeType.startsWith('audio/')) return 'audio';
+			if (mimeType.startsWith('video/')) return 'video';
+		}
+
+		// Extract the file extension from the path
 		const extension = path.split('.').pop()?.toLowerCase();
 		if (!extension) return 'file';
 		if (['svg'].includes(extension)) return 'svg';
