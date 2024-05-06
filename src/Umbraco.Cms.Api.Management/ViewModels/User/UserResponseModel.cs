@@ -10,7 +10,11 @@ public class UserResponseModel : UserPresentationBase
 
     public ISet<Guid> DocumentStartNodeIds { get; set; } = new HashSet<Guid>();
 
+    public bool HasDocumentRootAccess { get; set; }
+
     public ISet<Guid> MediaStartNodeIds { get; set; } = new HashSet<Guid>();
+
+    public bool HasMediaRootAccess { get; set; }
 
     public IEnumerable<string> AvatarUrls { get; set; } = Enumerable.Empty<string>();
 

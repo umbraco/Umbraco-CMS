@@ -60,11 +60,11 @@ for (const listViewType of listViewTypes) {
       // Arrange
       let columnData: string[];
       if (listViewType === 'List View - Media') {
-        columnData = ['Document Type', 'TestDocumentType', 'owner', 'Created by'];
+        columnData = ['Document Type', 'TestDocumentType', 'sortOrder', 'Sort'];
         await umbracoApi.documentType.ensureNameNotExists(columnData[1]);
         await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(columnData[1]);
       } else {
-        columnData = ['Media Type', 'Audio', 'owner', 'Created by'];
+        columnData = ['Media Type', 'Audio', 'sortOrder', 'Sort'];
       }
 
       const expectedIncludePropertiesValues = {
@@ -194,15 +194,14 @@ for (const listViewType of listViewTypes) {
 
     test('can update bulk action permission', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      const bulkActionPermissionValue = 'Allow bulk copy (content only)';
+      const bulkActionPermissionValue = 'Allow bulk delete';
       const expectedDataTypeValues = {
         "alias": "bulkActionPermissions",
         "value": {
-          "allowBulkPublish": false,
-          "allowBulkUnpublish": false,
+          "allowBulkPublish": true,
+          "allowBulkUnpublish": true,
           "allowBulkCopy": true,
-          "allowBulkDelete": false,
-          "allowBulkMove": false,
+          "allowBulkDelete": true
         },
       };
 
@@ -227,11 +226,7 @@ for (const listViewType of listViewTypes) {
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
       await umbracoUi.dataType.clickContentAppIconButton();
-      // TODO: Uncomment one of the possible ways to select the icon. when the helpers are fixed
-      // await umbracoUi.dataType.clickLabelWithName(iconValue, true);
-      // await umbracoUi.dataType.chooseContentAppIconByValue(iconValue);
-      await page.getByLabel(iconValue).click({force: true});
-      await umbracoUi.dataType.clickSubmitButton();
+      await umbracoUi.dataType.chooseContentAppIconByValue(iconValue);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert

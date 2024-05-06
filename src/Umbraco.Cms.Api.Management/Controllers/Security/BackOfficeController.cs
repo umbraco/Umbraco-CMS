@@ -66,12 +66,6 @@ public class BackOfficeController : SecurityControllerBase
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     public async Task<IActionResult> Login(CancellationToken cancellationToken, LoginRequestModel model)
     {
-        var validated = await _backOfficeUserManager.ValidateCredentialsAsync(model.Username, model.Password);
-        if (validated is false)
-        {
-            return Unauthorized();
-        }
-
         IdentitySignInResult result = await _backOfficeSignInManager.PasswordSignInAsync(
             model.Username, model.Password, true, true);
 

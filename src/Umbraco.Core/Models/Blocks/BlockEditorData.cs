@@ -40,7 +40,7 @@ public class BlockEditorData<TValue, TLayout>
     /// <summary>
     ///     Returns the layout for this specific property editor
     /// </summary>
-    public IEnumerable<TLayout>? Layout => BlockValue.Layout.TryGetValue(_propertyEditorAlias, out IEnumerable<TLayout>? layout) ? layout : null;
+    public IEnumerable<TLayout>? Layout => BlockValue.GetLayouts(_propertyEditorAlias);
 
     /// <summary>
     ///     Returns the reference to the original BlockValue
