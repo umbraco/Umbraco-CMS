@@ -8,14 +8,16 @@ test.describe('Template tests', () => {
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
     await umbracoApi.template.ensureNameNotExists(templateName);
     await umbracoUi.goToBackOffice();
-    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
   });
 
   test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.template.ensureNameNotExists(templateName);
   });
 
-  test('can create a template', async ({umbracoApi, umbracoUi}) => {
+  test('can create a template @smoke', async ({page, umbracoApi, umbracoUi}) => {
+    // Arrange
+    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
+
     // Act
     await umbracoUi.template.clickActionsMenuAtRoot();
     await umbracoUi.template.clickCreateButton();
@@ -25,11 +27,10 @@ test.describe('Template tests', () => {
     // Assert
     await umbracoUi.template.isSuccessNotificationVisible();
     expect(await umbracoApi.template.doesNameExist(templateName)).toBeTruthy();
-    await umbracoUi.template.clickRootFolderCaretButton();
-    await umbracoUi.template.isTemplateTreeItemVisibile(templateName);
+    await umbracoUi.template.isTemplateRootTreeItemVisible(templateName);
   });
 
-  test('can update content of a template', async ({umbracoApi, umbracoUi}) => {
+  test('can update content of a template @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const updatedTemplateContent =
       defaultTemplateContent + '\r\n' + '<p>AcceptanceTests</p>';
@@ -70,16 +71,17 @@ test.describe('Template tests', () => {
   test('can delete a template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.template.createDefaultTemplate(templateName);
+    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
 
     // Act
-    await umbracoUi.template.clickRootFolderCaretButton();
+    await umbracoUi.template.reloadTemplateTree();
     await umbracoUi.template.clickActionsMenuForTemplate(templateName);
     await umbracoUi.template.clickDeleteAndConfirmButton();
 
     // Assert
     await umbracoUi.template.isSuccessNotificationVisible();
     expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
-    await umbracoUi.template.isTemplateTreeItemVisibile(templateName, false);
+    await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false);
   });
 
   test('can set a template as master template', async ({umbracoApi, umbracoUi}) => {
@@ -139,9 +141,9 @@ test.describe('Template tests', () => {
     const propertyAliasValue = 'UpdateDate';
     const isAscending = true;
     const expectedCode = 'Umbraco.ContentAtRoot().FirstOrDefault()\r\n' +
-    '    .Children()\r\n' +
-    '    .Where(x => x.IsVisible())\r\n' +
-    '    .OrderBy(x => x.' + propertyAliasValue + ')';
+      '    .Children()\r\n' +
+      '    .Where(x => x.IsVisible())\r\n' +
+      '    .OrderBy(x => x.' + propertyAliasValue + ')';
     const expectedTemplateContent = '\r\n' +
       '@{\r\n' +
       '\tvar selection = ' + expectedCode + ';\r\n' +
@@ -156,7 +158,7 @@ test.describe('Template tests', () => {
       '</ul>\r\n' +
       '\r\n' + defaultTemplateContent;
 
-      await umbracoApi.template.createDefaultTemplate(templateName);
+    await umbracoApi.template.createDefaultTemplate(templateName);
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
@@ -180,9 +182,9 @@ test.describe('Template tests', () => {
     const operatorValue = 'is';
     const constrainValue = 'Test Content';
     const expectedCode = 'Umbraco.ContentAtRoot().FirstOrDefault()\r\n' +
-    '    .Children()\r\n' +
-    '    .Where(x => (x.' + propertyAliasValue + ' == "' + constrainValue + '"))\r\n' +
-    '    .Where(x => x.IsVisible())';
+      '    .Children()\r\n' +
+      '    .Where(x => (x.' + propertyAliasValue + ' == "' + constrainValue + '"))\r\n' +
+      '    .Where(x => x.IsVisible())';
     const expectedTemplateContent = '\r\n' +
       '@{\r\n' +
       '\tvar selection = ' + expectedCode + ';\r\n' +
@@ -197,10 +199,11 @@ test.describe('Template tests', () => {
       '</ul>\r\n' +
       '\r\n' + defaultTemplateContent;
 
-      await umbracoApi.template.createDefaultTemplate(templateName);
+    await umbracoApi.template.createDefaultTemplate(templateName);
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
     await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
     // Verify that the code is shown
@@ -223,6 +226,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
     await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSection(sectionType);
     await umbracoUi.template.clickSaveButton();
@@ -243,6 +247,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
     await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSection(sectionType, sectionName);
     await umbracoUi.template.clickSaveButton();
@@ -263,6 +268,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
     await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSection(sectionType, sectionName);
     await umbracoUi.template.clickSaveButton();
@@ -283,6 +289,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
     await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertDictionaryItem(dictionaryName);
     await umbracoUi.template.clickSaveButton();
@@ -307,6 +314,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
     await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertPartialView(partialViewFileName);
     await umbracoUi.template.clickSaveButton();
@@ -317,7 +325,8 @@ test.describe('Template tests', () => {
     expect(templateData.content).toBe(templateContent);
   });
 
-  test('can insert value into a template', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Update the value of the System Field in the testHelpers. There has been changes to the SystemField Name.
+  test.skip('can insert value into a template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.template.createDefaultTemplate(templateName);
     const systemFieldValue = 'createDate';
@@ -325,6 +334,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+    // TODO: refactor later
     await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
     await umbracoUi.template.clickSaveButton();
@@ -335,31 +345,31 @@ test.describe('Template tests', () => {
     expect(templateData.content).toBe(templateContent);
   });
 
-    // TODO: Remove skip when the front-end is ready. Currently the returned items count is not updated after choosing the root content.
-    test.skip('can show returned items in query builder ', async ({umbracoApi, umbracoUi}) => {
-      //Arrange
-      // Create content at root with a child
-      const documentTypeName = 'ParentDocumentType';
-      const childDocumentTypeName = 'ChildDocumentType';
-      const contentName = 'ContentName';
-      const childContentName = 'ChildContentName';
-      const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(childDocumentTypeName);
-      const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
-      const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-      await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
-      // Create template
-      await umbracoApi.template.createDefaultTemplate(templateName);
-  
-      //Act
-      await umbracoUi.template.goToTemplate(templateName);
-      await umbracoUi.template.clickQueryBuilderButton();
-      await umbracoUi.template.chooseRootContentInQueryBuilder('(' + contentName + ')');
-  
-      // Assert
-      await umbracoUi.template.doesReturnedItemsHaveCount(1);
-      await umbracoUi.template.doesQueryResultHaveContentName(childContentName);
-  
-      // Clean
-      await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-    });
+  // TODO: Remove skip when the front-end is ready. Currently the returned items count is not updated after choosing the root content.
+  test.skip('can show returned items in query builder ', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    // Create content at root with a child
+    const documentTypeName = 'ParentDocumentType';
+    const childDocumentTypeName = 'ChildDocumentType';
+    const contentName = 'ContentName';
+    const childContentName = 'ChildContentName';
+    const childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(childDocumentTypeName);
+    const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
+    const contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+    await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
+    // Create template
+    await umbracoApi.template.createDefaultTemplate(templateName);
+
+    // Act
+    await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.template.clickQueryBuilderButton();
+    await umbracoUi.template.chooseRootContentInQueryBuilder('(' + contentName + ')');
+
+    // Assert
+    await umbracoUi.template.doesReturnedItemsHaveCount(1);
+    await umbracoUi.template.doesQueryResultHaveContentName(childContentName);
+
+    // Clean
+    await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  });
 });

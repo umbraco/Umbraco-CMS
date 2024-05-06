@@ -68,6 +68,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddPasswordConfiguration()
                 .AddSupplemenataryLocalizedTextFileSources()
                 .AddUserData()
+                .AddSegment()
                 .AddExport()
                 .AddImport();
 

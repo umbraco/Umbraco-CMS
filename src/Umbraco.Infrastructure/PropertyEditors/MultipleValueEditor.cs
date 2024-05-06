@@ -30,25 +30,6 @@ public class MultipleValueEditor : DataValueEditor
         _jsonSerializer = jsonSerializer;
 
     /// <summary>
-    ///     Override so that we can return an array to the editor for multi-select values
-    /// </summary>
-    /// <param name="property"></param>
-    /// <param name="culture"></param>
-    /// <param name="segment"></param>
-    /// <returns></returns>
-    public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
-    {
-        var json = base.ToEditor(property, culture, segment)?.ToString();
-        string[]? result = null;
-        if (json is not null)
-        {
-            result = _jsonSerializer.Deserialize<string[]>(json);
-        }
-
-        return result ?? Array.Empty<string>();
-    }
-
-    /// <summary>
     ///     When multiple values are selected a json array will be posted back so we need to format for storage in
     ///     the database which is a comma separated string value
     /// </summary>
