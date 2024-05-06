@@ -110,11 +110,13 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		const extension = this.#getFileExtensionFromPath(src);
 
 		return html`
-			<div style="position:relative; display: flex; width: fit-content; max-width: 100%">
-				${getElementTemplate()}
-				${this.temporaryFile?.status === TemporaryFileStatus.WAITING
-					? html`<umb-temporary-file-badge></umb-temporary-file-badge>`
-					: nothing}
+			<div id="wrapper">
+				<div style="position:relative; display: flex; width: fit-content; max-width: 100%">
+					${getElementTemplate()}
+					${this.temporaryFile?.status === TemporaryFileStatus.WAITING
+						? html`<umb-temporary-file-badge></umb-temporary-file-badge>`
+						: nothing}
+				</div>
 			</div>
 			${this.#renderButtonRemove()}
 		`;
