@@ -9,6 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import './column-layouts/boolean/webhook-table-boolean-column-layout.element.js';
 import './column-layouts/name/webhook-table-name-column-layout.element.js';
 import './column-layouts/entity-actions/webhook-table-entity-actions-column-layout.element.js';
+import './column-layouts/content-type/webhook-table-name-column-layout.element.js';
 
 @customElement('umb-webhook-table-collection-view')
 export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
@@ -40,6 +41,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 		{
 			name: 'Types',
 			alias: 'types',
+			elementName: 'umb-webhook-table-content-type-column-layout',
 		},
 		{
 			name: '',
@@ -92,7 +94,7 @@ export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'types',
-						value: webhook.contentTypes,
+						value: { contentTypeName: webhook.events[0].eventType, contentTypes: webhook.contentTypes },
 					},
 					{
 						columnAlias: 'entityActions',
