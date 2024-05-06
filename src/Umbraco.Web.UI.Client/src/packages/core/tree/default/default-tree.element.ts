@@ -1,4 +1,4 @@
-import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '../types.js';
+import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration, UmbTreeStartFrom } from '../types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
 import { UMB_DEFAULT_TREE_CONTEXT } from './default-tree.context.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -21,6 +21,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	@property({ type: Boolean, attribute: false })
 	hideTreeRoot: boolean = false;
+
+	@property({ type: Object, attribute: false })
+	startFrom?: UmbTreeStartFrom;
 
 	@property({ attribute: false })
 	selectableFilter: (item: UmbTreeItemModelBase) => boolean = () => true;
@@ -84,6 +87,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		if (_changedProperties.has('filter')) {
 			this.#treeContext!.filter = this.filter;
 		}
+
+		if (_changedProperties.has('startFrom')) {
+			this.#treeContext!.startFrom = this.startFrom;
+		}
 	}
 
 	getSelection() {
@@ -104,7 +111,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	}
 
 	#renderRootItems() {
-		// only shot the root items directly if the tree root is hidden
+		// only show the root items directly if the tree root is hidden
 		if (this.hideTreeRoot === true) {
 			return html`
 				${repeat(
