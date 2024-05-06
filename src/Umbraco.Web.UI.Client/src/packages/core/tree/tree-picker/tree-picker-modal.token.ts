@@ -11,6 +11,10 @@ export interface UmbTreePickerModalCreateActionData<PathPatternParamsType extend
 	extendWithPathParams: PathPatternParamsType;
 }
 
+export interface UmbTreePickerStartFrom {
+	unique: string;
+}
+
 export interface UmbTreePickerModalData<
 	TreeItemType,
 	PathPatternParamsType extends UmbPathPatternParamsType = UmbPathPatternParamsType,
@@ -19,6 +23,7 @@ export interface UmbTreePickerModalData<
 	treeAlias?: string;
 	// Consider if it makes sense to move this into the UmbPickerModalData interface, but for now this is a TreePicker feature. [NL]
 	createAction?: UmbTreePickerModalCreateActionData<PathPatternParamsType>;
+	startFrom?: UmbTreePickerStartFrom;
 }
 
 export interface UmbTreePickerModalValue extends UmbPickerModalValue {}
