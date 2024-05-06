@@ -35,9 +35,12 @@ internal class WebhookPresentationFactory : IWebhookPresentationFactory
         return target;
     }
 
-    public IWebhook CreateWebhook(UpdateWebhookRequestModel webhookRequestModel)
+    public IWebhook CreateWebhook(UpdateWebhookRequestModel webhookRequestModel, Guid existingWebhookkey)
     {
-        var target = new Webhook(webhookRequestModel.Url, webhookRequestModel.Enabled, webhookRequestModel.ContentTypeKeys, webhookRequestModel.Events, webhookRequestModel.Headers);
+        var target = new Webhook(webhookRequestModel.Url, webhookRequestModel.Enabled, webhookRequestModel.ContentTypeKeys, webhookRequestModel.Events, webhookRequestModel.Headers)
+        {
+            Key = existingWebhookkey,
+        };
         return target;
     }
 

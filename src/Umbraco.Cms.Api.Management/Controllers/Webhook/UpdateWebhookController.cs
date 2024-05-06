@@ -43,7 +43,7 @@ public class UpdateWebhookController : WebhookControllerBase
             return WebhookNotFound();
         }
 
-        IWebhook updated = _webhookPresentationFactory.CreateWebhook(updateWebhookRequestModel);
+        IWebhook updated = _webhookPresentationFactory.CreateWebhook(updateWebhookRequestModel, id);
 
         Attempt<IWebhook, WebhookOperationStatus> result = await _webhookService.UpdateAsync(updated);
 
