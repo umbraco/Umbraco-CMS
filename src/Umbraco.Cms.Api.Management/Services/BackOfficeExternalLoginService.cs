@@ -32,14 +32,14 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
         _backOfficeSignInManager = backOfficeSignInManager;
     }
 
-    public async Task<Attempt<IEnumerable<UserExternalLoginProviderModel>, ExternalLoginOperationStatus>>
-        ExternalLoginStatusForUserAsync(Guid userid)
+    public async Task<Attempt<IEnumerable<UserExternalLoginProviderModel>, ExternalLoginOperationStatus>> ExternalLoginStatusForUserAsync(Guid userKey)
     {
         IEnumerable<BackOfficeExternaLoginProviderScheme> providers =
             await _backOfficeExternalLoginProviders.GetBackOfficeProvidersAsync();
 
         Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus> linkedLoginsAttempt =
-            await _userService.GetLinkedLoginsAsync(userid);
+            await _userService.GetLinkedLoginsAsync(userKey);
+
         if (linkedLoginsAttempt.Success is false)
         {
             return Attempt<IEnumerable<UserExternalLoginProviderModel>, ExternalLoginOperationStatus>.Fail(
@@ -67,7 +67,7 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
         }
 
         BackOfficeIdentityUser? user = await _backOfficeUserManager.FindByIdAsync(userId);
-        if (user == null)
+        if (user is null)
         {
             return Attempt.Fail(ExternalLoginOperationStatus.UserNotFound);
         }
@@ -75,32 +75,29 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
         AuthenticationScheme? authType = (await _backOfficeSignInManager.GetExternalAuthenticationSchemesAsync())
             .FirstOrDefault(x => x.Name == loginProvider);
 
-        if (authType == null)
+        if (authType is null)
         {
             return Attempt.Fail(ExternalLoginOperationStatus.AuthenticationSchemeNotFound);
         }
 
         BackOfficeExternaLoginProviderScheme? opt = await _backOfficeExternalLoginProviders.GetAsync(authType.Name);
-        if (opt == null)
+        if (opt is null)
         {
             return Attempt.Fail(ExternalLoginOperationStatus.AuthenticationOptionsNotFound);
         }
 
-        if (!opt.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking)
+        if (opt.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking is false)
         {
             return Attempt.Fail(ExternalLoginOperationStatus.UnlinkingDisabled);
         }
 
         IEnumerable<IIdentityUserLogin> externalLogins = user.Logins.Where(l => l.LoginProvider == loginProvider);
-        if (externalLogins.Any(l => l.ProviderKey == providerKey) == false)
+        if (externalLogins.Any(l => l.ProviderKey == providerKey) is false)
         {
             return Attempt.Fail(ExternalLoginOperationStatus.InvalidProviderKey);
         }
 
-        IdentityResult result = await _backOfficeUserManager.RemoveLoginAsync(
-            user,
-            loginProvider,
-            providerKey);
+        IdentityResult result = await _backOfficeUserManager.RemoveLoginAsync(user, loginProvider, providerKey);
 
         if (result.Succeeded is false)
         {
@@ -116,21 +113,20 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
         AuthenticateResult cookieAuthenticatedUserAttempt =
             await httpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
 
-        if (cookieAuthenticatedUserAttempt.Succeeded == false)
+        if (cookieAuthenticatedUserAttempt.Succeeded is false)
         {
             return Attempt.FailWithStatus(ExternalLoginOperationStatus.Unauthorized, Enumerable.Empty<IdentityError>());
         }
 
         BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(cookieAuthenticatedUserAttempt.Principal);
-        if (user == null)
+        if (user is null)
         {
             return Attempt.FailWithStatus(ExternalLoginOperationStatus.UserNotFound, Enumerable.Empty<IdentityError>());
         }
 
-        ExternalLoginInfo? info =
-            await _backOfficeSignInManager.GetExternalLoginInfoAsync();
+        ExternalLoginInfo? info = await _backOfficeSignInManager.GetExternalLoginInfoAsync();
 
-        if (info == null)
+        if (info is null)
         {
             return Attempt.FailWithStatus(ExternalLoginOperationStatus.ExternalInfoNotFound, Enumerable.Empty<IdentityError>());
         }

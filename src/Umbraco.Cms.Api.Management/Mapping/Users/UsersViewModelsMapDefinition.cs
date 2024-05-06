@@ -29,10 +29,10 @@ public class UsersViewModelsMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(UserCreationResult source, CreateUserResponseModel target, MapperContext context)
     {
-        Guid userId = source.CreatedUser?.Key
+        Guid userKey = source.CreatedUser?.Key
                       ?? throw new ArgumentException("Cannot map a user creation response without a created user", nameof(source));
 
-        target.User = new ReferenceByIdModel(userId);
+        target.User = new ReferenceByIdModel(userKey);
         target.InitialPassword = source.InitialPassword;
     }
 
@@ -42,7 +42,7 @@ public class UsersViewModelsMapDefinition : IMapDefinition
         target.ResetPassword = source.ResetPassword;
     }
 
-// Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll
     private void Map(UserExternalLoginProviderModel source, UserExternalLoginProviderResponseModel target, MapperContext context)
     {
         target.ProviderSchemaName = source.ProviderSchemaName;

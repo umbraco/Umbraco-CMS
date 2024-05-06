@@ -7,7 +7,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
@@ -40,8 +39,7 @@ public class ListExternalLoginProvidersCurrentUserController : CurrentUserContro
             await _backOfficeExternalLoginService.ExternalLoginStatusForUserAsync(userKey);
 
         return result.Success
-            ? Ok(_mapper.MapEnumerable<UserExternalLoginProviderModel, UserExternalLoginProviderResponseModel>(
-                result.Result))
+            ? Ok(_mapper.MapEnumerable<UserExternalLoginProviderModel, UserExternalLoginProviderResponseModel>(result.Result))
             : ExternalLoginOperationStatusResult(result.Status);
     }
 }
