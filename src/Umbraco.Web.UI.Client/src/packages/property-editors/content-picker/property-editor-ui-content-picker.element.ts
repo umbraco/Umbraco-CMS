@@ -27,6 +27,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 
 	@state()
 	min = 0;
+	_max = Infinity;
 
 	@state()
 	max = Infinity;
