@@ -60,17 +60,21 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
     // We know we don't have to run this matcher against the backoffice endpoints.
     public bool AppliesToEndpoints(IReadOnlyList<Endpoint> endpoints) => true;
 
-    public Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
+    public async Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
     {
         if (_runtimeState.Level != RuntimeLevel.Run)
         {
-            return HandleInstallUpgrade(httpContext, candidates);
+            var handled = await HandleInstallUpgrade(httpContext, candidates);
+            if (handled)
+            {
+                return;
+            }
         }
 
         // If there's only one candidate, we don't need to do anything.
         if (candidates.Count < 2)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         // If there are multiple candidates, we want to discard the catch-all (slug)
@@ -122,8 +126,6 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
         {
             candidates.SetValidity(dynamicId.Value, false);
         }
-
-        return Task.CompletedTask;
     }
 
     /// <summary>
@@ -167,7 +169,7 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
         return endpoint;
     }
 
-    private Task HandleInstallUpgrade(HttpContext httpContext, CandidateSet candidates)
+    private Task<bool> HandleInstallUpgrade(HttpContext httpContext, CandidateSet candidates)
     {
         if (_runtimeState.Level != RuntimeLevel.Upgrade)
         {
@@ -176,7 +178,7 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
             // Ideally we should do this in a more robust way, for instance with a dedicated attribute we can then check for.
             if (_umbracoRequestPaths.IsInstallerRequest(httpContext.Request.Path))
             {
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             }
 
             SetEndpoint(candidates, _installEndpoint.Value, new RouteValueDictionary
@@ -187,7 +189,7 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
                 [Constants.Web.Routing.AreaToken] = Constants.Web.Mvc.InstallArea,
             });
 
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
 
         // Check if maintenance page should be shown
@@ -201,7 +203,7 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
             if (_umbracoRequestPaths.IsBackOfficeRequest(httpContext.Request.Path)
                 || _umbracoRequestPaths.IsInstallerRequest(httpContext.Request.Path))
             {
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             }
 
             // Otherwise we'll re-route to the render controller (this will in turn show the maintenance page through a filter)
@@ -212,9 +214,9 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
                     [Constants.Web.Routing.ActionToken] = nameof(RenderController.Index),
                 });
 
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
 
-        return Task.CompletedTask;
+        return Task.FromResult(false);
     }
 }
