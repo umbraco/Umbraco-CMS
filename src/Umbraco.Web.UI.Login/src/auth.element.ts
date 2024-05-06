@@ -4,7 +4,6 @@ import { type InputType, type UUIFormLayoutItemElement, type UUILabelElement } f
 import { umbExtensionsRegistry } from "@umbraco-cms/backoffice/extension-registry";
 
 import { UMB_AUTH_CONTEXT, UmbAuthContext } from "./contexts";
-import type { UmbLoginInputElement } from "./components";
 import { UmbSlimBackofficeController } from "./controllers";
 
 // We import the authStyles here so that we can inline it in the shadow DOM that is created outside of the UmbAuthElement.
