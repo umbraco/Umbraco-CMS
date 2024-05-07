@@ -46,7 +46,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 	#paging = {
 		skip: 0,
-		take: 3,
+		take: 50,
 	};
 
 	#initResolver?: () => void;
@@ -122,16 +122,23 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		return this.#repository;
 	}
 
+	/**
+	 * Loads the tree
+	 * @memberof UmbDefaultTreeContext
+	 */
 	// TODO: debouncing the load tree method because multiple props can be set at the same time
 	// that would trigger multiple loadTree calls. This is a temporary solution to avoid that.
-	public loadTree = debounce(() => this.#debouncedLoadTree(), 50);
+	public loadTree = debounce(() => this.#debouncedLoadTree(), 100);
 
+	/**
+	 * Reloads the tree
+	 * @memberof UmbDefaultTreeContext
+	 */
 	public reloadTree = () => this.#debouncedLoadTree(true);
 
 	#debouncedLoadTree(reload = false) {
-		const startFrom = this.getStartFrom();
-		if (startFrom?.unique) {
-			this.#loadTreeFrom(startFrom, reload);
+		if (this.getStartFrom()) {
+			this.#loadRootItems(reload);
 			return;
 		}
 
@@ -161,34 +168,19 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		const skip = reload ? 0 : this.#paging.skip;
 		const take = reload ? this.pagination.getCurrentPageNumber() * this.#paging.take : this.#paging.take;
 
-		const { data } = await this.#repository!.requestRootTreeItems({
-			skip,
-			take,
-		});
+		// If we have a start node get children of that instead of the root
+		const startFrom = this.getStartFrom();
 
-		if (data) {
-			if (reload) {
-				this.#rootItems.setValue(data.items);
-			} else {
-				const currentItems = this.#rootItems.getValue();
-				this.#rootItems.setValue([...currentItems, ...data.items]);
-			}
-
-			this.pagination.setTotalItems(data.total);
-		}
-	}
-
-	async #loadTreeFrom(startFrom: UmbTreeStartFrom, reload = false) {
-		await this.#init;
-
-		const skip = reload ? 0 : this.#paging.skip;
-		const take = reload ? this.pagination.getCurrentPageNumber() * this.#paging.take : this.#paging.take;
-
-		const { data } = await this.#repository!.requestTreeItemsOf({
-			parentUnique: startFrom.unique,
-			skip,
-			take,
-		});
+		const { data } = startFrom?.unique
+			? await this.#repository!.requestTreeItemsOf({
+					parentUnique: startFrom.unique,
+					skip,
+					take,
+				})
+			: await this.#repository!.requestRootTreeItems({
+					skip,
+					take,
+				});
 
 		if (data) {
 			if (reload) {
