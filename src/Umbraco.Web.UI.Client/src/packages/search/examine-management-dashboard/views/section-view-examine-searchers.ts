@@ -1,13 +1,15 @@
+import { UMB_EXAMINE_FIELDS_SETTINGS_MODAL, UMB_EXAMINE_FIELDS_VIEWER_MODAL } from '../modal/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_EXAMINE_FIELDS_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_MANAGER_CONTEXT,
+	UMB_WORKSPACE_MODAL,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
 import type { SearchResultResponseModel, FieldPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-
-import './modal-views/fields-viewer.element.js';
-import './modal-views/fields-settings-modal.element.js';
 
 interface ExposedSearchResultField {
 	name: string;
@@ -36,8 +38,24 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		alert('TODO: Open workspace for ' + this.searcherName);
 	}
 
+	#entityType = '';
+
+	@state()
+	private _workspacePath = '';
+
 	private _onKeyPress(e: KeyboardEvent) {
 		e.key == 'Enter' ? this._onSearch() : undefined;
+	}
+
+	constructor() {
+		super();
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.onSetup(() => {
+				return { data: { entityType: this.#entityType, preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._workspacePath = routeBuilder({});
+			});
 	}
 
 	private async _onSearch() {
@@ -86,20 +104,24 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		const modalContext = modalManager.open(this, UMB_EXAMINE_FIELDS_SETTINGS_MODAL, {
 			value: { fields: this._exposedFields ?? [] },
 		});
-		modalContext?.onSubmit().then((value) => {
-			this._exposedFields = value.fields;
-		});
+		await modalContext.onSubmit().catch(() => undefined);
+
+		const value = modalContext.getValue();
+
+		this._exposedFields = value?.fields;
 	}
 
 	async #onFieldViewClick(rowData: SearchResultResponseModel) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager.open(this, 'umb-modal-element-fields-viewer', {
+
+		const modalContext = modalManager.open(this, UMB_EXAMINE_FIELDS_VIEWER_MODAL, {
 			modal: {
 				type: 'sidebar',
 				size: 'medium',
 			},
-			data: { ...rowData, name: this.getSearchResultNodeName(rowData) },
+			data: { searchResult: rowData, name: this.getSearchResultNodeName(rowData) },
 		});
+		await modalContext.onSubmit().catch(() => undefined);
 	}
 
 	render() {
@@ -128,6 +150,15 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		return nodeNameField?.values?.join(', ') ?? '';
 	}
 
+	#getEntityTypeFromIndexType(indexType: string) {
+		switch (indexType) {
+			case 'content':
+				return 'document';
+			default:
+				return indexType;
+		}
+	}
+
 	private renderSearchResults() {
 		if (this._searchLoading) return html`<uui-loader></uui-loader>`;
 		if (!this._searchResults) return nothing;
@@ -145,11 +176,18 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 						${this.renderHeadCells()}
 					</uui-table-head>
 					${this._searchResults?.map((rowData) => {
+						const indexType = rowData.fields?.find((field) => field.name === '__IndexType')?.values?.join(', ') ?? '';
+						this.#entityType = this.#getEntityTypeFromIndexType(indexType);
+						const unique = rowData.fields?.find((field) => field.name === '__Key')?.values?.join(', ') ?? '';
+
 						return html`<uui-table-row>
 							<uui-table-cell> ${rowData.score} </uui-table-cell>
 							<uui-table-cell> ${rowData.id} </uui-table-cell>
 							<uui-table-cell>
-								<uui-button look="secondary" label="Open workspace for this document" @click="${this._onNameClick}">
+								<uui-button
+									look="secondary"
+									label="Open workspace for this document"
+									href=${this._workspacePath + this.#entityType + '/edit/' + unique}>
 									${this.getSearchResultNodeName(rowData)}
 								</uui-button>
 							</uui-table-cell>

@@ -40,6 +40,19 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 		this._loadingSearchers = false;
 	}
 
+	#renderStatus(status: HealthStatusModel) {
+		switch (status) {
+			case HealthStatusModel.HEALTHY:
+				return html`<umb-icon name="icon-check color-green"></umb-icon>`;
+			case HealthStatusModel.UNHEALTHY:
+				return html`<umb-icon name="icon-error color-red"></umb-icon>`;
+			case HealthStatusModel.REBUILDING:
+				return html`<umb-icon name="icon-time color-yellow"></umb-icon>`;
+			default:
+				return;
+		}
+	}
+
 	render() {
 		return html`
 			<uui-box headline="Indexers" class="overview">
@@ -66,16 +79,7 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 			${this._indexers.map((index) => {
 				return html`
 					<uui-table-row>
-						<uui-table-cell style="width:0px">
-							<uui-icon-essentials>
-							${
-								index.healthStatus === HealthStatusModel.UNHEALTHY
-									? html`<uui-icon name="wrong" class="danger"></uui-icon>`
-									: html`<uui-icon name="check" class="positive"></uui-icon>`
-							}
-								</uui-icon>
-							</uui-icon-essentials>
-						</uui-table-cell>
+						<uui-table-cell style="width:0px"> ${this.#renderStatus(index.healthStatus.status)} </uui-table-cell>
 						<uui-table-cell>
 							<a href="${window.location.href.replace(/\/+$/, '')}/index/${index.name}">${index.name}</a>
 						</uui-table-cell>

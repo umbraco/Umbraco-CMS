@@ -1,7 +1,7 @@
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import type { IndexResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { HealthStatusResponseModel, IndexResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthStatusModel, IndexerService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -36,7 +36,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		this._indexData = data;
 
 		// TODO: Add continuous polling to update the status
-		if (this._indexData?.healthStatus === HealthStatusModel.REBUILDING) {
+		if (this._indexData?.healthStatus.status === HealthStatusModel.REBUILDING) {
 			this._buttonState = 'waiting';
 		}
 
@@ -73,6 +73,20 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		await this._getIndexData();
 	}
 
+	#renderHealthStatus(healthStatus: HealthStatusResponseModel) {
+		const msg = healthStatus.message ? healthStatus.message : healthStatus.status;
+		switch (healthStatus.status) {
+			case HealthStatusModel.HEALTHY:
+				return html`<umb-icon name="icon-check color-green"></umb-icon>${msg}`;
+			case HealthStatusModel.UNHEALTHY:
+				return html`<umb-icon name="icon-error color-red"></umb-icon>${msg}`;
+			case HealthStatusModel.REBUILDING:
+				return html`<umb-icon name="icon-time color-yellow"></umb-icon>${msg}`;
+			default:
+				return;
+		}
+	}
+
 	render() {
 		if (!this._indexData || this._loading) return html` <uui-loader-bar></uui-loader-bar>`;
 
@@ -82,24 +96,14 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 					<strong>Health Status</strong><br />
 					The health status of the ${this.indexName} and if it can be read
 				</p>
-				<div>
-					<uui-icon-essentials>
-						${
-							this._indexData.healthStatus === HealthStatusModel.UNHEALTHY
-								? html`<uui-icon name="wrong" class="danger"></uui-icon>`
-								: html`<uui-icon name="check" class="positive"></uui-icon>`
-						}
-						</uui-icon>
-					</uui-icon-essentials>
-					${this._indexData.healthStatus}
-				</div>
+				<div id="health-status">${this.#renderHealthStatus(this._indexData.healthStatus)}</div>
 			</uui-box>
 			${this.renderIndexSearch()} ${this.renderPropertyList()} ${this.renderTools()}
 		`;
 	}
 
 	private renderIndexSearch() {
-		if (!this._indexData || this._indexData.healthStatus !== HealthStatusModel.HEALTHY) return nothing;
+		if (!this._indexData || this._indexData.healthStatus.status !== HealthStatusModel.HEALTHY) return nothing;
 		return html`<umb-dashboard-examine-searcher .searcherName="${this.indexName}"></umb-dashboard-examine-searcher>`;
 	}
 
@@ -147,6 +151,11 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
+			#health-status {
+				display: flex;
+				gap: var(--uui-size-6);
+			}
+
 			:host {
 				display: block;
 			}
@@ -188,13 +197,6 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 			uui-icon {
 				vertical-align: top;
 				padding-right: var(--uui-size-space-5);
-			}
-
-			.positive {
-				color: var(--uui-color-positive);
-			}
-			.danger {
-				color: var(--uui-color-danger);
 			}
 
 			button {
