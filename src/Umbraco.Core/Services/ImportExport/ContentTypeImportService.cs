@@ -40,6 +40,8 @@ public class ContentTypeImportService : IContentTypeImportService
         Guid userKey,
         Guid? contentTypeId = null)
     {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
         Attempt<XElement?, TemporaryFileXmlImportOperationStatus> loadXmlAttempt =
             await _temporaryFileToXmlImportService.LoadXElementFromTemporaryFileAsync(temporaryFileId);
         if (loadXmlAttempt.Success is false)
@@ -68,8 +70,6 @@ public class ContentTypeImportService : IContentTypeImportService
                 null);
         }
 
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
-
         var entityExits = _entityService.Exists(packageEntityKey, UmbracoObjectTypes.DocumentType);
         if (entityExits && contentTypeId is null)
         {
@@ -80,6 +80,8 @@ public class ContentTypeImportService : IContentTypeImportService
 
         IReadOnlyList<IContentType> importResult =
             _packageDataInstallation.ImportDocumentType(loadXmlAttempt.Result!, await _userIdKeyResolver.GetAsync(userKey));
+
+        scope.Complete();
 
         return Attempt.SucceedWithStatus<IContentType?, ContentTypeImportOperationStatus>(
             entityExits

@@ -33,6 +33,8 @@ public class MediaTypeImportService : IMediaTypeImportService
         Guid userKey,
         Guid? mediaTypeId = null)
     {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
         Attempt<XElement?, TemporaryFileXmlImportOperationStatus> loadXmlAttempt =
             await _temporaryFileToXmlImportService.LoadXElementFromTemporaryFileAsync(temporaryFileId);
         if (loadXmlAttempt.Success is false)
@@ -52,8 +54,6 @@ public class MediaTypeImportService : IMediaTypeImportService
                 MediaTypeImportOperationStatus.TypeMismatch,
                 null);
         }
-
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
         Guid packageEntityKey = _packageDataInstallation.GetContentTypeKey(loadXmlAttempt.Result!);
         if (mediaTypeId is not null && mediaTypeId.Equals(packageEntityKey) is false)
@@ -75,6 +75,8 @@ public class MediaTypeImportService : IMediaTypeImportService
 
         IReadOnlyList<IMediaType> importResult =
             _packageDataInstallation.ImportMediaTypes(new[] { loadXmlAttempt.Result! }, await _userIdKeyResolver.GetAsync(userKey));
+
+        scope.Complete();
 
         return Attempt.SucceedWithStatus<IMediaType?, MediaTypeImportOperationStatus>(
             entityExits

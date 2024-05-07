@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Services.ImportExport;
 public interface ITemporaryFileToXmlImportService
 {
     Task<Attempt<XElement?, TemporaryFileXmlImportOperationStatus>> LoadXElementFromTemporaryFileAsync(
-        Guid temporaryFileId, bool cleanupFile = true);
+        Guid temporaryFileId);
 
     Attempt<UmbracoEntityTypes> GetEntityType(XElement entityElement);
 
