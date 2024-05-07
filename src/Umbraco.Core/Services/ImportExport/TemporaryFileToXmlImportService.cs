@@ -30,13 +30,11 @@ public class TemporaryFileToXmlImportService : ITemporaryFileToXmlImportService
                 TemporaryFileXmlImportOperationStatus.TemporaryFileNotFound, null);
         }
 
-        var xmlDocument = new XmlDocument { XmlResolver = null };
+        XDocument document;
         await using (Stream fileStream = documentTypeFile.OpenReadStream())
         {
-            xmlDocument.Load(fileStream);
+            document = await XDocument.LoadAsync(fileStream, LoadOptions.None, CancellationToken.None);
         }
-
-        var element = XElement.Parse(xmlDocument.InnerXml);
 
         if (cleanupFile)
         {
@@ -45,7 +43,7 @@ public class TemporaryFileToXmlImportService : ITemporaryFileToXmlImportService
 
         return Attempt.SucceedWithStatus<XElement?, TemporaryFileXmlImportOperationStatus>(
             TemporaryFileXmlImportOperationStatus.Success,
-            element);
+            document.Root);
     }
 
     public Attempt<UmbracoEntityTypes> GetEntityType(XElement entityElement)

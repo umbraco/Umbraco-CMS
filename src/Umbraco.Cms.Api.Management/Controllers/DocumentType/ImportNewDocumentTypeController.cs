@@ -34,17 +34,13 @@ public class ImportNewDocumentTypeController : DocumentTypeControllerBase
         CancellationToken cancellationToken,
         ImportDocumentTypeRequestModel model)
     {
-        IUser? user = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        if (user is null)
-        {
-            return Unauthorized();
-        }
 
-        Attempt<IContentType?, ContentTypeImportOperationStatus> importAttempt = await _contentTypeImportService.Import(model.File.Id, user.Id);
+        Attempt<IContentType?, ContentTypeImportOperationStatus> importAttempt = await _contentTypeImportService.Import(model.File.Id, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return importAttempt.Success is false
             ? ContentTypeImportOperationStatusResult(importAttempt.Status)
-            : CreatedAtId<ByKeyDocumentTypeController>(controller => nameof(controller.ByKey),
+            : CreatedAtId<ByKeyDocumentTypeController>(
+                controller => nameof(controller.ByKey),
                 importAttempt.Result!.Key);
     }
 }

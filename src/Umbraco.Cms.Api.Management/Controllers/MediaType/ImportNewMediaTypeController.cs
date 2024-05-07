@@ -35,13 +35,7 @@ public class ImportNewMediaTypeController : MediaTypeControllerBase
         CancellationToken cancellationToken,
         ImportMediaTypeRequestModel model)
     {
-        IUser? user = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        if (user is null)
-        {
-            return Unauthorized();
-        }
-
-        Attempt<IMediaType?, MediaTypeImportOperationStatus> importAttempt = await _mediaTypeImportService.Import(model.File.Id, user.Id);
+        Attempt<IMediaType?, MediaTypeImportOperationStatus> importAttempt = await _mediaTypeImportService.Import(model.File.Id, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return importAttempt.Success is false
             ? MediaTypeImportOperationStatusResult(importAttempt.Status)

@@ -35,13 +35,7 @@ public class ImportExistingDocumentTypeController : DocumentTypeControllerBase
         Guid id,
         ImportDocumentTypeRequestModel model)
     {
-        IUser? user = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        if (user is null)
-        {
-            return Unauthorized();
-        }
-
-        Attempt<IContentType?, ContentTypeImportOperationStatus> importAttempt = await _contentTypeImportService.Import(model.File.Id, user.Id, id);
+        Attempt<IContentType?, ContentTypeImportOperationStatus> importAttempt = await _contentTypeImportService.Import(model.File.Id, CurrentUserKey(_backOfficeSecurityAccessor), id);
 
         return importAttempt.Success is false
             ? ContentTypeImportOperationStatusResult(importAttempt.Status)

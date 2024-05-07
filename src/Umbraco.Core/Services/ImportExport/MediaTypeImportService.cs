@@ -12,22 +12,25 @@ public class MediaTypeImportService : IMediaTypeImportService
     private readonly IEntityService _entityService;
     private readonly ITemporaryFileToXmlImportService _temporaryFileToXmlImportService;
     private readonly ICoreScopeProvider _coreScopeProvider;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     public MediaTypeImportService(
         IPackageDataInstallation packageDataInstallation,
         IEntityService entityService,
         ITemporaryFileToXmlImportService temporaryFileToXmlImportService,
-        ICoreScopeProvider coreScopeProvider)
+        ICoreScopeProvider coreScopeProvider,
+        IUserIdKeyResolver userIdKeyResolver)
     {
         _packageDataInstallation = packageDataInstallation;
         _entityService = entityService;
         _temporaryFileToXmlImportService = temporaryFileToXmlImportService;
         _coreScopeProvider = coreScopeProvider;
+        _userIdKeyResolver = userIdKeyResolver;
     }
 
     public async Task<Attempt<IMediaType?, MediaTypeImportOperationStatus>> Import(
         Guid temporaryFileId,
-        int userId,
+        Guid userKey,
         Guid? mediaTypeId = null)
     {
         Attempt<XElement?, TemporaryFileXmlImportOperationStatus> loadXmlAttempt =
@@ -62,7 +65,7 @@ public class MediaTypeImportService : IMediaTypeImportService
 
         var entityExits = _entityService.Exists(
             _packageDataInstallation.GetContentTypeKey(loadXmlAttempt.Result!),
-            UmbracoObjectTypes.DocumentType);
+            UmbracoObjectTypes.MediaType);
         if (entityExits && mediaTypeId is null)
         {
             return Attempt.FailWithStatus<IMediaType?, MediaTypeImportOperationStatus>(
@@ -71,7 +74,7 @@ public class MediaTypeImportService : IMediaTypeImportService
         }
 
         IReadOnlyList<IMediaType> importResult =
-            _packageDataInstallation.ImportMediaTypes(new[] { loadXmlAttempt.Result! }, userId);
+            _packageDataInstallation.ImportMediaTypes(new[] { loadXmlAttempt.Result! }, await _userIdKeyResolver.GetAsync(userKey));
 
         return Attempt.SucceedWithStatus<IMediaType?, MediaTypeImportOperationStatus>(
             entityExits

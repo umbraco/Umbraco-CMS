@@ -12,17 +12,20 @@ public class ContentTypeImportService : IContentTypeImportService
     private readonly IEntityService _entityService;
     private readonly ITemporaryFileToXmlImportService _temporaryFileToXmlImportService;
     private readonly ICoreScopeProvider _coreScopeProvider;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     public ContentTypeImportService(
         IPackageDataInstallation packageDataInstallation,
         IEntityService entityService,
         ITemporaryFileToXmlImportService temporaryFileToXmlImportService,
-        ICoreScopeProvider coreScopeProvider)
+        ICoreScopeProvider coreScopeProvider,
+        IUserIdKeyResolver userIdKeyResolver)
     {
         _packageDataInstallation = packageDataInstallation;
         _entityService = entityService;
         _temporaryFileToXmlImportService = temporaryFileToXmlImportService;
         _coreScopeProvider = coreScopeProvider;
+        _userIdKeyResolver = userIdKeyResolver;
     }
 
     /// <summary>
@@ -34,7 +37,7 @@ public class ContentTypeImportService : IContentTypeImportService
     /// <returns></returns>
     public async Task<Attempt<IContentType?, ContentTypeImportOperationStatus>> Import(
         Guid temporaryFileId,
-        int userId,
+        Guid userKey,
         Guid? contentTypeId = null)
     {
         Attempt<XElement?, TemporaryFileXmlImportOperationStatus> loadXmlAttempt =
@@ -76,7 +79,7 @@ public class ContentTypeImportService : IContentTypeImportService
         }
 
         IReadOnlyList<IContentType> importResult =
-            _packageDataInstallation.ImportDocumentType(loadXmlAttempt.Result!, userId);
+            _packageDataInstallation.ImportDocumentType(loadXmlAttempt.Result!, await _userIdKeyResolver.GetAsync(userKey));
 
         return Attempt.SucceedWithStatus<IContentType?, ContentTypeImportOperationStatus>(
             entityExits

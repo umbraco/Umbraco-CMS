@@ -7,6 +7,6 @@ public interface IMediaTypeImportService
 {
     Task<Attempt<IMediaType?, MediaTypeImportOperationStatus>> Import(
         Guid temporaryFileId,
-        int userId,
+        Guid userKey,
         Guid? mediaTypeId = null);
 }
