@@ -32,12 +32,15 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 
 				const model: UmbMediaCollectionItemModel = {
 					unique: item.id,
+					entityType: 'media',
+					contentTypeAlias: item.mediaType.alias,
 					createDate: new Date(variant.createDate),
 					creator: item.creator,
 					icon: item.mediaType.icon,
 					name: variant.name,
 					sortOrder: item.sortOrder,
 					updateDate: new Date(variant.updateDate),
+					updater: item.creator, // TODO: Check if the `updater` is available for media items. [LK]
 					values: item.values.map((item) => {
 						return { alias: item.alias, value: item.value as string };
 					}),

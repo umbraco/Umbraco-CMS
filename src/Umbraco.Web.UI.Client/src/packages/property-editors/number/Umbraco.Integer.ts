@@ -6,7 +6,7 @@ export const manifests: Array<ManifestTypes> = [
 		name: 'Integer',
 		alias: 'Umbraco.Integer',
 		meta: {
-			defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
+			defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 			settings: {
 				properties: [
 					{
