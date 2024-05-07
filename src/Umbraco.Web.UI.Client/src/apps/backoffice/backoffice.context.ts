@@ -8,6 +8,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 
 export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 	#activeSectionAlias = new UmbStringState(undefined);
@@ -26,7 +27,13 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 			this.#allowedSections.setValue([...sections]);
 		});
 
-		this.#getVersion();
+		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
+		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+			this.observe(authContext.isAuthorized, (isAuthorized) => {
+				if (!isAuthorized) return;
+				this.#getVersion();
+			});
+		});
 	}
 
 	async #getVersion() {

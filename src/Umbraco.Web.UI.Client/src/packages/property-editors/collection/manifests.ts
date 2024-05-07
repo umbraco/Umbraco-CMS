@@ -24,13 +24,6 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Collection.LayoutConfiguration',
 				},
 				{
-					alias: 'pageSize',
-					label: 'Page Size',
-					description: 'Number of items per page.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
-					config: [{ alias: 'min', value: 0 }],
-				},
-				{
 					alias: 'orderBy',
 					label: 'Order By',
 					description: 'The default sort order for the list.',
@@ -40,6 +33,13 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 					alias: 'orderDirection',
 					label: 'Order Direction',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OrderDirection',
+				},
+				{
+					alias: 'pageSize',
+					label: 'Page Size',
+					description: 'Number of items per page.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					config: [{ alias: 'min', value: 0 }],
 				},
 				{
 					alias: 'bulkActionPermissions',
