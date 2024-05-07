@@ -113,7 +113,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
 
         // no change?
-        FileUploadValue? editorModelValue = TryParseFileUploadValue(editorValue.Value as string);
+        FileUploadValue? editorModelValue = TryParseFileUploadValue(editorValue.Value?.ToString());
 
         if (Equals(editorModelValue, currentModelValue))
         {
