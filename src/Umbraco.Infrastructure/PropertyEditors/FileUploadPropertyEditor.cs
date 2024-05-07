@@ -105,6 +105,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         {
             // Assume the value is a plain string with the file path
             mediaPath = stringValue;
+            return true;
         }
         else
         {
