@@ -16,7 +16,7 @@ public class UsersViewModelsMapDefinition : IMapDefinition
         mapper.Define<UserCreationResult, CreateUserResponseModel>((_, _) => new CreateUserResponseModel { User = new() }, Map);
         mapper.Define<IIdentityUserLogin, LinkedLoginViewModel>((_, _) => new LinkedLoginViewModel { ProviderKey = string.Empty, ProviderName = string.Empty }, Map);
         mapper.Define<UserExternalLoginProviderModel, UserExternalLoginProviderResponseModel>(
-            (_, _) => new UserExternalLoginProviderResponseModel{ ProviderSchemaName = string.Empty }, Map);
+            (_, _) => new UserExternalLoginProviderResponseModel { ProviderSchemeName = string.Empty }, Map);
     }
 
     // Umbraco.Code.MapAll
@@ -45,7 +45,7 @@ public class UsersViewModelsMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(UserExternalLoginProviderModel source, UserExternalLoginProviderResponseModel target, MapperContext context)
     {
-        target.ProviderSchemaName = source.ProviderSchemaName;
+        target.ProviderSchemeName = source.ProviderSchemeName;
         target.HasManualLinkingEnabled = source.HasManualLinkingEnabled;
         target.IsLinkedOnUser = source.IsLinkedOnUser;
     }

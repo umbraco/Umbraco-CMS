@@ -189,32 +189,46 @@ public class BackOfficeController : SecurityControllerBase
         return SignOut(Constants.Security.BackOfficeAuthenticationType, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
+    [HttpGet("link-login-key")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> LinkLoginKey(string provider)
+    {
+        Attempt<Guid?, ExternalLoginOperationStatus> generateSecretAttempt = await _externalLoginService.GenerateLoginProviderSecretAsync(User, provider);
+        return generateSecretAttempt.Success
+            ? Ok(generateSecretAttempt.Result)
+            : generateSecretAttempt.Status is ExternalLoginOperationStatus.AuthenticationSchemeNotFound
+                ? StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
+                .WithTitle("Invalid provider")
+                .WithDetail($"No provider with scheme name '{provider}' is configured")
+                .Build())
+                : Unauthorized();
+    }
+
     /// <summary>
     ///     Called when a user links an external login provider in the back office
     /// </summary>
     /// <param name="provider"></param>
     /// <returns></returns>
-    [HttpGet("link-login")]
+    [HttpPost("link-login")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> LinkLogin(string provider)
+    public async Task<IActionResult> LinkLogin(string provider, Guid linkKey)
     {
-        var cookieAuthenticatedUserAttempt =
-            await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+        Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus> claimsPrincipleAttempt = _externalLoginService.ClaimsPrincipleFromLoginProviderLinkKey(provider, linkKey);
 
-        if (cookieAuthenticatedUserAttempt.Succeeded == false)
+        if (claimsPrincipleAttempt.Success == false)
         {
             return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
-                "flow=link-login",
-                "status=unauthorized"));
+                $"{RedirectFlowParameter}=link-login",
+                $"{RedirectStatusParameter}=unauthorized"));
         }
 
-        BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(cookieAuthenticatedUserAttempt.Principal);
+        BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(claimsPrincipleAttempt.Result!);
         if (user == null)
         {
             return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
-                "flow=link-login",
-                "status=user-not-found"));
+                $"{RedirectFlowParameter}=link-login",
+                $"{RedirectStatusParameter}=user-not-found"));
         }
 
         // Request a redirect to the external login provider to link a login for the current user

@@ -2,14 +2,14 @@ namespace Umbraco.Cms.Core.Models;
 
 public class UserExternalLoginProviderModel
 {
-    public UserExternalLoginProviderModel(string providerSchemaName, bool isLinkedOnUser, bool hasManualLinkingEnabled)
+    public UserExternalLoginProviderModel(string providerSchemeName, bool isLinkedOnUser, bool hasManualLinkingEnabled)
     {
-        ProviderSchemaName = providerSchemaName;
+        ProviderSchemeName = providerSchemeName;
         IsLinkedOnUser = isLinkedOnUser;
         HasManualLinkingEnabled = hasManualLinkingEnabled;
     }
 
-    public string ProviderSchemaName { get; }
+    public string ProviderSchemeName { get; }
 
     public bool IsLinkedOnUser { get; }
 

@@ -36,8 +36,8 @@ public partial class BackOfficeExternalLoginServiceTests
         Assert.True(providersAttempt.Success);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, providersAttempt.Result.Count(p => p.ProviderSchemaName.Equals(firstProviderName)));
-            Assert.AreEqual(1, providersAttempt.Result.Count(p => p.ProviderSchemaName.Equals(secondProviderName)));
+            Assert.AreEqual(1, providersAttempt.Result.Count(p => p.ProviderSchemeName.Equals(firstProviderName)));
+            Assert.AreEqual(1, providersAttempt.Result.Count(p => p.ProviderSchemeName.Equals(secondProviderName)));
             Assert.AreEqual(2, providersAttempt.Result.Count());
         });
     }
@@ -69,7 +69,7 @@ public partial class BackOfficeExternalLoginServiceTests
         var providersAttempt = await externalLoginService.ExternalLoginStatusForUserAsync(userId);
 
         Assert.True(providersAttempt.Success);
-        Assert.IsTrue(providersAttempt.Result.Single(p => p.ProviderSchemaName == firstProviderName).IsLinkedOnUser);
+        Assert.IsTrue(providersAttempt.Result.Single(p => p.ProviderSchemeName == firstProviderName).IsLinkedOnUser);
     }
 
     [TestCase(true)]
@@ -97,6 +97,6 @@ public partial class BackOfficeExternalLoginServiceTests
         Assert.True(providersAttempt.Success);
         Assert.AreEqual(
             allowManualLinking,
-            providersAttempt.Result.Single(p => p.ProviderSchemaName == providerName).HasManualLinkingEnabled);
+            providersAttempt.Result.Single(p => p.ProviderSchemeName == providerName).HasManualLinkingEnabled);
     }
 }

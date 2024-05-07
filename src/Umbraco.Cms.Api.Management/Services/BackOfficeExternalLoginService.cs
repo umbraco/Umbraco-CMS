@@ -1,7 +1,10 @@
 using System.Security.Claims;
+using System.Security.Principal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Memory;
+using Umbraco.Cms.Api.Management.Models;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -19,17 +22,20 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
     private readonly IUserService _userService;
     private readonly IBackOfficeUserManager _backOfficeUserManager;
     private readonly IBackOfficeSignInManager _backOfficeSignInManager;
+    private readonly IMemoryCache _memoryCache;
 
     public BackOfficeExternalLoginService(
         IBackOfficeExternalLoginProviders backOfficeExternalLoginProviders,
         IUserService userService,
         IBackOfficeUserManager backOfficeUserManager,
-        IBackOfficeSignInManager backOfficeSignInManager)
+        IBackOfficeSignInManager backOfficeSignInManager,
+        IMemoryCache memoryCache)
     {
         _backOfficeExternalLoginProviders = backOfficeExternalLoginProviders;
         _userService = userService;
         _backOfficeUserManager = backOfficeUserManager;
         _backOfficeSignInManager = backOfficeSignInManager;
+        _memoryCache = memoryCache;
     }
 
     public async Task<Attempt<IEnumerable<UserExternalLoginProviderModel>, ExternalLoginOperationStatus>> ExternalLoginStatusForUserAsync(Guid userKey)
@@ -140,6 +146,52 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
         // Update any authentication tokens if succeeded
         await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(info);
         return Attempt.SucceedWithStatus(ExternalLoginOperationStatus.Success, Enumerable.Empty<IdentityError>());
+    }
+
+    public async Task<Attempt<Guid?, ExternalLoginOperationStatus>> GenerateLoginProviderSecretAsync(ClaimsPrincipal claimsPrincipal, string loginProvider)
+    {
+        if (claimsPrincipal.Identity is null)
+        {
+            return Attempt.FailWithStatus<Guid?, ExternalLoginOperationStatus>(ExternalLoginOperationStatus.IdentityNotFound, null);
+        }
+
+        IEnumerable<BackOfficeExternaLoginProviderScheme> configuredLoginProviders = await _backOfficeExternalLoginProviders.GetBackOfficeProvidersAsync();
+        if (configuredLoginProviders.Any(provider => provider.ExternalLoginProvider.AuthenticationType.Equals(loginProvider))
+            is false)
+        {
+            return Attempt.FailWithStatus<Guid?, ExternalLoginOperationStatus>(ExternalLoginOperationStatus.AuthenticationSchemeNotFound, null);
+        }
+
+        var userId = claimsPrincipal.Identity.GetUserId();
+        if (userId is null)
+        {
+            return Attempt.FailWithStatus<Guid?, ExternalLoginOperationStatus>(ExternalLoginOperationStatus.IdentityNotFound, null);
+        }
+
+        var secret = Guid.NewGuid();
+        _memoryCache.Set(secret, new LoginProviderUserLink { ClaimsPrincipal = claimsPrincipal, LoginProvider = loginProvider }, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30) });
+
+        return Attempt<Guid?, ExternalLoginOperationStatus>.Succeed(ExternalLoginOperationStatus.Success, secret);
+    }
+
+    public Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus> ClaimsPrincipleFromLoginProviderLinkKey(
+        string loginProvider,
+        Guid linkKey)
+    {
+        LoginProviderUserLink? cachedSecretValue = _memoryCache.Get<LoginProviderUserLink>(linkKey);
+        if (cachedSecretValue is null)
+        {
+            return Attempt.FailWithStatus<ClaimsPrincipal?, ExternalLoginOperationStatus>(ExternalLoginOperationStatus.UserSecretNotFound, null);
+        }
+
+        if (cachedSecretValue.LoginProvider.Equals(loginProvider) is false)
+        {
+            return Attempt.FailWithStatus<ClaimsPrincipal?, ExternalLoginOperationStatus>(
+                ExternalLoginOperationStatus.InvalidSecret, null);
+        }
+
+        _memoryCache.Remove(linkKey);
+        return Attempt.SucceedWithStatus<ClaimsPrincipal?, ExternalLoginOperationStatus>(ExternalLoginOperationStatus.Success, cachedSecretValue.ClaimsPrincipal);
     }
 
     private ExternalLoginOperationStatus FromUserOperationStatusFailure(UserOperationStatus userOperationStatus) =>

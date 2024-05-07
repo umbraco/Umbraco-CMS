@@ -12,5 +12,7 @@ public enum ExternalLoginOperationStatus
     AuthenticationSchemeNotFound,
     Unauthorized,
     ExternalInfoNotFound,
-    IdentityFailure
+    IdentityFailure,
+    UserSecretNotFound,
+    InvalidSecret
 }

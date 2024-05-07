@@ -14,4 +14,11 @@ public interface IBackOfficeExternalLoginService
     Task<Attempt<ExternalLoginOperationStatus>> UnLinkLoginAsync(ClaimsPrincipal claimsPrincipal, string loginProvider, string providerKey);
 
     Task<Attempt<IEnumerable<IdentityError>, ExternalLoginOperationStatus>> HandleLoginCallbackAsync(HttpContext httpContext);
+
+    Task<Attempt<Guid?, ExternalLoginOperationStatus>> GenerateLoginProviderSecretAsync(ClaimsPrincipal claimsPrincipal,
+        string loginProvider);
+
+    Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus> ClaimsPrincipleFromLoginProviderLinkKey(
+        string loginProvider,
+        Guid linkKey);
 }
