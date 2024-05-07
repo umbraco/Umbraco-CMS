@@ -243,7 +243,7 @@ public class BackOfficeController : SecurityControllerBase
 
     /// <summary>
     ///     Callback path when the user initiates a link login request from the back office to the external provider from the
-    ///     <see cref="LinkLogin(string)" /> action
+    ///     <see cref="LinkLogin(LinkLoginRequestModel)" /> action
     /// </summary>
     /// <remarks>
     ///     An example of this is here
