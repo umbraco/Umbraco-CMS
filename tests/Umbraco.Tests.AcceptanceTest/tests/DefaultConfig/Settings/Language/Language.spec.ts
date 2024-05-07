@@ -1,8 +1,7 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-// TODO: Remove @smoke tag before merging
-test.describe('Language tests @smoke', () => {
+test.describe('Language tests', () => {
   const languageName = 'Arabic';
   const isoCode = 'ar';
   const defaultLanguageName = 'English (United States)';
