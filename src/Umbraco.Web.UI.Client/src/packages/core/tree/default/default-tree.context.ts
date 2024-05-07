@@ -181,22 +181,53 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		}
 	}
 
+	/**
+	 * Sets the hideTreeRoot config
+	 * @param {boolean} hideTreeRoot
+	 * @memberof UmbDefaultTreeContext
+	 */
 	setHideTreeRoot(hideTreeRoot: boolean) {
 		this.#hideTreeRoot.setValue(hideTreeRoot);
+		// we need to reset the tree if this config changes
+		this.#resetTree();
 		this.loadTree();
 	}
 
+	/**
+	 * Gets the hideTreeRoot config
+	 * @return {boolean}
+	 * @memberof UmbDefaultTreeContext
+	 */
 	getHideTreeRoot() {
 		return this.#hideTreeRoot.getValue();
 	}
 
+	/**
+	 * Sets the startFrom config
+	 * @param {UmbTreeStartFrom} startFrom
+	 * @memberof UmbDefaultTreeContext
+	 */
 	setStartFrom(startFrom: UmbTreeStartFrom | undefined) {
 		this.#startFrom.setValue(startFrom);
+		// we need to reset the tree if this config changes
+		this.#resetTree();
 		this.loadTree();
 	}
 
+	/**
+	 * Gets the startFrom config
+	 * @return {UmbTreeStartFrom}
+	 * @memberof UmbDefaultTreeContext
+	 */
 	getStartFrom() {
 		return this.#startFrom.getValue();
+	}
+
+	#resetTree() {
+		this.#treeRoot.setValue(undefined);
+		this.#rootItems.setValue([]);
+		this.pagination.setTotalItems(0);
+		this.pagination.setCurrentPageNumber(1);
 	}
 
 	#consumeContexts() {
