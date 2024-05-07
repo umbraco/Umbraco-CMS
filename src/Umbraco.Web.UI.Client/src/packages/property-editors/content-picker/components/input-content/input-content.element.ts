@@ -7,7 +7,7 @@ import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
-import type { UmbTreeStartFrom } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 const elementName = 'umb-input-content';
 @customElement(elementName)
@@ -36,7 +36,7 @@ export class UmbInputContentElement extends UUIFormControlMixin(UmbLitElement, '
 	max = 0;
 
 	@property({ type: Object, attribute: false })
-	startFrom?: UmbTreeStartFrom;
+	startNode?: UmbTreeStartNode;
 
 	private _allowedContentTypeIds: Array<string> = [];
 	@property()
@@ -114,7 +114,7 @@ export class UmbInputContentElement extends UUIFormControlMixin(UmbLitElement, '
 	#renderDocumentPicker() {
 		return html`<umb-input-document
 			.selection=${this.#selection}
-			.startFrom=${this.startFrom}
+			.startNode=${this.startNode}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
 			.max=${this.max}

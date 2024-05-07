@@ -88,14 +88,14 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	}
 
 	render() {
-		const startFrom = this._rootUnique ? { unique: this._rootUnique } : undefined;
+		const startNode = this._rootUnique ? { unique: this._rootUnique } : undefined;
 
 		return html`<umb-input-content
 			.items=${this.value}
 			.type=${this._type}
 			.min=${this._min}
 			.max=${this._max}
-			.startFrom=${startFrom}
+			.startNode=${startNode}
 			.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
 			?showOpenButton=${this._showOpenButton}
 			?ignoreUserStartNodes=${this._ignoreUserStartNodes}

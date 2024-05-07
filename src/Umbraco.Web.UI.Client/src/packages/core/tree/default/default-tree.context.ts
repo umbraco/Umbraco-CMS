@@ -1,5 +1,5 @@
 import { UmbRequestReloadTreeItemChildrenEvent } from '../reload-tree-item-children/index.js';
-import type { UmbTreeItemModelBase, UmbTreeStartFrom } from '../types.js';
+import type { UmbTreeItemModelBase, UmbTreeStartNode } from '../types.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -37,8 +37,8 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	#hideTreeRoot = new UmbBooleanState(false);
 	hideTreeRoot = this.#hideTreeRoot.asObservable();
 
-	#startFrom = new UmbObjectState<UmbTreeStartFrom | undefined>(undefined);
-	startFrom = this.#startFrom.asObservable();
+	#startNode = new UmbObjectState<UmbTreeStartNode | undefined>(undefined);
+	startNode = this.#startNode.asObservable();
 
 	#manifest?: ManifestTree;
 	#repository?: UmbTreeRepository<TreeItemType>;
@@ -169,11 +169,11 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		const take = reload ? this.pagination.getCurrentPageNumber() * this.#paging.take : this.#paging.take;
 
 		// If we have a start node get children of that instead of the root
-		const startFrom = this.getStartFrom();
+		const startNode = this.getStartFrom();
 
-		const { data } = startFrom?.unique
+		const { data } = startNode?.unique
 			? await this.#repository!.requestTreeItemsOf({
-					parentUnique: startFrom.unique,
+					parentUnique: startNode.unique,
 					skip,
 					take,
 				})
@@ -216,24 +216,24 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	}
 
 	/**
-	 * Sets the startFrom config
-	 * @param {UmbTreeStartFrom} startFrom
+	 * Sets the startNode config
+	 * @param {UmbTreeStartNode} startNode
 	 * @memberof UmbDefaultTreeContext
 	 */
-	setStartFrom(startFrom: UmbTreeStartFrom | undefined) {
-		this.#startFrom.setValue(startFrom);
+	setStartFrom(startNode: UmbTreeStartNode | undefined) {
+		this.#startNode.setValue(startNode);
 		// we need to reset the tree if this config changes
 		this.#resetTree();
 		this.loadTree();
 	}
 
 	/**
-	 * Gets the startFrom config
-	 * @return {UmbTreeStartFrom}
+	 * Gets the startNode config
+	 * @return {UmbTreeStartNode}
 	 * @memberof UmbDefaultTreeContext
 	 */
 	getStartFrom() {
-		return this.#startFrom.getValue();
+		return this.#startNode.getValue();
 	}
 
 	#resetTree() {

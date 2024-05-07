@@ -21,6 +21,6 @@ export type UmbTreeSelectionConfiguration = {
 	selection?: Array<string | null>;
 };
 
-export interface UmbTreeStartFrom {
+export interface UmbTreeStartNode {
 	unique: string;
 }

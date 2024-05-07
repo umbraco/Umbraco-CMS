@@ -7,7 +7,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
-import type { UmbTreeStartFrom } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -82,7 +82,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	@property({ type: Object, attribute: false })
-	startFrom?: UmbTreeStartFrom;
+	startNode?: UmbTreeStartNode;
 
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
@@ -157,7 +157,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 			pickableFilter: this.#pickableFilter,
-			startFrom: this.startFrom,
+			startNode: this.startNode,
 		});
 	}
 

@@ -1,4 +1,4 @@
-import type { UmbTreeStartFrom } from '../types.js';
+import type { UmbTreeStartNode } from '../types.js';
 import { UMB_TREE_PICKER_MODAL_ALIAS } from './constants.js';
 import type { UmbPickerModalData, UmbPickerModalValue, UmbWorkspaceModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
@@ -20,7 +20,7 @@ export interface UmbTreePickerModalData<
 	treeAlias?: string;
 	// Consider if it makes sense to move this into the UmbPickerModalData interface, but for now this is a TreePicker feature. [NL]
 	createAction?: UmbTreePickerModalCreateActionData<PathPatternParamsType>;
-	startFrom?: UmbTreeStartFrom;
+	startNode?: UmbTreeStartNode;
 }
 
 export interface UmbTreePickerModalValue extends UmbPickerModalValue {}
