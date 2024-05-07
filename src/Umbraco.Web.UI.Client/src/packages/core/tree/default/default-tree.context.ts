@@ -78,7 +78,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 			const unique = treeRoot.unique;
 			if (event.detail.unique === unique) {
 				event.stopPropagation();
-				this.reloadTree();
+				this.loadTree();
 			}
 		});
 
@@ -134,7 +134,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	 * Reloads the tree
 	 * @memberof UmbDefaultTreeContext
 	 */
-	public reloadTree = () => this.#debouncedLoadTree(true);
+	public loadMore = () => this.#debouncedLoadTree(true);
 
 	#debouncedLoadTree(reload = false) {
 		if (this.getStartFrom()) {
@@ -162,11 +162,11 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		}
 	}
 
-	async #loadRootItems(reload = false) {
+	async #loadRootItems(loadMore = false) {
 		await this.#init;
 
-		const skip = reload ? 0 : this.#paging.skip;
-		const take = reload ? this.pagination.getCurrentPageNumber() * this.#paging.take : this.#paging.take;
+		const skip = loadMore ? this.#paging.skip : 0;
+		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
 
 		// If we have a start node get children of that instead of the root
 		const startNode = this.getStartFrom();
@@ -183,11 +183,11 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 				});
 
 		if (data) {
-			if (reload) {
-				this.#rootItems.setValue(data.items);
-			} else {
+			if (loadMore) {
 				const currentItems = this.#rootItems.getValue();
 				this.#rootItems.setValue([...currentItems, ...data.items]);
+			} else {
+				this.#rootItems.setValue(data.items);
 			}
 
 			this.pagination.setTotalItems(data.total);
@@ -259,7 +259,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
 		this.#paging.skip = target.getSkip();
-		this.#loadRootItems();
+		this.loadMore();
 	};
 
 	#observeRepository(repositoryAlias?: string) {
@@ -285,7 +285,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		// @ts-ignore
 		if (event.getUnique() !== treeRoot.unique) return;
 		if (event.getEntityType() !== treeRoot.entityType) return;
-		this.reloadTree();
+		this.loadTree();
 	};
 
 	destroy(): void {

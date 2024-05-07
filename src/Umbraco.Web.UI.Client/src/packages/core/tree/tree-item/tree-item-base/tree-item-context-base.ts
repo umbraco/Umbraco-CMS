@@ -98,7 +98,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			const unique = treeItem?.unique;
 			if (event.detail.unique === unique) {
 				event.stopPropagation();
-				this.reloadChildren();
+				this.loadChildren();
 			}
 		});
 
@@ -152,7 +152,19 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.#observeSectionPath();
 	}
 
-	public async loadChildren(reload = false) {
+	/**
+	 * Load children of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public loadChildren = () => this.#loadChildren();
+
+	/**
+	 * Load more children of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public loadMore = () => this.#loadChildren(true);
+
+	async #loadChildren(loadMore = false) {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		// TODO: wait for tree context to be ready
 		const repository = this.treeContext?.getRepository();
@@ -160,8 +172,8 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		this.#isLoading.setValue(true);
 
-		const skip = reload ? 0 : this.#paging.skip;
-		const take = reload ? this.pagination.getCurrentPageNumber() * this.#paging.take : this.#paging.take;
+		const skip = loadMore ? this.#paging.skip : 0;
+		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
 
 		const { data } = await repository.requestTreeItemsOf({
 			parentUnique: this.unique,
@@ -170,11 +182,11 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		});
 
 		if (data) {
-			if (reload) {
-				this.#childItems.setValue(data.items);
-			} else {
+			if (loadMore) {
 				const currentItems = this.#childItems.getValue();
 				this.#childItems.setValue([...currentItems, ...data.items]);
+			} else {
+				this.#childItems.setValue(data.items);
 			}
 
 			this.#hasChildren.setValue(data.total > 0);
@@ -183,8 +195,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		this.#isLoading.setValue(false);
 	}
-
-	public reloadChildren = () => this.loadChildren(true);
 
 	public toggleContextMenu() {
 		if (!this.getTreeItem() || !this.entityType || this.unique === undefined) {
@@ -313,7 +323,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#onReloadRequest = (event: UmbEntityActionEvent) => {
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
-		this.reloadChildren();
+		this.loadChildren();
 	};
 
 	#onReloadStructureRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
@@ -340,7 +350,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
 		this.#paging.skip = target.getSkip();
-		this.loadChildren();
+		this.loadMore();
 	};
 
 	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);
