@@ -72,7 +72,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	// TODO: get this from the tree context
 	#paging = {
 		skip: 0,
-		take: 50,
+		take: 3,
 	};
 
 	constructor(host: UmbControllerHost, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {
@@ -98,7 +98,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			const unique = treeItem?.unique;
 			if (event.detail.unique === unique) {
 				event.stopPropagation();
-				this.loadChildren();
+				this.reloadChildren();
 			}
 		});
 
@@ -152,7 +152,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.#observeSectionPath();
 	}
 
-	public async loadChildren() {
+	public async loadChildren(reload = false) {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		// TODO: wait for tree context to be ready
 		const repository = this.treeContext?.getRepository();
@@ -160,20 +160,31 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		this.#isLoading.setValue(true);
 
+		const skip = reload ? 0 : this.#paging.skip;
+		const take = reload ? this.pagination.getCurrentPageNumber() * this.#paging.take : this.#paging.take;
+
 		const { data } = await repository.requestTreeItemsOf({
 			parentUnique: this.unique,
-			skip: this.#paging.skip,
-			take: this.#paging.take,
+			skip,
+			take,
 		});
 
 		if (data) {
-			this.#childItems.setValue(data.items);
+			if (reload) {
+				this.#childItems.setValue(data.items);
+			} else {
+				const currentItems = this.#childItems.getValue();
+				this.#childItems.setValue([...currentItems, ...data.items]);
+			}
+
 			this.#hasChildren.setValue(data.total > 0);
 			this.pagination.setTotalItems(data.total);
 		}
 
 		this.#isLoading.setValue(false);
 	}
+
+	public reloadChildren = () => this.loadChildren(true);
 
 	public toggleContextMenu() {
 		if (!this.getTreeItem() || !this.entityType || this.unique === undefined) {
@@ -302,7 +313,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#onReloadRequest = (event: UmbEntityActionEvent) => {
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
-		this.loadChildren();
+		this.reloadChildren();
 	};
 
 	#onReloadStructureRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
