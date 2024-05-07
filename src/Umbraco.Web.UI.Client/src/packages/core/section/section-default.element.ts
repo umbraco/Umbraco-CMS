@@ -77,24 +77,26 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 
 	render() {
 		return html`
-			${this._sidebarApps && this._sidebarApps.length > 0
-				? html`
-						<!-- TODO: these extensions should be combined into one type: sectionSidebarApp with a "subtype" -->
-						<umb-section-sidebar>
-							${repeat(
-								this._sidebarApps,
-								(app) => app.alias,
-								(app) => app.component,
-							)}
-						</umb-section-sidebar>
-					`
-				: nothing}
-			<umb-section-main>
-				${this._routes && this._routes.length > 0
-					? html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`
+			<umb-split-panel lock="start" snap="300px">
+				${this._sidebarApps && this._sidebarApps.length > 0
+					? html`
+							<!-- TODO: these extensions should be combined into one type: sectionSidebarApp with a "subtype" -->
+							<umb-section-sidebar slot="start">
+								${repeat(
+									this._sidebarApps,
+									(app) => app.alias,
+									(app) => app.component,
+								)}
+							</umb-section-sidebar>
+						`
 					: nothing}
-				<slot></slot>
-			</umb-section-main>
+				<umb-section-main slot="end">
+					${this._routes && this._routes.length > 0
+						? html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`
+						: nothing}
+					<slot></slot>
+				</umb-section-main>
+			</umb-split-panel>
 		`;
 	}
 
@@ -105,6 +107,18 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 				flex: 1 1 auto;
 				height: 100%;
 				display: flex;
+			}
+
+			umb-split-panel {
+				--umb-split-panel-initial-position: 200px;
+				--umb-split-panel-start-min-width: 200px;
+				--umb-split-panel-start-max-width: 400px;
+				--umb-split-panel-end-min-width: 600px;
+			}
+			@media only screen and (min-width: 800px) {
+				umb-split-panel {
+					--umb-split-panel-initial-position: 300px;
+				}
 			}
 		`,
 	];
