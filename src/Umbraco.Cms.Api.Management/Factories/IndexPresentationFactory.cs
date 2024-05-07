@@ -38,8 +38,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
 
         IIndexDiagnostics indexDiag = _indexDiagnosticsFactory.Create(index);
 
-        Attempt<string?> isHealthy = indexDiag.IsHealthy();
-        var healthResult = isHealthy.Result;
+        Attempt<string?> isHealthyAttempt = indexDiag.IsHealthy();
 
         var properties = new Dictionary<string, object?>();
 
@@ -61,8 +60,8 @@ public class IndexPresentationFactory : IIndexPresentationFactory
             Name = index.Name,
             HealthStatus = new HealthStatusResponseModel
             {
-                Status = isHealthy.Success ? HealthStatus.Healthy : HealthStatus.Unhealthy,
-                Message = healthResult,
+                Status = isHealthyAttempt.Success ? HealthStatus.Healthy : HealthStatus.Unhealthy,
+                Message = isHealthyAttempt.Result,
             },
             CanRebuild = _indexRebuilder.CanRebuild(index.Name),
             SearcherName = index.Searcher.Name,
