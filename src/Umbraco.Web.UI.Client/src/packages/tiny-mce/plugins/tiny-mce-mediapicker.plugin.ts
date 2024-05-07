@@ -1,3 +1,4 @@
+import { getGuid } from '../utils.js';
 import { UMB_MEDIA_CAPTION_ALT_TEXT_MODAL } from '../modals/media-caption-alt-text/media-caption-alt-text-modal.token.js';
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -5,7 +6,12 @@ import type { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from '@umbraco-cms
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { sizeImageInEditor, uploadBlobImages, UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
+import {
+	sizeImageInEditor,
+	uploadBlobImages,
+	UMB_MEDIA_TREE_PICKER_MODAL,
+	UMB_MEDIA_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/media';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -137,16 +143,15 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 		// TODO => startNodeId and startNodeIsVirtual do not exist on ContentTreeItemResponseModel
 
-		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_TREE_PICKER_MODAL, {
+		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
 			data: {
 				multiple: false,
-				hideTreeRoot: true,
-
-				//startNodeId,
+				selectableFolders: false,
+				selectableNonImages: false,
 				//startNodeIsVirtual,
 			},
 			value: {
-				selection: currentTarget.udi ? [...currentTarget.udi] : [],
+				selection: currentTarget.udi ? [getGuid(currentTarget.udi)] : [],
 			},
 		});
 
@@ -164,8 +169,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_CAPTION_ALT_TEXT_MODAL, { data: { mediaUnique } });
 
-		await modalHandler?.onSubmit().catch(() => undefined);
-		const mediaData = modalHandler?.getValue();
+		const mediaData = await modalHandler?.onSubmit().catch(() => null);
+		if (!mediaData) return;
 
 		const media: MediaPickerTargetData = {
 			altText: mediaData?.altText,
