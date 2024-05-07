@@ -235,16 +235,17 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public Task<IEnumerable<IDataType>> GetAllAsync(params Guid[] keys)
         {
-            // Nothing requested, return nothing
-            if (keys.Any() is false)
-            {
-                return Task.FromResult(Enumerable.Empty<IDataType>());
-            }
-
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
-            IDataType[] dataTypes = _dataTypeRepository.Get(Query<IDataType>().Where(x => keys.Contains(x.Key))).ToArray();
+            IQuery<IDataType> query = Query<IDataType>();
+            if (keys.Length > 0)
+            {
+                query = query.Where(x => keys.Contains(x.Key));
+            }
+
+            IDataType[] dataTypes = _dataTypeRepository.Get(query).ToArray();
             ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+
             return Task.FromResult<IEnumerable<IDataType>>(dataTypes);
         }
 
