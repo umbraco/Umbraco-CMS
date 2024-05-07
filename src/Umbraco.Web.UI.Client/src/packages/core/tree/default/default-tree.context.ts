@@ -46,7 +46,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 	#paging = {
 		skip: 0,
-		take: 50,
+		take: 3,
 	};
 
 	#initResolver?: () => void;
@@ -78,9 +78,12 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 			const unique = treeRoot.unique;
 			if (event.detail.unique === unique) {
 				event.stopPropagation();
-				this.#loadRootItems();
+				this.reloadTree();
 			}
 		});
+
+		// always load the tree root because we need the root entity to reload the entire tree
+		this.#loadTreeRoot();
 	}
 
 	// TODO: find a generic way to do this
@@ -123,20 +126,20 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	// that would trigger multiple loadTree calls. This is a temporary solution to avoid that.
 	public loadTree = debounce(() => this.#debouncedLoadTree(), 50);
 
-	#debouncedLoadTree() {
+	public reloadTree = () => this.#debouncedLoadTree(true);
+
+	#debouncedLoadTree(reload = false) {
 		const startFrom = this.getStartFrom();
 		if (startFrom?.unique) {
-			this.#loadTreeFrom(startFrom);
+			this.#loadTreeFrom(startFrom, reload);
 			return;
 		}
 
 		const hideTreeRoot = this.getHideTreeRoot();
 		if (hideTreeRoot) {
-			this.#loadRootItems();
+			this.#loadRootItems(reload);
 			return;
 		}
-
-		this.#loadTreeRoot();
 	}
 
 	async #loadTreeRoot() {
@@ -152,31 +155,49 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		}
 	}
 
-	async #loadRootItems() {
+	async #loadRootItems(reload = false) {
 		await this.#init;
 
+		const skip = reload ? 0 : this.#paging.skip;
+		const take = reload ? this.pagination.getCurrentPageNumber() * this.#paging.take : this.#paging.take;
+
 		const { data } = await this.#repository!.requestRootTreeItems({
-			skip: this.#paging.skip,
-			take: this.#paging.take,
+			skip,
+			take,
 		});
 
 		if (data) {
-			this.#rootItems.setValue(data.items);
+			if (reload) {
+				this.#rootItems.setValue(data.items);
+			} else {
+				const currentItems = this.#rootItems.getValue();
+				this.#rootItems.setValue([...currentItems, ...data.items]);
+			}
+
 			this.pagination.setTotalItems(data.total);
 		}
 	}
 
-	async #loadTreeFrom(startFrom: UmbTreeStartFrom) {
+	async #loadTreeFrom(startFrom: UmbTreeStartFrom, reload = false) {
 		await this.#init;
+
+		const skip = reload ? 0 : this.#paging.skip;
+		const take = reload ? this.pagination.getCurrentPageNumber() * this.#paging.take : this.#paging.take;
 
 		const { data } = await this.#repository!.requestTreeItemsOf({
 			parentUnique: startFrom.unique,
-			skip: this.#paging.skip,
-			take: this.#paging.take,
+			skip,
+			take,
 		});
 
 		if (data) {
-			this.#rootItems.setValue(data.items);
+			if (reload) {
+				this.#rootItems.setValue(data.items);
+			} else {
+				const currentItems = this.#rootItems.getValue();
+				this.#rootItems.setValue([...currentItems, ...data.items]);
+			}
+
 			this.pagination.setTotalItems(data.total);
 		}
 	}
@@ -226,8 +247,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	#resetTree() {
 		this.#treeRoot.setValue(undefined);
 		this.#rootItems.setValue([]);
-		this.pagination.setTotalItems(0);
-		this.pagination.setCurrentPageNumber(1);
+		this.pagination.clear();
 	}
 
 	#consumeContexts() {
@@ -273,7 +293,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		// @ts-ignore
 		if (event.getUnique() !== treeRoot.unique) return;
 		if (event.getEntityType() !== treeRoot.entityType) return;
-		this.#loadRootItems();
+		this.reloadTree();
 	};
 
 	destroy(): void {
