@@ -212,9 +212,9 @@ public class BackOfficeController : SecurityControllerBase
     [HttpPost("link-login")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> LinkLogin(string provider, Guid linkKey)
+    public async Task<IActionResult> LinkLogin([FromForm] LinkLoginRequestModel requestModel)
     {
-        Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus> claimsPrincipleAttempt = _externalLoginService.ClaimsPrincipleFromLoginProviderLinkKey(provider, linkKey);
+        Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus> claimsPrincipleAttempt = _externalLoginService.ClaimsPrincipleFromLoginProviderLinkKey(requestModel.Provider, requestModel.LinkKey);
 
         if (claimsPrincipleAttempt.Success == false)
         {
@@ -236,9 +236,9 @@ public class BackOfficeController : SecurityControllerBase
 
         // Configures the redirect URL and user identifier for the specified external login including xsrf data
         AuthenticationProperties properties =
-            _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, user.Id);
+            _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(requestModel.Provider, redirectUrl, user.Id);
 
-        return Challenge(properties, provider);
+        return Challenge(properties, requestModel.Provider);
     }
 
     /// <summary>
