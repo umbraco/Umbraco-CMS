@@ -261,9 +261,10 @@ export class UmbSplitPanelElement extends LitElement {
 			--umb-split-panel-divider-touch-area-width: 20px;
 			--umb-split-panel-divider-width: 1px;
 			--umb-split-panel-divider-color: transparent;
+			--umb-split-panel-slot-overflow: hidden;
 		}
 		slot {
-			overflow: visible;
+			overflow: var(--umb-split-panel-slot-overflow);
 			display: block;
 		}
 		#main {

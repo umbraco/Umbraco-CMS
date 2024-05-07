@@ -114,6 +114,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 				--umb-split-panel-start-min-width: 200px;
 				--umb-split-panel-start-max-width: 400px;
 				--umb-split-panel-end-min-width: 600px;
+				--umb-split-panel-slot-overflow: visible;
 			}
 			@media only screen and (min-width: 800px) {
 				umb-split-panel {
