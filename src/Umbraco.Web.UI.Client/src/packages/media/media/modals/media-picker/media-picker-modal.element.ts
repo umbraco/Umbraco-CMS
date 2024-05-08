@@ -74,8 +74,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		});
 	}
 
-	#onFolderOpen(item: UmbMediaCardItemModel) {
-		if (!isUmbracoFolder(item.unique)) return;
+	#onOpen(item: UmbMediaCardItemModel) {
 		this._currentPath = item.unique!;
 		this.#loadMediaFolder();
 	}
@@ -195,7 +194,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		return html`
 			<uui-card-media
 				.name=${item.name ?? 'Unnamed Media'}
-				@open=${() => this.#onFolderOpen(item)}
+				@open=${() => this.#onOpen(item)}
 				@selected=${() => this.#onSelected(item)}
 				@deselected=${() => this.#onDeselected(item)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
