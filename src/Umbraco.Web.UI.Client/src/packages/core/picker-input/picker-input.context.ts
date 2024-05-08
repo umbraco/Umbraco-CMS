@@ -81,7 +81,7 @@ export class UmbPickerInputContext<
 			},
 			value: {
 				selection: this.getSelection(),
-			},
+			} as PickerModalValueType,
 		});
 
 		const modalValue = await modalContext?.onSubmit();
