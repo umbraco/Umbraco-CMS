@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
@@ -26,10 +27,23 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {
     protected IActionResult CreatedAtId<T>(Expression<Func<T, string>> action, Guid id)
-        => CreatedAtAction(action, new { id = id }, id.ToString());
+        => CreatedAtAction(action, new { id = id, version = GetApiVersion(action) }, id.ToString());
 
     protected IActionResult CreatedAtPath<T>(Expression<Func<T, string>> action, string path)
-        => CreatedAtAction(action, new { path = path }, path);
+        => CreatedAtAction(action, new { path = path, version = GetApiVersion(action) }, path);
+
+    private string? GetApiVersion<T>(Expression<Func<T, string>> action)
+    {
+        if (action.Body is not ConstantExpression constantExpression)
+        {
+            throw new ArgumentException("Expression must be a constant expression.");
+        }
+
+        Type controllerType = typeof(T);
+        var actionName = constantExpression.Value?.ToString() ?? throw new ArgumentException("Expression does not have a value.");
+        var apiVersion = controllerType.GetMethod(actionName)?.GetMapToApiVersionAttributeValue();
+        return apiVersion?.Split(".").FirstOrDefault();
+    }
 
     protected IActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, object routeValues, string resourceIdentifier)
     {
@@ -40,6 +54,7 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 
         var controllerName = ManagementApiRegexes.ControllerTypeToNameRegex().Replace(typeof(T).Name, string.Empty);
         var actionName = constantExpression.Value?.ToString() ?? throw new ArgumentException("Expression does not have a value.");
+
 
         return new EmptyCreatedAtActionResult(actionName, controllerName, routeValues, resourceIdentifier);
     }
