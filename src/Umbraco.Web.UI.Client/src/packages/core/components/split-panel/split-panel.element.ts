@@ -50,8 +50,6 @@ export class UmbSplitPanelElement extends LitElement {
 
 	/** Width of the locked panel when in "start" or "end" lock mode */
 	#lockedPanelWidth: number = 0;
-	/** Resize observer for tracking container size changes. */
-	#resizeObserver?: ResizeObserver;
 	/** Pixel value for the snap threshold. Determines how close the divider needs to be to a snap point to snap to it. */
 	readonly #SNAP_THRESHOLD = 25 as const;
 
@@ -95,17 +93,6 @@ export class UmbSplitPanelElement extends LitElement {
 		return Math.min(Math.max(value, min), max);
 	}
 
-	#onResize(entries: ResizeObserverEntry[]) {
-		const mainContainerWidth = entries[0].contentRect.width;
-
-		if (this.lock === 'start') {
-			this.#setPosition(this.#lockedPanelWidth);
-		}
-		if (this.lock === 'end') {
-			this.#setPosition(mainContainerWidth - this.#lockedPanelWidth);
-		}
-	}
-
 	#setPosition(pos: number) {
 		const { width } = this.mainElement.getBoundingClientRect();
 		const localPos = this.#clamp(pos, 0, width);
@@ -147,10 +134,12 @@ export class UmbSplitPanelElement extends LitElement {
 			this.#setPosition(mappedPos);
 		};
 
-		function stop() {
+		const stop = () => {
 			document.removeEventListener('pointermove', move);
 			document.removeEventListener('pointerup', stop);
-		}
+
+			this.dispatchEvent(new CustomEvent('position-changed', { detail: { position: this.position } }));
+		};
 
 		const mapXAxisToSnap = (xPos: number, containerWidth: number) => {
 			const snaps = this.snap?.split(' ');
@@ -186,7 +175,6 @@ export class UmbSplitPanelElement extends LitElement {
 	};
 
 	#disconnect() {
-		this.#resizeObserver?.unobserve(this);
 		this.dividerTouchAreaElement.removeEventListener('pointerdown', this.#onDragStart);
 		this.dividerTouchAreaElement.removeEventListener('touchstart', this.#onDragStart);
 		this.dividerElement.style.display = 'none';
@@ -197,7 +185,6 @@ export class UmbSplitPanelElement extends LitElement {
 	async #connect() {
 		this.#hasInitialized = true;
 
-		this.#resizeObserver = new ResizeObserver(this.#onResize.bind(this));
 		this.mainElement.style.display = 'grid';
 		this.mainElement.style.gridTemplateColumns = `${this.position} 0px 1fr`;
 		this.dividerElement.style.display = 'unset';
@@ -212,8 +199,6 @@ export class UmbSplitPanelElement extends LitElement {
 		const { left: mainLeft, width: mainWidth } = this.mainElement.getBoundingClientRect();
 		const percentagePos = ((dividerLeft - mainLeft) / mainWidth) * 100;
 		this.position = `${percentagePos}%`;
-
-		this.#resizeObserver?.observe(this);
 	}
 
 	#onSlotChanged(event: Event) {
@@ -238,7 +223,6 @@ export class UmbSplitPanelElement extends LitElement {
 	}
 
 	render() {
-		console.log('render', this._hasStartPanel, this._hasEndPanel);
 		return html`
 			<div id="main">
 				<slot
