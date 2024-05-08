@@ -139,7 +139,7 @@ export class UmbMediaPickerFolderPathElement extends UmbModalBaseElement<
 			#path {
 				display: flex;
 				align-items: center;
-				margin-bottom: var(--uui-size-3);
+				margin: 0 var(--uui-size-3);
 			}
 			#path uui-button {
 				font-weight: bold;
