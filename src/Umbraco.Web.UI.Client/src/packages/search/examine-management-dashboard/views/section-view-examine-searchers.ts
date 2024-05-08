@@ -167,16 +167,16 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		if (this._searchLoading) return html`<uui-loader></uui-loader>`;
 		if (!this._searchResults) return nothing;
 		if (!this._searchResults.length) {
-			return html`<p>No results found</p>`;
+			return html`<p>${this.localize.term('examineManagement_noResults')}</p>`;
 		}
 		return html`<div class="table-container">
 			<uui-scroll-container>
 				<uui-table class="search">
 					<uui-table-head>
 						<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
-						<uui-table-head-cell style="width:0">Id</uui-table-head-cell>
-						<uui-table-head-cell>Navn</uui-table-head-cell>
-						<uui-table-head-cell>Fields</uui-table-head-cell>
+						<uui-table-head-cell style="width:0">${this.localize.term('general_id')}</uui-table-head-cell>
+						<uui-table-head-cell>${this.localize.term('general_name')}</uui-table-head-cell>
+						<uui-table-head-cell>${this.localize.term('examineManagement_fields')}</uui-table-head-cell>
 						${this.renderHeadCells()}
 					</uui-table-head>
 					${this._searchResults?.map((rowData) => {
