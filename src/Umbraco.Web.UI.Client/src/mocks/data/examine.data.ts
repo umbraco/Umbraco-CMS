@@ -20,7 +20,7 @@ export const Indexers: IndexResponseModel[] = [
 	{
 		name: 'ExternalIndex',
 		canRebuild: true,
-		healthStatus: HealthStatusModel.HEALTHY,
+		healthStatus: { status: HealthStatusModel.HEALTHY },
 		documentCount: 0,
 		fieldCount: 0,
 		searcherName: '',
@@ -40,7 +40,7 @@ export const Indexers: IndexResponseModel[] = [
 	{
 		name: 'InternalIndex',
 		canRebuild: true,
-		healthStatus: HealthStatusModel.HEALTHY,
+		healthStatus: { status: HealthStatusModel.HEALTHY },
 		documentCount: 0,
 		fieldCount: 0,
 		searcherName: '',
@@ -60,7 +60,7 @@ export const Indexers: IndexResponseModel[] = [
 	{
 		name: 'MemberIndex',
 		canRebuild: true,
-		healthStatus: HealthStatusModel.HEALTHY,
+		healthStatus: { status: HealthStatusModel.HEALTHY },
 		fieldCount: 0,
 		documentCount: 0,
 		searcherName: '',
