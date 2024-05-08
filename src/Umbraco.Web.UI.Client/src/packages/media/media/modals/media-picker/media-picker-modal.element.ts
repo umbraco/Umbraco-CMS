@@ -39,16 +39,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	@state()
 	private _selectableNonImages = true;
 
-	@state()
-	private _selectableFolders = true;
-
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneElement;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._selectableNonImages = this.data?.selectableNonImages ?? true;
-		this._selectableFolders = this.data?.selectableFolders ?? true;
 		this._currentPath = this.data?.startNode ?? null;
 		this.#loadMediaFolder();
 	}
@@ -69,13 +65,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 		const { data } = await this.#mediaUrlRepository.requestItems(items.map((item) => item.unique));
 
-		return items.map((item) => {
+		return items.map((item): UmbMediaCardItemModel => {
 			const url = data?.find((media) => media.unique === item.unique)?.url;
 			const extension = url?.split('.').pop();
-			const isFolder = isUmbracoFolder(item.mediaType?.unique);
-			const isImageRenderable = url ? !!mime.getType(url)?.startsWith('image/') : false;
+			const isImage = url ? !!mime.getType(url)?.startsWith('image/') : false;
 
-			return { name: item.name, unique: item.unique, isImageRenderable, url, isFolder, extension };
+			return { name: item.name, unique: item.unique, isImage, url, extension };
 		});
 	}
 
@@ -204,11 +199,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				@selected=${() => this.#onSelected(item)}
 				@deselected=${() => this.#onDeselected(item)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
-				?selectable=${(!item.isFolder || this._selectableFolders) &&
-				(item.isImageRenderable || this._selectableNonImages)}
-				?select-only=${!item.isFolder}
+				?selectable=${item.isImage || this._selectableNonImages}
 				file-ext=${ifDefined(item.extension)}>
-				${item.isImageRenderable && item.url ? html`<img src=${item.url} alt=${ifDefined(item.name)} />` : ''}
+				${item.isImage && item.url ? html`<img src=${item.url} alt=${ifDefined(item.name)} />` : ''}
 			</uui-card-media>
 		`;
 	}

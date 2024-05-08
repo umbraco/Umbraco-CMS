@@ -3,8 +3,7 @@ export interface UmbMediaCardItemModel {
 	unique: string;
 	url?: string;
 	extension?: string;
-	isFolder: boolean;
-	isImageRenderable: boolean;
+	isImage: boolean;
 }
 
 export interface UmbMediaPathModel {
