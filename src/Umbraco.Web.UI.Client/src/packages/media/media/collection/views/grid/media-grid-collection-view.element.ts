@@ -1,12 +1,17 @@
-import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from '../../types.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
+import type { UmbMediaCollectionItemModel } from '../../types.js';
+import type { UmbMediaCollectionContext } from '../../media-collection.context.js';
+import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
+	@state()
+	private _editMediaPath = '';
+
 	@state()
 	private _items: Array<UmbMediaCollectionItemModel> = [];
 
@@ -16,7 +21,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
-	#collectionContext?: UmbDefaultCollectionContext<UmbMediaCollectionItemModel, UmbMediaCollectionFilterModel>;
+	#collectionContext?: UmbMediaCollectionContext;
 
 	constructor() {
 		super();
@@ -24,23 +29,43 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
 		});
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('media')
+			.onSetup(() => {
+				return { data: { entityType: 'media', preset: {} } };
+			})
+			.onReject(() => {
+				this.#collectionContext?.requestCollection();
+			})
+			.onSubmit(() => {
+				this.#collectionContext?.requestCollection();
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editMediaPath = routeBuilder({});
+			});
 	}
 
 	#observeCollectionContext() {
 		if (!this.#collectionContext) return;
 
-		this.observe(this.#collectionContext.items, (items) => (this._items = items), 'umbCollectionItemsObserver');
+		this.observe(this.#collectionContext.loading, (loading) => (this._loading = loading), '_observeLoading');
+
+		this.observe(this.#collectionContext.items, (items) => (this._items = items), '_observeItems');
 
 		this.observe(
 			this.#collectionContext.selection.selection,
 			(selection) => (this._selection = selection),
-			'umbCollectionSelectionObserver',
+			'_observeSelection',
 		);
 	}
 
-	#onOpen(item: UmbMediaCollectionItemModel) {
-		//TODO: Fix when we have dynamic routing
-		history.pushState(null, '', 'section/media/workspace/media/edit/' + item.unique);
+	#onOpen(event: Event, unique: string) {
+		event.preventDefault();
+		event.stopPropagation();
+
+		const url = this._editMediaPath + UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({ unique });
+		window.history.pushState(null, '', url);
 	}
 
 	#onSelect(item: UmbMediaCollectionItemModel) {
@@ -60,26 +85,37 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	}
 
 	render() {
-		if (this._loading) {
-			return html`<div class="container"><uui-loader></uui-loader></div>`;
-		}
+		return this._items.length === 0 ? this.#renderEmpty() : this.#renderItems();
+	}
 
-		if (this._items.length === 0) {
-			return html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`;
-		}
-
+	#renderEmpty() {
+		if (this._items.length > 0) return nothing;
 		return html`
-			<div id="media-grid">
-				${repeat(
-					this._items,
-					(item) => item.unique,
-					(item) => this.#renderCard(item),
+			<div class="container">
+				${when(
+					this._loading,
+					() => html`<uui-loader></uui-loader>`,
+					() => html`<p>${this.localize.term('content_listViewNoItems')}</p>`,
 				)}
 			</div>
 		`;
 	}
 
-	#renderCard(item: UmbMediaCollectionItemModel) {
+	#renderItems() {
+		if (this._items.length === 0) return nothing;
+		return html`
+			<div id="media-grid">
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this.#renderItem(item),
+				)}
+			</div>
+			${when(this._loading, () => html`<uui-loader-bar></uui-loader-bar>`)}
+		`;
+	}
+
+	#renderItem(item: UmbMediaCollectionItemModel) {
 		// TODO: Fix the file extension when media items have a file extension. [?]
 		return html`
 			<uui-card-media
@@ -87,7 +123,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				selectable
 				?select-only=${this._selection && this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
-				@open=${() => this.#onOpen(item)}
+				@open=${(event: Event) => this.#onOpen(event, item.unique)}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}
 				class="media-item"
