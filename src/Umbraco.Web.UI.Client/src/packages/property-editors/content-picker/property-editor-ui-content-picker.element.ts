@@ -69,16 +69,19 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	async #setPickerRootUnique() {
 		// If we have a root unique value, we don't need to fetch it from the dynamic root
 		if (this._rootUnique) return;
+		if (!this.#dynamicRoot) return;
 
-		// TODO: Awaiting the workspace context to have a parent entity ID value. [LK]
-		// e.g. const parentEntityId = this.#workspaceContext?.getParentEntityId();
 		const workspaceContext = await this.getContext(UMB_ENTITY_WORKSPACE_CONTEXT);
 		const unique = workspaceContext.getUnique();
-		if (unique && this.#dynamicRoot) {
-			const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique);
-			if (result && result.length > 0) {
-				this._rootUnique = result[0];
-			}
+		if (!unique) return;
+
+		const menuStructureWorkspaceContext = (await this.getContext('UmbMenuStructureWorkspaceContext')) as any;
+		const parent = (await this.observe(menuStructureWorkspaceContext.parent, () => {})?.asPromise()) as any;
+		const parentUnique = parent?.unique;
+
+		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
+		if (result && result.length > 0) {
+			this._rootUnique = result[0];
 		}
 	}
 
