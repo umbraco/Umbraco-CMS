@@ -122,18 +122,26 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-box headline="Search">
-				<p>Search the ${this.searcherName} and view the results</p>
+			<uui-box headline=${this.localize.term('general_search')}>
+				<p>
+					<umb-localize key="examineManagement_searchDescription"
+						>Search the ${this.searcherName} and view the results</umb-localize
+					>
+				</p>
 				<div class="flex">
 					<uui-input
 						type="search"
 						id="search-input"
-						placeholder="Type to filter..."
-						label="Type to filter"
+						placeholder=${this.localize.term('placeholders_filter')}
+						label=${this.localize.term('placeholders_filter')}
 						@keypress=${this._onKeyPress}
 						${umbFocus()}>
 					</uui-input>
-					<uui-button color="positive" look="primary" label="Search" @click="${this._onSearch}"> Search </uui-button>
+					<uui-button
+						color="positive"
+						look="primary"
+						label=${this.localize.term('general_search')}
+						@click="${this._onSearch}"></uui-button>
 				</div>
 				${this.renderSearchResults()}
 			</uui-box>
@@ -167,7 +175,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 					<uui-table-head>
 						<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
 						<uui-table-head-cell style="width:0">Id</uui-table-head-cell>
-						<uui-table-head-cell>Name</uui-table-head-cell>
+						<uui-table-head-cell>Navn</uui-table-head-cell>
 						<uui-table-head-cell>Fields</uui-table-head-cell>
 						${this.renderHeadCells()}
 					</uui-table-head>
@@ -182,7 +190,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 							<uui-table-cell>
 								<uui-button
 									look="secondary"
-									label="Open workspace for this document"
+									label=${this.localize.term('actions_editContent')}
 									href=${this._workspacePath + this.#entityType + '/edit/' + unique}>
 									${this.getSearchResultNodeName(rowData)}
 								</uui-button>
@@ -191,9 +199,10 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 								<uui-button
 									class="bright"
 									look="secondary"
-									label="Open sidebar to see all fields"
+									label=${this.localize.term('examineManagement_fieldValues')}
 									@click=${() => this.#onFieldViewClick(rowData)}>
-									${rowData.fields ? Object.keys(rowData.fields).length : ''} fields
+									${rowData.fields ? Object.keys(rowData.fields).length : ''}
+									${this.localize.term('examineManagement_fields')}
 								</uui-button>
 							</uui-table-cell>
 							${rowData.fields ? this.renderBodyCells(rowData.fields) : ''}
@@ -219,7 +228,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 							<span>${field.name}</span>
 							<uui-button
 								look="secondary"
-								label="Close field ${field.name}"
+								label="${this.localize.term('actions_remove')} ${field.name}"
 								compact
 								@click="${() => {
 									this._exposedFields = this._exposedFields?.map((f) => {
