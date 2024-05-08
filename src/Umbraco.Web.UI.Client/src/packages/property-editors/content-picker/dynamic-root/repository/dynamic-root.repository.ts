@@ -40,12 +40,13 @@ export class UmbContentPickerDynamicRootRepository extends UmbControllerBase {
 					alias: query.originAlias,
 					id: query.originKey,
 				},
-				steps: query.querySteps!.map((step) => {
-					return {
-						alias: step.alias!,
-						documentTypeIds: step.anyOfDocTypeKeys!,
-					};
-				}),
+				steps:
+					query.querySteps?.map((step) => {
+						return {
+							alias: step.alias!,
+							documentTypeIds: step.anyOfDocTypeKeys!,
+						};
+					}) || [],
 			},
 		};
 
