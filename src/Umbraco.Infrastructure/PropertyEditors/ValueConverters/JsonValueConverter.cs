@@ -22,7 +22,7 @@ public class JsonValueConverter : PropertyValueConverterBase, IDeliveryApiProper
     private readonly ILogger<JsonValueConverter> _logger;
     private readonly PropertyEditorCollection _propertyEditors;
 
-    private readonly string[] _excludedPropertyEditors = { Constants.PropertyEditors.Aliases.MediaPicker3, Constants.PropertyEditors.Aliases.UploadField };
+    private readonly string[] _excludedPropertyEditors = { Constants.PropertyEditors.Aliases.MediaPicker3 };
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="JsonValueConverter" /> class.
