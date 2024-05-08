@@ -107,17 +107,15 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
             mediaPath = stringValue;
             return true;
         }
-        else
+
+        try
         {
-            try
-            {
-                mediaPath = _jsonSerializer.Deserialize<FileUploadValue>(stringValue)?.Src;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Could not parse file upload value '{Json}'", stringValue);
-            }
+            mediaPath = _jsonSerializer.Deserialize<FileUploadValue>(stringValue)?.Src;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Could not parse file upload value '{Json}'", stringValue);
         }
 
         mediaPath = string.Empty;

@@ -1,12 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -29,10 +27,8 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
-    private readonly ILogger<FileUploadPropertyValueEditor> _logger;
     private ContentSettings _contentSettings;
 
-    [Obsolete("Use the non-obsolete constructor, scheduled for removal in V15")]
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
         MediaFileManager mediaFileManager,
@@ -44,22 +40,6 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         ITemporaryFileService temporaryFileService,
         IScopeProvider scopeProvider,
         IFileStreamSecurityValidator fileStreamSecurityValidator)
-    :this(attribute, mediaFileManager, localizedTextService, shortStringHelper, contentSettings, jsonSerializer, ioHelper, temporaryFileService, scopeProvider, fileStreamSecurityValidator, StaticServiceProvider.Instance.GetRequiredService<ILogger<FileUploadPropertyValueEditor>>())
-    {
-
-    }
-
-    public FileUploadPropertyValueEditor(
-        DataEditorAttribute attribute,
-        MediaFileManager mediaFileManager,
-        ILocalizedTextService localizedTextService,
-        IShortStringHelper shortStringHelper,
-        IOptionsMonitor<ContentSettings> contentSettings,
-        IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper,
-        ITemporaryFileService temporaryFileService,
-        IScopeProvider scopeProvider,
-        IFileStreamSecurityValidator fileStreamSecurityValidator, ILogger<FileUploadPropertyValueEditor> logger)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
@@ -67,7 +47,6 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
-        _logger = logger;
         _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
         contentSettings.OnChange(x => _contentSettings = x);
 
@@ -78,8 +57,20 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
             IsAllowedInDataTypeConfiguration));
     }
 
+    public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+    {
+        // the stored property value (if any) is the path to the file; convert it to the client model (FileUploadValue)
+        var propertyValue = property.GetValue(culture, segment);
+        return propertyValue is string stringValue
+            ? new FileUploadValue
+            {
+                Src = stringValue
+            }
+            : null;
+    }
+
     /// <summary>
-    ///     Converts the value received from the editor into the value can be stored in the database.
+    ///     Converts the client model (FileUploadValue) into the value can be stored in the database (the file path).
     /// </summary>
     /// <param name="editorValue">The value received from the editor.</param>
     /// <param name="currentValue">The current value of the property</param>
@@ -88,54 +79,36 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     ///     <para>The <paramref name="currentValue" /> is used to re-use the folder, if possible.</para>
     ///     <para>
     ///         The <paramref name="editorValue" /> is value passed in from the editor. If the value is empty, we
-    ///         must delete the currently selected file (<paramref name="currentValue" />). If the value is not empty,
-    ///         it is assumed to contain a temporary file key, and we will attempt to replace the currently selected
-    ///         file with the corresponding temporary file.
+    ///         must delete the currently selected file (<paramref name="currentValue" />).
     ///     </para>
     /// </remarks>
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-
-        FileUploadValue? currentModelValue = null;
-        var currentPath = string.Empty;
-        try
-        {
-            if (currentValue is string currentStringValue)
-            {
-                currentModelValue = TryParseFileUploadValue(currentStringValue);
-            }
-        }
-        catch (Exception ex)
-        {
-            // For some reason the value is invalid so continue as if there was no value there
-            _logger.LogWarning(ex, "Could not parse current db value to an ImageCropperValue object.");
-        }
-
+        FileUploadValue? editorModelValue = ParseFileUploadValue(editorValue.Value);
 
         // no change?
-        FileUploadValue? editorModelValue = TryParseFileUploadValue(editorValue.Value?.ToString());
-
-        if (Equals(editorModelValue, currentModelValue))
+        if (editorModelValue?.TemporaryFileId.HasValue is not true)
         {
             return currentValue;
         }
 
-        if (currentPath.IsNullOrWhiteSpace() == false)
-        {
-            currentPath = _mediaFileManager.FileSystem.GetRelativePath(currentPath);
-        }
+        // the current editor value (if any) is the path to the file
+        var currentPath = currentValue is string currentStringValue
+                          && currentStringValue.IsNullOrWhiteSpace() is false
+            ? _mediaFileManager.FileSystem.GetRelativePath(currentStringValue)
+            : null;
 
         // resetting the current value?
-        if (editorModelValue is null && currentPath.IsNullOrWhiteSpace() is false)
+        if (editorModelValue?.Src is null && currentPath.IsNullOrWhiteSpace() is false)
         {
             // delete the current file and clear the value of this property
             _mediaFileManager.FileSystem.DeleteFile(currentPath);
             return null;
         }
 
-        var temporaryFileKey = editorModelValue?.TemporaryFileId;
-        TemporaryFileModel? file = temporaryFileKey is null ? null : TryGetTemporaryFile(temporaryFileKey!.Value);
-        if (file == null)
+        Guid? temporaryFileKey = editorModelValue?.TemporaryFileId;
+        TemporaryFileModel? file = temporaryFileKey is null ? null : TryGetTemporaryFile(temporaryFileKey.Value);
+        if (file is null)
         {
             // at this point the temporary file *should* have been validated by TemporaryFileUploadValidator, so we
             // should never end up here. In case we do, let's attempt to at least be non-destructive by returning
@@ -171,57 +144,23 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
         scope.Complete();
 
-        return
-            _jsonSerializer.Serialize(new FileUploadValue()
-            {
-                TemporaryFileId = null,
-                Src = filepath == null ? null : _mediaFileManager.FileSystem.GetUrl(filepath)
-            });
-
+        return filepath is null ? null : _mediaFileManager.FileSystem.GetUrl(filepath);
     }
 
-    private FileUploadValue? TryParseFileUploadValue(string? value)
+    private FileUploadValue? ParseFileUploadValue(object? editorValue)
     {
-        try
+        if (editorValue is null)
         {
-            if (value is null)
-            {
-                return null;
-            }
-
-            if(_jsonSerializer.TryDeserialize(value, out FileUploadValue? modelValue))
-            {
-                return modelValue;
-            }
-
-            if(Guid.TryParse(value, out Guid temporaryFileId))
-            {
-                return new FileUploadValue()
-                {
-                    TemporaryFileId = temporaryFileId,
-                    Src = null,
-                };
-            }
-
-            return new FileUploadValue()
-            {
-                TemporaryFileId = null,
-                Src = value,
-            };
-        }
-        catch (Exception ex)
-        {
-            // For some reason the value is invalid - log error and continue as if no value was saved
-            _logger.LogWarning(ex, "Could not parse editor value to an FileUploadValue object.");
+            return null;
         }
 
-        return null;
+        return _jsonSerializer.TryDeserialize(editorValue, out FileUploadValue? modelValue)
+            ? modelValue
+            : throw new ArgumentException($"Could not parse editor value to a {nameof(FileUploadValue)} object.");
     }
 
     private Guid? TryParseTemporaryFileKey(object? editorValue)
-        => editorValue is string stringValue && Guid.TryParse(stringValue, out Guid temporaryFileKey)
-            ? temporaryFileKey
-            : null;
+        => ParseFileUploadValue(editorValue)?.TemporaryFileId;
 
     private TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
         => _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
