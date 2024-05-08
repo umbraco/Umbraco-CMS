@@ -55,17 +55,23 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-box headline="Indexers" class="overview">
+			<uui-box headline=${this.localize.term('examineManagement_indexers')} class="overview">
 				<p>
-					<strong>Manage Examine's indexes</strong><br />
-					Allows you to view the details of each index and provides some tools for managing the indexes
+					<strong><umb-localize key="examineManagement_manageIndexes">Manage Examine's indexes</umb-localize></strong
+					><br />
+					<umb-localize key="examineManagement_manageIndexesDescription"
+						>Allows you to view the details of each index and provides some tools for managing the indexes</umb-localize
+					>
 				</p>
 				${this.renderIndexersList()}
 			</uui-box>
-			<uui-box headline="Searchers">
+			<uui-box headline=${this.localize.term('examineManagement_searchers')}>
 				<p>
-					<strong>Configured Searchers</strong><br />
-					Shows properties and tools for any configured Searcher (i.e. such as a multi-index searcher)
+					<strong><umb-localize key="examineManagement_configuredSearchers">Configured Searchers</umb-localize></strong
+					><br />
+					<umb-localize key="examineManagement_configuredSearchersDescription"
+						>Shows properties and tools for any configured Searcher (i.e. such as a multi-index searcher)</umb-localize
+					>
 				</p>
 				${this.renderSearchersList()}
 			</uui-box>

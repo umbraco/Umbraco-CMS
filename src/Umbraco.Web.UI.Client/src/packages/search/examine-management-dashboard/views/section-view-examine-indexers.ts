@@ -45,15 +45,15 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 
 	private async _onRebuildHandler() {
 		await umbConfirmModal(this, {
-			headline: `Rebuild ${this.indexName}`,
-			content: html`
-				This will cause the index to be rebuilt.<br />
+			headline: `${this.localize.term('examineManagement_rebuildIndex')} ${this.indexName}`,
+			content: html`<umb-localize key="examineManagement_rebuildIndexWarning"
+				>This will cause the index to be rebuilt.<br />
 				Depending on how much content there is in your site this could take a while.<br />
 				It is not recommended to rebuild an index during times of high website traffic or when editors are editing
-				content.
-			`,
+				content.</umb-localize
+			> `,
 			color: 'danger',
-			confirmLabel: 'Rebuild',
+			confirmLabel: this.localize.term('examineManagement_rebuildIndex'),
 		});
 
 		this._rebuild();
@@ -93,8 +93,11 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		return html`
 			<uui-box headline="${this.indexName}">
 				<p>
-					<strong>Health Status</strong><br />
-					The health status of the ${this.indexName} and if it can be read
+					<strong><umb-localize key="examineManagement_healthStatus">Health Status</umb-localize></strong
+					><br />
+					<umb-localize key="examineManagement_healthStatusDescription"
+						>The health status of the ${this.indexName} and if it can be read</umb-localize
+					>
 				</p>
 				<div id="health-status">${this.#renderHealthStatus(this._indexData.healthStatus)}</div>
 			</uui-box>
@@ -110,8 +113,12 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	private renderPropertyList() {
 		if (!this._indexData) return nothing;
 
-		return html`<uui-box headline="Index info">
-			<p>Lists the properties of the ${this.indexName}</p>
+		return html`<uui-box headline=${this.localize.term('examineManagement_indexInfo')}>
+			<p>
+				<umb-localize key="examineManagement_indexInfoDescription"
+					>Lists the properties of the ${this.indexName}</umb-localize
+				>
+			</p>
 			<uui-table class="info">
 				<uui-table-row>
 					<uui-table-cell style="width:0px; font-weight: bold;"> documentCount </uui-table-cell>
@@ -134,17 +141,15 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	}
 
 	private renderTools() {
-		return html` <uui-box headline="Tools">
-			<p>Tools to manage the ${this.indexName}</p>
+		return html` <uui-box headline=${this.localize.term('examineManagement_tools')}>
+			<p><umb-localize key="examineManagement_toolsDescription">Tools to manage the ${this.indexName}</umb-localize></p>
 			<uui-button
 				color="danger"
 				look="primary"
 				.state="${this._buttonState}"
 				@click="${this._onRebuildHandler}"
 				.disabled="${this._indexData?.canRebuild ? false : true}"
-				label="Rebuild index">
-				Rebuild
-			</uui-button>
+				label=${this.localize.term('examineManagement_rebuildIndex')}></uui-button>
 		</uui-box>`;
 	}
 

@@ -16,7 +16,10 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 		return html`<umb-body-layout headline=${this.localize.term('examineManagement_fields')}>
 			<uui-scroll-container id="field-settings"> ${this.#renderFields()} </uui-scroll-container>
 			<div slot="actions">
-				<uui-button look="primary" label="Close sidebar" @click="${this._submitModal}">Close</uui-button>
+				<uui-button
+					look="primary"
+					label=${this.localize.term('general_close')}
+					@click="${this._submitModal}"></uui-button>
 			</div>
 		</umb-body-layout>`;
 	}
