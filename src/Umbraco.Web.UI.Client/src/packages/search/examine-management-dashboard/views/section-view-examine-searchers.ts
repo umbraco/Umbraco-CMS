@@ -33,28 +33,24 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	@query('#search-input')
 	private _searchInput!: HTMLInputElement;
 
-	private _onNameClick() {
-		// TODO:
-		alert('TODO: Open workspace for ' + this.searcherName);
-	}
-
-	#entityType = '';
-
 	@state()
-	private _workspacePath = '';
+	private _workspacePath = 'aa';
 
 	private _onKeyPress(e: KeyboardEvent) {
 		e.key == 'Enter' ? this._onSearch() : undefined;
 	}
 
+	#entityType = '';
+
 	constructor() {
 		super();
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.onSetup(() => {
-				return { data: { entityType: this.#entityType, preset: {} } };
+			.addAdditionalPath(':entityType')
+			.onSetup((routingInfo) => {
+				return { data: { entityType: routingInfo.entityType, preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this._workspacePath = routeBuilder({});
+				this._workspacePath = routeBuilder({ entityType: this.#entityType });
 			});
 	}
 
