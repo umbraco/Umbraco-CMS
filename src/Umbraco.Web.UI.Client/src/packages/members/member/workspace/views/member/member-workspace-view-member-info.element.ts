@@ -16,16 +16,18 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 	@state()
 	private _memberTypeIcon = '';
 
-	private _workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
-	private _memberTypeItemRepository: UmbMemberTypeItemRepository = new UmbMemberTypeItemRepository(this);
-
 	@state()
 	private _editMemberTypePath = '';
-
 	@state()
 	private _createDate = 'Unknown';
 	@state()
 	private _updateDate = 'Unknown';
+
+	@state()
+	private _unique = '';
+
+	#workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
+	#memberTypeItemRepository: UmbMemberTypeItemRepository = new UmbMemberTypeItemRepository(this);
 
 	constructor() {
 		super();
@@ -40,12 +42,13 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 			});
 
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, async (context) => {
-			this._workspaceContext = context;
-			this.observe(this._workspaceContext.contentTypeUnique, (unique) => (this._memberTypeUnique = unique || ''));
-			this.observe(this._workspaceContext.createDate, (date) => (this._createDate = date || 'Unknown'));
-			this.observe(this._workspaceContext.updateDate, (date) => (this._updateDate = date || 'Unknown'));
+			this.#workspaceContext = context;
+			this.observe(this.#workspaceContext.contentTypeUnique, (unique) => (this._memberTypeUnique = unique || ''));
+			this.observe(this.#workspaceContext.createDate, (date) => (this._createDate = date || 'Unknown'));
+			this.observe(this.#workspaceContext.updateDate, (date) => (this._updateDate = date || 'Unknown'));
+			this.observe(this.#workspaceContext.unique, (unique) => (this._unique = unique || ''));
 
-			const memberType = (await this._memberTypeItemRepository.requestItems([this._memberTypeUnique])).data?.[0];
+			const memberType = (await this.#memberTypeItemRepository.requestItems([this._memberTypeUnique])).data?.[0];
 			if (!memberType) return;
 			this._memberTypeName = memberType.name;
 			this._memberTypeIcon = memberType.icon;
@@ -83,7 +86,7 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 			</div>
 			<div class="general-item">
 				<umb-localize class="headline" key="template_id"></umb-localize>
-				<span>${this._memberTypeUnique}</span>
+				<span>${this._unique}</span>
 			</div>
 		`;
 	}
