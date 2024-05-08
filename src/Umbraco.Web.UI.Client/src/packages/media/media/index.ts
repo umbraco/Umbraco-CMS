@@ -7,6 +7,7 @@ export * from './reference/index.js';
 export * from './components/index.js';
 export * from './dropzone/index.js';
 export * from './entity.js';
+export * from './paths.js';
 export * from './utils/index.js';
 
 export { UMB_MEDIA_TREE_ALIAS, UMB_MEDIA_TREE_PICKER_MODAL } from './tree/index.js';

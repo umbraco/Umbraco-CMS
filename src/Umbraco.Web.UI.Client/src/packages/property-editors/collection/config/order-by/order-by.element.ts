@@ -1,34 +1,44 @@
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbCollectionColumnConfiguration } from '../../../../core/collection/types.js';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-property-editor-ui-collection-order-by
  */
 @customElement('umb-property-editor-ui-collection-order-by')
 export class UmbPropertyEditorUICollectionOrderByElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	private _value = '';
 	@property()
-	public set value(v: string) {
-		this._value = v;
-		this._options = this._options.map((option) => (option.value === v ? { ...option, selected: true } : option));
-	}
-	public get value() {
-		return this._value;
-	}
+	public value: string = '';
+
+	public config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	_options: Array<Option> = [
-		{ value: 'name', name: 'Name' },
-		{ value: 'updateDate', name: 'Last edited' },
-		{ value: 'owner', name: 'Created by' },
-	];
+	private _options: Array<Option> = [];
 
-	@property({ type: Object, attribute: false })
-	public config?: UmbPropertyEditorConfigCollection;
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
+			const workspace = instance;
+			this.observe(
+				await workspace.propertyValueByAlias<Array<UmbCollectionColumnConfiguration>>('includeProperties'),
+				(includeProperties) => {
+					if (!includeProperties) return;
+					this._options = includeProperties.map((property) => ({
+						name: property.header,
+						value: property.alias,
+						selected: property.alias === this.value,
+					}));
+				},
+				'_observeIncludeProperties',
+			);
+		});
+	}
 
 	#onChange(e: UUISelectEvent) {
 		this.value = e.target.value as string;
@@ -36,6 +46,7 @@ export class UmbPropertyEditorUICollectionOrderByElement extends UmbLitElement i
 	}
 
 	render() {
+		if (!this._options.length) return html`<p><em>Add a column (above) to order by.</em></p>`;
 		return html`<uui-select label="select" .options=${this._options} @change=${this.#onChange}></uui-select>`;
 	}
 }

@@ -1,4 +1,4 @@
-import type { UUIColorSwatchesEvent, UUIIconElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import { css, html, customElement, state, repeat, query, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -64,12 +64,9 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		}
 	}
 
-	#changeIcon(e: InputEvent | KeyboardEvent) {
+	#changeIcon(e: InputEvent | KeyboardEvent, iconName: string) {
 		if (e.type == 'click' || (e.type == 'keyup' && (e as KeyboardEvent).key == 'Enter')) {
-			const iconName = (e.target as UUIIconElement).name;
-			if (iconName) {
-				this.modalContext?.updateValue({ icon: iconName });
-			}
+			this.modalContext?.updateValue({ icon: iconName });
 		}
 	}
 
@@ -142,8 +139,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 							label="${icon.name}"
 							title="${icon.name}"
 							class="${icon.name === this._currentIcon ? 'selected' : ''}"
-							@click="${this.#changeIcon}"
-							@keyup="${this.#changeIcon}">
+							@click=${(e: InputEvent) => this.#changeIcon(e, icon.name)}
+							@keyup=${(e: KeyboardEvent) => this.#changeIcon(e, icon.name)}>
 							<uui-icon
 								style="--uui-icon-color: var(${extractUmbColorVariable(this._currentColor)})"
 								name="${icon.name}">
