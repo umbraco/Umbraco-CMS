@@ -16,7 +16,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 [DataEditor(
     Constants.PropertyEditors.Aliases.UploadField,
-    ValueType = ValueTypes.Json,
     ValueEditorIsReusable = true)]
 public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
