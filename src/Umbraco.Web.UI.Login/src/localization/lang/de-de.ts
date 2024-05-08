@@ -42,6 +42,7 @@ export default {
     mfaText: 'Sie haben die Multi-Faktor-Authentifizierung aktiviert und müssen Ihre Identität bestätigen.',
     mfaMultipleText: 'Bitte wählen Sie einen Multi-Faktor-Anbieter',
     mfaCodeInput: 'Bestätigungscode',
+    mfaInvalidCode: 'Ungültiger Code eingegeben',
     signInWith: 'Anmelden mit {0}',
     returnToLogin: 'Zurück zur Anmeldung',
     localLoginDisabled: 'Leider ist eine direkte Anmeldung nicht möglich. Sie wurde von einem Anbieter deaktiviert.',

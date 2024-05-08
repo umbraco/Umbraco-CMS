@@ -42,6 +42,7 @@ export default {
     mfaText: 'You have enabled 2-factor authentication and must verify your identity.',
     mfaMultipleText: 'Please choose a 2-factor provider',
     mfaCodeInput: 'Verification code',
+    mfaInvalidCode: 'Invalid code entered',
     signInWith: 'Sign in with {0}',
     returnToLogin: 'Return to login',
     localLoginDisabled: 'Unfortunately, direct login is not possible. It has been disabled by a provider.',

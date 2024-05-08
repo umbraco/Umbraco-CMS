@@ -42,6 +42,7 @@ export default {
     mfaText: 'Du har aktiveret multi-faktor godkendelse. Du skal nu bekræfte din identitet.',
     mfaMultipleText: 'Vælg venligst en godkendelsesmetode',
     mfaCodeInput: 'Kode',
+    mfaInvalidCode: 'Forkert kode indtastet',
     signInWith: 'Log ind med {0}',
     returnToLogin: 'Tilbage til log ind',
     localLoginDisabled: 'Desværre er det ikke muligt at logge ind direkte. Det er blevet deaktiveret af en login-udbyder.',

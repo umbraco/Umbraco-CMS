@@ -56,6 +56,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
     if (codeInput) {
       codeInput.error = false;
       codeInput.errorMessage = '';
+      codeInput.setCustomValidity('');
     }
 
     if (!form.checkValidity()) return;
@@ -84,44 +85,30 @@ export default class UmbMfaPageElement extends UmbLitElement {
 
     this.buttonState = 'waiting';
 
-    try {
-      const response = await this.#authContext.validateMfaCode(code, provider);
-      if (response.error) {
-        if (codeInput) {
-          codeInput.error = true;
-          codeInput.errorMessage = response.error;
-        } else {
-          this.error = response.error;
-        }
-        this.buttonState = 'failed';
-        return;
-      }
-
-      this.buttonState = 'success';
-
-      const returnPath = this.#authContext.returnPath;
-      if (returnPath) {
-        location.href = returnPath;
-      }
-
-      this.dispatchEvent(
-        new CustomEvent('umb-login-success', {bubbles: true, composed: true})
-      );
-    } catch (e) {
-      if (e instanceof Error) {
-        this.error = e.message ?? 'Unknown error';
+    const response = await this.#authContext.validateMfaCode(code, provider);
+    if (response.error) {
+      if (codeInput) {
+        codeInput.error = true;
+        codeInput.errorMessage = response.error;
       } else {
-        this.error = 'Unknown error';
+        this.error = response.error;
       }
       this.buttonState = 'failed';
-      this.dispatchEvent(new CustomEvent('umb-login-failed', {bubbles: true, composed: true}));
+      return;
+    }
+
+    this.buttonState = 'success';
+
+    const returnPath = this.#authContext.returnPath;
+    if (returnPath) {
+      location.href = returnPath;
     }
   }
 
   protected renderDefaultView() {
     return html`
       <uui-form>
-        <form id="LoginForm" @submit=${this.#handleSubmit}>
+        <form id="LoginForm" @submit=${this.#handleSubmit} novalidate>
           <header id="header">
             <h1>
               <umb-localize key="auth_mfaTitle">One last step</umb-localize>

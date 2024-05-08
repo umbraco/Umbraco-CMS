@@ -63,28 +63,32 @@ export class UmbAuthRepository extends UmbRepositoryBase {
   }
 
   public async validateMfaCode(code: string, provider: string): Promise<MfaCodeResponse> {
-    const requestData = new Request('management/api/v1/security/back-office/verify-2fa', {
-      method: 'POST',
-      body: JSON.stringify({
-        code,
-        provider,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    try {
+      const requestData = new Request('management/api/v1/security/back-office/verify-2fa', {
+        method: 'POST',
+        body: JSON.stringify({
+          code,
+          provider,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    const request = fetch(requestData);
+      const response = await fetch(requestData);
 
-    const response = await tryExecute(request);
+      if (!response.ok) {
+        return {
+          error: response.status === 400 ? this.#localize.term('auth_mfaInvalidCode') : await this.#getErrorText(response),
+        };
+      }
 
-    if (response.error) {
+      return {};
+    } catch (error) {
       return {
-        error: this.#getApiErrorDetailText(response.error, 'Could not validate the MFA code'),
+        error: error instanceof Error ? error.message : this.#localize.term('auth_receivedErrorFromServer'),
       };
     }
-
-    return {};
   }
 
   public async resetPassword(email: string): Promise<ResetPasswordResponse> {
@@ -216,7 +220,6 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 
       default:
         return (
-          response.statusText ??
           this.#localize.term('auth_receivedErrorFromServer')
         );
     }

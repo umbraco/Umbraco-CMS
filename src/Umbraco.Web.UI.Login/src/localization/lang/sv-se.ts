@@ -42,6 +42,7 @@ export default {
     mfaText: 'Du har aktiverat tvåfaktorsautentisering och måste verifiera din identitet.',
     mfaMultipleText: 'Vänligen välj en tvåfaktorsleverantör',
     mfaCodeInput: 'Verifieringskod',
+    mfaInvalidCode: 'Ogiltig kod angiven',
     signInWith: 'Logga in med {0}',
     returnToLogin: 'Återgå till inloggning',
     localLoginDisabled: 'Tyvärr är direktinloggning inte möjlig. Det har inaktiverats av en leverantör.',

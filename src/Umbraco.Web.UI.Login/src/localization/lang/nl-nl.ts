@@ -42,6 +42,7 @@ export default {
     mfaText: 'Je hebt tweestapsverificatie ingeschakeld en moet je identiteit verifiëren.',
     mfaMultipleText: 'Kies een tweestapsverificatie aanbieder',
     mfaCodeInput: 'Verificatiecode',
+    mfaInvalidCode: 'Ongeldige code ingevoerd',
     signInWith: 'Inloggen met {0}',
     returnToLogin: 'Terug naar loginformulier',
     localLoginDisabled: 'Helaas is direct inloggen niet mogelijk. Het is uitgeschakeld door een aanbieder.',

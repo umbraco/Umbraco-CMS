@@ -42,6 +42,7 @@ export default {
     mfaText: 'Du har aktivert tofaktorautentisering og må bekrefte identiteten din.',
     mfaMultipleText: 'Velg en tofaktorleverandør',
     mfaCodeInput: 'Bekreftelseskode',
+    mfaInvalidCode: 'Ugyldig kode angitt',
     signInWith: 'Logg inn med {0}',
     returnToLogin: 'Tilbake til innlogging',
     localLoginDisabled: 'Dessverre er direkte innlogging ikke mulig. Den er deaktivert av en leverandør.',
