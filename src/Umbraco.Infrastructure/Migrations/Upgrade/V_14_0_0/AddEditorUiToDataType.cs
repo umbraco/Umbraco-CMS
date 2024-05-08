@@ -67,7 +67,7 @@ public class AddEditorUiToDataType : MigrationBase
                 Constants.PropertyEditors.Aliases.MediaPicker3 => "Umb.PropertyEditorUi.MediaPicker",
                 Constants.PropertyEditors.Aliases.MemberPicker => "Umb.PropertyEditorUi.MemberPicker",
                 Constants.PropertyEditors.Aliases.MemberGroupPicker => "Umb.PropertyEditorUi.MemberGroupPicker",
-                Constants.PropertyEditors.Aliases.MultiNodeTreePicker => "Umb.PropertyEditorUi.TreePicker",
+                Constants.PropertyEditors.Aliases.MultiNodeTreePicker => "Umb.PropertyEditorUi.ContentPicker",
                 Constants.PropertyEditors.Aliases.MultipleTextstring => "Umb.PropertyEditorUi.MultipleTextString",
                 Constants.PropertyEditors.Aliases.Label => "Umb.PropertyEditorUi.Label",
                 Constants.PropertyEditors.Aliases.RadioButtonList => "Umb.PropertyEditorUi.RadioButtonList",
