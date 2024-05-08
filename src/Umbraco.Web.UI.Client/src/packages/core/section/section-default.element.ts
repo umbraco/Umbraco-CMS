@@ -44,6 +44,9 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		UmbExtensionElementInitializer<ManifestSectionSidebarApp | ManifestSectionSidebarAppMenuKind>
 	>;
 
+	@state()
+	_splitPanelPosition = '300px';
+
 	constructor() {
 		super();
 
@@ -54,6 +57,12 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		});
 
 		this.#createRoutes();
+
+		//Load the split panel position from localStorage
+		const splitPanelPosition = localStorage.getItem('umb-split-panel-position');
+		if (splitPanelPosition) {
+			this._splitPanelPosition = splitPanelPosition;
+		}
 	}
 
 	#createRoutes() {
@@ -75,9 +84,19 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		];
 	}
 
+	#onSplitPanelChange(event: CustomEvent) {
+		const position = event.detail.position;
+		// Save to localStorage
+		localStorage.setItem('umb-split-panel-position', position.toString());
+	}
+
 	render() {
 		return html`
-			<umb-split-panel lock="start" snap="300px">
+			<umb-split-panel
+				lock="start"
+				snap="300px"
+				@position-changed=${this.#onSplitPanelChange}
+				.position=${this._splitPanelPosition}>
 				${this._sidebarApps && this._sidebarApps.length > 0
 					? html`
 							<!-- TODO: these extensions should be combined into one type: sectionSidebarApp with a "subtype" -->
@@ -110,7 +129,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 			}
 
 			umb-split-panel {
-				--umb-split-panel-initial-position: 200px;
+				/* --umb-split-panel-initial-position: 200px; */
 				--umb-split-panel-start-min-width: 200px;
 				--umb-split-panel-start-max-width: 400px;
 				--umb-split-panel-end-min-width: 600px;
