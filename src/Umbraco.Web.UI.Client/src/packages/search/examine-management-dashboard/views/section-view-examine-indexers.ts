@@ -25,22 +25,38 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 
 	connectedCallback() {
 		super.connectedCallback();
-		this._getIndexData();
+		this.#loadData();
 	}
 
-	private async _getIndexData() {
+	async #loadData() {
+		this._indexData = await this.#getIndexData();
+
+		if (this._indexData?.healthStatus.status === HealthStatusModel.REBUILDING) {
+			this._buttonState = 'waiting';
+			this._continuousPolling();
+		} else {
+			this._loading = false;
+		}
+	}
+
+	async #getIndexData() {
 		const { data } = await tryExecuteAndNotify(
 			this,
 			IndexerService.getIndexerByIndexName({ indexName: this.indexName }),
 		);
-		this._indexData = data;
+		return data;
+	}
 
-		// TODO: Add continuous polling to update the status
-		if (this._indexData?.healthStatus.status === HealthStatusModel.REBUILDING) {
-			this._buttonState = 'waiting';
+	private async _continuousPolling() {
+		//Checking the server every 5 seconds to see if the index is still rebuilding.
+		while (this._buttonState === 'waiting') {
+			this._indexData = await this.#getIndexData();
+			if (this._indexData?.healthStatus.status !== HealthStatusModel.REBUILDING) {
+				this._buttonState = 'success';
+			}
+			await new Promise((resolve) => setTimeout(resolve, 5000));
 		}
-
-		this._loading = false;
+		return;
 	}
 
 	private async _onRebuildHandler() {
@@ -68,9 +84,8 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 			this._buttonState = 'failed';
 			return;
 		}
-
 		this._buttonState = 'success';
-		await this._getIndexData();
+		await this.#loadData();
 	}
 
 	#renderHealthStatus(healthStatus: HealthStatusResponseModel) {
