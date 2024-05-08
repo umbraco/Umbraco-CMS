@@ -24,32 +24,32 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 	}
 
 	/**
-	 * Gets the Wwbhook collection filtered by the given filter.
+	 * Gets the Webhook collection filtered by the given filter.
 	 * @param {UmbWebhookCollectionFilterModel} filter
 	 * @return {*}
 	 * @memberof UmbWebhookCollectionServerDataSource
 	 */
 	async getCollection(_filter: UmbWebhookCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookService.getItemWebhook({}));
+		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookService.getWebhook(_filter));
 
-		if (data) {
-			const items = data.map((item) => {
-				const model: UmbWebhookDetailModel = {
-					entityType: UMB_WEBHOOK_ENTITY_TYPE,
-					unique: item.url,
-					name: item.name,
-					url: item.url,
-					enabled: item.enabled,
-					events: item.events.split(','),
-					types: item.types.split(','),
-				};
-
-				return model;
-			});
-
-			return { data: { items, total: data.length } };
+		if (error || !data) {
+			return { error };
 		}
 
-		return { error };
+		const items = data.items.map((item) => {
+			const model: UmbWebhookDetailModel = {
+				entityType: UMB_WEBHOOK_ENTITY_TYPE,
+				unique: item.id,
+				url: item.url,
+				enabled: item.enabled,
+				headers: item.headers,
+				events: item.events,
+				contentTypes: item.contentTypeKeys,
+			};
+
+			return model;
+		});
+
+		return { data: { items, total: data.items.length } };
 	}
 }
