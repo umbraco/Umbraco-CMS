@@ -12,7 +12,7 @@ import { mime } from '@umbraco-cms/backoffice/external/mime';
 export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPickerModalData, UmbMediaPickerModalValue> {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
 	#mediaUrlRepository = new UmbMediaUrlRepository(this); // used to get urls
-	#mediaItemRepository = new UmbMediaItemRepository(this); // used to search
+	#mediaItemRepository = new UmbMediaItemRepository(this); // used to search & get media type of current path
 
 	#mediaItemsCurrentFolder: Array<UmbMediaCardItemModel> = [];
 
@@ -26,7 +26,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	private _searchQuery = '';
 
 	@state()
-	private _currentPath: string | null = null;
+	private _currentNode: string | null = null;
 
 	@state()
 	private _selectableNonImages = true;
@@ -34,13 +34,13 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._selectableNonImages = this.data?.selectableNonImages ?? true;
-		this._currentPath = this.data?.startNode ?? null;
+		this._currentNode = this.data?.startNode ?? null;
 		this.#loadMediaFolder();
 	}
 
 	async #loadMediaFolder() {
 		const { data } = await this.#mediaTreeRepository.requestTreeItemsOf({
-			parentUnique: this._currentPath,
+			parentUnique: this._currentNode,
 			skip: 0,
 			take: 100,
 		});
@@ -64,7 +64,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	}
 
 	#onOpen(item: UmbMediaCardItemModel) {
-		this._currentPath = item.unique!;
+		this._currentNode = item.unique!;
 		this.#loadMediaFolder();
 	}
 
@@ -112,7 +112,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	}
 
 	#onPathChange(e: CustomEvent) {
-		this._currentPath = (e.target as UmbMediaPickerFolderPathElement).currentPath;
+		this._currentNode = (e.target as UmbMediaPickerFolderPathElement).currentPath;
 		this.#loadMediaFolder();
 	}
 
@@ -134,7 +134,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 	#renderBody() {
 		return html`${this.#renderToolbar()}
-		<umb-dropzone id="dropzone" @change=${() => this.#loadMediaFolder()} .parentUnique=${this._currentPath}></umb-dropzone>
+		<umb-dropzone id="dropzone" @change=${() => this.#loadMediaFolder()} .parentUnique=${this._currentNode}></umb-dropzone>
 				${
 					!this._mediaFilteredList.length
 						? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
@@ -151,7 +151,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 	#renderToolbar() {
 		return html`<div id="toolbar">
-			<umb-media-picker-create-item .mediaTypeUnique=${null}></umb-media-picker-create-item>
+			<umb-media-picker-create-item .node=${this._currentNode}></umb-media-picker-create-item>
 			<div id="search">
 				<uui-input
 					label=${this.localize.term('general_search')}
@@ -187,7 +187,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	#renderPath() {
 		return html`<umb-media-picker-folder-path
 			slot="footer-info"
-			.currentPath=${this._currentPath}
+			.currentPath=${this._currentNode}
 			@change=${this.#onPathChange}></umb-media-picker-folder-path>`;
 	}
 

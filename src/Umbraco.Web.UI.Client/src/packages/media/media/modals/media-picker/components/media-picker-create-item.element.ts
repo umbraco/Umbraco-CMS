@@ -1,3 +1,4 @@
+import { UmbMediaDetailRepository } from '../../../repository/detail/media-detail.repository.js';
 import { css, html, customElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { type UmbAllowedMediaTypeModel, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
@@ -5,16 +6,18 @@ import { type UmbAllowedMediaTypeModel, UmbMediaTypeStructureRepository } from '
 @customElement('umb-media-picker-create-item')
 export class UmbMediaPickerCreateItemElement extends UmbLitElement {
 	#mediaTypeStructure = new UmbMediaTypeStructureRepository(this); // used to get allowed media items
+	#mediaDetailRepository = new UmbMediaDetailRepository(this); // used to get media type of node
 
-	private _mediaTypeUnique: string | null = null;
+	private _node: string | null = null;
+
 	@property()
-	public set mediaTypeUnique(value: string | null) {
-		this._mediaTypeUnique = value;
+	public set node(value: string | null) {
+		this._node = value;
 		this.#getAllowedMediaTypes();
 	}
 
-	public get mediaTypeUnique() {
-		return this._mediaTypeUnique;
+	public get node() {
+		return this._node;
 	}
 
 	@state()
@@ -23,8 +26,17 @@ export class UmbMediaPickerCreateItemElement extends UmbLitElement {
 	@state()
 	private _allowedMediaTypes: Array<UmbAllowedMediaTypeModel> = [];
 
+	async #getNodeMediaType() {
+		if (!this._node) return null;
+
+		const { data } = await this.#mediaDetailRepository.requestByUnique(this.node!);
+		return data?.mediaType.unique ?? null;
+	}
+
 	async #getAllowedMediaTypes() {
-		const { data: allowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(this._mediaTypeUnique);
+		const mediaType = await this.#getNodeMediaType();
+
+		const { data: allowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(mediaType);
 		this._allowedMediaTypes = allowedMediaTypes?.items ?? [];
 	}
 
