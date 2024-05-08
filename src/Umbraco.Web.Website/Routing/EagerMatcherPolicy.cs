@@ -193,7 +193,24 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
         }
 
         // Check if maintenance page should be shown
-        if (_runtimeState.Level != RuntimeLevel.Upgrade || _globalSettings.ShowMaintenancePageWhenInUpgradeState is false)
+        // Current behaviour is that statically routed endpoints still work in upgrade state
+        // This means that IF there is a static route, we should not show the maintenance page.
+        // And instead carry on as we normally would.
+        var hasStaticRoute = false;
+        for (var i = 0; i < candidates.Count; i++)
+        {
+            CandidateState candidate = candidates[i];
+            IDynamicEndpointMetadata? dynamicEndpointMetadata = candidate.Endpoint.Metadata.GetMetadata<IDynamicEndpointMetadata>();
+            if (dynamicEndpointMetadata is null || dynamicEndpointMetadata.IsDynamic is false)
+            {
+                hasStaticRoute = true;
+                break;
+            }
+        }
+
+        if (_runtimeState.Level != RuntimeLevel.Upgrade
+            || _globalSettings.ShowMaintenancePageWhenInUpgradeState is false
+            || hasStaticRoute)
         {
             return Task.FromResult(false);
         }
