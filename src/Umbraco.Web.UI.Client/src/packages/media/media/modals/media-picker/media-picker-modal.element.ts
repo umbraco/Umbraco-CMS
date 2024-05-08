@@ -1,9 +1,4 @@
-import {
-	type UmbMediaItemModel,
-	UmbMediaItemRepository,
-	UmbMediaUrlRepository,
-	UmbMediaDetailRepository,
-} from '../../repository/index.js';
+import { type UmbMediaItemModel, UmbMediaItemRepository, UmbMediaUrlRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import type { UmbMediaCardItemModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
@@ -12,7 +7,6 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { mime } from '@umbraco-cms/backoffice/external/mime';
-import { type UmbAllowedMediaTypeModel, UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 
 @customElement('umb-media-picker-modal')
 export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPickerModalData, UmbMediaPickerModalValue> {
@@ -37,14 +31,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	@state()
 	private _selectableNonImages = true;
 
-	@state()
-	private _allowedMediaTypes: Array<UmbAllowedMediaTypeModel> = [];
-
-	@state()
-	_popoverOpen = false;
-
-	#mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
-
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._selectableNonImages = this.data?.selectableNonImages ?? true;
@@ -61,7 +47,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 		this.#mediaItemsCurrentFolder = await this.#mapMediaUrls(data?.items ?? []);
 		this.#filterMediaItems();
-		this.#getAllowedMediaTypes();
 	}
 
 	async #mapMediaUrls(items: Array<UmbMediaItemModel>): Promise<Array<UmbMediaCardItemModel>> {
@@ -118,11 +103,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		}
 
 		// Map urls for search results as we are going to show for all folders (as long they aren't trashed).
-		this._mediaFilteredList = await this.#mapMediaUrls(
-			data.filter((found) => {
-				found.isTrashed ? false : false;
-			}),
-		);
+		this._mediaFilteredList = await this.#mapMediaUrls(data.filter((found) => found.isTrashed === false));
 	}
 
 	#onSearch(e: UUIInputEvent) {
@@ -170,7 +151,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 	#renderToolbar() {
 		return html`<div id="toolbar">
-			${this.#renderDropdown()}
+			<umb-media-picker-create-item .mediaTypeUnique=${null}></umb-media-picker-create-item>
 			<div id="search">
 				<uui-input
 					label=${this.localize.term('general_search')}
@@ -187,58 +168,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 	// Where should this be placed, without it looking terrible?
 	// <uui-checkbox @change=${() => (this._searchOnlyThisFolder = !this._searchOnlyThisFolder)} label=${this.localize.term('general_excludeFromSubFolders')}></uui-checkbox>
-
-	#onPopoverToggle(event: ToggleEvent) {
-		this._popoverOpen = event.newState === 'open';
-	}
-
-	async #getAllowedMediaTypes() {
-		let mediaType: string | null = null;
-		if (this._currentPath) {
-			const { data: media } = await this.#mediaItemRepository.requestItems([this._currentPath]);
-			mediaType = media?.[0].mediaType.unique ?? null;
-		}
-
-		const { data: allowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(mediaType);
-		this._allowedMediaTypes = allowedMediaTypes?.items ?? [];
-	}
-
-	#renderDropdown() {
-		return html`
-			<uui-button
-				popovertarget="collection-action-menu-popover"
-				label=${this.localize.term('actions_create')}
-				color="default"
-				look="outline">
-				${this.localize.term('actions_create')}
-				<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
-			</uui-button>
-			<uui-popover-container
-				id="collection-action-menu-popover"
-				placement="bottom-start"
-				@toggle=${this.#onPopoverToggle}>
-				<umb-popover-layout>
-					<uui-scroll-container>
-						${!this._allowedMediaTypes.length
-							? html`<div id="not-allowed">${this.localize.term('mediaPicker_notAllowed')}</div>`
-							: repeat(
-									this._allowedMediaTypes,
-									(item) => item.unique,
-									(item) =>
-										html`<uui-menu-item
-											label=${item.name}
-											@click=${() =>
-												alert(
-													'TODO: Open workspace (create) from modal. You can drop the files into this modal for now.',
-												)}>
-											<umb-icon slot="icon" name=${item.icon ?? 'icon-circle-dotted'}></umb-icon>
-										</uui-menu-item>`,
-								)}
-					</uui-scroll-container>
-				</umb-popover-layout>
-			</uui-popover-container>
-		`;
-	}
 
 	#renderCard(item: UmbMediaCardItemModel) {
 		return html`
@@ -288,9 +217,6 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 				grid-template-rows: repeat(auto-fill, 200px);
 				gap: var(--uui-size-space-5);
-			}
-			#not-allowed {
-				padding: var(--uui-size-space-3);
 			}
 		`,
 	];
