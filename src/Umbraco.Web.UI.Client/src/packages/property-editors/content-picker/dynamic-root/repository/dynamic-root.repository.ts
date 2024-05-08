@@ -24,16 +24,16 @@ export class UmbContentPickerDynamicRootRepository extends UmbControllerBase {
 	/**
 	 * Request dynamic root
 	 * @param {UmbContentPickerDynamicRoot} query
-	 * @param {string} entityId
-	 * @param {string} [parentId]
+	 * @param {string} entityUnique
+	 * @param {string} [parentUnique]
 	 * @return {*}
 	 * @memberof UmbContentPickerDynamicRootRepository
 	 */
-	async requestRoot(query: UmbContentPickerDynamicRoot, entityId: string, parentId?: string) {
+	async requestRoot(query: UmbContentPickerDynamicRoot, entityUnique: string, parentUnique?: string) {
 		const model: DynamicRootRequestModel = {
 			context: {
-				id: entityId,
-				parent: { id: parentId ?? GUID_EMPTY },
+				id: entityUnique,
+				parent: { id: parentUnique ?? GUID_EMPTY },
 			},
 			query: {
 				origin: {
