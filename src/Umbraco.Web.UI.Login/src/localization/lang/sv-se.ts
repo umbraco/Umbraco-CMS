@@ -23,6 +23,7 @@ export default {
     passwordMinLength: 'Lösenordet måste vara minst {0} tecken långt.',
     passwordIsBlank: 'Ditt nya lösenord kan inte vara tomt!',
     userFailedLogin: 'Hoppsan! Vi kunde inte logga in dig. Vänligen kontrollera dina uppgifter och försök igen.',
+    userLockedOut: 'Ditt konto har låsts. Vänligen försök igen senare.',
     receivedErrorFromServer: 'Ett fel uppstod på servern',
     resetCodeExpired: 'Länken du har klickat på är ogiltig eller har gått ut',
     userInviteWelcomeMessage: 'Hej och välkommen till Umbraco! Inom bara 1 minut är du redo att börja, vi behöver bara att du ställer in ett lösenord.',

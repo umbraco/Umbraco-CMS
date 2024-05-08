@@ -23,6 +23,7 @@ export default {
     passwordMinLength: 'Je wachtwoord moet minstens {0} tekens lang zijn.',
     passwordIsBlank: 'Je nieuwe wachtwoord mag niet leeg zijn!',
     userFailedLogin: 'Oeps! We konden je niet inloggen. Controleer je inloggegevens en probeer het opnieuw.',
+    userLockedOut: 'Je account is geblokkeerd. Probeer het later opnieuw.',
     receivedErrorFromServer: 'Een error ontvangen van de server',
     resetCodeExpired: 'De link die je hebt aangeklikt is niet (meer) geldig.',
     userInviteWelcomeMessage: 'Hallo en welkom in Umbraco! Binnen ongeveer één minuut kan je aan de slag. Je moet enkel je wachtwoord instellen.',

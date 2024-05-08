@@ -57,7 +57,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
     } catch (error) {
       return {
         status: 500,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : this.#localize.term('auth_receivedErrorFromServer'),
       };
     }
   }
@@ -207,6 +207,9 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 
       case 402:
         return this.#localize.term('auth_mfaText');
+
+      case 403:
+        return this.#localize.term('auth_userLockedOut');
 
       case 500:
         return this.#localize.term('auth_receivedErrorFromServer');

@@ -23,6 +23,7 @@ export default {
     passwordMinLength: 'Ihr Kennwort muss mindestens {0} Zeichen lang sein.',
     passwordIsBlank: 'Ihr neues Kennwort darf nicht leer sein!',
     userFailedLogin: 'Hoppla! Wir konnten Sie nicht anmelden. Bitte überprüfen Sie Ihre Anmeldeinformationen und versuchen Sie es erneut.',
+    userLockedOut: 'Ihr Konto wurde gesperrt. Bitte versuchen Sie es später erneut.',
     receivedErrorFromServer: 'Der Server hat einen Fehler gemeldet',
     resetCodeExpired: 'Der aufgerufene Link ist ungültig oder abgelaufen',
     userInviteWelcomeMessage: 'Hallo und Willkommen bei Umbraco! In nur einer Minute sind Sie bereit loszulegen, Sie müssen nur ein Kennwort festlegen.',
