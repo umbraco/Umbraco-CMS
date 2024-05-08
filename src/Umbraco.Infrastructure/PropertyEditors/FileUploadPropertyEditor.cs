@@ -2,18 +2,13 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -31,12 +26,9 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     private readonly IContentService _contentService;
     private readonly IOptionsMonitor<ContentSettings> _contentSettings;
     private readonly IIOHelper _ioHelper;
-    private readonly IJsonSerializer _jsonSerializer;
-    private readonly ILogger<FileUploadPropertyEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
     private readonly UploadAutoFillProperties _uploadAutoFillProperties;
 
-    [Obsolete("Use non-obsolete constructor. This constructor will be removed V15.")]
     public FileUploadPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         MediaFileManager mediaFileManager,
@@ -44,29 +36,6 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         UploadAutoFillProperties uploadAutoFillProperties,
         IContentService contentService,
         IIOHelper ioHelper)
-     :this(
-         dataValueEditorFactory,
-         mediaFileManager,
-         contentSettings,
-         uploadAutoFillProperties,
-         contentService,
-         ioHelper,
-         StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(),
-         StaticServiceProvider.Instance.GetRequiredService<ILogger<FileUploadPropertyEditor>>()
-         )
-    {
-
-    }
-
-    public FileUploadPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        MediaFileManager mediaFileManager,
-        IOptionsMonitor<ContentSettings> contentSettings,
-        UploadAutoFillProperties uploadAutoFillProperties,
-        IContentService contentService,
-        IIOHelper ioHelper,
-        IJsonSerializer jsonSerializer,
-        ILogger<FileUploadPropertyEditor> logger)
         : base(dataValueEditorFactory)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
@@ -74,15 +43,13 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         _uploadAutoFillProperties = uploadAutoFillProperties;
         _contentService = contentService;
         _ioHelper = ioHelper;
-        _jsonSerializer = jsonSerializer;
-        _logger = logger;
         SupportsReadOnly = true;
     }
 
     public bool TryGetMediaPath(string? propertyEditorAlias, object? value, [MaybeNullWhen(false)] out string mediaPath)
     {
         if (propertyEditorAlias == Alias &&
-            TryDeserializeMediaPath(value, out var mediaPathValue) &&
+            value?.ToString() is var mediaPathValue &&
             !string.IsNullOrWhiteSpace(mediaPathValue))
         {
             mediaPath = mediaPathValue;
@@ -92,36 +59,6 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         mediaPath = null;
         return false;
     }
-
-    private bool TryDeserializeMediaPath(object? propVal, out string? mediaPath)
-    {
-        if (propVal is not string stringValue)
-        {
-            mediaPath = null;
-            return false;
-        }
-
-        if (!stringValue.DetectIsJson())
-        {
-            // Assume the value is a plain string with the file path
-            mediaPath = stringValue;
-            return true;
-        }
-
-        try
-        {
-            mediaPath = _jsonSerializer.Deserialize<FileUploadValue>(stringValue)?.Src;
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Could not parse file upload value '{Json}'", stringValue);
-        }
-
-        mediaPath = string.Empty;
-        return false;
-    }
-
 
     public void Handle(ContentCopiedNotification notification)
     {
