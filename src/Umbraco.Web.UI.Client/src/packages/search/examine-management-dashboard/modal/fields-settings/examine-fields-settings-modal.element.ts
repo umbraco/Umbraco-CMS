@@ -1,7 +1,7 @@
 import type {
 	UmbExamineFieldsSettingsModalData,
 	UmbExamineFieldsSettingsModalValue,
-	FieldSettingsType,
+	UmbExamineFieldSettingsType,
 } from './examine-fields-settings-modal.token.js';
 import { html, css, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -24,8 +24,8 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 		</umb-body-layout>`;
 	}
 
-	#setExposed(fieldSetting: FieldSettingsType) {
-		const newField: FieldSettingsType = { ...fieldSetting, exposed: !fieldSetting.exposed };
+	#setExposed(fieldSetting: UmbExamineFieldSettingsType) {
+		const newField: UmbExamineFieldSettingsType = { ...fieldSetting, exposed: !fieldSetting.exposed };
 
 		const updatedFields =
 			this.modalContext?.getValue().fields.map((field) => {
