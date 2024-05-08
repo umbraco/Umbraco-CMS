@@ -50,11 +50,11 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	private async _continuousPolling() {
 		//Checking the server every 5 seconds to see if the index is still rebuilding.
 		while (this._buttonState === 'waiting') {
+			await new Promise((resolve) => setTimeout(resolve, 5000));
 			this._indexData = await this.#getIndexData();
 			if (this._indexData?.healthStatus.status !== HealthStatusModel.REBUILDING) {
 				this._buttonState = 'success';
 			}
-			await new Promise((resolve) => setTimeout(resolve, 5000));
 		}
 		return;
 	}
