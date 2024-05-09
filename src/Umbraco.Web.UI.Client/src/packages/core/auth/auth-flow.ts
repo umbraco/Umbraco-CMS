@@ -371,8 +371,10 @@ export class UmbAuthFlow {
 	async #performTokenRequest(request: TokenRequest): Promise<void> {
 		try {
 			this.#tokenResponse = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
+			this.#saveTokenState();
 		} catch (error) {
-			// If the token request fails, it means the refresh token is invalid
+			// If the token request fails, it means the code or refresh token is invalid
+			this.clearTokenStorage();
 			console.error('Token request error', error);
 		}
 	}
