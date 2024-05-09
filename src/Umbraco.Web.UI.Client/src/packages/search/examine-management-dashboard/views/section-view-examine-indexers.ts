@@ -137,12 +137,12 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 			</p>
 			<uui-table class="info">
 				<uui-table-row>
-					<uui-table-cell style="width:0px; font-weight: bold;"> documentCount </uui-table-cell>
-					<uui-table-cell>${this._indexData.documentCount} </uui-table-cell>
+					<uui-table-cell style="width:0px; font-weight: bold;">DocumentCount</uui-table-cell>
+					<uui-table-cell>${this._indexData.documentCount}</uui-table-cell>
 				</uui-table-row>
 				<uui-table-row>
-					<uui-table-cell style="width:0px; font-weight: bold;"> fieldCount </uui-table-cell>
-					<uui-table-cell>${this._indexData.fieldCount} </uui-table-cell>
+					<uui-table-cell style="width:0px; font-weight: bold;">FieldCount</uui-table-cell>
+					<uui-table-cell>${this._indexData.fieldCount}</uui-table-cell>
 				</uui-table-row>
 				${this._indexData.providerProperties
 					? Object.entries(this._indexData.providerProperties).map((entry) => {
