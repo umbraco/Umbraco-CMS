@@ -356,12 +356,9 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 
 	static styles = [
 		css`
-			#editor {
+			.tox-tinymce {
 				position: relative;
 				min-height: 100px;
-			}
-
-			.tox-tinymce {
 				border-radius: 0;
 				border: var(--uui-input-border-width, 1px) solid var(--uui-input-border-color, var(--uui-color-border, #d8d7d9));
 			}
