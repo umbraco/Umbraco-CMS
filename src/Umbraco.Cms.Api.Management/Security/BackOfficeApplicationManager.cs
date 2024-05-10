@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
@@ -6,7 +7,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Security;
 
@@ -57,6 +57,8 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         }
         else
         {
+            var developerClientTimeOutValue = new GlobalSettings().TimeOut.ToString("c", CultureInfo.InvariantCulture);
+
             await CreateOrUpdate(
                 new OpenIddictApplicationDescriptor
                 {
@@ -73,6 +75,11 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                         OpenIddictConstants.Permissions.Endpoints.Token,
                         OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                         OpenIddictConstants.Permissions.ResponseTypes.Code
+                    },
+                    Settings =
+                    {
+                        // use a fixed access token lifetime for tokens issued to the Swagger application.
+                        [OpenIddictConstants.Settings.TokenLifetimes.AccessToken] = developerClientTimeOutValue
                     }
                 },
                 cancellationToken);
@@ -93,6 +100,11 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                         OpenIddictConstants.Permissions.Endpoints.Token,
                         OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                         OpenIddictConstants.Permissions.ResponseTypes.Code
+                    },
+                    Settings =
+                    {
+                        // use a fixed access token lifetime for tokens issued to the Postman application.
+                        [OpenIddictConstants.Settings.TokenLifetimes.AccessToken] = developerClientTimeOutValue
                     }
                 },
                 cancellationToken);
