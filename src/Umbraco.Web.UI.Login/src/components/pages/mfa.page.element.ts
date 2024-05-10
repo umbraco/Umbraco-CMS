@@ -128,7 +128,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
                 <uui-label id="providerLabel" for="provider" slot="label" required>
                   <umb-localize key="auth_mfaMultipleText">Please choose a 2-factor provider</umb-localize>
                 </uui-label>
-                <uui-select id="provider" name="provider" .options=${this.providers} aria-required="true" required></uui-select>
+                <uui-select label=${this.localize.term('auth_mfaMultipleText')} id="provider" name="provider" .options=${this.providers} aria-required="true" required></uui-select>
               </uui-form-layout-item>
             `
             : nothing}
@@ -149,6 +149,7 @@ export default class UmbMfaPageElement extends UmbLitElement {
               aria-required="true"
               required
               required-message=${this.localize.term('auth_mfaCodeInputHelp')}
+              label=${this.localize.term('auth_mfaCodeInput')}
               style="width:100%;">
             </uui-input>
           </uui-form-layout-item>
