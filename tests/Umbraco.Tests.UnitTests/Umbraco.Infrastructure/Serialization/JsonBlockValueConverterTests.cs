@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -25,65 +25,48 @@ public class JsonBlockValueConverterTests
         var elementType3Key = Guid.NewGuid();
         var elementType4Key = Guid.NewGuid();
 
-        var blockGridValue = new BlockGridValue
-        {
-            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+        var blockGridValue = new BlockGridValue(
+        [
+            new BlockGridLayoutItem(contentElementUdi1, settingsElementUdi1)
             {
-                {
-                    Constants.PropertyEditors.Aliases.BlockGrid,
-                    new IBlockLayoutItem[]
+                ColumnSpan = 123,
+                RowSpan = 456,
+                Areas =
+                [
+                    new BlockGridLayoutAreaItem(Guid.NewGuid())
                     {
-                        new BlockGridLayoutItem
-                        {
-                            ColumnSpan = 123,
-                            RowSpan = 456,
-                            ContentUdi = contentElementUdi1,
-                            SettingsUdi = settingsElementUdi1,
-                            Areas = new []
+                        Items =
+                        [
+                            new BlockGridLayoutItem(contentElementUdi3, settingsElementUdi3)
                             {
-                                new BlockGridLayoutAreaItem
-                                {
-                                    Key = Guid.NewGuid(),
-                                    Items = new []
+                                ColumnSpan = 12,
+                                RowSpan = 34,
+                                Areas =
+                                [
+                                    new BlockGridLayoutAreaItem(Guid.NewGuid())
                                     {
-                                        new BlockGridLayoutItem
-                                        {
-                                            ColumnSpan = 12,
-                                            RowSpan = 34,
-                                            ContentUdi = contentElementUdi3,
-                                            SettingsUdi = settingsElementUdi3,
-                                            Areas = new []
+                                        Items =
+                                        [
+                                            new BlockGridLayoutItem(contentElementUdi4, settingsElementUdi4)
                                             {
-                                                new BlockGridLayoutAreaItem
-                                                {
-                                                    Key = Guid.NewGuid(),
-                                                    Items = new []
-                                                    {
-                                                        new BlockGridLayoutItem
-                                                        {
-                                                            ColumnSpan = 56,
-                                                            RowSpan = 78,
-                                                            ContentUdi = contentElementUdi4,
-                                                            SettingsUdi = settingsElementUdi4
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        new BlockGridLayoutItem
-                        {
-                            ColumnSpan = 789,
-                            RowSpan = 123,
-                            ContentUdi = contentElementUdi2,
-                            SettingsUdi = settingsElementUdi2
-                        }
-                    }
-                }
+                                                ColumnSpan = 56,
+                                                RowSpan = 78,
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
             },
+            new BlockGridLayoutItem(contentElementUdi2, settingsElementUdi2)
+            {
+                ColumnSpan = 789,
+                RowSpan = 123,
+            }
+        ])
+        {
             ContentData =
             [
                 new() { Udi = contentElementUdi1, ContentTypeAlias = "elementType1", ContentTypeKey = elementType1Key },
@@ -189,13 +172,7 @@ public class JsonBlockValueConverterTests
     [Test]
     public void Can_Serialize_BlockGrid_Without_Blocks()
     {
-        var blockGridValue = new BlockGridValue
-        {
-            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>(),
-            ContentData = [],
-            SettingsData = []
-        };
-
+        var blockGridValue = new BlockGridValue();
         var serializer = new SystemTextJsonSerializer();
         var serialized = serializer.Serialize(blockGridValue);
         var deserialized = serializer.Deserialize<BlockGridValue>(serialized);
@@ -222,27 +199,12 @@ public class JsonBlockValueConverterTests
         var elementType3Key = Guid.NewGuid();
         var elementType4Key = Guid.NewGuid();
 
-        var blockListValue = new BlockListValue
+        var blockListValue = new BlockListValue(
+        [
+            new BlockListLayoutItem(contentElementUdi1, settingsElementUdi1),
+            new BlockListLayoutItem(contentElementUdi2, settingsElementUdi2),
+        ])
         {
-            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
-            {
-                {
-                    Constants.PropertyEditors.Aliases.BlockList,
-                    new IBlockLayoutItem[]
-                    {
-                        new BlockListLayoutItem()
-                        {
-                            ContentUdi = contentElementUdi1,
-                            SettingsUdi = settingsElementUdi1
-                        },
-                        new BlockListLayoutItem
-                        {
-                            ContentUdi = contentElementUdi2,
-                            SettingsUdi = settingsElementUdi2
-                        }
-                    }
-                }
-            },
             ContentData =
             [
                 new() { Udi = contentElementUdi1, ContentTypeAlias = "elementType1", ContentTypeKey = elementType1Key },
@@ -302,13 +264,7 @@ public class JsonBlockValueConverterTests
     [Test]
     public void Can_Serialize_BlockList_Without_Blocks()
     {
-        var blockListValue = new BlockListValue
-        {
-            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>(),
-            ContentData = [],
-            SettingsData = []
-        };
-
+        var blockListValue = new BlockListValue();
         var serializer = new SystemTextJsonSerializer();
         var serialized = serializer.Serialize(blockListValue);
         var deserialized = serializer.Deserialize<BlockListValue>(serialized);
@@ -335,27 +291,12 @@ public class JsonBlockValueConverterTests
         var elementType3Key = Guid.NewGuid();
         var elementType4Key = Guid.NewGuid();
 
-        var richTextBlockValue = new RichTextBlockValue
+        var richTextBlockValue = new RichTextBlockValue(
+        [
+            new RichTextBlockLayoutItem(contentElementUdi1, settingsElementUdi1),
+            new RichTextBlockLayoutItem(contentElementUdi2, settingsElementUdi2),
+        ])
         {
-            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
-            {
-                {
-                    Constants.PropertyEditors.Aliases.TinyMce,
-                    new IBlockLayoutItem[]
-                    {
-                        new RichTextBlockLayoutItem
-                        {
-                            ContentUdi = contentElementUdi1,
-                            SettingsUdi = settingsElementUdi1
-                        },
-                        new RichTextBlockLayoutItem
-                        {
-                            ContentUdi = contentElementUdi2,
-                            SettingsUdi = settingsElementUdi2
-                        }
-                    }
-                }
-            },
             ContentData =
             [
                 new() { Udi = contentElementUdi1, ContentTypeAlias = "elementType1", ContentTypeKey = elementType1Key },
@@ -426,12 +367,7 @@ public class JsonBlockValueConverterTests
     {
         var richTextEditorValue = new RichTextEditorValue
         {
-            Blocks = new RichTextBlockValue
-            {
-                Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>(),
-                ContentData = new List<BlockItemData>(),
-                SettingsData = new List<BlockItemData>()
-            },
+            Blocks = new RichTextBlockValue(),
             Markup = "<p>This is some markup</p>"
         };
 
@@ -459,54 +395,25 @@ public class JsonBlockValueConverterTests
         var elementType1Key = Guid.NewGuid();
         var elementType2Key = Guid.NewGuid();
 
-        var blockListValue = new BlockListValue
+        var blockListValue = new BlockListValue(
+        [
+            new BlockListLayoutItem(contentElementUdi1, settingsElementUdi1),
+        ])
         {
-            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            Layout =
             {
-                {
-                    Constants.PropertyEditors.Aliases.TinyMce,
-                    new IBlockLayoutItem[]
-                    {
-                        new RichTextBlockLayoutItem
-                        {
-                            ContentUdi = contentElementUdi1,
-                            SettingsUdi = settingsElementUdi1
-                        }
-                    }
-                },
-                {
-                    Constants.PropertyEditors.Aliases.BlockList,
-                    new IBlockLayoutItem[]
-                    {
-                        new BlockListLayoutItem
-                        {
-                            ContentUdi = contentElementUdi1,
-                            SettingsUdi = settingsElementUdi1
-                        }
-                    }
-                },
-                {
-                    Constants.PropertyEditors.Aliases.BlockGrid,
-                    new IBlockLayoutItem[]
-                    {
-                        new BlockGridLayoutItem
-                        {
-                            ContentUdi = contentElementUdi1,
-                            SettingsUdi = settingsElementUdi1
-                        }
-                    }
-                },
-                {
-                    "Some.Custom.Block.Editor",
-                    new IBlockLayoutItem[]
-                    {
-                        new BlockListLayoutItem
-                        {
-                            ContentUdi = contentElementUdi1,
-                            SettingsUdi = settingsElementUdi1
-                        }
-                    }
-                }
+                [Constants.PropertyEditors.Aliases.TinyMce] =
+                [
+                    new RichTextBlockLayoutItem(contentElementUdi1, settingsElementUdi1)
+                ],
+                [Constants.PropertyEditors.Aliases.BlockGrid] =
+                [
+                    new BlockGridLayoutItem(contentElementUdi1, settingsElementUdi1),
+                ],
+                ["Some.Custom.Block.Editor"] =
+                [
+                    new BlockListLayoutItem(contentElementUdi1, settingsElementUdi1),
+                ]
             },
             ContentData =
             [
