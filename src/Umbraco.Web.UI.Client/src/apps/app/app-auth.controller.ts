@@ -60,36 +60,25 @@ export class UmbAppAuthController extends UmbControllerBase {
 			throw new Error('[Fatal] No auth providers available');
 		}
 
-		// If the user is timed out, we can show the login modal directly
-		if (userLoginState === 'timedOut') {
-			const selected = await this.#showLoginModal(userLoginState);
-
-			if (!selected) {
-				return false;
+		// If we are logging in, we need to check if we can redirect directly to the provider
+		if (userLoginState === 'loggingIn') {
+			// One provider available (most likely the Umbraco provider), so initiate the authorization request to the default provider
+			if (availableProviders.length === 1) {
+				await this.#authContext.makeAuthorizationRequest(availableProviders[0].forProviderName, true);
+				return this.#updateState();
 			}
 
-			return this.#updateState();
-		}
+			// Check if any provider is redirecting directly to the provider
+			const redirectProvider = availableProviders.find((provider) => provider.meta?.behavior?.autoRedirect);
 
-		if (availableProviders.length === 1) {
-			// One provider available (most likely the Umbraco provider), so initiate the authorization request to the default provider
-			await this.#authContext.makeAuthorizationRequest(availableProviders[0].forProviderName, true);
-			return this.#updateState();
-		}
-
-		// Check if any provider is redirecting directly to the provider
-		const redirectProvider =
-			userLoginState === 'loggingIn'
-				? availableProviders.find((provider) => provider.meta?.behavior?.autoRedirect)
-				: undefined;
-
-		if (redirectProvider) {
 			// Redirect directly to the provider
-			await this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName, true);
-			return this.#updateState();
+			if (redirectProvider) {
+				await this.#authContext.makeAuthorizationRequest(redirectProvider.forProviderName, true);
+				return this.#updateState();
+			}
 		}
 
-		// Show the provider selection screen
+		// Otherwise we can show the provider selection screen directly, because the user is either logged out, timed out, or has more than one provider available
 		const selected = await this.#showLoginModal(userLoginState);
 
 		if (!selected) {
