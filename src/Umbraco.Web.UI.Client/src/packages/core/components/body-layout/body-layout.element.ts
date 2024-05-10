@@ -75,6 +75,10 @@ export class UmbBodyLayoutElement extends LitElement {
 		this.toggleAttribute('scrolling', this._scrollContainer.scrollTop > 0);
 	};
 
+	#setSlotVisibility(target: HTMLElement, hasChildren: boolean) {
+		target.style.display = hasChildren ? 'flex' : 'none';
+	}
+
 	render() {
 		return html`
 			<div
@@ -92,18 +96,21 @@ export class UmbBodyLayoutElement extends LitElement {
 					name="header"
 					@slotchange=${(e: Event) => {
 						this._headerSlotHasChildren = this.#hasNodes(e);
+						this.#setSlotVisibility(e.target as HTMLElement, this._headerSlotHasChildren);
 					}}></slot>
 				<slot
 					id="navigation-slot"
 					name="navigation"
 					@slotchange=${(e: Event) => {
-						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
+						this._navigationSlotHasChildren = this.#hasNodes(e);
+						this.#setSlotVisibility(e.target as HTMLElement, this._navigationSlotHasChildren);
 					}}></slot>
 				<slot
 					id="action-menu-slot"
 					name="action-menu"
 					@slotchange=${(e: Event) => {
 						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
+						this.#setSlotVisibility(e.target as HTMLElement, this._actionsMenuSlotHasChildren);
 					}}></slot>
 			</div>
 
@@ -187,7 +194,7 @@ export class UmbBodyLayoutElement extends LitElement {
 			#header-slot,
 			#action-menu-slot,
 			#navigation-slot {
-				display: flex;
+				display: none;
 				height: 100%;
 				align-items: center;
 				box-sizing: border-box;
