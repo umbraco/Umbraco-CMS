@@ -81,15 +81,15 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		const avatarUrls = [
 			{
 				scale: '1x',
-				url: user.avatarUrls?.[0],
-			},
-			{
-				scale: '2x',
 				url: user.avatarUrls?.[1],
 			},
 			{
-				scale: '3x',
+				scale: '2x',
 				url: user.avatarUrls?.[2],
+			},
+			{
+				scale: '3x',
+				url: user.avatarUrls?.[3],
 			},
 		];
 
@@ -111,6 +111,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 				${this.#renderUserTag(user)} ${this.#renderUserGroupNames(user)} ${this.#renderUserLoginDate(user)}
 
 				<uui-avatar
+					style="font-size: 1.6rem;"
 					slot="avatar"
 					.name=${user.name || 'Unknown'}
 					img-src=${ifDefined(user.avatarUrls.length > 0 ? avatarUrls[0].url : undefined)}
