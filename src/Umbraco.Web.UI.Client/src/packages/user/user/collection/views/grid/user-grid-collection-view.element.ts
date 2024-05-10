@@ -81,15 +81,15 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		const avatarUrls = [
 			{
 				scale: '1x',
-				url: user.avatarUrls?.[0],
-			},
-			{
-				scale: '2x',
 				url: user.avatarUrls?.[1],
 			},
 			{
-				scale: '3x',
+				scale: '2x',
 				url: user.avatarUrls?.[2],
+			},
+			{
+				scale: '3x',
+				url: user.avatarUrls?.[3],
 			},
 		];
 
