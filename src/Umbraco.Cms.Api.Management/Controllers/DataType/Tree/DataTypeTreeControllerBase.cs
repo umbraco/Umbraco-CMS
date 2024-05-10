@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
@@ -40,11 +40,9 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
 
     protected override DataTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentId, IEntitySlim[] entities)
     {
-        Dictionary<int, IDataType> dataTypes = entities.Any()
-            ? _dataTypeService
-                .GetAllAsync(entities.Select(entity => entity.Key).ToArray()).GetAwaiter().GetResult()
-                .ToDictionary(contentType => contentType.Id)
-            : new Dictionary<int, IDataType>();
+        var dataTypes = _dataTypeService
+            .GetAllAsync(entities.Select(entity => entity.Key).ToArray()).GetAwaiter().GetResult()
+            .ToDictionary(contentType => contentType.Id);
 
         return entities.Select(entity =>
         {

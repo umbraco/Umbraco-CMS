@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -658,12 +658,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         => model.Properties.Select(property => property.DataTypeKey).Distinct().ToArray();
 
     private async Task<IDataType[]> GetDataTypesAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
-    {
-        Guid[] dataTypeKeys = GetDataTypeKeys(model);
-        return dataTypeKeys.Any()
-            ? (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray()
-            : Array.Empty<IDataType>();
-    }
+        => (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray();
 
     private int? GetParentId(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? containerKey)
     {
