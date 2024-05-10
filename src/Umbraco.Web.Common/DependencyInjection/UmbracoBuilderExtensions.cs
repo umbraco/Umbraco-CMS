@@ -44,6 +44,7 @@ using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Blocks;
 using Umbraco.Cms.Web.Common.Configuration;
+using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
 using Umbraco.Cms.Web.Common.Helpers;

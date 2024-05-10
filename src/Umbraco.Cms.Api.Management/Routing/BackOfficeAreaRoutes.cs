@@ -19,9 +19,6 @@ namespace Umbraco.Cms.Api.Management.Routing;
 /// </summary>
 public sealed class BackOfficeAreaRoutes : IAreaRoutes
 {
-    private readonly UmbracoApiControllerTypeCollection _apiControllers;
-    private readonly GlobalSettings _globalSettings;
-    private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IRuntimeState _runtimeState;
     private readonly string _umbracoPathSegment;
 
@@ -31,14 +28,20 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
     public BackOfficeAreaRoutes(
         IOptions<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment,
-        IRuntimeState runtimeState,
-        UmbracoApiControllerTypeCollection apiControllers)
+        IRuntimeState runtimeState)
     {
-        _globalSettings = globalSettings.Value;
-        _hostingEnvironment = hostingEnvironment;
         _runtimeState = runtimeState;
-        _apiControllers = apiControllers;
-        _umbracoPathSegment = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment);
+        _umbracoPathSegment = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
+    }
+
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
+    public BackOfficeAreaRoutes(
+        IOptions<GlobalSettings> globalSettings,
+        IHostingEnvironment hostingEnvironment,
+        IRuntimeState runtimeState,
+        UmbracoApiControllerTypeCollection apiControllers) : this(globalSettings, hostingEnvironment, runtimeState)
+    {
+
     }
 
     /// <inheritdoc />
@@ -53,7 +56,6 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
             case RuntimeLevel.Run:
 
                 MapMinimalBackOffice(endpoints);
-                AutoRouteBackOfficeApiControllers(endpoints);
                 break;
             case RuntimeLevel.BootFailed:
             case RuntimeLevel.Unknown:
@@ -87,34 +89,5 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
                 Action = nameof(BackOfficeDefaultController.Index),
             },
             constraints: new { slug = @"^(section.*|upgrade|install|oauth_complete|logout|error)$" });
-    }
-
-    /// <summary>
-    ///     Auto-routes all back office api controllers
-    /// </summary>
-    private void AutoRouteBackOfficeApiControllers(IEndpointRouteBuilder endpoints)
-    {
-        // TODO: We could investigate dynamically routing plugin controllers so we don't have to eagerly type scan for them,
-        // it would probably work well, see https://www.strathweb.com/2019/08/dynamic-controller-routing-in-asp-net-core-3-0/
-        // will probably be what we use for front-end routing too. BTW the orig article about migrating from IRouter to endpoint
-        // routing for things like a CMS is here https://github.com/dotnet/aspnetcore/issues/4221
-
-        foreach (Type controller in _apiControllers)
-        {
-            PluginControllerMetadata meta = PluginController.GetMetadata(controller);
-
-            // exclude front-end api controllers
-            if (!meta.IsBackOffice)
-            {
-                continue;
-            }
-
-            endpoints.MapUmbracoApiRoute(
-                meta.ControllerType,
-                _umbracoPathSegment,
-                meta.AreaName,
-                meta.IsBackOffice,
-                string.Empty); // no default action (this is what we had before)
-        }
     }
 }

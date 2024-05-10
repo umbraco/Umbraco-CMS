@@ -47,18 +47,9 @@ public class BackOfficeAreaRoutesTests
 
         Assert.AreEqual(1, endpoints.DataSources.Count);
         var route = endpoints.DataSources.First();
-        Assert.AreEqual(3, route.Endpoints.Count);
+        Assert.AreEqual(2, route.Endpoints.Count);
 
         AssertMinimalBackOfficeRoutes(route);
-
-        var endpoint4 = (RouteEndpoint)route.Endpoints[2];
-        var apiControllerName = ControllerExtensions.GetControllerName<Testing1Controller>();
-        Assert.AreEqual(
-            $"umbraco/backoffice/api/{apiControllerName.ToLowerInvariant()}/{{action}}/{{id?}}",
-            endpoint4.RoutePattern.RawText);
-        Assert.IsFalse(endpoint4.RoutePattern.Defaults.ContainsKey(AreaToken));
-        Assert.IsFalse(endpoint4.RoutePattern.Defaults.ContainsKey(ActionToken));
-        Assert.AreEqual(apiControllerName, endpoint4.RoutePattern.Defaults[ControllerToken]);
     }
 
     private void AssertMinimalBackOfficeRoutes(EndpointDataSource route)
