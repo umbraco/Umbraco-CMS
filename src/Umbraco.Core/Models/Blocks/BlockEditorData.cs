@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// </summary>
 public class BlockEditorData<TValue, TLayout>
     where TValue : BlockValue<TLayout>, new()
-    where TLayout : class, IBlockLayoutItem, new()
+    where TLayout : IBlockLayoutItem
 {
     private readonly string _propertyEditorAlias;
 

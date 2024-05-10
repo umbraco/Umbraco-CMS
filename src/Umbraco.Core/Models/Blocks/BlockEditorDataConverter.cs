@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// </summary>
 public abstract class BlockEditorDataConverter<TValue, TLayout>
     where TValue : BlockValue<TLayout>, new()
-    where TLayout : class, IBlockLayoutItem, new()
+    where TLayout : IBlockLayoutItem
 {
     private readonly IJsonSerializer _jsonSerializer;
 
@@ -42,7 +42,7 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
         }
         catch (Exception)
         {
-            blockEditorData = null;
+            blockEditorData = default;
             return false;
         }
     }
