@@ -47,15 +47,18 @@ public static class LinkGeneratorExtensions
     ///     Return the Url for a Web Api service
     /// </summary>
     /// <typeparam name="T">The <see cref="UmbracoApiControllerBase" /></typeparam>
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName, object? id = null)
         where T : UmbracoApiControllerBase => linkGenerator.GetUmbracoControllerUrl(
         actionName,
         typeof(T),
         new Dictionary<string, object?> { ["id"] = id });
 
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName, IDictionary<string, object?>? values)
         where T : UmbracoApiControllerBase => linkGenerator.GetUmbracoControllerUrl(actionName, typeof(T), values);
 
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiServiceBaseUrl<T>(
         this LinkGenerator linkGenerator,
         Expression<Func<T, object?>> methodSelector)
@@ -160,6 +163,7 @@ public static class LinkGeneratorExtensions
         return linkGenerator.GetUmbracoControllerUrl(actionName, ControllerExtensions.GetControllerName(controllerType), area, values);
     }
 
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService<T>(
         this LinkGenerator linkGenerator,
         Expression<Func<T, object>> methodSelector)

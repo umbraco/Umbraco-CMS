@@ -52,6 +52,7 @@ public static class UrlHelperExtensions
     /// <param name="actionName"></param>
     /// <param name="id"></param>
     /// <returns></returns>
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService<T>(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -60,6 +61,7 @@ public static class UrlHelperExtensions
         where T : UmbracoApiController =>
         url.GetUmbracoApiService(umbracoApiControllerTypeCollection, actionName, typeof(T), id);
 
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService<T>(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -91,6 +93,7 @@ public static class UrlHelperExtensions
     /// <param name="apiControllerType"></param>
     /// <param name="id"></param>
     /// <returns></returns>
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -210,6 +213,7 @@ public static class UrlHelperExtensions
     /// <param name="umbracoApiControllerTypeCollection"></param>
     /// <param name="actionName"></param>
     /// <returns></returns>
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiServiceBaseUrl<T>(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -217,6 +221,7 @@ public static class UrlHelperExtensions
         where T : UmbracoApiController =>
         url.GetUmbracoApiService<T>(umbracoApiControllerTypeCollection, actionName)?.TrimEnd(actionName);
 
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiServiceBaseUrl<T>(
         this IUrlHelper url,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
