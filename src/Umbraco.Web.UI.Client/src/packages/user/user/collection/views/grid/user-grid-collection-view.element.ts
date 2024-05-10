@@ -111,7 +111,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 				${this.#renderUserTag(user)} ${this.#renderUserGroupNames(user)} ${this.#renderUserLoginDate(user)}
 
 				<uui-avatar
-					style="font-size: 2rem;"
+					style="font-size: 1.6rem;"
 					slot="avatar"
 					.name=${user.name || 'Unknown'}
 					img-src=${ifDefined(user.avatarUrls.length > 0 ? avatarUrls[0].url : undefined)}
