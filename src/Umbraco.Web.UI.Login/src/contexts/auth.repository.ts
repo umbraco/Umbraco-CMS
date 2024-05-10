@@ -220,9 +220,6 @@ export class UmbAuthRepository extends UmbRepositoryBase {
       case 403:
         return this.#localize.term('auth_userLockedOut');
 
-      case 500:
-        return this.#localize.term('auth_receivedErrorFromServer');
-
       default:
         return (
           this.#localize.term('auth_receivedErrorFromServer')
