@@ -32,7 +32,8 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 				@input=${this.#onSearch}
 				label=${this.localize.term('general_search')}
 				placeholder=${this.localize.term('general_search')}
-				id="input-search"></uui-input> `;
+				id="input-search"></uui-input>
+			<umb-collection-view-bundle></umb-collection-view-bundle>`;
 	}
 
 	static styles = [
