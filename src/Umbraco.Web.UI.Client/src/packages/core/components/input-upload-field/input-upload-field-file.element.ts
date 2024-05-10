@@ -2,7 +2,6 @@ import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { mime } from '@umbraco-cms/backoffice/external/mime';
 
 @customElement('umb-input-upload-field-file')
 export class UmbInputUploadFieldFileElement extends UmbLitElement {
@@ -38,7 +37,7 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('file') && this.file) {
-			this.extension = mime.getExtension(this.file.type) ?? '';
+			this.extension = this.#getExtensionFromMime(this.file.type) ?? '';
 			this.label = this.file.name || 'loading...';
 		}
 
@@ -49,6 +48,18 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 				this.extension = this.path.split('.').pop() || '';
 				this.label = this.#serverUrl ? this.path.substring(this.#serverUrl.length) : 'loading...';
 			}
+		}
+	}
+
+	#getExtensionFromMime(mime: string): string {
+		//TODO Temporary solution.
+		if (!mime) return ''; //folders
+		const extension = mime.split('/')[1];
+		switch (extension) {
+			case 'svg+xml':
+				return 'svg';
+			default:
+				return extension;
 		}
 	}
 
