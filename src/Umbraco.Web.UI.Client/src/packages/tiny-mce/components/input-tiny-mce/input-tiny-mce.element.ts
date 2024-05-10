@@ -52,8 +52,6 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	@state()
 	private _tinyConfig: RawEditorOptions = {};
 
-	// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-	#renderEditor?: typeof import('@umbraco-cms/backoffice/external/tinymce').renderEditor;
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 	#editorRef?: Editor | null = null;
 	#stylesheetRepository = new UmbStylesheetDetailRepository(this);
@@ -80,21 +78,15 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	private _editorElement?: HTMLElement;
 
 	protected async firstUpdated(): Promise<void> {
-		// Here we want to start the loading of everything at first, not one at a time, which is why this code is not using await.
-		const loadEditor = import('@umbraco-cms/backoffice/external/tinymce').then((tinyMce) => {
-			this.#renderEditor = tinyMce.renderEditor;
-		});
-		await Promise.all([loadEditor, ...(await this.#loadPlugins())]);
+		await Promise.all([...(await this.#loadPlugins())]);
 		await this.#setTinyConfig();
 	}
 
 	disconnectedCallback() {
 		super.disconnectedCallback();
 
-		if (this.#editorRef) {
-			// TODO: Test if there is any problems with destroying the RTE here, but not initializing on connectedCallback. (firstUpdated is only called first time the element is rendered, not when it is reconnected)
-			this.#editorRef.destroy();
-		}
+		// TODO: Test if there is any problems with destroying the RTE here, but not initializing on connectedCallback. (firstUpdated is only called first time the element is rendered, not when it is reconnected)
+		this.#editorRef?.destroy();
 	}
 
 	/**
@@ -105,7 +97,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	 */
 	async #loadPlugins() {
 		const observable = umbExtensionsRegistry?.byType('tinyMcePlugin');
-		const manifests = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
+		const manifests = await firstValueFrom(observable);
 
 		const promises = [];
 		for (const manifest of manifests) {
@@ -255,10 +247,10 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			this.#editorRef.destroy();
 		}
 
-		if (!this.#renderEditor) {
-			throw new Error('TinyMCE renderEditor is not loaded');
-		}
-		const editors = await this.#renderEditor(this._tinyConfig);
+		const editors = await renderEditor(this._tinyConfig).catch((error) => {
+			console.error('Failed to render TinyMCE', error);
+			return [];
+		});
 		this.#editorRef = editors.pop();
 	}
 
@@ -321,7 +313,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			this.#onChange(editor.getContent());
 		});
 
-		editor.on('SetContent', (e) => {
+		editor.on('SetContent', () => {
 			/**
 			 * Prevent injecting arbitrary JavaScript execution in on-attributes.
 			 *
