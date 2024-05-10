@@ -979,6 +979,11 @@ export enum HealthStatusModel {
     REBUILDING = 'Rebuilding'
 }
 
+export type HealthStatusResponseModel = {
+        status: HealthStatusModel
+message?: string | null
+    };
+
 export type HelpPageResponseModel = {
         name?: string | null
 description?: string | null
@@ -993,7 +998,7 @@ parent?: ReferenceByIdModel | null
 
 export type IndexResponseModel = {
         name: string
-healthStatus: HealthStatusModel
+healthStatus: HealthStatusResponseModel
 canRebuild: boolean
 searcherName: string
 documentCount: number
@@ -5237,13 +5242,13 @@ GetWebhookById: {
                         id: string
                         
                     };
+DeleteWebhookById: {
+                        id: string
+                        
+                    };
 PutWebhookById: {
                         id: string
 requestBody?: UpdateWebhookRequestModel
-                        
-                    };
-DeleteWebhookById: {
-                        id: string
                         
                     };
 GetWebhookEvents: {
@@ -5259,8 +5264,8 @@ take?: number
                 ,GetWebhook: PagedWebhookResponseModel
                 ,PostWebhook: string
                 ,GetWebhookById: WebhookResponseModel
-                ,PutWebhookById: string
                 ,DeleteWebhookById: string
+                ,PutWebhookById: string
                 ,GetWebhookEvents: PagedWebhookEventModel
                 
         }

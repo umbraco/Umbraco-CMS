@@ -52,7 +52,7 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 				(item) => item.alias,
 				(item) => html`
 					<span>${item.eventName}</span>
-					<uui-button @click=${() => this.#removeEvent(item.alias)} label="remove"></uui-button>
+					<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#removeEvent(item.alias)}></uui-button>
 				`,
 			)}
 		`;
@@ -60,7 +60,7 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 
 	render() {
 		return html`${this.#renderEvents()}
-			<uui-button id="add" look="placeholder" label="Add" @click=${this.#openModal}></uui-button>`;
+			<uui-button id="choose" look="placeholder" label=${this.localize.term('general_choose')} @click=${this.#openModal}></uui-button>`;
 	}
 
 	static styles = [
@@ -73,7 +73,7 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			#add {
+			#choose {
 				grid-column: -1 / 1;
 			}
 		`,
