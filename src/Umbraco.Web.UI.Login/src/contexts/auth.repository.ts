@@ -36,13 +36,21 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 
       const response = await fetch(request);
 
-      // If the response code is 402, it means that the user has enabled 2-factor authentication
-      let twoFactorView = '';
-      let twoFactorProviders: Array<string> = [];
-      if (response.status === 402) {
-        const responseData = await response.json();
-        twoFactorView = responseData.twoFactorLoginView ?? '';
-        twoFactorProviders = responseData.enabledTwoFactorProviderNames ?? [];
+      if (!response.ok) {
+        // If the response code is 402, it means that the user has enabled 2-factor authentication
+        if (response.status === 402) {
+          const responseData = await response.json();
+          return {
+            status: response.status,
+            twoFactorView: responseData.twoFactorLoginView ?? '',
+            twoFactorProviders: responseData.enabledTwoFactorProviderNames ?? [],
+          };
+        }
+
+        return {
+          status: response.status,
+          error: await this.#getErrorText(response),
+        };
       }
 
       return {
@@ -50,9 +58,6 @@ export class UmbAuthRepository extends UmbRepositoryBase {
         data: {
           username: data.username,
         },
-        error: await this.#getErrorText(response),
-        twoFactorView,
-        twoFactorProviders,
       };
     } catch (error) {
       return {
