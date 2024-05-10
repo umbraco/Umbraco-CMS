@@ -1,26 +1,17 @@
-import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
-import {
-	UmbMediaDetailRepository,
-	type UmbMediaItemModel,
-	UmbMediaItemRepository,
-	UmbMediaUrlRepository,
-} from '../../repository/index.js';
+import { type UmbMediaItemModel, UmbMediaItemRepository, UmbMediaUrlRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import type { UmbMediaCardItemModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { css, html, customElement, state, repeat, query, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { isUmbracoFolder } from '@umbraco-cms/backoffice/media-type';
-import { mime } from '@umbraco-cms/backoffice/external/mime';
 
 @customElement('umb-media-picker-modal')
 export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPickerModalData, UmbMediaPickerModalValue> {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
-	#mediaDetailRepository = new UmbMediaDetailRepository(this); // used to create folders
 	#mediaUrlRepository = new UmbMediaUrlRepository(this); // used to get urls
-	#mediaItemRepository = new UmbMediaItemRepository(this); // used to search
+	#mediaItemRepository = new UmbMediaItemRepository(this); // used to search & get media type of current path
 
 	#mediaItemsCurrentFolder: Array<UmbMediaCardItemModel> = [];
 
@@ -34,28 +25,17 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	private _searchQuery = '';
 
 	@state()
-	private _currentPath: string | null = null;
-
-	@state()
-	private _selectableNonImages = true;
-
-	@state()
-	private _selectableFolders = true;
-
-	@query('#dropzone')
-	private _dropzone!: UmbDropzoneElement;
+	private _currentNode: string | null = null;
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this._selectableNonImages = this.data?.selectableNonImages ?? true;
-		this._selectableFolders = this.data?.selectableFolders ?? true;
-		this._currentPath = this.data?.startNode ?? null;
+		this._currentNode = this.data?.startNode ?? null;
 		this.#loadMediaFolder();
 	}
 
 	async #loadMediaFolder() {
 		const { data } = await this.#mediaTreeRepository.requestTreeItemsOf({
-			parentUnique: this._currentPath,
+			parentUnique: this._currentNode,
 			skip: 0,
 			take: 100,
 		});
@@ -69,19 +49,17 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 		const { data } = await this.#mediaUrlRepository.requestItems(items.map((item) => item.unique));
 
-		return items.map((item) => {
+		return items.map((item): UmbMediaCardItemModel => {
 			const url = data?.find((media) => media.unique === item.unique)?.url;
 			const extension = url?.split('.').pop();
-			const isFolder = isUmbracoFolder(item.mediaType?.unique);
-			const isImageRenderable = url ? !!mime.getType(url)?.startsWith('image/') : false;
+			//TODO Eventually we will get a renderable img from the server. Use this for the url. [LI]
 
-			return { name: item.name, unique: item.unique, isImageRenderable, url, isFolder, extension };
+			return { name: item.name, unique: item.unique, url, extension };
 		});
 	}
 
-	#onFolderOpen(item: UmbMediaCardItemModel) {
-		if (!isUmbracoFolder(item.unique)) return;
-		this._currentPath = item.unique!;
+	#onOpen(item: UmbMediaCardItemModel) {
+		this._currentNode = item.unique!;
 		this.#loadMediaFolder();
 	}
 
@@ -120,11 +98,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		}
 
 		// Map urls for search results as we are going to show for all folders (as long they aren't trashed).
-		this._mediaFilteredList = await this.#mapMediaUrls(
-			data.filter((found) => {
-				found.isTrashed ? false : false;
-			}),
-		);
+		this._mediaFilteredList = await this.#mapMediaUrls(data.filter((found) => found.isTrashed === false));
 	}
 
 	#onSearch(e: UUIInputEvent) {
@@ -133,14 +107,14 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	}
 
 	#onPathChange(e: CustomEvent) {
-		this._currentPath = (e.target as UmbMediaPickerFolderPathElement).currentPath;
+		this._currentNode = (e.target as UmbMediaPickerFolderPathElement).currentPath;
 		this.#loadMediaFolder();
 	}
 
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
-				${this.#renderBody()}
+				${this.#renderBody()} ${this.#renderPath()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -154,8 +128,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	}
 
 	#renderBody() {
-		return html`${this.#renderToolbar()}${this.#renderPath()}
-		<umb-dropzone id="dropzone" @change=${() => this.#loadMediaFolder()} .parentUnique=${this._currentPath}></umb-dropzone>
+		return html`${this.#renderToolbar()}
+		<umb-dropzone id="dropzone" @change=${() => this.#loadMediaFolder()} .parentUnique=${this._currentNode}></umb-dropzone>
 				${
 					!this._mediaFilteredList.length
 						? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
@@ -170,14 +144,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			</div>`;
 	}
 
-	#renderPath() {
-		return html`<umb-media-picker-folder-path
-			.currentPath=${this._currentPath}
-			@change=${this.#onPathChange}></umb-media-picker-folder-path>`;
-	}
-
 	#renderToolbar() {
 		return html`<div id="toolbar">
+			<umb-media-picker-create-item .node=${this._currentNode}></umb-media-picker-create-item>
 			<div id="search">
 				<uui-input
 					label=${this.localize.term('general_search')}
@@ -185,32 +154,36 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 					@change=${this.#onSearch}>
 					<uui-icon slot="prepend" name="icon-search"></uui-icon>
 				</uui-input>
-				<uui-checkbox
-					@change=${() => (this._searchOnlyThisFolder = !this._searchOnlyThisFolder)}
-					label=${this.localize.term('general_excludeFromSubFolders')}></uui-checkbox>
 			</div>
-			<uui-button
-				label=${this.localize.term('general_upload')}
-				look="primary"
-				@click=${() => this._dropzone?.browse()}></uui-button>
+			<uui-button label="TODO" compact @click=${() => alert('TODO: Show media items as list/grid')}
+				><uui-icon name="icon-grid"></uui-icon
+			></uui-button>
 		</div>`;
 	}
+
+	// Where should this be placed, without it looking terrible?
+	// <uui-checkbox @change=${() => (this._searchOnlyThisFolder = !this._searchOnlyThisFolder)} label=${this.localize.term('general_excludeFromSubFolders')}></uui-checkbox>
 
 	#renderCard(item: UmbMediaCardItemModel) {
 		return html`
 			<uui-card-media
 				.name=${item.name ?? 'Unnamed Media'}
-				@open=${() => this.#onFolderOpen(item)}
+				@open=${() => this.#onOpen(item)}
 				@selected=${() => this.#onSelected(item)}
 				@deselected=${() => this.#onDeselected(item)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
-				?selectable=${(!item.isFolder || this._selectableFolders) &&
-				(item.isImageRenderable || this._selectableNonImages)}
-				?select-only=${!item.isFolder}
+				selectable
 				file-ext=${ifDefined(item.extension)}>
-				${item.isImageRenderable && item.url ? html`<img src=${item.url} alt=${ifDefined(item.name)} />` : ''}
+				${item.url ? html`<img src=${item.url} alt=${ifDefined(item.name)} />` : ''}
 			</uui-card-media>
 		`;
+	}
+
+	#renderPath() {
+		return html`<umb-media-picker-folder-path
+			slot="footer-info"
+			.currentPath=${this._currentNode}
+			@change=${this.#onPathChange}></umb-media-picker-folder-path>`;
 	}
 
 	static styles = [
@@ -219,6 +192,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				display: flex;
 				gap: var(--uui-size-6);
 				align-items: flex-start;
+				margin-bottom: var(--uui-size-3);
 			}
 			#search {
 				flex: 1;
@@ -238,6 +212,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 				grid-template-rows: repeat(auto-fill, 200px);
 				gap: var(--uui-size-space-5);
+				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
 			}
 		`,
 	];

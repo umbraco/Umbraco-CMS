@@ -2,21 +2,17 @@ import type { UmbMediaPathModel } from '../types.js';
 import type { UmbMediaDetailModel } from '../../../types.js';
 import { UmbMediaDetailRepository } from '../../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../../tree/media-tree.repository.js';
-import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from '../media-picker-modal.token.js';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { css, html, customElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { getUmbracoFolderUnique } from '@umbraco-cms/backoffice/media-type';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 const root = { name: 'Media', unique: null };
 
 @customElement('umb-media-picker-folder-path')
-export class UmbMediaPickerFolderPathElement extends UmbModalBaseElement<
-	UmbMediaPickerModalData,
-	UmbMediaPickerModalValue
-> {
+export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
 	#mediaDetailRepository = new UmbMediaDetailRepository(this); // used to create folders
 
@@ -139,7 +135,7 @@ export class UmbMediaPickerFolderPathElement extends UmbModalBaseElement<
 			#path {
 				display: flex;
 				align-items: center;
-				margin-bottom: var(--uui-size-3);
+				margin: 0 var(--uui-size-3);
 			}
 			#path uui-button {
 				font-weight: bold;
