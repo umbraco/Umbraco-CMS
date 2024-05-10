@@ -185,7 +185,6 @@ export class UmbBodyLayoutElement extends LitElement {
 			}
 
 			#header-slot,
-			#tabs-slot,
 			#action-menu-slot,
 			#navigation-slot {
 				display: flex;
@@ -195,8 +194,7 @@ export class UmbBodyLayoutElement extends LitElement {
 				min-width: 0;
 			}
 
-			#navigation-slot,
-			#tabs-slot {
+			#navigation-slot {
 				margin-left: auto;
 			}
 
