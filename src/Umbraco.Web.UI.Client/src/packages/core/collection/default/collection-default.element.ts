@@ -32,13 +32,9 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		super();
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
 			this.#collectionContext = context;
+			this.#collectionContext?.requestCollection();
 			this.#observeCollectionRoutes();
 		});
-	}
-
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.firstUpdated(_changedProperties);
-		this.#collectionContext?.requestCollection();
 	}
 
 	#observeCollectionRoutes() {

@@ -641,6 +641,7 @@ export default {
 		entername: 'Enter a name...',
 		enteremail: 'Enter an email...',
 		enterusername: 'Enter a username...',
+		enterdate: 'Set a date...',
 		label: 'Label...',
 		enterDescription: 'Enter a description...',
 		search: 'Type to search...',
@@ -1054,34 +1055,9 @@ export default {
 		greeting4: 'Welcome',
 		greeting5: 'Welcome',
 		greeting6: 'Welcome',
-		instruction: 'Log in below',
-		signInWith: 'Sign in with',
-		timeout: 'Session timed out',
-		userFailedLogin: "Oops! We couldn't log you in. Please check your credentials and try again.",
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ',
-		forgottenPassword: 'Forgotten password?',
-		forgottenPasswordInstruction:
-			'An email will be sent to the address specified with a link to reset your\n      password\n    ',
-		requestPasswordResetConfirmation:
-			'An email with password reset instructions will be sent to the\n      specified address if it matched our records\n    ',
-		showPassword: 'Show password',
-		hidePassword: 'Hide password',
-		returnToLogin: 'Return to login form',
-		setPasswordInstruction: 'Please provide a new password',
-		setPasswordConfirmation: 'Your Password has been updated',
-		resetCodeExpired: 'The link you have clicked on is invalid or has expired',
-		resetPasswordEmailCopySubject: 'Umbraco: Reset Password',
-		resetPasswordEmailCopyFormat:
-			"\n        <html>\n\t\t\t<head>\n\t\t\t\t<meta name='viewport' content='width=device-width'>\n\t\t\t\t<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n\t\t\t</head>\n\t\t\t<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>\n\t\t\t\t<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>\n\t\t\t\t<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"body\" style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;\" bgcolor=\"#1d1333\">\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;\" valign=\"top\">\n\t\t\t\t\t\t\t<table style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;\">\n\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t<td background=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" bgcolor=\"#1d1333\" width=\"28\" height=\"28\" valign=\"top\" style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\">\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\" style=\"width:30px;height:30px;\"> <v:fill type=\"tile\" src=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" color=\"#1d1333\" /> <v:textbox inset=\"0,0,0,0\"> <![endif]-->\n<div></div>\n<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->\n</td>\n<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\" valign=\"top\"></td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>\n<tr>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>\n<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>\n<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>\n<br>\n<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>\n<tr>\n<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>\n<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>\n<tr>\n<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>\n<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPassword reset requested\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</h1>\n<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tYour username to login to the Umbraco backoffice is: <strong>%0%</strong>\n</p>\n<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>\n<tbody>\n<tr>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>\n<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tClick this link to reset your password\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</a>\n</td>\n</tr>\n</tbody>\n</table>\n</p>\n<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>If you cannot click on the link, copy and paste this URL into your browser window:</p>\n<table border='0' cellpadding='0' cellspacing='0'>\n<tr>\n<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>\n<font style=\"-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;\">\n<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>\n</font>\n</td>\n</tr>\n</table>\n</p>\n</td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n<br><br><br>\n</div>\n</td>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>\n</tr>\n</table>\n</body>\n</html>\n\t",
-		mfaSecurityCodeSubject: 'Umbraco: Security Code',
-		mfaSecurityCodeMessage: 'Your security code is: %0%',
-		'2faTitle': 'One last step',
-		'2faText': 'You have enabled 2-factor authentication and must verify your identity.',
-		'2faMultipleText': 'Please choose a 2-factor provider',
-		'2faCodeInput': 'Verification code',
-		'2faCodeInputHelp': 'Please enter the verification code',
-		'2faInvalidCode': 'Invalid code entered',
+		instruction: 'Sign in to Umbraco',
+		signInWith: 'Sign in with {0}',
+		timeout: 'Your session has timed out. Please sign in again below.',
 	},
 	main: {
 		dashboard: 'Dashboard',
@@ -1107,13 +1083,6 @@ export default {
 	notifications: {
 		editNotifications: 'Select your notification for <strong>%0%</strong>',
 		notificationsSavedFor: 'Notification settings saved for',
-		mailBody:
-			"\n      Hi %0%\n\n      This is an automated mail to inform you that the task '%1%'\n      has been performed on the page '%2%'\n      by the user '%3%'\n\n      Go to http://%4%/#/content/content/edit/%5% to edit.\n\n      %6%\n\n      Have a nice day!\n      Cheers from the Umbraco robot\n    ",
-		mailBodyVariantSummary: 'The following languages have been modified %0%',
-		mailBodyHtml:
-			"\n        <html>\n\t\t\t<head>\n\t\t\t\t<meta name='viewport' content='width=device-width'>\n\t\t\t\t<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n\t\t\t</head>\n\t\t\t<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>\n\t\t\t\t<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>\n\t\t\t\t<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"body\" style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;\" bgcolor=\"#1d1333\">\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;\" valign=\"top\">\n\t\t\t\t\t\t\t<table style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;\">\n\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t<td background=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" bgcolor=\"#1d1333\" width=\"28\" height=\"28\" valign=\"top\" style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\">\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\" style=\"width:30px;height:30px;\"> <v:fill type=\"tile\" src=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" color=\"#1d1333\" /> <v:textbox inset=\"0,0,0,0\"> <![endif]-->\n<div></div>\n<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->\n</td>\n<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\" valign=\"top\"></td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>\n<tr>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>\n<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>\n<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>\n<br>\n<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>\n<tr>\n<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>\n<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>\n<tr>\n<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>\n<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tHi %0%,\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</h1>\n<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tThis is an automated mail to inform you that the task <strong>'%1%'</strong> has been performed on the page <a style=\"color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;\" href=\"http://%4%/#/content/content/edit/%5%\"><strong>'%2%'</strong></a> by the user <strong>'%3%'</strong>\n</p>\n<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>\n<tbody>\n<tr>\n<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>\n<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>\n<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>EDIT</a></td></tr></tbody></table>\n</td>\n</tr>\n</tbody>\n</table>\n<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n<h3>Update summary:</h3>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t%6%\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tHave a nice day!<br /><br />\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tCheers from the Umbraco robot\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n</td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n<br><br><br>\n</div>\n</td>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>\n</tr>\n</table>\n</body>\n</html>\n\t",
-		mailBodyVariantHtmlSummary: '<p>The following languages have been modified:</p>\n        %0%\n    ',
-		mailSubject: '[%0%] Notification about %1% performed on %2%',
 		notifications: 'Notifications',
 	},
 	packager: {
@@ -1384,6 +1353,7 @@ export default {
 		folderUploadNotAllowed:
 			'This file is being uploaded as part of a folder, but creating a new folder is not allowed here',
 		folderCreationNotAllowed: 'Creating a new folder is not allowed here',
+		contentPublishedFailedByEvent: 'Content could not be published, a 3rd party add-in cancelled the action',
 		contentTypeDublicatePropertyType: 'Property type already exists',
 		contentTypePropertyTypeCreated: 'Property type created',
 		contentTypePropertyTypeCreatedText: 'Name: %0% <br /> DataType: %1%',
@@ -1397,6 +1367,7 @@ export default {
 		cssSavedText: 'Stylesheet saved without any errors',
 		dataTypeSaved: 'Datatype saved',
 		dictionaryItemSaved: 'Dictionary item saved',
+		editContentPublishedFailedByParent: 'Content could not be published, because a parent page is not published',
 		editContentPublishedHeader: 'Content published',
 		editContentPublishedText: 'and visible on the website',
 		editBlueprintSavedHeader: 'Content Template saved',
@@ -1523,6 +1494,7 @@ export default {
 		insertPartialViewDesc:
 			"\n      A partial view is a separate template file which can be rendered inside another\n      template, it's great for reusing markup or for separating complex templates into separate files.\n    ",
 		mastertemplate: 'Master template',
+		quickGuide: 'Quick guide to template tags',
 		noMaster: 'No master',
 		renderBody: 'Render child template',
 		renderBodyDesc:
@@ -1815,6 +1787,8 @@ export default {
 		preContent: 'Insert before field',
 		recursive: 'Recursive',
 		recursiveDescr: 'Yes, make it recursive',
+		removeParagraph: 'Remove paragraph tags',
+		removeParagraphHelp: 'Will remove paragraph tags from the field value',
 		standardFields: 'Standard Fields',
 		uppercase: 'Uppercase',
 		urlEncode: 'URL encode',
@@ -1828,8 +1802,6 @@ export default {
 		DownloadXmlDTD: 'Download XML DTD',
 		fields: 'Fields',
 		includeSubpages: 'Include subpages',
-		mailBody:
-			"\n      Hi %0%\n\n      This is an automated mail to inform you that the document '%1%'\n      has been requested for translation into '%5%' by %2%.\n\n      Go to http://%3%/translation/details.aspx?id=%4% to edit.\n\n      Or log into Umbraco to get an overview of your translation tasks\n      http://%3%\n\n      Have a nice day!\n      Cheers from the Umbraco robot\n    ",
 		noTranslators:
 			'No translator users found. Please create a translator user before you start sending\n      content to translation\n    ',
 		pageHasBeenSendToTranslation: "The page '%0%' has been send to translation",
@@ -1878,6 +1850,8 @@ export default {
 		stylesheets: 'Stylesheets',
 		templates: 'Templates',
 		logViewer: 'Log Viewer',
+		userPermissions: 'User permissions',
+		userTypes: 'User types',
 		users: 'Users',
 		settingsGroup: 'Settings',
 		templatingGroup: 'Templating',
@@ -2274,6 +2248,9 @@ export default {
 		labelUsedByMediaTypes: 'Used in Media Types',
 		labelUsedByMemberTypes: 'Used in Member Types',
 		usedByProperties: 'Used by',
+		labelUsedByDocuments: 'Used in Documents',
+		labelUsedByMembers: 'Used in Members',
+		labelUsedByMedia: 'Used in Media',
 		labelUsedItems: 'Items in use',
 		labelUsedDescendants: 'Descendants in use',
 		deleteWarning: 'This item or its descendants is being used. Deletion can lead to broken links on your website.',
@@ -2284,6 +2261,10 @@ export default {
 		labelUsedByItems: 'Referenced by the following items',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
+		labelMoreReferences: (count: number) => {
+			if (count === 1) return '...and one more item';
+			return `...and ${count} more items`;
+		},
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',

@@ -171,9 +171,7 @@ export class UmbAuthFlow {
 		const tokenResponseJson = await this.#storageBackend.getItem(UMB_STORAGE_TOKEN_RESPONSE_NAME);
 		if (tokenResponseJson) {
 			const response = new TokenResponse(JSON.parse(tokenResponseJson));
-			if (response.isValid()) {
-				this.#tokenResponse = response;
-			}
+			this.#tokenResponse = response;
 		}
 	}
 
@@ -225,13 +223,13 @@ export class UmbAuthFlow {
 	}
 
 	/**
-	 * This method will check if the user is logged in by validating the timestamp of the stored token.
+	 * This method will check if the user is logged in by validating if there is a token stored.
 	 * If no token is stored, it will return false.
 	 *
 	 * @returns true if the user is logged in, false otherwise.
 	 */
 	isAuthorized(): boolean {
-		return !!this.#tokenResponse && this.#tokenResponse.isValid();
+		return !!this.#tokenResponse;
 	}
 
 	/**
@@ -373,8 +371,10 @@ export class UmbAuthFlow {
 	async #performTokenRequest(request: TokenRequest): Promise<void> {
 		try {
 			this.#tokenResponse = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
+			this.#saveTokenState();
 		} catch (error) {
-			// If the token request fails, it means the refresh token is invalid
+			// If the token request fails, it means the code or refresh token is invalid
+			this.clearTokenStorage();
 			console.error('Token request error', error);
 		}
 	}
