@@ -287,6 +287,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
         builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
 
+        var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
+        builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+            .Add(umbracoApiControllerTypes);
+
         builder.Services.AddSingleton<UmbracoRequestLoggingMiddleware>();
         builder.Services.AddSingleton<PreviewAuthenticationMiddleware>();
         builder.Services.AddSingleton<UmbracoRequestMiddleware>();

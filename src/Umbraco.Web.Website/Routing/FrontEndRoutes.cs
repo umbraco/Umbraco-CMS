@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Web.Website.Routing;
 /// </summary>
 public sealed class FrontEndRoutes : IAreaRoutes
 {
+    private readonly UmbracoApiControllerTypeCollection _apiControllers;
     private readonly IRuntimeState _runtimeState;
     private readonly SurfaceControllerTypeCollection _surfaceControllerTypeCollection;
     private readonly string _umbracoPathSegment;
@@ -28,10 +29,12 @@ public sealed class FrontEndRoutes : IAreaRoutes
         IOptions<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment,
         IRuntimeState runtimeState,
-        SurfaceControllerTypeCollection surfaceControllerTypeCollection)
+        SurfaceControllerTypeCollection surfaceControllerTypeCollection,
+        UmbracoApiControllerTypeCollection apiControllers)
     {
         _runtimeState = runtimeState;
         _surfaceControllerTypeCollection = surfaceControllerTypeCollection;
+        _apiControllers = apiControllers;
         _umbracoPathSegment = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
     }
 
@@ -45,6 +48,7 @@ public sealed class FrontEndRoutes : IAreaRoutes
             case RuntimeLevel.Run:
 
                 AutoRouteSurfaceControllers(endpoints);
+                AutoRouteFrontEndApiControllers(endpoints);
                 break;
             case RuntimeLevel.BootFailed:
             case RuntimeLevel.Unknown:
@@ -69,6 +73,30 @@ public sealed class FrontEndRoutes : IAreaRoutes
                 meta.ControllerType,
                 _umbracoPathSegment,
                 meta.AreaName);
+        }
+    }
+
+    /// <summary>
+    ///     Auto-routes all front-end api controllers
+    /// </summary>
+    private void AutoRouteFrontEndApiControllers(IEndpointRouteBuilder endpoints)
+    {
+        foreach (Type controller in _apiControllers)
+        {
+            PluginControllerMetadata meta = PluginController.GetMetadata(controller);
+
+            // exclude back-end api controllers
+            if (meta.IsBackOffice)
+            {
+                continue;
+            }
+
+            endpoints.MapUmbracoApiRoute(
+                meta.ControllerType,
+                _umbracoPathSegment,
+                meta.AreaName,
+                meta.IsBackOffice,
+                string.Empty); // no default action (this is what we had before)
         }
     }
 }
