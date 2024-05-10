@@ -65,7 +65,7 @@ public class TemporaryFileToXmlImportService : ITemporaryFileToXmlImportService
     }
 
     /// <summary>
-    /// Reads the file trough the use of see<see cref="LoadXElementFromTemporaryFileAsync"/> and returns basic information regarding the entity that would be imported if this file was processed by
+    /// Reads the file trough the use of <see cref="LoadXElementFromTemporaryFileAsync"/> and returns basic information regarding the entity that would be imported if this file was processed by
     /// <see cref="IContentTypeImportService.Import(Guid,Guid,System.Nullable{System.Guid})"/> or <see cref="IMediaTypeImportService.Import(Guid,Guid,System.Nullable{System.Guid})"/>.
     /// </summary>
     /// <remarks>As this method does not persist anything, no scope is created and the temporary file is not cleaned up, see remark in <see cref="LoadXElementFromTemporaryFileAsync"/>.</remarks>
