@@ -91,7 +91,6 @@ export default class UmbLoginPageElement extends UmbLitElement {
     }
 
     if (response.error) {
-      this.dispatchEvent(new CustomEvent('umb-login-failed', {bubbles: true, composed: true}));
       return;
     }
 
@@ -100,8 +99,6 @@ export default class UmbLoginPageElement extends UmbLitElement {
     if (returnPath) {
       location.href = returnPath;
     }
-
-    this.dispatchEvent(new CustomEvent('umb-login-success', {bubbles: true, composed: true, detail: response.data}));
   };
 
   get #greetingLocalizationKey() {
