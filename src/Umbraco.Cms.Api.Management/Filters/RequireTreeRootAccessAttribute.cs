@@ -23,9 +23,9 @@ public abstract class RequireTreeRootAccessAttribute : ActionFilterAttribute
 
         var problemDetails = new ProblemDetails
         {
-            Title = "Unauthorized user",
+            Title = "Forbidden",
             Detail = "The current backoffice user should have access to the tree root",
-            Status = StatusCodes.Status401Unauthorized,
+            Status = StatusCodes.Status403Forbidden,
             Type = "Error",
         };
 
