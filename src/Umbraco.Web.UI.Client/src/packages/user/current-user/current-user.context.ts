@@ -14,6 +14,8 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 
 	readonly unique = this.#currentUser.asObservablePart((user) => user?.unique);
 	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode);
+	readonly hasDocumentRootAccess = this.#currentUser.asObservablePart((user) => user?.hasDocumentRootAccess);
+	readonly hasMediaRootAccess = this.#currentUser.asObservablePart((user) => user?.hasMediaRootAccess);
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#currentUserRepository = new UmbCurrentUserRepository(this);
