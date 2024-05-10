@@ -112,10 +112,11 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 				<umb-property-layout label="Language">
 					<div slot="editor">
 						<!-- TODO: disable already created cultures in the select -->
-						<umb-input-culture-select
-							value=${ifDefined(this._language?.unique)}
-							@change=${this.#handleCultureChange}
-							?readonly=${this._isNew === false}></umb-input-culture-select>
+						${this._isNew
+							? html` <umb-input-culture-select
+									value=${ifDefined(this._language?.unique)}
+									@change=${this.#handleCultureChange}></umb-input-culture-select>`
+							: this._language?.name}
 					</div>
 				</umb-property-layout>
 

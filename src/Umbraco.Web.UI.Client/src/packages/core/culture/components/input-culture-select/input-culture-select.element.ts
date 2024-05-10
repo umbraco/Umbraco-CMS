@@ -71,7 +71,7 @@ export class UmbInputCultureSelectElement extends UUIFormControlMixin(UmbLitElem
 	}
 
 	get #fromAvailableCultures() {
-		return this._cultures.find((culture) => culture.name.toLowerCase() === (this.value as string).toLowerCase());
+		return this._cultures.find((culture) => culture.name.toLowerCase() === (this.value as string)?.toLowerCase());
 	}
 
 	render() {
