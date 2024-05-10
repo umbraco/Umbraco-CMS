@@ -47,9 +47,16 @@
 
   <!-- Use version range on project references (to limit on major version in generated packages) -->
   <Target Name="_GetProjectReferenceVersionRanges" AfterTargets="_GetProjectReferenceVersions">
+    <PropertyGroup>
+      <!--
+      Because we exclude prereleases in the upper version limit (by adding '-0' - the lowest possible prerelease tag),
+      NuGet incorrectly triggers the 'A stable release of a package should not have a prerelease dependency.' warning.
+      -->
+      <NoWarn>$(NoWarn);NU5104</NoWarn>
+    </PropertyGroup>
     <ItemGroup>
       <_ProjectReferencesWithVersions Condition="'%(ProjectVersion)' != ''">
-        <ProjectVersion>[%(ProjectVersion), $([MSBuild]::Add($([System.Text.RegularExpressions.Regex]::Match('%(ProjectVersion)', '^\d+').Value), 1)))</ProjectVersion>
+        <ProjectVersion>[%(ProjectVersion), $([MSBuild]::Add($([System.Text.RegularExpressions.Regex]::Match('%(ProjectVersion)', '^\d+').Value), 1))-0)</ProjectVersion>
       </_ProjectReferencesWithVersions>
     </ItemGroup>
   </Target>
