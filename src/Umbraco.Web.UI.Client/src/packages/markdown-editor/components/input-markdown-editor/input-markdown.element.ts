@@ -1,4 +1,13 @@
-import { css, html, customElement, query, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	customElement,
+	query,
+	property,
+	unsafeHTML,
+	when,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
@@ -7,12 +16,14 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { UMB_LINK_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * @element umb-input-markdown
@@ -39,6 +50,9 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 	@query('umb-code-editor')
 	_codeEditor?: UmbCodeEditorElement;
 
+	@state()
+	_customActions: Array<monaco.editor.IActionDescriptor> = [];
+
 	private _modalContext?: UmbModalManagerContext;
 
 	private serverUrl?: string;
@@ -46,9 +60,11 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 	constructor() {
 		super();
 		this.#loadCodeEditor();
+
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
+
 		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
 			this.serverUrl = instance.getServerUrl();
 		});
@@ -67,6 +83,22 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 			}); // Prefer to update options before showing the editor, to avoid seeing the changes in the UI.
 
 			this.#isCodeEditorReady.setValue(true);
+
+			this.observe(umbExtensionsRegistry.byType('monacoMarkdownEditorAction'), (manifests) => {
+				manifests.forEach(async (manifest) => {
+					const api = await createExtensionApi(this, manifest, [this]);
+					const action: monaco.editor.IActionDescriptor = {
+						id: api.getUnique(),
+						label: api.getLabel(),
+						keybindings: api.getKeybindings(),
+						run: async () => await api.execute({ editor: this.#editor }),
+					};
+					this.#editor?.monacoEditor?.addAction(action);
+					this._customActions.push(action);
+					this.requestUpdate('_customActions');
+				});
+			});
+
 			this.#loadActions();
 		} catch (error) {
 			console.error(error);
@@ -158,12 +190,6 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 			run: () => this._insertLine(),
 		});
 		this.#editor?.monacoEditor?.addAction({
-			label: 'Add Link',
-			id: 'link',
-			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
-			run: () => this._insertLink(),
-		});
-		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Image',
 			id: 'image',
 			//keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyJ], // What keybinding would be good for image?
@@ -172,59 +198,16 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 		});
 	}
 
+	#onActionClick(event: any, action: monaco.editor.IActionDescriptor) {
+		event.stopPropagation();
+		const blah = this.#editor?.monacoEditor?.getAction(action.id);
+		debugger;
+		this.#editor?.monacoEditor?.getAction(action.id)?.run();
+	}
+
 	private _focusEditor(): void {
 		// If we press one of the action buttons manually (which is outside the editor), we need to focus the editor again.
 		this.#editor?.monacoEditor?.focus();
-	}
-
-	private _insertLink() {
-		const selection = this.#editor?.getSelections()[0];
-		if (!selection || !this._modalContext) return;
-
-		const selectedValue = this.#editor?.getValueInRange(selection);
-
-		this._focusEditor(); // Focus before opening modal
-		const modalContext = this._modalContext.open(this, UMB_LINK_PICKER_MODAL, {
-			modal: { size: this.overlaySize },
-			data: {
-				index: null,
-				config: {},
-			},
-			value: {
-				link: { name: selectedValue },
-			},
-		});
-
-		modalContext
-			?.onSubmit()
-			.then((value) => {
-				if (!value) return;
-
-				const name = this.localize.term('general_name');
-				const url = this.localize.term('general_url');
-
-				this.#editor?.monacoEditor?.executeEdits('', [
-					{ range: selection, text: `[${value.link.name || name}](${value.link.url || url})` },
-				]);
-
-				if (!value.link.name) {
-					this.#editor?.select({
-						startColumn: selection.startColumn + 1,
-						endColumn: selection.startColumn + 1 + name.length,
-						endLineNumber: selection.startLineNumber,
-						startLineNumber: selection.startLineNumber,
-					});
-				} else if (!value.link.url) {
-					this.#editor?.select({
-						startColumn: selection.startColumn + 3 + value.link.name.length,
-						endColumn: selection.startColumn + 3 + value.link.name.length + url.length,
-						endLineNumber: selection.startLineNumber,
-						startLineNumber: selection.startLineNumber,
-					});
-				}
-			})
-			.catch(() => undefined)
-			.finally(() => this._focusEditor());
 	}
 
 	private _insertMedia() {
@@ -491,19 +474,23 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 				<uui-button
 					compact
 					look="secondary"
-					label="Link"
-					title="Link, &lt;Ctrl+K&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('link')?.run()}>
-					<uui-icon name="icon-link"></uui-icon>
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
 					label="Image"
 					title="Image"
 					@click=${() => this.#editor?.monacoEditor?.getAction('image')?.run()}>
 					<uui-icon name="icon-picture"></uui-icon>
 				</uui-button>
+
+				${this._customActions.map(
+					(action) => html`
+						<uui-button
+							compact
+							look="secondary"
+							label=${action.label}
+							@click=${(event: any) => this.#onActionClick(event, action)}>
+							<uui-icon name="icon-link"></uui-icon>
+						</uui-button>
+					`,
+				)}
 			</div>
 			<div>
 				<uui-button
