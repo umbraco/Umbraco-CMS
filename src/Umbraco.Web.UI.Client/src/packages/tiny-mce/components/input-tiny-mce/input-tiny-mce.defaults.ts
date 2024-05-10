@@ -35,7 +35,7 @@ export const defaultFallbackConfig: RawEditorOptions = {
 		},
 		{
 			title: 'Blocks',
-			items: [{ title: 'Normal', block: 'p' }],
+			items: [{ title: 'Paragraph', block: 'p' }],
 		},
 		{
 			title: 'Containers',
