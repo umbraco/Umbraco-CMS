@@ -6,7 +6,6 @@ import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { mime } from '@umbraco-cms/backoffice/external/mime';
 
 @customElement('umb-media-picker-modal')
 export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPickerModalData, UmbMediaPickerModalValue> {
@@ -28,12 +27,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	@state()
 	private _currentNode: string | null = null;
 
-	@state()
-	private _selectableNonImages = true;
-
 	connectedCallback(): void {
 		super.connectedCallback();
-		this._selectableNonImages = this.data?.selectableNonImages ?? true;
 		this._currentNode = this.data?.startNode ?? null;
 		this.#loadMediaFolder();
 	}
@@ -57,9 +52,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 		return items.map((item): UmbMediaCardItemModel => {
 			const url = data?.find((media) => media.unique === item.unique)?.url;
 			const extension = url?.split('.').pop();
-			const isImage = url ? !!mime.getType(url)?.startsWith('image/') : false;
+			//TODO Eventually we will get a renderable img from the server. Use this for the url. [LI]
 
-			return { name: item.name, unique: item.unique, isImage, url, extension };
+			return { name: item.name, unique: item.unique, url, extension };
 		});
 	}
 
@@ -177,9 +172,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				@selected=${() => this.#onSelected(item)}
 				@deselected=${() => this.#onDeselected(item)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
-				?selectable=${item.isImage || this._selectableNonImages}
+				selectable
 				file-ext=${ifDefined(item.extension)}>
-				${item.isImage && item.url ? html`<img src=${item.url} alt=${ifDefined(item.name)} />` : ''}
+				${item.url ? html`<img src=${item.url} alt=${ifDefined(item.name)} />` : ''}
 			</uui-card-media>
 		`;
 	}
@@ -217,6 +212,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 				grid-template-rows: repeat(auto-fill, 200px);
 				gap: var(--uui-size-space-5);
+				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
 			}
 		`,
 	];
