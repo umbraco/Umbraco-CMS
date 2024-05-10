@@ -1,5 +1,5 @@
-import { umbExtensionsRegistry, type ManifestPropertyEditorUi } from '../../extension-registry/index.js';
 import { UmbPropertyContext } from './property.context.js';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
