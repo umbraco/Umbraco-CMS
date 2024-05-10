@@ -597,7 +597,7 @@ export default {
 	examineManagement: {
 		configuredSearchers: 'Configured Searchers',
 		configuredSearchersDescription:
-			'Shows properties and tools for any configured Searcher (i.e. such as a\n      multi-index searcher)\n    ',
+			'Shows properties and tools for any configured Searcher (i.e. such as a multi-index searcher)',
 		fieldValues: 'Field values',
 		healthStatus: 'Health status',
 		healthStatusDescription: 'The health status of the index and if it can be read',
@@ -607,10 +607,10 @@ export default {
 		indexInfoDescription: 'Lists the properties of the index',
 		manageIndexes: "Manage Examine's indexes",
 		manageIndexesDescription:
-			'Allows you to view the details of each index and provides some tools for\n      managing the indexes\n    ',
+			'Allows you to view the details of each index and provides some tools for managing the indexes',
 		rebuildIndex: 'Rebuild index',
 		rebuildIndexWarning:
-			'\n      This will cause the index to be rebuilt.<br />\n      Depending on how much content there is in your site this could take a while.<br />\n      It is not recommended to rebuild an index during times of high website traffic or when editors are editing content.\n     ',
+			'This will cause the index to be rebuilt.<br /> Depending on how much content there is in your site this could take a while.<br /> It is not recommended to rebuild an index during times of high website traffic or when editors are editing content.',
 		searchers: 'Searchers',
 		searchDescription: 'Search the index and view the results',
 		tools: 'Tools',
@@ -618,7 +618,7 @@ export default {
 		fields: 'fields',
 		indexCannotRead: 'The index cannot be read and will need to be rebuilt',
 		processIsTakingLonger:
-			'The process is taking longer than expected, check the Umbraco log to see if there\n      have been any errors during this operation\n    ',
+			'The process is taking longer than expected, check the Umbraco log to see if there have been any errors during this operation',
 		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
 		iIndexPopulator: 'IIndexPopulator',
 	},

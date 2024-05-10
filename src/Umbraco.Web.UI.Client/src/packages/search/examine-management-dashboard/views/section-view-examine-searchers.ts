@@ -1,13 +1,15 @@
+import { UMB_EXAMINE_FIELDS_SETTINGS_MODAL, UMB_EXAMINE_FIELDS_VIEWER_MODAL } from '../modal/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_EXAMINE_FIELDS_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_MANAGER_CONTEXT,
+	UMB_WORKSPACE_MODAL,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
 import type { SearchResultResponseModel, FieldPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-
-import './modal-views/fields-viewer.element.js';
-import './modal-views/fields-settings-modal.element.js';
 
 interface ExposedSearchResultField {
 	name: string;
@@ -31,13 +33,25 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	@query('#search-input')
 	private _searchInput!: HTMLInputElement;
 
-	private _onNameClick() {
-		// TODO:
-		alert('TODO: Open workspace for ' + this.searcherName);
-	}
+	@state()
+	private _workspacePath = 'aa';
 
 	private _onKeyPress(e: KeyboardEvent) {
 		e.key == 'Enter' ? this._onSearch() : undefined;
+	}
+
+	#entityType = '';
+
+	constructor() {
+		super();
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath(':entityType')
+			.onSetup((routingInfo) => {
+				return { data: { entityType: routingInfo.entityType, preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._workspacePath = routeBuilder({ entityType: this.#entityType });
+			});
 	}
 
 	private async _onSearch() {
@@ -86,36 +100,48 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		const modalContext = modalManager.open(this, UMB_EXAMINE_FIELDS_SETTINGS_MODAL, {
 			value: { fields: this._exposedFields ?? [] },
 		});
-		modalContext?.onSubmit().then((value) => {
-			this._exposedFields = value.fields;
-		});
+		await modalContext.onSubmit().catch(() => undefined);
+
+		const value = modalContext.getValue();
+
+		this._exposedFields = value?.fields;
 	}
 
 	async #onFieldViewClick(rowData: SearchResultResponseModel) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager.open(this, 'umb-modal-element-fields-viewer', {
+
+		const modalContext = modalManager.open(this, UMB_EXAMINE_FIELDS_VIEWER_MODAL, {
 			modal: {
 				type: 'sidebar',
 				size: 'medium',
 			},
-			data: { ...rowData, name: this.getSearchResultNodeName(rowData) },
+			data: { searchResult: rowData, name: this.getSearchResultNodeName(rowData) },
 		});
+		await modalContext.onSubmit().catch(() => undefined);
 	}
 
 	render() {
 		return html`
-			<uui-box headline="Search">
-				<p>Search the ${this.searcherName} and view the results</p>
+			<uui-box headline=${this.localize.term('general_search')}>
+				<p>
+					<umb-localize key="examineManagement_searchDescription"
+						>Search the ${this.searcherName} and view the results</umb-localize
+					>
+				</p>
 				<div class="flex">
 					<uui-input
 						type="search"
 						id="search-input"
-						placeholder="Type to filter..."
-						label="Type to filter"
+						placeholder=${this.localize.term('placeholders_filter')}
+						label=${this.localize.term('placeholders_filter')}
 						@keypress=${this._onKeyPress}
 						${umbFocus()}>
 					</uui-input>
-					<uui-button color="positive" look="primary" label="Search" @click="${this._onSearch}"> Search </uui-button>
+					<uui-button
+						color="positive"
+						look="primary"
+						label=${this.localize.term('general_search')}
+						@click="${this._onSearch}"></uui-button>
 				</div>
 				${this.renderSearchResults()}
 			</uui-box>
@@ -128,28 +154,44 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		return nodeNameField?.values?.join(', ') ?? '';
 	}
 
+	#getEntityTypeFromIndexType(indexType: string) {
+		switch (indexType) {
+			case 'content':
+				return 'document';
+			default:
+				return indexType;
+		}
+	}
+
 	private renderSearchResults() {
 		if (this._searchLoading) return html`<uui-loader></uui-loader>`;
 		if (!this._searchResults) return nothing;
 		if (!this._searchResults.length) {
-			return html`<p>No results found</p>`;
+			return html`<p>${this.localize.term('examineManagement_noResults')}</p>`;
 		}
 		return html`<div class="table-container">
 			<uui-scroll-container>
 				<uui-table class="search">
 					<uui-table-head>
 						<uui-table-head-cell style="width:0">Score</uui-table-head-cell>
-						<uui-table-head-cell style="width:0">Id</uui-table-head-cell>
-						<uui-table-head-cell>Name</uui-table-head-cell>
-						<uui-table-head-cell>Fields</uui-table-head-cell>
+						<uui-table-head-cell style="width:0">${this.localize.term('general_id')}</uui-table-head-cell>
+						<uui-table-head-cell>${this.localize.term('general_name')}</uui-table-head-cell>
+						<uui-table-head-cell>${this.localize.term('examineManagement_fields')}</uui-table-head-cell>
 						${this.renderHeadCells()}
 					</uui-table-head>
 					${this._searchResults?.map((rowData) => {
+						const indexType = rowData.fields?.find((field) => field.name === '__IndexType')?.values?.join(', ') ?? '';
+						this.#entityType = this.#getEntityTypeFromIndexType(indexType);
+						const unique = rowData.fields?.find((field) => field.name === '__Key')?.values?.join(', ') ?? '';
+
 						return html`<uui-table-row>
 							<uui-table-cell> ${rowData.score} </uui-table-cell>
 							<uui-table-cell> ${rowData.id} </uui-table-cell>
 							<uui-table-cell>
-								<uui-button look="secondary" label="Open workspace for this document" @click="${this._onNameClick}">
+								<uui-button
+									look="secondary"
+									label=${this.localize.term('actions_editContent')}
+									href=${this._workspacePath + this.#entityType + '/edit/' + unique}>
 									${this.getSearchResultNodeName(rowData)}
 								</uui-button>
 							</uui-table-cell>
@@ -157,9 +199,10 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 								<uui-button
 									class="bright"
 									look="secondary"
-									label="Open sidebar to see all fields"
+									label=${this.localize.term('examineManagement_fieldValues')}
 									@click=${() => this.#onFieldViewClick(rowData)}>
-									${rowData.fields ? Object.keys(rowData.fields).length : ''} fields
+									${rowData.fields ? Object.keys(rowData.fields).length : ''}
+									${this.localize.term('examineManagement_fields')}
 								</uui-button>
 							</uui-table-cell>
 							${rowData.fields ? this.renderBodyCells(rowData.fields) : ''}
@@ -185,7 +228,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 							<span>${field.name}</span>
 							<uui-button
 								look="secondary"
-								label="Close field ${field.name}"
+								label="${this.localize.term('actions_remove')} ${field.name}"
 								compact
 								@click="${() => {
 									this._exposedFields = this._exposedFields?.map((f) => {
