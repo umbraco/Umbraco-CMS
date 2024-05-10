@@ -22,28 +22,6 @@ namespace Umbraco.Extensions;
 public static class UrlHelperExtensions
 {
     /// <summary>
-    /// Gets the Umbraco backoffice URL (if Umbraco is installed).
-    /// </summary>
-    /// <param name="urlHelper">The URL helper.</param>
-    /// <returns>
-    /// The Umbraco backoffice URL.
-    /// </returns>
-    public static string? GetUmbracoBackOfficeUrl(this IUrlHelper urlHelper)
-        => urlHelper.Action("Default", "BackOffice", new { area = Constants.Web.Mvc.BackOfficeArea });
-
-    /// <summary>
-    ///     Return the back office url if the back office is installed
-    /// </summary>
-    /// <param name="url"></param>
-    /// <returns></returns>
-    /// <remarks>
-    /// This method contained a bug that would result in always returning "/".
-    /// </remarks>
-    [Obsolete("Use the GetUmbracoBackOfficeUrl extension method instead. This method will be removed in Umbraco 13.")]
-    public static string? GetBackOfficeUrl(this IUrlHelper url)
-        => "/";
-
-    /// <summary>
     ///     Return the Url for a Web Api service
     /// </summary>
     /// <typeparam name="T"></typeparam>
