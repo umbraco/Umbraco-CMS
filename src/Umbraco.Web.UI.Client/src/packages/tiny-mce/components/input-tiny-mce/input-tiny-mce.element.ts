@@ -12,8 +12,12 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { EditorEvent, Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
-import type { ManifestTinyMcePlugin } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	type EditorEvent,
+	type Editor,
+	type RawEditorOptions,
+	renderEditor,
+} from '@umbraco-cms/backoffice/external/tinymce';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
@@ -74,7 +78,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		return super.value;
 	}
 
-	@query('#editor', true)
+	@query('.editor', true)
 	private _editorElement?: HTMLElement;
 
 	protected async firstUpdated(): Promise<void> {
@@ -347,7 +351,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	 * a target div and binds the RTE to that element
 	 */
 	render() {
-		return html`<div id="editor"></div>`;
+		return html`<div class="editor"></div>`;
 	}
 
 	static styles = [
