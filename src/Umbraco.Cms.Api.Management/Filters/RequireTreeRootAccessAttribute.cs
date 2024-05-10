@@ -29,7 +29,7 @@ public abstract class RequireTreeRootAccessAttribute : ActionFilterAttribute
             Type = "Error",
         };
 
-        context.Result = new ObjectResult(problemDetails) { StatusCode = StatusCodes.Status401Unauthorized };
+        context.Result = new ObjectResult(problemDetails) { StatusCode = problemDetails.Status };
     }
 
     protected abstract int[] GetUserStartNodeIds(IUser user, ActionExecutingContext context);
