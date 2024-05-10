@@ -588,7 +588,7 @@ export default {
 	examineManagement: {
 		configuredSearchers: 'Konfigurerede søgere',
 		configuredSearchersDescription:
-			'Viser egenskaber og værktøjer til enhver konfigureret søger (dvs. som en\n      multi-indekssøger)\n    ',
+			'Viser egenskaber og værktøjer til enhver konfigureret søger (dvs. som en multi-indekssøger)',
 		fieldValues: 'Feltværdier',
 		healthStatus: 'Sundhedstilstand',
 		healthStatusDescription: 'Indeksets sundhedstilstand, og hvis det kan læses',
@@ -597,10 +597,10 @@ export default {
 		indexInfoDescription: 'Viser indeksets egenskaber',
 		manageIndexes: 'Administrer Examine indekserne',
 		manageIndexesDescription:
-			'Giver dig mulighed for at se detaljerne for hvert indeks og giver nogle\n      værktøjer til styring af indeksørerne\n    ',
+			'Giver dig mulighed for at se detaljerne for hvert indeks og giver nogle værktøjer til styring af indeksørerne',
 		rebuildIndex: 'Genopbyg indeks',
 		rebuildIndexWarning:
-			'\n        Dette vil medføre, at indekset genopbygges.<br />\n        Afhængigt af hvor meget indhold der er på dit website, kan det tage et stykke tid.<br />\n        Det anbefales ikke at genopbygge et indeks i perioder med høj websitetrafik eller når redaktører redigerer indhold.\n     ',
+			'Dette vil medføre, at indekset genopbygges.<br /> Afhængigt af hvor meget indhold der er på dit website, kan det tage et stykke tid.<br /> Det anbefales ikke at genopbygge et indeks i perioder med høj websitetrafik eller når redaktører redigerer indhold.',
 		searchers: 'Søgere',
 		searchDescription: 'Søg i indekset og se resultaterne',
 		tools: 'Værktøjer',
@@ -608,7 +608,7 @@ export default {
 		fields: 'felter',
 		indexCannotRead: 'Indexet skal bygges igen, for at kunne læses',
 		processIsTakingLonger:
-			'Processen tager længere tid end forventet. Kontrollér Umbraco loggen for at se om\n      der er sket fejl under operationen\n    ',
+			'Processen tager længere tid end forventet. Kontrollér Umbraco loggen for at se om der er sket fejl under operationen',
 		indexCannotRebuild: 'Dette index kan ikke genbygges for det ikke har nogen',
 		iIndexPopulator: 'IIndexPopulator',
 		contentInIndex: 'Content in index',

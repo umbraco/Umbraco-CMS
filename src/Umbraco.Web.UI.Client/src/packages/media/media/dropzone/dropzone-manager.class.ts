@@ -1,4 +1,3 @@
-import { getExtensionFromMime } from '../utils/index.js';
 import type { UmbMediaDetailModel } from '../types.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
 import { UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL } from './modals/dropzone-media-type-picker/dropzone-media-type-picker-modal.token.js';
@@ -81,7 +80,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		// removes duplicate file types so we don't call endpoints unnecessarily when building options.
 		const mimeTypes = [...new Set(files.map<string>((file) => file.type))];
 		const optionsArray = await this.#buildOptionsArrayFrom(
-			mimeTypes.map((mimetype) => this.#getExtensionFromMimeType(mimetype)),
+			mimeTypes.map((mimetype) => this.#getExtensionFromMime(mimetype)),
 			parentUnique,
 		);
 
@@ -91,7 +90,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		const uploadableFiles: Array<UmbUploadableFileModel> = [];
 
 		for (const file of files) {
-			const extension = this.#getExtensionFromMimeType(file.type);
+			const extension = this.#getExtensionFromMime(file.type);
 			if (!extension) {
 				// Folders have no extension on file drop. We assume it is a folder being uploaded.
 				return;
@@ -111,7 +110,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 	async #handleOneOneFile(file: File, parentUnique: string | null) {
 		this.#completed.setValue([]);
-		const extension = this.#getExtensionFromMimeType(file.type);
+		const extension = this.#getExtensionFromMime(file.type);
 
 		if (!extension) {
 			// TODO Folders have no extension on file drop. Assume it is a folder being uploaded.
@@ -146,8 +145,16 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		await this.#handleUpload([uploadableFile], parentUnique);
 	}
 
-	#getExtensionFromMimeType(mimeType: string): string {
-		return getExtensionFromMime(mimeType) || '';
+	#getExtensionFromMime(mime: string): string {
+		//TODO Temporary solution.
+		if (!mime) return ''; //folders
+		const extension = mime.split('/')[1];
+		switch (extension) {
+			case 'svg+xml':
+				return 'svg';
+			default:
+				return extension;
+		}
 	}
 
 	async #buildOptionsArrayFrom(

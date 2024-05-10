@@ -9022,20 +9022,17 @@ take
 	 * @returns string Success
 	 * @throws ApiError
 	 */
-	public static putWebhookById(data: WebhookData['payloads']['PutWebhookById']): CancelablePromise<WebhookData['responses']['PutWebhookById']> {
+	public static deleteWebhookById(data: WebhookData['payloads']['DeleteWebhookById']): CancelablePromise<WebhookData['responses']['DeleteWebhookById']> {
 		const {
                     
-                    id,
-requestBody
+                    id
                 } = data;
 		return __request(OpenAPI, {
-			method: 'PUT',
+			method: 'DELETE',
 			url: '/umbraco/management/api/v1/webhook/{id}',
 			path: {
 				id
 			},
-			body: requestBody,
-			mediaType: 'application/json',
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				400: `Bad Request`,
@@ -9050,17 +9047,20 @@ requestBody
 	 * @returns string Success
 	 * @throws ApiError
 	 */
-	public static deleteWebhookById(data: WebhookData['payloads']['DeleteWebhookById']): CancelablePromise<WebhookData['responses']['DeleteWebhookById']> {
+	public static putWebhookById(data: WebhookData['payloads']['PutWebhookById']): CancelablePromise<WebhookData['responses']['PutWebhookById']> {
 		const {
                     
-                    id
+                    id,
+requestBody
                 } = data;
 		return __request(OpenAPI, {
-			method: 'DELETE',
+			method: 'PUT',
 			url: '/umbraco/management/api/v1/webhook/{id}',
 			path: {
 				id
 			},
+			body: requestBody,
+			mediaType: 'application/json',
 			responseHeader: 'Umb-Notifications',
 			errors: {
 				400: `Bad Request`,
