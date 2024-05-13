@@ -279,8 +279,6 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 		// Only handle root request here. Items are handled by the tree item context
 		const treeRoot = this.#treeRoot.getValue();
 		if (treeRoot === undefined) return;
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		if (event.getUnique() !== treeRoot.unique) return;
 		if (event.getEntityType() !== treeRoot.entityType) return;
 		this.loadTree();
