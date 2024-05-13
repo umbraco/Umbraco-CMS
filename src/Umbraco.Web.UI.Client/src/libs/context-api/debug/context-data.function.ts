@@ -59,7 +59,7 @@ function contextItemData(contextInstance: any): UmbDebugContextItemData {
 
 							valueToDisplay = `Web Component <${tagName}>`;
 						} else if (isSubscribeLike) {
-							valueToDisplay = 'Subscribable';
+							valueToDisplay = 'Observable';
 						}
 
 						props.push({ key: key, type: typeof value, value: valueToDisplay });
