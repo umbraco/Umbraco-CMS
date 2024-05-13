@@ -2,11 +2,11 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 
-import type { DebugContextData, DebugContextItemData } from '@umbraco-cms/backoffice/context-api';
 import { contextData, UmbContextDebugRequest } from '@umbraco-cms/backoffice/context-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTEXT_DEBUGGER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbDebugContextData, UmbDebugContextItemData } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-debug')
 export class UmbDebugElement extends UmbLitElement {
@@ -17,7 +17,7 @@ export class UmbDebugElement extends UmbLitElement {
 	dialog = false;
 
 	@state()
-	contextData = Array<DebugContextData>();
+	private _contextData = Array<UmbDebugContextData>();
 
 	@state()
 	private _debugPaneOpen = false;
@@ -50,9 +50,9 @@ export class UmbDebugElement extends UmbLitElement {
 				// back to this property of the WebComponent
 
 				// Massage the data into a simplier array of objects
-				// From a function in the context-api '
-				this.contextData = contextData(contexts);
-				this.requestUpdate('contextData');
+				// from a function in the context-api.
+				this._contextData = contextData(contexts);
+				this.requestUpdate('_contextData');
 			}),
 		);
 	}
