@@ -62,21 +62,36 @@ export class UmbAppElement extends UmbLitElement {
 			path: 'oauth_complete',
 			component: () => import('./app-error.element.js'),
 			setup: (component) => {
+				if (!this.#authContext) {
+					throw new Error('[Fatal] Auth context is not available');
+				}
+
 				const searchParams = new URLSearchParams(window.location.search);
 				const hasCode = searchParams.has('code');
 				(component as UmbAppErrorElement).hideBackButton = true;
 				(component as UmbAppErrorElement).errorHeadline = this.localize.term('general_login');
-				(component as UmbAppErrorElement).errorMessage = hasCode
-					? this.localize.term('errors_externalLoginSuccess')
-					: this.localize.term('errors_externalLoginFailed');
 
-				// Complete the authorization request
-				this.#authContext?.completeAuthorizationRequest().finally(() => {
-					// If we don't have an opener, redirect to the root
-					if (!window.opener) {
-						history.replaceState(null, '', '');
-					}
-				});
+				// If there is an opener, we are in a popup window, and we should show a different message
+				// than if we are in the main window. If we are in the main window, we should redirect to the root.
+				// The authorization request will be completed in the active window (main or popup) and the authorization signal will be sent.
+				// If we are in a popup window, the storage event in UmbAuthContext will catch the signal and close the window.
+				// If we are in the main window, the signal will be caught right here and the user will be redirected to the root.
+				if (window.opener) {
+					(component as UmbAppErrorElement).errorMessage = hasCode
+						? this.localize.term('errors_externalLoginSuccess')
+						: this.localize.term('errors_externalLoginFailed');
+				} else {
+					(component as UmbAppErrorElement).errorMessage = hasCode
+						? 'Login successful, you will be redirected shortly'
+						: this.localize.term('errors_externalLoginFailed');
+
+					this.observe(this.#authContext.authorizationSignal, () => {
+						window.location.href = '/';
+					});
+				}
+
+				// Complete the authorization request, which will send the authorization signal
+				this.#authContext.completeAuthorizationRequest();
 			},
 		},
 		{
