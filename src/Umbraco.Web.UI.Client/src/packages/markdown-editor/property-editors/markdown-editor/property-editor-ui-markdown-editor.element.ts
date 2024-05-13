@@ -27,8 +27,8 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 		this._overlaySize = config?.getValueByAlias('overlaySize') ?? undefined;
 	}
 
-	#onChange(e: Event) {
-		this.value = (e.target as UmbInputMarkdownElement).value as string;
+	#onChange(event: Event & { target: UmbInputMarkdownElement }) {
+		this.value = event.target.value as string;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
