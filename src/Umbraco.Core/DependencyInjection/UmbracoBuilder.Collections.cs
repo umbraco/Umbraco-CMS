@@ -38,6 +38,7 @@ public static partial class UmbracoBuilderExtensions
             .Append<ContentFinderByPageIdQuery>()
             .Append<ContentFinderByUrl>()
             .Append<ContentFinderByIdPath>()
+            .Append<ContentFinderByKeyPath>()
             /*.Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder */
             .Append<ContentFinderByUrlAlias>()
             .Append<ContentFinderByRedirectUrl>();
