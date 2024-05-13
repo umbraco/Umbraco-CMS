@@ -8,7 +8,7 @@
 export function contextData(contexts: Map<any, any>): Array<UmbDebugContextData> {
 	const contextData = new Array<UmbDebugContextData>();
 	for (const [alias, instance] of contexts) {
-		const data: DebugContextItemData = contextItemData(instance);
+		const data = contextItemData(instance);
 		contextData.push({ alias: alias, type: typeof instance, data });
 	}
 	return contextData;
@@ -83,7 +83,7 @@ function contextItemData(contextInstance: any): UmbDebugContextItemData {
 /**
  * Gets a list of methods from a class
  *
- * @param klass The class to get the methods from
+ * @param class The class to get the methods from
  * @returns An array of method names as strings
  */
 function getClassMethodNames(klass: any) {

@@ -1,10 +1,7 @@
 import type { UmbContextRequestEvent } from '../consume/context-request.event.js';
-import { UMB_CONTENT_REQUEST_EVENT_TYPE, UMB_DEBUG_CONTEXT_EVENT_TYPE } from '../consume/context-request.event.js';
 import type { UmbContextToken } from '../token/index.js';
-import {
-	UmbContextProvideEventImplementation,
-	//UmbContextUnprovidedEventImplementation,
-} from './context-provide.event.js';
+import { UMB_CONTENT_REQUEST_EVENT_TYPE, UMB_DEBUG_CONTEXT_EVENT_TYPE } from '../consume/context-request.event.js';
+import { UmbContextProvideEventImplementation } from './context-provide.event.js';
 
 /**
  * @export
@@ -76,7 +73,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 		this.#eventTarget.dispatchEvent(new UmbContextProvideEventImplementation(this.#contextAlias));
 
 		// Listen to our debug event 'umb:debug-contexts'
-		this.#eventTarget.addEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this._handleDebugContextRequest);
+		this.#eventTarget.addEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this.#handleDebugContextRequest);
 	}
 
 	/**
@@ -88,10 +85,10 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 		//window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
 
 		// Stop listen to our debug event 'umb:debug-contexts'
-		this.#eventTarget?.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this._handleDebugContextRequest);
+		this.#eventTarget?.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this.#handleDebugContextRequest);
 	}
 
-	private _handleDebugContextRequest = (event: any): void => {
+	#handleDebugContextRequest = (event: any): void => {
 		// If the event doesn't have an instances property, create it.
 		if (!event.instances) {
 			event.instances = new Map();
