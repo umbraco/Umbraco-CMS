@@ -8,7 +8,10 @@ export interface UmbTreeItemModelBase {
 
 export interface UmbUniqueTreeItemModel extends UmbTreeItemModelBase {
 	unique: string;
-	parentUnique: string | null;
+	parent: {
+		unique: string | null;
+		entityType: string;
+	};
 }
 
 export interface UmbUniqueTreeRootModel extends UmbTreeItemModelBase {

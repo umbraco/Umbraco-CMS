@@ -1,4 +1,4 @@
-import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../entity.js';
+import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../entity.js';
 import type { UmbScriptTreeItemModel } from './types.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type {
@@ -70,7 +70,10 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbScriptTreeItemMod
 
 	return {
 		unique: serializer.toUnique(item.path),
-		parentUnique: item.parent ? serializer.toUnique(item.parent.path) : null,
+		parent: {
+			unique: item.parent ? serializer.toUnique(item.parent.path) : null,
+			entityType: item.parent ? UMB_SCRIPT_ENTITY_TYPE : UMB_SCRIPT_ROOT_ENTITY_TYPE,
+		},
 		entityType: item.isFolder ? UMB_SCRIPT_FOLDER_ENTITY_TYPE : UMB_SCRIPT_ENTITY_TYPE,
 		name: item.name,
 		isFolder: item.isFolder,

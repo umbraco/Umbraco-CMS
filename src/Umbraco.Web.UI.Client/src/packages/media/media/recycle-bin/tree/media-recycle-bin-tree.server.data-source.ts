@@ -1,4 +1,4 @@
-import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMediaRecycleBinTreeItemModel } from './types.js';
 import type { MediaRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -61,7 +61,10 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 const mapper = (item: MediaRecycleBinItemResponseModel): UmbMediaRecycleBinTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent ? item.parent.id : null,
+		parent: {
+			unique: item.parent ? item.parent.id : null,
+			entityType: item.parent ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
+		},
 		entityType: UMB_MEDIA_ENTITY_TYPE,
 		noAccess: false,
 		isTrashed: true,

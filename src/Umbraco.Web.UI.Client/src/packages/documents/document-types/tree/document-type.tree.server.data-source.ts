@@ -1,4 +1,8 @@
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+	UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+} from '../entity.js';
 import type { UmbDocumentTypeTreeItemModel } from './types.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -61,7 +65,10 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 const mapper = (item: DocumentTypeTreeItemResponseModel): UmbDocumentTypeTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent ? item.parent.id : null,
+		parent: {
+			unique: item.parent ? item.parent.id : null,
+			entityType: item.parent ? UMB_DOCUMENT_TYPE_ENTITY_TYPE : UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+		},
 		name: item.name,
 		entityType: item.isFolder ? UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE : UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 		hasChildren: item.hasChildren,

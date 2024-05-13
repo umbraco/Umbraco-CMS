@@ -1,4 +1,4 @@
-import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import type { UmbMediaTreeItemModel } from './types.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -60,7 +60,10 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent ? item.parent.id : null,
+		parent: {
+			unique: item.parent ? item.parent.id : null,
+			entityType: item.parent ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
+		},
 		entityType: UMB_MEDIA_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
 		noAccess: item.noAccess,

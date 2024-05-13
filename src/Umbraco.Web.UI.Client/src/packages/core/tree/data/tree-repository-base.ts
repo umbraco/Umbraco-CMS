@@ -2,7 +2,11 @@ import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '../types.js
 import type { UmbTreeStore } from './tree-store.interface.js';
 import type { UmbTreeRepository } from './tree-repository.interface.js';
 import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
-import type { UmbTreeAncestorsOfRequestArgs } from './types.js';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from './types.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -63,7 +67,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestRootTreeItems(args: any) {
+	async requestRootTreeItems(args: UmbTreeRootItemsRequestArgs) {
 		await this._init;
 
 		const { data, error: _error } = await this._treeSource.getRootItems(args);
@@ -81,7 +85,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeItemsOf(args: any) {
+	async requestTreeItemsOf(args: UmbTreeChildrenOfRequestArgs) {
 		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 		await this._init;
 

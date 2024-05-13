@@ -1,4 +1,8 @@
-import { UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_PARTIAL_VIEW_ENTITY_TYPE,
+	UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
+	UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+} from '../entity.js';
 import type { UmbPartialViewTreeItemModel } from './types.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type {
@@ -70,7 +74,10 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbPartialViewTreeIt
 
 	return {
 		unique: serializer.toUnique(item.path),
-		parentUnique: item.parent ? serializer.toUnique(item.parent?.path) : null,
+		parent: {
+			unique: item.parent ? serializer.toUnique(item.parent.path) : null,
+			entityType: item.parent ? UMB_PARTIAL_VIEW_ENTITY_TYPE : UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+		},
 		entityType: item.isFolder ? UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE : UMB_PARTIAL_VIEW_ENTITY_TYPE,
 		name: item.name,
 		isFolder: item.isFolder,

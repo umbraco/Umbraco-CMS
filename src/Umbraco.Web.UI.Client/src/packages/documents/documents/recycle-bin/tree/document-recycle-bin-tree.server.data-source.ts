@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentRecycleBinTreeItemModel } from './types.js';
 import type { DocumentRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -61,7 +62,10 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 const mapper = (item: DocumentRecycleBinItemResponseModel): UmbDocumentRecycleBinTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent ? item.parent.id : null,
+		parent: {
+			unique: item.parent ? item.parent.id : null,
+			entityType: item.parent ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
+		},
 		entityType: UMB_DOCUMENT_ENTITY_TYPE,
 		noAccess: false,
 		isTrashed: true,

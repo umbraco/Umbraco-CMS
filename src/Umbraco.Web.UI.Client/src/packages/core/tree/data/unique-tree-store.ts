@@ -23,7 +23,7 @@ export class UmbUniqueTreeStore
 	 * An observable to observe the root items
 	 * @memberof UmbUniqueTreeStore
 	 */
-	rootItems = this._data.asObservablePart((items) => items.filter((item) => item.parentUnique === null));
+	rootItems = this._data.asObservablePart((items) => items.filter((item) => item.parent.unique === null));
 
 	/**
 	 * Returns an observable to observe the children of a given parent
@@ -32,7 +32,7 @@ export class UmbUniqueTreeStore
 	 * @memberof UmbUniqueTreeStore
 	 */
 	childrenOf(parentUnique: string | null) {
-		return this._data.asObservablePart((items) => items.filter((item) => item.parentUnique === parentUnique));
+		return this._data.asObservablePart((items) => items.filter((item) => item.parent.unique === parentUnique));
 	}
 
 	/**

@@ -1,3 +1,8 @@
+import {
+	UMB_DATA_TYPE_ENTITY_TYPE,
+	UMB_DATA_TYPE_FOLDER_ENTITY_TYPE,
+	UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
+} from '../entity.js';
 import type { UmbDataTypeTreeItemModel } from './types.js';
 import type {
 	UmbTreeChildrenOfRequestArgs,
@@ -70,10 +75,13 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 const mapper = (item: DataTypeTreeItemResponseModel): UmbDataTypeTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent?.id || null,
+		parent: {
+			unique: item.parent?.id || null,
+			entityType: item.parent ? UMB_DATA_TYPE_ENTITY_TYPE : UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
+		},
 		icon: manifestPropertyEditorUis.find((ui) => ui.alias === item.editorUiAlias)?.meta.icon,
 		name: item.name,
-		entityType: item.isFolder ? 'data-type-folder' : 'data-type',
+		entityType: item.isFolder ? UMB_DATA_TYPE_FOLDER_ENTITY_TYPE : UMB_DATA_TYPE_ENTITY_TYPE,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
 	};

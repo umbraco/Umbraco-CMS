@@ -1,4 +1,4 @@
-import { UMB_TEMPLATE_ENTITY_TYPE } from '../entity.js';
+import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
 import type { UmbTemplateTreeItemModel } from './types.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -64,7 +64,10 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbTemplateTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent ? item.parent.id : null,
+		parent: {
+			unique: item.parent ? item.parent.id : null,
+			entityType: item.parent ? UMB_TEMPLATE_ENTITY_TYPE : UMB_TEMPLATE_ROOT_ENTITY_TYPE,
+		},
 		name: item.name,
 		entityType: UMB_TEMPLATE_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
