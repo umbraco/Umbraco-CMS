@@ -88,22 +88,37 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 		// Building an array of uploadable files. Do we want to build an array of failed files to let the user know which ones?
 		const uploadableFiles: Array<UmbUploadableFileModel> = [];
+		const notAllowedFiles: Array<File> = [];
 
 		for (const file of files) {
 			const extension = this.#getExtensionFromMime(file.type);
 			if (!extension) {
 				// Folders have no extension on file drop. We assume it is a folder being uploaded.
-				return;
+				continue;
 			}
 			const options = optionsArray.find((option) => option.fileExtension === extension)?.mediaTypes;
 
-			if (!options) return; // TODO Current dropped file not allowed in this area. Find a good way to show this to the user after we finish uploading the rest of the files.
+			if (!options || !options.length) {
+				// TODO Current dropped file not allowed in this area. Find a good way to show this to the user after we finish uploading the rest of the files.
+				notAllowedFiles.push(file);
+				continue;
+			}
 
 			// Since we are uploading multiple files, we will pick first allowed option.
 			// Consider a way we can handle this differently in the future to let the user choose. Maybe a list of all files with an allowed media type dropdown?
 			const mediaType = options[0];
 			uploadableFiles.push({ unique: UmbId.new(), file, mediaTypeUnique: mediaType.unique });
 		}
+
+		notAllowedFiles.forEach((file) => {
+			try {
+				throw new Error(`File ${file.name} of type ${file.type} is not allowed here.`);
+			} catch (e) {
+				undefined;
+			}
+		});
+
+		if (!uploadableFiles.length) return;
 
 		await this.#handleUpload(uploadableFiles, parentUnique);
 	}
@@ -118,7 +133,9 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		}
 
 		const optionsArray = await this.#buildOptionsArrayFrom([extension], parentUnique);
-		if (!optionsArray.length) throw new Error('File not allowed here.'); // Parent does not allow this file type here.
+		if (!optionsArray.length || !optionsArray[0].mediaTypes.length) {
+			throw new Error(`File ${file.name} of type ${file.type} is not allowed here.`); // Parent does not allow this file type here.
+		}
 
 		const mediaTypes = optionsArray[0].mediaTypes;
 		if (mediaTypes.length === 1) {
