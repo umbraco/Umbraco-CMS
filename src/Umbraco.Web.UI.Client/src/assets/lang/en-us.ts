@@ -720,6 +720,7 @@ export default {
 		externalLoginFailed:
 			'The server failed to authorize you against the external login provider. Please close the window and try again.',
 		externalLoginSuccess: 'You have successfully logged in. You may now close this window.',
+		externalLoginRedirectSuccess: 'You have successfully logged in. You will be redirected shortly.',
 	},
 	openidErrors: {
 		accessDenied: 'Access denied',

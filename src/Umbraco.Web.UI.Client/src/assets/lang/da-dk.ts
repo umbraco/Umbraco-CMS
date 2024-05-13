@@ -711,6 +711,7 @@ export default {
 		externalLoginFailed:
 			'Serveren mislykkedes i at logge ind med den eksterne loginudbyder. Luk dette vindue og prøv igen.',
 		externalLoginSuccess: 'Du er nu logget ind. Du kan nu lukke dette vindue.',
+		externalLoginRedirectSuccess: 'Du er nu logget ind. Du vil blive omdirigeret om et øjeblik.',
 	},
 	openidErrors: {
 		accessDenied: 'Access denied',
