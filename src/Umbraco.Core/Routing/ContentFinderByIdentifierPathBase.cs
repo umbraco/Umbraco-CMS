@@ -23,10 +23,11 @@ public abstract class ContentFinderByIdentifierPathBase
     {
         var cultureFromQuerystring = _requestAccessor.GetQueryStringValue("culture");
 
-        // if we have a node, check if we have a culture in the query string
+        // Check if we have a culture in the query string
         if (!string.IsNullOrEmpty(cultureFromQuerystring))
         {
-            // we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
+            // We're assuming it will match a culture, if an invalid one is passed in,
+            // an exception will throw (there is no TryGetCultureInfo method)
             frequest.SetCulture(cultureFromQuerystring);
         }
     }
