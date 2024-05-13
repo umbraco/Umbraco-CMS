@@ -71,7 +71,7 @@ function contextItemData(contextInstance: any): UmbDebugContextItemData {
 				}
 			}
 
-			contextItemData = { ...contextItemData, properties: props };
+			contextItemData = { ...contextItemData, properties: props.sort((a, b) => a.key.localeCompare(b.key)) };
 		}
 	} else {
 		contextItemData = { ...contextItemData, type: 'primitive', value: contextInstance };
@@ -98,7 +98,7 @@ function getClassMethodNames(klass: any) {
 
 	const allMethods =
 		typeof klass.prototype === 'undefined' ? distinctDeepFunctions(klass) : Object.getOwnPropertyNames(klass.prototype);
-	return allMethods.filter((name: any) => name !== 'constructor' && !name.startsWith('_'));
+	return allMethods.filter((name: any) => name !== 'constructor' && !name.startsWith('_')).sort();
 }
 
 export interface UmbDebugContextData {
