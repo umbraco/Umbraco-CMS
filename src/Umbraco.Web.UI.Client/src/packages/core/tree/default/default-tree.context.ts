@@ -71,9 +71,8 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 		// @ts-ignore
 		hostElement.addEventListener('temp-reload-tree-item-parent', (event: CustomEvent) => {
 			const treeRoot = this.#treeRoot.getValue();
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			const unique = treeRoot.unique;
+			const unique = treeRoot?.unique;
+
 			if (event.detail.unique === unique) {
 				event.stopPropagation();
 				this.loadTree();
