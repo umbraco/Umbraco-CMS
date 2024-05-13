@@ -1,6 +1,6 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import { UMB_DEFAULT_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/default-tree.context.js';
-import type { UmbTreeItemModel } from '../../types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../../reload-tree-item-children/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
@@ -17,7 +17,10 @@ import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action
 import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModel>
+export abstract class UmbTreeItemContextBase<
+		TreeItemType extends UmbTreeItemModel,
+		TreeRootType extends UmbTreeRootModel,
+	>
 	extends UmbContextBase<UmbTreeItemContext<TreeItemType>>
 	implements UmbTreeItemContext<TreeItemType>
 {
@@ -59,7 +62,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#path = new UmbStringState('');
 	readonly path = this.#path.asObservable();
 
-	treeContext?: UmbDefaultTreeContext<TreeItemType>;
+	treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
 	#sectionContext?: UmbSectionContext;
 	#sectionSidebarContext?: UmbSectionSidebarContext;
 	#actionEventContext?: UmbActionEventContext;
@@ -226,7 +229,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			this.#sectionSidebarContext = instance;
 		});
 
-		this.consumeContext(UMB_DEFAULT_TREE_CONTEXT, (treeContext: UmbDefaultTreeContext<TreeItemType>) => {
+		this.consumeContext(UMB_DEFAULT_TREE_CONTEXT, (treeContext) => {
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();

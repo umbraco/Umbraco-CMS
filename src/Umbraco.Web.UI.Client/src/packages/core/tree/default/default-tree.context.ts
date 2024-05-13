@@ -1,5 +1,5 @@
 import { UmbRequestReloadTreeItemChildrenEvent } from '../reload-tree-item-children/index.js';
-import type { UmbTreeItemModelBase, UmbTreeStartNode } from '../types.js';
+import type { UmbTreeItemModel, UmbTreeItemModelBase, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -17,11 +17,11 @@ import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/bac
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
-	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType>>
+export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRootType extends UmbTreeRootModel>
+	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType, TreeRootType>>
 	implements UmbTreeContext
 {
-	#treeRoot = new UmbObjectState<TreeItemType | undefined>(undefined);
+	#treeRoot = new UmbObjectState<TreeRootType | undefined>(undefined);
 	treeRoot = this.#treeRoot.asObservable();
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -41,7 +41,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	startNode = this.#startNode.asObservable();
 
 	#manifest?: ManifestTree;
-	#repository?: UmbTreeRepository<TreeItemType>;
+	#repository?: UmbTreeRepository<TreeItemType, TreeRootType>;
 	#actionEventContext?: UmbActionEventContext;
 
 	#paging = {
@@ -173,7 +173,10 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 		const { data } = startNode?.unique
 			? await this.#repository!.requestTreeItemsOf({
-					parentUnique: startNode.unique,
+					parent: {
+						unique: startNode.unique,
+						entityType: startNode.entityType,
+					},
 					skip,
 					take,
 				})
@@ -299,4 +302,6 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 export default UmbDefaultTreeContext;
 
-export const UMB_DEFAULT_TREE_CONTEXT = new UmbContextToken<UmbDefaultTreeContext<any>>('UmbTreeContext');
+export const UMB_DEFAULT_TREE_CONTEXT = new UmbContextToken<UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel>>(
+	'UmbTreeContext',
+);
