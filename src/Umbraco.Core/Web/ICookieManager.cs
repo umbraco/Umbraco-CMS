@@ -6,7 +6,7 @@ public interface ICookieManager
 
     string? GetCookieValue(string cookieName);
 
-    void SetCookieValue(string cookieName, string value);
+    void SetCookieValue(string cookieName, string value, bool httpOnly = false);
 
     bool HasCookie(string cookieName);
 }
