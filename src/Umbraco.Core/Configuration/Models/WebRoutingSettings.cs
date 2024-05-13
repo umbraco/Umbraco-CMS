@@ -60,8 +60,9 @@ public class WebRoutingSettings
     public bool ValidateAlternativeTemplates { get; set; } = StaticValidateAlternativeTemplates;
 
     /// <summary>
-    ///     Gets or sets a value indicating whether find content ID by path is disabled.
+    ///     Gets or sets a value indicating whether finding content by ID path or key path is disabled.
     /// </summary>
+    // TODO: Rename setting to DisableFindContentByIdentifierPath to reflect the usage in both <see cref="ContentFinderByIdPath" /> and <see cref="ContentFinderByKeyPath" />.
     [DefaultValue(StaticDisableFindContentByIdPath)]
     public bool DisableFindContentByIdPath { get; set; } = StaticDisableFindContentByIdPath;
 
