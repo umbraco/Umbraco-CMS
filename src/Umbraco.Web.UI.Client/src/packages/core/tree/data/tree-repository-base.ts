@@ -101,7 +101,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
-		if (args.descendantUnique === undefined) throw new Error('Descendant unique is missing');
+		if (args.treeItem.unique === undefined) throw new Error('Descendant unique is missing');
 		await this._init;
 
 		const { data, error: _error } = await this._treeSource.getAncestorsOf(args);

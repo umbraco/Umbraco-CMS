@@ -58,7 +58,10 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		);
 
 		const { data } = await treeRepository.requestTreeItemsOf({
-			parentUnique: this.data.unique,
+			parent: {
+				unique: this.data.unique,
+				entityType: this.data.entityType,
+			},
 			skip: this.#pagination.getSkip(),
 			take: this.#pagination.getPageSize(),
 		});

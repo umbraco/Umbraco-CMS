@@ -43,7 +43,7 @@ const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	StaticFileService.getTreeStaticFileRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parentUnique);
+	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parent.unique);
 
 	if (parentPath === null) {
 		return getRootItems(args);
@@ -60,7 +60,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	StaticFileService.getTreeStaticFileAncestors({
-		descendantPath: args.descendantUnique,
+		descendantPath: args.treeItem.unique,
 	});
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbStaticFileTreeItemModel => {

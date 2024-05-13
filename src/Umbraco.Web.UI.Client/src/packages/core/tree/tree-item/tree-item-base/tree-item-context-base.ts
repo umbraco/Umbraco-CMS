@@ -154,6 +154,8 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	public async loadChildren() {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
+		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
+
 		// TODO: wait for tree context to be ready
 		const repository = this.treeContext?.getRepository();
 		if (!repository) throw new Error('Could not request children, repository is missing');
@@ -161,7 +163,10 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.#isLoading.setValue(true);
 
 		const { data } = await repository.requestTreeItemsOf({
-			parentUnique: this.unique,
+			parent: {
+				unique: this.unique,
+				entityType: this.entityType,
+			},
 			skip: this.#paging.skip,
 			take: this.#paging.take,
 		});

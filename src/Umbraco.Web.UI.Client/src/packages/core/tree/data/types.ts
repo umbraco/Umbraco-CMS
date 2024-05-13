@@ -4,11 +4,17 @@ export interface UmbTreeRootItemsRequestArgs {
 }
 
 export interface UmbTreeChildrenOfRequestArgs {
-	parentUnique: string | null;
+	parent: {
+		unique: string | null;
+		entityType: string;
+	};
 	skip: number;
 	take: number;
 }
 
 export interface UmbTreeAncestorsOfRequestArgs {
-	descendantUnique: string;
+	treeItem: {
+		unique: string;
+		entityType: string;
+	};
 }

@@ -36,7 +36,7 @@ const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	MemberTypeService.getTreeMemberTypeRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	if (args.parentUnique === null) {
+	if (args.parent.unique === null) {
 		return getRootItems(args);
 	} else {
 		throw new Error('Not supported for the member type tree');

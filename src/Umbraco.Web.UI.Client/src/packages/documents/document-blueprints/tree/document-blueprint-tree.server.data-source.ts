@@ -40,12 +40,12 @@ const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	DocumentBlueprintService.getTreeDocumentBlueprintRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	if (args.parentUnique === null) {
+	if (args.parent.unique === null) {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentBlueprintService.getTreeDocumentBlueprintChildren({
-			parentId: args.parentUnique,
+			parentId: args.parent.unique,
 		});
 	}
 };

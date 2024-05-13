@@ -40,12 +40,15 @@ const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	TemplateService.getTreeTemplateRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	if (args.parentUnique === null) {
-		return getRootItems(args);
+	if (args.parent.unique === null) {
+		return getRootItems({
+			skip: args.skip,
+			take: args.take,
+		});
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return TemplateService.getTreeTemplateChildren({
-			parentId: args.parentUnique,
+			parentId: args.parent.unique,
 			skip: args.skip,
 			take: args.take,
 		});
@@ -55,7 +58,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	TemplateService.getTreeTemplateAncestors({
-		descendantId: args.descendantUnique,
+		descendantId: args.treeItem.unique,
 	});
 
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbTemplateTreeItemModel => {

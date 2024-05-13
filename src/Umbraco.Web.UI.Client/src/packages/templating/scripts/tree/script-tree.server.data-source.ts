@@ -41,7 +41,7 @@ const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	ScriptService.getTreeScriptRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parentUnique);
+	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parent.unique);
 
 	if (parentPath === null) {
 		return getRootItems(args);
@@ -56,7 +56,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 };
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
-	const descendantPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.descendantUnique);
+	const descendantPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.treeItem.unique);
 	if (!descendantPath) throw new Error('Descendant path is not available');
 
 	// eslint-disable-next-line local-rules/no-direct-api-import
