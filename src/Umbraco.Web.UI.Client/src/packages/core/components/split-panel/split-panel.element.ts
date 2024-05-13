@@ -250,6 +250,7 @@ export class UmbSplitPanelElement extends LitElement {
 		slot {
 			overflow: var(--umb-split-panel-slot-overflow);
 			display: block;
+			min-height: 0;
 		}
 		#main {
 			width: 100%;
