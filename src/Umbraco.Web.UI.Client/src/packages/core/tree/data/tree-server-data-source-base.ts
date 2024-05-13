@@ -1,4 +1,4 @@
-import type { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeItemModelBase, UmbUniqueTreeItemModel } from '../types.js';
 import type { UmbTreeDataSource } from './tree-data-source.interface.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -27,7 +27,7 @@ export interface UmbTreeServerDataSourceBaseArgs<
  */
 export abstract class UmbTreeServerDataSourceBase<
 	ServerTreeItemType extends { hasChildren: boolean },
-	ClientTreeItemType extends UmbTreeItemModelBase,
+	ClientTreeItemType extends UmbUniqueTreeItemModel,
 > implements UmbTreeDataSource<ClientTreeItemType>
 {
 	#host;
