@@ -86,7 +86,9 @@ export abstract class UmbTreeRepositoryBase<
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeItemsOf(args: UmbTreeChildrenOfRequestArgs) {
-		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
+		if (!args.parent) throw new Error('Parent is missing');
+		if (args.parent.unique === undefined) throw new Error('Parent unique is missing');
+		if (args.parent.entityType === null) throw new Error('Parent entity type is missing');
 		await this._init;
 
 		const { data, error: _error } = await this._treeSource.getChildrenOf(args);
@@ -95,7 +97,7 @@ export abstract class UmbTreeRepositoryBase<
 			this._treeStore!.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this._treeStore!.childrenOf(args.parentUnique) };
+		return { data, error, asObservable: () => this._treeStore!.childrenOf(args.parent.unique) };
 	}
 
 	/**
