@@ -152,7 +152,19 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.#observeSectionPath();
 	}
 
-	public async loadChildren() {
+	/**
+	 * Load children of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public loadChildren = () => this.#loadChildren();
+
+	/**
+	 * Load more children of the tree item
+	 * @memberof UmbTreeItemContextBase
+	 */
+	public loadMore = () => this.#loadChildren(true);
+
+	async #loadChildren(loadMore = false) {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		// TODO: wait for tree context to be ready
 		const repository = this.treeContext?.getRepository();
@@ -160,14 +172,23 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		this.#isLoading.setValue(true);
 
+		const skip = loadMore ? this.#paging.skip : 0;
+		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
+
 		const { data } = await repository.requestTreeItemsOf({
 			parentUnique: this.unique,
-			skip: this.#paging.skip,
-			take: this.#paging.take,
+			skip,
+			take,
 		});
 
 		if (data) {
-			this.#childItems.setValue(data.items);
+			if (loadMore) {
+				const currentItems = this.#childItems.getValue();
+				this.#childItems.setValue([...currentItems, ...data.items]);
+			} else {
+				this.#childItems.setValue(data.items);
+			}
+
 			this.#hasChildren.setValue(data.total > 0);
 			this.pagination.setTotalItems(data.total);
 		}
@@ -329,7 +350,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
 		this.#paging.skip = target.getSkip();
-		this.loadChildren();
+		this.loadMore();
 	};
 
 	#debouncedCheckIsActive = debounce(() => this.#checkIsActive(), 100);

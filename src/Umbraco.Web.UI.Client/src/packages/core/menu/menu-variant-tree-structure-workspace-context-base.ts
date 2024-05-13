@@ -1,9 +1,9 @@
 import type { UmbVariantStructureItemModel } from './types.js';
-import type { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeRepository, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
@@ -17,6 +17,9 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 	#structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
+
+	#parent = new UmbObjectState<UmbVariantStructureItemModel | undefined>(undefined);
+	public readonly parent = this.#parent.asObservable();
 
 	constructor(host: UmbControllerHost, args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs) {
 		// TODO: set up context token
@@ -38,17 +41,32 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew ? this.#workspaceContext?.parentUnique : this.#workspaceContext?.unique;
 
+		let structureItems: Array<UmbVariantStructureItemModel> = [];
+
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
 		if (!unique) throw new Error('Unique is not available');
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any>>(
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any, UmbUniqueTreeRootModel>>(
 			this,
 			this.#args.treeRepositoryAlias,
 		);
+
+		const { data: root } = await treeRepository.requestTreeRoot();
+
+		if (root) {
+			structureItems = [
+				{
+					unique: root.unique,
+					entityType: root.entityType,
+					variants: [{ name: root.name, culture: null, segment: null }],
+				},
+			];
+		}
+
 		const { data } = await treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
 
 		if (data) {
-			const structureItems = data.map((treeItem) => {
+			const ancestorItems = data.map((treeItem) => {
 				return {
 					unique: treeItem.unique,
 					entityType: treeItem.entityType,
@@ -62,6 +80,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				};
 			});
 
+			structureItems.push(...ancestorItems);
+
+			const parent = structureItems[structureItems.length - 2];
+			this.#parent.setValue(parent);
 			this.#structure.setValue(structureItems);
 		}
 	}
