@@ -1,4 +1,4 @@
-import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '../types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeAncestorsOfRequestArgs,
@@ -18,8 +18,8 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
  * @template TreeRootType
  */
 export interface UmbTreeRepository<
-	TreeItemType extends UmbUniqueTreeItemModel = UmbUniqueTreeItemModel,
-	TreeRootType extends UmbUniqueTreeRootModel = UmbUniqueTreeRootModel,
+	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel = UmbTreeRootModel,
 > extends UmbApi {
 	/**
 	 * Requests the root of the tree.

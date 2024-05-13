@@ -1,5 +1,5 @@
 import type { UmbStructureItemModel } from './types.js';
-import type { UmbTreeRepository, UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeRepository, UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -36,9 +36,10 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	async #requestStructure() {
 		let structureItems: Array<UmbStructureItemModel> = [];
 
-		const treeRepository = await createExtensionApiByAlias<
-			UmbTreeRepository<UmbUniqueTreeItemModel, UmbUniqueTreeRootModel>
-		>(this, this.#args.treeRepositoryAlias);
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbTreeItemModel, UmbTreeRootModel>>(
+			this,
+			this.#args.treeRepositoryAlias,
+		);
 
 		const { data: root } = await treeRepository.requestTreeRoot();
 

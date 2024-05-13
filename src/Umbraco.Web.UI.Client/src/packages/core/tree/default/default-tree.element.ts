@@ -1,4 +1,4 @@
-import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration, UmbUniqueTreeItemModel } from '../types.js';
+import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration, UmbTreeItemModel } from '../types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
 import { UMB_DEFAULT_TREE_CONTEXT } from './default-tree.context.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -40,7 +40,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@state()
 	private _totalPages = 1;
 
-	#treeContext?: UmbDefaultTreeContext<UmbUniqueTreeItemModel>;
+	#treeContext?: UmbDefaultTreeContext<UmbTreeItemModel>;
 	#init: Promise<unknown>;
 
 	constructor() {

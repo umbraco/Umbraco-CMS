@@ -1,4 +1,4 @@
-import type { UmbUniqueTreeItemModel } from '../types.js';
+import type { UmbTreeItemModel } from '../types.js';
 import type { UmbTreeStore } from './tree-store.interface.js';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -11,12 +11,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @extends {UmbStoreBase}
  * @description - Entity Tree Store
  */
-export class UmbUniqueTreeStore
-	extends UmbStoreBase<UmbUniqueTreeItemModel>
-	implements UmbTreeStore<UmbUniqueTreeItemModel>
-{
+export class UmbUniqueTreeStore extends UmbStoreBase<UmbTreeItemModel> implements UmbTreeStore<UmbTreeItemModel> {
 	constructor(host: UmbControllerHost, storeAlias: string) {
-		super(host, storeAlias, new UmbArrayState<UmbUniqueTreeItemModel>([], (x) => x.unique));
+		super(host, storeAlias, new UmbArrayState<UmbTreeItemModel>([], (x) => x.unique));
 	}
 
 	/**

@@ -6,7 +6,7 @@ export interface UmbTreeItemModelBase {
 	icon?: string | null;
 }
 
-export interface UmbUniqueTreeItemModel extends UmbTreeItemModelBase {
+export interface UmbTreeItemModel extends UmbTreeItemModelBase {
 	unique: string;
 	parent: {
 		unique: string | null;
@@ -14,7 +14,7 @@ export interface UmbUniqueTreeItemModel extends UmbTreeItemModelBase {
 	};
 }
 
-export interface UmbUniqueTreeRootModel extends UmbTreeItemModelBase {
+export interface UmbTreeRootModel extends UmbTreeItemModelBase {
 	unique: null;
 }
 

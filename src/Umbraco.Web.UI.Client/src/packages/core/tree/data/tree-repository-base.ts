@@ -1,4 +1,4 @@
-import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '../types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import type { UmbTreeStore } from './tree-store.interface.js';
 import type { UmbTreeRepository } from './tree-repository.interface.js';
 import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
@@ -25,8 +25,8 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
  * @template TreeRootType
  */
 export abstract class UmbTreeRepositoryBase<
-		TreeItemType extends UmbUniqueTreeItemModel,
-		TreeRootType extends UmbUniqueTreeRootModel,
+		TreeItemType extends UmbTreeItemModel,
+		TreeRootType extends UmbTreeRootModel,
 	>
 	extends UmbRepositoryBase
 	implements UmbTreeRepository<TreeItemType, TreeRootType>, UmbApi

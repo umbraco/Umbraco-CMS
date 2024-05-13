@@ -5,7 +5,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbTreeRepository, UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeRepository, UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
@@ -17,7 +17,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	UmbSortChildrenOfModalValue
 > {
 	@state()
-	_children: Array<UmbUniqueTreeItemModel> = [];
+	_children: Array<UmbTreeItemModel> = [];
 
 	@state()
 	_currentPage = 1;
@@ -27,7 +27,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 
 	#pagination = new UmbPaginationManager();
 	#sortedUniques = new Set<string>();
-	#sorter?: UmbSorterController<UmbUniqueTreeItemModel>;
+	#sorter?: UmbSorterController<UmbTreeItemModel>;
 
 	constructor() {
 		super();
@@ -52,7 +52,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		if (!this.data?.unique === undefined) throw new Error('unique is required');
 		if (!this.data?.treeRepositoryAlias) throw new Error('treeRepositoryAlias is required');
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbUniqueTreeItemModel>>(
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbTreeItemModel>>(
 			this,
 			this.data.treeRepositoryAlias,
 		);
@@ -80,7 +80,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 	#initSorter() {
 		if (this.#sorter) return;
 
-		this.#sorter = new UmbSorterController<UmbUniqueTreeItemModel>(this, {
+		this.#sorter = new UmbSorterController<UmbTreeItemModel>(this, {
 			getUniqueOfElement: (element) => {
 				return element.dataset.unique;
 			},
@@ -177,7 +177,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	#renderChild(item: UmbUniqueTreeItemModel) {
+	#renderChild(item: UmbTreeItemModel) {
 		return html`<uui-ref-node .name=${item.name} data-unique=${item.unique}></uui-ref-node>`;
 	}
 

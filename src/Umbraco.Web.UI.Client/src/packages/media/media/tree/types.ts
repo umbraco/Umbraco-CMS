@@ -1,8 +1,8 @@
 import type { UmbMediaEntityType, UmbMediaRootEntityType } from '../entity.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbMediaTreeItemModel extends UmbUniqueTreeItemModel {
+export interface UmbMediaTreeItemModel extends UmbTreeItemModel {
 	entityType: UmbMediaEntityType;
 	noAccess: boolean;
 	isTrashed: boolean;
@@ -14,7 +14,7 @@ export interface UmbMediaTreeItemModel extends UmbUniqueTreeItemModel {
 	variants: Array<UmbMediaTreeItemVariantModel>;
 }
 
-export interface UmbMediaTreeRootModel extends UmbUniqueTreeRootModel {
+export interface UmbMediaTreeRootModel extends UmbTreeRootModel {
 	entityType: UmbMediaRootEntityType;
 }
 

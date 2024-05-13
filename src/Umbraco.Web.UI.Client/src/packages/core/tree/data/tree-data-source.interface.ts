@@ -1,4 +1,4 @@
-import type { UmbUniqueTreeItemModel } from '../types.js';
+import type { UmbTreeItemModel } from '../types.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
@@ -13,7 +13,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @interface UmbTreeDataSourceConstructor
  * @template TreeItemType
  */
-export interface UmbTreeDataSourceConstructor<TreeItemType extends UmbUniqueTreeItemModel> {
+export interface UmbTreeDataSourceConstructor<TreeItemType extends UmbTreeItemModel> {
 	new (host: UmbControllerHost): UmbTreeDataSource<TreeItemType>;
 }
 
@@ -23,7 +23,7 @@ export interface UmbTreeDataSourceConstructor<TreeItemType extends UmbUniqueTree
  * @interface UmbTreeDataSource
  * @template TreeItemType
  */
-export interface UmbTreeDataSource<TreeItemType extends UmbUniqueTreeItemModel> {
+export interface UmbTreeDataSource<TreeItemType extends UmbTreeItemModel> {
 	/**
 	 * Gets the root items of the tree.
 	 * @return {*}  {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>}
