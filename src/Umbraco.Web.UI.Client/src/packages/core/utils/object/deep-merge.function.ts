@@ -13,7 +13,7 @@ export function umbDeepMerge<
 
 	for (const key in source) {
 		if (Object.prototype.hasOwnProperty.call(source, key) && source[key] !== undefined) {
-			if (source[key]?.constructor === Object && fallback[key].constructor === Object) {
+			if (source[key]?.constructor === Object && fallback[key]?.constructor === Object) {
 				result[key] = umbDeepMerge(source[key] as any, fallback[key]);
 			} else {
 				result[key] = source[key] as any;

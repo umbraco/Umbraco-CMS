@@ -17,6 +17,10 @@ export class UmbMediaTypeStructureServerDataSource extends UmbContentTypeStructu
 	constructor(host: UmbControllerHost) {
 		super(host, { getAllowedChildrenOf, mapper });
 	}
+
+	getMediaTypesOfFileExtension({ fileExtension, skip, take }: { fileExtension: string; skip: number; take: number }) {
+		return getAllowedMediaTypesOfExtension({ fileExtension, skip, take });
+	}
 }
 
 const getAllowedChildrenOf = (unique: string | null) => {
@@ -36,4 +40,18 @@ const mapper = (item: AllowedMediaTypeModel): UmbAllowedMediaTypeModel => {
 		description: item.description || null,
 		icon: item.icon || null,
 	};
+};
+
+const getAllowedMediaTypesOfExtension = async ({
+	fileExtension,
+	skip,
+	take,
+}: {
+	fileExtension: string;
+	skip: number;
+	take: number;
+}) => {
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	const { items } = await MediaTypeService.getItemMediaTypeAllowed({ fileExtension, skip, take });
+	return items.map((item) => mapper(item));
 };
