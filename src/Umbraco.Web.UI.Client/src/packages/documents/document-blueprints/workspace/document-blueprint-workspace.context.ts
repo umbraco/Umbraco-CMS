@@ -430,20 +430,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 		}
 	}
 
-	/*
-	concept notes:
-
-	public saveAndPreview() {
-
-	}
-	*/
-
-	/*public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		// TODO: [LK] Temporary workaround/hack to get the workspace to load.
-		const docCxt = new UmbDocumentWorkspaceContext(host);
-		return new UmbDocumentPropertyDataContext(host, docCxt, variantId);
-	}*/
-
 	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
 		return new UmbDocumentBlueprintPropertyDataContext(host, this, variantId);
 	}

@@ -544,20 +544,23 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	render() {
-		return html` <div id="actions">${this._renderBasicActions()}</div>
+		return html`
+			<div id="actions">${this._renderBasicActions()}</div>
 			<umb-code-editor
 				language="markdown"
+				theme="umb-light"
 				.code=${this.value as string}
 				@keypress=${this.onKeyPress}
-				@input=${this.#onInput}
-				theme="umb-light"></umb-code-editor>
-			${when(this.preview && this.value, () => this.renderPreview(this.value as string))}`;
+				@input=${this.#onInput}>
+			</umb-code-editor>
+			${when(this.preview && this.value, () => this.renderPreview(this.value as string))}
+		`;
 	}
 
 	renderPreview(markdown: string) {
 		const markdownAsHtml = marked.parse(markdown) as string;
 		const sanitizedHtml = markdownAsHtml ? DOMPurify.sanitize(markdownAsHtml) : '';
-		return html`<uui-scroll-container id="preview"> ${unsafeHTML(sanitizedHtml)} </uui-scroll-container>`;
+		return html`<uui-scroll-container id="preview">${unsafeHTML(sanitizedHtml)}</uui-scroll-container>`;
 	}
 
 	static styles = [

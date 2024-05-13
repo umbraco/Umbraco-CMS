@@ -33,11 +33,13 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 	}
 
 	render() {
-		return html`<umb-input-markdown
-			?preview=${this._preview}
-			.overlaySize=${this._overlaySize}
-			@change=${this.#onChange}
-			.value=${this.value}></umb-input-markdown>`;
+		return html`
+			<umb-input-markdown
+				value=${this.value}
+				.overlaySize=${this._overlaySize}
+				?preview=${this._preview}
+				@change=${this.#onChange}></umb-input-markdown>
+		`;
 	}
 }
 

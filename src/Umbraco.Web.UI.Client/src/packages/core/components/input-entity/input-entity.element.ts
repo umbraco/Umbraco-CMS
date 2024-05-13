@@ -29,6 +29,7 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 	protected getFormElement() {
 		return undefined;
 	}
+
 	@property({ type: Number })
 	public set min(value: number) {
 		this.#min = value;
