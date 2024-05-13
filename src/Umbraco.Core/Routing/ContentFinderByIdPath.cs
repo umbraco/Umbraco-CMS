@@ -56,62 +56,64 @@ public class ContentFinderByIdPath : IContentFinder
             return Task.FromResult(false);
         }
 
-        IPublishedContent? node = null;
         var path = frequest.AbsolutePathDecoded;
 
-        var nodeId = -1;
-
         // no id if "/"
-        if (path != "/")
+        if (path == "/")
         {
-            var noSlashPath = path.Substring(1);
-
-            if (int.TryParse(noSlashPath, NumberStyles.Integer, CultureInfo.InvariantCulture, out nodeId) == false)
-            {
-                nodeId = -1;
-            }
-
-            if (nodeId > 0)
-            {
-                if (_logger.IsEnabled(LogLevel.Debug))
-                {
-                    _logger.LogDebug("Id={NodeId}", nodeId);
-                }
-
-                node = umbracoContext.Content?.GetById(nodeId);
-
-                if (node != null)
-                {
-                    var cultureFromQuerystring = _requestAccessor.GetQueryStringValue("culture");
-
-                    // if we have a node, check if we have a culture in the query string
-                    if (!string.IsNullOrEmpty(cultureFromQuerystring))
-                    {
-                        // we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
-                        frequest.SetCulture(cultureFromQuerystring);
-                    }
-
-                    frequest.SetPublishedContent(node);
-                    if (_logger.IsEnabled(LogLevel.Debug))
-                    {
-                        _logger.LogDebug("Found node with id={PublishedContentId}", node.Id);
-                    }
-                }
-                else
-                {
-                    nodeId = -1; // trigger message below
-                }
-            }
+            return LogAndReturnFailure();
         }
 
-        if (nodeId == -1)
+        var noSlashPath = path.Substring(1);
+
+        if (int.TryParse(noSlashPath, NumberStyles.Integer, CultureInfo.InvariantCulture, out var nodeId) == false)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("Not a node id");
-            }
+            return LogAndReturnFailure();
         }
 
-        return Task.FromResult(node != null);
+        // NodeId cannot be negative or 0
+        if (nodeId < 1)
+        {
+            return LogAndReturnFailure();
+        }
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Id={NodeId}", nodeId);
+        }
+
+        IPublishedContent? node = umbracoContext.Content?.GetById(nodeId);
+
+        if (node is null)
+        {
+            return LogAndReturnFailure();
+        }
+
+        var cultureFromQuerystring = _requestAccessor.GetQueryStringValue("culture");
+
+        // if we have a node, check if we have a culture in the query string
+        if (!string.IsNullOrEmpty(cultureFromQuerystring))
+        {
+            // we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
+            frequest.SetCulture(cultureFromQuerystring);
+        }
+
+        frequest.SetPublishedContent(node);
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Found node with id={PublishedContentId}", node.Id);
+        }
+
+        return Task.FromResult(true);
+    }
+
+    private Task<bool> LogAndReturnFailure()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Not a node id");
+        }
+
+        return Task.FromResult(false);
     }
 }
