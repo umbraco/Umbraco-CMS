@@ -46,7 +46,8 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
 		if (!unique) throw new Error('Unique is not available');
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbTreeItemModel, UmbTreeRootModel>>(
+		// TODO: add correct tree variant item model
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any, UmbTreeRootModel>>(
 			this,
 			this.#args.treeRepositoryAlias,
 		);
