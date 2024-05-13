@@ -152,8 +152,6 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 		const { data } = await this.#repository!.requestTreeRoot();
 
 		if (data) {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
 			this.#treeRoot.setValue(data);
 			this.pagination.setTotalItems(1);
 		}
