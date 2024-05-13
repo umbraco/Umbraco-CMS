@@ -82,7 +82,7 @@ export class UmbAppElement extends UmbLitElement {
 						: this.localize.term('errors_externalLoginFailed');
 				} else {
 					(component as UmbAppErrorElement).errorMessage = hasCode
-						? 'Login successful, you will be redirected shortly'
+						? this.localize.term('errors_externalLoginRedirectSuccess')
 						: this.localize.term('errors_externalLoginFailed');
 
 					this.observe(this.#authContext.authorizationSignal, () => {
