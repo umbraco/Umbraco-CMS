@@ -25,7 +25,7 @@ internal class Property : PublishedPropertyBase
     // the invariant-neutral source and inter values
     private readonly object? _sourceValue;
     private readonly ContentVariation _variations;
-    private bool _sourceValueIsInvariant;
+    private readonly ContentVariation _sourceVariations;
 
     // the variant and non-variant object values
     private CacheValues? _cacheValues;
@@ -88,7 +88,7 @@ internal class Property : PublishedPropertyBase
         // this variable is used for contextualizing the variation level when calculating property values.
         // it must be set to the union of variance (the combination of content type and property type variance).
         _variations = propertyType.Variations | content.ContentType.Variations;
-        _sourceValueIsInvariant = propertyType.Variations is ContentVariation.Nothing;
+        _sourceVariations = propertyType.Variations;
     }
 
     // clone for previewing as draft a published content that is published and has no draft
@@ -104,7 +104,7 @@ internal class Property : PublishedPropertyBase
         _isMember = origin._isMember;
         _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
         _variations = origin._variations;
-        _sourceValueIsInvariant = origin._sourceValueIsInvariant;
+        _sourceVariations = origin._sourceVariations;
     }
 
     // used to cache the CacheValues of this property
@@ -148,9 +148,14 @@ internal class Property : PublishedPropertyBase
 
     public override object? GetSourceValue(string? culture = null, string? segment = null)
     {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_sourceVariations, _content.Id, ref culture, ref segment);
 
-        if (_sourceValueIsInvariant || (culture == string.Empty && segment == string.Empty))
+        // source values are tightly bound to the property/schema culture and segment configurations, so we need to
+        // sanitize the contextualized culture/segment states before using them to access the source values.
+        culture = _sourceVariations.VariesByCulture() ? culture : string.Empty;
+        segment = _sourceVariations.VariesBySegment() ? segment : string.Empty;
+
+        if (culture == string.Empty && segment == string.Empty)
         {
             return _sourceValue;
         }
