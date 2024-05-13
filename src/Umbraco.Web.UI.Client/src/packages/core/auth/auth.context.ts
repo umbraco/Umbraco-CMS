@@ -175,6 +175,15 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	}
 
 	/**
+	 * Validates the token against the server and returns true if the token is valid.
+	 * @memberof UmbAuthContext
+	 * @returns True if the token is valid, otherwise false
+	 */
+	async validateToken(): Promise<boolean> {
+		return this.#authFlow.makeRefreshTokenRequest();
+	}
+
+	/**
 	 * Clears the token storage.
 	 * @memberof UmbAuthContext
 	 */
@@ -188,7 +197,6 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	 * @memberof UmbAuthContext
 	 */
 	timeOut() {
-		this.clearTokenStorage();
 		this.#isAuthorized.setValue(false);
 		this.#isTimeout.next();
 	}
