@@ -13,12 +13,13 @@ namespace Umbraco.Cms.Core.Routing;
 /// <remarks>
 ///     <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
 /// </remarks>
-public class ContentFinderByIdPath : IContentFinder
+public class ContentFinderByIdPath : ContentFinderByIdentifierPathBase, IContentFinder
 {
     private readonly ILogger<ContentFinderByIdPath> _logger;
-    private readonly IRequestAccessor _requestAccessor;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private WebRoutingSettings _webRoutingSettings;
+
+    protected override string FailureLogMessageTemplate => "Not a node id";
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByIdPath" /> class.
@@ -28,11 +29,11 @@ public class ContentFinderByIdPath : IContentFinder
         ILogger<ContentFinderByIdPath> logger,
         IRequestAccessor requestAccessor,
         IUmbracoContextAccessor umbracoContextAccessor)
+        : base(requestAccessor, logger)
     {
         _webRoutingSettings = webRoutingSettings.CurrentValue ??
                               throw new ArgumentNullException(nameof(webRoutingSettings));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(requestAccessor));
         _umbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
 
@@ -89,14 +90,7 @@ public class ContentFinderByIdPath : IContentFinder
             return LogAndReturnFailure();
         }
 
-        var cultureFromQuerystring = _requestAccessor.GetQueryStringValue("culture");
-
-        // if we have a node, check if we have a culture in the query string
-        if (!string.IsNullOrEmpty(cultureFromQuerystring))
-        {
-            // we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
-            frequest.SetCulture(cultureFromQuerystring);
-        }
+        ResolveAndSetCultureOnRequest(frequest);
 
         frequest.SetPublishedContent(node);
         if (_logger.IsEnabled(LogLevel.Debug))
@@ -105,15 +99,5 @@ public class ContentFinderByIdPath : IContentFinder
         }
 
         return Task.FromResult(true);
-    }
-
-    private Task<bool> LogAndReturnFailure()
-    {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Not a node id");
-        }
-
-        return Task.FromResult(false);
     }
 }
