@@ -9,14 +9,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class ThumbnailUrlFactory : IThumbnailUrlFactory
+public class ReziseImageUrlFactory : IReziseImageUrlFactory
 {
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly ContentSettings _contentSettings;
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
 
-    public ThumbnailUrlFactory(IImageUrlGenerator imageUrlGenerator, IOptions<ContentSettings> contentSettings, MediaUrlGeneratorCollection mediaUrlGenerators, IAbsoluteUrlBuilder absoluteUrlBuilder)
+    public ReziseImageUrlFactory(IImageUrlGenerator imageUrlGenerator, IOptions<ContentSettings> contentSettings, MediaUrlGeneratorCollection mediaUrlGenerators, IAbsoluteUrlBuilder absoluteUrlBuilder)
     {
         _imageUrlGenerator = imageUrlGenerator;
         _contentSettings = contentSettings.Value;
