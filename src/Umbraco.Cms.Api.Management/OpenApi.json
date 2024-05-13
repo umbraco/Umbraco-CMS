@@ -10816,6 +10816,83 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/imaging/resize/urls": {
+      "get": {
+        "tags": [
+          "Imaging"
+        ],
+        "operationId": "GetImagingResizeUrls",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "height",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 200
+            }
+          },
+          {
+            "name": "width",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 200
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ImageCropModeModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MediaUrlInfoResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/indexer": {
       "get": {
         "tags": [
@@ -36708,6 +36785,17 @@
           }
         },
         "additionalProperties": false
+      },
+      "ImageCropModeModel": {
+        "enum": [
+          "Crop",
+          "Max",
+          "Stretch",
+          "Pad",
+          "BoxPad",
+          "Min"
+        ],
+        "type": "string"
       },
       "ImportDictionaryRequestModel": {
         "required": [
