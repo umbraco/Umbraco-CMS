@@ -43,7 +43,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@state()
 	private _totalPages = 1;
 
-	#treeContext?: UmbDefaultTreeContext<UmbTreeItemModel>;
+	#treeContext?: UmbDefaultTreeContext<UmbTreeItemModelBase>;
 	#init: Promise<unknown>;
 
 	constructor() {
