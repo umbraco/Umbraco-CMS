@@ -12,7 +12,6 @@ test.describe('Translation tests @smoke', () => {
 
   test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
-    await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
   });
 
   test('can create a dictionary item', async ({umbracoApi, umbracoUi}) => {
@@ -52,7 +51,6 @@ test.describe('Translation tests @smoke', () => {
     // TODO: Uncomment this when the front-end is ready. Currently the dictionary list is not updated immediately.
     // Verify the dictionary item does not display in the list
     //expect(await umbracoUi.translation.doesDictionaryListHaveText(dictionaryName)).toBeFalsy();
-    
   });
 
   test('can create a dictionary item in a dictionary @smoke', async ({umbracoApi, umbracoUi}) => {
@@ -77,6 +75,9 @@ test.describe('Translation tests @smoke', () => {
     // Verify the new dictionary item displays in the tree
     await umbracoUi.translation.reloadTree(parentDictionaryName);
     await umbracoUi.translation.isDictionaryTreeItemVisible(dictionaryName);
+
+    // Clean
+    await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
   });
 
   test('can export a dictionary item', async ({umbracoApi, umbracoUi}) => {
@@ -108,6 +109,9 @@ test.describe('Translation tests @smoke', () => {
 
     // Assert
     expect(exportData).toEqual(parentDictionaryId + '.udt');
+
+    // Clean
+    await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
   });
 
   test('can import a dictionary item', async ({umbracoApi, umbracoUi}) => {
