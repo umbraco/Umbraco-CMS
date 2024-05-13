@@ -1,6 +1,6 @@
 export interface UmbTreeRootItemsRequestArgs {
-	skip: number;
-	take: number;
+	skip?: number;
+	take?: number;
 }
 
 export interface UmbTreeChildrenOfRequestArgs {
@@ -8,8 +8,8 @@ export interface UmbTreeChildrenOfRequestArgs {
 		unique: string | null;
 		entityType: string;
 	};
-	skip: number;
-	take: number;
+	skip?: number;
+	take?: number;
 }
 
 export interface UmbTreeAncestorsOfRequestArgs {
