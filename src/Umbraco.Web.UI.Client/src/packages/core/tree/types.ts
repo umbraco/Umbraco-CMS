@@ -1,6 +1,7 @@
-export interface UmbTreeItemModelBase {
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+
+export interface UmbTreeItemModelBase extends UmbEntityModel {
 	name: string;
-	entityType: string;
 	hasChildren: boolean;
 	isFolder: boolean;
 	icon?: string | null;
@@ -8,10 +9,7 @@ export interface UmbTreeItemModelBase {
 
 export interface UmbTreeItemModel extends UmbTreeItemModelBase {
 	unique: string;
-	parent: {
-		unique: string | null;
-		entityType: string;
-	};
+	parent: UmbEntityModel;
 }
 
 export interface UmbTreeRootModel extends UmbTreeItemModelBase {
