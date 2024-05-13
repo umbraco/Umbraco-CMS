@@ -7,9 +7,6 @@ import {
 	UMB_TREE_PICKER_MODAL_ALIAS,
 } from '@umbraco-cms/backoffice/tree';
 
-/*export interface UmbDocumentTypePickerModalData
-	extends UmbTreePickerModalData<UmbDocumentTypeTreeItemModel, typeof umbCreateDocumentTypeWorkspacePathGenerator> {}
-*/
 export type UmbDocumentTypePickerModalData = UmbTreePickerModalData<
 	UmbDocumentTypeTreeItemModel,
 	typeof UMB_CREATE_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN.PARAMS

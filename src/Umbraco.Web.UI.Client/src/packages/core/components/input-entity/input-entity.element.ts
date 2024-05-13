@@ -125,6 +125,10 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 
 	#openPicker() {
 		this.#pickerContext?.openPicker({
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			// TODO: ignoring this for now to prevent breaking existing functionality.
+			// if we want a very generic input it should be possible to pass in picker config
 			hideTreeRoot: true,
 		});
 	}
