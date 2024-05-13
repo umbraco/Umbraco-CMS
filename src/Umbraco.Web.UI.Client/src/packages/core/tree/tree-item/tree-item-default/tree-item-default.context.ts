@@ -6,7 +6,7 @@ export class UmbDefaultTreeItemContext<
 	TreeItemModelType extends UmbUniqueTreeItemModel,
 > extends UmbTreeItemContextBase<TreeItemModelType> {
 	constructor(host: UmbControllerHost) {
-		super(host, (x: UmbUniqueTreeItemModel) => x.unique);
+		super(host);
 	}
 }
 

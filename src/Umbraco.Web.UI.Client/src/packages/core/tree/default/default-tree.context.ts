@@ -1,5 +1,5 @@
 import { UmbRequestReloadTreeItemChildrenEvent } from '../reload-tree-item-children/index.js';
-import type { UmbTreeItemModelBase } from '../types.js';
+import type { UmbUniqueTreeItemModel } from '../types.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -17,7 +17,7 @@ import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observabl
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
+export class UmbDefaultTreeContext<TreeItemType extends UmbUniqueTreeItemModel>
 	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType>>
 	implements UmbTreeContext
 {

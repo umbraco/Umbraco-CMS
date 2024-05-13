@@ -1,6 +1,6 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import { UMB_DEFAULT_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/default-tree.context.js';
-import type { UmbTreeItemModelBase } from '../../types.js';
+import type { UmbUniqueTreeItemModel } from '../../types.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../../reload-tree-item-children/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
@@ -17,11 +17,7 @@ import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action
 import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
-	x: TreeItemType,
-) => string | null | undefined;
-
-export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
+export abstract class UmbTreeItemContextBase<TreeItemType extends UmbUniqueTreeItemModel>
 	extends UmbContextBase<UmbTreeItemContext<TreeItemType>>
 	implements UmbTreeItemContext<TreeItemType>
 {
@@ -67,7 +63,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#sectionContext?: UmbSectionContext;
 	#sectionSidebarContext?: UmbSectionSidebarContext;
 	#actionEventContext?: UmbActionEventContext;
-	#getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>;
 
 	// TODO: get this from the tree context
 	#paging = {
@@ -75,10 +70,9 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		take: 50,
 	};
 
-	constructor(host: UmbControllerHost, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
 		this.pagination.setPageSize(this.#paging.take);
-		this.#getUniqueFunction = getUniqueFunction;
 		this.#consumeContexts();
 
 		// listen for page changes on the pagination manager
@@ -134,10 +128,9 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			return;
 		}
 
-		const unique = this.#getUniqueFunction(treeItem);
 		// Only check for undefined. The tree root has null as unique
-		if (unique === undefined) throw new Error('Could not create tree item context, unique key is missing');
-		this.unique = unique;
+		if (treeItem.unique === undefined) throw new Error('Could not create tree item context, unique is missing');
+		this.unique = treeItem.unique;
 
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
 		this.entityType = treeItem.entityType;
