@@ -34,14 +34,4 @@ export class UmbUniqueTreeStore
 	childrenOf(parentUnique: string | null) {
 		return this._data.asObservablePart((items) => items.filter((item) => item.parent.unique === parentUnique));
 	}
-
-	/**
-	 * Returns an observable to observe the items with the given uniques
-	 * @param {Array<string>} uniques
-	 * @return {*}
-	 * @memberof UmbUniqueTreeStore
-	 */
-	items(uniques: Array<string | null>) {
-		return this._data.asObservablePart((items) => items.filter((item) => uniques.includes(item.unique)));
-	}
 }
