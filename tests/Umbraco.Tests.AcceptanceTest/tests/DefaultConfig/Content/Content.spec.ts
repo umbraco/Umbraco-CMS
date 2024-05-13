@@ -62,7 +62,7 @@ test.describe('Content tests', () => {
   test('can create a content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowAsRoot(documentTypeName, dataTypeName, dataTypeData.id);
+    await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
 
     // Act
     await umbracoUi.goToBackOffice();
@@ -105,7 +105,7 @@ test.describe('Content tests', () => {
     // Arrange
     const wrongContentText = 'This is wrong test content text';
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowAsRoot(documentTypeName, dataTypeName, dataTypeData.id);
+    documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
     contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, wrongContentText, dataTypeName);
 
     // Act

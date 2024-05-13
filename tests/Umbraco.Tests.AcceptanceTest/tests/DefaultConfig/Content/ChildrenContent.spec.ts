@@ -45,7 +45,7 @@ test.describe('Children content tests', () => {
     expect(childData[0].variants[0].name).toBe(childContentName);
     // verify that the child content displays in the tree after reloading children
     await umbracoUi.content.clickActionsMenuForContent(contentName);
-    await umbracoUi.content.clickReloadChildrenThreeDotsButton();
+    await umbracoUi.content.clickReloadButton();
     await umbracoUi.content.clickCaretButtonForContentName(contentName);
     await umbracoUi.content.doesContentTreeHaveName(childContentName);
 
@@ -82,7 +82,7 @@ test.describe('Children content tests', () => {
     expect(childOfChildData[0].variants[0].name).toBe(childOfChildContentName);
     // verify that the child content displays in the tree after reloading children
     await umbracoUi.content.clickActionsMenuForContent(contentName);
-    await umbracoUi.content.clickReloadChildrenThreeDotsButton();
+    await umbracoUi.content.clickReloadButton();
     await umbracoUi.content.clickActionsMenuForContent(contentName);
     await umbracoUi.content.clickCaretButtonForContentName(childContentName);
     await umbracoUi.content.doesContentTreeHaveName(childOfChildContentName);
