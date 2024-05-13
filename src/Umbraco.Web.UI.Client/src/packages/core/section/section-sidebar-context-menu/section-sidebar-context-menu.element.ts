@@ -136,10 +136,10 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 			}
 			#action-modal {
 				position: absolute;
-				left: var(--umb-section-sidebar-width);
 				height: 100%;
 				z-index: 1;
 				top: 0;
+				right: calc(var(--umb-section-sidebar-width) * -1);
 				width: var(--umb-section-sidebar-width);
 				border: none;
 				border-left: 1px solid var(--uui-color-border);

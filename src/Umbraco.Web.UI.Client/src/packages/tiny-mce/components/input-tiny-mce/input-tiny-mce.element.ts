@@ -196,10 +196,10 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		// create an object by merging the configuration onto the fallback config
 		const configurationOptions: RawEditorOptions = {
 			...defaultFallbackConfig,
-			height: dimensions?.height || undefined,
-			width: dimensions?.width || undefined,
-			content_css: stylesheets,
-			style_formats: styleFormats,
+			height: dimensions?.height ?? defaultFallbackConfig.height,
+			width: dimensions?.width ?? defaultFallbackConfig.width,
+			content_css: stylesheets.length ? stylesheets : defaultFallbackConfig.content_css,
+			style_formats: styleFormats.length ? styleFormats : defaultFallbackConfig.style_formats,
 		};
 
 		// no auto resize when a fixed height is set
