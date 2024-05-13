@@ -5,6 +5,7 @@ export * from './workspace/index.js';
 
 export * from './repository/index.js';
 export * from './tree/types.js';
+export * from './utils.ts/index.js';
 export * from './types.js';
 export * from './entity.js';
 

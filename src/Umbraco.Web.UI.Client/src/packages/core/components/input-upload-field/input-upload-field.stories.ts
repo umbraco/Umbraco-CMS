@@ -11,7 +11,5 @@ export default meta;
 type Story = StoryObj<UmbInputUploadFieldElement>;
 
 export const Overview: Story = {
-	args: {
-		multiple: false,
-	},
+	args: {},
 };
