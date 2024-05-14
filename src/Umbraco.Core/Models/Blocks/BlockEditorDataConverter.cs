@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// </summary>
 public abstract class BlockEditorDataConverter<TValue, TLayout>
     where TValue : BlockValue<TLayout>, new()
-    where TLayout : class, IBlockLayoutItem, new()
+    where TLayout : IBlockLayoutItem
 {
     private readonly IJsonSerializer _jsonSerializer;
 
@@ -42,7 +42,7 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
         }
         catch (Exception)
         {
-            blockEditorData = null;
+            blockEditorData = default;
             return false;
         }
     }
@@ -62,15 +62,13 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
 
     public BlockEditorData<TValue, TLayout> Convert(TValue? value)
     {
-        var propertyEditorAlias = new TValue().PropertyEditorAlias;
-        IEnumerable<TLayout>? layouts = value?.GetLayouts(propertyEditorAlias);
-        if (layouts is null)
+        if (value?.GetLayouts() is not IEnumerable<TLayout> layouts)
         {
             return BlockEditorData<TValue, TLayout>.Empty;
         }
 
         IEnumerable<ContentAndSettingsReference> references = GetBlockReferences(layouts);
 
-        return new BlockEditorData<TValue, TLayout>(propertyEditorAlias, references, value!);
+        return new BlockEditorData<TValue, TLayout>(references, value);
     }
 }
