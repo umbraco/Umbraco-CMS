@@ -102,7 +102,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 		this.dispatchEvent(new UmbInputEvent());
 	}
 
-	#onColorInput(event: InputEvent) {
+	#onColorChange(event: Event) {
 		event.stopPropagation();
 		this.value = this._colorPicker.value;
 		this.dispatchEvent(new UmbChangeEvent());
@@ -153,7 +153,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 								value=${this._valueHex}
 								@click=${this.#onColorClick}></uui-color-swatch>
 						</uui-input>
-						<input aria-hidden="${true}" type="color" id="color" value=${this.value} @input=${this.#onColorInput} />
+						<input aria-hidden="${true}" type="color" id="color" value=${this.value} @change=${this.#onColorChange} />
 					</div>
 					${when(
 						this.showLabels,
