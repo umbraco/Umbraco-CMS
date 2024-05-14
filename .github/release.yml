@@ -1,0 +1,34 @@
+# .github/release.yml
+
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+      - duplicate
+      - wontfix
+  categories:
+    - title: 🙌 Notable Changes
+      labels:
+        - category/notable
+    - title: 💥 Breaking Changes
+      labels:
+        - category/breaking
+    - title: 🐛 Bug Fixes
+      labels:
+        - type/bug
+        - category/bug
+    - title: 📄 Documentation
+      labels:
+        - category/documentation
+    - title: 🏠 Internal
+      labels:
+        - internal
+    - title: 📦 Dependencies
+      labels:
+        - dependencies
+    - title: 🌈 A11Y
+      labels:
+        - category/accessibility
+    - title: 🚀 New Features
+      labels:
+        - '*'

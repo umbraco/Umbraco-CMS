@@ -19,11 +19,11 @@ public class MemberResponseModel : ContentResponseModelBase<MemberValueModel, Me
 
     public int FailedPasswordAttempts { get; set; }
 
-    public DateTime? LastLoginDate { get; set; }
+    public DateTimeOffset? LastLoginDate { get; set; }
 
-    public DateTime? LastLockoutDate { get; set; }
+    public DateTimeOffset? LastLockoutDate { get; set; }
 
-    public DateTime? LastPasswordChangeDate { get; set; }
+    public DateTimeOffset? LastPasswordChangeDate { get; set; }
 
     public IEnumerable<Guid> Groups { get; set; } = [];
 }
