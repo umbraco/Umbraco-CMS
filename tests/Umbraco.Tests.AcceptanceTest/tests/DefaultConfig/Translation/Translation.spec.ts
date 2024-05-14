@@ -1,8 +1,7 @@
 ﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-// TODO: Remove smoke tag befor merging
-test.describe('Translation tests @smoke', () => {
+test.describe('Translation tests', () => {
   const dictionaryName = 'TestDictionaryItem';
   const parentDictionaryName = 'TestParentDictionary';
 
