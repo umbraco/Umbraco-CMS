@@ -51,9 +51,8 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
 
             var options = new ImageUrlGenerationOptions(url)
             {
-                // FIXME: Don't hardcode these, preferably keep the ratio from image.
-                Height = 300,
-                Width = 300,
+                Height = height,
+                Width = width,
                 ImageCropMode = mode,
             };
 
