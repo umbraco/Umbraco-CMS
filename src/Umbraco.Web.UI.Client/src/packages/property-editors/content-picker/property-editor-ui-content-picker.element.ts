@@ -1,12 +1,16 @@
 import { UmbContentPickerDynamicRootRepository } from './dynamic-root/repository/index.js';
 import type { UmbInputContentElement } from './components/input-content/index.js';
-import type { UmbContentPickerSource } from './types.js';
+import type { UmbContentPickerSource, UmbContentPickerSourceType } from './types.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
+import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
+import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 // import of local component
 import './components/input-content/index.js';
@@ -40,8 +44,17 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	@state()
 	_rootUnique?: string | null;
 
+	@state()
+	_rootEntityType?: string;
+
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
 	#dynamicRootRepository = new UmbContentPickerDynamicRootRepository(this);
+
+	#entityTypeDictionary: { [type in UmbContentPickerSourceType]: string } = {
+		content: UMB_DOCUMENT_ENTITY_TYPE,
+		media: UMB_MEDIA_ENTITY_TYPE,
+		member: UMB_MEMBER_ENTITY_TYPE,
+	};
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -50,6 +63,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 		if (startNode) {
 			this._type = startNode.type;
 			this._rootUnique = startNode.id;
+			this._rootEntityType = this.#entityTypeDictionary[startNode.type];
 			this.#dynamicRoot = startNode.dynamicRoot;
 		}
 
@@ -91,7 +105,10 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	}
 
 	render() {
-		const startNode = this._rootUnique ? { unique: this._rootUnique } : undefined;
+		const startNode: UmbTreeStartNode | undefined =
+			this._rootUnique && this._rootEntityType
+				? { unique: this._rootUnique, entityType: this._rootEntityType }
+				: undefined;
 
 		return html`<umb-input-content
 			.items=${this.value}
