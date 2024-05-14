@@ -16,24 +16,33 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 	value?: string = '';
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		const listData: string[] | undefined = config?.getValueByAlias('items');
-		this._list = listData?.map((item) => ({ label: item, value: item })) ?? [];
+		if (!config) return;
+
+		const items = config.getValueByAlias('items');
+
+		if (Array.isArray(items) && items.length > 0) {
+			this._list =
+				typeof items[0] === 'string'
+					? items.map((item) => ({ label: item, value: item }))
+					: items.map((item) => ({ label: item.name, value: item.value }));
+		}
 	}
 
 	@state()
 	private _list: UmbInputRadioButtonListElement['list'] = [];
 
-	#onChange(event: CustomEvent) {
-		const element = event.target as UmbInputRadioButtonListElement;
-		this.value = element.value;
+	#onChange(event: CustomEvent & { target: UmbInputRadioButtonListElement }) {
+		this.value = event.target.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<umb-input-radio-button-list
-			.list=${this._list}
-			.value=${this.value ?? ''}
-			@change=${this.#onChange}></umb-input-radio-button-list>`;
+		return html`
+			<umb-input-radio-button-list
+				.list=${this._list}
+				.value=${this.value ?? ''}
+				@change=${this.#onChange}></umb-input-radio-button-list>
+		`;
 	}
 }
 
