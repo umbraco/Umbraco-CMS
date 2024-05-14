@@ -48,7 +48,11 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 	render() {
 		if (!this._themes.length) return nothing;
 		return html`
-			<uui-box headline="Select theme">
+			<uui-box>
+				<div slot="header">
+					<b>Select Theme</b>
+					<p>Experimental. Only light theme is fully supported</p>
+				</div>
 				<uui-select
 					label="Select theme"
 					.options=${this._themes}
@@ -62,6 +66,10 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 		css`
 			uui-select {
 				width: 100%;
+			}
+			p {
+				margin: 0;
+				margin-top: var(--uui-size-space-1);
 			}
 		`,
 	];
