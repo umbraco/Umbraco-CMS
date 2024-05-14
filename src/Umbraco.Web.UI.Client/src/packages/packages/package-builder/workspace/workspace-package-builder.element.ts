@@ -125,10 +125,8 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	render() {
 		if (!this.workspaceAlias) return nothing;
 		return html`
-			<umb-workspace-editor alias=${this.workspaceAlias}>
-				${this.#renderHeader()}
-				${this.#renderEditors()}
-				${this.#renderActions()}
+			<umb-workspace-editor alias=${this.workspaceAlias} back-path="section/packages/view/created">
+				${this.#renderHeader()} ${this.#renderEditors()} ${this.#renderActions()}
 			</umb-workspace-editor>
 		`;
 	}
@@ -137,9 +135,6 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		if (!this._package) return nothing;
 		return html`
 			<div id="header" slot="header">
-				<uui-button href="section/packages/view/created" label=${this.localize.term('general_backToOverview')} compact>
-					<uui-icon name="icon-arrow-left"></uui-icon>
-				</uui-button>
 				<uui-input
 					id="package-name-input"
 					required
@@ -178,17 +173,10 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	#renderEditors() {
 		return html`
 			<uui-box headline="Package Content">
-				${this.#renderDocumentSection()}
-				${this.#renderMediaSection()}
-				${this.#renderDocumentTypeSection()}
-				${this.#renderMediaTypeSection()}
-				${this.#renderLanguageSection()}
-				${this.#renderDictionarySection()}
-				${this.#renderDataTypeSection()}
-				${this.#renderTemplateSection()}
-				${this.#renderStylesheetsSection()}
-				${this.#renderScriptsSection()}
-				${this.#renderPartialViewSection()}
+				${this.#renderDocumentSection()} ${this.#renderMediaSection()} ${this.#renderDocumentTypeSection()}
+				${this.#renderMediaTypeSection()} ${this.#renderLanguageSection()} ${this.#renderDictionarySection()}
+				${this.#renderDataTypeSection()} ${this.#renderTemplateSection()} ${this.#renderStylesheetsSection()}
+				${this.#renderScriptsSection()} ${this.#renderPartialViewSection()}
 			</uui-box>
 		`;
 	}
