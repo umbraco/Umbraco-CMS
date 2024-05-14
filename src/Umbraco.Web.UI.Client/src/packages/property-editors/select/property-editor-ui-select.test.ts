@@ -6,7 +6,7 @@ describe('UmbPropertyEditorUISelectElement', () => {
 	let element: UmbPropertyEditorUISelectElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-property-editor-ui-select></umb-property-editor-ui-select> `);
+		element = await fixture(html`<umb-property-editor-ui-select></umb-property-editor-ui-select>`);
 	});
 
 	it('is defined with its own instance', () => {
