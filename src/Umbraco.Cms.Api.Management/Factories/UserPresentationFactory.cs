@@ -1,6 +1,7 @@
 using Umbraco.Cms.Api.Management.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core;
@@ -161,9 +162,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             Name = updateModel.Name,
             UserName = updateModel.UserName,
             LanguageIsoCode = updateModel.LanguageIsoCode,
-            ContentStartNodeKeys = updateModel.DocumentStartNodeIds,
+            ContentStartNodeKeys = updateModel.DocumentStartNodeIds.Select(x => x.Id).ToHashSet(),
             HasContentRootAccess = updateModel.HasDocumentRootAccess,
-            MediaStartNodeKeys = updateModel.MediaStartNodeIds,
+            MediaStartNodeKeys = updateModel.MediaStartNodeIds.Select(x => x.Id).ToHashSet(),
             HasMediaRootAccess = updateModel.HasMediaRootAccess
         };
 
@@ -211,16 +212,17 @@ public class UserPresentationFactory : IUserPresentationFactory
         });
     }
 
-    private ISet<Guid> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
+    private ISet<ReferenceByIdModel> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
     {
-        IEnumerable<Guid>? keys = ids?
+        IEnumerable<ReferenceByIdModel>? models = ids?
             .Select(x => _entityService.GetKey(x, type))
             .Where(x => x.Success)
-            .Select(x => x.Result);
+            .Select(x => x.Result)
+            .Select(x => new ReferenceByIdModel(x));
 
-        return keys is null
-            ? new HashSet<Guid>()
-            : new HashSet<Guid>(keys);
+        return models is null
+            ? new HashSet<ReferenceByIdModel>()
+            : new HashSet<ReferenceByIdModel>(models);
     }
 
     private bool HasRootAccess(IEnumerable<int>? startNodeIds)
