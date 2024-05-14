@@ -35,6 +35,5 @@ export const Datetimelocal: Story = {
 	args: {
 		type: 'datetime-local',
 		value: '2023-04-01T10:00:00',
-		displayValue: '',
 	},
 };

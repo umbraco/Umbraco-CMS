@@ -1,3 +1,8 @@
+import {
+	UMB_DATA_TYPE_ENTITY_TYPE,
+	UMB_DATA_TYPE_FOLDER_ENTITY_TYPE,
+	UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
+} from '../entity.js';
 import type { UmbDataTypeTreeItemModel } from './types.js';
 import type {
 	UmbTreeChildrenOfRequestArgs,
@@ -49,12 +54,12 @@ const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
 };
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	if (args.parentUnique === null) {
+	if (args.parent.unique === null) {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DataTypeService.getTreeDataTypeChildren({
-			parentId: args.parentUnique,
+			parentId: args.parent.unique,
 			skip: args.skip,
 			take: args.take,
 		});
@@ -64,16 +69,19 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DataTypeService.getTreeDataTypeAncestors({
-		descendantId: args.descendantUnique,
+		descendantId: args.treeItem.unique,
 	});
 
 const mapper = (item: DataTypeTreeItemResponseModel): UmbDataTypeTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent?.id || null,
+		parent: {
+			unique: item.parent?.id || null,
+			entityType: item.parent ? UMB_DATA_TYPE_ENTITY_TYPE : UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
+		},
 		icon: manifestPropertyEditorUis.find((ui) => ui.alias === item.editorUiAlias)?.meta.icon,
 		name: item.name,
-		entityType: item.isFolder ? 'data-type-folder' : 'data-type',
+		entityType: item.isFolder ? UMB_DATA_TYPE_FOLDER_ENTITY_TYPE : UMB_DATA_TYPE_ENTITY_TYPE,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
 	};

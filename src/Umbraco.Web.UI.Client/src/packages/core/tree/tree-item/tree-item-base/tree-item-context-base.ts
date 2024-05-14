@@ -1,6 +1,6 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import { UMB_DEFAULT_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/default-tree.context.js';
-import type { UmbTreeItemModelBase } from '../../types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../../reload-tree-item-children/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
@@ -17,11 +17,10 @@ import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action
 import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
-	x: TreeItemType,
-) => string | null | undefined;
-
-export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
+export abstract class UmbTreeItemContextBase<
+		TreeItemType extends UmbTreeItemModel,
+		TreeRootType extends UmbTreeRootModel,
+	>
 	extends UmbContextBase<UmbTreeItemContext<TreeItemType>>
 	implements UmbTreeItemContext<TreeItemType>
 {
@@ -63,11 +62,10 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#path = new UmbStringState('');
 	readonly path = this.#path.asObservable();
 
-	treeContext?: UmbDefaultTreeContext<TreeItemType>;
+	treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
 	#sectionContext?: UmbSectionContext;
 	#sectionSidebarContext?: UmbSectionSidebarContext;
 	#actionEventContext?: UmbActionEventContext;
-	#getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>;
 
 	// TODO: get this from the tree context
 	#paging = {
@@ -75,10 +73,9 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		take: 50,
 	};
 
-	constructor(host: UmbControllerHost, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
 		this.pagination.setPageSize(this.#paging.take);
-		this.#getUniqueFunction = getUniqueFunction;
 		this.#consumeContexts();
 
 		// listen for page changes on the pagination manager
@@ -134,10 +131,9 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			return;
 		}
 
-		const unique = this.#getUniqueFunction(treeItem);
 		// Only check for undefined. The tree root has null as unique
-		if (unique === undefined) throw new Error('Could not create tree item context, unique key is missing');
-		this.unique = unique;
+		if (treeItem.unique === undefined) throw new Error('Could not create tree item context, unique is missing');
+		this.unique = treeItem.unique;
 
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
 		this.entityType = treeItem.entityType;
@@ -166,6 +162,8 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	async #loadChildren(loadMore = false) {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
+		if (this.entityType === undefined) throw new Error('Could not request children, entity type is missing');
+
 		// TODO: wait for tree context to be ready
 		const repository = this.treeContext?.getRepository();
 		if (!repository) throw new Error('Could not request children, repository is missing');
@@ -176,7 +174,10 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
 
 		const { data } = await repository.requestTreeItemsOf({
-			parentUnique: this.unique,
+			parent: {
+				unique: this.unique,
+				entityType: this.entityType,
+			},
 			skip,
 			take,
 		});
@@ -228,7 +229,9 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			this.#sectionSidebarContext = instance;
 		});
 
-		this.consumeContext(UMB_DEFAULT_TREE_CONTEXT, (treeContext: UmbDefaultTreeContext<TreeItemType>) => {
+		this.consumeContext(UMB_DEFAULT_TREE_CONTEXT, (treeContext) => {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();

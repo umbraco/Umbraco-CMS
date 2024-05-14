@@ -1,4 +1,10 @@
-import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration, UmbTreeStartNode } from '../types.js';
+import type {
+	UmbTreeItemModel,
+	UmbTreeItemModelBase,
+	UmbTreeRootModel,
+	UmbTreeSelectionConfiguration,
+	UmbTreeStartNode,
+} from '../types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
 import { UMB_DEFAULT_TREE_CONTEXT } from './default-tree.context.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -32,10 +38,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	filter: (item: UmbTreeItemModelBase) => boolean = () => true;
 
 	@state()
-	private _rootItems: UmbTreeItemModelBase[] = [];
+	private _rootItems: UmbTreeItemModel[] = [];
 
 	@state()
-	private _treeRoot?: UmbTreeItemModelBase;
+	private _treeRoot?: UmbTreeRootModel;
 
 	@state()
 	private _currentPage = 1;
@@ -43,7 +49,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@state()
 	private _totalPages = 1;
 
-	#treeContext?: UmbDefaultTreeContext<UmbTreeItemModelBase>;
+	#treeContext?: UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel>;
 	#init: Promise<unknown>;
 
 	constructor() {

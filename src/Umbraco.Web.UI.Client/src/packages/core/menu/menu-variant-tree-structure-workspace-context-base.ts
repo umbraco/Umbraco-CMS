@@ -1,5 +1,5 @@
 import type { UmbVariantStructureItemModel } from './types.js';
-import type { UmbTreeRepository, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -40,13 +40,18 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	async #requestStructure() {
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew ? this.#workspaceContext?.parentUnique : this.#workspaceContext?.unique;
+		const entityTypeObservable = isNew ? this.#workspaceContext?.parentEntityType : this.#workspaceContext?.entityType;
 
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
 		if (!unique) throw new Error('Unique is not available');
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any, UmbUniqueTreeRootModel>>(
+		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
+		if (!entityType) throw new Error('Entity type is not available');
+
+		// TODO: add correct tree variant item model
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any, UmbTreeRootModel>>(
 			this,
 			this.#args.treeRepositoryAlias,
 		);
@@ -63,7 +68,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			];
 		}
 
-		const { data } = await treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
+		const { data } = await treeRepository.requestTreeItemAncestors({ treeItem: { unique, entityType } });
 
 		if (data) {
 			const ancestorItems = data.map((treeItem) => {

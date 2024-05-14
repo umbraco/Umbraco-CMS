@@ -1,10 +1,8 @@
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDocumentBlueprintOptionsCreateModalData {
-	parent: {
-		unique: string | null;
-		entityType: string;
-	};
+	parent: UmbEntityModel;
 }
 
 export interface UmbDocumentBlueprintOptionsCreateModalValue {
