@@ -227,7 +227,7 @@ public class BackOfficeController : SecurityControllerBase
 
         if (claimsPrincipleAttempt.Success == false)
         {
-            return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+            return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
                 $"{RedirectFlowParameter}=link-login",
                 $"{RedirectStatusParameter}=unauthorized"));
         }
@@ -235,7 +235,7 @@ public class BackOfficeController : SecurityControllerBase
         BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(claimsPrincipleAttempt.Result!);
         if (user == null)
         {
-            return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+            return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
                 $"{RedirectFlowParameter}=link-login",
                 $"{RedirectStatusParameter}=user-not-found"));
         }
@@ -268,7 +268,7 @@ public class BackOfficeController : SecurityControllerBase
 
         if (handleResult.Success)
         {
-            return Redirect(_securitySettings.Value.BackOfficeHost + _securitySettings.Value.AuthorizeCallbackPathName);
+            return Redirect(_securitySettings.Value.BackOfficeHost?.GetLeftPart(UriPartial.Authority) ?? Constants.System.DefaultUmbracoPath);
         }
 
         return handleResult.Status switch
@@ -417,8 +417,8 @@ public class BackOfficeController : SecurityControllerBase
 
     private RedirectResult CallbackErrorRedirectWithStatus( string flowType, string status, IEnumerable<IdentityError> identityErrors)
     {
-        var redirectUrl = _securitySettings.Value.BackOfficeHost +
-                          _securitySettings.Value.AuthorizeCallbackErrorPathName.AppendQueryStringToUrl(
+        var redirectUrl = _securitySettings.Value.BackOfficeHost + "/" +
+                          _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
                               $"{RedirectFlowParameter}={flowType}",
                               $"{RedirectStatusParameter}={status}");
         foreach (IdentityError identityError in identityErrors)
