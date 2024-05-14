@@ -189,6 +189,8 @@ public class BackOfficeController : SecurityControllerBase
         return SignOut(Constants.Security.BackOfficeAuthenticationType, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
+    // Creates and retains a short lived secret to use in the link-login
+    // endpoint because we can not protect that method with a bearer token for reasons explained there
     [HttpGet("link-login-key")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> LinkLoginKey(string provider)
@@ -209,12 +211,19 @@ public class BackOfficeController : SecurityControllerBase
     /// </summary>
     /// <param name="provider"></param>
     /// <returns></returns>
+    // This method is marked as AllowAnonymous and protected with a secret (linkKey) inside the model for the following reasons
+    // - when a js client uses the fetch api (or old ajax requests) they can send a bearer token
+    //   but since this method returns a redirect (after middleware intervenes) to another domain
+    //   and the redirect can not be intercepted, a cors error is thrown on the client
+    // - if we switch this method to a form post or a plain get, cors is not an issue, but the client
+    //   can't set a bearer token header.
+    // we are forcing form usage here for the whole model so the secret does not end up in url logs.
     [HttpPost("link-login")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> LinkLogin([FromForm] LinkLoginRequestModel requestModel)
     {
-        Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus> claimsPrincipleAttempt = _externalLoginService.ClaimsPrincipleFromLoginProviderLinkKey(requestModel.Provider, requestModel.LinkKey);
+        Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus> claimsPrincipleAttempt = await _externalLoginService.ClaimsPrincipleFromLoginProviderLinkKeyAsync(requestModel.Provider, requestModel.LinkKey);
 
         if (claimsPrincipleAttempt.Success == false)
         {

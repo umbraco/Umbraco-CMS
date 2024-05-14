@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Security;
@@ -23,7 +24,8 @@ public partial class BackOfficeExternalLoginServiceTests
                 BackOfficeLoginProviders.Object,
                 UserService.Object,
                 BackOfficeUserManager.Object,
-                BackOfficeSignInManager.Object);
+                BackOfficeSignInManager.Object,
+                MemoryCache.Object);
 
         public Mock<IBackOfficeExternalLoginProviders> BackOfficeLoginProviders { get; } = new();
 
@@ -32,6 +34,8 @@ public partial class BackOfficeExternalLoginServiceTests
         public Mock<IBackOfficeUserManager> BackOfficeUserManager { get; } = new();
 
         public Mock<IBackOfficeSignInManager> BackOfficeSignInManager { get; } = new();
+
+        public Mock<IMemoryCache> MemoryCache { get; } = new();
     }
 
     private class MockAuthenticationHandler : IAuthenticationHandler

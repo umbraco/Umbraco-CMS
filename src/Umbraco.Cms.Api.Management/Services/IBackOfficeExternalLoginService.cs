@@ -18,7 +18,7 @@ public interface IBackOfficeExternalLoginService
     Task<Attempt<Guid?, ExternalLoginOperationStatus>> GenerateLoginProviderSecretAsync(ClaimsPrincipal claimsPrincipal,
         string loginProvider);
 
-    Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus> ClaimsPrincipleFromLoginProviderLinkKey(
+    Task<Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus>> ClaimsPrincipleFromLoginProviderLinkKeyAsync(
         string loginProvider,
         Guid linkKey);
 }

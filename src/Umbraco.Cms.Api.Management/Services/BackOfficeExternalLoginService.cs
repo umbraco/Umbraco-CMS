@@ -169,12 +169,12 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
         }
 
         var secret = Guid.NewGuid();
-        _memoryCache.Set(secret, new LoginProviderUserLink { ClaimsPrincipal = claimsPrincipal, LoginProvider = loginProvider }, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30) });
+        _memoryCache.Set(secret, new LoginProviderUserLink { ClaimsPrincipalUserId = userId, LoginProvider = loginProvider }, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30) });
 
         return Attempt<Guid?, ExternalLoginOperationStatus>.Succeed(ExternalLoginOperationStatus.Success, secret);
     }
 
-    public Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus> ClaimsPrincipleFromLoginProviderLinkKey(
+    public async Task<Attempt<ClaimsPrincipal?, ExternalLoginOperationStatus>> ClaimsPrincipleFromLoginProviderLinkKeyAsync(
         string loginProvider,
         Guid linkKey)
     {
@@ -190,8 +190,17 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
                 ExternalLoginOperationStatus.InvalidSecret, null);
         }
 
+        BackOfficeIdentityUser? user = await _backOfficeUserManager.FindByIdAsync(cachedSecretValue.ClaimsPrincipalUserId);
+        if (user is null)
+        {
+            return Attempt.FailWithStatus<ClaimsPrincipal?, ExternalLoginOperationStatus>(
+                ExternalLoginOperationStatus.IdentityNotFound, null);
+        }
+
+        ClaimsPrincipal claimsPrinciple = await _backOfficeSignInManager.CreateUserPrincipalAsync(user);
+
         _memoryCache.Remove(linkKey);
-        return Attempt.SucceedWithStatus<ClaimsPrincipal?, ExternalLoginOperationStatus>(ExternalLoginOperationStatus.Success, cachedSecretValue.ClaimsPrincipal);
+        return Attempt.SucceedWithStatus<ClaimsPrincipal?, ExternalLoginOperationStatus>(ExternalLoginOperationStatus.Success, claimsPrinciple);
     }
 
     private ExternalLoginOperationStatus FromUserOperationStatusFailure(UserOperationStatus userOperationStatus) =>
