@@ -99,9 +99,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: Boolean, attribute: 'hide-anchor' })
 	hideAnchor?: boolean;
 
-	@property({ type: Boolean, attribute: 'ignore-user-start-nodes' })
-	ignoreUserStartNodes?: boolean;
-
 	/**
 	 * @type {UUIModalSidebarSize}
 	 * @attr
@@ -173,7 +170,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 						index: index,
 						config: {
 							hideAnchor: this.hideAnchor,
-							ignoreUserStartNodes: this.ignoreUserStartNodes,
 						},
 					},
 					value: {

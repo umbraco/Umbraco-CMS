@@ -50,9 +50,6 @@ export class UmbInputContentElement extends UUIFormControlMixin(UmbLitElement, '
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
 
-	@property({ type: Boolean })
-	ignoreUserStartNodes?: boolean;
-
 	#entityTypeLookup = { content: 'document', media: 'media', member: 'member' };
 
 	@property({ type: Array })
@@ -119,7 +116,6 @@ export class UmbInputContentElement extends UUIFormControlMixin(UmbLitElement, '
 			.min=${this.min}
 			.max=${this.max}
 			?showOpenButton=${this.showOpenButton}
-			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
 			@change=${this.#onChange}></umb-input-document>`;
 	}
 
@@ -130,7 +126,6 @@ export class UmbInputContentElement extends UUIFormControlMixin(UmbLitElement, '
 			.min=${this.min}
 			.max=${this.max}
 			?showOpenButton=${this.showOpenButton}
-			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
 			@change=${this.#onChange}></umb-input-media>`;
 	}
 

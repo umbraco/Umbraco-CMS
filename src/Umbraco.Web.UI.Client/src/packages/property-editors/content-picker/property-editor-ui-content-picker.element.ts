@@ -39,9 +39,6 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	_showOpenButton?: boolean;
 
 	@state()
-	_ignoreUserStartNodes?: boolean;
-
-	@state()
 	_rootUnique?: string | null;
 
 	@state()
@@ -72,7 +69,6 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 
 		this._allowedContentTypeUniques = config.getValueByAlias('filter');
 		this._showOpenButton = config.getValueByAlias('showOpenButton');
-		this._ignoreUserStartNodes = config.getValueByAlias('ignoreUserStartNodes');
 	}
 
 	connectedCallback() {
@@ -118,7 +114,6 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 			.startNode=${startNode}
 			.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
 			?showOpenButton=${this._showOpenButton}
-			?ignoreUserStartNodes=${this._ignoreUserStartNodes}
 			@change=${this.#onChange}></umb-input-content>`;
 	}
 }

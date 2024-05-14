@@ -24,7 +24,6 @@ export type UmbLinkPickerLinkType = 'document' | 'external' | 'media';
 // TODO: investigate: this looks more like a property editor configuration. Is this used in the correct way?
 export interface UmbLinkPickerConfig {
 	hideAnchor?: boolean;
-	ignoreUserStartNodes?: boolean;
 }
 
 export const UMB_LINK_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalValue>(

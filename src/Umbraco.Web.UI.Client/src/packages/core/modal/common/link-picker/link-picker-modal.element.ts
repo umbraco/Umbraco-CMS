@@ -32,7 +32,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	@state()
 	_layout: UmbLinkPickerConfig = {
 		hideAnchor: false,
-		ignoreUserStartNodes: false,
 	};
 
 	@state()
