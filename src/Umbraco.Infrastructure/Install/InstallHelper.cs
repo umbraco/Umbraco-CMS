@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Infrastructure.Install
                 {
                     installId = Guid.NewGuid();
 
-                    _cookieManager.SetCookieValue(Constants.Web.InstallerCookieName, installId.ToString());
+                    _cookieManager.SetCookieValue(Constants.Web.InstallerCookieName, installId.ToString(), false);
                 }
 
                 var dbProvider = string.Empty;
