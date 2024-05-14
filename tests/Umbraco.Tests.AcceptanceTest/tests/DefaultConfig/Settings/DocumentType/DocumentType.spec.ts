@@ -468,8 +468,6 @@ test.describe('Document Type tests @smoke', () => {
 
       // Assert
       await umbracoUi.documentType.isSuccessNotificationVisible();
-      // We need to reload the page, because the description is not updated until you refresh the page.
-      await umbracoUi.reloadPage();
       await expect(umbracoUi.documentType.enterDescriptionTxt).toBeVisible();
       expect(umbracoUi.documentType.doesDescriptionHaveValue(descriptionText)).toBeTruthy();
       const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
