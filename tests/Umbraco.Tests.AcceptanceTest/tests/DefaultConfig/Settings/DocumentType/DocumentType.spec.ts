@@ -49,6 +49,8 @@ test.describe('Document Type tests @smoke', () => {
     await umbracoUi.documentType.clickSaveButton();
 
     // Assert
+    // Checks if both the success notification for document Types and teh template are visible
+    await umbracoUi.documentType.doesSuccessNotificationsHaveCount(2);
     // Checks if the documentType contains the template
     const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
     const templateData = await umbracoApi.template.getByName(documentTypeName);
@@ -146,7 +148,7 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
       await umbracoUi.documentType.clickAddGroupButton();
       await umbracoUi.documentType.addPropertyEditor(dataTypeName);
-      await umbracoUi.documentType.enterDocumentTypeGroupName(groupName);
+      await umbracoUi.documentType.enterGroupName(groupName);
       await umbracoUi.documentType.clickSaveButton();
 
       // Assert
@@ -188,7 +190,7 @@ test.describe('Document Type tests @smoke', () => {
 
       // Act
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
-      await umbracoUi.documentType.enterDocumentTypeGroupName(newGroupName);
+      await umbracoUi.documentType.enterGroupName(newGroupName);
       await umbracoUi.documentType.clickSaveButton();
 
       // Assert
@@ -198,24 +200,23 @@ test.describe('Document Type tests @smoke', () => {
       expect(documentTypeData.containers[0].name).toBe(newGroupName);
     });
 
-    // TODO: It is currently not possible to delete a group
-    test.skip('can delete a group in a document type', async ({page, umbracoApi, umbracoUi}) => {
+    test('can delete a group in a document type', async ({page, umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
       await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
-      const groupId = await umbracoApi.documentType.getContainerIdWithName(documentTypeName, groupName);
-      console.log(groupId);
 
       // Act
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
+      await umbracoUi.documentType.deleteGroup(groupName, true);
+      await umbracoUi.documentType.clickConfirmToDeleteButton();
       await umbracoUi.documentType.clickSaveButton();
 
       // Assert
       await umbracoUi.documentType.isSuccessNotificationVisible();
-      expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
       const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-      console.log(documentTypeData);
+      expect(documentTypeData.containers.length).toBe(0);
+      expect(documentTypeData.properties.length).toBe(0);
     });
 
     // TODO: Currently I am getting an error If I delete a tab that contains children. The children are not cleaned up when deleting the tab.
@@ -245,7 +246,7 @@ test.describe('Document Type tests @smoke', () => {
 
       // Act
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
-      await umbracoUi.documentType.deletePropertyEditorInDocumentTypeWithName(dataTypeName);
+      await umbracoUi.documentType.deletePropertyEditorWithName(dataTypeName);
       await umbracoUi.documentType.clickSaveButton();
 
       // Assert
@@ -265,8 +266,8 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.clickAddTabButton();
       await umbracoUi.documentType.enterTabName(tabName);
       await umbracoUi.documentType.clickAddGroupButton();
-      await umbracoUi.documentType.addPropertyEditor(dataTypeName);
-      await umbracoUi.documentType.enterDocumentTypeGroupName(groupName);
+      await umbracoUi.documentType.addPropertyEditor(dataTypeName, 1);
+      await umbracoUi.documentType.enterGroupName(groupName);
       await umbracoUi.documentType.clickSaveButton();
 
       // Assert
@@ -288,7 +289,7 @@ test.describe('Document Type tests @smoke', () => {
       // Act
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
       await umbracoUi.documentType.clickAddGroupButton();
-      await umbracoUi.documentType.enterDocumentTypeGroupName(secondGroupName, 1);
+      await umbracoUi.documentType.enterGroupName(secondGroupName, 1);
       await umbracoUi.documentType.addPropertyEditor(secondDataTypeName, 1);
       await umbracoUi.documentType.clickSaveButton();
 
@@ -314,8 +315,8 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.clickAddTabButton();
       await umbracoUi.documentType.enterTabName(secondTabName);
       await umbracoUi.documentType.clickAddGroupButton();
-      await umbracoUi.documentType.enterDocumentTypeGroupName(secondGroupName);
-      await umbracoUi.documentType.addPropertyEditor(secondDataTypeName);
+      await umbracoUi.documentType.enterGroupName(secondGroupName);
+      await umbracoUi.documentType.addPropertyEditor(secondDataTypeName, 1);
       await umbracoUi.documentType.clickSaveButton();
 
       // Assert
@@ -387,9 +388,11 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
 
       // Act
-      const groupValues = await umbracoUi.documentType.reorderTwoGroupsInADocumentType();
+      await umbracoUi.documentType.clickReorderButton();
+      const groupValues = await umbracoUi.documentType.reorderTwoGroups();
       const firstGroupValue = groupValues.firstGroupValue;
       const secondGroupValue = groupValues.secondGroupValue;
+      await umbracoUi.documentType.clickIAmDoneReorderingButton();
       await umbracoUi.documentType.clickSaveButton();
 
       // Assert
@@ -603,7 +606,7 @@ test.describe('Document Type tests @smoke', () => {
       // Act
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
       await umbracoUi.documentType.clickStructureTab();
-      await umbracoUi.documentType.clickTrashIconButtonForName(childDocumentTypeName);
+      await umbracoUi.documentType.clickRemoveButtonForName(childDocumentTypeName);
       await umbracoUi.documentType.clickConfirmRemoveButton();
       await umbracoUi.documentType.clickSaveButton();
 

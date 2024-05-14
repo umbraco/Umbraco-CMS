@@ -1,7 +1,7 @@
 ﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
-test.describe('Document Type Folder tests', () => {
+test.describe('Document Type Folder tests @smoke', () => {
   const documentFolderName = 'TestFolder';
 
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
