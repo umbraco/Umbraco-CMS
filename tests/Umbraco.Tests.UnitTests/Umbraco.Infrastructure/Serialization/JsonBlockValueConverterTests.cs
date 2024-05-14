@@ -69,17 +69,17 @@ public class JsonBlockValueConverterTests
         {
             ContentData =
             [
-                new() { Udi = contentElementUdi1, ContentTypeAlias = "elementType1", ContentTypeKey = elementType1Key },
-                new() { Udi = contentElementUdi2, ContentTypeAlias = "elementType2", ContentTypeKey = elementType2Key },
-                new() { Udi = contentElementUdi3, ContentTypeAlias = "elementType3", ContentTypeKey = elementType3Key },
-                new() { Udi = contentElementUdi4, ContentTypeAlias = "elementType¤", ContentTypeKey = elementType4Key },
+                new(contentElementUdi1, elementType1Key, "elementType1"),
+                new(contentElementUdi2, elementType2Key, "elementType2"),
+                new(contentElementUdi3, elementType3Key, "elementType3"),
+                new(contentElementUdi4, elementType4Key, "elementType4"),
             ],
             SettingsData =
             [
-                new() { Udi = settingsElementUdi1, ContentTypeAlias = "elementType3", ContentTypeKey = elementType3Key },
-                new() { Udi = settingsElementUdi2, ContentTypeAlias = "elementType4", ContentTypeKey = elementType4Key },
-                new() { Udi = settingsElementUdi3, ContentTypeAlias = "elementType1", ContentTypeKey = elementType1Key },
-                new() { Udi = settingsElementUdi4, ContentTypeAlias = "elementType2", ContentTypeKey = elementType2Key }
+                new(settingsElementUdi1, elementType3Key, "elementType3"),
+                new(settingsElementUdi2, elementType4Key, "elementType4"),
+                new(settingsElementUdi3, elementType1Key, "elementType1"),
+                new(settingsElementUdi4, elementType2Key, "elementType2")
             ]
         };
 
@@ -207,13 +207,13 @@ public class JsonBlockValueConverterTests
         {
             ContentData =
             [
-                new() { Udi = contentElementUdi1, ContentTypeAlias = "elementType1", ContentTypeKey = elementType1Key },
-                new() { Udi = contentElementUdi2, ContentTypeAlias = "elementType2", ContentTypeKey = elementType2Key }
+                new(contentElementUdi1, elementType1Key, "elementType1"),
+                new(contentElementUdi2, elementType2Key, "elementType2")
             ],
             SettingsData =
             [
-                new() { Udi = settingsElementUdi1, ContentTypeAlias = "elementType3", ContentTypeKey = elementType3Key },
-                new() { Udi = settingsElementUdi2, ContentTypeAlias = "elementType4", ContentTypeKey = elementType4Key }
+                new(settingsElementUdi1, elementType3Key, "elementType3"),
+                new(settingsElementUdi2, elementType4Key, "elementType4")
             ]
         };
 
@@ -299,13 +299,13 @@ public class JsonBlockValueConverterTests
         {
             ContentData =
             [
-                new() { Udi = contentElementUdi1, ContentTypeAlias = "elementType1", ContentTypeKey = elementType1Key },
-                new() { Udi = contentElementUdi2, ContentTypeAlias = "elementType2", ContentTypeKey = elementType2Key }
+                new(contentElementUdi1, elementType1Key, "elementType1"),
+                new(contentElementUdi2, elementType2Key, "elementType2")
             ],
             SettingsData =
             [
-                new() { Udi = settingsElementUdi1, ContentTypeAlias = "elementType3", ContentTypeKey = elementType3Key },
-                new() { Udi = settingsElementUdi2, ContentTypeAlias = "elementType4", ContentTypeKey = elementType4Key }
+                new(settingsElementUdi1, elementType3Key, "elementType3"),
+                new(settingsElementUdi2, elementType4Key, "elementType4")
             ]
         };
 
@@ -417,11 +417,11 @@ public class JsonBlockValueConverterTests
             },
             ContentData =
             [
-                new() { Udi = contentElementUdi1, ContentTypeAlias = "elementType1", ContentTypeKey = elementType1Key },
+                new(contentElementUdi1, elementType1Key, "elementType1"),
             ],
             SettingsData =
             [
-                new() { Udi = settingsElementUdi1, ContentTypeAlias = "elementType2", ContentTypeKey = elementType2Key },
+                new(settingsElementUdi1, elementType2Key, "elementType2")
             ]
         };
 

@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -178,11 +178,8 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
         {
             ContentData =
             [
-                new()
+                new(contentElementUdi, elementType.Key, elementType.Alias)
                 {
-                    Udi = contentElementUdi,
-                    ContentTypeAlias = elementType.Alias,
-                    ContentTypeKey = elementType.Key,
                     RawPropertyValues = new Dictionary<string, object?>
                     {
                         {"singleLineText", "The single line of text in the block"},
@@ -302,22 +299,16 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
         {
             ContentData =
             [
-                new()
+                new(contentElementUdi, elementType.Key, elementType.Alias)
                 {
-                    Udi = contentElementUdi,
-                    ContentTypeAlias = elementType.Alias,
-                    ContentTypeKey = elementType.Key,
                     RawPropertyValues = new()
                     {
                         { "singleLineText", "The single line of text in the grid root" },
                         { "bodyText", "<p>The body text in the grid root</p>" },
                     },
                 },
-                new()
+                new(contentAreaElementUdi, elementType.Key, elementType.Alias)
                 {
-                    Udi = contentAreaElementUdi,
-                    ContentTypeAlias = elementType.Alias,
-                    ContentTypeKey = elementType.Key,
                     RawPropertyValues = new()
                     {
                         { "singleLineText", "The single line of text in the grid area" },
