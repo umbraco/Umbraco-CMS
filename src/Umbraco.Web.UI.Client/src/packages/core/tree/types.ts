@@ -24,4 +24,5 @@ export type UmbTreeSelectionConfiguration = {
 
 export interface UmbTreeStartNode {
 	unique: string;
+	entityType: string;
 }
