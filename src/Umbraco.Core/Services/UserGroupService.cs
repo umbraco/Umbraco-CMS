@@ -263,7 +263,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         if (userGroup.IsSystemUserGroup())
         {
-            return Attempt.Fail(UserGroupOperationStatus.IsSystemUserGroup);
+            return Attempt.Fail(UserGroupOperationStatus.CanNotDeleteIsSystemUserGroup);
         }
 
         return Attempt.Succeed(UserGroupOperationStatus.Success);
@@ -520,10 +520,16 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return UserGroupOperationStatus.NotFound;
         }
 
-        IUserGroup? existing = _userGroupRepository.Get(userGroup.Alias);
-        if (existing is not null && existing.Key != userGroup.Key)
+        IUserGroup? existingByAlias = _userGroupRepository.Get(userGroup.Alias);
+        if (existingByAlias is not null && existingByAlias.Key != userGroup.Key)
         {
             return UserGroupOperationStatus.DuplicateAlias;
+        }
+
+        IUserGroup? existingByKey = await GetAsync(userGroup.Key);
+        if (existingByKey is not null && existingByKey.IsSystemUserGroup() && existingByKey.Alias != userGroup.Alias)
+        {
+            return UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup;
         }
 
         return UserGroupOperationStatus.Success;
