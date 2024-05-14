@@ -26,6 +26,8 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 	@state()
 	editCropAlias = '';
 
+	#oldInputValue = '';
+
 	#onRemove(alias: string) {
 		this.value = [...this.value.filter((item) => item.alias !== alias)];
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
@@ -101,6 +103,24 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 			: html`<uui-button look="secondary" type="submit" label="Add"></uui-button>`;
 	}
 
+	#onLabelInput(event: Event) {
+		const value = (event.target as HTMLInputElement)?.value ?? '';
+
+		const aliasValue = value.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+		const alias = this.shadowRoot?.querySelector('#alias') as HTMLInputElement;
+
+		if (!alias) return;
+
+		const oldAliasValue = this.#oldInputValue.toLocaleLowerCase().replace(/[^a-z0-9]/g, '-');
+
+		if (alias.value === oldAliasValue || !alias.value) {
+			alias.value = aliasValue;
+		}
+
+		this.#oldInputValue = value;
+	}
+
 	render() {
 		if (!this.value) this.value = [];
 
@@ -109,7 +129,14 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 				<form @submit=${this.#onSubmit}>
 					<div class="input">
 						<uui-label for="label">Label</uui-label>
-						<uui-input label="Label" id="label" name="label" type="text" autocomplete="false" value=""></uui-input>
+						<uui-input
+							@input=${this.#onLabelInput}
+							label="Label"
+							id="label"
+							name="label"
+							type="text"
+							autocomplete="false"
+							value=""></uui-input>
 					</div>
 					<div class="input">
 						<uui-label for="alias">Alias</uui-label>
