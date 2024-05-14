@@ -1,10 +1,8 @@
 import { UMB_DUPLICATE_DOCUMENT_MODAL_ALIAS } from './constants.js';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbDuplicateDocumentModalData {
-	unique: string | null;
-	entityType: string;
-}
+export interface UmbDuplicateDocumentModalData extends UmbEntityModel {}
 
 export interface UmbDuplicateDocumentModalValue {
 	destination: {

@@ -45,6 +45,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
 	/**
 	 */
@@ -62,6 +63,8 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
+	readonly entityType = this.#currentData.asObservablePart((data) => data?.entityType);
+
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);

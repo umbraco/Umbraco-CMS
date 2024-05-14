@@ -1,3 +1,4 @@
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
@@ -10,12 +11,7 @@ export interface UmbRestoreFromRecycleBinModalData {
 }
 
 export interface UmbRestoreFromRecycleBinModalValue {
-	destination:
-		| {
-				unique: string | null;
-				entityType: string;
-		  }
-		| undefined;
+	destination: UmbEntityModel | undefined;
 }
 
 export const UMB_RESTORE_FROM_RECYCLE_BIN_MODAL = new UmbModalToken<

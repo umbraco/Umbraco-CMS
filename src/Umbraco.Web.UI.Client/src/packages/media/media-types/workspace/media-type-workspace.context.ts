@@ -33,12 +33,14 @@ export class UmbMediaTypeWorkspaceContext
 
 	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
 	readonly data;
 	readonly unique;
+	readonly entityType;
 	readonly name;
 	getName(): string | undefined {
 		return this.structure.getOwnerContentType()?.name;
@@ -63,6 +65,7 @@ export class UmbMediaTypeWorkspaceContext
 		// General for content types:
 		this.data = this.structure.ownerContentType;
 		this.unique = this.structure.ownerContentTypeObservablePart((data) => data?.unique);
+		this.entityType = this.structure.ownerContentTypeObservablePart((data) => data?.entityType);
 		this.name = this.structure.ownerContentTypeObservablePart((data) => data?.name);
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);

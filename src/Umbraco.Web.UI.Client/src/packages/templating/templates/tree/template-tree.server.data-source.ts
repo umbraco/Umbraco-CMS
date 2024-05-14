@@ -1,4 +1,4 @@
-import { UMB_TEMPLATE_ENTITY_TYPE } from '../entity.js';
+import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
 import type { UmbTemplateTreeItemModel } from './types.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -40,12 +40,15 @@ const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	TemplateService.getTreeTemplateRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	if (args.parentUnique === null) {
-		return getRootItems(args);
+	if (args.parent.unique === null) {
+		return getRootItems({
+			skip: args.skip,
+			take: args.take,
+		});
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return TemplateService.getTreeTemplateChildren({
-			parentId: args.parentUnique,
+			parentId: args.parent.unique,
 			skip: args.skip,
 			take: args.take,
 		});
@@ -55,13 +58,16 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	TemplateService.getTreeTemplateAncestors({
-		descendantId: args.descendantUnique,
+		descendantId: args.treeItem.unique,
 	});
 
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbTemplateTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent ? item.parent.id : null,
+		parent: {
+			unique: item.parent ? item.parent.id : null,
+			entityType: item.parent ? UMB_TEMPLATE_ENTITY_TYPE : UMB_TEMPLATE_ROOT_ENTITY_TYPE,
+		},
 		name: item.name,
 		entityType: UMB_TEMPLATE_ENTITY_TYPE,
 		hasChildren: item.hasChildren,

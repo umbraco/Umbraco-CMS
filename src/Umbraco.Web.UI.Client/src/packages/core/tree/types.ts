@@ -1,17 +1,18 @@
-export interface UmbTreeItemModelBase {
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+
+export interface UmbTreeItemModelBase extends UmbEntityModel {
 	name: string;
-	entityType: string;
 	hasChildren: boolean;
 	isFolder: boolean;
 	icon?: string | null;
 }
 
-export interface UmbUniqueTreeItemModel extends UmbTreeItemModelBase {
+export interface UmbTreeItemModel extends UmbTreeItemModelBase {
 	unique: string;
-	parentUnique: string | null;
+	parent: UmbEntityModel;
 }
 
-export interface UmbUniqueTreeRootModel extends UmbTreeItemModelBase {
+export interface UmbTreeRootModel extends UmbTreeItemModelBase {
 	unique: null;
 }
 
@@ -20,3 +21,8 @@ export type UmbTreeSelectionConfiguration = {
 	selectable?: boolean;
 	selection?: Array<string | null>;
 };
+
+export interface UmbTreeStartNode {
+	unique: string;
+	entityType: string;
+}

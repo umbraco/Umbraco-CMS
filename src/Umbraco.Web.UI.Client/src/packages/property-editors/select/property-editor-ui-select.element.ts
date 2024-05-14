@@ -1,4 +1,4 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -13,15 +13,21 @@ export class UmbPropertyEditorUISelectElement extends UmbLitElement implements U
 	@property()
 	value?: string = '';
 
-	@state()
-	private _list: Array<Option> = [];
-
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const listData = config.getValueByAlias<string[]>('items');
-		this._list = listData?.map((option) => ({ value: option, name: option, selected: option === this.value })) ?? [];
+		const items = config.getValueByAlias('items');
+
+		if (Array.isArray(items) && items.length > 0) {
+			this._options =
+				typeof items[0] === 'string'
+					? items.map((item) => ({ name: item, value: item, selected: item === this.value }))
+					: items.map((item) => ({ name: item.name, value: item.value, selected: item.value === this.value }));
+		}
 	}
+
+	@state()
+	private _options: Array<Option> = [];
 
 	#onChange(event: UUISelectEvent) {
 		this.value = event.target.value as string;
@@ -29,7 +35,7 @@ export class UmbPropertyEditorUISelectElement extends UmbLitElement implements U
 	}
 
 	render() {
-		return html`<uui-select .options=${this._list} @change=${this.#onChange}></uui-select>`;
+		return html`<uui-select .options=${this._options} @change=${this.#onChange}></uui-select>`;
 	}
 }
 

@@ -4,6 +4,8 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
 
+type UmbRadioButtonItem = { label: string; value: string };
+
 @customElement('umb-input-radio-button-list')
 export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#value: string = '';
@@ -17,7 +19,7 @@ export class UmbInputRadioButtonListElement extends UUIFormControlMixin(UmbLitEl
 	}
 
 	@property({ type: Array })
-	public list: Array<{ label: string; value: string }> = [];
+	public list: Array<UmbRadioButtonItem> = [];
 
 	protected getFormElement() {
 		return undefined;

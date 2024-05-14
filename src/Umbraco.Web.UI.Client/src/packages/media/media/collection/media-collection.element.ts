@@ -32,7 +32,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		return html`
 			<umb-media-collection-toolbar slot="header"></umb-media-collection-toolbar>
 			${when(this._progress >= 0, () => html`<uui-loader-bar progress=${this._progress}></uui-loader-bar>`)}
-			<umb-dropzone-media @change=${this.#onChange} @progress=${this.#onProgress}></umb-dropzone-media>
+			<umb-dropzone @change=${this.#onChange} @progress=${this.#onProgress}></umb-dropzone>
 		`;
 	}
 }

@@ -1,9 +1,9 @@
 import { UmbTreeItemElementBase } from '../tree-item-base/index.js';
-import type { UmbUniqueTreeItemModel } from '../../types.js';
+import type { UmbTreeItemModel } from '../../types.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-default-tree-item')
-export class UmbDefaultTreeItemElement extends UmbTreeItemElementBase<UmbUniqueTreeItemModel> {}
+export class UmbDefaultTreeItemElement extends UmbTreeItemElementBase<UmbTreeItemModel> {}
 
 export default UmbDefaultTreeItemElement;
 

@@ -1,4 +1,8 @@
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+	UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+} from '../entity.js';
 import type { UmbDocumentTypeTreeItemModel } from './types.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -40,12 +44,12 @@ const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	DocumentTypeService.getTreeDocumentTypeRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	if (args.parentUnique === null) {
+	if (args.parent.unique === null) {
 		return getRootItems({ skip: args.skip, take: args.take });
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentTypeService.getTreeDocumentTypeChildren({
-			parentId: args.parentUnique,
+			parentId: args.parent.unique,
 			skip: args.skip,
 			take: args.take,
 		});
@@ -55,13 +59,16 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DocumentTypeService.getTreeDocumentTypeAncestors({
-		descendantId: args.descendantUnique,
+		descendantId: args.treeItem.unique,
 	});
 
 const mapper = (item: DocumentTypeTreeItemResponseModel): UmbDocumentTypeTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent ? item.parent.id : null,
+		parent: {
+			unique: item.parent ? item.parent.id : null,
+			entityType: item.parent ? UMB_DOCUMENT_TYPE_ENTITY_TYPE : UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+		},
 		name: item.name,
 		entityType: item.isFolder ? UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE : UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 		hasChildren: item.hasChildren,

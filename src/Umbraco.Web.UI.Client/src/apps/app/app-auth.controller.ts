@@ -7,6 +7,7 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+	#isFirstCheck = true;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -37,7 +38,18 @@ export class UmbAppAuthController extends UmbControllerBase {
 		const isAuthorized = this.#authContext.getIsAuthorized();
 
 		if (isAuthorized) {
-			return true;
+			// If this is the first time we are checking the authorization state (i.e. on first load), we need to make sure
+			// that the token is still valid. If it is not, we need to start the authorization flow.
+			// If the token is still valid, we can return true.
+			if (this.#isFirstCheck) {
+				this.#isFirstCheck = false;
+				const isValid = await this.#authContext.validateToken();
+				if (isValid) {
+					return true;
+				}
+			} else {
+				return true;
+			}
 		}
 
 		// Make a request to the auth server to start the auth flow
