@@ -99,7 +99,7 @@ public interface IAuditService : IService
         int skip,
         int take,
         Direction orderDirection = Direction.Descending,
-        DateTime? sinceDate = null,
+        DateTimeOffset? sinceDate = null,
         AuditType[]? auditTypeFilter = null) => throw new NotImplementedException();
 
     /// <summary>
