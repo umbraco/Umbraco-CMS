@@ -2347,15 +2347,10 @@ internal class UserService : RepositoryService, IUserService
 
             if (entity is null)
             {
-                continue;
+                return Attempt.FailWithStatus(UserOperationStatus.NodeNotFound, Enumerable.Empty<NodePermissions>());
             }
 
             idKeyMap[entity.Id] = key;
-        }
-
-        if (idKeyMap.Count < 1)
-        {
-            return Attempt.SucceedWithStatus(UserOperationStatus.Success, Enumerable.Empty<NodePermissions>());
         }
 
         EntityPermissionCollection permissionCollection = _userGroupRepository.GetPermissions(user.Groups.ToArray(), true, idKeyMap.Keys.ToArray());
