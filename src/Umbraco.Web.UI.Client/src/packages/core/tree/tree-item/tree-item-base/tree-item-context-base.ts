@@ -230,6 +230,8 @@ export abstract class UmbTreeItemContextBase<
 		});
 
 		this.consumeContext(UMB_DEFAULT_TREE_CONTEXT, (treeContext) => {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
