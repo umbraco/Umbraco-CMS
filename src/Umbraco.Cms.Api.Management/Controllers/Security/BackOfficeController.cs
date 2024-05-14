@@ -94,7 +94,15 @@ public class BackOfficeController : SecurityControllerBase
                 EnabledTwoFactorProviderNames = enabledProviders
             });
         }
-        return Ok();
+
+        if (result.Succeeded)
+        {
+            return Ok();
+        }
+        return StatusCode(StatusCodes.Status401Unauthorized, new ProblemDetailsBuilder()
+            .WithTitle("Invalid credentials")
+            .WithDetail("The provided credentials are invalid. User has not been signed in.")
+            .Build());
     }
 
     [AllowAnonymous]
