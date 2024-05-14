@@ -512,7 +512,7 @@
                 init();
 
                 //needs to be manually set for infinite editing mode
-                $scope.page.isNew = false;
+                $scope.isNew = false;
 
                 syncTreeNode($scope.content, data.path, false, args.reloadChildren);
 
