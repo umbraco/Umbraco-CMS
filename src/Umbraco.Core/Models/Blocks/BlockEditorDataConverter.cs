@@ -62,13 +62,13 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
 
     public BlockEditorData<TValue, TLayout> Convert(TValue? value)
     {
-        if (value is null || value.GetLayouts() is not IEnumerable<TLayout> layouts)
+        if (value?.GetLayouts() is not IEnumerable<TLayout> layouts)
         {
             return BlockEditorData<TValue, TLayout>.Empty;
         }
 
         IEnumerable<ContentAndSettingsReference> references = GetBlockReferences(layouts);
 
-        return new BlockEditorData<TValue, TLayout>(value.PropertyEditorAlias, references, value);
+        return new BlockEditorData<TValue, TLayout>(references, value);
     }
 }

@@ -52,17 +52,7 @@ public abstract class BlockValue<TLayout> : BlockValue
     /// The layouts.
     /// </returns>
     public IEnumerable<TLayout>? GetLayouts()
-        => GetLayouts(PropertyEditorAlias);
-
-    /// <summary>
-    /// Gets the layouts of the specified property editor.
-    /// </summary>
-    /// <param name="propertyEditorAlias">The property editor alias.</param>
-    /// <returns>
-    /// The layouts.
-    /// </returns>
-    public IEnumerable<TLayout>? GetLayouts(string propertyEditorAlias)
-        => Layout.TryGetValue(propertyEditorAlias, out IEnumerable<IBlockLayoutItem>? layouts)
+        => Layout.TryGetValue(PropertyEditorAlias, out IEnumerable<IBlockLayoutItem>? layouts)
             ? layouts.OfType<TLayout>()
             : null;
 }
