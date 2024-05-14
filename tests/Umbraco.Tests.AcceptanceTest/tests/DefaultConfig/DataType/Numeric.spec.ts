@@ -1,6 +1,7 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
+// Skip all tests as there is no configuration for this data type.
 const dataTypeName = 'Numeric';
 test.describe(`${dataTypeName} tests`, () => {
   let dataTypeDefaultData = null;
@@ -19,7 +20,7 @@ test.describe(`${dataTypeName} tests`, () => {
     }   
   });
 
-  test('can update Minimum value', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can update Minimum value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const minimumValue = -5;
     const expectedDataTypeValues = {
@@ -36,7 +37,7 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-  test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const maximumValue = 1000000;
     const expectedDataTypeValues = {
@@ -53,7 +54,7 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-  test('can update Step Size value', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can update Step Size value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const stepSizeValue = 5;
     const expectedDataTypeValues = {
@@ -70,7 +71,7 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-  test('can allow decimals', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
       "alias": "allowDecimals",
