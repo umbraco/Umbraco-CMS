@@ -1,4 +1,4 @@
-import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import type { UmbMediaTreeItemModel } from './types.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -39,12 +39,12 @@ const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	MediaService.getTreeMediaRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	if (args.parentUnique === null) {
+	if (args.parent.unique === null) {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return MediaService.getTreeMediaChildren({
-			parentId: args.parentUnique,
+			parentId: args.parent.unique,
 			skip: args.skip,
 			take: args.take,
 		});
@@ -54,13 +54,16 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	MediaService.getTreeMediaAncestors({
-		descendantId: args.descendantUnique,
+		descendantId: args.treeItem.unique,
 	});
 
 const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent ? item.parent.id : null,
+		parent: {
+			unique: item.parent ? item.parent.id : null,
+			entityType: item.parent ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
+		},
 		entityType: UMB_MEDIA_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
 		noAccess: item.noAccess,

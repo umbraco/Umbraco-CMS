@@ -1,8 +1,8 @@
 import type { UmbDocumentBlueprintEntityType, UmbDocumentBlueprintFolderEntityType } from '../entity.js';
-import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbDocumentBlueprintTreeRootModel extends UmbUniqueTreeRootModel {}
+export interface UmbDocumentBlueprintTreeRootModel extends UmbTreeRootModel {}
 
-export interface UmbDocumentBlueprintTreeItemModel extends UmbUniqueTreeItemModel {
+export interface UmbDocumentBlueprintTreeItemModel extends UmbTreeItemModel {
 	entityType: UmbDocumentBlueprintEntityType | UmbDocumentBlueprintFolderEntityType;
 }

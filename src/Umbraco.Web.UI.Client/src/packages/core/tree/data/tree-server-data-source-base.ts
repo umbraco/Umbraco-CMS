@@ -1,4 +1,4 @@
-import type { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeItemModelBase, UmbTreeItemModel } from '../types.js';
 import type { UmbTreeDataSource } from './tree-data-source.interface.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -27,7 +27,7 @@ export interface UmbTreeServerDataSourceBaseArgs<
  */
 export abstract class UmbTreeServerDataSourceBase<
 	ServerTreeItemType extends { hasChildren: boolean },
-	ClientTreeItemType extends UmbTreeItemModelBase,
+	ClientTreeItemType extends UmbTreeItemModel,
 > implements UmbTreeDataSource<ClientTreeItemType>
 {
 	#host;
@@ -73,7 +73,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
 	async getChildrenOf(args: UmbTreeChildrenOfRequestArgs) {
-		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
+		if (args.parent.unique === undefined) throw new Error('Parent unique is missing');
 
 		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getChildrenOf(args));
 
@@ -92,7 +92,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
 	async getAncestorsOf(args: UmbTreeAncestorsOfRequestArgs) {
-		if (!args.descendantUnique) throw new Error('Parent unique is missing');
+		if (!args.treeItem.entityType) throw new Error('Parent unique is missing');
 
 		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getAncestorsOf(args));
 

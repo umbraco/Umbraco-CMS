@@ -180,7 +180,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	 * @returns True if the token is valid, otherwise false
 	 */
 	async validateToken(): Promise<boolean> {
-		return this.#authFlow.makeRefreshTokenRequest();
+		return this.#isBypassed || this.#authFlow.makeRefreshTokenRequest();
 	}
 
 	/**

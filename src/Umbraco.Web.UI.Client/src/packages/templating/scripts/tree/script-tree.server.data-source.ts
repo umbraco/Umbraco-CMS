@@ -1,4 +1,4 @@
-import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../entity.js';
+import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../entity.js';
 import type { UmbScriptTreeItemModel } from './types.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type {
@@ -41,7 +41,7 @@ const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	ScriptService.getTreeScriptRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parentUnique);
+	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parent.unique);
 
 	if (parentPath === null) {
 		return getRootItems(args);
@@ -56,7 +56,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 };
 
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
-	const descendantPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.descendantUnique);
+	const descendantPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.treeItem.unique);
 	if (!descendantPath) throw new Error('Descendant path is not available');
 
 	// eslint-disable-next-line local-rules/no-direct-api-import
@@ -70,7 +70,10 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbScriptTreeItemMod
 
 	return {
 		unique: serializer.toUnique(item.path),
-		parentUnique: item.parent ? serializer.toUnique(item.parent.path) : null,
+		parent: {
+			unique: item.parent ? serializer.toUnique(item.parent.path) : null,
+			entityType: item.parent ? UMB_SCRIPT_ENTITY_TYPE : UMB_SCRIPT_ROOT_ENTITY_TYPE,
+		},
 		entityType: item.isFolder ? UMB_SCRIPT_FOLDER_ENTITY_TYPE : UMB_SCRIPT_ENTITY_TYPE,
 		name: item.name,
 		isFolder: item.isFolder,

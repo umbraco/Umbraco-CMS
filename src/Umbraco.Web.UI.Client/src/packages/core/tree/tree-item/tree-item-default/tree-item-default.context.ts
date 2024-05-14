@@ -1,12 +1,13 @@
 import { UmbTreeItemContextBase } from '../tree-item-base/index.js';
-import type { UmbUniqueTreeItemModel } from '../../types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDefaultTreeItemContext<
-	TreeItemModelType extends UmbUniqueTreeItemModel,
-> extends UmbTreeItemContextBase<TreeItemModelType> {
+	TreeItemType extends UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel,
+> extends UmbTreeItemContextBase<TreeItemType, TreeRootType> {
 	constructor(host: UmbControllerHost) {
-		super(host, (x: UmbUniqueTreeItemModel) => x.unique);
+		super(host);
 	}
 }
 

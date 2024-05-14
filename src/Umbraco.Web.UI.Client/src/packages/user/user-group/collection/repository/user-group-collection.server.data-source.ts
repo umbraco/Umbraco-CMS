@@ -27,7 +27,7 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 	async getCollection(filter: UmbUserGroupCollectionFilterModel) {
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			UserGroupService.getUserGroup({ skip: filter.skip, take: filter.take }),
+			UserGroupService.getFilterUserGroup({ skip: filter.skip, take: filter.take, filter: filter.query }),
 		);
 
 		if (data) {

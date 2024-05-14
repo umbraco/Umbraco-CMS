@@ -1,4 +1,4 @@
-import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
+import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDictionaryTreeItemModel } from './types.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -40,12 +40,12 @@ const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	DictionaryService.getTreeDictionaryRoot({ skip: args.skip, take: args.take });
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
-	if (args.parentUnique === null) {
+	if (args.parent.unique === null) {
 		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DictionaryService.getTreeDictionaryChildren({
-			parentId: args.parentUnique,
+			parentId: args.parent.unique,
 			skip: args.skip,
 			take: args.take,
 		});
@@ -55,13 +55,16 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DictionaryService.getTreeDictionaryAncestors({
-		descendantId: args.descendantUnique,
+		descendantId: args.treeItem.unique,
 	});
 
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbDictionaryTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parent?.id || null,
+		parent: {
+			unique: item.parent?.id || null,
+			entityType: item.parent ? UMB_DICTIONARY_ENTITY_TYPE : UMB_DICTIONARY_ROOT_ENTITY_TYPE,
+		},
 		name: item.name,
 		entityType: UMB_DICTIONARY_ENTITY_TYPE,
 		hasChildren: item.hasChildren,

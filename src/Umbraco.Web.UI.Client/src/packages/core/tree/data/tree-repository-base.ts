@@ -1,8 +1,12 @@
-import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '../types.js';
+import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import type { UmbTreeStore } from './tree-store.interface.js';
 import type { UmbTreeRepository } from './tree-repository.interface.js';
 import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
-import type { UmbTreeAncestorsOfRequestArgs } from './types.js';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from './types.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -21,8 +25,8 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
  * @template TreeRootType
  */
 export abstract class UmbTreeRepositoryBase<
-		TreeItemType extends UmbUniqueTreeItemModel,
-		TreeRootType extends UmbUniqueTreeRootModel,
+		TreeItemType extends UmbTreeItemModel,
+		TreeRootType extends UmbTreeRootModel,
 	>
 	extends UmbRepositoryBase
 	implements UmbTreeRepository<TreeItemType, TreeRootType>, UmbApi
@@ -63,7 +67,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestRootTreeItems(args: any) {
+	async requestRootTreeItems(args: UmbTreeRootItemsRequestArgs) {
 		await this._init;
 
 		const { data, error: _error } = await this._treeSource.getRootItems(args);
@@ -81,8 +85,10 @@ export abstract class UmbTreeRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeItemsOf(args: any) {
-		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
+	async requestTreeItemsOf(args: UmbTreeChildrenOfRequestArgs) {
+		if (!args.parent) throw new Error('Parent is missing');
+		if (args.parent.unique === undefined) throw new Error('Parent unique is missing');
+		if (args.parent.entityType === null) throw new Error('Parent entity type is missing');
 		await this._init;
 
 		const { data, error: _error } = await this._treeSource.getChildrenOf(args);
@@ -91,7 +97,7 @@ export abstract class UmbTreeRepositoryBase<
 			this._treeStore!.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this._treeStore!.childrenOf(args.parentUnique) };
+		return { data, error, asObservable: () => this._treeStore!.childrenOf(args.parent.unique) };
 	}
 
 	/**
@@ -101,7 +107,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
-		if (args.descendantUnique === undefined) throw new Error('Descendant unique is missing');
+		if (args.treeItem.unique === undefined) throw new Error('Descendant unique is missing');
 		await this._init;
 
 		const { data, error: _error } = await this._treeSource.getAncestorsOf(args);

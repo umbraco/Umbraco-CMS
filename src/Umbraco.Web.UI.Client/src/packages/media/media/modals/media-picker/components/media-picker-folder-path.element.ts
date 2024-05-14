@@ -1,35 +1,37 @@
 import type { UmbMediaPathModel } from '../types.js';
 import type { UmbMediaDetailModel } from '../../../types.js';
 import { UmbMediaDetailRepository } from '../../../repository/index.js';
-import { UmbMediaTreeRepository } from '../../../tree/media-tree.repository.js';
+import { UmbMediaTreeRepository } from '../../../tree/index.js';
+import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../../entity.js';
 import { css, html, customElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { getUmbracoFolderUnique } from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
-const root = { name: 'Media', unique: null };
+// TODO: get root from tree repository
+const root = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
 @customElement('umb-media-picker-folder-path')
 export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
 	#mediaDetailRepository = new UmbMediaDetailRepository(this); // used to create folders
 
-	@property()
-	public set currentPath(value: string | null) {
-		if (value !== this._currentPath) {
-			this._currentPath = value;
+	@property({ type: Object, attribute: false })
+	public set currentMedia(value: UmbEntityModel | undefined) {
+		if (value !== this._currentMedia) {
+			this._currentMedia = value;
 			this.#loadPath();
-			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}
-	public get currentPath() {
-		return this._currentPath;
+
+	public get currentMedia() {
+		return this._currentMedia;
 	}
 
 	@state()
-	private _currentPath: string | null = null;
+	private _currentMedia: UmbEntityModel | undefined;
 
 	@state()
 	private _paths: Array<UmbMediaPathModel> = [root];
@@ -43,21 +45,32 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	}
 
 	async #loadPath() {
-		if (this.currentPath) {
+		const unique = this._currentMedia?.unique;
+		const entityType = this._currentMedia?.entityType;
+
+		if (unique && entityType) {
 			const { data } = await this.#mediaTreeRepository.requestTreeItemAncestors({
-				descendantUnique: this.currentPath,
+				treeItem: {
+					unique,
+					entityType,
+				},
 			});
+
 			if (data) {
-				this._paths = [root, ...data.map((item) => ({ name: item.name, unique: item.unique }))];
-			} else {
-				this._paths = [root];
+				this._paths = [
+					root,
+					...data.map((item) => ({ name: item.name, unique: item.unique, entityType: item.entityType })),
+				];
+				return;
 			}
 		}
+
+		this._paths = [root];
 	}
 
-	#goToFolder(unique: string | null) {
-		this._paths = [...this._paths].slice(0, this._paths.findIndex((path) => path.unique === unique) + 1);
-		this.currentPath = unique;
+	#goToFolder(entity: UmbEntityModel) {
+		this._paths = [...this._paths].slice(0, this._paths.findIndex((path) => path.unique === entity.unique) + 1);
+		this.currentMedia = entity;
 	}
 
 	#focusFolderInput() {
@@ -102,9 +115,10 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 
 		const name = data.variants[0].name;
 		const unique = data.unique;
+		const entityType = data.entityType;
 
-		this._paths = [...this._paths, { name, unique }];
-		this.currentPath = unique;
+		this._paths = [...this._paths, { name, unique, entityType }];
+		this.currentMedia = { unique, entityType };
 	}
 
 	render() {
@@ -116,8 +130,8 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 					html`<uui-button
 							compact
 							.label=${path.name}
-							?disabled=${this.currentPath == path.unique}
-							@click=${() => this.#goToFolder(path.unique)}></uui-button
+							?disabled=${this.currentMedia?.unique === path.unique}
+							@click=${() => this.#goToFolder({ unique: path.unique, entityType: path.entityType })}></uui-button
 						>/`,
 			)}${this._typingNewFolder
 				? html`<uui-input
