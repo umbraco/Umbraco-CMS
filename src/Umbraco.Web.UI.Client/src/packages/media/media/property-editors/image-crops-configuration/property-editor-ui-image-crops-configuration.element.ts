@@ -1,4 +1,4 @@
-import { html, customElement, property, css, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css, repeat, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -19,6 +19,9 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+	@query('#label')
+	private _labelInput!: HTMLInputElement;
+
 	//TODO MAKE TYPE
 	@property({ attribute: false })
 	value: UmbCrop[] = [];
@@ -94,6 +97,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 
 		form.reset();
+		this._labelInput.focus();
 	}
 
 	#renderActions() {
@@ -103,8 +107,8 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 			: html`<uui-button look="secondary" type="submit" label="Add"></uui-button>`;
 	}
 
-	#onLabelInput(event: Event) {
-		const value = (event.target as HTMLInputElement)?.value ?? '';
+	#onLabelInput() {
+		const value = this._labelInput.value ?? '';
 
 		const aliasValue = value.toLowerCase().replace(/[^a-z0-9]/g, '-');
 
