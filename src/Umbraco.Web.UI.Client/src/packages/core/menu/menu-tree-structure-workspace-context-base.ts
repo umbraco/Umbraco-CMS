@@ -59,11 +59,15 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew ? this.#workspaceContext?.parentUnique : this.#workspaceContext?.unique;
+		const entityTypeObservable = isNew ? this.#workspaceContext?.parentEntityType : this.#workspaceContext?.entityType;
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
 		if (!unique) throw new Error('Unique is not available');
 
-		const { data } = await treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
+		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
+		if (!entityType) throw new Error('Entity type is not available');
+
+		const { data } = await treeRepository.requestTreeItemAncestors({ treeItem: { unique, entityType } });
 
 		if (data) {
 			const ancestorItems = data.map((treeItem) => {

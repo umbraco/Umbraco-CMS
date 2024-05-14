@@ -40,11 +40,15 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	async #requestStructure() {
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew ? this.#workspaceContext?.parentUnique : this.#workspaceContext?.unique;
+		const entityTypeObservable = isNew ? this.#workspaceContext?.parentEntityType : this.#workspaceContext?.entityType;
 
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
 		if (!unique) throw new Error('Unique is not available');
+
+		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
+		if (!entityType) throw new Error('Entity type is not available');
 
 		// TODO: add correct tree variant item model
 		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any, UmbTreeRootModel>>(
@@ -64,7 +68,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			];
 		}
 
-		const { data } = await treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
+		const { data } = await treeRepository.requestTreeItemAncestors({ treeItem: { unique, entityType } });
 
 		if (data) {
 			const ancestorItems = data.map((treeItem) => {
