@@ -1,2 +1,2 @@
-export { UmbDefaultTreeElement as UmbTreeDefaultElement } from './default-tree.element.js';
-export { UmbDefaultTreeContext as UmbTreeDefaultContext } from './default-tree.context.js';
+export { UmbDefaultTreeElement } from './default-tree.element.js';
+export { UmbDefaultTreeContext } from './default-tree.context.js';
