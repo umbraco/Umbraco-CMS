@@ -36,7 +36,9 @@ There are two ways to use this:
 	"CMS": {
 		"Security":{
 			"BackOfficeHost": "http://localhost:5173",
-			"AuthorizeCallbackPathName": "/"
+			"AuthorizeCallbackPathName": "/oauth_complete",
+			"AuthorizeCallbackLogoutPathName": "/logout",
+			"AuthorizeCallbackErrorPathName": "/error",
 		},
 	},
 	[...]

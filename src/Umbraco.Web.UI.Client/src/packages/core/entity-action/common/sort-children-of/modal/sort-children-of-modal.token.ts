@@ -1,9 +1,8 @@
 import { UMB_SORT_CHILDREN_OF_MODAL_ALIAS } from './constants.js';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbSortChildrenOfModalData {
-	unique: string | null;
-	entityType: string;
+export interface UmbSortChildrenOfModalData extends UmbEntityModel {
 	treeRepositoryAlias: string;
 	sortChildrenOfRepositoryAlias: string;
 }

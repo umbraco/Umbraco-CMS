@@ -1,5 +1,9 @@
 import { UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type { ManifestWorkspaces, ManifestWorkspaceActions } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	ManifestWorkspaces,
+	ManifestWorkspaceActions,
+	ManifestTypes,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_PARTIAL_VIEW_WORKSPACE_ALIAS = 'Umb.Workspace.PartialView';
 
@@ -35,4 +39,4 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceActions];
+export const manifests: Array<ManifestTypes> = [workspace, ...workspaceActions];

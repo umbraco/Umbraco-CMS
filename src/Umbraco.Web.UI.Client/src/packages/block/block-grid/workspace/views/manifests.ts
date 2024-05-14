@@ -1,5 +1,5 @@
 import { UMB_BLOCK_GRID_TYPE_WORKSPACE_ALIAS } from '../index.js';
-import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
 
 export const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
@@ -27,7 +27,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./block-grid-type-workspace-view-areas.element.js'),
 		weight: 1000,
 		meta: {
-			label: '#blockEditor_areas',
+			label: '#blockEditor_tabAreas',
 			pathname: 'areas',
 			icon: 'icon-grid',
 		},
@@ -45,7 +45,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./block-grid-type-workspace-view-advanced.element.js'),
 		weight: 1000,
 		meta: {
-			label: '#blockEditor_tabAreas',
+			label: '#blockEditor_tabAdvanced',
 			pathname: 'advanced',
 			icon: 'icon-wrench',
 		},
@@ -58,4 +58,4 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
-export const manifests = [...workspaceViews];
+export const manifests: Array<ManifestTypes> = [...workspaceViews];

@@ -1,9 +1,10 @@
+import { UMB_USER_GROUP_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const tableCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
-	alias: 'Umb.CollectionView.UserGroup.Table',
+	alias: UMB_USER_GROUP_TABLE_COLLECTION_VIEW_ALIAS,
 	name: 'User Group Table Collection View',
 	js: () => import('./user-group-table-collection-view.element.js'),
 	meta: {
@@ -19,4 +20,4 @@ const tableCollectionView: ManifestCollectionView = {
 	],
 };
 
-export const manifests = [tableCollectionView];
+export const manifests: Array<ManifestTypes> = [tableCollectionView];

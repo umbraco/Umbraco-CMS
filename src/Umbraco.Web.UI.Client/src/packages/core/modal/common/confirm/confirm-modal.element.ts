@@ -24,13 +24,17 @@ export class UmbConfirmModalElement extends UmbLitElement {
 			<uui-dialog-layout class="uui-text" .headline=${this.data?.headline || null}>
 				${this.data?.content}
 
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}"></uui-button>
+				<uui-button
+					slot="actions"
+					id="cancel"
+					label=${this.data?.cancelLabel || this.localize.term('buttons_confirmActionCancel')}
+					@click=${this._handleCancel}></uui-button>
 				<uui-button
 					slot="actions"
 					id="confirm"
-					color="${this.data?.color || 'positive'}"
+					color=${this.data?.color || 'positive'}
 					look="primary"
-					label="${this.data?.confirmLabel || 'Confirm'}"
+					label=${this.data?.confirmLabel || this.localize.term('buttons_confirmActionConfirm')}
 					@click=${this._handleConfirm}
 					${umbFocus()}></uui-button>
 			</uui-dialog-layout>

@@ -1,6 +1,7 @@
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import { manifest as schemaManifest } from './Umbraco.ImageCropper.js';
+import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUi = {
+const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.ImageCropper',
 	name: 'Image Cropper Property Editor UI',
@@ -12,3 +13,5 @@ export const manifest: ManifestPropertyEditorUi = {
 		propertyEditorSchemaAlias: 'Umbraco.ImageCropper',
 	},
 };
+
+export const manifests: Array<ManifestTypes> = [manifest, schemaManifest];

@@ -4,6 +4,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
+import { UMB_CONTENT_REQUEST_EVENT_TYPE } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-section-sidebar-context-menu')
 export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
@@ -66,6 +68,17 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 		this.#closeContextMenu();
 	}
 
+	#proxyContextRequests(event: UmbContextRequestEvent) {
+		if (!this.#sectionSidebarContext) return;
+		// Note for this hack (The if-sentence):  [NL]
+		// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
+		// To avoid such this hack just prevents proxying the event if its a request for its own context.
+		if (event.contextAlias !== UMB_SECTION_SIDEBAR_CONTEXT.contextAlias) {
+			event.stopImmediatePropagation();
+			this.#sectionSidebarContext.getContextElement()?.dispatchEvent(event.clone());
+		}
+	}
+
 	render() {
 		return html`
 			${this.#renderBackdrop()}
@@ -84,7 +97,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 
 	#renderModal() {
 		return this._isOpen && this._unique !== undefined && this._entityType
-			? html`<div id="action-modal">
+			? html`<div id="action-modal" @umb:context-request=${this.#proxyContextRequests}>
 					${this._headline ? html`<h3>${this.localize.string(this._headline)}</h3>` : nothing}
 					<umb-entity-action-list
 						@action-executed=${this.#onActionExecuted}
@@ -123,10 +136,10 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 			}
 			#action-modal {
 				position: absolute;
-				left: var(--umb-section-sidebar-width);
 				height: 100%;
 				z-index: 1;
 				top: 0;
+				right: calc(var(--umb-section-sidebar-width) * -1);
 				width: var(--umb-section-sidebar-width);
 				border: none;
 				border-left: 1px solid var(--uui-color-border);

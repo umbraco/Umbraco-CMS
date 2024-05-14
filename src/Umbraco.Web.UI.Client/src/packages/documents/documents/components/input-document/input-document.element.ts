@@ -7,6 +7,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -72,16 +73,16 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
-	}
 	public set selection(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
 		this.#sorter.setModel(ids);
 	}
+	public get selection(): Array<string> {
+		return this.#pickerContext.getSelection();
+	}
 
-	@property({ type: String })
-	startNodeId?: string;
+	@property({ type: Object, attribute: false })
+	startNode?: UmbTreeStartNode;
 
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
@@ -120,8 +121,8 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 				this._editDocumentPath = routeBuilder({});
 			});
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 	}
 
 	connectedCallback(): void {
@@ -156,6 +157,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 			pickableFilter: this.#pickableFilter,
+			startNode: this.startNode,
 		});
 	}
 
@@ -237,8 +239,6 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		`,
 	];
 }
-
-export default UmbInputDocumentElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

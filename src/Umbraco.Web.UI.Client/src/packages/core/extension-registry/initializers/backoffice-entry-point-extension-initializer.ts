@@ -32,7 +32,7 @@ export class UmbBackofficeEntryPointExtensionInitializer extends UmbExtensionIni
 
 			// If the extension has known exports, be sure to run those
 			if (hasInitExport(moduleInstance)) {
-				moduleInstance.onInit(this.host, this.extensionRegistry);
+				await moduleInstance.onInit(this.host, this.extensionRegistry);
 			}
 		}
 	}

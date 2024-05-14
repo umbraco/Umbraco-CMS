@@ -2,7 +2,7 @@ import type { UmbContentTypeModel, UmbPropertyContainerTypes, UmbPropertyTypeCon
 import type { UmbContentTypeStructureManager } from './content-type-structure-manager.class.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * This class is a helper class for managing the structure of containers in a content type.
@@ -28,8 +28,8 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	// Owner containers are containers owned by the owner Content Type (The specific one up for editing)
 	#ownerChildContainers: UmbPropertyTypeContainerModel[] = [];
 
-	#hasProperties = new UmbBooleanState(false);
-	readonly hasProperties = this.#hasProperties.asObservable();
+	#hasProperties = new UmbArrayState<{ id: string | null; has: boolean }>([], (x) => x.id);
+	readonly hasProperties = this.#hasProperties.asObservablePart((x) => x.some((y) => y.has));
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -132,7 +132,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 						this.#containerName = undefined;
 						this.#containerType = undefined;
 						// TODO: reset has Properties.
-						this.#hasProperties.setValue(false);
+						this.#hasProperties.setValue([]);
 					}
 				},
 				'_observeMainContainer',
@@ -152,7 +152,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			(containers) => {
 				// We want to remove hasProperties of groups that does not exist anymore.:
 				// this.#removeHasPropertiesOfGroup()
-				this.#hasProperties.setValue(false);
+				this.#hasProperties.setValue([]);
 				this.#childContainers.setValue([]);
 
 				containers.forEach((container) => {
@@ -203,8 +203,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this.observe(
 			this.#structure.hasPropertyStructuresOf(groupId),
 			(hasProperties) => {
-				// TODO: Make this an array/map/state, so we only change the groupId. then hasProperties should be a observablePart that checks the array for true. [NL]
-				this.#hasProperties.setValue(hasProperties);
+				this.#hasProperties.appendOne({ id: groupId, has: hasProperties });
 			},
 			'_observePropertyStructureOfGroup' + groupId,
 		);
@@ -240,13 +239,18 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		return this.#ownerChildContainers.some((x) => x.id === containerId);
 	}
 
+	getContentTypeOfContainer(containerId?: string) {
+		if (!this.#structure || !containerId) return;
+		return this.#structure.getContentTypeOfContainer(containerId);
+	}
+
 	containersByNameAndType(name: string, type: UmbPropertyContainerTypes) {
 		return this.#childContainers.asObservablePart((cons) => cons.filter((x) => x.name === name && x.type === type));
 	}
 
 	/** Manipulate methods: */
 
-	async insertContainer(container: UmbPropertyTypeContainerModel, sortOrder = 0) {
+	/*async insertContainer(container: UmbPropertyTypeContainerModel, sortOrder = 0) {
 		await this.#init;
 		if (!this.#structure) return false;
 
@@ -254,7 +258,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 		await this.#structure.insertContainer(null, newContainer);
 		return true;
-	}
+	}*/
 
 	async addContainer(parentContainerId?: string | null, sortOrder?: number) {
 		if (!this.#structure) return;

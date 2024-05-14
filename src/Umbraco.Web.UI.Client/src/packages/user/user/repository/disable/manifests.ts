@@ -1,4 +1,4 @@
-import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DISABLE_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Disable';
 const disableRepository: ManifestRepository = {
@@ -8,4 +8,4 @@ const disableRepository: ManifestRepository = {
 	api: () => import('./disable-user.repository.js'),
 };
 
-export const manifests = [disableRepository];
+export const manifests: Array<ManifestTypes> = [disableRepository];

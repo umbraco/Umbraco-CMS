@@ -23,6 +23,13 @@ export class UmbUserWorkspaceContext
 	readonly data = this.#currentData.asObservable();
 	readonly state = this.#currentData.asObservablePart((x) => x?.state);
 	readonly unique = this.#currentData.asObservablePart((x) => x?.unique);
+	readonly userGroupUniques = this.#currentData.asObservablePart((x) => x?.userGroupUniques || []);
+	readonly documentStartNodeUniques = this.#currentData.asObservablePart(
+		(data) => data?.documentStartNodeUniques || [],
+	);
+	readonly hasDocumentRootAccess = this.#currentData.asObservablePart((data) => data?.hasDocumentRootAccess || false);
+	readonly mediaStartNodeUniques = this.#currentData.asObservablePart((data) => data?.mediaStartNodeUniques || []);
+	readonly hasMediaRootAccess = this.#currentData.asObservablePart((data) => data?.hasMediaRootAccess || false);
 
 	readonly routes = new UmbWorkspaceRouteManager(this);
 

@@ -52,7 +52,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 	}
 
 	render() {
-		return this._unique && this._entityType
+		return this._unique !== undefined && this._entityType
 			? html`
 					<uui-button
 						id="action-button"

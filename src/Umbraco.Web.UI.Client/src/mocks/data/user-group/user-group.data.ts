@@ -6,6 +6,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 	{
 		id: 'user-group-administrators-id',
 		name: 'Administrators',
+		alias: 'admin',
 		icon: 'icon-medal',
 		documentStartNode: { id: 'all-property-editors-document-id' },
 		fallbackPermissions: [
@@ -45,11 +46,13 @@ export const data: Array<UmbMockUserGroupModel> = [
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
 		mediaRootAccess: true,
-		isSystemGroup: true,
+		aliasCanBeChanged: false,
+		isDeletable: false,
 	},
 	{
 		id: 'user-group-editors-id',
 		name: 'Editors',
+		alias: 'editors',
 		icon: 'icon-tools',
 		documentStartNode: { id: 'all-property-editors-document-id' },
 		fallbackPermissions: [
@@ -73,11 +76,13 @@ export const data: Array<UmbMockUserGroupModel> = [
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
 		mediaRootAccess: true,
-		isSystemGroup: true,
+		aliasCanBeChanged: true,
+		isDeletable: true,
 	},
 	{
 		id: 'user-group-sensitive-data-id',
 		name: 'Sensitive data',
+		alias: 'sensitive-data',
 		icon: 'icon-lock',
 		documentStartNode: { id: 'all-property-editors-document-id' },
 		fallbackPermissions: [],
@@ -87,11 +92,13 @@ export const data: Array<UmbMockUserGroupModel> = [
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
 		mediaRootAccess: true,
-		isSystemGroup: true,
+		aliasCanBeChanged: false,
+		isDeletable: false,
 	},
 	{
 		id: 'user-group-translators-id',
 		name: 'Translators',
+		alias: 'translators',
 		icon: 'icon-globe',
 		documentStartNode: { id: 'all-property-editors-document-id' },
 		fallbackPermissions: ['Umb.Document.Read', 'Umb.Document.Update'],
@@ -101,11 +108,13 @@ export const data: Array<UmbMockUserGroupModel> = [
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
 		mediaRootAccess: true,
-		isSystemGroup: true,
+		aliasCanBeChanged: true,
+		isDeletable: true,
 	},
 	{
 		id: 'user-group-writers-id',
 		name: 'Writers',
+		alias: 'writers',
 		icon: 'icon-edit',
 		documentStartNode: { id: 'all-property-editors-document-id' },
 		fallbackPermissions: [
@@ -120,6 +129,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		hasAccessToAllLanguages: true,
 		documentRootAccess: true,
 		mediaRootAccess: true,
-		isSystemGroup: false,
+		aliasCanBeChanged: true,
+		isDeletable: true,
 	},
 ];

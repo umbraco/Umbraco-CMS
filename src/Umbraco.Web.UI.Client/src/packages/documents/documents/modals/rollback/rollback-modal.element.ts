@@ -10,6 +10,7 @@ import '../shared/document-variant-language-picker.element.js';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 
 type DocumentVersion = {
 	id: string;
@@ -147,7 +148,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		const docUnique = this.#workspaceContext?.getUnique() ?? '';
 		// TODO Use the load method on the context instead of location.href, when it works.
 		// this.#workspaceContext?.load(docUnique);
-		location.href = 'section/content/workspace/document/edit/' + docUnique;
+		location.href = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: docUnique });
 		this.modalContext?.reject();
 	}
 

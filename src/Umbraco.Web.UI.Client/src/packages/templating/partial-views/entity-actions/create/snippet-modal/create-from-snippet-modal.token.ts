@@ -1,10 +1,8 @@
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbCreatePartialViewFromSnippetModalData {
-	parent: {
-		unique: string | null;
-		entityType: string;
-	};
+	parent: UmbEntityModel;
 }
 
 export const UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL = new UmbModalToken<UmbCreatePartialViewFromSnippetModalData, string>(

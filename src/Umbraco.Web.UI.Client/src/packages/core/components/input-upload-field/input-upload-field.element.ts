@@ -1,6 +1,6 @@
+import type { MediaValueType } from '../../../property-editors/upload-field/property-editor-ui-upload-field.element.js';
 import type { UmbTemporaryFileModel } from '../../temporary-file/temporary-file-manager.class.js';
-import { UmbTemporaryFileManager } from '../../temporary-file/temporary-file-manager.class.js';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '../../property/property-dataset/property-dataset-context.token.js';
+import { TemporaryFileStatus, UmbTemporaryFileManager } from '../../temporary-file/temporary-file-manager.class.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	css,
@@ -11,169 +11,78 @@ import {
 	property,
 	query,
 	state,
-	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-
-import './input-upload-field-file.element.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import './input-upload-field-file.element.js';
 
 @customElement('umb-input-upload-field')
-export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElement, '') {
-	private _keys: Array<string> = [];
-	/**
-	 * @description Keys to the files that belong to this upload field.
-	 * @type {Array<String>}
-	 * @default []
-	 */
-	@property({ type: Array })
-	public set keys(fileKeys: Array<string>) {
-		this._keys = fileKeys;
-		super.value = this._keys.join(',');
-		this.#setFilePaths();
+export class UmbInputUploadFieldElement extends UmbLitElement {
+	@property({ type: Object })
+	set value(value: MediaValueType) {
+		if (!value?.src) return;
+		this._src = value.src;
 	}
-	public get keys(): Array<string> {
-		return this._keys;
+	get value(): MediaValueType {
+		return !this.temporaryFile ? { src: this._src } : { temporaryFileId: this.temporaryFile.unique };
 	}
 
 	/**
-	 * @description Allowed file extensions. If left empty, all are allowed.
+	 * @description Allowed file extensions. Allow all if empty.
 	 * @type {Array<String>}
 	 * @default undefined
 	 */
 	@property({ type: Array })
-	set fileExtensions(value: Array<string>) {
+	set allowedFileExtensions(value: Array<string>) {
 		this.#setExtensions(value);
 	}
-	get fileExtensions(): Array<string> | undefined {
-		return this.extensions;
+	get allowedFileExtensions(): Array<string> | undefined {
+		return this._extensions;
 	}
 
-	/**
-	 * @description Allows the user to upload multiple files.
-	 * @type {Boolean}
-	 * @default false
-	 * @attr
-	 */
-	@property({ type: Boolean })
-	multiple = false;
+	@state()
+	public temporaryFile?: UmbTemporaryFileModel;
 
 	@state()
-	_files: Array<{
-		path: string;
-		unique: string;
-		queueItem?: UmbTemporaryFileModel;
-		file?: File;
-	}> = [];
+	private _src = '';
 
 	@state()
-	extensions?: string[];
+	private _extensions?: string[];
 
 	@query('#dropzone')
 	private _dropzone?: UUIFileDropzoneElement;
 
-	#manager;
-	#serverUrl = '';
-	#serverUrlPromise;
+	#manager = new UmbTemporaryFileManager(this);
 
-	protected getFormElement() {
-		return undefined;
-	}
-
-	constructor() {
-		super();
-		this.#manager = new UmbTemporaryFileManager(this);
-
-		/*this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
-			this.observe(await context.propertyValueByAlias('umbracoExtension'), (value) => {
-				//const test = value;
-			});
-		});*/
-
-		this.#serverUrlPromise = this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this.#serverUrl = instance.getServerUrl();
-		}).asPromise();
-
-		this.observe(this.#manager.queue, (value) => {
-			this.error = !value.length;
-			this._files = this._files.map((file) => {
-				const queueItem = value.find((item) => item.unique === file.unique);
-				if (queueItem) {
-					file.queueItem = queueItem;
-				}
-				return file;
-			});
-		});
-	}
-
-	async #setFilePaths() {
-		await this.#serverUrlPromise;
-
-		this.keys.forEach((key) => {
-			if (!UmbId.validate(key) && key.startsWith('/')) {
-				this._files.push({
-					path: this.#serverUrl + key,
-					unique: UmbId.new(),
-				});
-				this.requestUpdate();
-			}
-		});
-	}
-
-	#setExtensions(value: Array<string>) {
+	#setExtensions(extensions: Array<string>) {
+		if (!extensions?.length) {
+			this._extensions = undefined;
+			return;
+		}
 		// TODO: The dropzone uui component does not support file extensions without a dot. Remove this when it does.
-		this.extensions = value.map((extension) => {
-			return `.${extension}`;
-		});
+		this._extensions = extensions?.map((extension) => `.${extension}`);
 	}
 
-	#onUpload(e: UUIFileDropzoneEvent) {
-		const files: File[] = e.detail.files;
+	async #onUpload(e: UUIFileDropzoneEvent) {
+		//Property Editor for Upload field will always only have one file.
+		const item: UmbTemporaryFileModel = {
+			unique: UmbId.new(),
+			file: e.detail.files[0],
+		};
+		const upload = this.#manager.uploadOne(item);
 
-		if (!files?.length) return;
+		const reader = new FileReader();
+		reader.onload = () => {
+			this._src = reader.result as string;
+		};
+		reader.readAsDataURL(item.file);
 
-		// TODO: Should we validate the mimetype some how?
-		this.#setFiles(files);
-	}
-
-	#setFiles(files: File[]) {
-		const items = files.map(
-			(file): UmbTemporaryFileModel => ({
-				unique: UmbId.new(),
-				file,
-				status: 'waiting',
-			}),
-		);
-		this.#manager.upload(items);
-
-		this.keys = items.map((item) => item.unique);
-		this.value = this.keys.join(',');
-
-		this.dispatchEvent(new UmbChangeEvent());
-
-		// Read files to get their paths and add them to the file paths array.
-		items.forEach((item) => {
-			this._files.push({
-				path: '',
-				unique: item.unique,
-				queueItem: item,
-				file: item.file,
-			});
-			const reader = new FileReader();
-			reader.onload = () => {
-				this._files = this._files.map((file) => {
-					if (file.unique === item.unique) {
-						file.path = reader.result as string;
-					}
-					return file;
-				});
-				this.requestUpdate();
-			};
-			reader.readAsDataURL(item.file);
-		});
+		const uploaded = await upload;
+		if (uploaded.status === TemporaryFileStatus.SUCCESS) {
+			this.temporaryFile = { unique: item.unique, file: item.file };
+			this.dispatchEvent(new UmbChangeEvent());
+		}
 	}
 
 	#handleBrowse() {
@@ -182,67 +91,53 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 	}
 
 	render() {
-		return html`
-			<div id="wrapper">${this.#renderFiles()}</div>
-			${this.#renderDropzone()} ${this.#renderButtonRemove()}
-		`;
+		return html`${this._src ? this.#renderFile(this._src, this.temporaryFile?.file) : this.#renderDropzone()}`;
 	}
 
-	//TODO When the property editor gets saved, it seems that the property editor gets the file path from the server rather than key/id.
-	// This however does not work when there is multiple files. Can the server not handle multiple files uploaded into one property editor?
 	#renderDropzone() {
-		if (!this.multiple && this._files.length) return nothing;
-
 		return html`
 			<uui-file-dropzone
 				id="dropzone"
 				label="dropzone"
 				@change="${this.#onUpload}"
-				accept="${ifDefined(this.extensions?.join(', '))}"
-				?multiple="${this.multiple}">
+				accept="${ifDefined(this._extensions?.join(', '))}">
 				<uui-button label=${this.localize.term('media_clickToUpload')} @click="${this.#handleBrowse}"></uui-button>
 			</uui-file-dropzone>
 		`;
 	}
 
-	#renderFiles() {
-		return repeat(
-			this._files,
-			(path) => path,
-			(path) => this.#renderFile(path),
-		);
-	}
-
-	#renderFile(file: { path: string; unique: string; queueItem?: UmbTemporaryFileModel; file?: File }) {
-		// TODO: Get the mime type from the server and use that to determine the file type.
-		const type = this.#getFileTypeFromPath(file.path);
+	#renderFile(src: string, file?: File) {
+		const extension = this.#getFileExtensionFromPath(src);
 
 		return html`
-			<div style="position:relative; display: flex; width: fit-content; max-width: 100%">
-				${getElementTemplate()}
-				${file.queueItem?.status === 'waiting' ? html`<umb-temporary-file-badge></umb-temporary-file-badge>` : nothing}
+			<div id="wrapper">
+				<div style="position:relative; display: flex; width: fit-content; max-width: 100%">
+					${getElementTemplate()}
+					${this.temporaryFile?.status === TemporaryFileStatus.WAITING
+						? html`<umb-temporary-file-badge></umb-temporary-file-badge>`
+						: nothing}
+				</div>
 			</div>
+			${this.#renderButtonRemove()}
 		`;
 
 		function getElementTemplate() {
-			switch (type) {
+			switch (extension) {
 				case 'audio':
-					return html`<umb-input-upload-field-audio .path=${file.path}></umb-input-upload-field-audio>`;
+					return html`<umb-input-upload-field-audio .path=${src}></umb-input-upload-field-audio>`;
 				case 'video':
-					return html`<umb-input-upload-field-video .path=${file.path}></umb-input-upload-field-video>`;
+					return html`<umb-input-upload-field-video .path=${src}></umb-input-upload-field-video>`;
 				case 'image':
-					return html`<umb-input-upload-field-image .path=${file.path}></umb-input-upload-field-image>`;
+					return html`<umb-input-upload-field-image .path=${src}></umb-input-upload-field-image>`;
 				case 'svg':
-					return html`<umb-input-upload-field-svg .path=${file.path}></umb-input-upload-field-svg>`;
-				case 'file':
-					return html`<umb-input-upload-field-file
-						.path=${file.path}
-						.file=${file.file as any}></umb-input-upload-field-file>`;
+					return html`<umb-input-upload-field-svg .path=${src}></umb-input-upload-field-svg>`;
+				default:
+					return html`<umb-input-upload-field-file .path=${src} .file=${file}></umb-input-upload-field-file>`;
 			}
 		}
 	}
 
-	#getFileTypeFromPath(path: string): 'audio' | 'video' | 'image' | 'svg' | 'file' {
+	#getFileExtensionFromPath(path: string): 'audio' | 'video' | 'image' | 'svg' | 'file' {
 		// Extract the MIME type from the data URL
 		if (path.startsWith('data:')) {
 			const mimeType = path.substring(5, path.indexOf(';'));
@@ -264,18 +159,14 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 	}
 
 	#renderButtonRemove() {
-		if (!this._files.length) return;
-
 		return html`<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
 			<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
 		</uui-button>`;
 	}
 
 	#handleRemove() {
-		this._files = [];
-		const uniques = this._files.map((file) => file.unique);
-		this.#manager.remove(uniques);
-
+		this._src = '';
+		this.temporaryFile = undefined;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -292,6 +183,7 @@ export class UmbInputUploadFieldElement extends UUIFormControlMixin(UmbLitElemen
 				gap: var(--uui-size-space-4);
 				box-sizing: border-box;
 			}
+
 			#wrapper:has(umb-input-upload-field-file) {
 				padding: var(--uui-size-space-4);
 				border: 1px solid var(--uui-color-border);

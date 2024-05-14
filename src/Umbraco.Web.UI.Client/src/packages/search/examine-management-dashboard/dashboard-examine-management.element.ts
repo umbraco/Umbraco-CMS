@@ -61,7 +61,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 					<div id="header" slot="header">
 						<a href=${this._routerPath}> &larr; Back to overview </a>
 					</div>
-			  `
+				`
 			: nothing;
 	}
 

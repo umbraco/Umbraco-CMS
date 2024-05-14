@@ -31,6 +31,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	#sectionSidebarContext?: UmbSectionSidebarContext;
 
+	// TODO: provide the entity context on a higher level, like the root element of this entity, tree-item/workspace/... [NL]
 	#entityContext = new UmbEntityContext(this);
 
 	constructor() {
@@ -75,7 +76,11 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	#openContextMenu() {
 		if (!this.entityType) throw new Error('Entity type is not defined');
 		if (this.unique === undefined) throw new Error('Unique is not defined');
-		this.#sectionSidebarContext?.toggleContextMenu(this.entityType, this.unique, this.label);
+		this.#sectionSidebarContext?.toggleContextMenu(this, {
+			entityType: this.entityType,
+			unique: this.unique,
+			headline: this.label,
+		});
 	}
 
 	async #onFirstActionClick(event: PointerEvent) {

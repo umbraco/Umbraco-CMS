@@ -1,5 +1,5 @@
 import { UMB_WEBHOOK_ENTITY_TYPE } from '../entity.js';
-import type { ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestMenuItem, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestMenuItem = {
 	type: 'menuItem',
@@ -9,9 +9,9 @@ const menuItem: ManifestMenuItem = {
 	meta: {
 		label: 'Webhooks',
 		icon: 'icon-webhook',
-		entityType: UMB_WEBHOOK_ENTITY_TYPE,
+		entityType: 'webhook-root',
 		menus: ['Umb.Menu.AdvancedSettings'],
 	},
 };
 
-export const manifests = [menuItem];
+export const manifests: Array<ManifestTypes> = [menuItem];

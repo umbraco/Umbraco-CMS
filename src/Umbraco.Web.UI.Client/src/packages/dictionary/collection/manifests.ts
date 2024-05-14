@@ -2,7 +2,7 @@ import { UMB_DICTIONARY_COLLECTION_REPOSITORY_ALIAS } from './repository/index.j
 import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
 import { manifests as collectionViewManifests } from './views/manifests.js';
 import { manifests as collectionActionManifests } from './action/manifests.js';
-import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollection, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DICTIONARY_COLLECTION_ALIAS = 'Umb.Collection.Dictionary';
 
@@ -16,7 +16,7 @@ const collectionManifest: ManifestCollection = {
 	},
 };
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	collectionManifest,
 	...collectionRepositoryManifests,
 	...collectionViewManifests,

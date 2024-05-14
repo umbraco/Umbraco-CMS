@@ -1,14 +1,19 @@
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+
 export interface UmbTreeRootItemsRequestArgs {
-	skip: number;
-	take: number;
+	skip?: number;
+	take?: number;
 }
 
 export interface UmbTreeChildrenOfRequestArgs {
-	parentUnique: string | null;
-	skip: number;
-	take: number;
+	parent: UmbEntityModel;
+	skip?: number;
+	take?: number;
 }
 
 export interface UmbTreeAncestorsOfRequestArgs {
-	descendantUnique: string;
+	treeItem: {
+		unique: string;
+		entityType: string;
+	};
 }

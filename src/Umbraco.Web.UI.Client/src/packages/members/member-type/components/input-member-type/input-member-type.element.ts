@@ -5,7 +5,6 @@ import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
 
-
 @customElement('umb-input-member-type')
 export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
 	/**
@@ -111,13 +110,13 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 	#renderItems() {
 		if (!this._items) return;
 		return html`
-			<uui-ref-list
-				>${repeat(
+			<uui-ref-list>
+				${repeat(
 					this._items,
 					(item) => item.unique,
 					(item) => this.#renderItem(item),
-				)}</uui-ref-list
-			>
+				)}
+			</uui-ref-list>
 		`;
 	}
 
@@ -125,7 +124,7 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 		if (this.max === 1 && this.selection.length >= this.max) return;
 		return html`
 			<uui-button
-				id="add-button"
+				id="btn-add"
 				look="placeholder"
 				@click=${this.#openPicker}
 				label="${this.localize.term('general_choose')}"
@@ -152,7 +151,7 @@ export class UmbInputMemberTypeElement extends UUIFormControlMixin(UmbLitElement
 
 	static styles = [
 		css`
-			#add-button {
+			#btn-add {
 				width: 100%;
 			}
 		`,

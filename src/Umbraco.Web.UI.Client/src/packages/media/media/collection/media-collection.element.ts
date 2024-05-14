@@ -1,6 +1,6 @@
 import type { UmbMediaCollectionContext } from './media-collection.context.js';
 import { customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_DEFAULT_COLLECTION_CONTEXT, UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT, UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import type { UmbProgressEvent } from '@umbraco-cms/backoffice/event';
 
 import './media-collection-toolbar.element.js';
@@ -14,7 +14,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#mediaCollection = instance as UmbMediaCollectionContext;
 		});
 	}
@@ -32,7 +32,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		return html`
 			<umb-media-collection-toolbar slot="header"></umb-media-collection-toolbar>
 			${when(this._progress >= 0, () => html`<uui-loader-bar progress=${this._progress}></uui-loader-bar>`)}
-			<umb-dropzone-media @change=${this.#onChange} @progress=${this.#onProgress}></umb-dropzone-media>
+			<umb-dropzone @change=${this.#onChange} @progress=${this.#onProgress}></umb-dropzone>
 		`;
 	}
 }

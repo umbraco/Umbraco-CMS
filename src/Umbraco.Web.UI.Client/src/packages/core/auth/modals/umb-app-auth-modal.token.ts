@@ -7,16 +7,10 @@ export type UmbModalAppAuthConfig = {
 
 export type UmbModalAppAuthValue = {
 	/**
-	 * The name of the provider that the user has selected to authenticate with.
+	 * An indicator of whether the authentication was successful.
 	 * @required
 	 */
-	providerName?: string;
-
-	/**
-	 * The login hint that the user has provided to the provider.
-	 * @optional
-	 */
-	loginHint?: string;
+	success?: boolean;
 };
 
 export const UMB_MODAL_APP_AUTH = new UmbModalToken<UmbModalAppAuthConfig, UmbModalAppAuthValue>('Umb.Modal.AppAuth', {

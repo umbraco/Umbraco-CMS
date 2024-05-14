@@ -2,8 +2,10 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_DUPLICATE } from '../../user-permissions/constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as modalManifests } from './modal/manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		kind: 'duplicateTo',
@@ -15,6 +17,9 @@ export const manifests = [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_DUPLICATE],
+			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},

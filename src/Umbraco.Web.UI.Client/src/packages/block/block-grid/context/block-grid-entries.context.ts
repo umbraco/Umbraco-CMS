@@ -4,7 +4,7 @@ import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridWorkspaceData } from '..
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeAreaType, UmbBlockGridTypeModel } from '../types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
 import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
-import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbNumberState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
@@ -30,6 +30,34 @@ export class UmbBlockGridEntriesContext
 
 	#parentUnique?: string | null;
 	#areaKey?: string | null;
+
+	#allowedBlockTypes = new UmbArrayState<UmbBlockGridTypeModel>([], (x) => x.contentElementTypeKey);
+	public readonly allowedBlockTypes = this.#allowedBlockTypes.asObservable();
+	public readonly amountOfAllowedBlockTypes = this.#allowedBlockTypes.asObservablePart((x) => x.length);
+	public readonly canCreate = this.#allowedBlockTypes.asObservablePart((x) => x.length > 0);
+
+	firstAllowedBlockTypeName() {
+		if (!this._manager) {
+			throw new Error('Manager not ready');
+		}
+
+		const nameState = new UmbStringState(undefined);
+		this.observe(this.allowedBlockTypes, (x) => {
+			if (x.length === 1) {
+				this.observe(
+					this._manager!.contentTypeNameOf(x[0].contentElementTypeKey),
+					(name) => {
+						nameState.setValue(name);
+					},
+					'getFirstAllowedBlockTypeName',
+				);
+			} else {
+				this.removeUmbControllerByAlias('getFirstAllowedBlockTypeName');
+			}
+		});
+
+		return nameState.asObservable();
+	}
 
 	setParentUnique(contentUdi: string | null) {
 		this.#parentUnique = contentUdi;
@@ -66,7 +94,7 @@ export class UmbBlockGridEntriesContext
 		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockGridEntry) => {
 			this.#parentEntry = blockGridEntry;
 			this.#gotBlockParentEntry(); // is not used at this point. [NL]
-		}).asPromise();
+		});
 
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
 			.addUniquePaths(['propertyAlias', 'variantId', 'parentUnique', 'areaKey'])
@@ -76,7 +104,7 @@ export class UmbBlockGridEntriesContext
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				return {
 					data: {
-						blocks: this.#retrieveAllowedElementTypes(),
+						blocks: this.#allowedBlockTypes.getValue(),
 						blockGroups: this._manager?.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
 						blockOriginData: { index: index, areaKey: this.#areaKey, parentUnique: this.#parentUnique },
@@ -91,6 +119,8 @@ export class UmbBlockGridEntriesContext
 
 	protected _gotBlockManager() {
 		if (!this._manager) return;
+
+		this.#allowedBlockTypes.setValue(this.#retrieveAllowedElementTypes());
 
 		this.observe(
 			this._manager.propertyAlias,
@@ -280,13 +310,10 @@ export class UmbBlockGridEntriesContext
 	 */
 	allowDrop(contentUdi: string) {
 		const content = this._manager?.getContentOf(contentUdi);
-		if (!content) return false;
+		const allowedBlocks = this.#allowedBlockTypes.getValue();
+		if (!content || !allowedBlocks) return false;
 
-		return (
-			this.#retrieveAllowedElementTypes()
-				.map((x) => x.contentElementTypeKey)
-				.indexOf(content.contentTypeKey) !== -1
-		);
+		return allowedBlocks.map((x) => x.contentElementTypeKey).indexOf(content.contentTypeKey) !== -1;
 	}
 
 	onDragStart() {

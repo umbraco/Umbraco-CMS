@@ -7,34 +7,34 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 
 import './components/index.js';
 
 const CORE_PACKAGES = [
-	import('../../packages/umbraco-news/umbraco-package.js'),
-	import('../../packages/documents/umbraco-package.js'),
+	import('../../packages/block/umbraco-package.js'),
 	import('../../packages/data-type/umbraco-package.js'),
+	import('../../packages/dictionary/umbraco-package.js'),
+	import('../../packages/documents/umbraco-package.js'),
+	import('../../packages/health-check/umbraco-package.js'),
+	import('../../packages/language/umbraco-package.js'),
+	import('../../packages/log-viewer/umbraco-package.js'),
+	import('../../packages/markdown-editor/umbraco-package.js'),
 	import('../../packages/media/umbraco-package.js'),
 	import('../../packages/members/umbraco-package.js'),
+	import('../../packages/models-builder/umbraco-package.js'),
+	import('../../packages/packages/umbraco-package.js'),
+	import('../../packages/property-editors/umbraco-package.js'),
+	import('../../packages/relations/umbraco-package.js'),
 	import('../../packages/search/umbraco-package.js'),
 	import('../../packages/settings/umbraco-package.js'),
-	import('../../packages/language/umbraco-package.js'),
 	import('../../packages/static-file/umbraco-package.js'),
-	import('../../packages/dynamic-root/umbraco-package.js'),
-	import('../../packages/block/umbraco-package.js'),
 	import('../../packages/tags/umbraco-package.js'),
-	import('../../packages/tiny-mce/umbraco-package.js'),
-	import('../../packages/markdown-editor/umbraco-package.js'),
 	import('../../packages/templating/umbraco-package.js'),
-	import('../../packages/dictionary/umbraco-package.js'),
+	import('../../packages/tiny-mce/umbraco-package.js'),
+	import('../../packages/umbraco-news/umbraco-package.js'),
 	import('../../packages/user/umbraco-package.js'),
-	import('../../packages/health-check/umbraco-package.js'),
-	import('../../packages/audit-log/umbraco-package.js'),
 	import('../../packages/webhook/umbraco-package.js'),
-	import('../../packages/relations/umbraco-package.js'),
-	import('../../packages/models-builder/umbraco-package.js'),
-	import('../../packages/log-viewer/umbraco-package.js'),
-	import('../../packages/packages/umbraco-package.js'),
 ];
 
 @customElement('umb-backoffice')
@@ -59,7 +59,15 @@ export class UmbBackofficeElement extends UmbLitElement {
 			umbExtensionsRegistry.registerMany(packageModule.extensions);
 		});
 
-		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions();
+		const serverExtensions = new UmbServerExtensionRegistrator(this, umbExtensionsRegistry);
+
+		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
+		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+			this.observe(authContext.isAuthorized, (isAuthorized) => {
+				if (!isAuthorized) return;
+				serverExtensions.registerPrivateExtensions();
+			});
+		});
 	}
 
 	render() {

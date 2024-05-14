@@ -1,6 +1,10 @@
 import { UmbMockDBBase } from './utils/mock-db-base.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
+
+type UmbEntityBase = {
+	id?: string;
+	name?: string;
+};
 
 // Temp mocked database
 export class UmbEntityData<T extends UmbEntityBase> extends UmbMockDBBase<T> {

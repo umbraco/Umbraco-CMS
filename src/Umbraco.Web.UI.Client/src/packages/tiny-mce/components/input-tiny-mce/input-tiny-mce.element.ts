@@ -1,19 +1,24 @@
 import { loadManifestApi } from '../../../../libs/extension-api/functions/load-manifest-api.function.js';
-import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
-import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
+import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
+import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import type { TinyMcePluginArguments, UmbTinyMcePluginBase } from './tiny-mce-plugin.js';
-import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { EditorEvent, Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
-import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
+import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import {
+	type EditorEvent,
+	type Editor,
+	type RawEditorOptions,
+	renderEditor,
+} from '@umbraco-cms/backoffice/external/tinymce';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * Handles the resize event
@@ -51,8 +56,6 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	@state()
 	private _tinyConfig: RawEditorOptions = {};
 
-	// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-	#renderEditor?: typeof import('@umbraco-cms/backoffice/external/tinymce').renderEditor;
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 	#editorRef?: Editor | null = null;
 	#stylesheetRepository = new UmbStylesheetDetailRepository(this);
@@ -75,25 +78,19 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		return super.value;
 	}
 
-	@query('#editor', true)
+	@query('.editor', true)
 	private _editorElement?: HTMLElement;
 
 	protected async firstUpdated(): Promise<void> {
-		// Here we want to start the loading of everything at first, not one at a time, which is why this code is not using await.
-		const loadEditor = import('@umbraco-cms/backoffice/external/tinymce').then((tinyMce) => {
-			this.#renderEditor = tinyMce.renderEditor;
-		});
-		await Promise.all([loadEditor, ...(await this.#loadPlugins())]);
+		await Promise.all([...(await this.#loadPlugins())]);
 		await this.#setTinyConfig();
 	}
 
 	disconnectedCallback() {
 		super.disconnectedCallback();
 
-		if (this.#editorRef) {
-			// TODO: Test if there is any problems with destroying the RTE here, but not initializing on connectedCallback. (firstUpdated is only called first time the element is rendered, not when it is reconnected)
-			this.#editorRef.destroy();
-		}
+		// TODO: Test if there is any problems with destroying the RTE here, but not initializing on connectedCallback. (firstUpdated is only called first time the element is rendered, not when it is reconnected)
+		this.#editorRef?.destroy();
 	}
 
 	/**
@@ -104,7 +101,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	 */
 	async #loadPlugins() {
 		const observable = umbExtensionsRegistry?.byType('tinyMcePlugin');
-		const manifests = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
+		const manifests = await firstValueFrom(observable);
 
 		const promises = [];
 		for (const manifest of manifests) {
@@ -195,10 +192,10 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		// create an object by merging the configuration onto the fallback config
 		const configurationOptions: RawEditorOptions = {
 			...defaultFallbackConfig,
-			height: dimensions?.height || undefined,
-			width: dimensions?.width || undefined,
-			content_css: stylesheets,
-			style_formats: styleFormats,
+			height: dimensions?.height ?? defaultFallbackConfig.height,
+			width: dimensions?.width ?? defaultFallbackConfig.width,
+			content_css: stylesheets.length ? stylesheets : defaultFallbackConfig.content_css,
+			style_formats: styleFormats.length ? styleFormats : defaultFallbackConfig.style_formats,
 		};
 
 		// no auto resize when a fixed height is set
@@ -254,10 +251,10 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			this.#editorRef.destroy();
 		}
 
-		if (!this.#renderEditor) {
-			throw new Error('TinyMCE renderEditor is not loaded');
-		}
-		const editors = await this.#renderEditor(this._tinyConfig);
+		const editors = await renderEditor(this._tinyConfig).catch((error) => {
+			console.error('Failed to render TinyMCE', error);
+			return [];
+		});
 		this.#editorRef = editors.pop();
 	}
 
@@ -320,7 +317,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			this.#onChange(editor.getContent());
 		});
 
-		editor.on('SetContent', (e) => {
+		editor.on('SetContent', () => {
 			/**
 			 * Prevent injecting arbitrary JavaScript execution in on-attributes.
 			 *
@@ -354,17 +351,14 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	 * a target div and binds the RTE to that element
 	 */
 	render() {
-		return html`<div id="editor"></div>`;
+		return html`<div class="editor"></div>`;
 	}
 
 	static styles = [
 		css`
-			#editor {
+			.tox-tinymce {
 				position: relative;
 				min-height: 100px;
-			}
-
-			.tox-tinymce {
 				border-radius: 0;
 				border: var(--uui-input-border-width, 1px) solid var(--uui-input-border-color, var(--uui-color-border, #d8d7d9));
 			}

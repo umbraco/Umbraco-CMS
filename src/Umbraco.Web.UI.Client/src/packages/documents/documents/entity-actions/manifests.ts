@@ -15,7 +15,11 @@ import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
 
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+	UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
+} from '@umbraco-cms/backoffice/recycle-bin';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -32,6 +36,9 @@ const entityActions: Array<ManifestEntityAction> = [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
+			},
+			{
+				alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -52,6 +59,9 @@ const entityActions: Array<ManifestEntityAction> = [
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
 			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
 		],
 	},
 	{
@@ -70,6 +80,9 @@ const entityActions: Array<ManifestEntityAction> = [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH],
+			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -90,6 +103,9 @@ const entityActions: Array<ManifestEntityAction> = [
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS],
 			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
 		],
 	},
 	{
@@ -109,11 +125,14 @@ const entityActions: Array<ManifestEntityAction> = [
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS],
 			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
 		],
 	},
 ];
 
-export const manifests = [
+export const manifests: Array<ManifestTypes> = [
 	...createBlueprintManifests,
 	...createManifests,
 	...cultureAndHostnamesManifests,

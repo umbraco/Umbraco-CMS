@@ -1,6 +1,6 @@
 import { UmbDictionaryItemStore } from './dictionary-item.store.js';
 import { UmbDictionaryItemRepository } from './dictionary-item.repository.js';
-import type { ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestItemStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.Dictionary.Item';
 export const UMB_DICTIONARY_STORE_ALIAS = 'Umb.Store.Dictionary.Item';
@@ -19,4 +19,4 @@ const itemStore: ManifestItemStore = {
 	api: UmbDictionaryItemStore,
 };
 
-export const manifests = [itemRepository, itemStore];
+export const manifests: Array<ManifestTypes> = [itemRepository, itemStore];

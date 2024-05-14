@@ -8,7 +8,7 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 export interface UmbCollectionViewManagerConfig {
 	defaultViewAlias?: string;
-	manifestFilter?: (manifest: ManifestCollectionView) => boolean
+	manifestFilter?: (manifest: ManifestCollectionView) => boolean;
 }
 
 export class UmbCollectionViewManager extends UmbControllerBase {

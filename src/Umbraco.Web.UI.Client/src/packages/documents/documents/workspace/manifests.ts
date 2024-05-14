@@ -4,11 +4,13 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 } from '../user-permissions/index.js';
+import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import type {
 	ManifestWorkspaces,
 	ManifestWorkspaceActions,
 	ManifestWorkspaceActionMenuItem,
 	ManifestWorkspaceView,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_WORKSPACE_ALIAS = 'Umb.Workspace.Document';
@@ -101,6 +103,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: workspace.alias,
 			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
 		],
 	},
 	{
@@ -120,6 +125,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: workspace.alias,
 			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
 		],
 	},
 	{
@@ -136,6 +144,9 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: workspace.alias,
+			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -159,6 +170,9 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH],
 			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
 		],
 	},
 	{
@@ -177,6 +191,9 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 			{
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
+			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
 		],
 	},
@@ -197,8 +214,16 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_UPDATE, UMB_USER_PERMISSION_DOCUMENT_PUBLISH],
 			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
 		],
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions, ...workspaceActionMenuItems];
+export const manifests: Array<ManifestTypes> = [
+	workspace,
+	...workspaceViews,
+	...workspaceActions,
+	...workspaceActionMenuItems,
+];

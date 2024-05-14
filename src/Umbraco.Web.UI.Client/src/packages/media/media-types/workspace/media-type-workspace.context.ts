@@ -33,13 +33,18 @@ export class UmbMediaTypeWorkspaceContext
 
 	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
 	readonly data;
 	readonly unique;
+	readonly entityType;
 	readonly name;
+	getName(): string | undefined {
+		return this.structure.getOwnerContentType()?.name;
+	}
 	readonly alias;
 	readonly description;
 	readonly icon;
@@ -60,6 +65,7 @@ export class UmbMediaTypeWorkspaceContext
 		// General for content types:
 		this.data = this.structure.ownerContentType;
 		this.unique = this.structure.ownerContentTypeObservablePart((data) => data?.unique);
+		this.entityType = this.structure.ownerContentTypeObservablePart((data) => data?.entityType);
 		this.name = this.structure.ownerContentTypeObservablePart((data) => data?.name);
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
@@ -205,17 +211,15 @@ export class UmbMediaTypeWorkspaceContext
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
 
-			if ((await this.structure.create(parent.unique)) === true) {
-				if (!parent) throw new Error('Parent is not set');
+			await this.structure.create(parent.unique);
 
-				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-				const event = new UmbRequestReloadTreeItemChildrenEvent({
-					entityType: parent.entityType,
-					unique: parent.unique,
-				});
-				eventContext.dispatchEvent(event);
-				this.setIsNew(false);
-			}
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadTreeItemChildrenEvent({
+				entityType: parent.entityType,
+				unique: parent.unique,
+			});
+			eventContext.dispatchEvent(event);
+			this.setIsNew(false);
 		} else {
 			await this.structure.save();
 

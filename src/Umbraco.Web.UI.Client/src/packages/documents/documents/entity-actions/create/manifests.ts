@@ -1,3 +1,4 @@
+import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_CREATE } from '../../user-permissions/index.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
@@ -20,6 +21,9 @@ const entityActions: Array<ManifestTypes> = [
 				alias: 'Umb.Condition.UserPermission.Document',
 				allOf: [UMB_USER_PERMISSION_DOCUMENT_CREATE],
 			},
+			{
+				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
 		],
 	},
 ];
@@ -33,4 +37,4 @@ const modals: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...entityActions, ...modals];
+export const manifests: Array<ManifestTypes> = [...entityActions, ...modals];

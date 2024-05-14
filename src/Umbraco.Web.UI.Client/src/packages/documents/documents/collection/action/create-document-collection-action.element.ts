@@ -1,11 +1,16 @@
-import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, map, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
+import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import {
+	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
+	UMB_DOCUMENT_ENTITY_TYPE,
+	UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+	UMB_DOCUMENT_WORKSPACE_CONTEXT,
+} from '@umbraco-cms/backoffice/document';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbAllowedDocumentTypeModel } from '@umbraco-cms/backoffice/document-type';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-create-document-collection-action')
 export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
@@ -16,6 +21,9 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	private _createDocumentPath = '';
 
 	@state()
+	private _currentView?: string;
+
+	@state()
 	private _documentUnique?: string;
 
 	@state()
@@ -23,6 +31,9 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 
 	@state()
 	private _popoverOpen = false;
+
+	@state()
+	private _rootPathName?: string;
 
 	@state()
 	private _useInfiniteEditor = false;
@@ -53,7 +64,13 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 			});
 		});
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+		this.consumeContext(UMB_COLLECTION_CONTEXT, (collectionContext) => {
+			this.observe(collectionContext.view.currentView, (currentView) => {
+				this._currentView = currentView?.meta.pathName;
+			});
+			this.observe(collectionContext.view.rootPathName, (rootPathName) => {
+				this._rootPathName = rootPathName;
+			});
 			this.observe(collectionContext.filter, (filter) => {
 				this._useInfiniteEditor = filter.useInfiniteEditor == true;
 			});
@@ -82,10 +99,22 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	}
 
 	#getCreateUrl(item: UmbAllowedDocumentTypeModel) {
-		// TODO: [LK] I need help with this. I don't know what the infinity editor URL should be.
-		return this._useInfiniteEditor
-			? `${this._createDocumentPath}create/${this._documentUnique ?? 'null'}/${item.unique}`
-			: `section/content/workspace/document/create/${this._documentUnique ?? 'null'}/${item.unique}`;
+		if (this._useInfiniteEditor) {
+			return (
+				this._createDocumentPath.replace(`${this._rootPathName}`, `${this._rootPathName}/${this._currentView}`) +
+				UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
+					parentEntityType: this._documentUnique ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+					parentUnique: this._documentUnique ?? 'null',
+					documentTypeUnique: item.unique,
+				})
+			);
+		}
+
+		return UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({
+			parentEntityType: this._documentUnique ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+			parentUnique: this._documentUnique ?? 'null',
+			documentTypeUnique: item.unique,
+		});
 	}
 
 	render() {
@@ -98,11 +127,9 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		const item = this._allowedDocumentTypes[0];
 		const label = (this.manifest?.meta.label ?? this.localize.term('general_create')) + ' ' + item.name;
 
-		return html`<uui-button
-			color="default"
-			href=${this.#getCreateUrl(item)}
-			label=${label}
-			look="outline"></uui-button>`;
+		return html`
+			<uui-button color="default" href=${this.#getCreateUrl(item)} label=${label} look="outline"></uui-button>
+		`;
 	}
 
 	#renderDropdown() {
@@ -134,6 +161,14 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 			</uui-popover-container>
 		`;
 	}
+
+	static styles = [
+		css`
+			uui-scroll-container {
+				max-height: 500px;
+			}
+		`,
+	];
 }
 
 export default UmbCreateDocumentCollectionActionElement;

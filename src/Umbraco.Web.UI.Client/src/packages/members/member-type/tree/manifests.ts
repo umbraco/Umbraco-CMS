@@ -7,6 +7,7 @@ import type {
 	ManifestTree,
 	ManifestTreeItem,
 	ManifestTreeStore,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_MEMBER_TYPE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.MemberType.Tree';
@@ -45,4 +46,10 @@ const treeItem: ManifestTreeItem = {
 	forEntityTypes: [UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE, UMB_MEMBER_TYPE_ENTITY_TYPE],
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem, ...reloadTreeItemChildrenManifest];
+export const manifests: Array<ManifestTypes> = [
+	treeRepository,
+	treeStore,
+	tree,
+	treeItem,
+	...reloadTreeItemChildrenManifest,
+];

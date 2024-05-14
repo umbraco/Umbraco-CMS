@@ -20,6 +20,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 
 	@property({ attribute: false })
 	value: UmbImageCropperPropertyEditorValue = {
+		temporaryFileId: null,
 		src: '',
 		crops: [],
 		focalPoint: { left: 0.5, top: 0.5 },
@@ -53,7 +54,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		this.file = file;
 		this.fileUnique = unique;
 
-		this.value = assignToFrozenObject(this.value, { src: unique });
+		this.value = assignToFrozenObject(this.value, { temporaryFileId: unique });
 
 		this.#manager?.uploadOne({ unique, file });
 
@@ -66,7 +67,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 	}
 
 	#onRemove = () => {
-		this.value = assignToFrozenObject(this.value, { src: '' });
+		this.value = assignToFrozenObject(this.value, { src: '', temporaryFileId: null });
 		if (!this.fileUnique) return;
 		this.#manager?.removeOne(this.fileUnique);
 		this.fileUnique = undefined;

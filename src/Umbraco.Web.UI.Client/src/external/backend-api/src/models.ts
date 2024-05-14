@@ -14,29 +14,12 @@ description?: string | null
 icon?: string | null
     };
 
-export type AuditLogEntityModel = {
-        id?: string | null
-type?: string | null
-    };
-
 export type AuditLogResponseModel = {
         user: ReferenceByIdModel
-entity?: AuditLogEntityModel | null
 timestamp: string
 logType: AuditTypeModel
 comment?: string | null
 parameters?: string | null
-    };
-
-export type AuditLogWithUsernameResponseModel = {
-        user: ReferenceByIdModel
-entity?: AuditLogEntityModel | null
-timestamp: string
-logType: AuditTypeModel
-comment?: string | null
-parameters?: string | null
-userName?: string | null
-userAvatars: Array<string>
     };
 
 export enum AuditTypeModel {
@@ -130,7 +113,7 @@ export type CopyMediaTypeRequestModel = {
 export type CreateDataTypeRequestModel = {
         name: string
 editorAlias: string
-editorUiAlias?: string | null
+editorUiAlias: string
 values: Array<DataTypePropertyPresentationModel>
 id?: string | null
 parent?: ReferenceByIdModel | null
@@ -350,6 +333,7 @@ stylesheets: Array<string>
 scripts: Array<string>
 languages: Array<string>
 dictionaryItems: Array<string>
+id?: string | null
     };
 
 export type CreatePartialViewFolderRequestModel = {
@@ -401,6 +385,7 @@ key?: string | null
 
 export type CreateUserGroupRequestModel = {
         name: string
+alias: string
 icon?: string | null
 sections: Array<string>
 languages: Array<string>
@@ -411,6 +396,7 @@ mediaStartNode?: ReferenceByIdModel | null
 mediaRootAccess: boolean
 fallbackPermissions: Array<string>
 permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>
+id?: string | null
     };
 
 export type CreateUserRequestModel = {
@@ -453,7 +439,9 @@ userName: string
 name: string
 languageIsoCode?: string | null
 documentStartNodeIds: Array<string>
+hasDocumentRootAccess: boolean
 mediaStartNodeIds: Array<string>
+hasMediaRootAccess: boolean
 avatarUrls: Array<string>
 languages: Array<string>
 hasAccessToAllLanguages: boolean
@@ -496,7 +484,7 @@ properties: Array<DataTypePropertyReferenceModel>
 export type DataTypeResponseModel = {
         name: string
 editorAlias: string
-editorUiAlias?: string | null
+editorUiAlias: string
 values: Array<DataTypePropertyPresentationModel>
 id: string
 isDeletable: boolean
@@ -625,8 +613,7 @@ updater?: string | null
     };
 
 export type DocumentConfigurationResponseModel = {
-        sanitizeTinyMce: boolean
-disableDeleteWhenReferenced: boolean
+        disableDeleteWhenReferenced: boolean
 disableUnpublishWhenReferenced: boolean
 allowEditInvariantFromNonDefault: boolean
 allowNonExistingSegmentsCreation: boolean
@@ -992,6 +979,11 @@ export enum HealthStatusModel {
     REBUILDING = 'Rebuilding'
 }
 
+export type HealthStatusResponseModel = {
+        status: HealthStatusModel
+message?: string | null
+    };
+
 export type HelpPageResponseModel = {
         name?: string | null
 description?: string | null
@@ -1006,7 +998,7 @@ parent?: ReferenceByIdModel | null
 
 export type IndexResponseModel = {
         name: string
-healthStatus: HealthStatusModel
+healthStatus: HealthStatusResponseModel
 canRebuild: boolean
 searcherName: string
 documentCount: number
@@ -1124,7 +1116,6 @@ mediaType: MediaTypeCollectionReferenceResponseModel
 export type MediaConfigurationResponseModel = {
         disableDeleteWhenReferenced: boolean
 disableUnpublishWhenReferenced: boolean
-sanitizeTinyMce: boolean
 reservedFieldNames: Array<string>
     };
 
@@ -1398,6 +1389,14 @@ id: string
 compositions: Array<MemberTypeCompositionModel>
     };
 
+export type MemberTypeTreeItemResponseModel = {
+        hasChildren: boolean
+id: string
+parent?: ReferenceByIdModel | null
+name: string
+icon: string
+    };
+
 export type MemberValueModel = {
         culture?: string | null
 segment?: string | null
@@ -1479,6 +1478,10 @@ category: string
 type: EventMessageTypeModel
     };
 
+export type OEmbedResponseModel = {
+        markup: string
+    };
+
 export type ObjectTypeResponseModel = {
         name?: string | null
 id: string
@@ -1546,11 +1549,6 @@ items: Array<AllowedMediaTypeModel>
 export type PagedAuditLogResponseModel = {
         total: number
 items: Array<AuditLogResponseModel>
-    };
-
-export type PagedAuditLogWithUsernameResponseModel = {
-        total: number
-items: Array<AuditLogWithUsernameResponseModel>
     };
 
 export type PagedCultureReponseModel = {
@@ -1683,6 +1681,11 @@ export type PagedMemberResponseModel = {
 items: Array<MemberResponseModel>
     };
 
+export type PagedMemberTypeTreeItemResponseModel = {
+        total: number
+items: Array<MemberTypeTreeItemResponseModel>
+    };
+
 export type PagedModelDataTypeItemResponseModel = {
         items: Array<DataTypeItemResponseModel>
 total: number
@@ -1788,6 +1791,11 @@ export type PagedSearcherResponseModel = {
 items: Array<SearcherResponseModel>
     };
 
+export type PagedSegmentResponseModel = {
+        total: number
+items: Array<SegmentResponseModel>
+    };
+
 export type PagedTagResponseModel = {
         total: number
 items: Array<TagResponseModel>
@@ -1811,6 +1819,11 @@ items: Array<UserGroupResponseModel>
 export type PagedUserResponseModel = {
         total: number
 items: Array<UserResponseModel>
+    };
+
+export type PagedWebhookEventModel = {
+        total: number
+items: Array<WebhookEventModel>
     };
 
 export type PagedWebhookResponseModel = {
@@ -1892,6 +1905,13 @@ export type PublicAccessRequestModel = {
 errorDocument: ReferenceByIdModel
 memberUserNames: Array<string>
 memberGroupNames: Array<string>
+    };
+
+export type PublicAccessResponseModel = {
+        loginDocument: ReferenceByIdModel
+errorDocument: ReferenceByIdModel
+members: Array<MemberItemResponseModel>
+groups: Array<MemberGroupItemResponseModel>
     };
 
 export type PublishDocumentRequestModel = {
@@ -2050,6 +2070,11 @@ export type SearcherResponseModel = {
 
 export type SecurityConfigurationResponseModel = {
         passwordConfiguration: PasswordConfigurationResponseModel
+    };
+
+export type SegmentResponseModel = {
+        name: string
+alias: string
     };
 
 export type ServerConfigurationItemResponseModel = {
@@ -2253,7 +2278,7 @@ export type UnpublishDocumentRequestModel = {
 export type UpdateDataTypeRequestModel = {
         name: string
 editorAlias: string
-editorUiAlias?: string | null
+editorUiAlias: string
 values: Array<DataTypePropertyPresentationModel>
     };
 
@@ -2478,6 +2503,7 @@ key: string
 
 export type UpdateUserGroupRequestModel = {
         name: string
+alias: string
 icon?: string | null
 sections: Array<string>
 languages: Array<string>
@@ -2502,7 +2528,9 @@ name: string
 userGroupIds: Array<string>
 languageIsoCode: string
 documentStartNodeIds: Array<string>
+hasDocumentRootAccess: boolean
 mediaStartNodeIds: Array<string>
+hasMediaRootAccess: boolean
     };
 
 export type UpdateWebhookRequestModel = {
@@ -2550,10 +2578,12 @@ export type UserGroupItemResponseModel = {
         id: string
 name: string
 icon?: string | null
+alias?: string | null
     };
 
 export type UserGroupResponseModel = {
         name: string
+alias: string
 icon?: string | null
 sections: Array<string>
 languages: Array<string>
@@ -2565,7 +2595,8 @@ mediaRootAccess: boolean
 fallbackPermissions: Array<string>
 permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>
 id: string
-isSystemGroup: boolean
+isDeletable: boolean
+aliasCanBeChanged: boolean
     };
 
 export type UserInstallRequestModel = {
@@ -2578,6 +2609,7 @@ readonly subscribeToNewsletter: boolean
 export type UserItemResponseModel = {
         id: string
 name: string
+avatarUrls: Array<string>
     };
 
 export enum UserOrderModel {
@@ -2610,7 +2642,9 @@ userGroupIds: Array<string>
 id: string
 languageIsoCode?: string | null
 documentStartNodeIds: Array<string>
+hasDocumentRootAccess: boolean
 mediaStartNodeIds: Array<string>
+hasMediaRootAccess: boolean
 avatarUrls: Array<string>
 state: UserStateModel
 failedLoginAttempts: number
@@ -2665,6 +2699,12 @@ export type VerifyResetPasswordTokenRequestModel = {
 resetCode: string
     };
 
+export type WebhookEventModel = {
+        eventName: string
+eventType: string
+alias: string
+    };
+
 export type WebhookEventResponseModel = {
         eventName: string
 eventType: string
@@ -2687,43 +2727,6 @@ headers: Record<string, string>
 id: string
 events: Array<WebhookEventResponseModel>
     };
-
-export type AuditLogData = {
-        
-        payloads: {
-            GetAuditLog: {
-                        orderDirection?: DirectionModel
-sinceDate?: string
-skip?: number
-take?: number
-                        
-                    };
-GetAuditLogById: {
-                        id: string
-orderDirection?: DirectionModel
-sinceDate?: string
-skip?: number
-take?: number
-                        
-                    };
-GetAuditLogTypeByLogType: {
-                        logType: AuditTypeModel
-sinceDate?: string
-skip?: number
-take?: number
-                        
-                    };
-        }
-        
-        
-        responses: {
-            GetAuditLog: PagedAuditLogWithUsernameResponseModel
-                ,GetAuditLogById: PagedAuditLogResponseModel
-                ,GetAuditLogTypeByLogType: PagedAuditLogResponseModel
-                
-        }
-        
-    }
 
 export type CultureData = {
         
@@ -3228,6 +3231,14 @@ PutDocumentById: {
 requestBody?: UpdateDocumentRequestModel
                         
                     };
+GetDocumentByIdAuditLog: {
+                        id: string
+orderDirection?: DirectionModel
+sinceDate?: string
+skip?: number
+take?: number
+                        
+                    };
 PostDocumentByIdCopy: {
                         id: string
 requestBody?: CopyDocumentRequestModel
@@ -3388,6 +3399,7 @@ take?: number
                 ,GetDocumentById: DocumentResponseModel
                 ,DeleteDocumentById: string
                 ,PutDocumentById: string
+                ,GetDocumentByIdAuditLog: PagedAuditLogResponseModel
                 ,PostDocumentByIdCopy: string
                 ,GetDocumentByIdDomains: DomainsResponseModel
                 ,PutDocumentByIdDomains: string
@@ -3397,7 +3409,7 @@ take?: number
                 ,PutDocumentByIdNotifications: string
                 ,PostDocumentByIdPublicAccess: string
                 ,DeleteDocumentByIdPublicAccess: string
-                ,GetDocumentByIdPublicAccess: void
+                ,GetDocumentByIdPublicAccess: PublicAccessResponseModel
                 ,PutDocumentByIdPublicAccess: string
                 ,PutDocumentByIdPublish: string
                 ,PutDocumentByIdPublishWithDescendants: string
@@ -3583,6 +3595,7 @@ requestBody?: UpdateLanguageRequestModel
         
         responses: {
             GetItemLanguage: Array<LanguageItemResponseModel>
+                ,GetItemLanguageDefault: LanguageItemResponseModel
                 ,GetLanguage: PagedLanguageResponseModel
                 ,PostLanguage: string
                 ,GetLanguageByIsoCode: LanguageResponseModel
@@ -3682,6 +3695,12 @@ export type MediaTypeData = {
                         id?: Array<string>
                         
                     };
+GetItemMediaTypeAllowed: {
+                        fileExtension?: string
+skip?: number
+take?: number
+                        
+                    };
 GetItemMediaTypeSearch: {
                         query?: string
 skip?: number
@@ -3773,6 +3792,7 @@ take?: number
         
         responses: {
             GetItemMediaType: Array<MediaTypeItemResponseModel>
+                ,GetItemMediaTypeAllowed: PagedModelMediaTypeItemResponseModel
                 ,GetItemMediaTypeSearch: PagedModelMediaTypeItemResponseModel
                 ,PostMediaType: string
                 ,GetMediaTypeById: MediaTypeResponseModel
@@ -3834,6 +3854,14 @@ DeleteMediaById: {
 PutMediaById: {
                         id: string
 requestBody?: UpdateMediaRequestModel
+                        
+                    };
+GetMediaByIdAuditLog: {
+                        id: string
+orderDirection?: DirectionModel
+sinceDate?: string
+skip?: number
+take?: number
                         
                     };
 PutMediaByIdMove: {
@@ -3932,6 +3960,7 @@ take?: number
                 ,GetMediaById: MediaResponseModel
                 ,DeleteMediaById: string
                 ,PutMediaById: string
+                ,GetMediaByIdAuditLog: PagedAuditLogResponseModel
                 ,PutMediaByIdMove: string
                 ,PutMediaByIdMoveToRecycleBin: string
                 ,GetMediaByIdReferencedBy: PagedIReferenceResponseModel
@@ -3996,10 +4025,10 @@ take?: number
         responses: {
             GetItemMemberGroup: Array<MemberGroupItemResponseModel>
                 ,GetMemberGroup: PagedMemberGroupResponseModel
-                ,PostMemberGroup: MemberGroupResponseModel
+                ,PostMemberGroup: string
                 ,GetMemberGroupById: MemberGroupResponseModel
                 ,DeleteMemberGroupById: string
-                ,PutMemberGroupById: MemberGroupResponseModel
+                ,PutMemberGroupById: string
                 ,GetTreeMemberGroupRoot: PagedNamedEntityTreeItemResponseModel
                 
         }
@@ -4066,7 +4095,7 @@ take?: number
                 ,GetMemberTypeByIdCompositionReferences: Array<MemberTypeCompositionResponseModel>
                 ,PostMemberTypeByIdCopy: string
                 ,PostMemberTypeAvailableCompositions: Array<AvailableMemberTypeCompositionResponseModel>
-                ,GetTreeMemberTypeRoot: PagedNamedEntityTreeItemResponseModel
+                ,GetTreeMemberTypeRoot: PagedMemberTypeTreeItemResponseModel
                 
         }
         
@@ -4167,6 +4196,25 @@ take?: number
         
         responses: {
             GetObjectTypes: PagedObjectTypeResponseModel
+                
+        }
+        
+    }
+
+export type OembedData = {
+        
+        payloads: {
+            GetOembedQuery: {
+                        maxHeight?: number
+maxWidth?: number
+url?: string
+                        
+                    };
+        }
+        
+        
+        responses: {
+            GetOembedQuery: OEmbedResponseModel
                 
         }
         
@@ -4591,6 +4639,24 @@ PostSecurityForgotPasswordVerify: {
         
     }
 
+export type SegmentData = {
+        
+        payloads: {
+            GetSegment: {
+                        skip?: number
+take?: number
+                        
+                    };
+        }
+        
+        
+        responses: {
+            GetSegment: PagedSegmentResponseModel
+                
+        }
+        
+    }
+
 export type ServerData = {
         
         
@@ -4880,15 +4946,15 @@ export type UserDataData = {
                         requestBody?: CreateUserDataRequestModel
                         
                     };
-PutUserData: {
-                        requestBody?: UpdateUserDataRequestModel
-                        
-                    };
 GetUserData: {
                         groups?: Array<string>
 identifiers?: Array<string>
 skip?: number
 take?: number
+                        
+                    };
+PutUserData: {
+                        requestBody?: UpdateUserDataRequestModel
                         
                     };
 GetUserDataById: {
@@ -4900,8 +4966,8 @@ GetUserDataById: {
         
         responses: {
             PostUserData: string
-                ,PutUserData: string
                 ,GetUserData: PagedUserDataResponseModel
+                ,PutUserData: string
                 ,GetUserDataById: UserDataModel
                 
         }
@@ -4911,7 +4977,13 @@ GetUserDataById: {
 export type UserGroupData = {
         
         payloads: {
-            GetItemUserGroup: {
+            GetFilterUserGroup: {
+                        filter?: string
+skip?: number
+take?: number
+                        
+                    };
+GetItemUserGroup: {
                         id?: Array<string>
                         
                     };
@@ -4955,7 +5027,8 @@ requestBody?: Array<string>
         
         
         responses: {
-            GetItemUserGroup: Array<UserGroupItemResponseModel>
+            GetFilterUserGroup: PagedUserGroupResponseModel
+                ,GetItemUserGroup: Array<UserGroupItemResponseModel>
                 ,DeleteUserGroup: string
                 ,PostUserGroup: string
                 ,GetUserGroup: PagedUserGroupResponseModel
@@ -5152,7 +5225,11 @@ PostUserUnlock: {
 export type WebhookData = {
         
         payloads: {
-            GetWebhook: {
+            GetItemWebhook: {
+                        id?: Array<string>
+                        
+                    };
+GetWebhook: {
                         skip?: number
 take?: number
                         
@@ -5165,29 +5242,31 @@ GetWebhookById: {
                         id: string
                         
                     };
+DeleteWebhookById: {
+                        id: string
+                        
+                    };
 PutWebhookById: {
                         id: string
 requestBody?: UpdateWebhookRequestModel
                         
                     };
-DeleteWebhookById: {
-                        id: string
-                        
-                    };
-GetWebhookItem: {
-                        ids?: Array<string>
+GetWebhookEvents: {
+                        skip?: number
+take?: number
                         
                     };
         }
         
         
         responses: {
-            GetWebhook: PagedWebhookResponseModel
+            GetItemWebhook: Array<WebhookItemResponseModel>
+                ,GetWebhook: PagedWebhookResponseModel
                 ,PostWebhook: string
                 ,GetWebhookById: WebhookResponseModel
-                ,PutWebhookById: string
                 ,DeleteWebhookById: string
-                ,GetWebhookItem: Array<WebhookItemResponseModel>
+                ,PutWebhookById: string
+                ,GetWebhookEvents: PagedWebhookEventModel
                 
         }
         

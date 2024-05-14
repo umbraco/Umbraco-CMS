@@ -2,6 +2,7 @@ import { UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_CONTENT_MENU_ALIAS } from './documen
 import type {
 	ManifestSection,
 	ManifestSectionSidebarAppMenuWithEntityActionsKind,
+	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Content';
@@ -10,7 +11,7 @@ const section: ManifestSection = {
 	type: 'section',
 	alias: sectionAlias,
 	name: 'Content Section',
-	weight: 600,
+	weight: 1000,
 	meta: {
 		label: '#sections_content',
 		pathname: 'content',
@@ -42,4 +43,4 @@ const menuSectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind 
 	],
 };
 
-export const manifests = [section, menuSectionSidebarApp];
+export const manifests: Array<ManifestTypes> = [section, menuSectionSidebarApp];
