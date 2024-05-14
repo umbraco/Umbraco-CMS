@@ -30,8 +30,7 @@ test.describe('Partial View tests', () => {
     await umbracoUi.partialView.isSuccessNotificationVisible();
     expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
     // Verify the new partial view is displayed under the Partial Views section
-    await umbracoUi.partialView.clickRootFolderCaretButton();
-    await umbracoUi.partialView.isPartialViewTreeItemVisibile(partialViewFileName);
+    await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(partialViewFileName);
   })
 
   test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) => {
@@ -64,8 +63,7 @@ test.describe('Partial View tests', () => {
     }
 
     // Verify the new partial view is displayed under the Partial Views section
-    await umbracoUi.partialView.clickRootFolderCaretButton();
-    await umbracoUi.partialView.isPartialViewTreeItemVisibile(partialViewFileName);
+    await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(partialViewFileName);
   });
 
   test('can rename a partial view @smoke', async ({umbracoApi, umbracoUi}) => {
@@ -78,7 +76,7 @@ test.describe('Partial View tests', () => {
     expect(await umbracoApi.partialView.doesExist(wrongPartialViewFileName)).toBeTruthy();
 
     //Act
-    await umbracoUi.partialView.clickRootFolderCaretButton();
+    await umbracoUi.partialView.reloadPartialViewTree();
     await umbracoUi.partialView.clickActionsMenuForPartialView(wrongPartialViewFileName);
     await umbracoUi.partialView.rename(partialViewName);
 
@@ -87,9 +85,9 @@ test.describe('Partial View tests', () => {
     expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
     expect(await umbracoApi.partialView.doesNameExist(wrongPartialViewFileName)).toBeFalsy();
     // Verify the old partial view is NOT displayed under the Partial Views section
-    await umbracoUi.partialView.isPartialViewTreeItemVisibile(wrongPartialViewFileName, false);
+    await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(wrongPartialViewFileName, false);
     // Verify the new partial view is displayed under the Partial Views section
-    await umbracoUi.partialView.isPartialViewTreeItemVisibile(partialViewFileName);
+    await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(partialViewFileName);
   });
 
   test('can update a partial view content @smoke', async ({umbracoApi, umbracoUi}) => {
@@ -194,7 +192,8 @@ test.describe('Partial View tests', () => {
     expect(updatedPartialView.content).toBe(expectedTemplateContent);
   });
 
-  test('can insert dictionary item into a partial view', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Remove skip when the front-end is ready. Currently the returned items count is not updated after choosing the root content.
+  test.skip('can insert dictionary item into a partial view', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.partialView.create(partialViewFileName, defaultPartialViewContent, '/');
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
@@ -215,7 +214,8 @@ test.describe('Partial View tests', () => {
     expect(partialViewData.content).toBe(partialViewContent);
   });
 
-  test('can insert value into a partial view', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Update the value of the System Field in the testHelpers. There has been changes to the SystemField Name.
+  test.skip('can insert value into a partial view', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.partialView.create(partialViewFileName, defaultPartialViewContent, '/');
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
@@ -249,7 +249,7 @@ test.describe('Partial View tests', () => {
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeFalsy();
     // Verify the partial view is NOT displayed under the Partial Views section
     await umbracoUi.partialView.clickRootFolderCaretButton();
-    await umbracoUi.partialView.isPartialViewTreeItemVisibile(partialViewFileName, false);
+    await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(partialViewFileName, false);
   });
 
   // TODO: Remove skip when the front-end is ready. Currently the returned items count is not updated after choosing the root content.

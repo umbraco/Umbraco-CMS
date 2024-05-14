@@ -44,6 +44,7 @@ using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Blocks;
 using Umbraco.Cms.Web.Common.Configuration;
+using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
 using Umbraco.Cms.Web.Common.Helpers;
@@ -286,6 +287,10 @@ public static partial class UmbracoBuilderExtensions
         // register the umbraco context factory
         builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
         builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
+
+        var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
+        builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+            .Add(umbracoApiControllerTypes);
 
         builder.Services.AddSingleton<UmbracoRequestLoggingMiddleware>();
         builder.Services.AddSingleton<PreviewAuthenticationMiddleware>();

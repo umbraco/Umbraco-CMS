@@ -286,6 +286,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IMediaTypeContainerService, MediaTypeContainerService>();
             Services.AddUnique<IContentBlueprintContainerService, ContentBlueprintContainerService>();
             Services.AddUnique<IIsoCodeValidator, IsoCodeValidator>();
+            Services.AddUnique<ICultureService, CultureService>();
             Services.AddUnique<ILanguageService, LanguageService>();
             Services.AddUnique<IMemberGroupService, MemberGroupService>();
             Services.AddUnique<IRedirectUrlService, RedirectUrlService>();
@@ -323,6 +324,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ITemporaryFileService, TemporaryFileService>();
             Services.AddUnique<ITemplateContentParserService, TemplateContentParserService>();
             Services.AddUnique<IEntityService, EntityService>();
+            Services.AddUnique<IOEmbedService, OEmbedService>();
             Services.AddUnique<IRelationService, RelationService>();
             Services.AddUnique<IMemberTypeService, MemberTypeService>();
             Services.AddUnique<IMemberContentEditingService, MemberContentEditingService>();
@@ -390,6 +392,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
             Services.AddSingleton<IUserGroupPermissionAuthorizer, UserGroupPermissionAuthorizer>();
             Services.AddSingleton<IUserPermissionAuthorizer, UserPermissionAuthorizer>();
+
+            // Segments
+            Services.AddUnique<ISegmentService, NoopSegmentService>();
         }
     }
 }

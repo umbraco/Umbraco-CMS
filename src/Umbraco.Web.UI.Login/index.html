@@ -10,11 +10,19 @@
   <meta name="pinterest" content="nopin"/>
   <title>Umbraco</title>
   <script type="module">
+    import '@umbraco-ui/uui-css/dist/uui-css.css';
     const { startMockServiceWorker } = await import('./src/mocks/index.ts');
     await startMockServiceWorker();
     await import('./src/index.ts');
   </script>
   <link rel="stylesheet" href="/user-defined.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+  </style>
 </head>
 <body style="margin: 0; padding: 0; overflow: hidden">
 <noscript>

@@ -20,17 +20,20 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
     private readonly IMemberService _memberService;
     private readonly IUmbracoMapper _mapper;
     private readonly IMemberRoleManager _memberRoleManager;
+    private readonly IMemberPresentationFactory _memberPresentationFactory;
 
     public PublicAccessPresentationFactory(
         IEntityService entityService,
         IMemberService memberService,
         IUmbracoMapper mapper,
-        IMemberRoleManager memberRoleManager)
+        IMemberRoleManager memberRoleManager,
+        IMemberPresentationFactory memberPresentationFactory)
     {
         _entityService = entityService;
         _memberService = memberService;
         _mapper = mapper;
         _memberRoleManager = memberRoleManager;
+        _memberPresentationFactory = memberPresentationFactory;
     }
 
     public Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus> CreatePublicAccessResponseModel(PublicAccessEntry entry)
@@ -57,8 +60,8 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
 
         MemberItemResponseModel[] members = usernames
             .Select(username => _memberService.GetByUsername(username))
-            .Select(_mapper.Map<MemberItemResponseModel>)
             .WhereNotNull()
+            .Select(_memberPresentationFactory.CreateItemResponseModel)
             .ToArray();
 
         var allGroups = _memberRoleManager.Roles.Where(x => x.Name != null).ToDictionary(x => x.Name!);
@@ -68,9 +71,12 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
                 rule.RuleValue is not null && allGroups.TryGetValue(rule.RuleValue, out UmbracoIdentityRole? memberRole)
                     ? memberRole
                     : null)
-            .WhereNotNull();
+            .WhereNotNull()
+            .ToArray();
 
-        IEnumerable<IEntitySlim> groupsEntities = _entityService.GetAll(UmbracoObjectTypes.MemberGroup, identityRoles.Select(x => Convert.ToInt32(x.Id)).ToArray());
+        IEnumerable<IEntitySlim> groupsEntities = identityRoles.Any()
+            ? _entityService.GetAll(UmbracoObjectTypes.MemberGroup, identityRoles.Select(x => Convert.ToInt32(x.Id)).ToArray())
+            : Enumerable.Empty<IEntitySlim>();
         MemberGroupItemResponseModel[] memberGroups = groupsEntities.Select(x => _mapper.Map<MemberGroupItemResponseModel>(x)!).ToArray();
 
         var responseModel = new PublicAccessResponseModel

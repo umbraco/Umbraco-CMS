@@ -12,7 +12,7 @@ public class UpdateMemberRequestModel : UpdateContentRequestModelBase<MemberValu
 
     public string? NewPassword { get; set; }
 
-    public IEnumerable<string>? Groups { get; set; }
+    public IEnumerable<Guid>? Groups { get; set; }
 
     public bool IsApproved { get; set; }
 
