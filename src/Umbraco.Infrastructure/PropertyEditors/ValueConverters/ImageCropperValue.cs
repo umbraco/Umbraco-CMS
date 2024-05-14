@@ -11,13 +11,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// <summary>
 ///     Represents a value of the image cropper value editor.
 /// </summary>
-public class ImageCropperValue : IHtmlEncodedString, IEquatable<ImageCropperValue>
+public class ImageCropperValue :TemporaryFileUploadValueBase, IHtmlEncodedString, IEquatable<ImageCropperValue>
 {
-    /// <summary>
-    ///     Gets or sets the value source image.
-    /// </summary>
-    public string? Src { get; set; } = string.Empty;
-
     /// <summary>
     ///     Gets or sets the value focal point.
     /// </summary>
