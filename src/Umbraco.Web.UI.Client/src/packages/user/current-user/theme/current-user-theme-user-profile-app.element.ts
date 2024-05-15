@@ -59,10 +59,6 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 			uui-select {
 				width: 100%;
 			}
-			p {
-				margin: 0;
-				margin-top: var(--uui-size-space-1);
-			}
 		`,
 	];
 }
