@@ -100,6 +100,7 @@ export class UmbAuthFlow {
 
 	// external login
 	#link_endpoint;
+	#link_key_endpoint;
 	#unlink_endpoint;
 
 	/**
@@ -130,6 +131,7 @@ export class UmbAuthFlow {
 		});
 
 		this.#link_endpoint = `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/link-login`;
+		this.#link_key_endpoint = `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/link-login-key`;
 		this.#unlink_endpoint = `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/unlink-login`;
 
 		this.#notifier = new AuthorizationNotifier();
@@ -331,10 +333,26 @@ export class UmbAuthFlow {
 	 * This method will link the current user to the specified provider by redirecting the user to the link endpoint.
 	 * @param provider The provider to link to.
 	 */
-	linkLogin(provider: string): void {
-		const url = new URL(this.#link_endpoint);
-		url.searchParams.set('provider', provider);
-		location.href = url.href;
+	async linkLogin(provider: string): Promise<void> {
+		const linkKey = await this.#makeLinkTokenRequest(provider);
+
+		const form = document.createElement('form');
+		form.method = 'POST';
+		form.action = this.#link_endpoint;
+		form.style.display = 'none';
+
+		const providerInput = document.createElement('input');
+		providerInput.name = 'provider';
+		providerInput.value = provider;
+		form.appendChild(providerInput);
+
+		const linkKeyInput = document.createElement('input');
+		linkKeyInput.name = 'linkKey';
+		linkKeyInput.value = linkKey;
+		form.appendChild(linkKeyInput);
+
+		document.body.appendChild(form);
+		form.submit();
 	}
 
 	/**
@@ -422,5 +440,22 @@ export class UmbAuthFlow {
 			this.clearTokenStorage();
 			return false;
 		}
+	}
+
+	async #makeLinkTokenRequest(provider: string) {
+		const token = await this.performWithFreshTokens();
+
+		const request = await fetch(`${this.#link_key_endpoint}?provider=${provider}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+				'Content-Type': 'application/json',
+			},
+		});
+
+		if (!request.ok) {
+			throw new Error('Failed to link login');
+		}
+
+		return request.json();
 	}
 }
