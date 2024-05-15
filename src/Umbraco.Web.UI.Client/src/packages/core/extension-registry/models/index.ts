@@ -67,6 +67,7 @@ import type { ManifestSearchResultItem } from './search-result-item.model.js';
 import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
 import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
 import type { ManifestEntryPoint } from './entry-point.model.js';
+import type { ManifestMonacoMarkdownEditorAction } from './monaco-markdown-editor-action.model.js';
 import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export type * from './app-entry-point.model.js';
@@ -94,6 +95,7 @@ export type * from './menu-item.model.js';
 export type * from './menu.model.js';
 export type * from './mfa-login-provider.model.js';
 export type * from './modal.model.js';
+export type * from './monaco-markdown-editor-action.model.js';
 export type * from './package-view.model.js';
 export type * from './property-action.model.js';
 export type * from './property-editor.model.js';
@@ -179,6 +181,7 @@ export type ManifestTypes =
 	| ManifestMenuItemTreeKind
 	| ManifestMfaLoginProvider
 	| ManifestModal
+	| ManifestMonacoMarkdownEditorAction
 	| ManifestPackageView
 	| ManifestPropertyActions
 	| ManifestPropertyEditorSchema
