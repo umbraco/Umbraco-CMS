@@ -1,5 +1,5 @@
 import { umbUserGroupMockDb } from '../user-group/user-group.db.js';
-import { arrayFilter, stringFilter, queryFilter } from '../utils.js';
+import { arrayFilter, stringFilter, queryFilter, objectArrayFilter } from '../utils.js';
 import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
@@ -28,7 +28,7 @@ interface UserFilterOptions {
 }
 
 const userGroupFilter = (filterOptions: UserFilterOptions, item: UmbMockUserModel) =>
-	arrayFilter(filterOptions.userGroupIds, item.userGroupIds);
+	objectArrayFilter(filterOptions.userGroupIds, item.userGroupIds, 'id');
 const userStateFilter = (filterOptions: UserFilterOptions, item: UmbMockUserModel) =>
 	stringFilter(filterOptions.userStates, item.state);
 const userQueryFilter = (filterOptions: UserFilterOptions, item: UmbMockUserModel) =>
