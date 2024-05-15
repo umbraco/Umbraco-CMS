@@ -17,11 +17,22 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-const userGroupFilter = (filterOptions: any, item: UmbMockUserModel) =>
+interface UserFilterOptions {
+	skip: number;
+	take: number;
+	orderBy: string;
+	orderDirection: string;
+	userGroupIds: Array<{ id: string }>;
+	userStates: Array<string>;
+	filter: string;
+}
+
+const userGroupFilter = (filterOptions: UserFilterOptions, item: UmbMockUserModel) =>
 	arrayFilter(filterOptions.userGroupIds, item.userGroupIds);
-const userStateFilter = (filterOptions: any, item: UmbMockUserModel) =>
+const userStateFilter = (filterOptions: UserFilterOptions, item: UmbMockUserModel) =>
 	stringFilter(filterOptions.userStates, item.state);
-const userQueryFilter = (filterOptions: any, item: UmbMockUserModel) => queryFilter(filterOptions.filter, item.name);
+const userQueryFilter = (filterOptions: UserFilterOptions, item: UmbMockUserModel) =>
+	queryFilter(filterOptions.filter, item.name);
 
 // Temp mocked database
 class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
@@ -155,10 +166,10 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 		return { userId: newUserId };
 	}
 
-	filter(options: any): PagedUserResponseModel {
+	filter(options: UserFilterOptions): PagedUserResponseModel {
 		const allItems = this.getAll();
 
-		const filterOptions = {
+		const filterOptions: UserFilterOptions = {
 			skip: options.skip || 0,
 			take: options.take || 25,
 			orderBy: options.orderBy || 'name',
