@@ -45,11 +45,10 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-workspace-editor alias="Umb.Workspace.Language">
+		return html`<umb-workspace-editor
+			alias="Umb.Workspace.Language"
+			back-path="section/settings/workspace/language-root">
 			<div id="header" slot="header">
-				<uui-button label="Navigate back" href="section/settings/workspace/language-root" compact>
-					<uui-icon name="icon-arrow-left"></uui-icon>
-				</uui-button>
 				${this._isNew
 					? html`<strong>Add language</strong>`
 					: html`<uui-input
@@ -66,7 +65,6 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 		css`
 			#header {
 				display: flex;
-				padding: 0 var(--uui-size-space-6);
 				gap: var(--uui-size-space-4);
 				width: 100%;
 			}

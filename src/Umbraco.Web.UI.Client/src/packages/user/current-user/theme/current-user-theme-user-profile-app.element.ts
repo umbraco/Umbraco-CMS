@@ -53,11 +53,7 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 					<b>Select Theme</b>
 					<p>Experimental. Only light theme is fully supported</p>
 				</div>
-				<uui-select
-					label="Select theme"
-					.options=${this._themes}
-					.value=${this._themeAlias}
-					@change=${this.#onThemeChange}></uui-select>
+				<uui-select label="Select theme" .options=${this._themes} @change=${this.#onThemeChange}></uui-select>
 			</uui-box>
 		`;
 	}
