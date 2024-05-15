@@ -62,8 +62,16 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 					userGroupUniques: item.userGroupIds,
 					unique: item.id,
 					languageIsoCode: item.languageIsoCode || null,
-					documentStartNodeUniques: item.documentStartNodeIds,
-					mediaStartNodeUniques: item.mediaStartNodeIds,
+					documentStartNodeUniques: item.documentStartNodeIds.map((node) => {
+						return {
+							unique: node.id,
+						};
+					}),
+					mediaStartNodeUniques: item.mediaStartNodeIds.map((node) => {
+						return {
+							unique: node.id,
+						};
+					}),
 					hasDocumentRootAccess: item.hasDocumentRootAccess,
 					hasMediaRootAccess: item.hasMediaRootAccess,
 					avatarUrls: item.avatarUrls,

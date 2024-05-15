@@ -31,9 +31,9 @@ export const data: Array<UmbMockUserModel> = [
 	},
 	{
 		id: '82e11d3d-b91d-43c9-9071-34d28e62e81d',
-		documentStartNodeIds: ['simple-document-id'],
+		documentStartNodeIds: [{ id: 'simple-document-id' }],
 		hasDocumentRootAccess: true,
-		mediaStartNodeIds: ['f2f81a40-c989-4b6b-84e2-057cecd3adc1'],
+		mediaStartNodeIds: [{ id: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1' }],
 		hasMediaRootAccess: true,
 		name: 'Amelie Walker',
 		email: 'awalker1@domain.com',

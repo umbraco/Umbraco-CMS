@@ -1,4 +1,5 @@
 import type { UmbUserEntityType } from './entity.js';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UserStateModel, type UserTwoFactorProviderModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbUserStateEnum = UserStateModel;
@@ -7,7 +8,7 @@ export const UmbUserStateEnum = UserStateModel;
 export interface UmbUserDetailModel {
 	avatarUrls: Array<string>;
 	createDate: string | null;
-	documentStartNodeUniques: Array<string>;
+	documentStartNodeUniques: Array<UmbReferenceByUnique>;
 	email: string;
 	entityType: UmbUserEntityType;
 	failedLoginAttempts: number;
@@ -18,7 +19,7 @@ export interface UmbUserDetailModel {
 	lastLockoutDate: string | null;
 	lastLoginDate: string | null;
 	lastPasswordChangeDate: string | null;
-	mediaStartNodeUniques: Array<string>;
+	mediaStartNodeUniques: Array<UmbReferenceByUnique>;
 	name: string;
 	state: UmbUserStateEnum | null;
 	unique: string;

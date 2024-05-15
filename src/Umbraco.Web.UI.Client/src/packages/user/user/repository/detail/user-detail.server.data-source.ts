@@ -78,7 +78,11 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			avatarUrls: data.avatarUrls,
 			createDate: data.createDate,
 			hasDocumentRootAccess: data.hasDocumentRootAccess,
-			documentStartNodeUniques: data.documentStartNodeIds,
+			documentStartNodeUniques: data.documentStartNodeIds.map((node) => {
+				return {
+					unique: node.id,
+				};
+			}),
 			email: data.email,
 			entityType: UMB_USER_ENTITY_TYPE,
 			failedLoginAttempts: data.failedLoginAttempts,
@@ -88,7 +92,11 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			lastLoginDate: data.lastLoginDate || null,
 			lastPasswordChangeDate: data.lastPasswordChangeDate || null,
 			hasMediaRootAccess: data.hasMediaRootAccess,
-			mediaStartNodeUniques: data.mediaStartNodeIds,
+			mediaStartNodeUniques: data.mediaStartNodeIds.map((node) => {
+				return {
+					unique: node.id,
+				};
+			}),
 			name: data.name,
 			state: data.state,
 			unique: data.id,
@@ -142,12 +150,20 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateUserRequestModel = {
-			documentStartNodeIds: model.documentStartNodeUniques,
+			documentStartNodeIds: model.documentStartNodeUniques.map((node) => {
+				return {
+					id: node.unique,
+				};
+			}),
 			email: model.email,
 			hasDocumentRootAccess: model.hasDocumentRootAccess,
 			hasMediaRootAccess: model.hasMediaRootAccess,
 			languageIsoCode: model.languageIsoCode || '',
-			mediaStartNodeIds: model.mediaStartNodeUniques,
+			mediaStartNodeIds: model.mediaStartNodeUniques.map((node) => {
+				return {
+					id: node.unique,
+				};
+			}),
 			name: model.name,
 			userGroupIds: model.userGroupUniques,
 			userName: model.userName,

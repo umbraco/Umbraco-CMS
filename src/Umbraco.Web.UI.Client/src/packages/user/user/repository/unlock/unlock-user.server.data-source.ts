@@ -33,7 +33,7 @@ export class UmbUnlockUserServerDataSource implements UmbUnlockUserDataSource {
 			this.#host,
 			UserService.postUserUnlock({
 				requestBody: {
-					userIds,
+					userIds: userIds.map((id) => ({ id })),
 				},
 			}),
 		);
