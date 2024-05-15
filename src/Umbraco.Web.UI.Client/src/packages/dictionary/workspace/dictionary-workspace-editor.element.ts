@@ -38,11 +38,8 @@ export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.Dictionary">
+			<umb-workspace-editor alias="Umb.Workspace.Dictionary" back-path="section/dictionary/dashboard">
 				<div id="header" slot="header">
-					<uui-button href="section/dictionary/dashboard" label=${this.localize.term('general_backToOverview')} compact>
-						<uui-icon name="icon-arrow-left"></uui-icon>
-					</uui-button>
 					<uui-input
 						placeholder=${this.localize.term('placeholders_entername')}
 						.value=${this._name ?? ''}

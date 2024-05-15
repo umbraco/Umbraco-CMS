@@ -8,6 +8,7 @@ import { UmbExtensionsApiInitializer, type UmbEntryPointOnInit } from '@umbraco-
 
 // TODO temp relative import until modules ship a component sub module
 import './menu/components/index.js';
+import './extension-registry/components/index.js';
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);

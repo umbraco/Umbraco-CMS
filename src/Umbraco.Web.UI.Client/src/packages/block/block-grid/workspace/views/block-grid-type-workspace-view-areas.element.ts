@@ -32,7 +32,7 @@ export class UmbBlockGridTypeWorkspaceViewAreasElement extends UmbLitElement imp
 				<umb-property
 					label=${this.localize.term('blockEditor_areasLayoutColumns')}
 					alias="areaGridColumns"
-					property-editor-ui-alias="Umb.PropertyEditorUi.Number"></umb-property>
+					property-editor-ui-alias="Umb.PropertyEditorUi.Integer"></umb-property>
 				<umb-property
 					label=${this.localize.term('blockEditor_areasConfigurations')}
 					alias="areas"

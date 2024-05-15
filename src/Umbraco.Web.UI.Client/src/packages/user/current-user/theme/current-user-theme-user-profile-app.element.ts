@@ -48,12 +48,8 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 	render() {
 		if (!this._themes.length) return nothing;
 		return html`
-			<uui-box headline="Select theme">
-				<uui-select
-					label="Select theme"
-					.options=${this._themes}
-					.value=${this._themeAlias}
-					@change=${this.#onThemeChange}></uui-select>
+			<uui-box headline="Theme (Experimental)">
+				<uui-select label="Select theme" .options=${this._themes} @change=${this.#onThemeChange}></uui-select>
 			</uui-box>
 		`;
 	}
