@@ -26,11 +26,11 @@ export const manifests: Array<ManifestTypes> = [
 	},
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.Number',
-		name: 'Number Property Editor UI',
+		alias: 'Umb.PropertyEditorUi.Integer',
+		name: 'Numeric Property Editor UI',
 		element: () => import('./property-editor-ui-number.element.js'),
 		meta: {
-			label: 'Number',
+			label: 'Numeric',
 			icon: 'icon-autofill',
 			group: 'common',
 			propertyEditorSchemaAlias: 'Umbraco.Integer',

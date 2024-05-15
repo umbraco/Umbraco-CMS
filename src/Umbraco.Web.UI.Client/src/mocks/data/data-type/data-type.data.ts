@@ -988,7 +988,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		id: 'dt-integer',
 		parent: null,
 		editorAlias: 'Umbraco.Integer',
-		editorUiAlias: 'Umb.PropertyEditorUi.Number',
+		editorUiAlias: 'Umb.PropertyEditorUi.Integer',
 		hasChildren: false,
 		isFolder: false,
 		isDeletable: true,
