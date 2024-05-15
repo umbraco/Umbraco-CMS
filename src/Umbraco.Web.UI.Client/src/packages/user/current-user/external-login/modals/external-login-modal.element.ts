@@ -8,6 +8,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { ApiError, ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbExternalLoginProviderOption = UmbCurrentUserExternalLoginProviderModel & {
 	displayName: string;
@@ -149,7 +150,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 				color: 'positive',
 			});
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
-			authContext.linkLogin(item.providerSchemeName);
+			await authContext.linkLogin(item.providerSchemeName);
 		} catch (error) {
 			if (error instanceof Error) {
 				this.#notificationContext?.peek('danger', {
@@ -172,16 +173,21 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 				color: 'danger',
 			});
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
-			authContext.unlinkLogin(item.providerSchemeName, item.providerKey);
+			await authContext.unlinkLogin(item.providerSchemeName, item.providerKey);
 		} catch (error) {
+			let message = this.localize.term('errors_receivedErrorFromServer');
 			if (error instanceof Error) {
-				this.#notificationContext?.peek('danger', {
-					data: {
-						headline: this.localize.term('defaultdialogs_unLinkYour', providerDisplayName),
-						message: error.message,
-					},
-				});
+				message = error.message;
+			} else if (typeof error === 'object' && (error as ProblemDetails).title) {
+				message = (error as ProblemDetails).title ?? message;
 			}
+			console.error('[External Login] Error unlinking provider: ', error);
+			this.#notificationContext?.peek('danger', {
+				data: {
+					headline: this.localize.term('defaultdialogs_unLinkYour', providerDisplayName),
+					message,
+				},
+			});
 		}
 	}
 

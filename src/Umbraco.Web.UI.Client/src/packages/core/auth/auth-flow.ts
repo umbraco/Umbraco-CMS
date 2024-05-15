@@ -369,7 +369,8 @@ export class UmbAuthFlow {
 		const result = await fetch(request);
 
 		if (!result.ok) {
-			throw new Error('Failed to unlink login');
+			const error = await result.json();
+			throw error;
 		}
 
 		await this.signOut();
