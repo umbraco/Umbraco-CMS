@@ -1,6 +1,6 @@
-import { UmbModalToken } from '../../../core/modal/token/modal-token.js';
 import { UMB_MULTI_URL_PICKER_MODAL_ALIAS } from './constants.js';
 import type { UmbLinkPickerLink } from './types.js';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbLinkPickerModalData {
 	config: UmbLinkPickerConfig;
