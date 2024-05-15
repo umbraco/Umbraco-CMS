@@ -103,6 +103,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 							selectionConfiguration: this._selectionConfiguration,
 							filter: this.data?.filter,
 							selectableFilter: this.data?.pickableFilter,
+							startNode: this.data?.startNode,
 						}}
 						@selection-change=${this.#onSelectionChange}
 						@selected=${this.#onSelected}

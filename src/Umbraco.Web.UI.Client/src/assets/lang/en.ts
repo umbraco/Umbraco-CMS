@@ -731,6 +731,7 @@ export default {
 		externalLoginFailed:
 			'The server failed to authorize you against the external login provider. Please close the window and try again.',
 		externalLoginSuccess: 'You have successfully logged in. You may now close this window.',
+		externalLoginRedirectSuccess: 'You have successfully logged in. You will be redirected shortly.',
 	},
 	openidErrors: {
 		accessDenied: 'Access denied',
@@ -2542,8 +2543,8 @@ export default {
 		searchResults: 'items returned',
 	},
 	propertyEditorPicker: {
-		title: 'Select Property Editor',
-		openPropertyEditorPicker: 'Select Property Editor',
+		title: 'Select a property editor',
+		openPropertyEditorPicker: 'Select a property editor UI',
 	},
 	analytics: {
 		consentForAnalytics: 'Consent for telemetry data',

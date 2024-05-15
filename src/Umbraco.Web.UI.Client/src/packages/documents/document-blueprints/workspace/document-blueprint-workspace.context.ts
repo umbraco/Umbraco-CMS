@@ -45,6 +45,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
 	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
+	readonly parentEntityType = this.#parent.asObservablePart((parent) => (parent ? parent.entityType : undefined));
 
 	/**
 	 */
@@ -62,6 +63,8 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
+	readonly entityType = this.#currentData.asObservablePart((data) => data?.entityType);
+
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
@@ -426,20 +429,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 			await this.repository.delete(id);
 		}
 	}
-
-	/*
-	concept notes:
-
-	public saveAndPreview() {
-
-	}
-	*/
-
-	/*public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		// TODO: [LK] Temporary workaround/hack to get the workspace to load.
-		const docCxt = new UmbDocumentWorkspaceContext(host);
-		return new UmbDocumentPropertyDataContext(host, docCxt, variantId);
-	}*/
 
 	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
 		return new UmbDocumentBlueprintPropertyDataContext(host, this, variantId);

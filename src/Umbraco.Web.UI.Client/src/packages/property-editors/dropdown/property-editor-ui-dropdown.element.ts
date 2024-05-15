@@ -21,20 +21,30 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 		return this.#selection;
 	}
 
-	@state()
-	private _items: Array<Option> = [];
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		if (!config) return;
+
+		const items = config.getValueByAlias('items');
+
+		if (Array.isArray(items) && items.length > 0) {
+			this._options =
+				typeof items[0] === 'string'
+					? items.map((item) => ({ name: item, value: item, selected: this.#selection.includes(item) }))
+					: items.map((item) => ({
+							name: item.name,
+							value: item.value,
+							selected: this.#selection.includes(item.value),
+						}));
+		}
+
+		this._multiple = config.getValueByAlias<boolean>('multiple') ?? false;
+	}
 
 	@state()
 	private _multiple: boolean = false;
 
-	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		if (!config) return;
-
-		const items = config.getValueByAlias<string[]>('items');
-		this._items = items?.map((item) => ({ value: item, name: item, selected: this.#selection.includes(item) })) ?? [];
-
-		this._multiple = config?.getValueByAlias<boolean>('multiple') ?? false;
-	}
+	@state()
+	private _options: Array<Option> = [];
 
 	#onChange(event: UUISelectEvent) {
 		const value = event.target.value as string;
@@ -61,7 +71,7 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 		return html`
 			<select id="native" multiple @change=${this.#onChangeMulitple}>
 				${map(
-					this._items,
+					this._options,
 					(item) => html`<option value=${item.value} ?selected=${item.selected}>${item.name}</option>`,
 				)}
 			</select>
@@ -69,7 +79,9 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	}
 
 	#renderDropdownSingle() {
-		return html`<umb-input-dropdown-list .options=${this._items} @change=${this.#onChange}></umb-input-dropdown-list>`;
+		return html`
+			<umb-input-dropdown-list .options=${this._options} @change=${this.#onChange}></umb-input-dropdown-list>
+		`;
 	}
 
 	static styles = [

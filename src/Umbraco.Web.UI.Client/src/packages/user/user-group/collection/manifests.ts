@@ -9,9 +9,10 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 export const UMB_USER_GROUP_COLLECTION_ALIAS = 'Umb.Collection.UserGroup';
 const collection: ManifestTypes = {
 	type: 'collection',
-	kind: 'default',
 	alias: UMB_USER_GROUP_COLLECTION_ALIAS,
 	name: 'User Group Collection',
+	api: () => import('./user-group-collection.context.js'),
+	element: () => import('./user-group-collection.element.js'),
 	meta: {
 		repositoryAlias: UMB_USER_GROUP_COLLECTION_REPOSITORY_ALIAS,
 	},

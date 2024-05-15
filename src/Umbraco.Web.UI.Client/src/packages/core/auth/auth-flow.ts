@@ -307,29 +307,17 @@ export class UmbAuthFlow {
 			return Promise.resolve(this.#tokenResponse.accessToken);
 		}
 
-		// if the refresh token is not set (maybe the provider doesn't support them)
-		if (!this.#tokenResponse?.refreshToken) {
-			this.#timeoutSignal.next();
-			return Promise.reject('Missing refreshToken.');
-		}
+		const success = await this.makeRefreshTokenRequest();
 
-		const request = new TokenRequest({
-			client_id: this.#clientId,
-			redirect_uri: this.#redirectUri,
-			grant_type: GRANT_TYPE_REFRESH_TOKEN,
-			code: undefined,
-			refresh_token: this.#tokenResponse.refreshToken,
-			extras: undefined,
-		});
-
-		await this.#performTokenRequest(request);
-
-		if (!this.#tokenResponse) {
+		if (!success) {
+			this.clearTokenStorage();
 			this.#timeoutSignal.next();
 			return Promise.reject('Missing tokenResponse.');
 		}
 
-		return Promise.resolve(this.#tokenResponse.accessToken);
+		return this.#tokenResponse
+			? Promise.resolve(this.#tokenResponse.accessToken)
+			: Promise.reject('Missing tokenResponse.');
 	}
 
 	/**
@@ -364,18 +352,36 @@ export class UmbAuthFlow {
 		await this.#performTokenRequest(request);
 	}
 
+	async makeRefreshTokenRequest(): Promise<boolean> {
+		if (!this.#tokenResponse?.refreshToken) {
+			return false;
+		}
+
+		const request = new TokenRequest({
+			client_id: this.#clientId,
+			redirect_uri: this.#redirectUri,
+			grant_type: GRANT_TYPE_REFRESH_TOKEN,
+			code: undefined,
+			refresh_token: this.#tokenResponse.refreshToken,
+			extras: undefined,
+		});
+
+		return this.#performTokenRequest(request);
+	}
+
 	/**
 	 * This method will make a token request to the server using the refresh token.
 	 * If the request fails, it will sign the user out (clear the token state).
 	 */
-	async #performTokenRequest(request: TokenRequest): Promise<void> {
+	async #performTokenRequest(request: TokenRequest): Promise<boolean> {
 		try {
 			this.#tokenResponse = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
 			this.#saveTokenState();
+			return true;
 		} catch (error) {
-			// If the token request fails, it means the code or refresh token is invalid
-			this.clearTokenStorage();
 			console.error('Token request error', error);
+			this.clearTokenStorage();
+			return false;
 		}
 	}
 }

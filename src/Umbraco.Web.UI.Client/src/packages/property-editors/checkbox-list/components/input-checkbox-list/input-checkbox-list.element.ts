@@ -4,11 +4,12 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
+type UmbCheckboxListItem = { label: string; value: string; checked: boolean };
+
 @customElement('umb-input-checkbox-list')
 export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitElement, '') {
-	// TODO: Could this use a type that we export to ensure TS failure, or hook this up with a type coming from backend?
 	@property({ attribute: false })
-	public list: Array<{ label: string; value: string; checked: boolean }> = [];
+	public list: Array<UmbCheckboxListItem> = [];
 
 	#selection: Array<string> = [];
 	@property({ type: Array })
@@ -29,10 +30,10 @@ export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitEleme
 		return undefined;
 	}
 
-	#onChange(e: UUIBooleanInputEvent) {
-		e.stopPropagation();
-		if (e.target.checked) this.selection = [...this.selection, e.target.value];
-		else this.#removeFromSelection(this.selection.findIndex((value) => e.target.value === value));
+	#onChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		if (event.target.checked) this.selection = [...this.selection, event.target.value];
+		else this.#removeFromSelection(this.selection.findIndex((value) => event.target.value === value));
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
