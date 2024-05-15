@@ -48,7 +48,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 			([serverLoginProviders, manifestLoginProviders]) => {
 				const providers: UmbExternalLoginProviderOption[] = manifestLoginProviders.map((manifestLoginProvider) => {
 					const serverLoginProvider = serverLoginProviders.find(
-						(serverLoginProvider) => serverLoginProvider.providerName === manifestLoginProvider.forProviderName,
+						(serverLoginProvider) => serverLoginProvider.providerSchemeName === manifestLoginProvider.forProviderName,
 					);
 					return {
 						isEnabledOnUser: !!serverLoginProvider,

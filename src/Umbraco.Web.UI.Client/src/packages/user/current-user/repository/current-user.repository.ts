@@ -49,10 +49,10 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 		const { data, error } = await this.#currentUserSource.getExternalLoginProviders();
 
 		if (data) {
-			this.#currentUserStore?.setExternalLoginProviders(data.linkedLogins);
+			this.#currentUserStore?.setExternalLoginProviders(data);
 		}
 
-		return { data: data?.linkedLogins, error, asObservable: () => this.#currentUserStore!.externalLoginProviders };
+		return { data, error, asObservable: () => this.#currentUserStore!.externalLoginProviders };
 	}
 
 	/**

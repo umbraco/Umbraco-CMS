@@ -1,7 +1,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { CultureData, DataTypeData, DictionaryData, DocumentBlueprintData, DocumentTypeData, DocumentVersionData, DocumentData, DynamicRootData, HealthCheckData, HelpData, IndexerData, InstallData, LanguageData, LogViewerData, ManifestData, MediaTypeData, MediaData, MemberGroupData, MemberTypeData, MemberData, ModelsBuilderData, ObjectTypesData, OembedData, PackageData, PartialViewData, PreviewData, ProfilingData, PropertyTypeData, PublishedCacheData, RedirectManagementData, RelationTypeData, RelationData, ScriptData, SearcherData, SecurityData, SegmentData, ServerData, StaticFileData, StylesheetData, TagData, TelemetryData, TemplateData, TemporaryFileData, UpgradeData, UserDataData, UserGroupData, UserData, WebhookData } from './models';
+import type { CultureData, DataTypeData, DictionaryData, DocumentBlueprintData, DocumentTypeData, DocumentVersionData, DocumentData, DynamicRootData, HealthCheckData, HelpData, ImagingData, IndexerData, InstallData, LanguageData, LogViewerData, ManifestData, MediaTypeData, MediaData, MemberGroupData, MemberTypeData, MemberData, ModelsBuilderData, ObjectTypesData, OembedData, PackageData, PartialViewData, PreviewData, ProfilingData, PropertyTypeData, PublishedCacheData, RedirectManagementData, RelationTypeData, RelationData, ScriptData, SearcherData, SecurityData, SegmentData, ServerData, StaticFileData, StylesheetData, TagData, TelemetryData, TemplateData, TemporaryFileData, UpgradeData, UserDataData, UserGroupData, UserData, WebhookData } from './models';
 
 export class CultureService {
 
@@ -2911,6 +2911,35 @@ baseUrl
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
+			},
+		});
+	}
+
+}
+
+export class ImagingService {
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getImagingResizeUrls(data: ImagingData['payloads']['GetImagingResizeUrls'] = {}): CancelablePromise<ImagingData['responses']['GetImagingResizeUrls']> {
+		const {
+                    
+                    id,
+height,
+width,
+mode
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/imaging/resize/urls',
+			query: {
+				id, height, width, mode
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -8653,6 +8682,21 @@ requestBody
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
 				403: `The authenticated user do not have access to this resource`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getUserCurrentLoginProviders(): CancelablePromise<UserData['responses']['GetUserCurrentLoginProviders']> {
+		
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/user/current/login-providers',
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
 			},
 		});
 	}

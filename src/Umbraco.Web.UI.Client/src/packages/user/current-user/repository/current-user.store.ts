@@ -17,7 +17,10 @@ export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 	#mfaProviders = new UmbArrayState<UmbCurrentUserMfaProviderModel>([], (e) => e.providerName);
 	readonly mfaProviders = this.#mfaProviders.asObservable();
 
-	#externalLoginProviders = new UmbArrayState<UmbCurrentUserExternalLoginProviderModel>([], (e) => e.providerName);
+	#externalLoginProviders = new UmbArrayState<UmbCurrentUserExternalLoginProviderModel>(
+		[],
+		(e) => e.providerSchemeName,
+	);
 	readonly externalLoginProviders = this.#externalLoginProviders.asObservable();
 
 	constructor(host: UmbControllerHost) {
@@ -98,7 +101,7 @@ export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 	}
 
 	updateExternalLoginProvider(data: Partial<UmbCurrentUserExternalLoginProviderModel>) {
-		this.#externalLoginProviders.updateOne(data.providerName, data);
+		this.#externalLoginProviders.updateOne(data.providerSchemeName, data);
 	}
 }
 

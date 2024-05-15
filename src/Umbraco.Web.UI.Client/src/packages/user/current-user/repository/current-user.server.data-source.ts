@@ -58,13 +58,7 @@ export class UmbCurrentUserServerDataSource {
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getExternalLoginProviders() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserService.getUserCurrentLogins());
-
-		if (data) {
-			return { data };
-		}
-
-		return { error };
+		return tryExecuteAndNotify(this.#host, UserService.getUserCurrentLoginProviders());
 	}
 
 	/**

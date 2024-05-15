@@ -2,8 +2,8 @@ import type {
 	ApiError,
 	CancelError,
 	DocumentPermissionPresentationModel,
-	LinkedLoginModel,
 	UnknownTypePermissionPresentationModel,
+	UserExternalLoginProviderModel,
 	UserTwoFactorProviderModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
@@ -26,7 +26,7 @@ export interface UmbCurrentUserModel {
 	userName: string;
 }
 
-export type UmbCurrentUserExternalLoginProviderModel = LinkedLoginModel;
+export type UmbCurrentUserExternalLoginProviderModel = UserExternalLoginProviderModel;
 
 export type UmbCurrentUserMfaProviderModel = UserTwoFactorProviderModel;
 
