@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
@@ -33,7 +34,7 @@ public class RemoveUsersFromUserGroupController : UserGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(CancellationToken cancellationToken, Guid id, Guid[] userIds)
+    public async Task<IActionResult> Update(CancellationToken cancellationToken, Guid id, ReferenceByIdModel[] userIds)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
@@ -46,7 +47,7 @@ public class RemoveUsersFromUserGroupController : UserGroupControllerBase
         }
 
         UserGroupOperationStatus result = await _userGroupService.RemoveUsersFromUserGroupAsync(
-            new UsersToUserGroupManipulationModel(id, userIds), CurrentUserKey(_backOfficeSecurityAccessor));
+            new UsersToUserGroupManipulationModel(id, userIds.Select(x => x.Id).ToArray()), CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result == UserGroupOperationStatus.Success
             ? Ok()
