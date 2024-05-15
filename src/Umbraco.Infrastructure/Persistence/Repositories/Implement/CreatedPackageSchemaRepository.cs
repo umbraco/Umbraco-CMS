@@ -605,15 +605,15 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     {
         var contentTypes = new HashSet<IContentType>();
         var docTypesXml = new XElement("DocumentTypes");
-        foreach (var dtId in definition.DocumentTypes)
+        foreach (var documentTypeIdentifierString in definition.DocumentTypes)
         {
-            if (!int.TryParse(dtId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+            if (Guid.TryParse(documentTypeIdentifierString, out Guid documentTypeKey) is false)
             {
                 continue;
             }
 
-            IContentType? contentType = _contentTypeService.Get(outInt);
-            if (contentType == null)
+            IContentType? contentType = _contentTypeService.Get(documentTypeKey);
+            if (contentType is null)
             {
                 continue;
             }
@@ -660,33 +660,34 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private void PackageDocumentsAndTags(PackageDefinition definition, XContainer root)
     {
         // Documents and tags
-        if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(
-                definition.ContentNodeId,
-                NumberStyles.Integer,
-                CultureInfo.InvariantCulture,
-                out var contentNodeId))
+        if (string.IsNullOrWhiteSpace(definition.ContentNodeId))
         {
-            if (contentNodeId > 0)
-            {
-                // load content from umbraco.
-                IContent? content = _contentService.GetById(contentNodeId);
-                if (content != null)
-                {
-                    XElement contentXml = definition.ContentLoadChildNodes
-                        ? content.ToDeepXml(_serializer)
-                        : content.ToXml(_serializer);
-
-                    // Create the Documents/DocumentSet node
-                    root.Add(
-                        new XElement(
-                            "Documents",
-                            new XElement(
-                                "DocumentSet",
-                                new XAttribute("importMode", "root"),
-                                contentXml)));
-                }
-            }
+            return;
         }
+
+        if (Guid.TryParse(definition.ContentNodeId, out Guid contentNodeKey) is false)
+        {
+            return;
+        }
+
+        IContent? content = _contentService.GetById(contentNodeKey);
+        if (content is null)
+        {
+            return;
+        }
+
+        XElement contentXml = definition.ContentLoadChildNodes
+            ? content.ToDeepXml(_serializer)
+            : content.ToXml(_serializer);
+
+        // Create the Documents/DocumentSet node
+        root.Add(
+            new XElement(
+                "Documents",
+                new XElement(
+                    "DocumentSet",
+                    new XAttribute("importMode", "root"),
+                    contentXml)));
     }
 
     private Dictionary<string, Stream> PackageMedia(PackageDefinition definition, XElement root)
