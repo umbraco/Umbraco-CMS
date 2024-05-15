@@ -116,6 +116,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Content node not found")
                 .WithDetail("The specified content node was not found.")
                 .Build()),
+            UserOperationStatus.NodeNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("Node not found")
+                .WithDetail("The specified node was not found.")
+                .Build()),
             UserOperationStatus.NotInInviteState => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid user state")
                 .WithDetail("The target user is not in the invite state.")
