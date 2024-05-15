@@ -1,6 +1,5 @@
 export const umbracoColors = [
 	{ alias: 'text', varName: '--uui-color-text' },
-	{ alias: 'black', varName: '--uui-color-text' },
 	{ alias: 'yellow', varName: '--uui-palette-sunglow' },
 	{ alias: 'pink', varName: '--uui-palette-spanish-pink' },
 	{ alias: 'blue', varName: '--uui-palette-violet-blue' },
@@ -10,6 +9,7 @@ export const umbracoColors = [
 	{ alias: 'brown', varName: '--uui-palette-chamoisee' },
 	{ alias: 'grey', varName: '--uui-palette-dusty-grey' },
 
+	{ alias: 'black', legacy: true, varName: '--uui-color-text' },
 	{ alias: 'blue-grey', legacy: true, varName: '--uui-palette-dusty-grey' },
 	{ alias: 'indigo', legacy: true, varName: '--uui-palette-malibu' },
 	{ alias: 'purple', legacy: true, varName: '--uui-palette-space-cadet' },
