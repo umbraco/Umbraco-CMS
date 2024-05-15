@@ -25,7 +25,9 @@ public class SecuritySettings
 
     internal const int StaticMemberDefaultLockoutTimeInMinutes = 30 * 24 * 60;
     internal const int StaticUserDefaultLockoutTimeInMinutes = 30 * 24 * 60;
-    internal const string StaticAuthorizeCallbackPathName = "/umbraco";
+    internal const string StaticAuthorizeCallbackPathName = "/umbraco/oauth_complete";
+    internal const string StaticAuthorizeCallbackLogoutPathName = "/umbraco/logout";
+    internal const string StaticAuthorizeCallbackErrorPathName = "/umbraco/error";
 
     /// <summary>
     ///     Gets or sets a value indicating whether to keep the user logged in.
@@ -112,8 +114,20 @@ public class SecuritySettings
     public Uri? BackOfficeHost { get; set; }
 
     /// <summary>
-    ///     The path to use for authorization callback. Will be appended to the BackOfficeHost.
+    ///     Gets or sets the path to use for authorization callback. Will be appended to the BackOfficeHost.
     /// </summary>
     [DefaultValue(StaticAuthorizeCallbackPathName)]
     public string AuthorizeCallbackPathName { get; set; } = StaticAuthorizeCallbackPathName;
+
+    /// <summary>
+    ///     Gets or sets the path to use for authorization callback logout. Will be appended to the BackOfficeHost.
+    /// </summary>
+    [DefaultValue(StaticAuthorizeCallbackLogoutPathName)]
+    public string AuthorizeCallbackLogoutPathName { get; set; } = StaticAuthorizeCallbackLogoutPathName;
+
+    /// <summary>
+    ///     Gets or sets the path to use for authorization callback error. Will be appended to the BackOfficeHost.
+    /// </summary>
+    [DefaultValue(StaticAuthorizeCallbackErrorPathName)]
+    public string AuthorizeCallbackErrorPathName { get; set; } = StaticAuthorizeCallbackErrorPathName;
 }

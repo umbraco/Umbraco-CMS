@@ -27,6 +27,11 @@ public class ItemMediaTypeItemController : MediaTypeItemControllerBase
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
+        if (ids.Count is 0)
+        {
+            return Ok(Enumerable.Empty<MediaTypeItemResponseModel>());
+        }
+
         IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetAll(ids);
         List<MediaTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IMediaType, MediaTypeItemResponseModel>(mediaTypes);
         return await Task.FromResult(Ok(responseModels));

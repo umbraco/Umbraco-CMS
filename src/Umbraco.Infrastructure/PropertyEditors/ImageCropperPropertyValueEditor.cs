@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
@@ -131,7 +130,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             currentPath = _mediaFileManager.FileSystem.GetRelativePath(currentPath);
         }
 
-        ImageCropperValue? editorImageCropperValue = TryParseImageCropperValue(editorValue.Value);
+        ImageCropperValue? editorImageCropperValue = ParseImageCropperValue(editorValue.Value);
 
         // ensure we have the required guids
         Guid contentKey = editorValue.ContentKey;
@@ -149,7 +148,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         using IScope scope = _scopeProvider.CreateScope();
 
         TemporaryFileModel? file = null;
-        Guid? temporaryFileKey = TryParseTemporaryFileKey(editorImageCropperValue);
+        Guid? temporaryFileKey = editorImageCropperValue?.TemporaryFileId;
         if (temporaryFileKey.HasValue)
         {
             file = TryGetTemporaryFile(temporaryFileKey.Value);
@@ -196,6 +195,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         }
 
         editorImageCropperValue.Src = filepath is null ? string.Empty : _mediaFileManager.FileSystem.GetUrl(filepath);
+        editorImageCropperValue.TemporaryFileId = null;
         return _jsonSerializer.Serialize(editorImageCropperValue);
     }
 
@@ -220,40 +220,20 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         return _jsonSerializer.Serialize(new { src = val, crops });
     }
 
-    private ImageCropperValue? TryParseImageCropperValue(object? editorValue)
+    private ImageCropperValue? ParseImageCropperValue(object? editorValue)
     {
-        try
+        if (editorValue is null)
         {
-            if (editorValue is null ||
-                _jsonSerializer.TryDeserialize(editorValue, out ImageCropperValue? imageCropperValue) is false)
-            {
-                return null;
-            }
-
-            imageCropperValue.Prune();
-            return imageCropperValue;
-        }
-        catch (Exception ex)
-        {
-            // For some reason the value is invalid - log error and continue as if no value was saved
-            _logger.LogWarning(ex, "Could not parse editor value to an ImageCropperValue object.");
+            return null;
         }
 
-        return null;
+        return _jsonSerializer.TryDeserialize(editorValue, out ImageCropperValue? imageCropperValue)
+            ? imageCropperValue
+            : throw new ArgumentException($"Could not parse editor value to a {nameof(ImageCropperValue)} object.");
     }
 
     private Guid? TryParseTemporaryFileKey(object? editorValue)
-    {
-        ImageCropperValue? imageCropperValue = TryParseImageCropperValue(editorValue);
-        return imageCropperValue != null
-            ? TryParseTemporaryFileKey(imageCropperValue)
-            : null;
-    }
-
-    private Guid? TryParseTemporaryFileKey(ImageCropperValue? editorValue)
-        => Guid.TryParse(editorValue?.Src, out Guid temporaryFileKey)
-            ? temporaryFileKey
-            : null;
+        => ParseImageCropperValue(editorValue)?.TemporaryFileId;
 
     private TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
         => _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
