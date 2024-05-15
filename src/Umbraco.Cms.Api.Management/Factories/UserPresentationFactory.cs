@@ -70,7 +70,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             CreateDate = user.CreateDate,
             UpdateDate = user.UpdateDate,
             State = user.UserState,
-            UserGroupIds = new HashSet<Guid>(user.Groups.Select(x => x.Key)),
+            UserGroupIds = new HashSet<ReferenceByIdModel>(user.Groups.Select(x => new ReferenceByIdModel(x.Key))),
             DocumentStartNodeIds = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
             HasDocumentRootAccess = HasRootAccess(user.StartContentIds),
             MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
@@ -102,7 +102,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Email = requestModel.Email,
             Name = requestModel.Name,
             UserName = requestModel.UserName,
-            UserGroupKeys = requestModel.UserGroupIds,
+            UserGroupKeys = requestModel.UserGroupIds.Select(x => x.Id).ToHashSet(),
         };
 
         return await Task.FromResult(createModel);
@@ -115,7 +115,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Email = requestModel.Email,
             Name = requestModel.Name,
             UserName = requestModel.UserName,
-            UserGroupKeys = requestModel.UserGroupIds,
+            UserGroupKeys = requestModel.UserGroupIds.Select(x => x.Id).ToHashSet(),
             Message = requestModel.Message,
         };
 
@@ -165,10 +165,10 @@ public class UserPresentationFactory : IUserPresentationFactory
             ContentStartNodeKeys = updateModel.DocumentStartNodeIds.Select(x => x.Id).ToHashSet(),
             HasContentRootAccess = updateModel.HasDocumentRootAccess,
             MediaStartNodeKeys = updateModel.MediaStartNodeIds.Select(x => x.Id).ToHashSet(),
-            HasMediaRootAccess = updateModel.HasMediaRootAccess
+            HasMediaRootAccess = updateModel.HasMediaRootAccess,
         };
 
-        model.UserGroupKeys = updateModel.UserGroupIds;
+        model.UserGroupKeys = updateModel.UserGroupIds.Select(x => x.Id).ToHashSet();
 
         return await Task.FromResult(model);
     }
