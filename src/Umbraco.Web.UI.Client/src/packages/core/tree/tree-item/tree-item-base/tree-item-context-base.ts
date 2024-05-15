@@ -339,9 +339,8 @@ export abstract class UmbTreeItemContextBase<
 		It does not look like there is a way to have a "dynamic" parent context that will stop when a
 		specific parent is reached (a tree item unique that matches the parentUnique of this item) */
 		const treeItem = this.getTreeItem();
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		const parentUnique = treeItem?.parentUnique;
+		const parentUnique = treeItem?.parent.unique;
+
 		const customEvent = new CustomEvent('temp-reload-tree-item-parent', {
 			detail: { unique: parentUnique },
 			bubbles: true,
