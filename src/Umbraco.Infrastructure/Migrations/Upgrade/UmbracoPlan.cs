@@ -81,5 +81,6 @@ public class UmbracoPlan : MigrationPlan
         To<V_14_0_0.MigrateUserGroup2PermissionPermissionColumnType>("{8184E61D-ECBA-4AAA-B61B-D7A82EB82EB7}");
         To<V_14_0_0.MigrateNotificationCharsToStrings>("{E261BF01-2C7F-4544-BAE7-49D545B21D68}");
         To<V_14_0_0.AddEditorUiToDataType>("{5A2EF07D-37B4-49D5-8E9B-3ED01877263B}");
+        To<V_14_0_0.CleanUpDataTypeConfigurations>("{827360CA-0855-42A5-8F86-A51F168CB559}");
     }
 }
