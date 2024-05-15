@@ -27,17 +27,19 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 		this._overlaySize = config?.getValueByAlias('overlaySize') ?? undefined;
 	}
 
-	#onChange(e: Event) {
-		this.value = (e.target as UmbInputMarkdownElement).value as string;
+	#onChange(event: Event & { target: UmbInputMarkdownElement }) {
+		this.value = event.target.value as string;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<umb-input-markdown
-			?preview=${this._preview}
-			.overlaySize=${this._overlaySize}
-			@change=${this.#onChange}
-			.value=${this.value}></umb-input-markdown>`;
+		return html`
+			<umb-input-markdown
+				value=${this.value}
+				.overlaySize=${this._overlaySize}
+				?preview=${this._preview}
+				@change=${this.#onChange}></umb-input-markdown>
+		`;
 	}
 }
 

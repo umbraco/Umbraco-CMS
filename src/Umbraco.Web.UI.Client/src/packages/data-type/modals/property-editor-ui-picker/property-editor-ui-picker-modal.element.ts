@@ -84,7 +84,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 
 	render() {
 		return html`
-			<umb-body-layout headline="Select Property Editor UI">
+			<umb-body-layout headline=${this.localize.term('propertyEditorPicker_openPropertyEditorPicker')}>
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
