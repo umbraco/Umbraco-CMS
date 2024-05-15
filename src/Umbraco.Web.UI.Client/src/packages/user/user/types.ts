@@ -24,7 +24,7 @@ export interface UmbUserDetailModel {
 	state: UmbUserStateEnum | null;
 	unique: string;
 	updateDate: string | null;
-	userGroupUniques: Array<string>;
+	userGroupUniques: Array<UmbReferenceByUnique>;
 	userName: string;
 }
 

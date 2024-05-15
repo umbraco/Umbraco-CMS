@@ -403,7 +403,7 @@ export type CreateUserRequestModel = {
         email: string
 userName: string
 name: string
-userGroupIds: Array<string>
+userGroupIds: Array<ReferenceByIdModel>
 id?: string | null
     };
 
@@ -1030,7 +1030,7 @@ export type InviteUserRequestModel = {
         email: string
 userName: string
 name: string
-userGroupIds: Array<string>
+userGroupIds: Array<ReferenceByIdModel>
 id?: string | null
 message?: string | null
     };
@@ -2534,7 +2534,7 @@ export type UpdateUserRequestModel = {
         email: string
 userName: string
 name: string
-userGroupIds: Array<string>
+userGroupIds: Array<ReferenceByIdModel>
 languageIsoCode: string
 documentStartNodeIds: Array<ReferenceByIdModel>
 hasDocumentRootAccess: boolean
@@ -2647,7 +2647,7 @@ export type UserResponseModel = {
         email: string
 userName: string
 name: string
-userGroupIds: Array<string>
+userGroupIds: Array<ReferenceByIdModel>
 id: string
 languageIsoCode?: string | null
 documentStartNodeIds: Array<ReferenceByIdModel>
