@@ -20,6 +20,7 @@ export const manifests: Array<ManifestTypes> = [
 						alias: 'blockGroups',
 						label: '',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockTypeGroupConfiguration',
+						weight: 1,
 					},
 					{
 						alias: 'useLiveEditing',
