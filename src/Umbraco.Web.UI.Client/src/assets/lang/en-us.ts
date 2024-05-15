@@ -1247,8 +1247,8 @@ export default {
 		openMediaPicker: 'Open media picker',
 	},
 	propertyEditorPicker: {
-		title: 'Select Property Editor',
-		openPropertyEditorPicker: 'Select Property Editor',
+		title: 'Select a property editor',
+		openPropertyEditorPicker: 'Select a property editor UI',
 	},
 	relatedlinks: {
 		enterExternal: 'enter external link',

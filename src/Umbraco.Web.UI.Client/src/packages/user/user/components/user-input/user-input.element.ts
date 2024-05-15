@@ -135,8 +135,8 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			<uui-button
 				id="btn-add"
 				look="placeholder"
-				@click=${this.#openPicker}
-				label="${this.localize.term('general_choose')}"></uui-button>
+				label=${this.localize.term('general_choose')}
+				@click=${this.#openPicker}></uui-button>
 		`;
 	}
 
