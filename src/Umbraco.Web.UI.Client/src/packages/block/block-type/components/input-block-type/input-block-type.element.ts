@@ -7,7 +7,10 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
-import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/document-type';
+import {
+	UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT,
+	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/document-type';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 /** TODO: Look into sending a "change" event when there is a change, rather than create, delete, and change event. Make sure it doesn't break move for RTE/List/Grid. [LI] */
@@ -123,10 +126,13 @@ export class UmbInputBlockTypeElement<
 	}
 
 	async #onRequestDelete(item: BlockType) {
+		const store = await this.getContext(UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT);
+		const contentType = store.getItems([item.contentElementTypeKey]);
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `Remove [TODO: Get name]?`,
-			content: 'Are you sure you want to remove this block type?',
+			headline: `Remove ${contentType[0]?.name}?`,
+			// TODO: Translations: [NL]
+			content: 'Are you sure you want to remove this Block Type Configuration?',
 			confirmLabel: 'Remove',
 		});
 		this.deleteItem(item.contentElementTypeKey);
