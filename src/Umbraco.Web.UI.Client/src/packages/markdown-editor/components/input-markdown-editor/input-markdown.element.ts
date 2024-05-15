@@ -51,7 +51,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 	_codeEditor?: UmbCodeEditorElement;
 
 	@state()
-	_customActions: Array<monaco.editor.IActionDescriptor> = [];
+	_actionExtensions: Array<monaco.editor.IActionDescriptor> = [];
 
 	private _modalContext?: UmbModalManagerContext;
 
@@ -84,6 +84,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 
 			this.#isCodeEditorReady.setValue(true);
 
+			// TODO: make all action into extensions
 			this.observe(umbExtensionsRegistry.byType('monacoMarkdownEditorAction'), (manifests) => {
 				manifests.forEach(async (manifest) => {
 					const api = await createExtensionApi(this, manifest, [this]);
@@ -94,8 +95,8 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 						run: async () => await api.execute({ editor: this.#editor }),
 					};
 					this.#editor?.monacoEditor?.addAction(action);
-					this._customActions.push(action);
-					this.requestUpdate('_customActions');
+					this._actionExtensions.push(action);
+					this.requestUpdate('_actionExtensions');
 				});
 			});
 
@@ -200,8 +201,8 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 
 	#onActionClick(event: any, action: monaco.editor.IActionDescriptor) {
 		event.stopPropagation();
-		const blah = this.#editor?.monacoEditor?.getAction(action.id);
-		debugger;
+		const hasAction = this.#editor?.monacoEditor?.getAction(action.id);
+		if (!hasAction) throw new Error(`Action ${action.id} not found in the editor.`);
 		this.#editor?.monacoEditor?.getAction(action.id)?.run();
 	}
 
@@ -480,7 +481,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 					<uui-icon name="icon-picture"></uui-icon>
 				</uui-button>
 
-				${this._customActions.map(
+				${this._actionExtensions.map(
 					(action) => html`
 						<uui-button
 							compact
