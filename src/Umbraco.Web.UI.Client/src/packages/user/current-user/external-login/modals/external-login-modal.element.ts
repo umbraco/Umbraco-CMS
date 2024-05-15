@@ -12,7 +12,6 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 type UmbExternalLoginProviderOption = UmbCurrentUserExternalLoginProviderModel & {
 	displayName: string;
 	icon?: string;
-	isEnabledOnUser: boolean;
 };
 
 @customElement('umb-current-user-external-login-modal')
@@ -51,13 +50,14 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 						(serverLoginProvider) => serverLoginProvider.providerSchemeName === manifestLoginProvider.forProviderName,
 					);
 					return {
-						isEnabledOnUser: !!serverLoginProvider,
-						icon: manifestLoginProvider.meta?.defaultView?.icon,
+						hasManualLinkingEnabled: serverLoginProvider?.hasManualLinkingEnabled ?? false,
+						isLinkedOnUser: serverLoginProvider?.isLinkedOnUser ?? false,
 						providerKey: serverLoginProvider?.providerKey ?? '',
-						providerName: manifestLoginProvider.forProviderName,
+						providerSchemeName: manifestLoginProvider.forProviderName,
+						icon: manifestLoginProvider.meta?.defaultView?.icon,
 						displayName:
 							manifestLoginProvider.meta?.label ?? manifestLoginProvider.forProviderName ?? manifestLoginProvider.name,
-					};
+					} satisfies UmbExternalLoginProviderOption;
 				});
 
 				return providers;
@@ -81,15 +81,10 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 		return html`
 			<umb-body-layout headline="${this.localize.term('defaultdialogs_externalLoginProviders')}">
 				<div id="main">
-					${when(
-						this._items.length > 0,
-						() => html`
-							${repeat(
-								this._items,
-								(item) => item.providerName,
-								(item) => this.#renderProvider(item),
-							)}
-						`,
+					${repeat(
+						this._items,
+						(item) => item.providerSchemeName,
+						(item) => this.#renderProvider(item),
 					)}
 				</div>
 				<div slot="actions">
@@ -110,7 +105,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 					${this.localize.string(item.displayName)}
 				</div>
 				${when(
-					item.isEnabledOnUser,
+					item.isLinkedOnUser,
 					() => html`
 						<p style="margin-top:0">
 							<umb-localize key="defaultdialogs_linkedToService">Your account is linked to this service</umb-localize>
@@ -154,7 +149,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 				color: 'positive',
 			});
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
-			authContext.linkLogin(item.providerName);
+			authContext.linkLogin(item.providerSchemeName);
 		} catch (error) {
 			if (error instanceof Error) {
 				this.#notificationContext?.peek('danger', {
@@ -177,7 +172,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 				color: 'danger',
 			});
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
-			authContext.unlinkLogin(item.providerName, item.providerKey);
+			authContext.unlinkLogin(item.providerSchemeName, item.providerKey);
 		} catch (error) {
 			if (error instanceof Error) {
 				this.#notificationContext?.peek('danger', {
