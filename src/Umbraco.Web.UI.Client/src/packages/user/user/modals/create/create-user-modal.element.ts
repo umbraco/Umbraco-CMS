@@ -4,7 +4,7 @@ import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-grou
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-create-user-modal')
 export class UmbCreateUserModalElement extends UmbModalBaseElement {

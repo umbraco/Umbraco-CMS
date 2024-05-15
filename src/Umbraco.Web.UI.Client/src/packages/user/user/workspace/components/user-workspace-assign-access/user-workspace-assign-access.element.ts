@@ -7,7 +7,7 @@ import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 const elementName = 'umb-user-workspace-assign-access';
 @customElement(elementName)
