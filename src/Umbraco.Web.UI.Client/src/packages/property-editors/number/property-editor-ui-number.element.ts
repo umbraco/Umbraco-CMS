@@ -18,11 +18,15 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 	@state()
 	private _step?: number;
 
+	@state()
+	private _placeholder?: string;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		this._min = this.#parseInt(config.getValueByAlias('min'));
 		this._max = this.#parseInt(config.getValueByAlias('max'));
 		this._step = this.#parseInt(config.getValueByAlias('step'));
+		this._placeholder = config.getValueByAlias('placeholder');
 	}
 
 	#parseInt(input: unknown): number | undefined {
@@ -42,7 +46,8 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 				min=${ifDefined(this._min)}
 				max=${ifDefined(this._max)}
 				step=${ifDefined(this._step)}
-				.value=${this.value ?? 0}
+				placeholder=${ifDefined(this._placeholder)}
+				.value=${this.value ?? (this._placeholder ? undefined : 0)}
 				@input=${this.#onInput}>
 			</uui-input>
 		`;
