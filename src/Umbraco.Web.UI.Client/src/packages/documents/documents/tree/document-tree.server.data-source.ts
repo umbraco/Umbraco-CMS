@@ -18,7 +18,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  */
 export class UmbDocumentTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	DocumentTreeItemResponseModel,
-	UmbDocumentTreeItemModel
+	UmbDocumentTreeItemModel,
+	UmbDocumentTreeRootItemsRequestArgs,
+	UmbDocumentTreeChildrenOfRequestArgs
 > {
 	/**
 	 * Creates an instance of UmbDocumentTreeServerDataSource.
