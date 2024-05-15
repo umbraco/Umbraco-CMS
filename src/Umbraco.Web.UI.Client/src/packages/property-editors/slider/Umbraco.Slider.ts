@@ -12,13 +12,13 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'minVal',
 					label: 'Minimum value',
 					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 				},
 				{
 					alias: 'maxVal',
 					label: 'Maximum value',
 					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 				},
 			],
 			defaultData: [

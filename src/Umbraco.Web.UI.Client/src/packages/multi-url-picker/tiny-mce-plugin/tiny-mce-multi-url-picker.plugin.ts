@@ -1,6 +1,8 @@
-import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
-import type { UmbLinkPickerModalValue, UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
-import { UMB_LINK_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbLinkPickerModalValue } from '../link-picker-modal/link-picker-modal.token.js';
+import { UMB_LINK_PICKER_MODAL } from '../link-picker-modal/link-picker-modal.token.js';
+import type { UmbLinkPickerLink } from '../link-picker-modal/types.js';
+import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 type AnchorElementAttributes = {
 	href?: string | null;
@@ -11,7 +13,7 @@ type AnchorElementAttributes = {
 	text?: string;
 };
 
-export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
+export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase {
 	#linkPickerData?: UmbLinkPickerModalValue;
 
 	#anchorElement?: HTMLAnchorElement;
