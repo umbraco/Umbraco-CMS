@@ -86,7 +86,7 @@ export class UmbAppElement extends UmbLitElement {
 						: this.localize.term('errors_externalLoginFailed');
 
 					this.observe(this.#authContext.authorizationSignal, () => {
-						window.location.href = '/';
+						history.replaceState(null, '', '');
 					});
 				}
 
