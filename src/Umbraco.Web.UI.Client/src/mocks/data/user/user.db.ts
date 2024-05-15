@@ -38,7 +38,8 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 	 * @memberof UmbUserData
 	 */
 	setUserGroups(data: UpdateUserGroupsOnUserRequestModel): void {
-		const users = this.data.filter((user) => data.userIds?.includes(user.id ?? ''));
+		const users = this.data.filter((user) => data.userIds?.map((reference) => reference.id).includes(user.id));
+
 		users.forEach((user) => {
 			user.userGroupIds = data.userGroupIds;
 		});
@@ -209,7 +210,7 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		lastLoginDate: null,
 		lastLockoutDate: null,
 		lastPasswordChangeDate: null,
-		isAdmin: item.userGroupIds.includes(umbUserGroupMockDb.getAll()[0].id),
+		isAdmin: item.userGroupIds.map((reference) => reference.id).includes(umbUserGroupMockDb.getAll()[0].id),
 	};
 };
 
