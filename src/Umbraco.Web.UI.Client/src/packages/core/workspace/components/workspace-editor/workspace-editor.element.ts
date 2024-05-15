@@ -1,11 +1,10 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
-import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { createExtensionElement, UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 
 /**
  * @element umb-workspace-editor
@@ -92,14 +91,15 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				<slot name="action-menu" slot="action-menu"></slot>
 				${this.#renderRoutes()}
 				<slot></slot>
-				${this.enforceNoFooter
-					? ''
-					: html`
-							<umb-workspace-footer slot="footer">
-								<slot name="footer-info"></slot>
-								<slot name="actions" slot="actions"></slot>
-							</umb-workspace-footer>
-						`}
+				${when(
+					!this.enforceNoFooter,
+					() => html`
+						<umb-workspace-footer slot="footer">
+							<slot name="footer-info"></slot>
+							<slot name="actions" slot="actions"></slot>
+						</umb-workspace-footer>
+					`,
+				)}
 			</umb-body-layout>
 		`;
 	}
@@ -114,10 +114,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 								(view) => view.alias,
 								(view) => html`
 									<uui-tab
-										.label="${view.meta.label ? this.localize.string(view.meta.label) : view.name}"
 										href="${this._routerPath}/view/${view.meta.pathname}"
-										?active="${'view/' + view.meta.pathname === this._activePath}">
-										<umb-icon slot="icon" name="${view.meta.icon}"></umb-icon>
+										.label="${view.meta.label ? this.localize.string(view.meta.label) : view.name}"
+										?active=${'view/' + view.meta.pathname === this._activePath}>
+										<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>
 										${view.meta.label ? this.localize.string(view.meta.label) : view.name}
 									</uui-tab>
 								`,
@@ -132,8 +132,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		if (!this.backPath) return nothing;
 		return html`
 			<uui-button
-				class="back-button"
 				slot="header"
+				class="back-button"
 				compact
 				href=${this.backPath}
 				label=${this.localize.term('general_back')}>
@@ -143,20 +143,17 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRoutes() {
+		if (!this._routes || this._routes.length === 0) return nothing;
 		return html`
-			${this._routes && this._routes.length > 0
-				? html`
-						<umb-router-slot
-							id="router-slot"
-							.routes="${this._routes}"
-							@init=${(event: UmbRouterSlotInitEvent) => {
-								this._routerPath = event.target.absoluteRouterPath;
-							}}
-							@change=${(event: UmbRouterSlotChangeEvent) => {
-								this._activePath = event.target.localActiveViewPath;
-							}}></umb-router-slot>
-					`
-				: nothing}
+			<umb-router-slot
+				id="router-slot"
+				.routes=${this._routes}
+				@init=${(event: UmbRouterSlotInitEvent) => {
+					this._routerPath = event.target.absoluteRouterPath;
+				}}
+				@change=${(event: UmbRouterSlotChangeEvent) => {
+					this._activePath = event.target.localActiveViewPath;
+				}}></umb-router-slot>
 		`;
 	}
 

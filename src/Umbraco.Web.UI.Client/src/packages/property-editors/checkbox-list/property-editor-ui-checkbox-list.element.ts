@@ -12,26 +12,38 @@ import './components/input-checkbox-list/input-checkbox-list.element.js';
  */
 @customElement('umb-property-editor-ui-checkbox-list')
 export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	#value: Array<string> = [];
+	#selection: Array<string> = [];
+
 	@property({ type: Array })
-	public set value(value: Array<string>) {
-		this.#value = value ?? [];
+	public set value(value: Array<string> | string | undefined) {
+		this.#selection = Array.isArray(value) ? value : value ? [value] : [];
 	}
-	public get value(): Array<string> {
-		return this.#value;
+	public get value(): Array<string> | undefined {
+		return this.#selection;
 	}
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		const listData: string[] | undefined = config?.getValueByAlias('items');
-		this._list = listData?.map((item) => ({ label: item, value: item, checked: this.#value.includes(item) })) ?? [];
+		if (!config) return;
+
+		const items = config.getValueByAlias('items');
+
+		if (Array.isArray(items) && items.length > 0) {
+			this._list =
+				typeof items[0] === 'string'
+					? items.map((item) => ({ label: item, value: item, checked: this.#selection.includes(item) }))
+					: items.map((item) => ({
+							label: item.name,
+							value: item.value,
+							checked: this.#selection.includes(item.value),
+						}));
+		}
 	}
 
 	@state()
 	private _list: UmbInputCheckboxListElement['list'] = [];
 
-	#onChange(event: CustomEvent) {
-		const element = event.target as UmbInputCheckboxListElement;
-		this.value = element.selection;
+	#onChange(event: CustomEvent & { target: UmbInputCheckboxListElement }) {
+		this.value = event.target.selection;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -39,7 +51,7 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 		return html`
 			<umb-input-checkbox-list
 				.list=${this._list}
-				.selection=${this.#value}
+				.selection=${this.#selection}
 				@change=${this.#onChange}></umb-input-checkbox-list>
 		`;
 	}

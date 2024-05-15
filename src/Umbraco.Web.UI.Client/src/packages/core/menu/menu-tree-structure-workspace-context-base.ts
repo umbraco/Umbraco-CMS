@@ -1,9 +1,9 @@
 import type { UmbStructureItemModel } from './types.js';
-import type { UmbTreeRepository, UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeRepository, UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
@@ -16,6 +16,9 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 
 	#structure = new UmbArrayState<UmbStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
+
+	#parent = new UmbObjectState<UmbStructureItemModel | undefined>(undefined);
+	public readonly parent = this.#parent.asObservable();
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		// TODO: set up context token
@@ -36,9 +39,10 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	async #requestStructure() {
 		let structureItems: Array<UmbStructureItemModel> = [];
 
-		const treeRepository = await createExtensionApiByAlias<
-			UmbTreeRepository<UmbUniqueTreeItemModel, UmbUniqueTreeRootModel>
-		>(this, this.#args.treeRepositoryAlias);
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbTreeItemModel, UmbTreeRootModel>>(
+			this,
+			this.#args.treeRepositoryAlias,
+		);
 
 		const { data: root } = await treeRepository.requestTreeRoot();
 
@@ -55,11 +59,15 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew ? this.#workspaceContext?.parentUnique : this.#workspaceContext?.unique;
+		const entityTypeObservable = isNew ? this.#workspaceContext?.parentEntityType : this.#workspaceContext?.entityType;
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
 		if (!unique) throw new Error('Unique is not available');
 
-		const { data } = await treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
+		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
+		if (!entityType) throw new Error('Entity type is not available');
+
+		const { data } = await treeRepository.requestTreeItemAncestors({ treeItem: { unique, entityType } });
 
 		if (data) {
 			const ancestorItems = data.map((treeItem) => {
@@ -70,9 +78,12 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 					isFolder: treeItem.isFolder,
 				};
 			});
+
 			structureItems.push(...ancestorItems);
 		}
 
+		const parent = structureItems[structureItems.length - 2];
+		this.#parent.setValue(parent);
 		this.#structure.setValue(structureItems);
 	}
 }

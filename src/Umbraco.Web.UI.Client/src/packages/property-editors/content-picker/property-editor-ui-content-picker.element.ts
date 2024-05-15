@@ -1,12 +1,16 @@
 import { UmbContentPickerDynamicRootRepository } from './dynamic-root/repository/index.js';
 import type { UmbInputContentElement } from './components/input-content/index.js';
-import type { UmbContentPickerSource } from './types.js';
+import type { UmbContentPickerSource, UmbContentPickerSourceType } from './types.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
+import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
+import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
+import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 // import of local component
 import './components/input-content/index.js';
@@ -20,66 +24,78 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	value: UmbInputContentElement['items'] = [];
 
 	@state()
-	type: UmbContentPickerSource['type'] = 'content';
+	_type: UmbContentPickerSource['type'] = 'content';
 
 	@state()
-	startNodeId?: string | null;
+	_min = 0;
 
 	@state()
-	min = 0;
+	_max = Infinity;
 
 	@state()
-	max = Infinity;
+	_allowedContentTypeUniques?: string | null;
 
 	@state()
-	allowedContentTypeIds?: string | null;
+	_showOpenButton?: boolean;
 
 	@state()
-	showOpenButton?: boolean;
+	_ignoreUserStartNodes?: boolean;
 
 	@state()
-	ignoreUserStartNodes?: boolean;
+	_rootUnique?: string | null;
+
+	@state()
+	_rootEntityType?: string;
 
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
-
 	#dynamicRootRepository = new UmbContentPickerDynamicRootRepository(this);
+
+	#entityTypeDictionary: { [type in UmbContentPickerSourceType]: string } = {
+		content: UMB_DOCUMENT_ENTITY_TYPE,
+		media: UMB_MEDIA_ENTITY_TYPE,
+		member: UMB_MEMBER_ENTITY_TYPE,
+	};
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
 		const startNode = config.getValueByAlias<UmbContentPickerSource>('startNode');
 		if (startNode) {
-			this.type = startNode.type;
-			this.startNodeId = startNode.id;
+			this._type = startNode.type;
+			this._rootUnique = startNode.id;
+			this._rootEntityType = this.#entityTypeDictionary[startNode.type];
 			this.#dynamicRoot = startNode.dynamicRoot;
 		}
 
-		this.min = Number(config.getValueByAlias('minNumber')) || 0;
-		this.max = Number(config.getValueByAlias('maxNumber')) || Infinity;
+		this._min = Number(config.getValueByAlias('minNumber')) || 0;
+		this._max = Number(config.getValueByAlias('maxNumber')) || Infinity;
 
-		this.allowedContentTypeIds = config.getValueByAlias('filter');
-		this.showOpenButton = config.getValueByAlias('showOpenButton');
-		this.ignoreUserStartNodes = config.getValueByAlias('ignoreUserStartNodes');
+		this._allowedContentTypeUniques = config.getValueByAlias('filter');
+		this._showOpenButton = config.getValueByAlias('showOpenButton');
+		this._ignoreUserStartNodes = config.getValueByAlias('ignoreUserStartNodes');
 	}
 
 	connectedCallback() {
 		super.connectedCallback();
-
-		this.#setStartNodeId();
+		this.#setPickerRootUnique();
 	}
 
-	async #setStartNodeId() {
-		if (this.startNodeId) return;
+	async #setPickerRootUnique() {
+		// If we have a root unique value, we don't need to fetch it from the dynamic root
+		if (this._rootUnique) return;
+		if (!this.#dynamicRoot) return;
 
-		// TODO: Awaiting the workspace context to have a parent entity ID value. [LK]
-		// e.g. const parentEntityId = this.#workspaceContext?.getParentEntityId();
 		const workspaceContext = await this.getContext(UMB_ENTITY_WORKSPACE_CONTEXT);
 		const unique = workspaceContext.getUnique();
-		if (unique && this.#dynamicRoot) {
-			const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique);
-			if (result && result.length > 0) {
-				this.startNodeId = result[0];
-			}
+		if (!unique) return;
+
+		const menuStructureWorkspaceContext = (await this.getContext('UmbMenuStructureWorkspaceContext')) as any;
+		const parent = (await this.observe(menuStructureWorkspaceContext.parent, () => {})?.asPromise()) as any;
+		const parentUnique = parent?.unique;
+
+		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
+		if (result && result.length > 0) {
+			this._rootUnique = result[0];
 		}
 	}
 
@@ -89,15 +105,20 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	}
 
 	render() {
+		const startNode: UmbTreeStartNode | undefined =
+			this._rootUnique && this._rootEntityType
+				? { unique: this._rootUnique, entityType: this._rootEntityType }
+				: undefined;
+
 		return html`<umb-input-content
 			.items=${this.value}
-			.type=${this.type}
-			.startNodeId=${this.startNodeId ?? ''}
-			.min=${this.min}
-			.max=${this.max}
-			.allowedContentTypeIds=${this.allowedContentTypeIds ?? ''}
-			?showOpenButton=${this.showOpenButton}
-			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
+			.type=${this._type}
+			.min=${this._min}
+			.max=${this._max}
+			.startNode=${startNode}
+			.allowedContentTypeIds=${this._allowedContentTypeUniques ?? ''}
+			?showOpenButton=${this._showOpenButton}
+			?ignoreUserStartNodes=${this._ignoreUserStartNodes}
 			@change=${this.#onChange}></umb-input-content>`;
 	}
 }

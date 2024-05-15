@@ -95,14 +95,16 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 			const providerName =
 				typeof providerOrManifest === 'string' ? providerOrManifest : providerOrManifest.forProviderName;
 
-			await authContext.makeAuthorizationRequest(providerName, false, loginHint, manifest);
+			// If the user is timed out, we do not want to lose the state, so avoid redirecting to the provider
+			// and instead just make the authorization request. In all other cases, we want to redirect to the provider.
+			const isTimedOut = this.data?.userLoginState === 'timedOut';
+
+			await authContext.makeAuthorizationRequest(providerName, isTimedOut ? false : true, loginHint, manifest);
 
 			const isAuthed = authContext.getIsAuthorized();
 			this.value = { success: isAuthed };
 			if (isAuthed) {
 				this._submitModal();
-			} else {
-				this._error = 'Failed to authenticate';
 			}
 		} catch (error) {
 			console.error('[AuthModal] Error submitting auth request', error);
