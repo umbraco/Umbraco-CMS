@@ -14,6 +14,11 @@ const menuItem: ManifestMenuItemTreeKind = {
 		icon: 'icon-trash',
 		menus: [UMB_MEDIA_MENU_ALIAS],
 	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.CurrentUser.AllowMediaRecycleBin',
+		},
+	],
 };
 
 export const manifests: Array<ManifestTypes> = [menuItem];
