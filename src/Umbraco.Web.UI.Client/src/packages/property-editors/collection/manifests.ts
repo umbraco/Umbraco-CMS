@@ -101,26 +101,11 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 	},
 };
 
-/**
- * Legacy property editor UI manifest for the collection view property editor.
- * @deprecated Use the property editor UI alias of 'Umb.PropertyEditorUi.Collection' instead.
- */
-const legacyPropertyEditorUiManifest: ManifestPropertyEditorUi = {
-	...propertyEditorUiManifest,
-	alias: 'Umb.PropertyEditorUi.CollectionView',
-	element: () => import('./legacy-property-editor-ui-collection.element.js'),
-};
-
-const config: Array<ManifestPropertyEditorUi> = [
+export const manifests: Array<ManifestTypes> = [
+	propertyEditorUiManifest,
 	bulkActionPermissions,
 	columnConfiguration,
 	layoutConfiguration,
 	orderBy,
-];
-
-export const manifests: Array<ManifestTypes> = [
-	propertyEditorUiManifest,
-	legacyPropertyEditorUiManifest,
-	...config,
 	schema,
 ];
