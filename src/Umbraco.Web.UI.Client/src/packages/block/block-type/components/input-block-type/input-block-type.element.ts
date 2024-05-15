@@ -149,6 +149,7 @@ export class UmbInputBlockTypeElement<
 			<umb-block-type-card
 				.data-umb-content-element-key=${block.contentElementTypeKey}
 				.name=${block.label}
+				.iconFile=${block.thumbnail}
 				.iconColor=${block.iconColor}
 				.backgroundColor=${block.backgroundColor}
 				.href="${this.workspacePath}edit/${block.contentElementTypeKey}"
