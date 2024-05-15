@@ -1,13 +1,11 @@
-import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
-
-import { css, html, customElement, state, repeat, query, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-
-import type { UmbIconPickerModalData, UmbIconPickerModalValue } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { css, customElement, html, nothing, query, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { extractUmbColorVariable, umbracoColors } from '@umbraco-cms/backoffice/resources';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_ICON_REGISTRY_CONTEXT, type UmbIconDefinition } from '@umbraco-cms/backoffice/icon';
+import type { UmbIconPickerModalData, UmbIconPickerModalValue } from '@umbraco-cms/backoffice/modal';
+import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-icon-picker-modal')
 export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalValue> {
@@ -106,12 +104,12 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				<uui-button
 					slot="actions"
 					label=${this.localize.term('general_close')}
-					@click="${this._rejectModal}"></uui-button>
+					@click=${this._rejectModal}></uui-button>
 				<uui-button
 					slot="actions"
 					color="positive"
 					look="primary"
-					@click="${this._submitModal}"
+					@click=${this._submitModal}
 					label=${this.localize.term('general_submit')}></uui-button>
 			</umb-body-layout>
 		`;
@@ -123,7 +121,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 			placeholder=${this.localize.term('placeholders_filter')}
 			label=${this.localize.term('placeholders_filter')}
 			id="search"
-			@keyup="${this.#filterIcons}"
+			@keyup=${this.#filterIcons}
 			${umbFocus()}>
 			<uui-icon name="search" slot="prepend" id="search_icon"></uui-icon>
 		</uui-input>`;
@@ -136,15 +134,14 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					(icon) => icon.name,
 					(icon) => html`
 						<uui-button
-							label="${icon.name}"
-							title="${icon.name}"
-							class="${icon.name === this._currentIcon ? 'selected' : ''}"
+							label=${icon.name}
+							title=${icon.name}
+							class=${icon.name === this._currentIcon ? 'selected' : ''}
 							@click=${(e: InputEvent) => this.#changeIcon(e, icon.name)}
 							@keyup=${(e: KeyboardEvent) => this.#changeIcon(e, icon.name)}>
 							<uui-icon
 								style="--uui-icon-color: var(${extractUmbColorVariable(this._currentColor)})"
-								name="${icon.name}">
-							</uui-icon>
+								name=${icon.name}></uui-icon>
 						</uui-button>
 					`,
 				)
