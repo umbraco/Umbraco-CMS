@@ -991,6 +991,15 @@ url?: string | null
 type?: string | null
     };
 
+export enum ImageCropModeModel {
+    CROP = 'Crop',
+    MAX = 'Max',
+    STRETCH = 'Stretch',
+    PAD = 'Pad',
+    BOX_PAD = 'BoxPad',
+    MIN = 'Min'
+}
+
 export type ImportDictionaryRequestModel = {
         temporaryFile: ReferenceByIdModel
 parent?: ReferenceByIdModel | null
@@ -2574,6 +2583,12 @@ value: string
 key: string
     };
 
+export type UserExternalLoginProviderModel = {
+        providerSchemeName: string
+isLinkedOnUser: boolean
+hasManualLinkingEnabled: boolean
+    };
+
 export type UserGroupItemResponseModel = {
         id: string
 name: string
@@ -3505,6 +3520,26 @@ tree?: string
         
         responses: {
             GetHelp: PagedHelpPageResponseModel
+                
+        }
+        
+    }
+
+export type ImagingData = {
+        
+        payloads: {
+            GetImagingResizeUrls: {
+                        height?: number
+id?: Array<string>
+mode?: ImageCropModeModel
+width?: number
+                        
+                    };
+        }
+        
+        
+        responses: {
+            GetImagingResizeUrls: Array<MediaUrlInfoResponseModel>
                 
         }
         
@@ -5205,6 +5240,7 @@ PostUserUnlock: {
                 ,PostUserCurrentAvatar: string
                 ,PostUserCurrentChangePassword: string
                 ,GetUserCurrentConfiguration: CurrenUserConfigurationResponseModel
+                ,GetUserCurrentLoginProviders: Array<UserExternalLoginProviderModel>
                 ,GetUserCurrentLogins: LinkedLoginsRequestModel
                 ,GetUserCurrentPermissions: UserPermissionsResponseModel
                 ,GetUserCurrentPermissionsDocument: Array<UserPermissionsResponseModel>

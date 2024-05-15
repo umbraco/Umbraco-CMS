@@ -253,7 +253,6 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				box-sizing: border-box;
 				height: auto;
 				width: 100%;
-				padding: var(--uui-size-space-3) var(--uui-size-space-6);
 			}
 
 			.container {
