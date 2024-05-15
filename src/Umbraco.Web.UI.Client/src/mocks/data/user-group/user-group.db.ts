@@ -39,9 +39,9 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 		return uniqueArray;
 	}
 
-	getAllowedSections(userGroupIds: string[]): string[] {
+	getAllowedSections(userGroupIds: Array<{ id: string }>): string[] {
 		const sections = this.data
-			.filter((userGroup) => userGroupIds.includes(userGroup.id))
+			.filter((userGroup) => userGroupIds.map((reference) => reference.id).includes(userGroup.id))
 			.map((userGroup) => (userGroup.sections?.length ? userGroup.sections : []))
 			.flat();
 

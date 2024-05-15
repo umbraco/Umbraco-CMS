@@ -101,7 +101,11 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			state: data.state,
 			unique: data.id,
 			updateDate: data.updateDate,
-			userGroupUniques: data.userGroupIds,
+			userGroupUniques: data.userGroupIds.map((reference) => {
+				return {
+					unique: reference.id,
+				};
+			}),
 			userName: data.userName,
 		};
 
@@ -121,7 +125,11 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		const requestBody: CreateUserRequestModel = {
 			email: model.email,
 			name: model.name,
-			userGroupIds: model.userGroupUniques,
+			userGroupIds: model.userGroupUniques.map((reference) => {
+				return {
+					id: reference.unique,
+				};
+			}),
 			userName: model.userName,
 		};
 
@@ -165,7 +173,11 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 				};
 			}),
 			name: model.name,
-			userGroupIds: model.userGroupUniques,
+			userGroupIds: model.userGroupUniques.map((reference) => {
+				return {
+					id: reference.unique,
+				};
+			}),
 			userName: model.userName,
 		};
 
