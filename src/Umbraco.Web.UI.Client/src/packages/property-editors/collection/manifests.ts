@@ -38,7 +38,7 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 					alias: 'pageSize',
 					label: 'Page Size',
 					description: 'Number of items per page.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 					config: [{ alias: 'min', value: 0 }],
 				},
 				{
