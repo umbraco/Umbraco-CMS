@@ -27,10 +27,10 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 	 * @memberof UmbUserGroupData
 	 */
 	getPermissions(
-		userGroupIds: string[],
+		userGroupIds: Array<{ id: string }>,
 	): Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel> {
 		const permissions = this.data
-			.filter((userGroup) => userGroupIds.includes(userGroup.id))
+			.filter((userGroup) => userGroupIds.map((reference) => reference.id).includes(userGroup.id))
 			.map((userGroup) => (userGroup.permissions?.length ? userGroup.permissions : []))
 			.flat();
 
