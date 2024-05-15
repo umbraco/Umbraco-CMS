@@ -438,9 +438,9 @@ email: string
 userName: string
 name: string
 languageIsoCode?: string | null
-documentStartNodeIds: Array<string>
+documentStartNodeIds: Array<ReferenceByIdModel>
 hasDocumentRootAccess: boolean
-mediaStartNodeIds: Array<string>
+mediaStartNodeIds: Array<ReferenceByIdModel>
 hasMediaRootAccess: boolean
 avatarUrls: Array<string>
 languages: Array<string>
@@ -541,11 +541,11 @@ icon?: string | null
     };
 
 export type DeleteUserGroupsRequestModel = {
-        userGroupIds: Array<string>
+        userGroupIds: Array<ReferenceByIdModel>
     };
 
 export type DeleteUsersRequestModel = {
-        userIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
     };
 
 export type DictionaryItemItemResponseModel = {
@@ -577,7 +577,7 @@ export enum DirectionModel {
 }
 
 export type DisableUserRequestModel = {
-        userIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
     };
 
 export type DocumentBlueprintItemResponseModel = {
@@ -898,7 +898,7 @@ secret: string
     };
 
 export type EnableUserRequestModel = {
-        userIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
     };
 
 export enum EventMessageTypeModel {
@@ -990,6 +990,15 @@ description?: string | null
 url?: string | null
 type?: string | null
     };
+
+export enum ImageCropModeModel {
+    CROP = 'Crop',
+    MAX = 'Max',
+    STRETCH = 'Stretch',
+    PAD = 'Pad',
+    BOX_PAD = 'BoxPad',
+    MIN = 'Min'
+}
 
 export type ImportDictionaryRequestModel = {
         temporaryFile: ReferenceByIdModel
@@ -2268,7 +2277,7 @@ context: string
     };
 
 export type UnlockUsersRequestModel = {
-        userIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
     };
 
 export type UnpublishDocumentRequestModel = {
@@ -2517,8 +2526,8 @@ permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPr
     };
 
 export type UpdateUserGroupsOnUserRequestModel = {
-        userIds: Array<string>
-userGroupIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
+userGroupIds: Array<ReferenceByIdModel>
     };
 
 export type UpdateUserRequestModel = {
@@ -2527,9 +2536,9 @@ userName: string
 name: string
 userGroupIds: Array<string>
 languageIsoCode: string
-documentStartNodeIds: Array<string>
+documentStartNodeIds: Array<ReferenceByIdModel>
 hasDocumentRootAccess: boolean
-mediaStartNodeIds: Array<string>
+mediaStartNodeIds: Array<ReferenceByIdModel>
 hasMediaRootAccess: boolean
     };
 
@@ -2641,9 +2650,9 @@ name: string
 userGroupIds: Array<string>
 id: string
 languageIsoCode?: string | null
-documentStartNodeIds: Array<string>
+documentStartNodeIds: Array<ReferenceByIdModel>
 hasDocumentRootAccess: boolean
-mediaStartNodeIds: Array<string>
+mediaStartNodeIds: Array<ReferenceByIdModel>
 hasMediaRootAccess: boolean
 avatarUrls: Array<string>
 state: UserStateModel
@@ -3505,6 +3514,26 @@ tree?: string
         
         responses: {
             GetHelp: PagedHelpPageResponseModel
+                
+        }
+        
+    }
+
+export type ImagingData = {
+        
+        payloads: {
+            GetImagingResizeUrls: {
+                        height?: number
+id?: Array<string>
+mode?: ImageCropModeModel
+width?: number
+                        
+                    };
+        }
+        
+        
+        responses: {
+            GetImagingResizeUrls: Array<MediaUrlInfoResponseModel>
                 
         }
         
@@ -5015,12 +5044,12 @@ requestBody?: UpdateUserGroupRequestModel
                     };
 DeleteUserGroupByIdUsers: {
                         id: string
-requestBody?: Array<string>
+requestBody?: Array<ReferenceByIdModel>
                         
                     };
 PostUserGroupByIdUsers: {
                         id: string
-requestBody?: Array<string>
+requestBody?: Array<ReferenceByIdModel>
                         
                     };
         }
