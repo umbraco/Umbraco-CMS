@@ -7,6 +7,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 type UmbExternalLoginProviderOption = UmbCurrentUserExternalLoginProviderModel & {
 	displayName: string;
@@ -23,10 +24,15 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 	_items: Array<UmbExternalLoginProviderOption> = [];
 
 	#currentUserRepository = new UmbCurrentUserRepository(this);
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 		this.#loadProviders();
+
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
+			this.#notificationContext = context;
+		});
 	}
 
 	async #loadProviders() {
@@ -139,8 +145,8 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 	}
 
 	async #onProviderEnable(item: UmbExternalLoginProviderOption) {
+		const providerDisplayName = this.localize.string(item.displayName);
 		try {
-			const providerDisplayName = this.localize.string(item.displayName);
 			await umbConfirmModal(this, {
 				headline: this.localize.term('defaultdialogs_linkYour', providerDisplayName),
 				content: this.localize.term('defaultdialogs_linkYourConfirm', providerDisplayName),
@@ -149,14 +155,21 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 			});
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 			authContext.linkLogin(item.providerName);
-		} catch {
-			// Do nothing
+		} catch (error) {
+			if (error instanceof Error) {
+				this.#notificationContext?.peek('danger', {
+					data: {
+						headline: this.localize.term('defaultdialogs_linkYour', providerDisplayName),
+						message: error.message,
+					},
+				});
+			}
 		}
 	}
 
 	async #onProviderDisable(item: UmbExternalLoginProviderOption) {
+		const providerDisplayName = this.localize.string(item.displayName);
 		try {
-			const providerDisplayName = this.localize.string(item.displayName);
 			await umbConfirmModal(this, {
 				headline: this.localize.term('defaultdialogs_unLinkYour', providerDisplayName),
 				content: this.localize.term('defaultdialogs_unLinkYourConfirm', providerDisplayName),
@@ -165,8 +178,15 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 			});
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 			authContext.unlinkLogin(item.providerName, item.providerKey);
-		} catch {
-			// Do nothing
+		} catch (error) {
+			if (error instanceof Error) {
+				this.#notificationContext?.peek('danger', {
+					data: {
+						headline: this.localize.term('defaultdialogs_unLinkYour', providerDisplayName),
+						message: error.message,
+					},
+				});
+			}
 		}
 	}
 
