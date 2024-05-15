@@ -1,7 +1,8 @@
 ﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-test.describe('Children content tests', () => {
+// Remove smoke tag before merging
+test.describe('Children content tests @smoke', () => {
   let documentTypeId = '';
   let childDocumentTypeId = '';
   let contentId = '';

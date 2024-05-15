@@ -1,7 +1,8 @@
 ﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-test.describe('Redirect Management tests', () => {
+// Remove smoke tag before merging
+test.describe('Redirect Management tests @smoke', () => {
   const disableStatus = 'Disabled';
   const enableStatus = 'Enabled';
 

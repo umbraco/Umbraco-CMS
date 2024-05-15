@@ -1,12 +1,13 @@
 ﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
-test.describe('Content info tab tests', () => {
+// Remove smoke tag before merging
+test.describe('Content info tab tests @smoke', () => {
   let documentTypeId = '';
   let contentId = '';
   const contentName = 'TestInfoTab';
   const documentTypeName = 'TestDocumentTypeForContent';
 
-  test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+  test.beforeEach(async ({umbracoApi}) => {
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
     await umbracoApi.document.ensureNameNotExists(contentName);
   });
