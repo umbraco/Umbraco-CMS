@@ -23,6 +23,7 @@ const CORE_PACKAGES = [
 	import('../../packages/media/umbraco-package.js'),
 	import('../../packages/members/umbraco-package.js'),
 	import('../../packages/models-builder/umbraco-package.js'),
+	import('../../packages/multi-url-picker/umbraco-package.js'),
 	import('../../packages/packages/umbraco-package.js'),
 	import('../../packages/property-editors/umbraco-package.js'),
 	import('../../packages/relations/umbraco-package.js'),
