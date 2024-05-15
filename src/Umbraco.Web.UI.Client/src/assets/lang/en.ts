@@ -578,7 +578,6 @@ export default {
 		unLinkYour: 'Un-link your {0} account',
 		unLinkYourConfirm: 'You are about to un-link your Umbraco and {0} accounts and you will be logged out.',
 		linkedToService: 'Your account is linked to this service',
-		account: 'account',
 		selectEditor: 'Select editor',
 		selectSnippet: 'Select snippet',
 		variantdeletewarning:
