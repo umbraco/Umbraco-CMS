@@ -91,10 +91,6 @@ export class UmbInputContentElement extends UUIFormControlMixin(UmbLitElement, '
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	constructor() {
-		super();
-	}
-
 	render() {
 		switch (this._type) {
 			case 'content':
