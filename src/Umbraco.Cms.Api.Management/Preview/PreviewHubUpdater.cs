@@ -26,8 +26,13 @@ public class PreviewHubUpdater : INotificationAsyncHandler<ContentCacheRefresher
         IHubContext<PreviewHub, IPreviewHub> hubContextInstance = _hubContext.Value;
         foreach (ContentCacheRefresher.JsonPayload payload in payloads)
         {
-            var id = payload.Id; // keep it simple for now, ignore ChangeTypes
-            await hubContextInstance.Clients.All.refreshed(id);
+            var key = payload.Key; // keep it simple for now, ignore ChangeTypes
+            if (key.HasValue is false)
+            {
+                throw new InvalidOperationException($"No key is set for payload with id {payload.Id}");
+            }
+
+            await hubContextInstance.Clients.All.refreshed(key.Value);
         }
     }
 }
