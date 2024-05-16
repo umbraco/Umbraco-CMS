@@ -68,8 +68,9 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 
 	#onRemove = () => {
 		this.value = assignToFrozenObject(this.value, { src: '', temporaryFileId: null });
-		if (!this.fileUnique) return;
-		this.#manager?.removeOne(this.fileUnique);
+		if (this.fileUnique) {
+			this.#manager?.removeOne(this.fileUnique);
+		}
 		this.fileUnique = undefined;
 		this.file = undefined;
 
@@ -114,7 +115,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		const value = (e.target as UmbInputImageCropperFieldElement).value;
 
 		if (!value) {
-			this.value = { src: '', crops: [], focalPoint: { left: 0.5, top: 0.5 } };
+			this.value = { src: '', crops: [], focalPoint: { left: 0.5, top: 0.5 }, temporaryFileId: null };
 			this.dispatchEvent(new UmbChangeEvent());
 			return;
 		}
