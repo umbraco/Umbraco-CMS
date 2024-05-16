@@ -1,8 +1,7 @@
-import type { UmbMediaCardItemModel } from '../../modals/index.js';
+import { UMB_MEDIA_PICKER_MODAL, type UmbMediaCardItemModel } from '../../modals/index.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbMediaItemModel } from '../../repository/item/types.js';
 import type { UmbMediaTreeItemModel } from '../../tree/index.js';
-import { UMB_MEDIA_TREE_PICKER_MODAL } from '../../tree/index.js';
 import type {
 	UmbMediaTreePickerModalData,
 	UmbMediaTreePickerModalValue,
@@ -24,7 +23,7 @@ export class UmbMediaPickerContext extends UmbPickerInputContext<
 	readonly cardItems = this.#cardItems.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_TREE_PICKER_MODAL);
+		super(host, UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_PICKER_MODAL);
 		this.#imagingRepository = new UmbImagingRepository(host);
 
 		this.observe(this.selectedItems, async (selectedItems) => {
