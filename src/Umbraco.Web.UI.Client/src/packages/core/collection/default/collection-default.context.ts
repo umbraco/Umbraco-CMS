@@ -24,7 +24,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 const LOCAL_STORAGE_KEY = 'umb-collection-view';
 
 export class UmbDefaultCollectionContext<
-		CollectionItemType extends { entityType: string; unique: string } = { entityType: string; unique: string },
+		CollectionItemType extends { entityType: string; unique: string } = any,
 		FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
 	>
 	extends UmbContextBase<UmbDefaultCollectionContext>
@@ -37,7 +37,7 @@ export class UmbDefaultCollectionContext<
 	#loading = new UmbObjectState<boolean>(false);
 	public readonly loading = this.#loading.asObservable();
 
-	#items = new UmbArrayState<CollectionItemType>([], (x) => x);
+	#items = new UmbArrayState<CollectionItemType>([], (x) => x.unique);
 	public readonly items = this.#items.asObservable();
 
 	#totalItems = new UmbNumberState(0);
