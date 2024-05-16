@@ -61,6 +61,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 				flex-direction: column;
 				align-items: center;
 				gap: var(--uui-size-space-3);
+				min-width: var(--uui-size-100);
 			}
 		`,
 	];

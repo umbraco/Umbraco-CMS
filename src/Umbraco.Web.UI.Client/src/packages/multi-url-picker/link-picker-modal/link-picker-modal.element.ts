@@ -1,13 +1,12 @@
+import type { UmbLinkPickerLink, UmbLinkPickerLinkType } from './types.js';
+import type {
+	UmbLinkPickerConfig,
+	UmbLinkPickerModalData,
+	UmbLinkPickerModalValue,
+} from './link-picker-modal.token.js';
 import type { UmbTreeElement, UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
 import { css, html, nothing, customElement, query, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import type {
-	UmbLinkPickerConfig,
-	UmbLinkPickerLink,
-	UmbLinkPickerLinkType,
-	UmbLinkPickerModalData,
-	UmbLinkPickerModalValue,
-} from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_DOCUMENT_TREE_ALIAS } from '@umbraco-cms/backoffice/document';
 
@@ -32,7 +31,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	@state()
 	_layout: UmbLinkPickerConfig = {
 		hideAnchor: false,
-		ignoreUserStartNodes: false,
 	};
 
 	@state()

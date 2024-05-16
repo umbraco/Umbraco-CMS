@@ -7,6 +7,7 @@ import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 const elementName = 'umb-user-workspace-assign-access';
 @customElement(elementName)
@@ -69,7 +70,9 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 	#onUserGroupsChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbUserGroupInputElement;
-		const selection = target.selection;
+		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique) => {
+			return { unique };
+		});
 		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('userGroupUniques', selection);
 	}
@@ -85,7 +88,9 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 	#onDocumentStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputDocumentElement;
-		const selection = target.selection;
+		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique) => {
+			return { unique };
+		});
 		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('documentStartNodeUniques', selection);
 	}
@@ -101,7 +106,9 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 	#onMediaStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputMediaElement;
-		const selection = target.selection;
+		const selection: Array<UmbReferenceByUnique> = target.selection.map((unique) => {
+			return { unique };
+		});
 		// TODO make contexts method
 		this.#workspaceContext?.updateProperty('mediaStartNodeUniques', selection);
 	}
@@ -123,7 +130,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 			description="${this.localize.term('user_groupsHelp')}">
 			<umb-user-group-input
 				slot="editor"
-				.selection=${this._userGroupUniques}
+				.selection=${this._userGroupUniques.map((reference) => reference.unique)}
 				@change=${this.#onUserGroupsChange}></umb-user-group-input>
 		</umb-property-layout>`;
 	}
@@ -145,7 +152,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 					? html`
 							<umb-input-document
 								slot="editor"
-								.selection=${this._documentStartNodeUniques}
+								.selection=${this._documentStartNodeUniques.map((reference) => reference.unique)}
 								@change=${this.#onDocumentStartNodeChange}></umb-input-document>
 						`
 					: nothing}
@@ -170,7 +177,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 					? html`
 							<umb-input-media
 								slot="editor"
-								.selection=${this._mediaStartNodeUniques}
+								.selection=${this._mediaStartNodeUniques.map((reference) => reference.unique)}
 								@change=${this.#onMediaStartNodeChange}></umb-input-media>
 						`
 					: nothing}

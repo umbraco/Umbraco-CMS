@@ -1,15 +1,13 @@
+import type { UmbLinkPickerLink } from '../link-picker-modal/types.js';
+import { UMB_LINK_PICKER_MODAL } from '../link-picker-modal/link-picker-modal.token.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	umbConfirmModal,
-	UmbModalRouteRegistrationController,
-	UMB_LINK_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbModalRouteBuilder, UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
@@ -19,8 +17,9 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
  * @fires blur - when the input loses focus
  * @fires focus - when the input gains focus
  */
-@customElement('umb-input-multi-url')
-export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, '') {
+const elementName = 'umb-multi-url-picker';
+@customElement(elementName)
+export class UmbMultiUrlPickerElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<UmbLinkPickerLink>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -99,9 +98,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: Boolean, attribute: 'hide-anchor' })
 	hideAnchor?: boolean;
 
-	@property({ type: Boolean, attribute: 'ignore-user-start-nodes' })
-	ignoreUserStartNodes?: boolean;
-
 	/**
 	 * @type {UUIModalSidebarSize}
 	 * @attr
@@ -173,7 +169,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 						index: index,
 						config: {
 							hideAnchor: this.hideAnchor,
-							ignoreUserStartNodes: this.ignoreUserStartNodes,
 						},
 					},
 					value: {
@@ -300,6 +295,6 @@ export class UmbInputMultiUrlElement extends UUIFormControlMixin(UmbLitElement, 
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-multi-url': UmbInputMultiUrlElement;
+		[elementName]: UmbMultiUrlPickerElement;
 	}
 }

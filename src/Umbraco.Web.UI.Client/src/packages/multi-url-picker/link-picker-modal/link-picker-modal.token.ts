@@ -1,4 +1,6 @@
-import { UmbModalToken } from './modal-token.js';
+import { UMB_MULTI_URL_PICKER_MODAL_ALIAS } from './constants.js';
+import type { UmbLinkPickerLink } from './types.js';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbLinkPickerModalData {
 	config: UmbLinkPickerConfig;
@@ -7,28 +9,13 @@ export interface UmbLinkPickerModalData {
 
 export type UmbLinkPickerModalValue = { link: UmbLinkPickerLink };
 
-export interface UmbLinkPickerLink {
-	icon?: string | null;
-	name?: string | null;
-	published?: boolean | null;
-	queryString?: string | null;
-	target?: string | null;
-	trashed?: boolean | null;
-	type?: UmbLinkPickerLinkType | null;
-	unique?: string | null;
-	url?: string | null;
-}
-
-export type UmbLinkPickerLinkType = 'document' | 'external' | 'media';
-
 // TODO: investigate: this looks more like a property editor configuration. Is this used in the correct way?
 export interface UmbLinkPickerConfig {
 	hideAnchor?: boolean;
-	ignoreUserStartNodes?: boolean;
 }
 
 export const UMB_LINK_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalValue>(
-	'Umb.Modal.LinkPicker',
+	UMB_MULTI_URL_PICKER_MODAL_ALIAS,
 	{
 		modal: {
 			type: 'sidebar',

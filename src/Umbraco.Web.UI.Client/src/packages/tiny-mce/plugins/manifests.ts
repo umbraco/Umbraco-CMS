@@ -18,26 +18,6 @@ export const manifests: Array<ManifestTinyMcePlugin> = [
 	},
 	{
 		type: 'tinyMcePlugin',
-		alias: 'Umb.TinyMcePlugin.LinkPicker',
-		name: 'Link Picker TinyMCE Plugin',
-		js: () => import('./tiny-mce-linkpicker.plugin.js'),
-		meta: {
-			toolbar: [
-				{
-					alias: 'link',
-					label: 'Insert/Edit link',
-					icon: 'link',
-				},
-				{
-					alias: 'unlink',
-					label: 'Remove link',
-					icon: 'unlink',
-				},
-			],
-		},
-	},
-	{
-		type: 'tinyMcePlugin',
 		alias: 'Umb.TinyMcePlugin.MediaPicker',
 		name: 'Media Picker TinyMCE Plugin',
 		js: () => import('./tiny-mce-mediapicker.plugin.js'),

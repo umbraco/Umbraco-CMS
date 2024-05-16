@@ -5,8 +5,9 @@ export interface UmbMediaCardItemModel {
 	name: string;
 	unique: string;
 	entityType: UmbMediaEntityType;
+	isTrashed: boolean;
+	icon: string;
 	url?: string;
-	extension?: string;
 }
 
 export interface UmbMediaPathModel extends UmbEntityModel {

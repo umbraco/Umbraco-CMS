@@ -1,6 +1,8 @@
-import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
-import type { UmbLinkPickerModalValue, UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
-import { UMB_LINK_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbLinkPickerModalValue } from '../link-picker-modal/link-picker-modal.token.js';
+import { UMB_LINK_PICKER_MODAL } from '../link-picker-modal/link-picker-modal.token.js';
+import type { UmbLinkPickerLink } from '../link-picker-modal/types.js';
+import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 type AnchorElementAttributes = {
 	href?: string | null;
@@ -11,7 +13,7 @@ type AnchorElementAttributes = {
 	text?: string;
 };
 
-export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
+export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase {
 	#linkPickerData?: UmbLinkPickerModalValue;
 
 	#anchorElement?: HTMLAnchorElement;
@@ -72,7 +74,7 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 
 		if (this.#anchorElement.href.includes('localLink:')) {
 			const href = this.#anchorElement.getAttribute('href')!;
-			currentTarget.unique = href.substring(href.indexOf(":") + 1, href.indexOf("}"));
+			currentTarget.unique = href.substring(href.indexOf(':') + 1, href.indexOf('}'));
 		} else if (this.#anchorElement.host.length) {
 			currentTarget.url = this.#anchorElement.protocol ? this.#anchorElement.protocol + '//' : undefined;
 			currentTarget.url += this.#anchorElement.host + this.#anchorElement.pathname;
@@ -85,9 +87,7 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalHandler = modalManager.open(this, UMB_LINK_PICKER_MODAL, {
 			data: {
-				config: {
-					ignoreUserStartNodes: this.configuration?.getValueByAlias<boolean>('ignoreUserStartNodes') ?? false,
-				},
+				config: {},
 				index: null,
 			},
 			value: {
@@ -122,9 +122,10 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 			a.title = name;
 		}
 
-		if (this.#linkPickerData?.link.queryString?.startsWith('#') || 
-			this.#linkPickerData?.link.queryString?.startsWith('?')) 
-		{
+		if (
+			this.#linkPickerData?.link.queryString?.startsWith('#') ||
+			this.#linkPickerData?.link.queryString?.startsWith('?')
+		) {
 			a['data-anchor'] = this.#linkPickerData?.link.queryString;
 			a.href += this.#linkPickerData?.link.queryString;
 		}

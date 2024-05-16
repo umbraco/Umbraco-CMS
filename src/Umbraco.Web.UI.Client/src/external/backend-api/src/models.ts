@@ -403,7 +403,7 @@ export type CreateUserRequestModel = {
         email: string
 userName: string
 name: string
-userGroupIds: Array<string>
+userGroupIds: Array<ReferenceByIdModel>
 id?: string | null
     };
 
@@ -438,9 +438,9 @@ email: string
 userName: string
 name: string
 languageIsoCode?: string | null
-documentStartNodeIds: Array<string>
+documentStartNodeIds: Array<ReferenceByIdModel>
 hasDocumentRootAccess: boolean
-mediaStartNodeIds: Array<string>
+mediaStartNodeIds: Array<ReferenceByIdModel>
 hasMediaRootAccess: boolean
 avatarUrls: Array<string>
 languages: Array<string>
@@ -541,11 +541,11 @@ icon?: string | null
     };
 
 export type DeleteUserGroupsRequestModel = {
-        userGroupIds: Array<string>
+        userGroupIds: Array<ReferenceByIdModel>
     };
 
 export type DeleteUsersRequestModel = {
-        userIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
     };
 
 export type DictionaryItemItemResponseModel = {
@@ -577,7 +577,7 @@ export enum DirectionModel {
 }
 
 export type DisableUserRequestModel = {
-        userIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
     };
 
 export type DocumentBlueprintItemResponseModel = {
@@ -898,7 +898,7 @@ secret: string
     };
 
 export type EnableUserRequestModel = {
-        userIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
     };
 
 export enum EventMessageTypeModel {
@@ -1030,7 +1030,7 @@ export type InviteUserRequestModel = {
         email: string
 userName: string
 name: string
-userGroupIds: Array<string>
+userGroupIds: Array<ReferenceByIdModel>
 id?: string | null
 message?: string | null
     };
@@ -2277,7 +2277,7 @@ context: string
     };
 
 export type UnlockUsersRequestModel = {
-        userIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
     };
 
 export type UnpublishDocumentRequestModel = {
@@ -2526,19 +2526,19 @@ permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPr
     };
 
 export type UpdateUserGroupsOnUserRequestModel = {
-        userIds: Array<string>
-userGroupIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
+userGroupIds: Array<ReferenceByIdModel>
     };
 
 export type UpdateUserRequestModel = {
         email: string
 userName: string
 name: string
-userGroupIds: Array<string>
+userGroupIds: Array<ReferenceByIdModel>
 languageIsoCode: string
-documentStartNodeIds: Array<string>
+documentStartNodeIds: Array<ReferenceByIdModel>
 hasDocumentRootAccess: boolean
-mediaStartNodeIds: Array<string>
+mediaStartNodeIds: Array<ReferenceByIdModel>
 hasMediaRootAccess: boolean
     };
 
@@ -2653,12 +2653,12 @@ export type UserResponseModel = {
         email: string
 userName: string
 name: string
-userGroupIds: Array<string>
+userGroupIds: Array<ReferenceByIdModel>
 id: string
 languageIsoCode?: string | null
-documentStartNodeIds: Array<string>
+documentStartNodeIds: Array<ReferenceByIdModel>
 hasDocumentRootAccess: boolean
-mediaStartNodeIds: Array<string>
+mediaStartNodeIds: Array<ReferenceByIdModel>
 hasMediaRootAccess: boolean
 avatarUrls: Array<string>
 state: UserStateModel
@@ -5050,12 +5050,12 @@ requestBody?: UpdateUserGroupRequestModel
                     };
 DeleteUserGroupByIdUsers: {
                         id: string
-requestBody?: Array<string>
+requestBody?: Array<ReferenceByIdModel>
                         
                     };
 PostUserGroupByIdUsers: {
                         id: string
-requestBody?: Array<string>
+requestBody?: Array<ReferenceByIdModel>
                         
                     };
         }

@@ -20,6 +20,7 @@ export const manifests: Array<ManifestTypes> = [
 						alias: 'blockGroups',
 						label: '',
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockTypeGroupConfiguration',
+						weight: 1,
 					},
 					{
 						alias: 'useLiveEditing',
@@ -42,9 +43,12 @@ export const manifests: Array<ManifestTypes> = [
 					{
 						alias: 'gridColumns',
 						label: 'Grid Columns',
-						description: 'Set the number of columns for the layout. (defaults to 12)',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
-						config: [{ alias: 'min', value: 0 }],
+						description: 'Set the number of columns for the layout.',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
+						config: [
+							{ alias: 'min', value: 0 },
+							{ alias: 'placeholder', value: '12' },
+						],
 					},
 					{
 						alias: 'layoutStylesheet',
