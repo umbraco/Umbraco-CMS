@@ -1,14 +1,24 @@
-import type { UmbDocumentTreeItemModel, UmbDocumentTreeRootModel } from './types.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type {
+	UmbDocumentTreeItemModel,
+	UmbDocumentTreeRootItemsRequestArgs,
+	UmbDocumentTreeRootModel,
+} from './types.js';
 import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UmbDefaultTreeContext } from '@umbraco-cms/backoffice/tree';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbDocumentTreeContext extends UmbDefaultTreeContext<UmbDocumentTreeItemModel, UmbDocumentTreeRootModel> {
+export class UmbDocumentTreeContext extends UmbDefaultTreeContext<
+	UmbDocumentTreeItemModel,
+	UmbDocumentTreeRootModel,
+	UmbDocumentTreeRootItemsRequestArgs
+> {
 	constructor(host: UmbControllerHost) {
 		super(host);
 
 		this.consumeContext(UMB_CONTENT_PROPERTY_CONTEXT, (context) => {
-			console.log(context);
+			this.observe(context.dataType, (value) => {
+				this.loadWithAdditionalArgs({ dataType: value });
+			});
 		});
 	}
 }

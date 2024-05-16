@@ -2,6 +2,7 @@ import { UmbRequestReloadTreeItemChildrenEvent } from '../reload-tree-item-child
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
+import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
 import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
@@ -17,10 +18,17 @@ import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRootType extends UmbTreeRootModel>
-	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType, TreeRootType>>
+export class UmbDefaultTreeContext<
+		TreeItemType extends UmbTreeItemModel,
+		TreeRootType extends UmbTreeRootModel,
+		RootItemsRequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+	>
+	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType, TreeRootType, RootItemsRequestArgsType>>
 	implements UmbTreeContext
 {
+	#rootItemsRequestArgs = new UmbObjectState<RootItemsRequestArgsType | object>({});
+	public readonly rootItemsRequestArgs = this.#rootItemsRequestArgs.asObservable();
+
 	#treeRoot = new UmbObjectState<TreeRootType | undefined>(undefined);
 	treeRoot = this.#treeRoot.asObservable();
 
@@ -167,6 +175,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 
 		// If we have a start node get children of that instead of the root
 		const startNode = this.getStartNode();
+		const args = this.#rootItemsRequestArgs.getValue();
 
 		const { data } = startNode?.unique
 			? await this.#repository!.requestTreeItemsOf({
@@ -176,10 +185,12 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 					},
 					skip,
 					take,
+					...args,
 				})
 			: await this.#repository!.requestTreeRootItems({
 					skip,
 					take,
+					...args,
 				});
 
 		if (data) {
@@ -223,6 +234,12 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 	setStartNode(startNode: UmbTreeStartNode | undefined) {
 		this.#startNode.setValue(startNode);
 		// we need to reset the tree if this config changes
+		this.#resetTree();
+		this.loadTree();
+	}
+
+	public loadWithAdditionalArgs(args: Partial<RootItemsRequestArgsType>) {
+		this.#rootItemsRequestArgs.setValue({ ...this.#rootItemsRequestArgs.getValue(), ...args });
 		this.#resetTree();
 		this.loadTree();
 	}
