@@ -67,9 +67,9 @@ export class UmbBlockGridEntryContext
 
 	protected _gotLayout(layout: UmbBlockGridLayoutModel | undefined) {
 		if (layout) {
-			// TODO: Implement size correction to fit with configurations. both for columnSpan and rowSpan.
 			layout = { ...layout };
 			layout.columnSpan ??= 999;
+			layout.rowSpan ??= 1;
 			layout.areas ??= [];
 		}
 		return layout;
