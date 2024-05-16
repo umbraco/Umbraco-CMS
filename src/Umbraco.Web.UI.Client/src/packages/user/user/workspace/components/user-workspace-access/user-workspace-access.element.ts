@@ -40,12 +40,15 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	#renderDocumentStartNodes() {
 		return html` <b><umb-localize key="sections_content">Content</umb-localize></b>
 			<umb-user-document-start-node
-				.uniques=${this._user?.documentStartNodeUniques || []}></umb-user-document-start-node>`;
+				.uniques=${this._user?.documentStartNodeUniques.map((reference) => reference.unique) ||
+				[]}></umb-user-document-start-node>`;
 	}
 
 	#renderMediaStartNodes() {
 		return html` <b><umb-localize key="sections_media">Media</umb-localize></b>
-			<umb-user-media-start-node .uniques=${this._user?.mediaStartNodeUniques || []}></umb-user-media-start-node>`;
+			<umb-user-media-start-node
+				.uniques=${this._user?.mediaStartNodeUniques.map((reference) => reference.unique) ||
+				[]}></umb-user-media-start-node>`;
 	}
 
 	static styles = [

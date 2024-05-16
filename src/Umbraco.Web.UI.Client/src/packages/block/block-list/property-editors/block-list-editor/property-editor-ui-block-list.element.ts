@@ -82,20 +82,23 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		const blocks = config.getValueByAlias<Array<UmbBlockTypeBaseModel>>('blocks') ?? [];
 		this.#managerContext.setBlockTypes(blocks);
 
+		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
+		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
+		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
+		// TODO:
+		//config.useSingleBlockMode, not done jet
+
+		this.#managerContext.setEditorConfiguration(config);
+
 		const customCreateButtonLabel = config.getValueByAlias<string>('createLabel');
 		if (customCreateButtonLabel) {
 			this._createButtonLabel = customCreateButtonLabel;
 		} else if (blocks.length === 1) {
-			this._createButtonLabel = `${this.localize.term('general_add')} ${blocks[0].label}`;
+			this.#managerContext.contentTypesLoaded.then(() => {
+				const firstContentTypeName = this.#managerContext.getContentTypeNameOf(blocks[0].contentElementTypeKey);
+				this._createButtonLabel = `${this.localize.term('general_add')} ${firstContentTypeName}`;
+			});
 		}
-
-		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
-		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
-		// TODO:
-		//config.useSingleBlockMode, not done jet
-		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
-
-		this.#managerContext.setEditorConfiguration(config);
 	}
 
 	@state()

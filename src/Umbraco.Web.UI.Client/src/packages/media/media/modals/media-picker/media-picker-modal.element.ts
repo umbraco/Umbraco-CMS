@@ -1,19 +1,22 @@
+import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { type UmbMediaItemModel, UmbMediaItemRepository, UmbMediaUrlRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
-import type { UmbMediaCardItemModel } from './types.js';
+import type { UmbMediaCardItemModel, UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+
+const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
 @customElement('umb-media-picker-modal')
 export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPickerModalData, UmbMediaPickerModalValue> {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
 	#mediaUrlRepository = new UmbMediaUrlRepository(this); // used to get urls
-	#mediaItemRepository = new UmbMediaItemRepository(this); // used to search & get media type of current path
+	#mediaItemRepository = new UmbMediaItemRepository(this); // used to search
+	#imagingRepository = new UmbImagingRepository(this); // used to get image renditions
 
 	#mediaItemsCurrentFolder: Array<UmbMediaCardItemModel> = [];
 
@@ -27,7 +30,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	private _searchQuery = '';
 
 	@state()
-	private _currentMediaEntity: UmbEntityModel = { unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
+	private _currentMediaEntity: UmbMediaPathModel = root;
+
 	async connectedCallback(): Promise<void> {
 		super.connectedCallback();
 
@@ -35,7 +39,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			const { data } = await this.#mediaItemRepository.requestItems([this.data.startNode]);
 
 			if (data?.length) {
-				this._currentMediaEntity = { unique: data[0].unique, entityType: data[0].entityType };
+				this._currentMediaEntity = { name: data[0].name, unique: data[0].unique, entityType: data[0].entityType };
 			}
 		}
 
@@ -59,18 +63,17 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	async #mapMediaUrls(items: Array<UmbMediaItemModel>): Promise<Array<UmbMediaCardItemModel>> {
 		if (!items.length) return [];
 
-		const { data } = await this.#mediaUrlRepository.requestItems(items.map((item) => item.unique));
+		const { data } = await this.#imagingRepository.requestResizedItems(items.map((item) => item.unique));
 
 		return items.map((item): UmbMediaCardItemModel => {
 			const url = data?.find((media) => media.unique === item.unique)?.url;
-			const extension = url?.split('.').pop();
-			//TODO Eventually we will get a renderable img from the server. Use this for the url. [LI]
-			return { name: item.name, unique: item.unique, url, extension, entityType: item.entityType };
+			return { name: item.name, unique: item.unique, url, icon: item.mediaType.icon, entityType: item.entityType };
 		});
 	}
 
 	#onOpen(item: UmbMediaCardItemModel) {
 		this._currentMediaEntity = {
+			name: item.name,
 			unique: item.unique,
 			entityType: UMB_MEDIA_ROOT_ENTITY_TYPE,
 		};
@@ -189,9 +192,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				@selected=${() => this.#onSelected(item)}
 				@deselected=${() => this.#onDeselected(item)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
-				selectable
-				file-ext=${ifDefined(item.extension)}>
-				${item.url ? html`<img src=${item.url} alt=${ifDefined(item.name)} />` : ''}
+				selectable>
+				${item.url
+					? html`<img src=${item.url} alt=${ifDefined(item.name)} />`
+					: html`<umb-icon .name=${item.icon}></umb-icon>`}
 			</uui-card-media>
 		`;
 	}
@@ -199,7 +203,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	#renderPath() {
 		return html`<umb-media-picker-folder-path
 			slot="footer-info"
-			.currentPath=${this._currentMediaEntity.unique}
+			.currentMedia=${this._currentMediaEntity}
 			@change=${this.#onPathChange}></umb-media-picker-folder-path>`;
 	}
 
@@ -227,9 +231,22 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			#media-grid {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-				grid-template-rows: repeat(auto-fill, 200px);
+				grid-auto-rows: 200px;
 				gap: var(--uui-size-space-5);
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
+			}
+			umb-icon {
+				font-size: var(--uui-size-24);
+			}
+
+			img {
+				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
+				background-size: 10px 10px;
+				background-repeat: repeat;
+			}
+
+			#actions {
+				max-width: 100%;
 			}
 		`,
 	];
