@@ -196,7 +196,9 @@ export class UmbBlockGridEntriesContext
 			this.observe(
 				this.#parentEntry.layoutsOfArea(this.#areaKey),
 				(layouts) => {
-					this._layoutEntries.setValue(layouts);
+					if (layouts) {
+						this._layoutEntries.setValue(layouts);
+					}
 				},
 				'observeParentLayouts',
 			);

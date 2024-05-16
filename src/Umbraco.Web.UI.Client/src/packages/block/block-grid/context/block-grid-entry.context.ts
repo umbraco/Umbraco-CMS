@@ -80,7 +80,7 @@ export class UmbBlockGridEntryContext
 			},
 			null,
 		);
-		// columnSpan is secured in _gotEntries, cause it uses the layoutColumns as a max.
+		// Notice columnSpan is secured in _gotEntries, cause it uses the layoutColumns of entries context as a max.
 	}
 
 	protected _gotLayout(layout: UmbBlockGridLayoutModel | undefined) {
@@ -94,7 +94,7 @@ export class UmbBlockGridEntryContext
 	}
 
 	layoutsOfArea(areaKey: string) {
-		return this._layout.asObservablePart((x) => x?.areas.find((x) => x.key === areaKey)?.items ?? []);
+		return this._layout.asObservablePart((x) => x?.areas.find((x) => x.key === areaKey)?.items);
 	}
 
 	areaType(areaKey: string) {
