@@ -18,6 +18,7 @@ public class WebRoutingSettings
     internal const bool StaticDisableAlternativeTemplates = false;
     internal const bool StaticValidateAlternativeTemplates = false;
     internal const bool StaticDisableFindContentByIdPath = false;
+    internal const bool StaticDisableFindContentByIdentifierPath = false;
     internal const bool StaticDisableRedirectUrlTracking = false;
     internal const string StaticUrlProviderMode = "Auto";
 
@@ -59,13 +60,12 @@ public class WebRoutingSettings
     [DefaultValue(StaticValidateAlternativeTemplates)]
     public bool ValidateAlternativeTemplates { get; set; } = StaticValidateAlternativeTemplates;
 
-    /// <summary>
-    ///     Gets or sets a value indicating whether finding content by ID path or key path is disabled.
-    /// </summary>
-    // TODO: Rename setting to DisableFindContentByIdentifierPath to reflect the usage in both <see cref="ContentFinderByIdPath" /> and <see cref="ContentFinderByKeyPath" />.
+    [Obsolete("Use DisableFindContentByIdentifierPath instead. This will be removed in Umbraco 15." )]
     [DefaultValue(StaticDisableFindContentByIdPath)]
     public bool DisableFindContentByIdPath { get; set; } = StaticDisableFindContentByIdPath;
 
+    [DefaultValue(StaticDisableFindContentByIdentifierPath)]
+    public bool DisableFindContentByIdentifierPath { get; set; } = StaticDisableFindContentByIdentifierPath;
     /// <summary>
     ///     Gets or sets a value indicating whether redirect URL tracking is disabled.
     /// </summary>

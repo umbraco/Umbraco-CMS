@@ -13,6 +13,7 @@ namespace Umbraco.Cms.Core.Routing;
 /// <remarks>
 ///     <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
 /// </remarks>
+[Obsolete("Use ContentFinderByKeyPath instead. This will be removed in Umbraco 15.")]
 public class ContentFinderByIdPath : ContentFinderByIdentifierPathBase, IContentFinder
 {
     private readonly ILogger<ContentFinderByIdPath> _logger;
@@ -52,7 +53,7 @@ public class ContentFinderByIdPath : ContentFinderByIdentifierPathBase, IContent
             return Task.FromResult(false);
         }
 
-        if (umbracoContext.InPreviewMode == false && _webRoutingSettings.DisableFindContentByIdPath)
+        if (umbracoContext.InPreviewMode == false && (_webRoutingSettings.DisableFindContentByIdPath || _webRoutingSettings.DisableFindContentByIdentifierPath))
         {
             return Task.FromResult(false);
         }

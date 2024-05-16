@@ -51,9 +51,7 @@ public class ContentFinderByKeyPath : ContentFinderByIdentifierPathBase, IConten
             return Task.FromResult(false);
         }
 
-        // Reusing DisableFindContentByIdPath configuration as if people have disabled content finders by ids,
-        // the same should apply for keys
-        if (umbracoContext.InPreviewMode == false && _webRoutingSettings.DisableFindContentByIdPath)
+        if (umbracoContext.InPreviewMode == false && _webRoutingSettings.DisableFindContentByIdentifierPath)
         {
             return Task.FromResult(false);
         }
