@@ -10,6 +10,7 @@ import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
+import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbMediaPickerContext extends UmbPickerInputContext<
 	UmbMediaItemModel,
@@ -31,7 +32,10 @@ export class UmbMediaPickerContext extends UmbPickerInputContext<
 				this.#cardItems.setValue([]);
 				return;
 			}
-			const { data } = await this.#imagingRepository.requestResizedItems(selectedItems.map((x) => x.unique));
+			const { data } = await this.#imagingRepository.requestResizedItems(
+				selectedItems.map((x) => x.unique),
+				{ height: 400, width: 400, mode: ImageCropModeModel.MIN },
+			);
 
 			this.#cardItems.setValue(
 				selectedItems.map((item) => {

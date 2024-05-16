@@ -43,7 +43,9 @@ export class UmbDropzoneElement extends UmbLitElement {
 		document.removeEventListener('drop', this.#handleDrop.bind(this));
 	}
 
-	#handleDragEnter() {
+	#handleDragEnter(e: DragEvent) {
+		// Avoid collision with UmbSorterController
+		if (!e.dataTransfer?.types?.length) return;
 		this.toggleAttribute('dragging', true);
 	}
 
