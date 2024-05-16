@@ -197,7 +197,7 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 		});
 	}
 
-	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type.
+	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type. [NL]
 	render() {
 		return html`
 			${this._styleElement}
