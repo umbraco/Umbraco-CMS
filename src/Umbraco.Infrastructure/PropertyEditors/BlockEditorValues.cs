@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -15,13 +15,13 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class BlockEditorValues
 {
     private readonly BlockEditorDataConverter _dataConverter;
-    private readonly IContentTypeService _contentTypeService;
+    private readonly IBlockEditorElementTypeCache _elementTypeCache;
     private readonly ILogger _logger;
 
-    public BlockEditorValues(BlockEditorDataConverter dataConverter, IContentTypeService contentTypeService, ILogger logger)
+    public BlockEditorValues(BlockEditorDataConverter dataConverter, IBlockEditorElementTypeCache elementTypeCache, ILogger logger)
     {
         _dataConverter = dataConverter;
-        _contentTypeService = contentTypeService;
+        _elementTypeCache = elementTypeCache;
         _logger = logger;
     }
 
@@ -57,7 +57,7 @@ internal class BlockEditorValues
         // filter out any content that isn't referenced in the layout references
         IEnumerable<Guid> contentTypeKeys = blockEditorData.BlockValue.ContentData.Select(x => x.ContentTypeKey)
             .Union(blockEditorData.BlockValue.SettingsData.Select(x => x.ContentTypeKey)).Distinct();
-        IDictionary<Guid, IContentType> contentTypesDictionary = _contentTypeService.GetAll(contentTypeKeys).ToDictionary(x=>x.Key);
+        IDictionary<Guid, IContentType> contentTypesDictionary = _elementTypeCache.GetAll(contentTypeKeys).ToDictionary(x=>x.Key);
 
         foreach (BlockItemData block in blockEditorData.BlockValue.ContentData.Where(x =>
                      blockEditorData.References.Any(r => x.Udi is not null && r.ContentUdi == x.Udi)))
