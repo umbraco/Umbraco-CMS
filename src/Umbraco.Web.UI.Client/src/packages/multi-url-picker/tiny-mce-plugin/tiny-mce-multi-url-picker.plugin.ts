@@ -87,9 +87,7 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalHandler = modalManager.open(this, UMB_LINK_PICKER_MODAL, {
 			data: {
-				config: {
-					ignoreUserStartNodes: this.configuration?.getValueByAlias<boolean>('ignoreUserStartNodes') ?? false,
-				},
+				config: {},
 				index: null,
 			},
 			value: {

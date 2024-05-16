@@ -19,7 +19,7 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
  * @abstract
  * @class UmbTreeRepositoryBase
  * @extends {UmbRepositoryBase}
- * @implements {UmbTreeRepository<TreeItemType, TreeRootType>}
+ * @implements {UmbTreeRepository}
  * @implements {UmbApi}
  * @template TreeItemType
  * @template TreeRootType
@@ -27,9 +27,20 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 export abstract class UmbTreeRepositoryBase<
 		TreeItemType extends UmbTreeItemModel,
 		TreeRootType extends UmbTreeRootModel,
+		TreeRootItemsRequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+		TreeChildrenOfRequestArgsType extends UmbTreeChildrenOfRequestArgs = UmbTreeChildrenOfRequestArgs,
+		TreeAncestorsOfRequestArgsType extends UmbTreeAncestorsOfRequestArgs = UmbTreeAncestorsOfRequestArgs,
 	>
 	extends UmbRepositoryBase
-	implements UmbTreeRepository<TreeItemType, TreeRootType>, UmbApi
+	implements
+		UmbTreeRepository<
+			TreeItemType,
+			TreeRootType,
+			TreeRootItemsRequestArgsType,
+			TreeChildrenOfRequestArgsType,
+			TreeAncestorsOfRequestArgsType
+		>,
+		UmbApi
 {
 	protected _init: Promise<unknown>;
 	protected _treeStore?: UmbTreeStore<TreeItemType>;
@@ -67,7 +78,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestRootTreeItems(args: UmbTreeRootItemsRequestArgs) {
+	async requestTreeRootItems(args: TreeRootItemsRequestArgsType) {
 		await this._init;
 
 		const { data, error: _error } = await this._treeSource.getRootItems(args);
@@ -85,7 +96,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeItemsOf(args: UmbTreeChildrenOfRequestArgs) {
+	async requestTreeItemsOf(args: TreeChildrenOfRequestArgsType) {
 		if (!args.parent) throw new Error('Parent is missing');
 		if (args.parent.unique === undefined) throw new Error('Parent unique is missing');
 		if (args.parent.entityType === null) throw new Error('Parent entity type is missing');
@@ -106,7 +117,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
+	async requestTreeItemAncestors(args: TreeAncestorsOfRequestArgsType) {
 		if (args.treeItem.unique === undefined) throw new Error('Descendant unique is missing');
 		await this._init;
 

@@ -1,5 +1,6 @@
 import type { UmbPropertyEditorConfig } from '../../../property-editor/index.js';
 import type { UmbPropertyTypeModel } from '../../types.js';
+import { UmbContentPropertyContext } from '@umbraco-cms/backoffice/content';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -34,6 +35,8 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 	private _dataTypeObserver?: UmbObserverController<UmbDataTypeDetailModel | undefined>;
 
+	#contentPropertyContext = new UmbContentPropertyContext(this);
+
 	private async _observeDataType(dataTypeUnique?: string) {
 		this._dataTypeObserver?.destroy();
 		if (dataTypeUnique) {
@@ -42,6 +45,9 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			this._dataTypeObserver = this.observe(
 				await this._dataTypeDetailRepository.byUnique(dataTypeUnique),
 				(dataType) => {
+					const contextValue = dataType ? { unique: dataType.unique } : undefined;
+					this.#contentPropertyContext.setDataType(contextValue);
+
 					this._dataTypeData = dataType?.values;
 					this._propertyEditorUiAlias = dataType?.editorUiAlias || undefined;
 					// If there is no UI, we will look up the Property editor model to find the default UI alias:
