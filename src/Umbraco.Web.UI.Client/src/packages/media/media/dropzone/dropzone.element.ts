@@ -1,13 +1,28 @@
-import { UmbDropzoneManager } from './dropzone-manager.class.js';
-import { UmbChangeEvent, UmbProgressEvent } from '@umbraco-cms/backoffice/event';
+import { UmbDropzoneManager, type UmbUploadableFileModel } from './dropzone-manager.class.js';
+import { UmbProgressEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
 
 @customElement('umb-dropzone')
 export class UmbDropzoneElement extends UmbLitElement {
 	@property({ attribute: false })
 	parentUnique: string | null = null;
+
+	@property({ type: Boolean })
+	multiple: boolean = true;
+
+	@property({ type: Boolean })
+	createAsTemporary: boolean = false;
+
+	//TODO: logic to disable the dropzone?
+
+	#files: Array<UmbUploadableFileModel | UmbTemporaryFileModel> = [];
+
+	public getFiles() {
+		return this.#files;
+	}
 
 	public browse() {
 		const element = this.shadowRoot?.querySelector('#dropzone') as UUIFileDropzoneElement;
@@ -57,20 +72,25 @@ export class UmbDropzoneElement extends UmbLitElement {
 				this.dispatchEvent(new UmbProgressEvent(progress));
 
 				if (completed.length === files.length) {
-					this.dispatchEvent(new UmbChangeEvent());
+					this.#files = completed;
+					this.dispatchEvent(new CustomEvent('change', { detail: { completed } }));
 					dropzoneManager.destroy();
 				}
 			},
 			'_observeCompleted',
 		);
 		//TODO Create some placeholder items while files are being uploaded? Could update them as they get completed.
-		await dropzoneManager.createFilesAsMedia(files, this.parentUnique);
+		if (this.createAsTemporary) {
+			await dropzoneManager.createFilesAsTemporary(files);
+		} else {
+			await dropzoneManager.createFilesAsMedia(files, this.parentUnique);
+		}
 	}
 
 	render() {
 		return html`<uui-file-dropzone
 			id="dropzone"
-			multiple
+			?multiple=${this.multiple}
 			@change=${this.#onDropFiles}
 			label="${this.localize.term('media_dragAndDropYourFilesIntoTheArea')}"
 			accept=""></uui-file-dropzone>`;
