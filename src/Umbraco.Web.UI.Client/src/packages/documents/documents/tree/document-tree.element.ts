@@ -3,11 +3,7 @@ import { UmbDefaultTreeElement } from '@umbraco-cms/backoffice/tree';
 
 const elementName = 'umb-document-tree';
 @customElement(elementName)
-export class UmbDocumentTreeElement extends UmbDefaultTreeElement {
-	connectedCallback(): void {
-		super.connectedCallback();
-	}
-}
+export class UmbDocumentTreeElement extends UmbDefaultTreeElement {}
 
 export { UmbDocumentTreeElement as element };
 
