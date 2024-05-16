@@ -1880,6 +1880,9 @@ export default {
 		searchAllChildren: "Søg alle 'børn'",
 		languagesHelp: 'Tilføj sprog for at give brugerne adgang til at redigere',
 		sectionsHelp: 'Tilføj sektioner for at give brugerne adgang',
+		allowAccessToAllLanguages: 'Tillad adgang til alle sprog',
+		allowAccessToAllDocuments: 'Tillad adgang til alle dokumenter',
+		allowAccessToAllMedia: 'Tillad adgang til alle medier',
 		selectUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
 		},
