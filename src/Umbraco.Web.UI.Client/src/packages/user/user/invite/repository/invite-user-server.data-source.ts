@@ -35,7 +35,9 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 			email: request.email,
 			userName: request.userName,
 			name: request.name,
-			userGroupIds: request.userGroupUniques,
+			userGroupIds: request.userGroupUniques.map((reference) => {
+				return { id: reference.unique };
+			}),
 			message: request.message,
 		};
 

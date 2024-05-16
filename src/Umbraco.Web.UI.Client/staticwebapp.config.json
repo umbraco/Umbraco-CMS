@@ -1,10 +1,7 @@
 {
-    "navigationFallback": {
-        "rewrite": "/index.html",
-        "exclude": [
-            "*.{jpg,jpeg,gif,png,svg}",
-            "/assets/*"
-        ]
-    },
-    "trailingSlash": "never"
+	"navigationFallback": {
+		"rewrite": "/index.html",
+		"exclude": ["*.{jpg,jpeg,gif,png,svg,css}", "/assets/*"]
+	},
+	"trailingSlash": "never"
 }

@@ -14,7 +14,14 @@ export const manifests: Array<ManifestTypes> = [
 			icon: 'icon-autofill',
 			group: 'common',
 			settings: {
-				properties: [],
+				properties: [
+					{
+						alias: 'placeholder',
+						label: 'Placeholder text',
+						description: 'Enter the text to be displayed when the value is empty',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					},
+				],
 				defaultData: [
 					{
 						alias: 'step',
