@@ -1,49 +1,25 @@
-(() => {
+!(() => {
   "use strict";
 
   // Quick exit if within an iframe.
   if (window.self !== window.top) return;
 
   class UmbWebsitePreviewElement extends HTMLElement {
-    static observedAttributes = ["path", "unique", "url"];
-
-    #path;
-    #unique;
-    #url;
-
-    constructor() {
-      super();
-    }
-
     connectedCallback() {
       this.#render();
     }
 
-    attributeChangedCallback(name, oldValue, newValue) {
-      switch (name) {
-        case "path":
-          this.#path = newValue;
-          break;
-
-        case "unique":
-          this.#unique = newValue;
-          break;
-
-        case "url":
-          this.#url = newValue;
-          break;
-
-        default:
-          break;
-      }
-    }
-
     #render() {
+      const path = this.getAttribute("path") ?? '/umbraco';
+      const unique = this.getAttribute("unique") ?? '';
+      const url = this.getAttribute("url") ?? '';
+
       const shadow = this.attachShadow({ mode: "open" });
 
       const wrapper = document.createElement("div");
       wrapper.id = "umbracoPreviewBadge";
       wrapper.className = "umbraco-preview-badge";
+      wrapper.popover = "manual";
 
       const title = document.createElement("span");
       title.className = "umbraco-preview-badge__header";
@@ -54,7 +30,7 @@
       const btnOpen = document.createElement('a');
       btnOpen.classList.add('umbraco-preview-badge__a', 'open');
       btnOpen.title = 'Open preview in BackOffice';
-      btnOpen.href = `${this.#path}/preview/?id=${this.#unique}`;
+      btnOpen.href = `${path}/preview/?id=${unique}`;
       btnOpen.innerHTML = '&hellip;';
 
       wrapper.appendChild(btnOpen);
@@ -62,7 +38,7 @@
       const btnExit = document.createElement("a");
       btnExit.classList.add("umbraco-preview-badge__a", "end");
       btnExit.title = "End preview mode";
-      btnExit.href = `${this.#path}/preview/end/?redir=${this.#url}`;
+      btnExit.href = `${path}/preview/end/?redir=${url}`;
       btnExit.innerHTML = `
 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <title>Click to end preview mode</title>
@@ -78,25 +54,27 @@
 
       style.textContent = `
 .umbraco-preview-badge {
-    position: fixed;
-    bottom: 0;
     display: inline-flex;
     background: rgba(27, 38, 79, 0.9);
     color: #fff;
-    font-size: 12px;
-    z-index: 99999999;
+    font-size: 87.5%;
     justify-content: center;
     align-items: center;
     box-shadow: 0 5px 10px rgba(0, 0, 0, .2), 0 1px 2px rgba(0, 0, 0, .2);
     line-height: 1;
     pointer-events:none;
-    left: 50%;
-    transform: translate(-50%, 40px);
     animation: umbraco-preview-badge--effect 10s 1.2s ease both;
     border-radius: 3px 3px 0 0;
 }
+.umbraco-preview-badge[popover] {
+    inset: unset;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 55px);
+}
 @keyframes umbraco-preview-badge--effect {
-    0% { transform: translate(-50%, 40px); animation-timing-function: ease-out; }
+    0% { transform: translate(-50%, 55px); animation-timing-function: ease-out; }
     1.5% { transform: translate(-50%, -20px); animation-timing-function: ease-in; }
     5.0% { transform: translate(-50%, -8px); animation-timing-function: ease-in; }
     7.5% { transform: translate(-50%, -4px); animation-timing-function: ease-in; }
@@ -105,7 +83,7 @@
     9.7% { transform: translate(-50%, 0); animation-timing-function: ease-out; }
     10.0% { transform: translate(-50%, 0); }
     60% { transform: translate(-50%, 0); animation-timing-function: ease-out; }
-    61.5% { transform: translate(-50%, -20px); animation-timing-function: ease-in; }
+    61.5% { transform: translate(-50%, -24px); animation-timing-function: ease-in; }
     65.0% { transform: translate(-50%, -8px); animation-timing-function: ease-in; }
     67.5% { transform: translate(-50%, -4px); animation-timing-function: ease-in; }
     69.2% { transform: translate(-50%, -2px); animation-timing-function: ease-in; }
