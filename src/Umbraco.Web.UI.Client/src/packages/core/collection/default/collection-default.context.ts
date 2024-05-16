@@ -6,6 +6,7 @@ import type {
 	UmbCollectionContext,
 	UmbCollectionLayoutConfiguration,
 } from '../types.js';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -17,12 +18,15 @@ import type { ManifestCollection, ManifestRepository } from '@umbraco-cms/backof
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbCollectionFilterModel, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 const LOCAL_STORAGE_KEY = 'umb-collection-view';
 
 export class UmbDefaultCollectionContext<
-		CollectionItemType = any,
-		FilterModelType extends UmbCollectionFilterModel = any,
+		CollectionItemType extends UmbEntityModel = UmbEntityModel,
+		FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
 	>
 	extends UmbContextBase<UmbDefaultCollectionContext>
 	implements UmbCollectionContext, UmbApi
@@ -63,6 +67,8 @@ export class UmbDefaultCollectionContext<
 		this.#initialized ? resolve() : (this.#initResolver = resolve);
 	});
 
+	#actionEventContext: UmbActionEventContext | undefined;
+
 	constructor(host: UmbControllerHost, defaultViewAlias: string, defaultFilter: Partial<FilterModelType> = {}) {
 		super(host, UMB_COLLECTION_CONTEXT);
 
@@ -70,6 +76,23 @@ export class UmbDefaultCollectionContext<
 		this.#defaultFilter = defaultFilter;
 
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
+		this.#listenToEntityEvents();
+	}
+
+	async #listenToEntityEvents() {
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
+			this.#actionEventContext = context;
+
+			context?.removeEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadStructureRequest as unknown as EventListener,
+			);
+
+			context?.addEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadStructureRequest as unknown as EventListener,
+			);
+		});
 	}
 
 	#configured = false;
@@ -221,6 +244,23 @@ export class UmbDefaultCollectionContext<
 		layouts[unique] = viewAlias;
 
 		localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(layouts));
+	}
+
+	#onReloadStructureRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
+		const items = this.#items.getValue();
+		const hasItem = items.some((item) => item.unique === event.getUnique());
+		if (hasItem) {
+			this.requestCollection();
+		}
+	};
+
+	destroy(): void {
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureRequest as unknown as EventListener,
+		);
+
+		super.destroy();
 	}
 }
 
