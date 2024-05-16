@@ -194,6 +194,7 @@ public class ContentItemDisplay<TVariant> :
     ///     This is not used for outgoing model information.
     /// </remarks>
     [IgnoreDataMember]
+    [Obsolete("No longer used. Will be removed in V15.")]
     public ContentPropertyCollectionDto? ContentDto { get; set; }
 
     /// <summary>
