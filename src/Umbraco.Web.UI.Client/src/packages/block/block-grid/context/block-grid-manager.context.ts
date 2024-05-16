@@ -63,7 +63,7 @@ export class UmbBlockGridManagerContext<
 	): Array<UmbBlockGridLayoutModel> | undefined {
 		// I'm sorry, this code is not easy to read or maintain [NL]
 		let i: number = entries.length;
-		while (--i) {
+		while (i--) {
 			const layoutEntry = entries[i];
 			if (layoutEntry.contentUdi === parentId) {
 				// Append the layout entry to be inserted and unfreeze the rest of the data:
@@ -79,7 +79,7 @@ export class UmbBlockGridManagerContext<
 				);
 			}
 			let y: number = layoutEntry.areas?.length;
-			while (--y) {
+			while (y--) {
 				// Recursively ask the items of this area to insert the layout entry, if something returns there was a match in this branch. [NL]
 				const correctedAreaItems = this.#appendLayoutEntryToArea(
 					insert,
