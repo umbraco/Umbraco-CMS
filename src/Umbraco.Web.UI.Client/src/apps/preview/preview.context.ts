@@ -1,9 +1,9 @@
 import { UMB_APP_CONTEXT } from '../app/app.context.js';
-import { UmbDocumentPreviewRepository } from '../../packages/documents/documents/repository/preview/index.js';
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbDocumentPreviewRepository } from '@umbraco-cms/backoffice/document';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 const UMB_LOCALSTORAGE_SESSION_KEY = 'umb:previewSessions';
