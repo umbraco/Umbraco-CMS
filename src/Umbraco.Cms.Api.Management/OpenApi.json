@@ -11165,6 +11165,83 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/imaging/resize/urls": {
+      "get": {
+        "tags": [
+          "Imaging"
+        ],
+        "operationId": "GetImagingResizeUrls",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "height",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 200
+            }
+          },
+          {
+            "name": "width",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 200
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ImageCropModeModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MediaUrlInfoResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/import/analyze": {
       "get": {
         "tags": [
@@ -29045,8 +29122,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -29054,8 +29134,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -29063,8 +29146,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             }
@@ -29159,8 +29245,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -29168,8 +29257,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -29177,8 +29269,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             }
@@ -31367,6 +31462,41 @@
           },
           "403": {
             "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current/login-providers": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserCurrentLoginProviders",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/UserExternalLoginProviderModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
           }
         },
         "security": [
@@ -35009,8 +35139,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "id": {
@@ -35167,8 +35300,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasDocumentRootAccess": {
@@ -35178,8 +35314,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasMediaRootAccess": {
@@ -35577,8 +35716,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -35594,8 +35736,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -35714,8 +35859,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -37159,8 +37307,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -37460,6 +37611,22 @@
         ],
         "type": "string"
       },
+      "HealthStatusResponseModel": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/HealthStatusModel"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "HelpPageResponseModel": {
         "type": "object",
         "properties": {
@@ -37481,6 +37648,17 @@
           }
         },
         "additionalProperties": false
+      },
+      "ImageCropModeModel": {
+        "enum": [
+          "Crop",
+          "Max",
+          "Stretch",
+          "Pad",
+          "BoxPad",
+          "Min"
+        ],
+        "type": "string"
       },
       "ImportDictionaryRequestModel": {
         "required": [
@@ -37554,7 +37732,11 @@
             "type": "string"
           },
           "healthStatus": {
-            "$ref": "#/components/schemas/HealthStatusModel"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HealthStatusResponseModel"
+              }
+            ]
           },
           "canRebuild": {
             "type": "boolean"
@@ -37655,8 +37837,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "id": {
@@ -42787,8 +42972,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -44029,16 +44217,22 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "userGroupIds": {
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -44071,8 +44265,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "languageIsoCode": {
@@ -44082,8 +44279,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasDocumentRootAccess": {
@@ -44093,8 +44293,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasMediaRootAccess": {
@@ -44245,6 +44448,26 @@
           "key": {
             "type": "string",
             "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserExternalLoginProviderModel": {
+        "required": [
+          "hasManualLinkingEnabled",
+          "isLinkedOnUser",
+          "providerSchemeName"
+        ],
+        "type": "object",
+        "properties": {
+          "providerSchemeName": {
+            "type": "string"
+          },
+          "isLinkedOnUser": {
+            "type": "boolean"
+          },
+          "hasManualLinkingEnabled": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -44514,8 +44737,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "id": {
@@ -44530,8 +44756,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasDocumentRootAccess": {
@@ -44541,8 +44770,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasMediaRootAccess": {

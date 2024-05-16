@@ -287,6 +287,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IMediaTypeContainerService, MediaTypeContainerService>();
             Services.AddUnique<IContentBlueprintContainerService, ContentBlueprintContainerService>();
             Services.AddUnique<IIsoCodeValidator, IsoCodeValidator>();
+            Services.AddUnique<ICultureService, CultureService>();
             Services.AddUnique<ILanguageService, LanguageService>();
             Services.AddUnique<IMemberGroupService, MemberGroupService>();
             Services.AddUnique<IRedirectUrlService, RedirectUrlService>();

@@ -4,11 +4,11 @@ public class UpdateUserRequestModel : UserPresentationBase
 {
     public string LanguageIsoCode { get; set; } = string.Empty;
 
-    public ISet<Guid> DocumentStartNodeIds { get; set; } = new HashSet<Guid>();
+    public ISet<ReferenceByIdModel> DocumentStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
 
     public bool HasDocumentRootAccess { get; init; }
 
-    public ISet<Guid> MediaStartNodeIds { get; set; } = new HashSet<Guid>();
+    public ISet<ReferenceByIdModel> MediaStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
 
     public bool HasMediaRootAccess { get; init; }
 }
