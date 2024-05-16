@@ -14,4 +14,6 @@ public interface ITemporaryFileToXmlImportService
 
     Task<Attempt<EntityXmlAnalysis?, TemporaryFileXmlImportOperationStatus>> AnalyzeAsync(
         Guid temporaryFileId);
+
+    void CleanupFileIfScopeCompletes(Guid temporaryFileId);
 }

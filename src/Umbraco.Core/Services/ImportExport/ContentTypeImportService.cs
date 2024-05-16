@@ -42,6 +42,7 @@ public class ContentTypeImportService : IContentTypeImportService
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
+        _temporaryFileToXmlImportService.CleanupFileIfScopeCompletes(temporaryFileId);
         Attempt<XElement?, TemporaryFileXmlImportOperationStatus> loadXmlAttempt =
             await _temporaryFileToXmlImportService.LoadXElementFromTemporaryFileAsync(temporaryFileId);
         if (loadXmlAttempt.Success is false)

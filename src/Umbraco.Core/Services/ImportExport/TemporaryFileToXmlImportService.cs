@@ -38,8 +38,6 @@ public class TemporaryFileToXmlImportService : ITemporaryFileToXmlImportService
                 TemporaryFileXmlImportOperationStatus.TemporaryFileNotFound, null);
         }
 
-        _temporaryFileService.EnlistDeleteIfScopeCompletes(documentTypeFile.Key, _coreScopeProvider);
-
         XDocument document;
         await using (Stream fileStream = documentTypeFile.OpenReadStream())
         {
@@ -50,6 +48,9 @@ public class TemporaryFileToXmlImportService : ITemporaryFileToXmlImportService
             TemporaryFileXmlImportOperationStatus.Success,
             document.Root);
     }
+
+    public void CleanupFileIfScopeCompletes(Guid temporaryFileId)
+        => _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileId, _coreScopeProvider);
 
     public Attempt<UmbracoEntityTypes> GetEntityType(XElement entityElement)
     {
