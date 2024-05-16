@@ -38,7 +38,7 @@ export interface UmbTreeRepository<
 	 * @param {UmbTreeRootItemsRequestArgs} args
 	 * @memberof UmbTreeRepository
 	 */
-	requestRootTreeItems: (args: TreeRootItemsRequestArgsType) => Promise<{
+	requestTreeRootItems: (args: TreeRootItemsRequestArgsType) => Promise<{
 		data?: UmbPagedModel<TreeItemType>;
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;

@@ -78,7 +78,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestRootTreeItems(args: TreeRootItemsRequestArgsType) {
+	async requestTreeRootItems(args: TreeRootItemsRequestArgsType) {
 		await this._init;
 
 		const { data, error: _error } = await this._treeSource.getRootItems(args);

@@ -177,7 +177,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 					skip,
 					take,
 				})
-			: await this.#repository!.requestRootTreeItems({
+			: await this.#repository!.requestTreeRootItems({
 					skip,
 					take,
 				});
