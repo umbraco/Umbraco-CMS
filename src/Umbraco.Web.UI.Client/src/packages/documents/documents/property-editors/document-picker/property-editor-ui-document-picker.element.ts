@@ -22,7 +22,6 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 			this._max = minMax.max && minMax.max > 0 ? minMax.max : Infinity;
 		}
 
-		this._ignoreUserStartNodes = config.getValueByAlias('ignoreUserStartNodes') ?? false;
 		this._startNodeId = config.getValueByAlias('startNodeId');
 		this._showOpenButton = config.getValueByAlias('showOpenButton') ?? false;
 	}
@@ -38,9 +37,6 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 
 	@state()
 	private _showOpenButton?: boolean;
-
-	@state()
-	private _ignoreUserStartNodes?: boolean;
 
 	#onChange(event: CustomEvent & { target: UmbInputDocumentElement }) {
 		this.value = event.target.selection.join(',');
@@ -58,7 +54,6 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 				.max=${this._max}
 				.startNode=${startNode}
 				.value=${this.value ?? ''}
-				?ignoreUserStartNodes=${this._ignoreUserStartNodes}
 				?showOpenButton=${this._showOpenButton}
 				@change=${this.#onChange}>
 			</umb-input-document>
