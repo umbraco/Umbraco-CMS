@@ -2583,6 +2583,12 @@ value: string
 key: string
     };
 
+export type UserExternalLoginProviderModel = {
+        providerSchemeName: string
+isLinkedOnUser: boolean
+hasManualLinkingEnabled: boolean
+    };
+
 export type UserGroupItemResponseModel = {
         id: string
 name: string
@@ -5234,6 +5240,7 @@ PostUserUnlock: {
                 ,PostUserCurrentAvatar: string
                 ,PostUserCurrentChangePassword: string
                 ,GetUserCurrentConfiguration: CurrenUserConfigurationResponseModel
+                ,GetUserCurrentLoginProviders: Array<UserExternalLoginProviderModel>
                 ,GetUserCurrentLogins: LinkedLoginsRequestModel
                 ,GetUserCurrentPermissions: UserPermissionsResponseModel
                 ,GetUserCurrentPermissionsDocument: Array<UserPermissionsResponseModel>
