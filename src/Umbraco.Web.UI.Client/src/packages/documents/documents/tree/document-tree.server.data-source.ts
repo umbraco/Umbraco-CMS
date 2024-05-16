@@ -40,7 +40,7 @@ export class UmbDocumentTreeServerDataSource extends UmbTreeServerDataSourceBase
 const getRootItems = (args: UmbDocumentTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
 	DocumentService.getTreeDocumentRoot({
-		dataTypeId: args.dataType.unique,
+		dataTypeId: args.dataType?.unique,
 		skip: args.skip,
 		take: args.take,
 	});

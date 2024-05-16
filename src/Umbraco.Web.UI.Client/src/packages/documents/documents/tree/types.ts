@@ -33,13 +33,13 @@ export interface UmbDocumentTreeItemVariantModel {
 }
 
 export interface UmbDocumentTreeRootItemsRequestArgs extends UmbTreeRootItemsRequestArgs {
-	dataType: {
+	dataType?: {
 		unique: string;
 	};
 }
 
 export interface UmbDocumentTreeChildrenOfRequestArgs extends UmbTreeChildrenOfRequestArgs {
-	dataType: {
+	dataType?: {
 		unique: string;
 	};
 }
