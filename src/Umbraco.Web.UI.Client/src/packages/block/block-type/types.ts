@@ -6,6 +6,7 @@ export interface UmbBlockTypeBaseModel {
 	label?: string;
 	//view?: string; // TODO: remove/replace with custom element manifest type for block list.
 	//stylesheet?: string; // TODO: remove/replace with custom element manifest type for block list.
+	thumbnail?: string;
 	iconColor?: string;
 	backgroundColor?: string;
 	editorSize?: UUIModalSidebarSize;

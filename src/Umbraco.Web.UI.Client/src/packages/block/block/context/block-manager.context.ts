@@ -26,6 +26,10 @@ export abstract class UmbBlockManagerContext<
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 > extends UmbContextBase<UmbBlockManagerContext> {
 	//
+	get contentTypesLoaded() {
+		return Promise.all(this.#contentTypeRequests);
+	}
+	#contentTypeRequests: Array<Promise<unknown>> = [];
 	#contentTypeRepository = new UmbDocumentTypeDetailRepository(this);
 
 	#propertyAlias = new UmbStringState(undefined);
@@ -115,7 +119,9 @@ export abstract class UmbBlockManagerContext<
 	async #ensureContentType(unique: string) {
 		if (this.#contentTypes.getValue().find((x) => x.unique === unique)) return;
 
-		const { data } = await this.#contentTypeRepository.requestByUnique(unique);
+		const contentTypeRequest = this.#contentTypeRepository.requestByUnique(unique);
+		this.#contentTypeRequests.push(contentTypeRequest);
+		const { data } = await contentTypeRequest;
 		if (!data) {
 			this.#contentTypes.removeOne(unique);
 			return;
@@ -131,6 +137,9 @@ export abstract class UmbBlockManagerContext<
 	}
 	contentTypeNameOf(contentTypeKey: string) {
 		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeKey)?.name);
+	}
+	getContentTypeNameOf(contentTypeKey: string) {
+		return this.#contentTypes.getValue().find((x) => x.unique === contentTypeKey)?.name;
 	}
 	blockTypeOf(contentTypeKey: string) {
 		return this.#blockTypes.asObservablePart((source) =>

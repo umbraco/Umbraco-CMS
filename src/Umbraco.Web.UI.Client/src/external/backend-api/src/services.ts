@@ -8690,6 +8690,21 @@ requestBody
 	 * @returns unknown Success
 	 * @throws ApiError
 	 */
+	public static getUserCurrentLoginProviders(): CancelablePromise<UserData['responses']['GetUserCurrentLoginProviders']> {
+		
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/user/current/login-providers',
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
 	public static getUserCurrentLogins(): CancelablePromise<UserData['responses']['GetUserCurrentLogins']> {
 		
 		return __request(OpenAPI, {
