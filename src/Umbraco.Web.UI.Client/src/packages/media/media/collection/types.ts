@@ -20,10 +20,10 @@ export interface UmbMediaCollectionItemModel {
 	updateDate: Date;
 	updater?: string | null;
 	values: Array<{ alias: string; value: string }>;
+	url?: string;
 }
 
 export interface UmbEditableMediaCollectionItemModel {
 	item: UmbMediaCollectionItemModel;
 	editPath: string;
 }
-
