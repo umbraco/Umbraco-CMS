@@ -8,7 +8,7 @@ public class PreviewService : IPreviewService
 
     public PreviewService(ICookieManager cookieManager) => _cookieManager = cookieManager;
 
-    public void EnterPreview() => _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, "preview");
+    public void EnterPreview() => _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, "preview", true);
 
 
     public void EndPreview() => _cookieManager.ExpireCookie(Constants.Web.PreviewCookieName);

@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -8,26 +7,25 @@ using Umbraco.Cms.Core.Web;
 namespace Umbraco.Cms.Core.Routing;
 
 /// <summary>
-///     Provides an implementation of <see cref="IContentFinder" /> that handles page identifiers.
+///     Provides an implementation of <see cref="IContentFinder" /> that handles page key identifiers.
 /// </summary>
 /// <remarks>
-///     <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
+///     <para>Handles <c>/e7b65017-c6b3-4c11-b7c7-7ea1d0404c9a</c> where <c>e7b65017-c6b3-4c11-b7c7-7ea1d0404c9a</c> is the key of a document.</para>
 /// </remarks>
-[Obsolete("Use ContentFinderByKeyPath instead. This will be removed in Umbraco 15.")]
-public class ContentFinderByIdPath : ContentFinderByIdentifierPathBase, IContentFinder
+public class ContentFinderByKeyPath : ContentFinderByIdentifierPathBase, IContentFinder
 {
-    private readonly ILogger<ContentFinderByIdPath> _logger;
+    private readonly ILogger<ContentFinderByKeyPath> _logger;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private WebRoutingSettings _webRoutingSettings;
 
-    protected override string FailureLogMessageTemplate => "Not a node id";
+    protected override string FailureLogMessageTemplate => "Not a node key";
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentFinderByIdPath" /> class.
+    ///     Initializes a new instance of the <see cref="ContentFinderByKeyPath" /> class.
     /// </summary>
-    public ContentFinderByIdPath(
+    public ContentFinderByKeyPath(
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
-        ILogger<ContentFinderByIdPath> logger,
+        ILogger<ContentFinderByKeyPath> logger,
         IRequestAccessor requestAccessor,
         IUmbracoContextAccessor umbracoContextAccessor)
         : base(requestAccessor, logger)
@@ -53,7 +51,7 @@ public class ContentFinderByIdPath : ContentFinderByIdentifierPathBase, IContent
             return Task.FromResult(false);
         }
 
-        if (umbracoContext.InPreviewMode == false && (_webRoutingSettings.DisableFindContentByIdPath || _webRoutingSettings.DisableFindContentByIdentifierPath))
+        if (umbracoContext.InPreviewMode == false && _webRoutingSettings.DisableFindContentByIdentifierPath)
         {
             return Task.FromResult(false);
         }
@@ -68,23 +66,23 @@ public class ContentFinderByIdPath : ContentFinderByIdentifierPathBase, IContent
 
         var noSlashPath = path.Substring(1);
 
-        if (int.TryParse(noSlashPath, NumberStyles.Integer, CultureInfo.InvariantCulture, out var nodeId) == false)
+        if (Guid.TryParse(noSlashPath, out var nodeKey) == false)
         {
             return LogAndReturnFailure();
         }
 
-        // NodeId cannot be negative or 0
-        if (nodeId < 1)
+        // We shouldn't be persisting empty Guids
+        if (nodeKey.Equals(Guid.Empty))
         {
             return LogAndReturnFailure();
         }
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("Id={NodeId}", nodeId);
+            _logger.LogDebug("Key={NodeKey}", nodeKey);
         }
 
-        IPublishedContent? node = umbracoContext.Content?.GetById(nodeId);
+        IPublishedContent? node = umbracoContext.Content?.GetById(nodeKey);
 
         if (node is null)
         {
@@ -96,7 +94,7 @@ public class ContentFinderByIdPath : ContentFinderByIdentifierPathBase, IContent
         frequest.SetPublishedContent(node);
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("Found node with id={PublishedContentId}", node.Id);
+            _logger.LogDebug("Found node with key={PublishedContentKey}", node.Key);
         }
 
         return Task.FromResult(true);

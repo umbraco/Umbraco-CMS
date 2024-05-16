@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
@@ -46,11 +47,11 @@ public class RemoveUsersFromUserGroupController : UserGroupControllerBase
             return Forbidden();
         }
 
-        UserGroupOperationStatus result = await _userGroupService.RemoveUsersFromUserGroupAsync(
+        Attempt<UserGroupOperationStatus> result = await _userGroupService.RemoveUsersFromUserGroupAsync(
             new UsersToUserGroupManipulationModel(id, userIds.Select(x => x.Id).ToArray()), CurrentUserKey(_backOfficeSecurityAccessor));
 
-        return result == UserGroupOperationStatus.Success
+        return result.Success
             ? Ok()
-            : UserGroupOperationStatusResult(result);
+            : UserGroupOperationStatusResult(result.Result);
     }
 }
