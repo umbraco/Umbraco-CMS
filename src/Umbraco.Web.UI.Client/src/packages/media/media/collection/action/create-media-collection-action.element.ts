@@ -1,7 +1,7 @@
+import { UMB_MEDIA_COLLECTION_CONTEXT } from '../media-collection.context-token.js';
 import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/media';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
@@ -53,7 +53,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 			});
 		});
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (collectionContext) => {
+		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
 			this.observe(collectionContext.filter, (filter) => {
 				this._useInfiniteEditor = filter.useInfiniteEditor == true;
 			});
@@ -86,7 +86,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 			? `${this._createMediaPath}create/${this._mediaUnique ?? 'null'}/${mediaType.unique}`
 			: `section/media/workspace/media/create/parent/${mediaEntityType}/${this._mediaUnique ?? 'null'}/${
 					mediaType.unique
-			  }`;
+				}`;
 	}
 
 	render() {
