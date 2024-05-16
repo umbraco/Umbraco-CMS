@@ -33,7 +33,7 @@ export class UmbDisableUserServerDataSource implements UmbDisableUserDataSource 
 			this.#host,
 			UserService.postUserDisable({
 				requestBody: {
-					userIds,
+					userIds: userIds.map((id) => ({ id })),
 				},
 			}),
 		);
