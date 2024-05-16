@@ -1,6 +1,11 @@
 import type { UmbMediaEntityType, UmbMediaRootEntityType } from '../entity.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { UmbTreeItemModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeItemModel,
+	UmbTreeRootItemsRequestArgs,
+	UmbTreeRootModel,
+} from '@umbraco-cms/backoffice/tree';
 
 export interface UmbMediaTreeItemModel extends UmbTreeItemModel {
 	entityType: UmbMediaEntityType;
@@ -21,4 +26,16 @@ export interface UmbMediaTreeRootModel extends UmbTreeRootModel {
 export interface UmbMediaTreeItemVariantModel {
 	name: string;
 	culture: string | null;
+}
+
+export interface UmbMediaTreeRootItemsRequestArgs extends UmbTreeRootItemsRequestArgs {
+	dataType?: {
+		unique: string;
+	};
+}
+
+export interface UmbMediaTreeChildrenOfRequestArgs extends UmbTreeChildrenOfRequestArgs {
+	dataType?: {
+		unique: string;
+	};
 }
