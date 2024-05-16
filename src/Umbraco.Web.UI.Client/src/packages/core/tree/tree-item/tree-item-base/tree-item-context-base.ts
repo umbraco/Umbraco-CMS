@@ -1,5 +1,5 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
-import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/default-tree.context.js';
+import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../../reload-tree-item-children/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';

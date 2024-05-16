@@ -6,7 +6,7 @@ import type {
 	UmbTreeStartNode,
 } from '../types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
-import { UMB_TREE_CONTEXT } from './default-tree.context.js';
+import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
