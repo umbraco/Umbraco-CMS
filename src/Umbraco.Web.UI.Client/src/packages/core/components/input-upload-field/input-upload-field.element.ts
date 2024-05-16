@@ -25,7 +25,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 		this._src = value.src;
 	}
 	get value(): MediaValueType {
-		return !this.temporaryFile ? { src: this._src } : { temporaryFileId: this.temporaryFile.unique };
+		return !this.temporaryFile ? { src: this._src } : { temporaryFileId: this.temporaryFile.temporaryUnique };
 	}
 
 	/**
@@ -67,7 +67,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 	async #onUpload(e: UUIFileDropzoneEvent) {
 		//Property Editor for Upload field will always only have one file.
 		const item: UmbTemporaryFileModel = {
-			unique: UmbId.new(),
+			temporaryUnique: UmbId.new(),
 			file: e.detail.files[0],
 		};
 		const upload = this.#manager.uploadOne(item);
@@ -80,7 +80,7 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 		const uploaded = await upload;
 		if (uploaded.status === TemporaryFileStatus.SUCCESS) {
-			this.temporaryFile = { unique: item.unique, file: item.file };
+			this.temporaryFile = { temporaryUnique: item.temporaryUnique, file: item.file };
 			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}

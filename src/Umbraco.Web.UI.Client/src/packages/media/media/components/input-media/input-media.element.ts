@@ -1,3 +1,4 @@
+import type { UmbMediaCardItemModel } from '../../modals/index.js';
 import type { UmbMediaItemModel } from '../../repository/index.js';
 import { UmbMediaPickerContext } from './input-media.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -7,6 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbUploadableFileModel } from '@umbraco-cms/backoffice/media';
 
 @customElement('umb-input-media')
 export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -103,7 +105,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	private _editMediaPath = '';
 
 	@state()
-	private _items?: Array<UmbMediaItemModel>;
+	private _items?: Array<UmbMediaCardItemModel>;
 
 	#pickerContext = new UmbMediaPickerContext(this);
 
@@ -120,7 +122,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 			});
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#pickerContext.cardItems, (cardItems) => (this._items = cardItems));
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -154,8 +156,25 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		});
 	}
 
+	async #onUploadCompleted(e: CustomEvent) {
+		const completed = e.detail?.completed as Array<UmbUploadableFileModel>;
+		const uploaded = completed.map((file) => file.unique);
+
+		this.selection = [...this.selection, ...uploaded];
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
 	render() {
-		return html`<div class="container">${this.#renderItems()} ${this.#renderAddButton()}</div>`;
+		return html`${this.#renderDropzone()}
+			<div class="container">${this.#renderItems()} ${this.#renderAddButton()}</div>`;
+	}
+
+	#renderDropzone() {
+		if (this._items && this._items.length >= this.max) return;
+		return html`<umb-dropzone
+			id="dropzone"
+			?multiple=${this.max === 1}
+			@change=${this.#onUploadCompleted}></umb-dropzone>`;
 	}
 
 	#renderItems() {
@@ -181,13 +200,13 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	#renderItem(item: UmbMediaItemModel) {
+	#renderItem(item: UmbMediaCardItemModel) {
 		// TODO: `file-ext` value has been hardcoded here. Find out if API model has value for it. [LK]
 		return html`
-			<uui-card-media
-				name=${ifDefined(item.name === null ? undefined : item.name)}
-				detail=${ifDefined(item.unique)}
-				file-ext="jpg">
+			<uui-card-media name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.unique)}>
+				${item.url
+					? html`<img src=${item.url} alt=${item.name} />`
+					: html`<umb-icon name=${ifDefined(item.icon)}></umb-icon>`}
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
@@ -204,7 +223,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	#renderIsTrashed(item: UmbMediaItemModel) {
+	#renderIsTrashed(item: UmbMediaCardItemModel) {
 		if (!item.isTrashed) return;
 		return html`
 			<uui-tag size="s" slot="tag" color="danger">
@@ -213,7 +232,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	#renderOpenButton(item: UmbMediaItemModel) {
+	#renderOpenButton(item: UmbMediaCardItemModel) {
 		if (!this.showOpenButton) return;
 		return html`
 			<uui-button
@@ -227,6 +246,9 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 
 	static styles = [
 		css`
+			:host {
+				position: relative;
+			}
 			.container {
 				display: grid;
 				gap: var(--uui-size-space-3);

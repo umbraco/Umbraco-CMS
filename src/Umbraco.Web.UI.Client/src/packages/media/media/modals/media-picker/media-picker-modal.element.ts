@@ -67,7 +67,14 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 		return items.map((item): UmbMediaCardItemModel => {
 			const url = data?.find((media) => media.unique === item.unique)?.url;
-			return { name: item.name, unique: item.unique, url, icon: item.mediaType.icon, entityType: item.entityType };
+			return {
+				name: item.name,
+				unique: item.unique,
+				url,
+				icon: item.mediaType.icon,
+				entityType: item.entityType,
+				isTrashed: item.isTrashed,
+			};
 		});
 	}
 
