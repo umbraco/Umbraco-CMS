@@ -37,7 +37,10 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
     [HttpPost("{id:guid}/public-access")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(Guid id, PublicAccessRequestModel publicAccessRequestModel)
+    public async Task<IActionResult> Create(
+        CancellationToken cancellationToken,
+        Guid id,
+        PublicAccessRequestModel publicAccessRequestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
@@ -54,7 +57,7 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
         Attempt<PublicAccessEntry?, PublicAccessOperationStatus> saveAttempt = await _publicAccessService.CreateAsync(publicAccessEntrySlim);
 
         return saveAttempt.Success
-            ? CreatedAtId<GetPublicAccessDocumentController>(controller => nameof(controller.GetPublicAccess), saveAttempt.Result!.Key)
+            ? CreatedAtId<GetPublicAccessDocumentController>(controller => nameof(controller.GetPublicAccess), id)
             : PublicAccessOperationStatusResult(saveAttempt.Status);
     }
 }

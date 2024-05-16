@@ -20,6 +20,12 @@
   <ItemGroup>
     <Compile Remove="Umbraco.Core\DeliveryApi\NestedContentValueConverterTests.cs" />
     <Compile Remove="Umbraco.Core\PropertyEditors\NestedContentPropertyComponentTests.cs" />
+    <Compile Update="Umbraco.Cms.Api.Management\Services\BackOfficeExternalLoginServiceTests.ExternalLoginStatusForUserAsync.cs">
+      <DependentUpon>BackOfficeExternalLoginServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Cms.Api.Management\Services\BackOfficeExternalLoginServiceTests.UnLinkLoginAsync.cs">
+      <DependentUpon>BackOfficeExternalLoginServiceTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

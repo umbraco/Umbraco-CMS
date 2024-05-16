@@ -22,17 +22,19 @@ public static class DistributedCacheExtensions
 
     #region UserCacheRefresher
 
-    public static void RemoveUserCache(this DistributedCache dc, int userId)
-        => dc.Remove(UserCacheRefresher.UniqueId, userId);
-
     public static void RemoveUserCache(this DistributedCache dc, IEnumerable<IUser> users)
         => dc.Remove(UserCacheRefresher.UniqueId, users.Select(x => x.Id).Distinct().ToArray());
 
-    public static void RefreshUserCache(this DistributedCache dc, int userId)
-        => dc.Refresh(UserCacheRefresher.UniqueId, userId);
-
     public static void RefreshUserCache(this DistributedCache dc, IEnumerable<IUser> users)
-        => dc.Refresh(UserCacheRefresher.UniqueId, users.Select(x => x.Id).Distinct().ToArray());
+    {
+        IEnumerable<UserCacheRefresher.JsonPayload> payloads = users.Select(x => new UserCacheRefresher.JsonPayload()
+        {
+            Id = x.Id,
+            Key = x.Key,
+        });
+
+        dc.RefreshByPayload(UserCacheRefresher.UniqueId, payloads);
+    }
 
     public static void RefreshAllUserCache(this DistributedCache dc)
         => dc.RefreshAll(UserCacheRefresher.UniqueId);
@@ -92,16 +94,8 @@ public static class DistributedCacheExtensions
 
     #region DataTypeCacheRefresher
 
-    [Obsolete("Use the overload accepting IEnumerable instead. This overload will be removed in Umbraco 13.")]
-    public static void RefreshDataTypeCache(this DistributedCache dc, IDataType dataType)
-        => dc.RefreshDataTypeCache(dataType.Yield());
-
     public static void RefreshDataTypeCache(this DistributedCache dc, IEnumerable<IDataType> dataTypes)
         => dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, dataTypes.DistinctBy(x => (x.Id, x.Key)).Select(x => new DataTypeCacheRefresher.JsonPayload(x.Id, x.Key, false)));
-
-    [Obsolete("Use the overload accepting IEnumerable instead. This overload will be removed in Umbraco 13.")]
-    public static void RemoveDataTypeCache(this DistributedCache dc, IDataType dataType)
-        => dc.RemoveDataTypeCache(dataType.Yield());
 
     public static void RemoveDataTypeCache(this DistributedCache dc, IEnumerable<IDataType> dataTypes)
         => dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, dataTypes.DistinctBy(x => (x.Id, x.Key)).Select(x => new DataTypeCacheRefresher.JsonPayload(x.Id, x.Key, true)));
@@ -131,10 +125,6 @@ public static class DistributedCacheExtensions
         dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
     }
 
-    [Obsolete("Use the overload accepting IEnumerable instead to avoid allocating arrays. This overload will be removed in Umbraco 13.")]
-    public static void RefreshContentCache(this DistributedCache dc, TreeChange<IContent>[] changes)
-        => dc.RefreshContentCache(changes.AsEnumerable());
-
     public static void RefreshContentCache(this DistributedCache dc, IEnumerable<TreeChange<IContent>> changes)
     {
         IEnumerable<ContentCacheRefresher.JsonPayload> payloads = changes.Select(x => new ContentCacheRefresher.JsonPayload()
@@ -152,17 +142,8 @@ public static class DistributedCacheExtensions
 
     #region MemberCacheRefresher
 
-    [Obsolete("Use the overload accepting IEnumerable instead to avoid allocating arrays. This overload will be removed in Umbraco 13.")]
-    public static void RefreshMemberCache(this DistributedCache dc, params IMember[] members)
-        => dc.RefreshMemberCache(members.AsEnumerable());
-
     public static void RefreshMemberCache(this DistributedCache dc, IEnumerable<IMember> members)
         => dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.DistinctBy(x => (x.Id, x.Username)).Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, false)));
-
-
-    [Obsolete("Use the overload accepting IEnumerable instead to avoid allocating arrays. This overload will be removed in Umbraco 13.")]
-    public static void RemoveMemberCache(this DistributedCache dc, params IMember[] members)
-        => dc.RemoveMemberCache(members.AsEnumerable());
 
     public static void RemoveMemberCache(this DistributedCache dc, IEnumerable<IMember> members)
         => dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.DistinctBy(x => (x.Id, x.Username)).Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, true)));
@@ -191,9 +172,6 @@ public static class DistributedCacheExtensions
         // note: refresh all media cache does refresh content types too
         => dc.RefreshByPayload(MediaCacheRefresher.UniqueId, new MediaCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll).Yield());
 
-    [Obsolete("Use the overload accepting IEnumerable instead to avoid allocating arrays. This overload will be removed in Umbraco 13.")]
-    public static void RefreshMediaCache(this DistributedCache dc, TreeChange<IMedia>[] changes)
-        => dc.RefreshMediaCache(changes.AsEnumerable());
 
     public static void RefreshMediaCache(this DistributedCache dc, IEnumerable<TreeChange<IMedia>> changes)
         => dc.RefreshByPayload(MediaCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.Item.Key, x.ChangeTypes)).Select(x => new MediaCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes)));
@@ -214,23 +192,11 @@ public static class DistributedCacheExtensions
 
     #region ContentTypeCacheRefresher
 
-    [Obsolete("Use the overload accepting IEnumerable instead to avoid allocating arrays. This overload will be removed in Umbraco 13.")]
-    public static void RefreshContentTypeCache(this DistributedCache dc, ContentTypeChange<IContentType>[] changes)
-        => dc.RefreshContentTypeCache(changes.AsEnumerable());
-
     public static void RefreshContentTypeCache(this DistributedCache dc, IEnumerable<ContentTypeChange<IContentType>> changes)
         => dc.RefreshByPayload(ContentTypeCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.ChangeTypes)).Select(x => new ContentTypeCacheRefresher.JsonPayload(typeof(IContentType).Name, x.Item.Id, x.ChangeTypes)));
 
-    [Obsolete("Use the overload accepting IEnumerable instead to avoid allocating arrays. This overload will be removed in Umbraco 13.")]
-    public static void RefreshContentTypeCache(this DistributedCache dc, ContentTypeChange<IMediaType>[] changes)
-        => dc.RefreshContentTypeCache(changes.AsEnumerable());
-
     public static void RefreshContentTypeCache(this DistributedCache dc, IEnumerable<ContentTypeChange<IMediaType>> changes)
         => dc.RefreshByPayload(ContentTypeCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.ChangeTypes)).Select(x => new ContentTypeCacheRefresher.JsonPayload(typeof(IMediaType).Name, x.Item.Id, x.ChangeTypes)));
-
-    [Obsolete("Use the overload accepting IEnumerable instead to avoid allocating arrays. This overload will be removed in Umbraco 13.")]
-    public static void RefreshContentTypeCache(this DistributedCache dc, ContentTypeChange<IMemberType>[] changes)
-        => dc.RefreshContentTypeCache(changes.AsEnumerable());
 
     public static void RefreshContentTypeCache(this DistributedCache dc, IEnumerable<ContentTypeChange<IMemberType>> changes)
         => dc.RefreshByPayload(ContentTypeCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.ChangeTypes)).Select(x => new ContentTypeCacheRefresher.JsonPayload(typeof(IMemberType).Name, x.Item.Id, x.ChangeTypes)));
@@ -239,16 +205,8 @@ public static class DistributedCacheExtensions
 
     #region DomainCacheRefresher
 
-    [Obsolete("Use the overload accepting IEnumerable instead. This overload will be removed in Umbraco 13.")]
-    public static void RefreshDomainCache(this DistributedCache dc, IDomain domain)
-        => dc.RefreshDomainCache(domain.Yield());
-
     public static void RefreshDomainCache(this DistributedCache dc, IEnumerable<IDomain> domains)
         => dc.RefreshByPayload(DomainCacheRefresher.UniqueId, domains.DistinctBy(x => x.Id).Select(x => new DomainCacheRefresher.JsonPayload(x.Id, DomainChangeTypes.Refresh)));
-
-    [Obsolete("Use the overload accepting IEnumerable instead. This overload will be removed in Umbraco 13.")]
-    public static void RemoveDomainCache(this DistributedCache dc, IDomain domain)
-        => dc.RemoveDomainCache(domain.Yield());
 
     public static void RemoveDomainCache(this DistributedCache dc, IEnumerable<IDomain> domains)
         => dc.RefreshByPayload(DomainCacheRefresher.UniqueId, domains.DistinctBy(x => x.Id).Select(x => new DomainCacheRefresher.JsonPayload(x.Id, DomainChangeTypes.Remove)));
@@ -260,10 +218,6 @@ public static class DistributedCacheExtensions
 
     #region LanguageCacheRefresher
 
-    [Obsolete("Use the overload accepting IEnumerable instead. This overload will be removed in Umbraco 13.")]
-    public static void RefreshLanguageCache(this DistributedCache dc, ILanguage language)
-        => dc.RefreshLanguageCache(language.Yield());
-
     public static void RefreshLanguageCache(this DistributedCache dc, IEnumerable<ILanguage> languages)
         => dc.RefreshByPayload(LanguageCacheRefresher.UniqueId, languages.DistinctBy(x => (x.Id, x.IsoCode)).Select(x => new LanguageCacheRefresher.JsonPayload(
             x.Id,
@@ -271,10 +225,6 @@ public static class DistributedCacheExtensions
             x.WasPropertyDirty(nameof(ILanguage.IsoCode))
             ? LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
             : LanguageCacheRefresher.JsonPayload.LanguageChangeType.Update)));
-
-    [Obsolete("Use the overload accepting IEnumerable instead. This overload will be removed in Umbraco 13.")]
-    public static void RemoveLanguageCache(this DistributedCache dc, ILanguage language)
-        => dc.RemoveLanguageCache(language.Yield());
 
     public static void RemoveLanguageCache(this DistributedCache dc, IEnumerable<ILanguage> languages)
         => dc.RefreshByPayload(LanguageCacheRefresher.UniqueId, languages.DistinctBy(x => (x.Id, x.IsoCode)).Select(x => new LanguageCacheRefresher.JsonPayload(x.Id, x.IsoCode, LanguageCacheRefresher.JsonPayload.LanguageChangeType.Remove)));

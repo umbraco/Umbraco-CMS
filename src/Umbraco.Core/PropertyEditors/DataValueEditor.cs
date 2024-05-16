@@ -211,7 +211,7 @@ public class DataValueEditor : IDataValueEditor
             case ValueStorageType.Ntext:
             case ValueStorageType.Nvarchar:
                 // If it is a string type, we will attempt to see if it is JSON stored data, if it is we'll try to convert
-                // to a real JSON object so we can pass the true JSON object directly to Angular!
+                // to a real JSON object so we can pass the true JSON object directly to the client
                 var stringValue = value as string ?? value.ToString();
                 if (stringValue!.DetectIsJson())
                 {

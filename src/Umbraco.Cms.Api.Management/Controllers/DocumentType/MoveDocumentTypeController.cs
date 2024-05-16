@@ -22,7 +22,10 @@ public class MoveDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Move(Guid id, MoveDocumentTypeRequestModel moveDocumentTypeRequestModel)
+    public async Task<IActionResult> Move(
+        CancellationToken cancellationToken,
+        Guid id,
+        MoveDocumentTypeRequestModel moveDocumentTypeRequestModel)
     {
         Attempt<IContentType?, ContentTypeStructureOperationStatus> result = await _contentTypeService.MoveAsync(id, moveDocumentTypeRequestModel.Target?.Id);
 

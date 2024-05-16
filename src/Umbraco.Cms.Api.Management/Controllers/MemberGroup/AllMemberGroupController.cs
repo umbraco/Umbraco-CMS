@@ -24,7 +24,10 @@ public class AllMemberGroupController : MemberGroupControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MemberGroupResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<MemberGroupResponseModel>>> All(int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<MemberGroupResponseModel>>> All(
+        CancellationToken cancellationToken,
+        int skip = 0,
+        int take = 100)
     {
         IMemberGroup[] memberGroups = (await _memberGroupService.GetAllAsync()).ToArray();
         var viewModel = new PagedViewModel<MemberGroupResponseModel>

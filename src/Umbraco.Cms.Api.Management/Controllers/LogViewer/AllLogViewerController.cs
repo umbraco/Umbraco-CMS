@@ -42,13 +42,14 @@ public class AllLogViewerController : LogViewerControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<LogMessageResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> AllLogs(
+        CancellationToken cancellationToken,
         int skip = 0,
         int take = 100,
         Direction orderDirection = Direction.Descending,
         string? filterExpression = null,
         [FromQuery(Name = "logLevel")] LogLevel[]? logLevels = null,
-        DateTime? startDate = null,
-        DateTime? endDate = null)
+        DateTimeOffset? startDate = null,
+        DateTimeOffset? endDate = null)
     {
         var levels = logLevels?.Select(l => l.ToString()).ToArray();
 

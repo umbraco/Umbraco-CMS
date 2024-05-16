@@ -18,17 +18,20 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     private readonly IMemberService _memberService;
     private readonly IMemberTypeService _memberTypeService;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly IMemberGroupService _memberGroupService;
 
     public MemberPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IMemberService memberService,
         IMemberTypeService memberTypeService,
-        ITwoFactorLoginService twoFactorLoginService)
+        ITwoFactorLoginService twoFactorLoginService,
+        IMemberGroupService memberGroupService)
     {
         _umbracoMapper = umbracoMapper;
         _memberService = memberService;
         _memberTypeService = memberTypeService;
         _twoFactorLoginService = twoFactorLoginService;
+        _memberGroupService = memberGroupService;
     }
 
     public async Task<MemberResponseModel> CreateResponseModelAsync(IMember member, IUser currentUser)
@@ -36,8 +39,10 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         MemberResponseModel responseModel = _umbracoMapper.Map<MemberResponseModel>(member)!;
 
         responseModel.IsTwoFactorEnabled = await _twoFactorLoginService.IsTwoFactorEnabledAsync(member.Key);
-        responseModel.Groups = _memberService.GetAllRoles(member.Username);
+        IEnumerable<string> roles = _memberService.GetAllRoles(member.Username);
 
+        // Get the member groups per role, so we can return the group keys
+        responseModel.Groups = roles.Select(x => _memberGroupService.GetByName(x)).WhereNotNull().Select(x => x.Key).ToArray();
         return currentUser.HasAccessToSensitiveData()
             ? responseModel
             : await RemoveSensitiveDataAsync(member, responseModel);
@@ -55,20 +60,21 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     }
 
     public MemberItemResponseModel CreateItemResponseModel(IMemberEntitySlim entity)
-    {
-        var responseModel = new MemberItemResponseModel
+        => CreateItemResponseModel<IMemberEntitySlim>(entity);
+
+    public MemberItemResponseModel CreateItemResponseModel(IMember entity)
+        => CreateItemResponseModel<IMember>(entity);
+
+    private MemberItemResponseModel CreateItemResponseModel<T>(T entity)
+        where T : ITreeEntity
+        => new MemberItemResponseModel
         {
             Id = entity.Key,
+            MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!,
+            Variants = CreateVariantsItemResponseModels(entity)
         };
 
-        responseModel.MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!;
-
-        responseModel.Variants = CreateVariantsItemResponseModels(entity);
-
-        return responseModel;
-    }
-
-    public IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(IMemberEntitySlim entity)
+    private static IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(ITreeEntity entity)
         => new[]
         {
             new VariantItemResponseModel
@@ -77,9 +83,6 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
                 Culture = null
             }
         };
-
-    public MemberTypeReferenceResponseModel CreateMemberTypeReferenceResponseModel(IMemberEntitySlim entity)
-        => _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!;
 
     private async Task<MemberResponseModel> RemoveSensitiveDataAsync(IMember member, MemberResponseModel responseModel)
     {

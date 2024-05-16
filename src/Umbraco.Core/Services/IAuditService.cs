@@ -1,6 +1,5 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
-using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -76,12 +75,12 @@ public interface IAuditService : IService
         IQuery<IAuditItem>? customFilter = null);
 
     /// <summary>
-    ///     Returns paged items in the audit trail for a given user
+    ///     Returns paged items in the audit trail for a given entity
     /// </summary>
-    /// <param name="entityKey">The key of the user</param>
-    /// <param name="skip">The amount of entries to skip</param>
-    /// <param name="take">The amount of entiries to take</param>
-    /// <param name="totalRecords">The total amount of entires</param>
+    /// <param name="entityKey">The key of the entity</param>
+    /// <param name="entityType">The entity type</param>
+    /// <param name="skip">The amount of audit trail entries to skip</param>
+    /// <param name="take">The amount of audit trail entries to take</param>
     /// <param name="orderDirection">
     ///     By default this will always be ordered descending (newest first)
     /// </param>
@@ -96,10 +95,11 @@ public interface IAuditService : IService
     /// <returns></returns>
     Task<PagedModel<IAuditItem>> GetItemsByKeyAsync(
         Guid entityKey,
+        UmbracoObjectTypes entityType,
         int skip,
         int take,
         Direction orderDirection = Direction.Descending,
-        DateTime? sinceDate = null,
+        DateTimeOffset? sinceDate = null,
         AuditType[]? auditTypeFilter = null) => throw new NotImplementedException();
 
     /// <summary>

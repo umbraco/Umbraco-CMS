@@ -25,16 +25,6 @@ public static partial class Constants
         public const string CsrfValidationCookieName = "UMB-XSRF-V";
 
         /// <summary>
-        ///     The cookie name that is set for angular to use to pass in to the header value for "X-UMB-XSRF-TOKEN"
-        /// </summary>
-        public const string AngularCookieName = "UMB-XSRF-TOKEN";
-
-        /// <summary>
-        ///     The header name that angular uses to pass in the token to validate the cookie
-        /// </summary>
-        public const string AngularHeadername = "X-UMB-XSRF-TOKEN";
-
-        /// <summary>
         ///     The route name of the page shown when Umbraco has no published content.
         /// </summary>
         public const string NoContentRouteName = "umbraco-no-content";
@@ -61,6 +51,11 @@ public static partial class Constants
             public const string BackOfficeTreeArea = "UmbracoTrees"; // Same name as v8 so all routing remains the same
             public const string BackOfficeLoginArea = "UmbracoLogin"; // Used for area routes of non-api controllers for login
         }
+
+        /// <summary>
+        ///     The "base" path to the Management API
+        /// </summary>
+        public const string ManagementApiPath = "/management/api/";
 
         public static class Routing
         {

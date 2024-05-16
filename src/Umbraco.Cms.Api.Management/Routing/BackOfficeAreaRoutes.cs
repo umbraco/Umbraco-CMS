@@ -19,8 +19,6 @@ namespace Umbraco.Cms.Api.Management.Routing;
 /// </summary>
 public sealed class BackOfficeAreaRoutes : IAreaRoutes
 {
-    private readonly GlobalSettings _globalSettings;
-    private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IRuntimeState _runtimeState;
     private readonly string _umbracoPathSegment;
 
@@ -32,10 +30,18 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
         IHostingEnvironment hostingEnvironment,
         IRuntimeState runtimeState)
     {
-        _globalSettings = globalSettings.Value;
-        _hostingEnvironment = hostingEnvironment;
         _runtimeState = runtimeState;
-        _umbracoPathSegment = _globalSettings.GetUmbracoMvcArea(_hostingEnvironment);
+        _umbracoPathSegment = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
+    }
+
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
+    public BackOfficeAreaRoutes(
+        IOptions<GlobalSettings> globalSettings,
+        IHostingEnvironment hostingEnvironment,
+        IRuntimeState runtimeState,
+        UmbracoApiControllerTypeCollection apiControllers) : this(globalSettings, hostingEnvironment, runtimeState)
+    {
+
     }
 
     /// <inheritdoc />
@@ -76,11 +82,12 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
 
         endpoints.MapControllerRoute(
             "catch-all-sections-to-client",
-            new StringBuilder(_umbracoPathSegment).Append("/section/{**slug}").ToString(),
+            new StringBuilder(_umbracoPathSegment).Append("/{**slug}").ToString(),
             new
             {
                 Controller = ControllerExtensions.GetControllerName<BackOfficeDefaultController>(),
-                Action = nameof(BackOfficeDefaultController.Index)
-            });
+                Action = nameof(BackOfficeDefaultController.Index),
+            },
+            constraints: new { slug = @"^(section.*|upgrade|install|oauth_complete|logout|error)$" });
     }
 }

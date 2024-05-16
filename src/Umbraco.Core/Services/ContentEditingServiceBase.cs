@@ -60,23 +60,23 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected async Task<Attempt<TContentCreateResult, ContentEditingOperationStatus>> MapCreate<TContentCreateResult>(ContentCreationModelBase contentCreationModelBase)
         where TContentCreateResult : ContentCreateResultBase<TContent>, new()
     {
-        TContentType? contentType = TryGetAndValidateContentType(contentCreationModelBase.ContentTypeKey, contentCreationModelBase, out ContentEditingOperationStatus operationStatus);
+        TContentType? contentType = TryGetAndValidateContentType(contentCreationModelBase.ContentTypeKey, contentCreationModelBase, out ContentEditingOperationStatus validationOperationStatus);
         if (contentType == null)
         {
-            return Attempt.FailWithStatus(operationStatus, new TContentCreateResult());
+            return Attempt.FailWithStatus(validationOperationStatus, new TContentCreateResult());
         }
 
-        TContent? parent = TryGetAndValidateParent(contentCreationModelBase.ParentKey, contentType, out operationStatus);
-        if (operationStatus != ContentEditingOperationStatus.Success)
+        (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(contentCreationModelBase.ParentKey, contentType);
+        if (parent.OperationStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus(operationStatus, new TContentCreateResult());
+            return Attempt.FailWithStatus(parent.OperationStatus, new TContentCreateResult());
         }
 
         // NOTE: property level validation errors must NOT fail the update - it must be possible to save invalid properties.
         //       instead, the error state and validation errors will be communicated in the return value.
         Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentCreationModelBase, contentType);
 
-        TContent content = New(null, parent?.Id ?? Constants.System.Root, contentType);
+        TContent content = New(null, parent.ParentId ?? Constants.System.Root, contentType);
         if (contentCreationModelBase.Key.HasValue)
         {
             content.Key = contentCreationModelBase.Key.Value;
@@ -188,26 +188,32 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
 
-        TContent? parent = TryGetAndValidateParent(parentKey, contentType, out ContentEditingOperationStatus operationStatus);
-        if (operationStatus != ContentEditingOperationStatus.Success)
+        (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(parentKey, contentType);
+        if (parent.OperationStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(operationStatus, content);
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(parent.OperationStatus, content);
         }
 
         // special case for move: short circuit the operation if the content is already under the correct parent.
-        if ((parent == null && content.ParentId == Constants.System.Root) || (parent != null && parent.Id == content.ParentId))
+        if ((parent.ParentId == null && content.ParentId == Constants.System.Root) || (parent.ParentId != null && parent.ParentId == content.ParentId))
         {
             return Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, content);
         }
 
         // special case for move: do not allow moving an item beneath itself.
-        if (parent?.Path.Split(Constants.CharArrays.Comma).Select(int.Parse).Contains(content.Id) is true)
+        if (parentKey.HasValue)
         {
-            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ParentInvalid, content);
+            // at this point the parent MUST exist - unless someone starts using this move method
+            // e.g. for blueprints (which should be handled elsewhere).
+            TContent parentContent = ContentService.GetById(parentKey.Value) ?? throw new InvalidOperationException("The content parent ID was validated, but the parent was not found");
+            if (parentContent.Path.Split(Constants.CharArrays.Comma).Select(int.Parse).Contains(content.Id) is true)
+            {
+                return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ParentInvalid, content);
+            }
         }
 
         var userId = await GetUserIdAsync(userKey);
-        OperationResult? moveResult = Move(content, parent?.Id ?? Constants.System.Root, userId);
+        OperationResult? moveResult = Move(content, parent.ParentId ?? Constants.System.Root, userId);
 
         scope.Complete();
 
@@ -225,14 +231,14 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
 
-        TContent? parent = TryGetAndValidateParent(parentKey, contentType, out ContentEditingOperationStatus operationStatus);
-        if (operationStatus != ContentEditingOperationStatus.Success)
+        (int? ParentId, ContentEditingOperationStatus OperationStatus) parent = await TryGetAndValidateParentIdAsync(parentKey, contentType);
+        if (parent.OperationStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(operationStatus, content);
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(parent.OperationStatus, content);
         }
 
         var userId = await GetUserIdAsync(userKey);
-        TContent? copy = Copy(content, parent?.Id ?? Constants.System.Root, relateToOriginal, includeDescendants, userId);
+        TContent? copy = Copy(content, parent.ParentId ?? Constants.System.Root, relateToOriginal, includeDescendants, userId);
         scope.Complete();
 
         // we'll assume that we have performed all validations for unsuccessful scenarios above, so a null result here
@@ -324,7 +330,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return contentType;
     }
 
-    private TContent? TryGetAndValidateParent(Guid? parentKey, TContentType contentType, out ContentEditingOperationStatus operationStatus)
+    protected virtual async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
     {
         TContent? parent = parentKey.HasValue
             ? ContentService.GetById(parentKey.Value)
@@ -332,22 +338,19 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         if (parentKey.HasValue && parent == null)
         {
-            operationStatus = ContentEditingOperationStatus.ParentNotFound;
-            return null;
+            return await Task.FromResult<(int? ParentId, ContentEditingOperationStatus OperationStatus)>((null, ContentEditingOperationStatus.ParentNotFound));
         }
 
         if (parent == null && contentType.AllowedAsRoot == false)
         {
-            operationStatus = ContentEditingOperationStatus.NotAllowed;
-            return null;
+            return (null, ContentEditingOperationStatus.NotAllowed);
         }
 
         if (parent != null)
         {
             if (parent.Trashed)
             {
-                operationStatus = ContentEditingOperationStatus.InTrash;
-                return null;
+                return (null, ContentEditingOperationStatus.InTrash);
             }
 
             TContentType? parentContentType = ContentTypeService.Get(parent.ContentType.Key);
@@ -356,13 +359,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
             if (allowedContentTypeKeys.Contains(contentType.Key) == false)
             {
-                operationStatus = ContentEditingOperationStatus.NotAllowed;
-                return null;
+                return (null, ContentEditingOperationStatus.NotAllowed);
             }
         }
 
-        operationStatus = ContentEditingOperationStatus.Success;
-        return parent;
+        return (parent?.Id ?? Constants.System.Root, ContentEditingOperationStatus.Success);
     }
 
     private void UpdateNames(ContentEditingModelBase contentEditingModelBase, TContent content, TContentType contentType)

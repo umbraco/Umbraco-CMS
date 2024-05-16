@@ -1,7 +1,6 @@
 using System.Data.Common;
 using System.Net.Http.Headers;
 using System.Reflection;
-using Dazinator.Extensions.FileProviders.GlobPatternFilter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
@@ -12,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Serilog.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Blocks;
@@ -49,6 +47,7 @@ using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
+using Umbraco.Cms.Web.Common.Helpers;
 using Umbraco.Cms.Web.Common.Localization;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
@@ -268,7 +267,6 @@ public static partial class UmbracoBuilderExtensions
 
         // AspNetCore specific services
         builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
-        builder.AddNotificationHandler<UmbracoRequestBeginNotification, AspNetCoreRequestAccessor>();
         builder.AddNotificationHandler<UmbracoRequestBeginNotification, ApplicationUrlRequestBeginNotificationHandler>();
 
         // Password hasher
@@ -290,6 +288,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
         builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
 
+        var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
+        builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+            .Add(umbracoApiControllerTypes);
+
         builder.Services.AddSingleton<UmbracoRequestLoggingMiddleware>();
         builder.Services.AddSingleton<PreviewAuthenticationMiddleware>();
         builder.Services.AddSingleton<UmbracoRequestMiddleware>();
@@ -306,6 +308,13 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
 
         builder.AddHttpClients();
+
+        return builder;
+    }
+
+    public static IUmbracoBuilder AddHelpers(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<OAuthOptionsHelper>();
 
         return builder;
     }

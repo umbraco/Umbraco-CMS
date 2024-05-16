@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Mapping;
 
@@ -52,16 +52,6 @@ public class UmbracoMapper : IUmbracoMapper
 
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ILogger<UmbracoMapper> _logger;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbracoMapper" /> class.
-    /// </summary>
-    /// <param name="profiles"></param>
-    /// <param name="scopeProvider"></param>
-    [Obsolete("Please use ctor that takes an ILogger")]
-    public UmbracoMapper(MapDefinitionCollection profiles, ICoreScopeProvider scopeProvider) : this(profiles, scopeProvider, StaticServiceProvider.Instance.GetRequiredService<ILogger<UmbracoMapper>>())
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoMapper" /> class.

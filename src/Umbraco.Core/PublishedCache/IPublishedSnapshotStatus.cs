@@ -6,11 +6,6 @@ namespace Umbraco.Cms.Core.PublishedCache;
 public interface IPublishedSnapshotStatus
 {
     /// <summary>
-    ///     Gets the URL used to retreive the status
-    /// </summary>
-    string StatusUrl { get; }
-
-    /// <summary>
     ///     Gets the status report as a string
     /// </summary>
     string GetStatus();

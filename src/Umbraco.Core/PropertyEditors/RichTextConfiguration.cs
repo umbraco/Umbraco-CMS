@@ -9,7 +9,7 @@ public class RichTextConfiguration : IIgnoreUserStartNodesConfig
     public RichTextBlockConfiguration[]? Blocks { get; set; } = null!;
 
     [ConfigurationField("mediaParentId")]
-    public GuidUdi? MediaParentId { get; set; }
+    public Guid? MediaParentId { get; set; }
 
     [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes)]
     public bool IgnoreUserStartNodes { get; set; }

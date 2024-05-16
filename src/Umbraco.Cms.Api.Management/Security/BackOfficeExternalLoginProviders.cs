@@ -39,13 +39,6 @@ public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProvider
     }
 
     /// <inheritdoc />
-    public string? GetAutoLoginProvider()
-    {
-        var found = _externalLogins.Values.Where(x => x.Options.AutoRedirectLoginToExternalProvider).ToList();
-        return found.Count > 0 ? found[0].AuthenticationType : null;
-    }
-
-    /// <inheritdoc />
     public async Task<IEnumerable<BackOfficeExternaLoginProviderScheme>> GetBackOfficeProvidersAsync()
     {
         var providersWithSchemes = new List<BackOfficeExternaLoginProviderScheme>();

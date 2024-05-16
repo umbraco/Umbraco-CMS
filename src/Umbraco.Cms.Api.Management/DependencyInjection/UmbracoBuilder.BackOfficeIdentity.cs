@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.Telemetry;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -69,6 +70,8 @@ public static partial class UmbracoBuilderExtensions
 
         // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
         services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();
+
+        services.AddScoped<IBackOfficeExternalLoginService, BackOfficeExternalLoginService>();
 
         return builder;
     }

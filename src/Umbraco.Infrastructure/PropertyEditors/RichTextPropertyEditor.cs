@@ -214,18 +214,15 @@ public class RichTextPropertyEditor : DataEditor
                           Constants.Security.SuperUserKey;
 
             var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
-            GuidUdi? mediaParent = config?.MediaParentId;
-            Guid mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
+            Guid mediaParentId = config?.MediaParentId ?? Guid.Empty;
 
             if (string.IsNullOrWhiteSpace(richTextEditorValue.Markup))
             {
                 return null;
             }
 
-            var parseAndSaveBase64Images = _pastedImages.FindAndPersistEmbeddedImages(
-                richTextEditorValue.Markup, mediaParentId, userKey);
             var parseAndSavedTempImages = _pastedImages
-                .FindAndPersistPastedTempImagesAsync(parseAndSaveBase64Images, mediaParentId, userKey)
+                .FindAndPersistPastedTempImagesAsync(richTextEditorValue.Markup, mediaParentId, userKey)
                 .GetAwaiter()
                 .GetResult();
             var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
@@ -277,6 +274,6 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         private BlockEditorValues<RichTextBlockValue, RichTextBlockLayoutItem> CreateBlockEditorValues()
-            => new(new RichTextEditorBlockDataConverter(), _contentTypeService, _logger);
+            => new(new RichTextEditorBlockDataConverter(_jsonSerializer), _contentTypeService, _logger);
     }
 }
