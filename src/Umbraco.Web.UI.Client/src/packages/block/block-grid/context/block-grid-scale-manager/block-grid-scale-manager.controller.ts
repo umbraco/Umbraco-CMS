@@ -9,7 +9,7 @@ export interface UmbBlockGridScalableContext extends UmbControllerHost {
 	setRowSpan: (rowSpan: number) => void;
 	getColumnSpan: () => number | undefined;
 	getRowSpan: () => number | undefined;
-	getMinMaxRowSpan: () => [number, number];
+	getMinMaxRowSpan: () => [number, number] | undefined;
 	getRelevantColumnSpanOptions: () => Array<number> | undefined;
 }
 

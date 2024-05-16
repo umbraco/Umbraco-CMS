@@ -35,10 +35,13 @@ export class UmbBlockGridEntryContext
 	readonly columnSpanOptions = this._blockType.asObservablePart((x) => x?.columnSpanOptions ?? []);
 	readonly areaTypeGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);
 	readonly areas = this._blockType.asObservablePart((x) => x?.areas ?? []);
-	readonly minMaxRowSpan = this._blockType.asObservablePart((x) => [x?.rowMinSpan ?? 1, x?.rowMaxSpan ?? 1]);
-	public getMinMaxRowSpan(): [number, number] {
+	readonly minMaxRowSpan = this._blockType.asObservablePart((x) =>
+		x ? [x.rowMinSpan ?? 1, x.rowMaxSpan ?? 1] : undefined,
+	);
+	public getMinMaxRowSpan(): [number, number] | undefined {
 		const x = this._blockType.getValue();
-		return [x?.rowMinSpan ?? 1, x?.rowMaxSpan ?? 1];
+		if (!x) return undefined;
+		return [x.rowMinSpan ?? 1, x.rowMaxSpan ?? 1];
 	}
 	readonly inlineEditingMode = this._blockType.asObservablePart((x) => x?.inlineEditing === true);
 
@@ -63,6 +66,21 @@ export class UmbBlockGridEntryContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT, UMB_BLOCK_GRID_ENTRIES_CONTEXT);
+
+		// Secure rowSpan fits options:
+		this.observe(
+			observeMultiple([this.minMaxRowSpan, this.rowSpan]),
+			([minMax, rowSpan]) => {
+				if (minMax && rowSpan) {
+					const newRowSpan = Math.max(minMax[0], Math.min(rowSpan, minMax[1]));
+					if (newRowSpan !== rowSpan) {
+						this._layout.update({ rowSpan: newRowSpan });
+					}
+				}
+			},
+			null,
+		);
+		// columnSpan is secured in _gotEntries, cause it uses the layoutColumns as a max.
 	}
 
 	protected _gotLayout(layout: UmbBlockGridLayoutModel | undefined) {
@@ -110,9 +128,9 @@ export class UmbBlockGridEntryContext
 	}
 
 	setRowSpan(rowSpan: number) {
-		const blockType = this._blockType.getValue();
-		if (!blockType) return;
-		rowSpan = Math.max(blockType.rowMinSpan, Math.min(rowSpan, blockType.rowMaxSpan));
+		const minMax = this.getMinMaxRowSpan();
+		if (!minMax) return;
+		rowSpan = Math.max(minMax[0], Math.min(rowSpan, minMax[1]));
 		this._layout.update({ rowSpan });
 	}
 
@@ -127,10 +145,11 @@ export class UmbBlockGridEntryContext
 
 		if (!this._entries) return;
 
+		// Retrieve scale options:
 		this.observe(
 			observeMultiple([this.minMaxRowSpan, this.columnSpanOptions, this._entries.layoutColumns]),
 			([minMaxRowSpan, columnSpanOptions, layoutColumns]) => {
-				if (!layoutColumns) return;
+				if (!layoutColumns || !minMaxRowSpan) return;
 				const relevantColumnSpanOptions = columnSpanOptions
 					? columnSpanOptions
 							.filter((x) => x.columnSpan <= layoutColumns)
@@ -147,14 +166,7 @@ export class UmbBlockGridEntryContext
 			'observeScaleOptions',
 		);
 
-		this.observe(
-			observeMultiple([this.areaTypeGridColumns, this._entries.layoutColumns]),
-			([areaTypeGridColumns, layoutColumns]) => {
-				this.#areaGridColumns.setValue(areaTypeGridColumns ?? layoutColumns);
-			},
-			'observeAreaGridColumns',
-		);
-
+		// Secure columnSpan fits options:
 		this.observe(
 			observeMultiple([this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
 			([columnSpan, relevantColumnSpanOptions, layoutColumns]) => {
@@ -176,6 +188,15 @@ export class UmbBlockGridEntryContext
 				}
 			},
 			'observeColumnSpanValidation',
+		);
+
+		// Retrieve The Grid Columns for the Areas:
+		this.observe(
+			observeMultiple([this.areaTypeGridColumns, this._entries.layoutColumns]),
+			([areaTypeGridColumns, layoutColumns]) => {
+				this.#areaGridColumns.setValue(areaTypeGridColumns ?? layoutColumns);
+			},
+			'observeAreaGridColumns',
 		);
 	}
 
