@@ -33,8 +33,8 @@ export class UmbUserSetGroupsServerDataSource {
 			this.#host,
 			UserService.postUserSetUserGroups({
 				requestBody: {
-					userIds,
-					userGroupIds,
+					userIds: userIds.map((id) => ({ id })),
+					userGroupIds: userGroupIds.map((id) => ({ id })),
 				},
 			}),
 		);
