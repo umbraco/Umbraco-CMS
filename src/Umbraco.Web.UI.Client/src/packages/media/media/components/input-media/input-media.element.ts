@@ -122,7 +122,9 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 			});
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.#pickerContext.cardItems, (cardItems) => (this._items = cardItems));
+		this.observe(this.#pickerContext.cardItems, (cardItems) => {
+			this._items = cardItems;
+		});
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -178,7 +180,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this._items?.length) return;
 		return html`${repeat(
 			this._items,
 			(item) => item.unique,

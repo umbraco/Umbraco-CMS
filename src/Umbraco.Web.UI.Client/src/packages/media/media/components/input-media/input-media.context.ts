@@ -27,7 +27,10 @@ export class UmbMediaPickerContext extends UmbPickerInputContext<
 		this.#imagingRepository = new UmbImagingRepository(host);
 
 		this.observe(this.selectedItems, async (selectedItems) => {
-			if (!selectedItems.length) return;
+			if (!selectedItems?.length) {
+				this.#cardItems.setValue([]);
+				return;
+			}
 			const { data } = await this.#imagingRepository.requestResizedItems(selectedItems.map((x) => x.unique));
 
 			this.#cardItems.setValue(
