@@ -80,7 +80,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		}
 
 		if (_changedProperties.has('startNode')) {
-			this.#treeContext!.setStartFrom(this.startNode);
+			this.#treeContext!.setStartNode(this.startNode);
 		}
 
 		if (_changedProperties.has('hideTreeRoot')) {

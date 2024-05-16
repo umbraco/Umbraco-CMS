@@ -136,7 +136,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 	public loadMore = () => this.#debouncedLoadTree(true);
 
 	#debouncedLoadTree(reload = false) {
-		if (this.getStartFrom()) {
+		if (this.getStartNode()) {
 			this.#loadRootItems(reload);
 			return;
 		}
@@ -166,7 +166,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
 
 		// If we have a start node get children of that instead of the root
-		const startNode = this.getStartFrom();
+		const startNode = this.getStartNode();
 
 		const { data } = startNode?.unique
 			? await this.#repository!.requestTreeItemsOf({
@@ -220,7 +220,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 	 * @param {UmbTreeStartNode} startNode
 	 * @memberof UmbDefaultTreeContext
 	 */
-	setStartFrom(startNode: UmbTreeStartNode | undefined) {
+	setStartNode(startNode: UmbTreeStartNode | undefined) {
 		this.#startNode.setValue(startNode);
 		// we need to reset the tree if this config changes
 		this.#resetTree();
@@ -232,7 +232,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 	 * @return {UmbTreeStartNode}
 	 * @memberof UmbDefaultTreeContext
 	 */
-	getStartFrom() {
+	getStartNode() {
 		return this.#startNode.getValue();
 	}
 
