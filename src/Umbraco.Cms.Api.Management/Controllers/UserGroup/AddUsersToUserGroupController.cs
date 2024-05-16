@@ -51,11 +51,11 @@ public class AddUsersToUserGroupController : UserGroupControllerBase
             return Forbidden();
         }
 
-        UserGroupOperationStatus result = await _userGroupService.AddUsersToUserGroupAsync(
+        Attempt<UserGroupOperationStatus> result = await _userGroupService.AddUsersToUserGroupAsync(
             new UsersToUserGroupManipulationModel(id, userIds.Select(x => x.Id).ToArray()), CurrentUserKey(_backOfficeSecurityAccessor));
 
-        return result == UserGroupOperationStatus.Success
+        return result.Success
             ? Ok()
-            : UserGroupOperationStatusResult(result);
+            : UserGroupOperationStatusResult(result.Result);
     }
 }
