@@ -59,11 +59,23 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 					email: item.email,
 					userName: item.userName,
 					name: item.name,
-					userGroupUniques: item.userGroupIds,
+					userGroupUniques: item.userGroupIds.map((reference) => {
+						return {
+							unique: reference.id,
+						};
+					}),
 					unique: item.id,
 					languageIsoCode: item.languageIsoCode || null,
-					documentStartNodeUniques: item.documentStartNodeIds,
-					mediaStartNodeUniques: item.mediaStartNodeIds,
+					documentStartNodeUniques: item.documentStartNodeIds.map((node) => {
+						return {
+							unique: node.id,
+						};
+					}),
+					mediaStartNodeUniques: item.mediaStartNodeIds.map((node) => {
+						return {
+							unique: node.id,
+						};
+					}),
 					hasDocumentRootAccess: item.hasDocumentRootAccess,
 					hasMediaRootAccess: item.hasMediaRootAccess,
 					avatarUrls: item.avatarUrls,

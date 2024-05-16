@@ -13,7 +13,6 @@ import { manifests as eyeDropperManifests } from './eye-dropper/manifests.js';
 import { manifests as iconPickerManifests } from './icon-picker/manifests.js';
 import { manifests as labelManifests } from './label/manifests.js';
 import { manifests as multipleTextStringManifests } from './multiple-text-string/manifests.js';
-import { manifests as multiUrlPickerManifests } from './multi-url-picker/manifests.js';
 import { manifests as numberManifests } from './number/manifests.js';
 import { manifests as radioButtonListManifests } from './radio-button-list/manifests.js';
 import { manifests as sliderManifests } from './slider/manifests.js';
@@ -34,7 +33,6 @@ export const manifests: Array<ManifestTypes> = [
 	...iconPickerManifests,
 	...labelManifests,
 	...multipleTextStringManifests,
-	...multiUrlPickerManifests,
 	...numberManifests,
 	...radioButtonListManifests,
 	...sliderManifests,

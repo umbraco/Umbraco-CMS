@@ -24,19 +24,19 @@ export const manifests: Array<ManifestTypes> = [
 						alias: 'initVal1',
 						label: 'Initial value',
 						description: '',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 					},
 					{
 						alias: 'initVal2',
 						label: 'Initial value 2',
 						description: 'Used when range is enabled',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 					},
 					{
 						alias: 'step',
 						label: 'Step increments',
 						description: '',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 					},
 				],
 				defaultData: [
