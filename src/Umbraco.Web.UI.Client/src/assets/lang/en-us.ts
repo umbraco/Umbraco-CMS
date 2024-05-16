@@ -875,6 +875,7 @@ export default {
 		upload: 'Upload',
 		url: 'URL',
 		user: 'User',
+		users: 'Users',
 		username: 'Username',
 		validate: 'Validate',
 		value: 'Value',
@@ -1925,6 +1926,7 @@ export default {
 		userNotInGroup: "The user is not in group '%0%'",
 		userPermissions: 'User permissions',
 		usergroup: 'User group',
+		usergroups: 'User groups',
 		userInvited: 'has been invited',
 		userInvitedSuccessHelp:
 			'An invitation has been sent to the new user with details about how to log in to\n      Umbraco.\n    ',

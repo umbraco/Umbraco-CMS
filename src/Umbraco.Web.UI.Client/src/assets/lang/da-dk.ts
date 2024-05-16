@@ -856,6 +856,7 @@ export default {
 		upload: 'Upload',
 		url: 'URL',
 		user: 'Bruger',
+		users: 'Brugere',
 		username: 'Brugernavn',
 		value: 'Værdi',
 		view: 'Vis',
@@ -1896,6 +1897,7 @@ export default {
 		username: 'Navn',
 		userPermissions: 'Brugertilladelser',
 		usergroup: 'Brugergruppe',
+		usergroups: 'Brugergrupper',
 		userInvited: 'er blevet inviteret',
 		userInvitedSuccessHelp:
 			'En invitation er blevet sendt til den nye bruger med oplysninger om, hvordan man\n      logger ind i Umbraco.\n    ',
