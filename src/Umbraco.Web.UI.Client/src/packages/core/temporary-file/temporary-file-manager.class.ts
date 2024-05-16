@@ -2,7 +2,6 @@ import { UmbTemporaryFileRepository } from './temporary-file.repository.js';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 
 ///export type TemporaryFileStatus = 'success' | 'waiting' | 'error';
 
@@ -14,7 +13,7 @@ export enum TemporaryFileStatus {
 
 export interface UmbTemporaryFileModel {
 	file: File;
-	unique: string;
+	temporaryUnique: string;
 	status?: TemporaryFileStatus;
 }
 
@@ -23,7 +22,7 @@ export class UmbTemporaryFileManager<
 > extends UmbControllerBase {
 	#temporaryFileRepository;
 
-	#queue = new UmbArrayState<UploadableItem>([], (item) => item.unique);
+	#queue = new UmbArrayState<UploadableItem>([], (item) => item.temporaryUnique);
 	public readonly queue = this.#queue.asObservable();
 
 	constructor(host: UmbControllerHost) {
@@ -66,18 +65,18 @@ export class UmbTemporaryFileManager<
 		if (!queue.length) return filesCompleted;
 
 		for (const item of queue) {
-			if (!item.unique) throw new Error(`Unique is missing for item ${item}`);
+			if (!item.temporaryUnique) throw new Error(`Unique is missing for item ${item}`);
 
-			const { error } = await this.#temporaryFileRepository.upload(item.unique, item.file);
+			const { error } = await this.#temporaryFileRepository.upload(item.temporaryUnique, item.file);
 			//await new Promise((resolve) => setTimeout(resolve, (Math.random() + 0.5) * 1000)); // simulate small delay so that the upload badge is properly shown
 
 			let status: TemporaryFileStatus;
 			if (error) {
 				status = TemporaryFileStatus.ERROR;
-				this.#queue.updateOne(item.unique, { ...item, status });
+				this.#queue.updateOne(item.temporaryUnique, { ...item, status });
 			} else {
 				status = TemporaryFileStatus.SUCCESS;
-				this.#queue.updateOne(item.unique, { ...item, status });
+				this.#queue.updateOne(item.temporaryUnique, { ...item, status });
 			}
 
 			filesCompleted.push({ ...item, status });

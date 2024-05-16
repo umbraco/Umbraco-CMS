@@ -15,7 +15,6 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export interface UmbUploadableFileModel extends UmbTemporaryFileModel {
 	unique: string;
-	file: File;
 	mediaTypeUnique: string;
 }
 
@@ -38,7 +37,10 @@ export class UmbDropzoneManager extends UmbControllerBase {
 	#mediaTypeStructure = new UmbMediaTypeStructureRepository(this);
 	#mediaDetailRepository = new UmbMediaDetailRepository(this);
 
-	#completed = new UmbArrayState<UmbUploadableFileModel | UmbTemporaryFileModel>([], (upload) => upload.unique);
+	#completed = new UmbArrayState<UmbUploadableFileModel | UmbTemporaryFileModel>(
+		[],
+		(upload) => upload.temporaryUnique,
+	);
 	public readonly completed = this.#completed.asObservable();
 
 	constructor(host: UmbControllerHost) {
@@ -56,7 +58,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		const temporaryFiles: Array<UmbTemporaryFileModel> = [];
 
 		for (const file of files) {
-			const uploaded = await this.#tempFileManager.uploadOne({ unique: UmbId.new(), file });
+			const uploaded = await this.#tempFileManager.uploadOne({ temporaryUnique: UmbId.new(), file });
 			this.#completed.setValue([...this.#completed.getValue(), uploaded]);
 			temporaryFiles.push(uploaded);
 		}
@@ -107,7 +109,12 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			// Since we are uploading multiple files, we will pick first allowed option.
 			// Consider a way we can handle this differently in the future to let the user choose. Maybe a list of all files with an allowed media type dropdown?
 			const mediaType = options[0];
-			uploadableFiles.push({ unique: UmbId.new(), file, mediaTypeUnique: mediaType.unique });
+			uploadableFiles.push({
+				temporaryUnique: UmbId.new(),
+				file,
+				mediaTypeUnique: mediaType.unique,
+				unique: UmbId.new(),
+			});
 		}
 
 		notAllowedFiles.forEach((file) => {
@@ -142,6 +149,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			// Only one allowed option, upload file using that option.
 			const uploadableFile: UmbUploadableFileModel = {
 				unique: UmbId.new(),
+				temporaryUnique: UmbId.new(),
 				file,
 				mediaTypeUnique: mediaTypes[0].unique,
 			};
@@ -156,6 +164,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 
 		const uploadableFile: UmbUploadableFileModel = {
 			unique: UmbId.new(),
+			temporaryUnique: UmbId.new(),
 			file,
 			mediaTypeUnique: mediaType.unique,
 		};
@@ -211,6 +220,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 			if (upload.status === TemporaryFileStatus.SUCCESS) {
 				// Upload successful. Create media item.
 				const preset: Partial<UmbMediaDetailModel> = {
+					unique: file.unique,
 					mediaType: {
 						unique: upload.mediaTypeUnique,
 						collection: null,
@@ -227,7 +237,7 @@ export class UmbDropzoneManager extends UmbControllerBase {
 					values: [
 						{
 							alias: 'umbracoFile',
-							value: { temporaryFileId: upload.unique },
+							value: { temporaryFileId: upload.temporaryUnique },
 							culture: null,
 							segment: null,
 						},
