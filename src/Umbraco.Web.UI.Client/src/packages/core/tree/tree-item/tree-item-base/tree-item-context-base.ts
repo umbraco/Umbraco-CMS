@@ -172,6 +172,7 @@ export abstract class UmbTreeItemContextBase<
 
 		const skip = loadMore ? this.#paging.skip : 0;
 		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
+		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
 		const { data } = await repository.requestTreeItemsOf({
 			parent: {
@@ -180,6 +181,7 @@ export abstract class UmbTreeItemContextBase<
 			},
 			skip,
 			take,
+			...additionalArgs,
 		});
 
 		if (data) {

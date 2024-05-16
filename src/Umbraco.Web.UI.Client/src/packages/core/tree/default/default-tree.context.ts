@@ -21,13 +21,13 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 export class UmbDefaultTreeContext<
 		TreeItemType extends UmbTreeItemModel,
 		TreeRootType extends UmbTreeRootModel,
-		RootItemsRequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+		RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
 	>
-	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType, TreeRootType, RootItemsRequestArgsType>>
+	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType, TreeRootType, RequestArgsType>>
 	implements UmbTreeContext
 {
-	#rootItemsRequestArgs = new UmbObjectState<RootItemsRequestArgsType | object>({});
-	public readonly rootItemsRequestArgs = this.#rootItemsRequestArgs.asObservable();
+	#additionalRequestArgs = new UmbObjectState<Partial<RequestArgsType> | object>({});
+	public readonly additionalRequestArgs = this.#additionalRequestArgs.asObservable();
 
 	#treeRoot = new UmbObjectState<TreeRootType | undefined>(undefined);
 	treeRoot = this.#treeRoot.asObservable();
@@ -175,22 +175,22 @@ export class UmbDefaultTreeContext<
 
 		// If we have a start node get children of that instead of the root
 		const startNode = this.getStartNode();
-		const args = this.#rootItemsRequestArgs.getValue();
+		const additionalArgs = this.#additionalRequestArgs.getValue();
 
 		const { data } = startNode?.unique
 			? await this.#repository!.requestTreeItemsOf({
+					...additionalArgs,
 					parent: {
 						unique: startNode.unique,
 						entityType: startNode.entityType,
 					},
 					skip,
 					take,
-					...args,
 				})
 			: await this.#repository!.requestTreeRootItems({
+					...additionalArgs,
 					skip,
 					take,
-					...args,
 				});
 
 		if (data) {
@@ -238,10 +238,17 @@ export class UmbDefaultTreeContext<
 		this.loadTree();
 	}
 
-	public loadWithAdditionalArgs(args: Partial<RootItemsRequestArgsType>) {
-		this.#rootItemsRequestArgs.setValue({ ...this.#rootItemsRequestArgs.getValue(), ...args });
+	/**
+	 * Updates the requestArgs config and reloads the tree.
+	 */
+	public updateAdditionalRequestArgs(args: Partial<RequestArgsType>) {
+		this.#additionalRequestArgs.setValue({ ...this.#additionalRequestArgs.getValue(), ...args });
 		this.#resetTree();
 		this.loadTree();
+	}
+
+	public getAdditionalRequestArgs() {
+		return this.#additionalRequestArgs.getValue();
 	}
 
 	/**

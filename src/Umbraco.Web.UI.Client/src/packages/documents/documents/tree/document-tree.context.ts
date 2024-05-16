@@ -17,7 +17,7 @@ export class UmbDocumentTreeContext extends UmbDefaultTreeContext<
 
 		this.consumeContext(UMB_CONTENT_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.dataType, (value) => {
-				this.loadWithAdditionalArgs({ dataType: value });
+				this.updateAdditionalRequestArgs({ dataType: value });
 			});
 		});
 	}
