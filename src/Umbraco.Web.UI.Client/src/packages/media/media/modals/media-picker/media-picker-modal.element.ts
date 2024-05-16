@@ -8,7 +8,6 @@ import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
@@ -64,15 +63,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	async #mapMediaUrls(items: Array<UmbMediaItemModel>): Promise<Array<UmbMediaCardItemModel>> {
 		if (!items.length) return [];
 
-		const { data } = await this.#imagingRepository.requestResizedItems({
-			uniques: items.map((item) => item.unique),
-			width: 250,
-			mode: ImageCropModeModel.MIN,
-		});
+		const { data } = await this.#imagingRepository.requestResizedItems(items.map((item) => item.unique));
 
 		return items.map((item): UmbMediaCardItemModel => {
 			const url = data?.find((media) => media.unique === item.unique)?.url;
-
 			return { name: item.name, unique: item.unique, url, icon: item.mediaType.icon, entityType: item.entityType };
 		});
 	}

@@ -4,7 +4,6 @@ import { UMB_MEDIA_GRID_COLLECTION_VIEW_ALIAS } from './views/index.js';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 	UmbMediaCollectionItemModel,
@@ -22,11 +21,7 @@ export class UmbMediaCollectionContext extends UmbDefaultCollectionContext<
 		this.observe(this.items, async (items) => {
 			if (!items?.length) return;
 
-			const { data } = await this.#imagingRepository.requestResizedItems({
-				uniques: items.map((m) => m.unique),
-				width: 250,
-				mode: ImageCropModeModel.MIN,
-			});
+			const { data } = await this.#imagingRepository.requestResizedItems(items.map((m) => m.unique));
 
 			this.#thumbnailItems.setValue(
 				items.map((item) => {

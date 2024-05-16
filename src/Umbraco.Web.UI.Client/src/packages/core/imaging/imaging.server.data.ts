@@ -27,12 +27,12 @@ export class UmbImagingServerDataSource {
 	 * @param {string} unique
 	 * @memberof UmbImagingServerDataSource
 	 */
-	async getItems({ uniques, width, height, mode }: UmbImagingModel) {
+	async getItems(uniques: Array<string>, imagingModel?: UmbImagingModel) {
 		if (!uniques.length) throw new Error('Uniques are missing');
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			ImagingService.getImagingResizeUrls({ id: uniques, width, height, mode }),
+			ImagingService.getImagingResizeUrls({ id: uniques, ...imagingModel }),
 		);
 
 		if (data) {
