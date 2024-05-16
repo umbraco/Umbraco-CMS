@@ -137,7 +137,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 	#renderUserGroupNames(user: UmbUserDetailModel) {
 		const userGroupNames = this.#userGroups
-			.filter((userGroup) => user.userGroupUniques?.includes(userGroup.unique))
+			.filter((userGroup) => user.userGroupUniques?.map((reference) => reference.unique).includes(userGroup.unique))
 			.map((userGroup) => userGroup.name)
 			.join(', ');
 
