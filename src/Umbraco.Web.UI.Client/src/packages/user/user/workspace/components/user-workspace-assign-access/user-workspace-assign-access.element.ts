@@ -130,7 +130,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 			description="${this.localize.term('user_groupsHelp')}">
 			<umb-user-group-input
 				slot="editor"
-				.selection=${this._userGroupUniques}
+				.selection=${this._userGroupUniques.map((reference) => reference.unique)}
 				@change=${this.#onUserGroupsChange}></umb-user-group-input>
 		</umb-property-layout>`;
 	}
@@ -152,7 +152,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 					? html`
 							<umb-input-document
 								slot="editor"
-								.selection=${this._documentStartNodeUniques}
+								.selection=${this._documentStartNodeUniques.map((reference) => reference.unique)}
 								@change=${this.#onDocumentStartNodeChange}></umb-input-document>
 						`
 					: nothing}
@@ -177,7 +177,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 					? html`
 							<umb-input-media
 								slot="editor"
-								.selection=${this._mediaStartNodeUniques}
+								.selection=${this._mediaStartNodeUniques.map((reference) => reference.unique)}
 								@change=${this.#onMediaStartNodeChange}></umb-input-media>
 						`
 					: nothing}
