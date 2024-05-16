@@ -6,7 +6,6 @@ import type {
 	UmbCollectionContext,
 	UmbCollectionLayoutConfiguration,
 } from '../types.js';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -25,7 +24,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 const LOCAL_STORAGE_KEY = 'umb-collection-view';
 
 export class UmbDefaultCollectionContext<
-		CollectionItemType extends UmbEntityModel = UmbEntityModel,
+		CollectionItemType extends { entityType: string; unique: string } = { entityType: string; unique: string },
 		FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
 	>
 	extends UmbContextBase<UmbDefaultCollectionContext>
