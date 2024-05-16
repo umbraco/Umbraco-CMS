@@ -4,7 +4,7 @@ import { UmbAppContext } from './app.context.js';
 import { UmbServerConnection } from './server-connection.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
+import { UMB_STORAGE_REDIRECT_URL, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -86,7 +86,14 @@ export class UmbAppElement extends UmbLitElement {
 						: this.localize.term('errors_externalLoginFailed');
 
 					this.observe(this.#authContext.authorizationSignal, () => {
-						history.replaceState(null, '', '');
+						// Redirect to the saved state or root
+						let currentRoute = '';
+						const savedRoute = sessionStorage.getItem(UMB_STORAGE_REDIRECT_URL);
+						if (savedRoute) {
+							sessionStorage.removeItem(UMB_STORAGE_REDIRECT_URL);
+							currentRoute = savedRoute.endsWith('logout') ? currentRoute : savedRoute;
+						}
+						history.replaceState(null, '', currentRoute);
 					});
 				}
 

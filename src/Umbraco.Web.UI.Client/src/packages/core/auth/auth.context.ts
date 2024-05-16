@@ -1,6 +1,6 @@
 import type { UmbBackofficeExtensionRegistry, ManifestAuthProvider } from '../extension-registry/index.js';
 import { UmbAuthFlow } from './auth-flow.js';
-import { UMB_AUTH_CONTEXT, UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
+import { UMB_AUTH_CONTEXT, UMB_STORAGE_REDIRECT_URL, UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -106,6 +106,9 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	) {
 		const redirectUrl = await this.#authFlow.makeAuthorizationRequest(identityProvider, usernameHint);
 		if (redirect) {
+			// Save the current state
+			sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, window.location.href);
+
 			location.href = redirectUrl;
 			return;
 		}
