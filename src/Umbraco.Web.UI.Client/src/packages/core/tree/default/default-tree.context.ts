@@ -57,7 +57,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 	constructor(host: UmbControllerHost) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		super(host, UMB_DEFAULT_TREE_CONTEXT);
+		super(host, UMB_TREE_CONTEXT);
 		this.pagination.setPageSize(this.#paging.take);
 		this.#consumeContexts();
 
@@ -297,6 +297,6 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 
 export default UmbDefaultTreeContext;
 
-export const UMB_DEFAULT_TREE_CONTEXT = new UmbContextToken<UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel>>(
+export const UMB_TREE_CONTEXT = new UmbContextToken<UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel>>(
 	'UmbTreeContext',
 );
