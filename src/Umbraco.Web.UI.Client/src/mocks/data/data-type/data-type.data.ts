@@ -831,7 +831,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'icon', value: 'icon-layers' },
 			{ alias: 'tabName', value: 'Children' },
 			{ alias: 'showContentFirst', value: true },
-			{ alias: 'useInfiniteEditor', value: true },
 		],
 	},
 	{
@@ -876,7 +875,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'icon', value: 'icon-layers' },
 			{ alias: 'tabName', value: 'Items' },
 			{ alias: 'showContentFirst', value: false },
-			{ alias: 'useInfiniteEditor', value: true },
 		],
 	},
 	{

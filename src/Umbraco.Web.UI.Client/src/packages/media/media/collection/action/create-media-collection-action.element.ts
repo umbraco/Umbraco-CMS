@@ -1,8 +1,10 @@
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../media-collection.context-token.js';
+import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../workspace/index.js';
+import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN } from '../../paths.js';
+import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_MEDIA_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/media';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
@@ -16,6 +18,9 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	private _createMediaPath = '';
 
 	@state()
+	private _currentView?: string;
+
+	@state()
 	private _mediaUnique?: string;
 
 	@state()
@@ -25,7 +30,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	private _popoverOpen = false;
 
 	@state()
-	private _useInfiniteEditor = false;
+	private _rootPathName?: string;
 
 	@property({ attribute: false })
 	manifest?: ManifestCollectionAction;
@@ -54,8 +59,11 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
-			this.observe(collectionContext.filter, (filter) => {
-				this._useInfiniteEditor = filter.useInfiniteEditor == true;
+			this.observe(collectionContext.view.currentView, (currentView) => {
+				this._currentView = currentView?.meta.pathName;
+			});
+			this.observe(collectionContext.view.rootPathName, (rootPathName) => {
+				this._rootPathName = rootPathName;
 			});
 		});
 	}
@@ -78,15 +86,15 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		this._popoverOpen = event.newState === 'open';
 	}
 
-	#getCreateUrl(mediaType: UmbAllowedMediaTypeModel) {
-		// TODO: [LK] I need help with this. I don't know what the infinity editor URL should be.
-
-		const mediaEntityType = 'media-root'; // TODO: this should be dynamic
-		return this._useInfiniteEditor
-			? `${this._createMediaPath}create/${this._mediaUnique ?? 'null'}/${mediaType.unique}`
-			: `section/media/workspace/media/create/parent/${mediaEntityType}/${this._mediaUnique ?? 'null'}/${
-					mediaType.unique
-				}`;
+	#getCreateUrl(item: UmbAllowedMediaTypeModel) {
+		return (
+			this._createMediaPath.replace(`${this._rootPathName}`, `${this._rootPathName}/${this._currentView}`) +
+			UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({
+				parentEntityType: this._mediaUnique ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
+				parentUnique: this._mediaUnique ?? 'null',
+				documentTypeUnique: item.unique,
+			})
+		);
 	}
 
 	render() {
