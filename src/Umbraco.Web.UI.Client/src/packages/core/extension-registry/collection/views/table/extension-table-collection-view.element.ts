@@ -1,3 +1,4 @@
+import type { UmbExtensionCollectionFilterModel } from '../../types.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
@@ -43,7 +44,7 @@ export class UmbExtensionTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
-	#collectionContext?: UmbDefaultCollectionContext<ManifestBase>;
+	#collectionContext?: UmbDefaultCollectionContext<any, UmbExtensionCollectionFilterModel>;
 
 	constructor() {
 		super();

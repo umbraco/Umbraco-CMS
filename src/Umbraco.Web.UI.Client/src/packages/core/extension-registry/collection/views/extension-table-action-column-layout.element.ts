@@ -1,4 +1,5 @@
 import { umbExtensionsRegistry } from '../../index.js';
+import type { UmbExtensionCollectionFilterModel } from '../types.js';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -11,7 +12,7 @@ export class UmbExtensionTableActionColumnLayoutElement extends UmbLitElement {
 	@property({ attribute: false })
 	value!: ManifestBase;
 
-	#collectionContext?: UmbDefaultCollectionContext<ManifestBase>;
+	#collectionContext?: UmbDefaultCollectionContext<any, UmbExtensionCollectionFilterModel>;
 
 	constructor() {
 		super();
