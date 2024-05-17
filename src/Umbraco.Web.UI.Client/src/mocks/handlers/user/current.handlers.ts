@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbUserMockDb } from '../../data/user/user.db.js';
 import { UMB_SLUG } from './slug.js';
-import type { LinkedLoginsRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { LinkedLoginsRequestModel, UserData } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
@@ -9,19 +9,22 @@ export const handlers = [
 		const loggedInUser = umbUserMockDb.getCurrentUser();
 		return res(ctx.status(200), ctx.json(loggedInUser));
 	}),
-	rest.get<LinkedLoginsRequestModel>(umbracoPath(`${UMB_SLUG}/current/logins`), (_req, res, ctx) => {
-		return res(
-			ctx.status(200),
-			ctx.json<LinkedLoginsRequestModel>({
-				linkedLogins: [
+	rest.get<UserData['responses']['GetUserCurrentLoginProviders']>(
+		umbracoPath(`${UMB_SLUG}/current/login-providers`),
+		(_req, res, ctx) => {
+			return res(
+				ctx.status(200),
+				ctx.json<UserData['responses']['GetUserCurrentLoginProviders']>([
 					{
+						hasManualLinkingEnabled: true,
+						isLinkedOnUser: true,
 						providerKey: 'google',
-						providerName: 'Umbraco.Google',
+						providerSchemeName: 'Umbraco.Google',
 					},
-				],
-			}),
-		);
-	}),
+				]),
+			);
+		},
+	),
 	rest.get(umbracoPath(`${UMB_SLUG}/current/2fa`), (_req, res, ctx) => {
 		const mfaLoginProviders = umbUserMockDb.getMfaLoginProviders();
 		return res(ctx.status(200), ctx.json(mfaLoginProviders));
