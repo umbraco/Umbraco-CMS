@@ -1,7 +1,7 @@
+import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../document-collection.context-token.js';
 import { css, customElement, html, map, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_DOCUMENT_ENTITY_TYPE,
@@ -11,7 +11,6 @@ import {
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbAllowedDocumentTypeModel } from '@umbraco-cms/backoffice/document-type';
-import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../document-collection.context-token';
 
 @customElement('umb-create-document-collection-action')
 export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
