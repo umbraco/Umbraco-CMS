@@ -1,9 +1,9 @@
-import { UMB_COLLECTION_CONTEXT } from '../default/collection-default.context.js';
-import type { ManifestEntityBulkAction, MetaEntityBulkAction } from '../../extension-registry/models/index.js';
+import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
 import type { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { ManifestEntityBulkAction, MetaEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 
 function apiArgsMethod(manifest: ManifestEntityBulkAction<MetaEntityBulkAction>) {
 	return [{ meta: manifest.meta }] as unknown[];

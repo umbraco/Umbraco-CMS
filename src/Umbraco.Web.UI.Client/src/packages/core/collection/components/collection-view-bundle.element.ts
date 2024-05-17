@@ -1,5 +1,5 @@
-import type { UmbDefaultCollectionContext } from '../default/collection-default.context.js';
-import { UMB_COLLECTION_CONTEXT } from '../default/collection-default.context.js';
+import type { UmbDefaultCollectionContext } from '../default/index.js';
+import { UMB_COLLECTION_CONTEXT } from '../default/index.js';
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
 import { css, html, customElement, state, nothing, repeat, query } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
