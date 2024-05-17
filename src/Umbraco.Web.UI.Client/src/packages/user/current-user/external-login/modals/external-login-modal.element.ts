@@ -1,6 +1,6 @@
 import { UmbCurrentUserRepository } from '../../repository/index.js';
 import type { UmbCurrentUserExternalLoginProviderModel } from '../../types.js';
-import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbConfirmModal, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -13,6 +13,7 @@ import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-ap
 type UmbExternalLoginProviderOption = UmbCurrentUserExternalLoginProviderModel & {
 	displayName: string;
 	icon?: string;
+	existsOnServer: boolean;
 };
 
 @customElement('umb-current-user-external-login-modal')
@@ -51,6 +52,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 						(serverLoginProvider) => serverLoginProvider.providerSchemeName === manifestLoginProvider.forProviderName,
 					);
 					return {
+						existsOnServer: !!serverLoginProvider,
 						hasManualLinkingEnabled: serverLoginProvider?.hasManualLinkingEnabled ?? false,
 						isLinkedOnUser: serverLoginProvider?.isLinkedOnUser ?? false,
 						providerKey: serverLoginProvider?.providerKey ?? '',
@@ -106,6 +108,20 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 					${this.localize.string(item.displayName)}
 				</div>
 				${when(
+					item.existsOnServer,
+					() => nothing,
+					() =>
+						html`<div style="position:relative" slot="header-actions">
+							<uui-badge
+								style="cursor:default"
+								title="Warning: This provider is not configured on the server"
+								color="danger"
+								look="primary">
+								!
+							</uui-badge>
+						</div>`,
+				)}
+				${when(
 					item.isLinkedOnUser,
 					() => html`
 						<p style="margin-top:0">
@@ -127,6 +143,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 						<uui-button
 							type="button"
 							look="secondary"
+							color="success"
 							.label=${this.localize.term('defaultdialogs_linkYour', item.displayName)}
 							@click=${() => this.#onProviderEnable(item)}>
 							<umb-localize key="defaultdialogs_linkYour" .args=${[this.localize.string(item.displayName)]}>
