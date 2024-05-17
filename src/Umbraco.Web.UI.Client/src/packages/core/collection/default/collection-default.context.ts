@@ -10,7 +10,6 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import type { ManifestCollection, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
@@ -262,5 +261,3 @@ export class UmbDefaultCollectionContext<
 		super.destroy();
 	}
 }
-
-export const UMB_COLLECTION_CONTEXT = new UmbContextToken<UmbDefaultCollectionContext>('UmbCollectionContext');
