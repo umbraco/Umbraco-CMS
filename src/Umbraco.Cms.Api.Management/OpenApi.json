@@ -28354,8 +28354,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -28363,8 +28366,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -28372,8 +28378,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             }
@@ -28468,8 +28477,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -28477,8 +28489,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -28486,8 +28501,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             }
@@ -30685,23 +30703,26 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/user/current/logins": {
+    "/umbraco/management/api/v1/user/current/login-providers": {
       "get": {
         "tags": [
           "User"
         ],
-        "operationId": "GetUserCurrentLogins",
+        "operationId": "GetUserCurrentLoginProviders",
         "responses": {
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/LinkedLoginsRequestModel"
-                    }
-                  ]
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/UserExternalLoginProviderModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -34318,8 +34339,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "id": {
@@ -34476,8 +34500,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasDocumentRootAccess": {
@@ -34487,8 +34514,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasMediaRootAccess": {
@@ -34886,8 +34916,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -34903,8 +34936,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -35023,8 +35059,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -36468,8 +36507,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -36942,8 +36984,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "id": {
@@ -37033,41 +37078,6 @@
           "isoCode": {
             "minLength": 1,
             "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LinkedLoginModel": {
-        "required": [
-          "providerKey",
-          "providerName"
-        ],
-        "type": "object",
-        "properties": {
-          "providerName": {
-            "type": "string"
-          },
-          "providerKey": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LinkedLoginsRequestModel": {
-        "required": [
-          "linkedLogins"
-        ],
-        "type": "object",
-        "properties": {
-          "linkedLogins": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/LinkedLoginModel"
-                }
-              ]
-            }
           }
         },
         "additionalProperties": false
@@ -42074,8 +42084,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -43316,16 +43329,22 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "userGroupIds": {
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -43358,8 +43377,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "languageIsoCode": {
@@ -43369,8 +43391,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasDocumentRootAccess": {
@@ -43380,8 +43405,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasMediaRootAccess": {
@@ -43532,6 +43560,30 @@
           "key": {
             "type": "string",
             "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserExternalLoginProviderModel": {
+        "required": [
+          "hasManualLinkingEnabled",
+          "isLinkedOnUser",
+          "providerSchemeName"
+        ],
+        "type": "object",
+        "properties": {
+          "providerSchemeName": {
+            "type": "string"
+          },
+          "providerKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "isLinkedOnUser": {
+            "type": "boolean"
+          },
+          "hasManualLinkingEnabled": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -43801,8 +43853,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "id": {
@@ -43817,8 +43872,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasDocumentRootAccess": {
@@ -43828,8 +43886,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasMediaRootAccess": {
