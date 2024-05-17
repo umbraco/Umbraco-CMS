@@ -1,16 +1,26 @@
 import { umbExtensionsRegistry } from '../../registry.js';
-import type { UmbExtensionCollectionFilterModel } from '../types.js';
+import type { UmbExtensionCollectionFilterModel, UmbExtensionDetailModel } from '../types.js';
+import { UMB_EXTENSION_ENTITY_TYPE } from '../../entity.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 
-export class UmbExtensionCollectionRepository extends UmbRepositoryBase implements UmbCollectionRepository {
+export class UmbExtensionCollectionRepository
+	extends UmbRepositoryBase
+	implements UmbCollectionRepository<UmbExtensionDetailModel, UmbExtensionCollectionFilterModel>
+{
 	constructor(host: UmbControllerHost) {
 		super(host);
 	}
 
 	async requestCollection(query: UmbExtensionCollectionFilterModel) {
-		let extensions = umbExtensionsRegistry.getAllExtensions();
+		let extensions: Array<UmbExtensionDetailModel> = umbExtensionsRegistry.getAllExtensions().map((manifest) => {
+			return {
+				...manifest,
+				unique: manifest.alias,
+				entityType: UMB_EXTENSION_ENTITY_TYPE,
+			};
+		});
 
 		const skip = query.skip || 0;
 		const take = query.take || 100;
