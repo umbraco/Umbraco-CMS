@@ -6,6 +6,9 @@ import type {
 	UmbCollectionContext,
 	UmbCollectionLayoutConfiguration,
 } from '../types.js';
+import type { UmbCollectionFilterModel } from '../collection-filter-model.interface.js';
+import type { UmbCollectionRepository } from '../repository/collection-repository.interface.js';
+import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -14,7 +17,6 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import type { ManifestCollection, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbCollectionFilterModel, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
