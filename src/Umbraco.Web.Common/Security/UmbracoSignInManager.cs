@@ -85,6 +85,14 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         return result;
     }
 
+    public virtual async Task<ClaimsPrincipal?> CreateUserPrincipalAsync(Guid userKey)
+    {
+        TUser? user = await UserManager.FindByIdAsync(userKey.ToString());
+        return user is null
+                ? null
+                : await this.ClaimsFactory.CreateAsync(user);
+    }
+
     /// <inheritdoc />
     public override async Task<ExternalLoginInfo?> GetExternalLoginInfoAsync(string? expectedXsrf = null)
     {

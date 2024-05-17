@@ -13,10 +13,8 @@ public class EndPreviewTests : ManagementApiTest<EndPreviewController>
 
 
     [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    public virtual async Task As_Anonymous_I_Can_End_Preview_Mode()
     {
-        await AuthenticateClientAsync(Client, "admin@umbraco.com", "1234567890", true);
-
         var response = await Client.DeleteAsync(Url);
 
         // Check if the set cookie header is sent
