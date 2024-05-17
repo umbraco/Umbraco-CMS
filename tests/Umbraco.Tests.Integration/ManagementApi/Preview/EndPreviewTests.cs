@@ -13,7 +13,7 @@ public class EndPreviewTests : ManagementApiTest<EndPreviewController>
 
 
     [Test]
-    public virtual async Task As_Anonymous_I_Have_Access()
+    public virtual async Task As_Anonymous_I_Can_End_Preview_Mode()
     {
         var response = await Client.DeleteAsync(Url);
 

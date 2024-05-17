@@ -21,7 +21,7 @@ public class EnterPreviewTests : ManagementApiTest<EnterPreviewController>
 
         // Check if the set cookie header is sent
         var doesHeaderExist = response.Headers.TryGetValues("Set-Cookie", out var setCookieValues) &&
-            setCookieValues.Any(value => value.Contains($"{Constants.Web.PreviewCookieName}=") && value.Contains("path=/"));
+            setCookieValues.Any(value => value.Contains($"{Constants.Web.PreviewCookieName}=") && value.Contains("path=/") && value.Contains("httponly"));
 
         Assert.IsTrue(doesHeaderExist);
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode,  await response.Content.ReadAsStringAsync());
