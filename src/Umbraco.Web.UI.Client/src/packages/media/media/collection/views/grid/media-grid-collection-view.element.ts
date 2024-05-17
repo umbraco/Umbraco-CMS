@@ -116,7 +116,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbMediaCollectionItemModel) {
-		// TODO: Fix the file extension when media items have a file extension. [?]
 		return html`
 			<uui-card-media
 				.name=${item.name ?? 'Unnamed Media'}
@@ -126,8 +125,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				@open=${(event: Event) => this.#onOpen(event, item.unique)}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}
-				class="media-item"
-				file-ext="${item.icon}">
+				class="media-item">
 				${item.url ? html`<img src=${item.url} alt=${item.name} />` : html`<umb-icon name=${item.icon}></umb-icon>`}
 				<!-- TODO: [LK] I'd like to indicate a busy state when bulk actions are triggered. -->
 				<!-- <div class="container"><uui-loader></uui-loader></div> -->
@@ -156,7 +154,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				gap: var(--uui-size-space-5);
 			}
 			umb-icon {
-				font-size: var(--uui-size-24);
+				font-size: var(--uui-size-8);
 			}
 		`,
 	];

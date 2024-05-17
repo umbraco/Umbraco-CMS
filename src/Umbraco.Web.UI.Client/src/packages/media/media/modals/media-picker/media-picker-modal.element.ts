@@ -1,4 +1,3 @@
-import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { type UmbMediaItemModel, UmbMediaItemRepository, UmbMediaUrlRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
@@ -6,8 +5,10 @@ import type { UmbMediaCardItemModel, UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
@@ -63,11 +64,21 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	async #mapMediaUrls(items: Array<UmbMediaItemModel>): Promise<Array<UmbMediaCardItemModel>> {
 		if (!items.length) return [];
 
-		const { data } = await this.#imagingRepository.requestResizedItems(items.map((item) => item.unique));
+		const { data } = await this.#imagingRepository.requestResizedItems(
+			items.map((item) => item.unique),
+			{ height: 400, width: 400, mode: ImageCropModeModel.MIN },
+		);
 
 		return items.map((item): UmbMediaCardItemModel => {
 			const url = data?.find((media) => media.unique === item.unique)?.url;
-			return { name: item.name, unique: item.unique, url, icon: item.mediaType.icon, entityType: item.entityType };
+			return {
+				name: item.name,
+				unique: item.unique,
+				url,
+				icon: item.mediaType.icon,
+				entityType: item.entityType,
+				isTrashed: item.isTrashed,
+			};
 		});
 	}
 
@@ -236,7 +247,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
 			}
 			umb-icon {
-				font-size: var(--uui-size-24);
+				font-size: var(--uui-size-8);
 			}
 
 			img {
