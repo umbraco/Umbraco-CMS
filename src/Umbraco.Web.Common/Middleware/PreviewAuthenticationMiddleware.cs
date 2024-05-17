@@ -5,6 +5,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Preview;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware;
@@ -16,8 +21,19 @@ namespace Umbraco.Cms.Web.Common.Middleware;
 public class PreviewAuthenticationMiddleware : IMiddleware
 {
     private readonly ILogger<PreviewAuthenticationMiddleware> _logger;
+    private readonly IPreviewTokenGenerator _previewTokenGenerator;
+    private readonly IPreviewService _previewService;
 
-    public PreviewAuthenticationMiddleware(ILogger<PreviewAuthenticationMiddleware> logger) => _logger = logger;
+
+    public PreviewAuthenticationMiddleware(
+        ILogger<PreviewAuthenticationMiddleware> logger,
+        IPreviewTokenGenerator previewTokenGenerator,
+        IPreviewService previewService)
+    {
+        _logger = logger;
+        _previewTokenGenerator = previewTokenGenerator;
+        _previewService = previewService;
+    }
 
     /// <inheritdoc />
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -38,36 +54,21 @@ public class PreviewAuthenticationMiddleware : IMiddleware
 
             if (isPreview)
             {
-                CookieAuthenticationOptions? cookieOptions = context.RequestServices
-                    .GetRequiredService<IOptionsSnapshot<CookieAuthenticationOptions>>()
-                    .Get(Core.Constants.Security.BackOfficeAuthenticationType);
-
-                if (cookieOptions == null)
-                {
-                    throw new InvalidOperationException("No cookie options found with name " +
-                                                        Core.Constants.Security.BackOfficeAuthenticationType);
-                }
 
                 // If we've gotten this far it means a preview cookie has been set and a front-end umbraco document request is executing.
-                // In this case, authentication will not have occurred for an Umbraco back office User, however we need to perform the authentication
-                // for the user here so that the preview capability can be authorized otherwise only the non-preview page will be rendered.
-                if (cookieOptions.Cookie.Name != null)
+                var chunkingCookieManager = new ChunkingCookieManager();
+                var cookie = chunkingCookieManager.GetRequestCookie(context, Core.Constants.Web.PreviewCookieName);
+
+                if (!string.IsNullOrEmpty(cookie))
                 {
-                    var chunkingCookieManager = new ChunkingCookieManager();
-                    var cookie = chunkingCookieManager.GetRequestCookie(context, cookieOptions.Cookie.Name);
+                    var backOfficeIdentity = await _previewService.TryGetPreviewClaimsIdentityAsync();
 
-                    if (!string.IsNullOrEmpty(cookie))
+                    if (backOfficeIdentity != null)
                     {
-                        AuthenticationTicket? unprotected = cookieOptions.TicketDataFormat.Unprotect(cookie);
-                        ClaimsIdentity? backOfficeIdentity = unprotected?.Principal.GetUmbracoIdentity();
-
-                        if (backOfficeIdentity != null)
-                        {
-                            // Ok, we've got a real ticket, now we can add this ticket's identity to the current
-                            // Principal, this means we'll have 2 identities assigned to the principal which we can
-                            // use to authorize the preview and allow for a back office User.
-                            context.User.AddIdentity(backOfficeIdentity);
-                        }
+                        // Ok, we've got a real ticket, now we can add this ticket's identity to the current
+                        // Principal, this means we'll have 2 identities assigned to the principal which we can
+                        // use to authorize the preview and allow for a back office User.
+                        context.User.AddIdentity(backOfficeIdentity);
                     }
                 }
             }

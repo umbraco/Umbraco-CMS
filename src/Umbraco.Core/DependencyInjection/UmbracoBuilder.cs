@@ -35,6 +35,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
+using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.Querying.RecycleBin;
@@ -348,6 +349,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<ConflictingPackageData>();
             Services.AddSingleton<CompiledPackageXmlParser>();
+            Services.AddUnique<IPreviewTokenGenerator, NoopPreviewTokenGenerator>();
             Services.AddUnique<IPreviewService, PreviewService>();
 
             // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
