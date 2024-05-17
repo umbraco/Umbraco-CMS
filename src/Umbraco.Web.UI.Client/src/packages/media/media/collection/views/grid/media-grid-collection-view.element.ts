@@ -153,6 +153,13 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				grid-auto-rows: 200px;
 				gap: var(--uui-size-space-5);
 			}
+
+			img {
+				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
+				background-size: 10px 10px;
+				background-repeat: repeat;
+			}
+
 			umb-icon {
 				font-size: var(--uui-size-8);
 			}

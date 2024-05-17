@@ -6,12 +6,7 @@ import type { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from '@umbraco-cms
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import {
-	sizeImageInEditor,
-	uploadBlobImages,
-	UMB_MEDIA_TREE_PICKER_MODAL,
-	UMB_MEDIA_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/media';
+import { sizeImageInEditor, uploadBlobImages, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
 
 interface MediaPickerTargetData {
 	altText?: string;

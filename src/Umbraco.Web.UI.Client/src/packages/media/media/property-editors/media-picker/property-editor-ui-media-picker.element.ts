@@ -1,6 +1,6 @@
 import type { UmbInputMediaElement } from '../../components/input-media/input-media.element.js';
 import '../../components/input-media/input-media.element.js';
-import type { UmbMediaPickerPropertyValue } from './index.js';
+import type { UmbCropModel, UmbMediaPickerPropertyValue } from './index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbPropertyValueChangeEvent,
@@ -13,6 +13,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 /**
  * @element umb-property-editor-ui-media-picker
  */
+
 @customElement('umb-property-editor-ui-media-picker')
 export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ attribute: false })
@@ -21,12 +22,38 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		this._items = this.value ? this.value.map((x) => x.mediaKey) : [];
 	}
 	//TODO: Add support for document specific crops. The server side already supports this.
-
 	public get value() {
 		return this.#value;
 	}
 
+	@state()
+	private _startNode: string = '';
+
+	@state()
+	private _focalPointEnabled: boolean = false;
+
+	@state()
+	private _crops: Array<UmbCropModel> = [];
+
+	@state()
+	private _allowedMediaTypes: Array<string> = [];
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		const multiple = config?.getByAlias('multiple');
+		this._multiple = (multiple?.value as boolean) ?? false;
+
+		const startNodeId = config?.getByAlias('startNodeId');
+		this._startNode = (startNodeId?.value as string) ?? '';
+
+		const enableFocalPoint = config?.getByAlias('enableFocalPoint');
+		this._focalPointEnabled = (enableFocalPoint?.value as boolean) ?? false;
+
+		const crops = config?.getByAlias('crops');
+		this._crops = (crops?.value as Array<UmbCropModel>) ?? [];
+
+		const filter = config?.getByAlias('filter')?.value as string;
+		this._allowedMediaTypes = filter?.split(',') ?? [];
+
 		const validationLimit = config?.getByAlias('validationLimit');
 		if (!validationLimit) return;
 
@@ -40,10 +67,14 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	}
 
 	@state()
+	private _multiple: boolean = false;
+
+	@state()
 	_items: Array<string> = [];
 
 	@state()
 	private _limitMin: number = 0;
+
 	@state()
 	private _limitMax: number = Infinity;
 
@@ -71,6 +102,11 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		return html`
 			<umb-input-media
 				@change=${this.#onChange}
+				?multiple=${this._multiple}
+				.allowedContentTypeIds=${this._allowedMediaTypes}
+				.startNode=${this._startNode}
+				.focalPointEnabled=${this._focalPointEnabled}
+				.crops=${this._crops}
 				.selection=${this._items}
 				.min=${this._limitMin}
 				.max=${this._limitMax}>

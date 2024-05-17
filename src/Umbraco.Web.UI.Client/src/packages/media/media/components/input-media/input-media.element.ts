@@ -1,3 +1,4 @@
+import type { UmbCropModel } from '../../property-editors/index.js';
 import type { UmbMediaCardItemModel } from '../../modals/index.js';
 import type { UmbMediaItemModel } from '../../repository/index.js';
 import { UmbMediaPickerContext } from './input-media.context.js';
@@ -22,6 +23,8 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		identifier: 'Umb.SorterIdentifier.InputMedia',
 		itemSelector: 'uui-card-media',
 		containerSelector: '.container',
+		/** TODO: This component probably needs some grid-like logic for resolve placement... [LI] */
+		resolvePlacement: () => false,
 		onChange: ({ model }) => {
 			this.selection = model;
 
@@ -89,6 +92,18 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
 
+	@property({ type: String })
+	startNode = '';
+
+	@property({ type: Boolean })
+	focalPointEnabled = false;
+
+	@property({ type: Array })
+	crops?: Array<UmbCropModel>;
+
+	@property({ type: Boolean })
+	multiple = false;
+
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
@@ -149,7 +164,8 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 
 	#openPicker() {
 		this.#pickerContext.openPicker({
-			hideTreeRoot: true,
+			multiple: this.multiple,
+			startNode: this.startNode,
 			pickableFilter: this.#pickableFilter,
 		});
 	}
@@ -169,10 +185,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 
 	#renderDropzone() {
 		if (this._items && this._items.length >= this.max) return;
-		return html`<umb-dropzone
-			id="dropzone"
-			?multiple=${this.max === 1}
-			@change=${this.#onUploadCompleted}></umb-dropzone>`;
+		return html`<umb-dropzone id="dropzone" @change=${this.#onUploadCompleted}></umb-dropzone>`;
 	}
 
 	#renderItems() {
@@ -185,7 +198,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	#renderAddButton() {
-		if (this._items && this.max && this._items.length >= this.max) return;
+		if ((this._items && this.max && this._items.length >= this.max) || (this._items?.length && !this.multiple)) return;
 		return html`
 			<uui-button
 				id="btn-add"
@@ -203,7 +216,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 			<uui-card-media name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.unique)}>
 				${item.url
 					? html`<img src=${item.url} alt=${item.name} />`
-					: html`<umb-icon name=${ifDefined(item.icon)}></umb-icon>`}
+					: html`<umb-icon name=${ifDefined(item.mediaType.icon)}></umb-icon>`}
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
@@ -250,8 +263,8 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 			.container {
 				display: grid;
 				gap: var(--uui-size-space-3);
-				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+				grid-auto-rows: 150px;
 			}
 
 			#btn-add {

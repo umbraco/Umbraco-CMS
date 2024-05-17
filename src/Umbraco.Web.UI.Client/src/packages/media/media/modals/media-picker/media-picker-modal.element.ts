@@ -1,3 +1,4 @@
+import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
 import { type UmbMediaItemModel, UmbMediaItemRepository, UmbMediaUrlRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
@@ -6,21 +7,29 @@ import type { UmbMediaPickerFolderPathElement } from './components/media-picker-
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
-import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
 @customElement('umb-media-picker-modal')
-export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPickerModalData, UmbMediaPickerModalValue> {
+export class UmbMediaPickerModalElement extends UmbModalBaseElement<
+	UmbMediaPickerModalData<unknown>,
+	UmbMediaPickerModalValue
+> {
 	#mediaTreeRepository = new UmbMediaTreeRepository(this); // used to get file structure
 	#mediaUrlRepository = new UmbMediaUrlRepository(this); // used to get urls
 	#mediaItemRepository = new UmbMediaItemRepository(this); // used to search
 	#imagingRepository = new UmbImagingRepository(this); // used to get image renditions
 
-	#mediaItemsCurrentFolder: Array<UmbMediaCardItemModel> = [];
+	@state()
+	private _filter: (item: UmbMediaCardItemModel) => boolean = () => true;
 
+	@state()
+	private _selectableFilter: (item: UmbMediaCardItemModel) => boolean = () => true;
+
+	#mediaItemsCurrentFolder: Array<UmbMediaCardItemModel> = [];
 	@state()
 	private _mediaFilteredList: Array<UmbMediaCardItemModel> = [];
 
@@ -33,8 +42,14 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	@state()
 	private _currentMediaEntity: UmbMediaPathModel = root;
 
+	@query('#dropzone')
+	private _dropzone!: UmbDropzoneElement;
+
 	async connectedCallback(): Promise<void> {
 		super.connectedCallback();
+
+		if (this.data?.filter) this._filter = this.data?.filter;
+		if (this.data?.pickableFilter) this._selectableFilter = this.data?.pickableFilter;
 
 		if (this.data?.startNode) {
 			const { data } = await this.#mediaItemRepository.requestItems([this.data.startNode]);
@@ -69,17 +84,12 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			{ height: 400, width: 400, mode: ImageCropModeModel.MIN },
 		);
 
-		return items.map((item): UmbMediaCardItemModel => {
-			const url = data?.find((media) => media.unique === item.unique)?.url;
-			return {
-				name: item.name,
-				unique: item.unique,
-				url,
-				icon: item.mediaType.icon,
-				entityType: item.entityType,
-				isTrashed: item.isTrashed,
-			};
-		});
+		return items
+			.map((item): UmbMediaCardItemModel => {
+				const url = data?.find((media) => media.unique === item.unique)?.url;
+				return { ...item, url };
+			})
+			.filter((item) => this._filter(item));
 	}
 
 	#onOpen(item: UmbMediaCardItemModel) {
@@ -176,8 +186,9 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 	}
 
 	#renderToolbar() {
+		/**<umb-media-picker-create-item .node=${this._currentMediaEntity.unique}></umb-media-picker-create-item>
+		 * We cannot route to a workspace without the media picker modal is a routeable. Using regular upload button for now... */
 		return html`<div id="toolbar">
-			<umb-media-picker-create-item .node=${this._currentMediaEntity.unique}></umb-media-picker-create-item>
 			<div id="search">
 				<uui-input
 					label=${this.localize.term('general_search')}
@@ -185,28 +196,31 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 					@change=${this.#onSearch}>
 					<uui-icon slot="prepend" name="icon-search"></uui-icon>
 				</uui-input>
+				<uui-checkbox
+					@change=${() => (this._searchOnlyThisFolder = !this._searchOnlyThisFolder)}
+					label=${this.localize.term('general_excludeFromSubFolders')}></uui-checkbox>
 			</div>
-			<uui-button label="TODO" compact @click=${() => alert('TODO: Show media items as list/grid')}
-				><uui-icon name="icon-grid"></uui-icon
-			></uui-button>
-		</div>`;
+			<uui-button
+				@click=${() => this._dropzone.browse()}
+				label=${this.localize.term('general_upload')}
+				look="primary"></uui-button>
+		</div> `;
 	}
 
-	// Where should this be placed, without it looking terrible?
-	// <uui-checkbox @change=${() => (this._searchOnlyThisFolder = !this._searchOnlyThisFolder)} label=${this.localize.term('general_excludeFromSubFolders')}></uui-checkbox>
-
 	#renderCard(item: UmbMediaCardItemModel) {
+		const disabled = !this._selectableFilter(item);
 		return html`
 			<uui-card-media
+				class=${ifDefined(disabled ? 'not-allowed' : undefined)}
 				.name=${item.name ?? 'Unnamed Media'}
 				@open=${() => this.#onOpen(item)}
 				@selected=${() => this.#onSelected(item)}
 				@deselected=${() => this.#onDeselected(item)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
-				selectable>
+				?selectable=${!disabled}>
 				${item.url
 					? html`<img src=${item.url} alt=${ifDefined(item.name)} />`
-					: html`<umb-icon .name=${item.icon}></umb-icon>`}
+					: html`<umb-icon .name=${item.mediaType.icon}></umb-icon>`}
 			</uui-card-media>
 		`;
 	}
@@ -241,8 +255,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 			}
 			#media-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-				grid-auto-rows: 200px;
+				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+				grid-auto-rows: 150px;
 				gap: var(--uui-size-space-5);
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
 			}
@@ -258,6 +272,10 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 
 			#actions {
 				max-width: 100%;
+			}
+
+			.not-allowed {
+				cursor: not-allowed;
 			}
 		`,
 	];
