@@ -40,14 +40,7 @@ export class UmbMediaPickerContext extends UmbPickerInputContext<
 			this.#cardItems.setValue(
 				selectedItems.map((item) => {
 					const url = data?.find((x) => x.unique === item.unique)?.url;
-					return {
-						icon: item.mediaType.icon,
-						name: item.name,
-						unique: item.unique,
-						isTrashed: item.isTrashed,
-						entityType: item.entityType,
-						url,
-					};
+					return { ...item, url };
 				}),
 			);
 		});
