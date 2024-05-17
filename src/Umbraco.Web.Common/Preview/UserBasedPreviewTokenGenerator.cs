@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Preview;
@@ -11,13 +12,18 @@ public class UserBasedPreviewTokenGenerator : IPreviewTokenGenerator
 {
     private readonly IDataProtectionProvider _dataProtectionProvider;
     private readonly IUserService _userService;
+    private readonly ILogger<UserBasedPreviewTokenGenerator> _logger;
 
-    public UserBasedPreviewTokenGenerator(IDataProtectionProvider dataProtectionProvider, IUserService userService)
+    public UserBasedPreviewTokenGenerator(
+        IDataProtectionProvider dataProtectionProvider,
+        IUserService userService,
+        ILogger<UserBasedPreviewTokenGenerator> logger)
     {
         _dataProtectionProvider = dataProtectionProvider;
         _userService = userService;
+        _logger = logger;
     }
- 
+
     public Task<Attempt<string?>> GenerateTokenAsync(Guid userKey)
     {
         var token = EncryptionHelper.Encrypt(userKey.ToString(), _dataProtectionProvider);
@@ -40,9 +46,9 @@ public class UserBasedPreviewTokenGenerator : IPreviewTokenGenerator
                 }
             }
         }
-        catch
+        catch (Exception e)
         {
-            // ignored
+            _logger.LogDebug(e, "An error occured when trying to get the user from the encrypted token");
         }
 
         return Attempt.Fail<Guid?>(null);

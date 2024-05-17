@@ -8,12 +8,12 @@ public interface IPreviewService
     /// <summary>
     /// Enters preview mode for a given user that calls this
     /// </summary>
-    Task EnterPreviewAsync(IUser user);
+    Task<bool> TryEnterPreviewAsync(IUser user);
 
     /// <summary>
     /// Exits preview mode for a given user that calls this
     /// </summary>
     Task EndPreviewAsync();
 
-    Task<ClaimsIdentity?> TryGetPreviewClaimsIdentityAsync();
+    Task<Attempt<ClaimsIdentity>> TryGetPreviewClaimsIdentityAsync();
 }

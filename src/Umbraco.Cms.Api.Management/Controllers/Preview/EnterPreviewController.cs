@@ -23,7 +23,14 @@ public class EnterPreviewController : PreviewControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Enter(CancellationToken cancellationToken)
     {
-        await _previewService.EnterPreviewAsync(CurrentUser(_backOfficeSecurityAccessor));
-        return Ok();
+        return await _previewService.TryEnterPreviewAsync(CurrentUser(_backOfficeSecurityAccessor))
+            ? Ok()
+            : StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "Could not enter preview",
+                Detail = "Something unexpected went wrong trying to activate preview mode for the current user",
+                Status = StatusCodes.Status500InternalServerError,
+                Type = "Error",
+            });
     }
 }

@@ -24,7 +24,7 @@ public class PreviewService : IPreviewService
         _serviceScopeFactory = serviceScopeFactory;
     }
 
-    public async Task EnterPreviewAsync(IUser user)
+    public async Task<bool> TryEnterPreviewAsync(IUser user)
     {
         Attempt<string?> attempt = await _previewTokenGenerator.GenerateTokenAsync(user.Key);
 
@@ -32,8 +32,9 @@ public class PreviewService : IPreviewService
         {
             _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, attempt.Result!, true);
         }
-        }
 
+        return attempt.Success;
+    }
 
     public Task EndPreviewAsync()
     {
@@ -41,33 +42,27 @@ public class PreviewService : IPreviewService
          return Task.CompletedTask;
     }
 
-    public async Task<ClaimsIdentity?> TryGetPreviewClaimsIdentityAsync()
+    public async Task<Attempt<ClaimsIdentity>> TryGetPreviewClaimsIdentityAsync()
     {
         var cookieValue = _cookieManager.GetCookieValue(Constants.Web.PreviewCookieName);
         if (string.IsNullOrWhiteSpace(cookieValue))
         {
-            return null;
+            return Attempt<ClaimsIdentity>.Fail();
         }
 
-        Attempt<Guid?> attempt = await _previewTokenGenerator.VerifyAsync(cookieValue);
+        Attempt<Guid?> userKeyAttempt = await _previewTokenGenerator.VerifyAsync(cookieValue);
 
-        if (attempt.Success is false)
+        if (userKeyAttempt.Success is false)
         {
-            return null;
-        }
-
-        Guid? userKey = attempt.Result;
-        if (userKey is null)
-        {
-            return null;
+            return Attempt<ClaimsIdentity>.Fail();
         }
 
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         ICoreBackOfficeSignInManager coreBackOfficeSignInManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeSignInManager>();
 
-        ClaimsPrincipal? principal = await coreBackOfficeSignInManager.CreateUserPrincipalAsync(userKey.Value);
+        ClaimsPrincipal? principal = await coreBackOfficeSignInManager.CreateUserPrincipalAsync(userKeyAttempt.Result!.Value);
         ClaimsIdentity? backOfficeIdentity = principal?.GetUmbracoIdentity();
 
-        return backOfficeIdentity;
+        return Attempt<ClaimsIdentity>.Succeed(backOfficeIdentity);
     }
 }

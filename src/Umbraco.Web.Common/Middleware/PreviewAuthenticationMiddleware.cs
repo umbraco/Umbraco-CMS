@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -54,14 +55,18 @@ public class PreviewAuthenticationMiddleware : IMiddleware
 
             if (isPreview)
             {
-                ClaimsIdentity? backOfficeIdentity = await _previewService.TryGetPreviewClaimsIdentityAsync();
+                Attempt<ClaimsIdentity> backOfficeIdentityAttempt = await _previewService.TryGetPreviewClaimsIdentityAsync();
 
-                if (backOfficeIdentity != null)
+                if (backOfficeIdentityAttempt.Success)
                 {
                     // Ok, we've got a real ticket, now we can add this ticket's identity to the current
                     // Principal, this means we'll have 2 identities assigned to the principal which we can
                     // use to authorize the preview and allow for a back office User.
-                    context.User.AddIdentity(backOfficeIdentity);
+                    context.User.AddIdentity(backOfficeIdentityAttempt.Result!);
+                }
+                else
+                {
+                    _logger.LogDebug("Could not transform previewCookie value into a claimsIdentity");
                 }
             }
         }
