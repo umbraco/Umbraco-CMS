@@ -79,6 +79,10 @@ export abstract class UmbBlockManagerContext<
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		this._layouts.setValue(layouts);
 	}
+	// TODO: Remove this as it is just for debug purpose...?
+	getLayouts(): Array<BlockLayoutType> {
+		return this._layouts.getValue();
+	}
 	setContents(contents: Array<UmbBlockDataType>) {
 		this.#contents.setValue(contents);
 	}
