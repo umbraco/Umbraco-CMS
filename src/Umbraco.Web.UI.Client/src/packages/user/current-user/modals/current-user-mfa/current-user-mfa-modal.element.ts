@@ -124,6 +124,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 						<uui-button
 							type="button"
 							look="secondary"
+							?disabled=${!item.existsOnServer}
 							.label=${this.localize.term('actions_enable')}
 							@click=${() => this.#onProviderEnable(item)}></uui-button>
 					`,

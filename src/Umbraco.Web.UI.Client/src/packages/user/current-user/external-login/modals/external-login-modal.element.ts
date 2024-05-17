@@ -145,6 +145,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 							look="secondary"
 							color="success"
 							.label=${this.localize.term('defaultdialogs_linkYour', item.displayName)}
+							?disabled=${!item.existsOnServer || !item.hasManualLinkingEnabled}
 							@click=${() => this.#onProviderEnable(item)}>
 							<umb-localize key="defaultdialogs_linkYour" .args=${[this.localize.string(item.displayName)]}>
 								Link your ${this.localize.string(item.displayName)} account
