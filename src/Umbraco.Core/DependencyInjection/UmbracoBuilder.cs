@@ -38,6 +38,7 @@ using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Preview;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services.FileSystem;
+using Umbraco.Cms.Core.Services.ImportExport;
 using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
@@ -397,6 +398,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Segments
             Services.AddUnique<ISegmentService, NoopSegmentService>();
+            
+            // definition Import/export
+            Services.AddUnique<ITemporaryFileToXmlImportService, TemporaryFileToXmlImportService>();
+            Services.AddUnique<IContentTypeImportService, ContentTypeImportService>();
+            Services.AddUnique<IMediaTypeImportService, MediaTypeImportService>();
         }
     }
 }
