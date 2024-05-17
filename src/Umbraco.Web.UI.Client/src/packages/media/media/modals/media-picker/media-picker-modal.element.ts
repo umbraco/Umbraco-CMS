@@ -247,7 +247,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<UmbMediaPick
 				padding-bottom: 5px; /** The modal is a bit jumpy due to the img card focus/hover border. This fixes the issue. */
 			}
 			umb-icon {
-				font-size: var(--uui-size-24);
+				font-size: var(--uui-size-8);
 			}
 
 			img {

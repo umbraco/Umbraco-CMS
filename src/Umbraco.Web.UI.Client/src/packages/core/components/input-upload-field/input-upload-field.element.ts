@@ -172,6 +172,9 @@ export class UmbInputUploadFieldElement extends UmbLitElement {
 
 	static styles = [
 		css`
+			:host {
+				position: relative;
+			}
 			uui-icon {
 				vertical-align: sub;
 				margin-right: var(--uui-size-space-4);
