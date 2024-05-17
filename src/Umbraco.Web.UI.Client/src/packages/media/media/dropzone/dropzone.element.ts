@@ -16,6 +16,9 @@ export class UmbDropzoneElement extends UmbLitElement {
 	@property({ type: Boolean })
 	createAsTemporary: boolean = false;
 
+	@property({ type: Array, attribute: false })
+	accept: Array<string> = [];
+
 	//TODO: logic to disable the dropzone?
 
 	#files: Array<UmbUploadableFileModel | UmbTemporaryFileModel> = [];
@@ -92,10 +95,10 @@ export class UmbDropzoneElement extends UmbLitElement {
 	render() {
 		return html`<uui-file-dropzone
 			id="dropzone"
+			.accept=${this.accept?.join(',')}
 			?multiple=${this.multiple}
 			@change=${this.#onDropFiles}
-			label="${this.localize.term('media_dragAndDropYourFilesIntoTheArea')}"
-			accept=""></uui-file-dropzone>`;
+			label="${this.localize.term('media_dragAndDropYourFilesIntoTheArea')}"></uui-file-dropzone>`;
 	}
 
 	static styles = [

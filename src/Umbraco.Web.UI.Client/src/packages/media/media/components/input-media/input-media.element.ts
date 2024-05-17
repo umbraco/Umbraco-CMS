@@ -199,7 +199,6 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	#renderItem(item: UmbMediaCardItemModel) {
-		// TODO: `file-ext` value has been hardcoded here. Find out if API model has value for it. [LK]
 		return html`
 			<uui-card-media name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.unique)}>
 				${item.url
@@ -208,10 +207,11 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
-					<uui-button label="Copy media">
+					<uui-button label="Copy media" look="secondary">
 						<uui-icon name="icon-documents"></uui-icon>
 					</uui-button>
 					<uui-button
+						look="secondary"
 						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
 						label="Remove media ${item.name}">
 						<uui-icon name="icon-trash"></uui-icon>
@@ -262,6 +262,10 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 			uui-icon {
 				display: block;
 				margin: 0 auto;
+			}
+
+			uui-card-media umb-icon {
+				font-size: var(--uui-size-8);
 			}
 
 			uui-card-media[drag-placeholder] {
