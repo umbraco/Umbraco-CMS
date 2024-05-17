@@ -164,6 +164,10 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 	}
 
 	async #onProviderDisable(item: UmbExternalLoginProviderOption) {
+		if (!item.providerKey) {
+			throw new Error('Provider key is missing');
+		}
+
 		const providerDisplayName = this.localize.string(item.displayName);
 		try {
 			await umbConfirmModal(this, {
