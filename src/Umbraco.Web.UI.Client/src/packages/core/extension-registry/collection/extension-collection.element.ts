@@ -1,4 +1,5 @@
 import { umbExtensionsRegistry } from '../registry.js';
+import type { UmbExtensionCollectionFilterModel } from './types.js';
 import { html, customElement, css } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UMB_COLLECTION_CONTEXT, UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
@@ -7,7 +8,7 @@ import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-extension-collection')
 export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
-	#collectionContext?: UmbDefaultCollectionContext;
+	#collectionContext?: UmbDefaultCollectionContext<any, UmbExtensionCollectionFilterModel>;
 
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 500;
@@ -29,7 +30,7 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 	}
 
 	#onChange(event: UUISelectEvent) {
-		const extensionType = event.target.value;
+		const extensionType = event.target.value as string;
 		this.#collectionContext?.setFilter({ type: extensionType });
 	}
 
@@ -37,7 +38,7 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 		const target = event.target as HTMLInputElement;
 		const query = target.value || '';
 		clearTimeout(this.#inputTimer);
-		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ query }), this.#inputTimerAmount);
+		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter: query }), this.#inputTimerAmount);
 	}
 
 	protected renderToolbar() {
