@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbUserMockDb } from '../../data/user/user.db.js';
 import { UMB_SLUG } from './slug.js';
-import type { LinkedLoginsRequestModel, UserData } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UserData } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
