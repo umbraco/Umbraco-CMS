@@ -33,11 +33,7 @@ export class UmbImageCropperPreviewElement extends LitElement {
 		if (!this.crop) return;
 
 		await this.updateComplete; // Wait for the @query to be resolved
-
-		if (!this.imageElement.complete) {
-			// Wait for the image to load
-			await new Promise((resolve) => (this.imageElement.onload = () => resolve(this.imageElement)));
-		}
+		await new Promise((resolve) => (this.imageElement.onload = () => resolve(this.imageElement)));
 
 		const container = this.imageContainerElement.getBoundingClientRect();
 		const cropAspectRatio = this.crop.width / this.crop.height;
