@@ -54,22 +54,14 @@ public class PreviewAuthenticationMiddleware : IMiddleware
 
             if (isPreview)
             {
+                ClaimsIdentity? backOfficeIdentity = await _previewService.TryGetPreviewClaimsIdentityAsync();
 
-                // If we've gotten this far it means a preview cookie has been set and a front-end umbraco document request is executing.
-                var chunkingCookieManager = new ChunkingCookieManager();
-                var cookie = chunkingCookieManager.GetRequestCookie(context, Core.Constants.Web.PreviewCookieName);
-
-                if (!string.IsNullOrEmpty(cookie))
+                if (backOfficeIdentity != null)
                 {
-                    var backOfficeIdentity = await _previewService.TryGetPreviewClaimsIdentityAsync();
-
-                    if (backOfficeIdentity != null)
-                    {
-                        // Ok, we've got a real ticket, now we can add this ticket's identity to the current
-                        // Principal, this means we'll have 2 identities assigned to the principal which we can
-                        // use to authorize the preview and allow for a back office User.
-                        context.User.AddIdentity(backOfficeIdentity);
-                    }
+                    // Ok, we've got a real ticket, now we can add this ticket's identity to the current
+                    // Principal, this means we'll have 2 identities assigned to the principal which we can
+                    // use to authorize the preview and allow for a back office User.
+                    context.User.AddIdentity(backOfficeIdentity);
                 }
             }
         }
