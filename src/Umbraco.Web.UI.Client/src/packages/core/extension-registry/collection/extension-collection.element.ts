@@ -36,9 +36,9 @@ export class UmbExtensionCollectionElement extends UmbCollectionDefaultElement {
 
 	#onSearch(event: InputEvent) {
 		const target = event.target as HTMLInputElement;
-		const query = target.value || '';
+		const filter = target.value || '';
 		clearTimeout(this.#inputTimer);
-		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter: query }), this.#inputTimerAmount);
+		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter }), this.#inputTimerAmount);
 	}
 
 	protected renderToolbar() {
