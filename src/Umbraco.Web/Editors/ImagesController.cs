@@ -8,6 +8,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
@@ -102,7 +103,7 @@ namespace Umbraco.Web.Editors
         private bool IsAllowed(string encodedImagePath)
         {
 
-            if(Uri.IsWellFormedUriString(encodedImagePath, UriKind.Relative))
+            if(WebPath.IsWellFormedWebPath(encodedImagePath, UriKind.Relative))
             {
                 return true;
             }

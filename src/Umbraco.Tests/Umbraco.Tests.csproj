@@ -170,6 +170,7 @@
     <Compile Include="PublishedContent\NuCacheTests.cs" />
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
     <Compile Include="Routing\RoutableDocumentFilterTests.cs" />
+    <Compile Include="Routing\WebPathTests.cs" />
     <Compile Include="Runtimes\StandaloneTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
     <Compile Include="Scheduling\ContentVersionCleanup_Tests_UnitTests.cs" />
