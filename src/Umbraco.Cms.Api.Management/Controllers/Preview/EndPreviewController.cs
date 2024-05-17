@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
@@ -15,6 +16,7 @@ public class EndPreviewController : PreviewControllerBase
     [HttpDelete]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [AllowAnonymous] // It's okay the client can do this from the website without having a token
     public async Task<IActionResult> End(CancellationToken cancellationToken)
     {
         await _previewService.EndPreviewAsync();
