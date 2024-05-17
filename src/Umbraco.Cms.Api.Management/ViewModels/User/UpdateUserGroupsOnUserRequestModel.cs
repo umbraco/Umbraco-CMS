@@ -2,7 +2,7 @@
 
 public class UpdateUserGroupsOnUserRequestModel
 {
-    public required ISet<Guid> UserIds { get; set; }
+    public required ISet<ReferenceByIdModel> UserIds { get; set; }
 
-    public required ISet<Guid> UserGroupIds { get; set; }
+    public required ISet<ReferenceByIdModel> UserGroupIds { get; set; }
 }

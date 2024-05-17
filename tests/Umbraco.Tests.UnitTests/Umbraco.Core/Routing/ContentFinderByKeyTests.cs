@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
 
 [TestFixture]
-public class ContentFinderByIdTests : ContentFinderByIdentifierTestsBase
+public class ContentFinderByKeyTests : ContentFinderByIdentifierTestsBase
 {
     [SetUp]
     public override void Setup()
@@ -18,20 +18,22 @@ public class ContentFinderByIdTests : ContentFinderByIdentifierTestsBase
         base.Setup();
     }
 
-    [TestCase("/1046", 1046, true)]
-    [TestCase("/1046", 1047, false)]
-    public async Task Lookup_By_Id(string urlAsString, int nodeId, bool shouldSucceed)
+    [TestCase("/1598901d-ebbe-4996-b7fb-6a6cbac13a62", "1598901d-ebbe-4996-b7fb-6a6cbac13a62", true)]
+    [TestCase("/1598901d-ebbe-4996-b7fb-6a6cbac13a62", "a383f6ed-cc54-46f1-a577-33f42e7214de", false)]
+    public async Task Lookup_By_Key(string urlAsString, string nodeKeyString, bool shouldSucceed)
     {
-        PopulateCache(nodeId, Guid.NewGuid());
+        var nodeKey = Guid.Parse(nodeKeyString);
+
+        PopulateCache(9999, nodeKey);
 
         var umbracoContextAccessor = GetUmbracoContextAccessor(urlAsString);
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
         var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
         var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
         var webRoutingSettings = new WebRoutingSettings();
-        var lookup = new ContentFinderByIdPath(
+        var lookup = new ContentFinderByKeyPath(
             Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == webRoutingSettings),
-            Mock.Of<ILogger<ContentFinderByIdPath>>(),
+            Mock.Of<ILogger<ContentFinderByKeyPath>>(),
             Mock.Of<IRequestAccessor>(),
             umbracoContextAccessor);
 
@@ -40,7 +42,7 @@ public class ContentFinderByIdTests : ContentFinderByIdentifierTestsBase
         Assert.AreEqual(shouldSucceed, result);
         if (shouldSucceed)
         {
-            Assert.AreEqual(frequest.PublishedContent!.Id, nodeId);
+            Assert.AreEqual(frequest.PublishedContent!.Key, nodeKey);
         }
         else
         {
