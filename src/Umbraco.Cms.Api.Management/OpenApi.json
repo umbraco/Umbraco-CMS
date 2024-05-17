@@ -19524,6 +19524,205 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/my/item": {
+      "post": {
+        "tags": [
+          "My item API"
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "My item API"
+        ],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/my/item/{id}": {
+      "delete": {
+        "tags": [
+          "My item API"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "My item API"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "My item API"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "value",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  },
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/object-types": {
       "get": {
         "tags": [
@@ -28354,8 +28553,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -28363,8 +28565,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -28372,8 +28577,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             }
@@ -28468,8 +28676,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -28477,8 +28688,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             },
@@ -28486,8 +28700,11 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "string",
-                  "format": "uuid"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReferenceByIdModel"
+                    }
+                  ]
                 }
               }
             }
@@ -30676,6 +30893,41 @@
           },
           "403": {
             "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current/login-providers": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserCurrentLoginProviders",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/UserExternalLoginProviderModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
           }
         },
         "security": [
@@ -34318,8 +34570,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "id": {
@@ -34476,8 +34731,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasDocumentRootAccess": {
@@ -34487,8 +34745,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasMediaRootAccess": {
@@ -34886,8 +35147,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -34903,8 +35167,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -35023,8 +35290,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -36468,8 +36738,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -36942,8 +37215,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "id": {
@@ -42074,8 +42350,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -43316,16 +43595,22 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "userGroupIds": {
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           }
         },
@@ -43358,8 +43643,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "languageIsoCode": {
@@ -43369,8 +43657,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasDocumentRootAccess": {
@@ -43380,8 +43671,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasMediaRootAccess": {
@@ -43532,6 +43826,26 @@
           "key": {
             "type": "string",
             "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserExternalLoginProviderModel": {
+        "required": [
+          "hasManualLinkingEnabled",
+          "isLinkedOnUser",
+          "providerSchemeName"
+        ],
+        "type": "object",
+        "properties": {
+          "providerSchemeName": {
+            "type": "string"
+          },
+          "isLinkedOnUser": {
+            "type": "boolean"
+          },
+          "hasManualLinkingEnabled": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -43801,8 +44115,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "id": {
@@ -43817,8 +44134,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasDocumentRootAccess": {
@@ -43828,8 +44148,11 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
           "hasMediaRootAccess": {

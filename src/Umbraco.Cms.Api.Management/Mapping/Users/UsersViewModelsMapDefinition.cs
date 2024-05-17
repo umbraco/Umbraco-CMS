@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.User;
+using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -14,6 +15,8 @@ public class UsersViewModelsMapDefinition : IMapDefinition
         mapper.Define<PasswordChangedModel, ResetPasswordUserResponseModel>((_, _) => new ResetPasswordUserResponseModel(), Map);
         mapper.Define<UserCreationResult, CreateUserResponseModel>((_, _) => new CreateUserResponseModel { User = new() }, Map);
         mapper.Define<IIdentityUserLogin, LinkedLoginViewModel>((_, _) => new LinkedLoginViewModel { ProviderKey = string.Empty, ProviderName = string.Empty }, Map);
+        mapper.Define<UserExternalLoginProviderModel, UserExternalLoginProviderResponseModel>(
+            (_, _) => new UserExternalLoginProviderResponseModel { ProviderSchemeName = string.Empty }, Map);
     }
 
     // Umbraco.Code.MapAll
@@ -26,10 +29,10 @@ public class UsersViewModelsMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(UserCreationResult source, CreateUserResponseModel target, MapperContext context)
     {
-        Guid userId = source.CreatedUser?.Key
+        Guid userKey = source.CreatedUser?.Key
                       ?? throw new ArgumentException("Cannot map a user creation response without a created user", nameof(source));
 
-        target.User = new ReferenceByIdModel(userId);
+        target.User = new ReferenceByIdModel(userKey);
         target.InitialPassword = source.InitialPassword;
     }
 
@@ -37,5 +40,13 @@ public class UsersViewModelsMapDefinition : IMapDefinition
     private void Map(PasswordChangedModel source, ResetPasswordUserResponseModel target, MapperContext context)
     {
         target.ResetPassword = source.ResetPassword;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(UserExternalLoginProviderModel source, UserExternalLoginProviderResponseModel target, MapperContext context)
+    {
+        target.ProviderSchemeName = source.ProviderSchemeName;
+        target.HasManualLinkingEnabled = source.HasManualLinkingEnabled;
+        target.IsLinkedOnUser = source.IsLinkedOnUser;
     }
 }
