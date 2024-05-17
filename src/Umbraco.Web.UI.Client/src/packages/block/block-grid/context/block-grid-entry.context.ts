@@ -83,16 +83,6 @@ export class UmbBlockGridEntryContext
 		// Notice columnSpan is secured in _gotEntries, cause it uses the layoutColumns of entries context as a max.
 	}
 
-	protected _gotLayout(layout: UmbBlockGridLayoutModel | undefined) {
-		if (layout) {
-			layout = { ...layout };
-			layout.columnSpan ??= 999;
-			layout.rowSpan ??= 1;
-			layout.areas ??= [];
-		}
-		return layout;
-	}
-
 	layoutsOfArea(areaKey: string) {
 		return this._layout.asObservablePart((x) => x?.areas.find((x) => x.key === areaKey)?.items);
 	}
@@ -115,25 +105,40 @@ export class UmbBlockGridEntryContext
 		this._layout.update({ areas });
 	}
 
+	/**
+	 * Set the column span of this entry.
+	 * @param columnSpan {number} The new column span.
+	 */
 	setColumnSpan(columnSpan: number) {
 		if (!this._entries) return;
 		const layoutColumns = this._entries.getLayoutColumns();
 		if (!layoutColumns) return;
 
-		columnSpan = Math.max(1, Math.min(columnSpan, layoutColumns));
+		columnSpan = this.#calcColumnSpan(columnSpan, this.getRelevantColumnSpanOptions(), layoutColumns);
 		this._layout.update({ columnSpan });
 	}
+	/**
+	 * Get the column span of this entry.
+	 * @returns {number} The column span.
+	 */
 	getColumnSpan() {
 		return this._layout.getValue()?.columnSpan;
 	}
 
+	/**
+	 * Set the row span of this entry.
+	 * @param rowSpan {number} The new row span.
+	 */
 	setRowSpan(rowSpan: number) {
 		const minMax = this.getMinMaxRowSpan();
 		if (!minMax) return;
 		rowSpan = Math.max(minMax[0], Math.min(rowSpan, minMax[1]));
 		this._layout.update({ rowSpan });
 	}
-
+	/**
+	 * Get the row span of this entry.
+	 * @returns {number} The row span.
+	 */
 	getRowSpan() {
 		return this._layout.getValue()?.rowSpan;
 	}
@@ -171,20 +176,9 @@ export class UmbBlockGridEntryContext
 			observeMultiple([this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
 			([columnSpan, relevantColumnSpanOptions, layoutColumns]) => {
 				if (!columnSpan || !layoutColumns) return;
-				if (relevantColumnSpanOptions.length > 0) {
-					// Correct columnSpan so it fits.
-					const newColumnSpan =
-						closestColumnSpanOption(columnSpan, relevantColumnSpanOptions, layoutColumns) ?? layoutColumns;
-					if (newColumnSpan !== columnSpan) {
-						//this.setColumnSpan(newColumnSpan);
-						this._layout.update({ columnSpan: newColumnSpan });
-					}
-				} else {
-					// Reset to the layoutColumns.
-					if (layoutColumns !== columnSpan) {
-						//this.setColumnSpan(layoutColumns);
-						this._layout.update({ columnSpan: layoutColumns });
-					}
+				const newColumnSpan = this.#calcColumnSpan(columnSpan, relevantColumnSpanOptions, layoutColumns);
+				if (newColumnSpan !== columnSpan) {
+					this._layout.update({ columnSpan: newColumnSpan });
 				}
 			},
 			'observeColumnSpanValidation',
@@ -202,5 +196,22 @@ export class UmbBlockGridEntryContext
 
 	_gotContentType(contentType: UmbContentTypeModel | undefined) {
 		this.#firstPropertyType.setValue(contentType?.properties[0]);
+	}
+
+	#calcColumnSpan(columnSpan: number, relevantColumnSpanOptions: number[], layoutColumns: number) {
+		if (relevantColumnSpanOptions.length > 0) {
+			// Correct to a columnSpan option.
+			const newColumnSpan =
+				closestColumnSpanOption(columnSpan, relevantColumnSpanOptions, layoutColumns) ?? layoutColumns;
+			if (newColumnSpan !== columnSpan) {
+				return newColumnSpan;
+			}
+		} else {
+			// Reset to the layoutColumns.
+			if (layoutColumns !== columnSpan) {
+				return layoutColumns;
+			}
+		}
+		return columnSpan;
 	}
 }
