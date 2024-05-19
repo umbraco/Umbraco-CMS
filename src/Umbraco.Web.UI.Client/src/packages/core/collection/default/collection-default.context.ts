@@ -18,9 +18,13 @@ import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffi
 import type { ManifestCollection, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import type { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 
 const LOCAL_STORAGE_KEY = 'umb-collection-view';
 
@@ -88,9 +92,19 @@ export class UmbDefaultCollectionContext<
 				this.#onReloadStructureRequest as unknown as EventListener,
 			);
 
+			context?.removeEventListener(
+				UmbRequestReloadChildrenOfEntityEvent.TYPE,
+				this.#onReloadChildrenRequest as unknown as EventListener,
+			);
+
 			context?.addEventListener(
 				UmbRequestReloadStructureForEntityEvent.TYPE,
 				this.#onReloadStructureRequest as unknown as EventListener,
+			);
+
+			context?.addEventListener(
+				UmbRequestReloadChildrenOfEntityEvent.TYPE,
+				this.#onReloadChildrenRequest as unknown as EventListener,
 			);
 		});
 	}
@@ -246,10 +260,21 @@ export class UmbDefaultCollectionContext<
 		localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(layouts));
 	}
 
-	#onReloadStructureRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
+	#onReloadStructureRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
 		const items = this.#items.getValue();
 		const hasItem = items.some((item) => item.unique === event.getUnique());
 		if (hasItem) {
+			this.requestCollection();
+		}
+	};
+
+	#onReloadChildrenRequest = async (event: UmbRequestReloadChildrenOfEntityEvent) => {
+		// check if the collection is in the same context as the entity from the event
+		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
+		const unique = entityContext.getUnique();
+		const entityType = entityContext.getEntityType();
+
+		if (unique === event.getUnique() && entityType === event.getEntityType()) {
 			this.requestCollection();
 		}
 	};
@@ -258,6 +283,11 @@ export class UmbDefaultCollectionContext<
 		this.#actionEventContext?.removeEventListener(
 			UmbRequestReloadStructureForEntityEvent.TYPE,
 			this.#onReloadStructureRequest as unknown as EventListener,
+		);
+
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadChildrenOfEntityEvent.TYPE,
+			this.#onReloadChildrenRequest as unknown as EventListener,
 		);
 
 		super.destroy();
