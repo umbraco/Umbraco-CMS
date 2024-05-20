@@ -19,6 +19,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Amount',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
 					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
+					weight: 100,
 				},
 			],
 			defaultData: [

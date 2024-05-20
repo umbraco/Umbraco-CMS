@@ -32,7 +32,11 @@ export class UmbCurrentUserServerDataSource {
 			const user: UmbCurrentUserModel = {
 				allowedSections: data.allowedSections,
 				avatarUrls: data.avatarUrls,
-				documentStartNodeUniques: data.documentStartNodeIds,
+				documentStartNodeUniques: data.documentStartNodeIds.map((node) => {
+					return {
+						unique: node.id,
+					};
+				}),
 				email: data.email,
 				fallbackPermissions: data.fallbackPermissions,
 				hasAccessToAllLanguages: data.hasAccessToAllLanguages,
@@ -41,7 +45,11 @@ export class UmbCurrentUserServerDataSource {
 				isAdmin: data.isAdmin,
 				languageIsoCode: data.languageIsoCode || 'en-us', // TODO: make global variable
 				languages: data.languages,
-				mediaStartNodeUniques: data.mediaStartNodeIds,
+				mediaStartNodeUniques: data.mediaStartNodeIds.map((node) => {
+					return {
+						unique: node.id,
+					};
+				}),
 				name: data.name,
 				permissions: data.permissions,
 				unique: data.id,

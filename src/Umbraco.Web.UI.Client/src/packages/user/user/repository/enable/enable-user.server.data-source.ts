@@ -33,7 +33,7 @@ export class UmbEnableUserServerDataSource implements UmbEnableUserDataSource {
 			this.#host,
 			UserService.postUserEnable({
 				requestBody: {
-					userIds,
+					userIds: userIds.map((id) => ({ id })),
 				},
 			}),
 		);

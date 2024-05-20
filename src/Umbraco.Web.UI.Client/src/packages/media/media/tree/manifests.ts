@@ -28,9 +28,10 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
-	kind: 'default',
 	alias: UMB_MEDIA_TREE_ALIAS,
 	name: 'Media Tree',
+	element: () => import('./media-tree.element.js'),
+	api: () => import('./media-tree.context.js'),
 	meta: {
 		repositoryAlias: UMB_MEDIA_TREE_REPOSITORY_ALIAS,
 	},

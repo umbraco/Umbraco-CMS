@@ -1,3 +1,4 @@
+import { queryFilter } from '../utils.js';
 import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
@@ -6,11 +7,21 @@ import { data } from './user-group.data.js';
 import type {
 	CreateUserGroupRequestModel,
 	DocumentPermissionPresentationModel,
+	PagedUserGroupResponseModel,
 	UnknownTypePermissionPresentationModel,
 	UserGroupItemResponseModel,
 	UserGroupResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+
+interface UserGroupFilterOptions {
+	skip: number;
+	take: number;
+	filter: string;
+}
+
+const userGroupQueryFilter = (filterOptions: UserGroupFilterOptions, item: UmbMockUserGroupModel) =>
+	queryFilter(filterOptions.filter, item.name);
 
 export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupModel> {
 	item = new UmbMockEntityItemManager<UmbMockUserGroupModel>(this, itemMapper);
@@ -27,10 +38,10 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 	 * @memberof UmbUserGroupData
 	 */
 	getPermissions(
-		userGroupIds: string[],
+		userGroupIds: Array<{ id: string }>,
 	): Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel> {
 		const permissions = this.data
-			.filter((userGroup) => userGroupIds.includes(userGroup.id))
+			.filter((userGroup) => userGroupIds.map((reference) => reference.id).includes(userGroup.id))
 			.map((userGroup) => (userGroup.permissions?.length ? userGroup.permissions : []))
 			.flat();
 
@@ -39,14 +50,31 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 		return uniqueArray;
 	}
 
-	getAllowedSections(userGroupIds: string[]): string[] {
+	getAllowedSections(userGroupIds: Array<{ id: string }>): string[] {
 		const sections = this.data
-			.filter((userGroup) => userGroupIds.includes(userGroup.id))
+			.filter((userGroup) => userGroupIds.map((reference) => reference.id).includes(userGroup.id))
 			.map((userGroup) => (userGroup.sections?.length ? userGroup.sections : []))
 			.flat();
 
 		// Remove duplicates
 		return Array.from(new Set(sections));
+	}
+
+	filter(options: UserGroupFilterOptions): PagedUserGroupResponseModel {
+		const allItems = this.getAll();
+
+		const filterOptions: UserGroupFilterOptions = {
+			skip: options.skip || 0,
+			take: options.take || 25,
+			filter: options.filter,
+		};
+
+		const filteredItems = allItems.filter((item) => userGroupQueryFilter(filterOptions, item));
+		const totalItems = filteredItems.length;
+
+		const paginatedItems = filteredItems.slice(filterOptions.skip, filterOptions.skip + filterOptions.take);
+
+		return { total: totalItems, items: paginatedItems };
 	}
 }
 

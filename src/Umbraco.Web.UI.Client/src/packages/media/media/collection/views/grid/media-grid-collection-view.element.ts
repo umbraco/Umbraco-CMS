@@ -26,7 +26,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (collectionContext) => {
-			this.#collectionContext = collectionContext;
+			this.#collectionContext = collectionContext as UmbMediaCollectionContext;
 			this.#observeCollectionContext();
 		});
 
@@ -51,7 +51,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 
 		this.observe(this.#collectionContext.loading, (loading) => (this._loading = loading), '_observeLoading');
 
-		this.observe(this.#collectionContext.items, (items) => (this._items = items), '_observeItems');
+		this.observe(this.#collectionContext.thumbnailItems, (items) => (this._items = items), '_observeItems');
 
 		this.observe(
 			this.#collectionContext.selection.selection,
@@ -116,7 +116,6 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderItem(item: UmbMediaCollectionItemModel) {
-		// TODO: Fix the file extension when media items have a file extension. [?]
 		return html`
 			<uui-card-media
 				.name=${item.name ?? 'Unnamed Media'}
@@ -126,8 +125,8 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				@open=${(event: Event) => this.#onOpen(event, item.unique)}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}
-				class="media-item"
-				file-ext="${item.icon}">
+				class="media-item">
+				${item.url ? html`<img src=${item.url} alt=${item.name} />` : html`<umb-icon name=${item.icon}></umb-icon>`}
 				<!-- TODO: [LK] I'd like to indicate a busy state when bulk actions are triggered. -->
 				<!-- <div class="container"><uui-loader></uui-loader></div> -->
 			</uui-card-media>
@@ -151,8 +150,11 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 			#media-grid {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-				grid-template-rows: repeat(auto-fill, 200px);
+				grid-auto-rows: 200px;
 				gap: var(--uui-size-space-5);
+			}
+			umb-icon {
+				font-size: var(--uui-size-8);
 			}
 		`,
 	];
