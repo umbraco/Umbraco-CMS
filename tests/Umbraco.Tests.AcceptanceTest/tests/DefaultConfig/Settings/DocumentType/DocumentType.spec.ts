@@ -736,6 +736,9 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.isSuccessNotificationVisible();
       const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
       expect(documentTypeData.allowedTemplates[0].id).toBe(templateId);
+
+      // Clean
+      await umbracoApi.template.ensureNameNotExists(templateName);
     });
 
     // When removing a template, the defaultTemplateId is set to "" which is not correct
