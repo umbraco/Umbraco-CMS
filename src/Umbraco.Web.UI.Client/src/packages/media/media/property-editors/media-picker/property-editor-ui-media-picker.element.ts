@@ -100,7 +100,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 
 	render() {
 		return html`
-			<umb-input-media
+			<umb-input-rich-media
 				@change=${this.#onChange}
 				?multiple=${this._multiple}
 				.allowedContentTypeIds=${this._allowedMediaTypes}
@@ -110,7 +110,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 				.selection=${this._items}
 				.min=${this._limitMin}
 				.max=${this._limitMax}>
-			</umb-input-media>
+			</umb-input-rich-media>
 		`;
 	}
 }
