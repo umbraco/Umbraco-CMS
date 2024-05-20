@@ -86,7 +86,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 			? `${this._createMediaPath}create/${this._mediaUnique ?? 'null'}/${mediaType.unique}`
 			: `section/media/workspace/media/create/parent/${mediaEntityType}/${this._mediaUnique ?? 'null'}/${
 					mediaType.unique
-			  }`;
+				}`;
 	}
 
 	render() {
@@ -109,7 +109,9 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	#renderDropdown() {
 		if (!this._allowedMediaTypes.length) return;
 
-		const label = this.manifest?.meta.label ?? this.localize.term('general_create');
+		const label = this.manifest?.meta.label
+			? this.localize.string(this.manifest.meta.label)
+			: this.manifest?.name ?? '';
 
 		return html`
 			<uui-button popovertarget="collection-action-menu-popover" label=${label} color="default" look="outline">
