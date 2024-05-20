@@ -10,6 +10,7 @@ import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { css, html, customElement, state, repeat, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
@@ -23,6 +24,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	#mediaItemRepository = new UmbMediaItemRepository(this); // used to search
 	#imagingRepository = new UmbImagingRepository(this); // used to get image renditions
 
+	#dataType?: { unique: string };
+
 	@state()
 	private _filter: (item: UmbMediaCardItemModel) => boolean = () => true;
 
@@ -30,6 +33,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	private _selectableFilter: (item: UmbMediaCardItemModel) => boolean = () => true;
 
 	#mediaItemsCurrentFolder: Array<UmbMediaCardItemModel> = [];
+
 	@state()
 	private _mediaFilteredList: Array<UmbMediaCardItemModel> = [];
 
@@ -44,6 +48,16 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneElement;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_CONTENT_PROPERTY_CONTEXT, (context) => {
+			this.observe(context.dataType, (dataType) => {
+				this.#dataType = dataType;
+			});
+		});
+	}
 
 	async connectedCallback(): Promise<void> {
 		super.connectedCallback();
@@ -68,6 +82,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 				unique: this._currentMediaEntity.unique,
 				entityType: this._currentMediaEntity.entityType,
 			},
+			dataType: this.#dataType,
 			skip: 0,
 			take: 100,
 		});
