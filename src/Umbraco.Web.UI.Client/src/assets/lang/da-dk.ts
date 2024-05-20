@@ -1838,6 +1838,7 @@ export default {
 		failedPasswordAttempts: 'Fejlede loginforsøg',
 		goToProfile: 'Gå til brugerprofil',
 		groupsHelp: 'Tilføj grupper for at tildele adgang og tilladelser',
+		invite: 'Invitér',
 		inviteAnotherUser: 'Invitér anden bruger',
 		inviteUserHelp:
 			'Invitér nye brugere til at give dem adgang til Umbraco. En invitation vil blive sendt\n      via e-mail til brugeren med oplysninger om, hvordan man logger ind i Umbraco.\n    ',

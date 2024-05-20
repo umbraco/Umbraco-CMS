@@ -1852,6 +1852,7 @@ export default {
 		failedPasswordAttempts: 'Failed login attempts',
 		goToProfile: 'Go to user profile',
 		groupsHelp: 'Add groups to assign access and permissions',
+		invite: 'Invite',
 		inviteAnotherUser: 'Invite another user',
 		inviteUserHelp:
 			'Invite new users to give them access to Umbraco. An invite email will be sent to the\n      user with information on how to log in to Umbraco. Invites last for 72 hours.\n    ',
