@@ -73,7 +73,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     ////     Builder.ComposeFileSystems();
     //// }
 
-    private PackageDataInstallation PackageDataInstallation => GetRequiredService<PackageDataInstallation>();
+    private IPackageDataInstallation PackageDataInstallation => GetRequiredService<IPackageDataInstallation>();
 
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 

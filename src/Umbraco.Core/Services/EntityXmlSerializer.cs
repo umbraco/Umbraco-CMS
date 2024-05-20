@@ -396,7 +396,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         {
             foreach (ContentTypeSort allowedType in mediaType.AllowedContentTypes)
             {
-                structure.Add(new XElement("MediaType", allowedType.Alias));
+                structure.Add(new XElement(IEntityXmlSerializer.MediaTypeElementName, allowedType.Alias));
             }
         }
 
@@ -409,7 +409,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             SerializePropertyGroups(mediaType.PropertyGroups)); // TODO Rename to PropertyGroups
 
         var xml = new XElement(
-            "MediaType",
+            IEntityXmlSerializer.MediaTypeElementName,
             info,
             structure,
             genericProperties,
@@ -474,7 +474,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         {
             foreach (ContentTypeSort allowedType in contentType.AllowedContentTypes)
             {
-                structure.Add(new XElement("DocumentType", allowedType.Alias));
+                structure.Add(new XElement(IEntityXmlSerializer.DocumentTypeElementName, allowedType.Alias));
             }
         }
 
@@ -487,7 +487,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             SerializePropertyGroups(contentType.PropertyGroups)); // TODO Rename to PropertyGroups
 
         var xml = new XElement(
-            "DocumentType",
+            IEntityXmlSerializer.DocumentTypeElementName,
             info,
             structure,
             genericProperties,
