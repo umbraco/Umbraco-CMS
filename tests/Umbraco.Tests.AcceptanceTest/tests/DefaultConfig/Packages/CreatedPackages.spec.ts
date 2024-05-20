@@ -16,7 +16,7 @@ test.describe('Created packages tests', () => {
     await umbracoApi.package.ensureNameNotExists(packageName);
   });
 
-  test.skip('can create a empty package @smoke', async ({umbracoUi}) => {
+  test.skip('can create a empty package', {tag: '@smoke'}, async ({umbracoUi}) => {
     // Act
     await umbracoUi.package.clickCreatePackageButton();
     await umbracoUi.package.enterPackageName(packageName);
