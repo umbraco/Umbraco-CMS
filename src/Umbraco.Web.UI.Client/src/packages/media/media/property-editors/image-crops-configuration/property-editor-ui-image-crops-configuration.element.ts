@@ -3,6 +3,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { generateAlias } from '@umbraco-cms/backoffice/utils';
 
 export type UmbCrop = {
 	label: string;
@@ -110,13 +111,13 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 	#onLabelInput() {
 		const value = this._labelInput.value ?? '';
 
-		const aliasValue = value.toLowerCase().replace(/[^a-z0-9]/g, '-');
+		const aliasValue = generateAlias(value);
 
 		const alias = this.shadowRoot?.querySelector('#alias') as HTMLInputElement;
 
 		if (!alias) return;
 
-		const oldAliasValue = this.#oldInputValue.toLocaleLowerCase().replace(/[^a-z0-9]/g, '-');
+		const oldAliasValue = generateAlias(this.#oldInputValue);
 
 		if (alias.value === oldAliasValue || !alias.value) {
 			alias.value = aliasValue;
