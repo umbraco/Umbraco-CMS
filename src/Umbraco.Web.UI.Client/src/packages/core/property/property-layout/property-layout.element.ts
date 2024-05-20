@@ -1,4 +1,6 @@
-import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_LABEL_TEMPLATE_CONTEXT } from '../../label-template/index.js';
+import { css, customElement, html, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
@@ -9,7 +11,18 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
  *  @slot action-menu - Slot for rendering the Property Action Menu
  */
 @customElement('umb-property-layout')
-export class UmbPropertyLayoutElement extends LitElement {
+export class UmbPropertyLayoutElement extends UmbLitElement {
+	#labelTemplate?: typeof UMB_LABEL_TEMPLATE_CONTEXT.TYPE;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_LABEL_TEMPLATE_CONTEXT, (context) => {
+			this.#labelTemplate = context;
+			this.#labelTemplate.setHostElement(this);
+		});
+	}
+
 	/**
 	 * Alias. The technical name of the property.
 	 * @type {string}
@@ -57,14 +70,17 @@ export class UmbPropertyLayoutElement extends LitElement {
 	public invalid?: boolean;
 
 	render() {
+		const label = this.#labelTemplate?.transformInline(this.label) ?? this.label;
+		const description = this.#labelTemplate?.transform(this.description) ?? this.description;
+
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
 			<div id="headerColumn">
 				<uui-label title=${this.alias}>
-					${this.label} ${this.invalid ? html`<uui-badge color="danger" attention>!</uui-badge>` : ''}
+					${label} ${when(this.invalid, () => html`<uui-badge color="danger" attention>!</uui-badge>`)}
 				</uui-label>
 				<slot name="action-menu"></slot>
-				<div id="description">${this.description}</div>
+				<div id="description">${unsafeHTML(description)}</div>
 				<slot name="description"></slot>
 			</div>
 			<div id="editorColumn">
