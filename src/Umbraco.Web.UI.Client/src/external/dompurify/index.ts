@@ -1,4 +1,4 @@
-/* eslint local-rules/enforce-umbraco-external-imports: 0 */
 import DOMPurify from 'dompurify';
+import createDOMPurify from 'dompurify'
 
-export { DOMPurify };
+export { DOMPurify, createDOMPurify };
