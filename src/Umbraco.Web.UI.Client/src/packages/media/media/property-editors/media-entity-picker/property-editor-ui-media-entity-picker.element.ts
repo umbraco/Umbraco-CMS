@@ -33,7 +33,7 @@ export class UmbPropertyEditorUIMediaEntityPickerElement extends UmbLitElement i
 		return undefined;
 	}
 
-	#onChange(event: { target: UmbInputMediaElement }) {
+	#onChange(event: CustomEvent & { target: UmbInputMediaElement }) {
 		this.value = event.target.selection?.join(',') ?? null;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}

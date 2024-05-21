@@ -1,11 +1,11 @@
-import { UMB_MEDIA_PICKER_MODAL, type UmbMediaCardItemModel } from '../../modals/index.js';
+import {
+	UMB_MEDIA_PICKER_MODAL,
+	type UmbMediaPickerModalData,
+	type UmbMediaPickerModalValue,
+	type UmbMediaCardItemModel,
+} from '../../modals/index.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbMediaItemModel } from '../../repository/item/types.js';
-import type { UmbMediaTreeItemModel } from '../../tree/index.js';
-import type {
-	UmbMediaTreePickerModalData,
-	UmbMediaTreePickerModalValue,
-} from '../../tree/media-tree-picker-modal.token.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -14,9 +14,9 @@ import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api
 
 export class UmbMediaPickerContext extends UmbPickerInputContext<
 	UmbMediaItemModel,
-	UmbMediaTreeItemModel,
-	UmbMediaTreePickerModalData,
-	UmbMediaTreePickerModalValue
+	UmbMediaItemModel,
+	UmbMediaPickerModalData<UmbMediaItemModel>,
+	UmbMediaPickerModalValue
 > {
 	#imagingRepository: UmbImagingRepository;
 
@@ -40,14 +40,7 @@ export class UmbMediaPickerContext extends UmbPickerInputContext<
 			this.#cardItems.setValue(
 				selectedItems.map((item) => {
 					const url = data?.find((x) => x.unique === item.unique)?.url;
-					return {
-						icon: item.mediaType.icon,
-						name: item.name,
-						unique: item.unique,
-						isTrashed: item.isTrashed,
-						entityType: item.entityType,
-						url,
-					};
+					return { ...item, url };
 				}),
 			);
 		});

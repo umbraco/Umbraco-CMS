@@ -1,12 +1,7 @@
-import type { UmbMediaEntityType } from '../../entity.js';
+import type { UmbMediaItemModel } from '../../repository/index.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
-export interface UmbMediaCardItemModel {
-	name: string;
-	unique: string;
-	entityType: UmbMediaEntityType;
-	isTrashed: boolean;
-	icon: string;
+export interface UmbMediaCardItemModel extends UmbMediaItemModel {
 	url?: string;
 }
 
