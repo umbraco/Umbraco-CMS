@@ -8,7 +8,6 @@ import { manifests as entityActionManifests } from './entity-action/manifests.js
 import { manifests as extensionManifests } from './extension-registry/manifests.js';
 import { manifests as iconRegistryManifests } from './icon-registry/manifests.js';
 import { manifests as imagingManifests } from './imaging/manifests.js';
-import { manifests as labelTemplateManifests } from './label-template/manifests.js';
 import { manifests as localizationManifests } from './localization/manifests.js';
 import { manifests as modalManifests } from './modal/common/manifests.js';
 import { manifests as propertyActionManifests } from './property-action/manifests.js';
@@ -28,7 +27,6 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...iconRegistryManifests,
 	...imagingManifests,
 	...cultureManifests,
-	...labelTemplateManifests,
 	...localizationManifests,
 	...themeManifests,
 	...sectionManifests,
