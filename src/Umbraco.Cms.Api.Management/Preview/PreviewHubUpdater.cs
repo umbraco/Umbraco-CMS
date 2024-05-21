@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.SignalR;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Api.Management.Preview;
@@ -9,15 +12,22 @@ namespace Umbraco.Cms.Api.Management.Preview;
 public class PreviewHubUpdater : INotificationAsyncHandler<ContentCacheRefresherNotification>
 {
     private readonly Lazy<IHubContext<PreviewHub, IPreviewHub>> _hubContext;
+    private readonly IRuntimeState _runtimeState;
 
     // using a lazy arg here means that we won't create the hub until necessary
     // and therefore we won't have too bad an impact on boot time
-    public PreviewHubUpdater(Lazy<IHubContext<PreviewHub, IPreviewHub>> hubContext) => _hubContext = hubContext;
-
+    public PreviewHubUpdater(
+        Lazy<IHubContext<PreviewHub, IPreviewHub>> hubContext,
+        IRuntimeState runtimeState)
+    {
+        _hubContext = hubContext;
+        _runtimeState = runtimeState;
+    }
 
     public async Task HandleAsync(ContentCacheRefresherNotification args, CancellationToken cancellationToken)
     {
-        if (args.MessageType != MessageType.RefreshByPayload)
+        if (_runtimeState.Level is not RuntimeLevel.Run
+            || args.MessageType is not MessageType.RefreshByPayload)
         {
             return;
         }
@@ -26,6 +36,12 @@ public class PreviewHubUpdater : INotificationAsyncHandler<ContentCacheRefresher
         IHubContext<PreviewHub, IPreviewHub> hubContextInstance = _hubContext.Value;
         foreach (ContentCacheRefresher.JsonPayload payload in payloads)
         {
+            if (payload.ChangeTypes is TreeChangeTypes.RefreshAll)
+            {
+                await hubContextInstance.Clients.All.allRefreshed();
+                continue;
+            }
+
             var key = payload.Key; // keep it simple for now, ignore ChangeTypes
             if (key.HasValue is false)
             {
