@@ -2466,6 +2466,8 @@ export default {
 		getStarted: 'To get you started',
 	},
 	settingsDashboard: {
+		documentationHeader: 'Dokumentation',
+		documentationDescription: 'Læs mere om at arbejde med elementerne i Indstillinger i vores Dokumentation.',
 		communityHeader: 'Community',
 		communityDescription: 'Stil et spørgsmål i community forummet eller i vores Discord community',
 		trainingHeader: 'Træning',
