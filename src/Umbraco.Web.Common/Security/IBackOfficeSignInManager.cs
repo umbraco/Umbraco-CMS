@@ -23,8 +23,6 @@ public interface IBackOfficeSignInManager : ICoreBackOfficeSignInManager
 
     Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure);
 
-    Task SignOutAsync();
-
     Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent, string? authenticationMethod = null);
 
     Task<ClaimsPrincipal> CreateUserPrincipalAsync(BackOfficeIdentityUser user);
