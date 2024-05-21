@@ -40,6 +40,7 @@ export class UmbCurrentUserServerDataSource {
 				email: data.email,
 				fallbackPermissions: data.fallbackPermissions,
 				hasAccessToAllLanguages: data.hasAccessToAllLanguages,
+				hasAccessToSensitiveData: data.hasAccessToSensitiveData,
 				hasDocumentRootAccess: data.hasDocumentRootAccess,
 				hasMediaRootAccess: data.hasMediaRootAccess,
 				isAdmin: data.isAdmin,
