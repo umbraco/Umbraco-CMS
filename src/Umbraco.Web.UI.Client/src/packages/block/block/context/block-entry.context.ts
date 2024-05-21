@@ -204,7 +204,6 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._entries.layoutOf(this.#contentUdi),
 			(layout) => {
-				console.log('setValue', this.#contentUdi, layout);
 				this._layout.setValue(layout);
 			},
 			'observeParentLayout',
