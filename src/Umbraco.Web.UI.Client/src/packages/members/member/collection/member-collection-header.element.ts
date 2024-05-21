@@ -1,9 +1,9 @@
 import { UmbMemberTypeTreeRepository } from '../../member-type/tree/member-type-tree.repository.js';
 import type { UmbMemberTypeItemModel } from '../../member-type/repository/item/types.js';
 import type { UmbMemberCollectionContext } from './member-collection.context.js';
+import { UMB_MEMBER_COLLECTION_CONTEXT } from './member-collection.context-token.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 
 @customElement('umb-member-collection-header')
 export class UmbMemberCollectionHeaderElement extends UmbLitElement {
@@ -23,8 +23,8 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance as UmbMemberCollectionContext;
+		this.consumeContext(UMB_MEMBER_COLLECTION_CONTEXT, (instance) => {
+			this.#collectionContext = instance;
 		});
 
 		this.#requestContentTypes();

@@ -1,6 +1,6 @@
 import type { UmbBackofficeExtensionRegistry, ManifestAuthProvider } from '../extension-registry/index.js';
 import { UmbAuthFlow } from './auth-flow.js';
-import { UMB_AUTH_CONTEXT, UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
+import { UMB_AUTH_CONTEXT, UMB_STORAGE_REDIRECT_URL, UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -12,18 +12,20 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
 	// Timeout is different from `isAuthorized` because it can occur repeatedly
 	#isTimeout = new Subject<void>();
-	/**
-	 * Observable that emits true when the auth context is initialized.
-	 * @remark It will only emit once and then complete itself.
-	 */
 	#isInitialized = new ReplaySubject<void>(1);
-	#isBypassed = false;
+	#isBypassed;
 	#serverUrl;
 	#backofficePath;
 	#authFlow;
 
 	#authWindowProxy?: WindowProxy | null;
 	#previousAuthUrl?: string;
+
+	/**
+	 * Observable that emits true when the auth context is initialized.
+	 * @remark It will only emit once and then complete itself.
+	 */
+	readonly isInitialized = this.#isInitialized.asObservable();
 
 	/**
 	 * Observable that emits true if the user is authorized, otherwise false.
@@ -104,6 +106,9 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	) {
 		const redirectUrl = await this.#authFlow.makeAuthorizationRequest(identityProvider, usernameHint);
 		if (redirect) {
+			// Save the current state
+			sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, window.location.href);
+
 			location.href = redirectUrl;
 			return;
 		}
@@ -254,22 +259,51 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		};
 	}
 
+	/**
+	 * Sets the auth context as initialized, which means that the auth context is ready to be used.
+	 * @remark This is used to let the app context know that the core module is ready, which means that the core auth providers are available.
+	 */
 	setInitialized() {
 		this.#isInitialized.next();
 		this.#isInitialized.complete();
 	}
 
+	/**
+	 * Gets all registered auth providers.
+	 */
 	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
 		return this.#isInitialized.pipe(
 			switchMap(() => extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider')),
 		);
 	}
 
+	/**
+	 * Gets the authorized redirect url.
+	 * @returns The redirect url, which is the backoffice path.
+	 */
 	getRedirectUrl() {
 		return `${window.location.origin}${this.#backofficePath}${this.#backofficePath.endsWith('/') ? '' : '/'}oauth_complete`;
 	}
 
+	/**
+	 * Gets the post logout redirect url.
+	 * @returns The post logout redirect url, which is the backoffice path with the logout path appended.
+	 */
 	getPostLogoutRedirectUrl() {
 		return `${window.location.origin}${this.#backofficePath}${this.#backofficePath.endsWith('/') ? '' : '/'}logout`;
+	}
+
+	/**
+	 * @see UmbAuthFlow#linkLogin
+	 */
+	linkLogin(provider: string) {
+		return this.#authFlow.linkLogin(provider);
+	}
+
+	/**
+	 * @see UmbAuthFlow#unlinkLogin
+	 */
+	unlinkLogin(providerName: string, providerKey: string) {
+		return this.#authFlow.unlinkLogin(providerName, providerKey);
 	}
 }

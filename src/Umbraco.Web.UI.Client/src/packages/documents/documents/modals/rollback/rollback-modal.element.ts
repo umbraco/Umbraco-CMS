@@ -274,7 +274,9 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 	get currentVersionHeader() {
 		return (
-			this.localize.date(this.currentVersion?.date || '', this.#localizeDateOptions) + ' - ' + this.currentVersion?.user
+			this.localize.date(this.currentVersion?.date ?? new Date(), this.#localizeDateOptions) +
+			' - ' +
+			this.currentVersion?.user
 		);
 	}
 

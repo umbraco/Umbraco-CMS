@@ -40,6 +40,7 @@ export class UmbCurrentUserServerDataSource {
 				email: data.email,
 				fallbackPermissions: data.fallbackPermissions,
 				hasAccessToAllLanguages: data.hasAccessToAllLanguages,
+				hasAccessToSensitiveData: data.hasAccessToSensitiveData,
 				hasDocumentRootAccess: data.hasDocumentRootAccess,
 				hasMediaRootAccess: data.hasMediaRootAccess,
 				isAdmin: data.isAdmin,
@@ -59,6 +60,14 @@ export class UmbCurrentUserServerDataSource {
 		}
 
 		return { error };
+	}
+
+	/**
+	 * Get the current user's external login providers
+	 * @memberof UmbCurrentUserServerDataSource
+	 */
+	async getExternalLoginProviders() {
+		return tryExecuteAndNotify(this.#host, UserService.getUserCurrentLoginProviders());
 	}
 
 	/**

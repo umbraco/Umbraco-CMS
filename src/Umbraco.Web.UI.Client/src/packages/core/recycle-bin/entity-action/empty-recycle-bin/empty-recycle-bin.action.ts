@@ -6,7 +6,7 @@ import {
 	type MetaEntityActionEmptyRecycleBinKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 /**
  * Entity action for emptying the recycle bin.
@@ -34,7 +34,7 @@ export class UmbEmptyRecycleBinEntityAction extends UmbEntityActionBase<MetaEnti
 		await recycleBinRepository.requestEmpty();
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+		const event = new UmbRequestReloadChildrenOfEntityEvent({
 			unique: this.args.unique,
 			entityType: this.args.entityType,
 		});

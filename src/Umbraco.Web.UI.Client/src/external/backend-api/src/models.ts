@@ -1057,15 +1057,6 @@ fallbackIsoCode?: string | null
 isoCode: string
     };
 
-export type LinkedLoginModel = {
-        providerName: string
-providerKey: string
-    };
-
-export type LinkedLoginsRequestModel = {
-        linkedLogins: Array<LinkedLoginModel>
-    };
-
 export type LogLevelCountsReponseModel = {
         information: number
 debug: number
@@ -2585,6 +2576,7 @@ key: string
 
 export type UserExternalLoginProviderModel = {
         providerSchemeName: string
+providerKey?: string | null
 isLinkedOnUser: boolean
 hasManualLinkingEnabled: boolean
     };
@@ -5241,7 +5233,6 @@ PostUserUnlock: {
                 ,PostUserCurrentChangePassword: string
                 ,GetUserCurrentConfiguration: CurrenUserConfigurationResponseModel
                 ,GetUserCurrentLoginProviders: Array<UserExternalLoginProviderModel>
-                ,GetUserCurrentLogins: LinkedLoginsRequestModel
                 ,GetUserCurrentPermissions: UserPermissionsResponseModel
                 ,GetUserCurrentPermissionsDocument: Array<UserPermissionsResponseModel>
                 ,GetUserCurrentPermissionsMedia: UserPermissionsResponseModel

@@ -1,7 +1,7 @@
 import type { UmbMediaCollectionContext } from './media-collection.context.js';
+import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 
 @customElement('umb-media-collection-toolbar')
 export class UmbMediaCollectionToolbarElement extends UmbLitElement {
@@ -13,8 +13,8 @@ export class UmbMediaCollectionToolbarElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance as UmbMediaCollectionContext;
+		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (instance) => {
+			this.#collectionContext = instance;
 		});
 	}
 

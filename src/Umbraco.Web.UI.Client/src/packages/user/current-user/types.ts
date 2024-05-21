@@ -3,6 +3,7 @@ import type {
 	CancelError,
 	DocumentPermissionPresentationModel,
 	UnknownTypePermissionPresentationModel,
+	UserExternalLoginProviderModel,
 	UserTwoFactorProviderModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
@@ -14,6 +15,7 @@ export interface UmbCurrentUserModel {
 	email: string;
 	fallbackPermissions: Array<string>;
 	hasAccessToAllLanguages: boolean;
+	hasAccessToSensitiveData: boolean;
 	hasDocumentRootAccess: boolean;
 	hasMediaRootAccess: boolean;
 	isAdmin: boolean;
@@ -25,6 +27,8 @@ export interface UmbCurrentUserModel {
 	unique: string;
 	userName: string;
 }
+
+export type UmbCurrentUserExternalLoginProviderModel = UserExternalLoginProviderModel;
 
 export type UmbCurrentUserMfaProviderModel = UserTwoFactorProviderModel;
 

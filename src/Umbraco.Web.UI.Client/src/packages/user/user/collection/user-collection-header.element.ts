@@ -2,10 +2,10 @@ import type { UmbUserCollectionContext } from './user-collection.context.js';
 import type { UmbUserOrderByOption } from './types.js';
 import type { UmbUserStateFilterType } from './utils/index.js';
 import { UmbUserStateFilter } from './utils/index.js';
+import { UMB_USER_COLLECTION_CONTEXT } from './user-collection.context-token.js';
 import type { UUIBooleanInputEvent, UUICheckboxElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
@@ -39,8 +39,8 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance as UmbUserCollectionContext;
+		this.consumeContext(UMB_USER_COLLECTION_CONTEXT, (instance) => {
+			this.#collectionContext = instance;
 			this.#observeOrderByOptions();
 		});
 	}

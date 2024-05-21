@@ -48,7 +48,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		this._focalPointEnabled = Boolean(config.getValueByAlias('enableFocalPoint'));
 		this._crops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
 
-		const filter = config.getValueByAlias<string>('filter') ?? '';
+		const filter = config.getValueByAlias<string>('filter');
 		this._allowedMediaTypes = filter?.split(',') ?? [];
 
 		const minMax = config.getValueByAlias<NumberRangeValueType>('validationLimit');

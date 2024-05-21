@@ -2405,6 +2405,10 @@
 			"file": "square-arrow-down-left.svg"
 		},
 		{
+			"name": "icon-window-popout",
+			"file": "square-arrow-up-right.svg"
+		},
+		{
 			"name": "icon-window-sizes",
 			"file": "scaling.svg"
 		},

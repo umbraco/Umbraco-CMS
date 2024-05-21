@@ -18,7 +18,6 @@ export interface UmbCollectionConfiguration {
 	orderBy?: string;
 	orderDirection?: string;
 	pageSize?: number;
-	useInfiniteEditor?: boolean;
 	userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 }
 
