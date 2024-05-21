@@ -53,7 +53,6 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	@state()
 	private _layoutColumns?: number;
 
-	#debounceChangeEvent?: boolean;
 	@property({ attribute: false })
 	public set value(value: UmbBlockGridValueModel | undefined) {
 		const buildUpValue: Partial<UmbBlockGridValueModel> = value ? { ...value } : {};
