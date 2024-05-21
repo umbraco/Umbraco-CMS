@@ -163,13 +163,6 @@ export class UmbBlockGridEntriesContext
 				},
 				'observeParentLayouts',
 			);
-			this.observe(
-				this.layoutEntries,
-				(layouts) => {
-					this._manager?.setLayouts(layouts);
-				},
-				'observeThisLayouts',
-			);
 
 			const hostEl = this.getHostElement() as HTMLElement | undefined;
 			if (hostEl) {
@@ -204,16 +197,6 @@ export class UmbBlockGridEntriesContext
 			);
 
 			this.observe(
-				this.layoutEntries,
-				(layouts) => {
-					if (this.#areaKey) {
-						this.#parentEntry?.setLayoutsOfArea(this.#areaKey, layouts);
-					}
-				},
-				'observeThisLayouts',
-			);
-
-			this.observe(
 				this.#parentEntry.areaType(this.#areaKey),
 				(areaType) => {
 					this.#areaType = areaType;
@@ -244,6 +227,18 @@ export class UmbBlockGridEntriesContext
 
 	getPathForClipboard(index: number) {
 		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
+	}
+
+	async setLayouts(layouts: Array<UmbBlockGridLayoutModel>) {
+		await this._retrieveManager;
+		if (this.#areaKey === null) {
+			this._manager?.setLayouts(layouts);
+		} else {
+			if (!this.#parentUnique || !this.#areaKey) {
+				throw new Error('ParentUnique or AreaKey not set');
+			}
+			this._manager?.setLayoutsOfArea(this.#parentUnique, this.#areaKey, layouts);
+		}
 	}
 
 	async create(

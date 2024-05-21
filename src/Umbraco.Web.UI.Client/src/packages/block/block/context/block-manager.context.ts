@@ -235,6 +235,8 @@ export abstract class UmbBlockManagerContext<
 		modalData: UmbBlockWorkspaceData,
 	): boolean;
 
+	abstract updateLayout(layoutEntry: Partial<BlockLayoutType> & Pick<BlockLayoutType, 'contentUdi'>): boolean;
+
 	protected insertBlockData<ModalDataType extends UmbBlockWorkspaceData>(
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataType,

@@ -52,13 +52,6 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 			},
 			'observeParentLayouts',
 		);
-		this.observe(
-			this.layoutEntries,
-			(layouts) => {
-				this._manager?.setLayouts(layouts);
-			},
-			'observeThisLayouts',
-		);
 
 		this.observe(
 			this._manager.propertyAlias,
@@ -85,6 +78,11 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 
 	getPathForClipboard(index: number) {
 		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
+	}
+
+	async setLayouts(layouts: Array<UmbBlockListLayoutModel>) {
+		await this._retrieveManager;
+		this._manager?.setLayouts(layouts);
 	}
 
 	async create(
