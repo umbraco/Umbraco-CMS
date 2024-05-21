@@ -9,7 +9,7 @@ import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 
-// TODO: This code can be split into a UmbContentTypePropertyDatasetContext, leaving just the publishing state and methods to this class.
+// TODO: This code can be split into a UmbContentTypePropertyDatasetContext, leaving just the publishing state and methods to this class. [NL]
 export class UmbDocumentPropertyDataContext
 	extends UmbContextBase<UmbPropertyDatasetContext>
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
@@ -26,11 +26,6 @@ export class UmbDocumentPropertyDataContext
 	name = this.#currentVariant.asObservablePart((x) => x?.name);
 	culture = this.#currentVariant.asObservablePart((x) => x?.culture);
 	segment = this.#currentVariant.asObservablePart((x) => x?.segment);
-
-	// TODO: Refactor: Make a properties observable. (with such I think i mean a property value object array.. array with object with properties, alias, value, culture and segment)
-	// TO make such happen I think we need to maintain all properties and their value of this object.
-	// This will actually make it simpler if multiple are watching the same property.
-	// But it will also mean that we wil watch all properties and their structure, for variantID, all the time for all of the properties.
 
 	getEntityType(): string {
 		return this.#workspace.getEntityType();
@@ -72,8 +67,10 @@ export class UmbDocumentPropertyDataContext
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
-	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
+	 * @method propertyVariantId
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<UmbVariantId | undefined> | undefined>}
+	 * @description Get an Observable for the variant id of this property.
 	 */
 	async propertyVariantId(propertyAlias: string) {
 		return (await this.#workspace.structure.propertyStructureByAlias(propertyAlias)).pipe(
@@ -82,8 +79,10 @@ export class UmbDocumentPropertyDataContext
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
-	 * Ideally do not use this method, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
+	 * @method propertyValueByAlias
+	 * @param {string} propertyAlias
+	 * @returns {Promise<Observable<ReturnType | undefined> | undefined>}
+	 * @description Get an Observable for the value of this property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(
 		propertyAlias: string,
@@ -97,7 +96,7 @@ export class UmbDocumentPropertyDataContext
 	}
 
 	// TODO: Refactor: Not used currently, but should investigate if we can implement this, to spare some energy.
-	async propertyValueByAliasAndCulture<ReturnType = unknown>(
+	async propertyValueByAliasAndVariantId<ReturnType = unknown>(
 		propertyAlias: string,
 		propertyVariantId: UmbVariantId,
 	): Promise<Observable<ReturnType | undefined> | undefined> {
@@ -105,17 +104,38 @@ export class UmbDocumentPropertyDataContext
 	}
 
 	/**
-	 * TODO: Write proper JSDocs here.
-	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
+	 * @method setPropertyValueByVariant
+	 * @param {string} propertyAlias
+	 * @param {PromiseLike<unknown>} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @param {UmbVariantId} propertyVariantId - The variant id for the value to be set for.
+	 * @returns {Promise<unknown>}
+	 * @description Get the value of this property.
 	 */
-	async setPropertyValue(propertyAlias: string, value: unknown) {
+	setPropertyValueByVariant(
+		propertyAlias: string,
+		value: PromiseLike<unknown>,
+		propertyVariantId: UmbVariantId,
+	): Promise<void> {
+		return this.#workspace.setPropertyValue(propertyAlias, value, propertyVariantId);
+	}
+
+	/**
+	 * @method setPropertyValue
+	 * @param {string} propertyAlias
+	 * @param {PromiseLike<unknown>} value - value can be a promise resolving into the actual value or the raw value it self.
+	 * @returns {Promise<void>}
+	 * @description Set the value of this property.
+	 */
+	async setPropertyValue(propertyAlias: string, value: PromiseLike<unknown>) {
+		this.#workspace.initiatePropertyValueChange();
 		// This is not reacting to if the property variant settings changes while running.
 		const property = await this.#workspace.structure.getPropertyStructureByAlias(propertyAlias);
 		if (property) {
 			const variantId = this.#createPropertyVariantId(property);
 
 			// This is not reacting to if the property variant settings changes while running.
-			this.#workspace.setPropertyValue(propertyAlias, value, variantId);
+			this.#workspace.setPropertyValue(propertyAlias, await value, variantId);
 		}
+		this.#workspace.finishPropertyValueChange();
 	}
 }
