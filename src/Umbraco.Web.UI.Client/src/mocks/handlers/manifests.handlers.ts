@@ -76,6 +76,15 @@ const privateManifests: PackageManifestResponse = [
 					label: 'Setup SMS Verification',
 				},
 			},
+			{
+				type: 'mfaLoginProvider',
+				alias: 'My.MfaLoginProvider.Custom.Email',
+				name: 'My Custom Email MFA Provider',
+				forProviderName: 'email',
+				meta: {
+					label: 'Setup Email Verification',
+				},
+			},
 		],
 	},
 	{
@@ -88,20 +97,6 @@ const privateManifests: PackageManifestResponse = [
 				js: '/App_Plugins/package-view.js',
 				meta: {
 					packageName: 'Package with a view',
-				},
-			},
-		],
-	},
-	{
-		name: 'My MFA Package',
-		extensions: [
-			{
-				type: 'mfaLoginProvider',
-				alias: 'My.MfaLoginProvider.Custom',
-				name: 'My Custom MFA Provider',
-				forProviderName: 'sms',
-				meta: {
-					label: 'Setup SMS Verification',
 				},
 			},
 		],

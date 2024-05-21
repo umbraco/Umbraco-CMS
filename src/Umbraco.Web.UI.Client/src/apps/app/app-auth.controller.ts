@@ -1,4 +1,9 @@
-import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH, type UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
+import {
+	UMB_AUTH_CONTEXT,
+	UMB_MODAL_APP_AUTH,
+	UMB_STORAGE_REDIRECT_URL,
+	type UmbUserLoginState,
+} from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
@@ -64,6 +69,9 @@ export class UmbAppAuthController extends UmbControllerBase {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
+
+		// Save the current state
+		sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, window.location.href);
 
 		// Figure out which providers are available
 		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders(umbExtensionsRegistry));

@@ -235,7 +235,10 @@ export class UmbPropertyElement extends UmbLitElement {
 				this.#valueObserver = this.observe(
 					this.#propertyContext.value,
 					(value) => {
+						// Set the value on the element:
 						this._element!.value = value;
+						// Set the value on the context as well, to ensure that any default values are stored right away:
+						this.#propertyContext.setValue(value);
 						if (this.#validationMessageBinder) {
 							this.#validationMessageBinder.value = value;
 						}

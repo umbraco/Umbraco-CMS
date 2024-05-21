@@ -1,7 +1,7 @@
 import type { UmbMemberCollectionModel } from '../../types.js';
+import { UMB_MEMBER_COLLECTION_CONTEXT } from '../../member-collection.context-token.js';
+import type { UmbMemberCollectionContext } from '../../member-collection.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -24,12 +24,12 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
-	#collectionContext?: UmbDefaultCollectionContext<UmbMemberCollectionModel>;
+	#collectionContext?: UmbMemberCollectionContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_MEMBER_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.#observeCollectionItems();
 		});

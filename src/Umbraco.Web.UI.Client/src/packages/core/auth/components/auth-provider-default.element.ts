@@ -18,19 +18,25 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 		this.setAttribute('part', 'auth-provider-default');
 	}
 
+	get #label() {
+		const label = this.manifest.meta?.label ?? this.manifest.forProviderName;
+		const labelLocalized = this.localize.string(label);
+		return this.localize.term('login_signInWith', labelLocalized);
+	}
+
 	render() {
 		return html`
 			<uui-button
 				type="button"
 				@click=${() => this.onSubmit(this.manifest)}
 				id="auth-provider-button"
-				.label=${this.manifest.meta?.label ?? this.manifest.forProviderName}
+				.label=${this.#label}
 				.look=${this.manifest.meta?.defaultView?.look ?? 'outline'}
 				.color=${this.manifest.meta?.defaultView?.color ?? 'default'}>
 				${this.manifest.meta?.defaultView?.icon
-					? html`<uui-icon .name=${this.manifest.meta?.defaultView?.icon}></uui-icon>`
+					? html`<uui-icon id="icon" .name=${this.manifest.meta?.defaultView?.icon}></uui-icon>`
 					: nothing}
-				${this.manifest.meta?.label ?? this.manifest.forProviderName}
+				${this.#label}
 			</uui-button>
 		`;
 	}
@@ -44,6 +50,10 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 
 			#auth-provider-button {
 				width: 100%;
+			}
+
+			#icon {
+				margin-right: var(--uui-size-space-1);
 			}
 		`,
 	];

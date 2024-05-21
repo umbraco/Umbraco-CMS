@@ -65,12 +65,6 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 					description: 'Enable this to show the content app by default instead of the list view app.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
-				{
-					alias: 'useInfiniteEditor',
-					label: 'Edit in Infinite Editor',
-					description: 'Enable this to use infinite editing to edit the content of the list view.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-				},
 			],
 			defaultData: [
 				{

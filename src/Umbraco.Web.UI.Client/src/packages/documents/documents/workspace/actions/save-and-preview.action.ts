@@ -1,7 +1,12 @@
 import { UmbDocumentUserPermissionCondition } from '../../user-permissions/document-user-permission.condition.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../document-workspace.context-token.js';
 import { UMB_USER_PERMISSION_DOCUMENT_UPDATE } from '../../user-permissions/index.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+
+// TODO: Investigate how additional preview environments can be supported. [LK:2024-05-16]
+// https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/additional-preview-environments-support
+// In v13, they are registered on the server using `SendingContentNotification`, which is no longer available in v14.
 
 export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceActionBase {
 	constructor(host: UmbControllerHost, args: any) {
@@ -24,7 +29,8 @@ export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceAction
 	}
 
 	async execute() {
-		alert('Save and preview');
+		const workspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT);
+		workspaceContext.saveAndPreview();
 	}
 }
 

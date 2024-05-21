@@ -1,7 +1,7 @@
 import { UmbUserRepository } from '../../repository/index.js';
 import type { UmbUserMfaProviderModel } from '../../types.js';
 import type { UmbUserMfaModalConfiguration } from './user-mfa-modal.token.js';
-import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbConfirmModal, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -10,6 +10,7 @@ import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbMfaLoginProviderOption = UmbUserMfaProviderModel & {
 	displayName: string;
+	existsOnServer: boolean;
 };
 
 @customElement('umb-user-mfa-modal')
@@ -41,6 +42,7 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 						(serverLoginProvider) => serverLoginProvider.providerName === manifestLoginProvider.forProviderName,
 					);
 					return {
+						existsOnServer: !!serverLoginProvider,
 						isEnabledOnUser: serverLoginProvider?.isEnabledOnUser ?? false,
 						providerName: serverLoginProvider?.providerName ?? manifestLoginProvider.forProviderName,
 						displayName:
@@ -91,6 +93,20 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 	#renderProvider(item: UmbMfaLoginProviderOption) {
 		return html`
 			<uui-box headline=${item.displayName}>
+				${when(
+					item.existsOnServer,
+					() => nothing,
+					() =>
+						html`<div style="position:relative" slot="header-actions">
+							<uui-badge
+								style="cursor:default"
+								title="Warning: This provider is not configured on the server"
+								color="danger"
+								look="primary">
+								!
+							</uui-badge>
+						</div>`,
+				)}
 				${when(
 					item.isEnabledOnUser,
 					() => html`

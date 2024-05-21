@@ -12,18 +12,20 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
 	// Timeout is different from `isAuthorized` because it can occur repeatedly
 	#isTimeout = new Subject<void>();
-	/**
-	 * Observable that emits true when the auth context is initialized.
-	 * @remark It will only emit once and then complete itself.
-	 */
 	#isInitialized = new ReplaySubject<void>(1);
-	#isBypassed = false;
+	#isBypassed;
 	#serverUrl;
 	#backofficePath;
 	#authFlow;
 
 	#authWindowProxy?: WindowProxy | null;
 	#previousAuthUrl?: string;
+
+	/**
+	 * Observable that emits true when the auth context is initialized.
+	 * @remark It will only emit once and then complete itself.
+	 */
+	readonly isInitialized = this.#isInitialized.asObservable();
 
 	/**
 	 * Observable that emits true if the user is authorized, otherwise false.
@@ -254,22 +256,51 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 		};
 	}
 
+	/**
+	 * Sets the auth context as initialized, which means that the auth context is ready to be used.
+	 * @remark This is used to let the app context know that the core module is ready, which means that the core auth providers are available.
+	 */
 	setInitialized() {
 		this.#isInitialized.next();
 		this.#isInitialized.complete();
 	}
 
+	/**
+	 * Gets all registered auth providers.
+	 */
 	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
 		return this.#isInitialized.pipe(
 			switchMap(() => extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider')),
 		);
 	}
 
+	/**
+	 * Gets the authorized redirect url.
+	 * @returns The redirect url, which is the backoffice path.
+	 */
 	getRedirectUrl() {
 		return `${window.location.origin}${this.#backofficePath}${this.#backofficePath.endsWith('/') ? '' : '/'}oauth_complete`;
 	}
 
+	/**
+	 * Gets the post logout redirect url.
+	 * @returns The post logout redirect url, which is the backoffice path with the logout path appended.
+	 */
 	getPostLogoutRedirectUrl() {
 		return `${window.location.origin}${this.#backofficePath}${this.#backofficePath.endsWith('/') ? '' : '/'}logout`;
+	}
+
+	/**
+	 * @see UmbAuthFlow#linkLogin
+	 */
+	linkLogin(provider: string) {
+		return this.#authFlow.linkLogin(provider);
+	}
+
+	/**
+	 * @see UmbAuthFlow#unlinkLogin
+	 */
+	unlinkLogin(providerName: string, providerKey: string) {
+		return this.#authFlow.unlinkLogin(providerName, providerKey);
 	}
 }

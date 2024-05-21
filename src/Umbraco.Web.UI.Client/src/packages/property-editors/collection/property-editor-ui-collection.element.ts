@@ -60,7 +60,6 @@ export class UmbPropertyEditorUICollectionElement extends UmbLitElement implemen
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
 			pageSize: Number(config?.getValueByAlias('pageSize')) ?? 50,
-			useInfiniteEditor: config?.getValueByAlias('useInfiniteEditor') ?? false,
 			userDefinedProperties: config?.getValueByAlias('includeProperties'),
 		};
 	}

@@ -67,7 +67,6 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement implements 
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
 			pageSize: Number(config?.getValueByAlias('pageSize')) ?? 50,
-			useInfiniteEditor: config?.getValueByAlias('useInfiniteEditor') ?? false,
 			userDefinedProperties: config?.getValueByAlias('includeProperties'),
 		};
 	}

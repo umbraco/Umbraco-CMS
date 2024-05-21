@@ -5,5 +5,12 @@ export type UmbMediaPickerPropertyValue = {
 	mediaKey: string;
 	mediaTypeAlias: string;
 	focalPoint: { left: number; top: number } | null;
-	crops: Array<{ alias: string; width: number; height: number }>;
+	crops: Array<UmbCropModel>;
 };
+
+export interface UmbCropModel {
+	label: string;
+	alias: string;
+	width: number;
+	height: number;
+}

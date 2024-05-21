@@ -90,9 +90,6 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
 
-	@property({ type: Boolean })
-	ignoreUserStartNodes?: boolean;
-
 	@property()
 	public set value(idsString: string) {
 		this.selection = splitStringToArray(idsString);
@@ -153,7 +150,6 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 	};
 
 	#openPicker() {
-		// TODO: Configure the content picker, with `startNodeId` and `ignoreUserStartNodes` [LK]
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 			pickableFilter: this.#pickableFilter,

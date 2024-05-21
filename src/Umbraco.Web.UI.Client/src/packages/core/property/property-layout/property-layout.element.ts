@@ -104,7 +104,7 @@ export class UmbPropertyLayoutElement extends LitElement {
 				height: min-content;
 			}
 			/*@container (width > 600px) {*/
-			#headerColumn {
+			:host(:not([orientation='vertical'])) #headerColumn {
 				position: sticky;
 				top: calc(var(--uui-size-space-2) * -1);
 			}
@@ -128,7 +128,7 @@ export class UmbPropertyLayoutElement extends LitElement {
 				margin-top: var(--uui-size-space-3);
 			}
 			/*@container (width > 600px) {*/
-			#editorColumn {
+			:host(:not([orientation='vertical'])) #editorColumn {
 				margin-top: 0;
 			}
 			/*}*/

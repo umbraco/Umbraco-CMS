@@ -1,3 +1,4 @@
+import type { UmbMediaCardItemModel } from '../../modals/index.js';
 import type { UmbMediaItemModel } from '../../repository/index.js';
 import { UmbMediaPickerContext } from './input-media.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -20,9 +21,10 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		identifier: 'Umb.SorterIdentifier.InputMedia',
 		itemSelector: 'uui-card-media',
 		containerSelector: '.container',
+		/** TODO: This component probably needs some grid-like logic for resolve placement... [LI] */
+		resolvePlacement: () => false,
 		onChange: ({ model }) => {
 			this.selection = model;
-
 			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
@@ -87,8 +89,11 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
 
+	@property({ type: String })
+	startNode = '';
+
 	@property({ type: Boolean })
-	ignoreUserStartNodes?: boolean;
+	multiple = false;
 
 	@property()
 	public set value(idsString: string) {
@@ -100,10 +105,10 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	@state()
-	private _editMediaPath = '';
+	protected editMediaPath = '';
 
 	@state()
-	private _items?: Array<UmbMediaItemModel>;
+	protected items?: Array<UmbMediaCardItemModel>;
 
 	#pickerContext = new UmbMediaPickerContext(this);
 
@@ -116,11 +121,13 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 				return { data: { entityType: 'media', preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this._editMediaPath = routeBuilder({});
+				this.editMediaPath = routeBuilder({});
 			});
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#pickerContext.cardItems, (cardItems) => {
+			this.items = cardItems;
+		});
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -147,11 +154,15 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	};
 
 	#openPicker() {
-		// TODO: Configure the media picker, with `ignoreUserStartNodes` [LK]
 		this.#pickerContext.openPicker({
-			hideTreeRoot: true,
+			multiple: this.multiple,
+			startNode: this.startNode,
 			pickableFilter: this.#pickableFilter,
 		});
+	}
+
+	protected onRemove(item: UmbMediaCardItemModel) {
+		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
 	render() {
@@ -159,16 +170,16 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this.items?.length) return;
 		return html`${repeat(
-			this._items,
+			this.items,
 			(item) => item.unique,
-			(item) => this.#renderItem(item),
+			(item) => this.renderItem(item),
 		)}`;
 	}
 
 	#renderAddButton() {
-		if (this._items && this.max && this._items.length >= this.max) return;
+		if ((this.items && this.max && this.items.length >= this.max) || (this.items?.length && !this.multiple)) return;
 		return html`
 			<uui-button
 				id="btn-add"
@@ -181,22 +192,21 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	#renderItem(item: UmbMediaItemModel) {
-		// TODO: `file-ext` value has been hardcoded here. Find out if API model has value for it. [LK]
+	protected renderItem(item: UmbMediaCardItemModel) {
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				detail=${ifDefined(item.unique)}
-				file-ext="jpg">
-				${this.#renderIsTrashed(item)}
+				href="${this.editMediaPath}edit/${item.unique}">
+				${item.url
+					? html`<img src=${item.url} alt=${item.name} />`
+					: html`<umb-icon name=${ifDefined(item.mediaType.icon)}></umb-icon>`}
+				${this.renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
-					${this.#renderOpenButton(item)}
-					<uui-button label="Copy media">
-						<uui-icon name="icon-documents"></uui-icon>
-					</uui-button>
 					<uui-button
-						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
-						label="Remove media ${item.name}">
+						label=${this.localize.term('general_remove')}
+						look="secondary"
+						@click=${() => this.onRemove(item)}>
 						<uui-icon name="icon-trash"></uui-icon>
 					</uui-button>
 				</uui-action-bar>
@@ -204,7 +214,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	#renderIsTrashed(item: UmbMediaItemModel) {
+	protected renderIsTrashed(item: UmbMediaCardItemModel) {
 		if (!item.isTrashed) return;
 		return html`
 			<uui-tag size="s" slot="tag" color="danger">
@@ -213,25 +223,16 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	#renderOpenButton(item: UmbMediaItemModel) {
-		if (!this.showOpenButton) return;
-		return html`
-			<uui-button
-				compact
-				href="${this._editMediaPath}edit/${item.unique}"
-				label=${this.localize.term('general_edit') + ` ${item.name}`}>
-				<uui-icon name="icon-edit"></uui-icon>
-			</uui-button>
-		`;
-	}
-
 	static styles = [
 		css`
+			:host {
+				position: relative;
+			}
 			.container {
 				display: grid;
 				gap: var(--uui-size-space-3);
-				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+				grid-auto-rows: 150px;
 			}
 
 			#btn-add {
@@ -242,6 +243,10 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 			uui-icon {
 				display: block;
 				margin: 0 auto;
+			}
+
+			uui-card-media umb-icon {
+				font-size: var(--uui-size-8);
 			}
 
 			uui-card-media[drag-placeholder] {

@@ -24,6 +24,7 @@ import {
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 } from '../paths.js';
 import { UMB_DOCUMENTS_SECTION_PATH } from '../../paths.js';
+import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -47,8 +48,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { type Observable, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbServerModelValidationContext,
@@ -587,7 +590,7 @@ export class UmbDocumentWorkspaceContext
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadTreeItemChildrenEvent({
+			const event = new UmbRequestReloadChildrenOfEntityEvent({
 				entityType: parent.entityType,
 				unique: parent.unique,
 			});
@@ -610,6 +613,28 @@ export class UmbDocumentWorkspaceContext
 
 			eventContext.dispatchEvent(event);
 		}
+	}
+
+	async #handleSaveAndPreview() {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		let culture = UMB_INVARIANT_CULTURE;
+
+		// Save document (the active variant) before previewing.
+		const { selected } = await this.#determineVariantOptions();
+		if (selected.length > 0) {
+			culture = selected[0];
+			const variantId = UmbVariantId.FromString(culture);
+			const saveData = this.#buildSaveData([variantId]);
+			await this.#performSaveOrCreate(saveData);
+		}
+
+		// Tell the server that we're entering preview mode.
+		await new UmbDocumentPreviewRepository(this).enter();
+
+		const preview = window.open(`preview?id=${unique}&culture=${culture}`, 'umbpreview');
+		preview?.focus();
 	}
 
 	async #handleSaveAndPublish() {
@@ -680,6 +705,7 @@ export class UmbDocumentWorkspaceContext
 			},
 		);
 	}
+
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
@@ -738,6 +764,10 @@ export class UmbDocumentWorkspaceContext
 
 	public async publish() {
 		throw new Error('Method not implemented.');
+	}
+
+	public async saveAndPreview(): Promise<void> {
+		return this.#handleSaveAndPreview();
 	}
 
 	public async saveAndPublish(): Promise<void> {
