@@ -46,7 +46,21 @@
       btnExit.type = "button";
       btnExit.classList.add("umbraco-preview-badge__a", "end");
       btnExit.title = "End preview mode";
-      btnExit.innerHTML = `
+      btnExit.innerHTML = this.exitIcon;
+      btnExit.onclick = () => this.#endPreview();
+
+      wrapper.appendChild(btnExit);
+
+      const style = document.createElement("style");
+
+      style.textContent = this.styles;
+
+      shadow.appendChild(style);
+      shadow.appendChild(wrapper);
+    }
+
+    get exitIcon() {
+      return `
 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <title>Click to end preview mode</title>
   <path fill="#fff" d="M5273.1 2400.1v-2c0-2.8-5-4-9.7-4s-9.7 1.3-9.7 4v2a7 7 0 002 4.9l5 4.9c.3.3.4.6.4 1v6.4c0 .4.2.7.6.8l2.9.9c.5.1 1-.2 1-.8v-7.2c0-.4.2-.7.4-1l5.1-5a7 7 0 002-4.9zm-9.7-.1c-4.8 0-7.4-1.3-7.5-1.8.1-.5 2.7-1.8 7.5-1.8s7.3 1.3 7.5 1.8c-.2.5-2.7 1.8-7.5 1.8z"/>
@@ -54,13 +68,10 @@
   <path fill="#fff" d="M78.2 13l-8.7 11.7a32.5 32.5 0 11-51.9 25.8c0-10.3 4.7-19.7 12.9-25.8L21.8 13a47 47 0 1056.4 0z"/>
   <path fill="#fff" d="M42.7 2.5h14.6v49.4H42.7z"/>
 </svg>`;
-      btnExit.onclick = () => this.#endPreview();
+    }
 
-      wrapper.appendChild(btnExit);
-
-      const style = document.createElement("style");
-
-      style.textContent = `
+    get styles() {
+      return `
 .umbraco-preview-badge {
     display: inline-flex;
     background: rgba(27, 38, 79, 0.9);
@@ -130,9 +141,6 @@
     background: #202d5e00;
 }
       `;
-
-      shadow.appendChild(style);
-      shadow.appendChild(wrapper);
     }
   }
 
