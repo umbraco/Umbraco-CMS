@@ -22,4 +22,4 @@ export class UmbMemberCollectionContext extends UmbDefaultCollectionContext<
 	}
 }
 
-export default UmbMemberCollectionContext;
+export { UmbMemberCollectionContext as api };

@@ -1,10 +1,10 @@
 import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbMediaCollectionItemModel } from '../../types.js';
 import type { UmbMediaCollectionContext } from '../../media-collection.context.js';
+import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-media-grid-collection-view')
@@ -25,8 +25,8 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (collectionContext) => {
-			this.#collectionContext = collectionContext as UmbMediaCollectionContext;
+		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (collectionContext) => {
+			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
 		});
 
@@ -153,6 +153,13 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				grid-auto-rows: 200px;
 				gap: var(--uui-size-space-5);
 			}
+
+			img {
+				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
+				background-size: 10px 10px;
+				background-repeat: repeat;
+			}
+
 			umb-icon {
 				font-size: var(--uui-size-8);
 			}

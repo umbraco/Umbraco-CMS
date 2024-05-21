@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_CONTEXT } from './default/collection-default.context.js';
+import { UMB_COLLECTION_CONTEXT } from './default/index.js';
 import type { CollectionBulkActionPermissionConditionConfig } from './collection-bulk-action-permission.manifest.js';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';

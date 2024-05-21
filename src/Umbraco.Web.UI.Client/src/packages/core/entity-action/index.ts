@@ -7,4 +7,5 @@ export * from './types.js';
 export type * from './entity-action-element.interface.js';
 
 export { UmbRequestReloadStructureForEntityEvent } from './request-reload-structure-for-entity.event.js';
+export { UmbRequestReloadChildrenOfEntityEvent } from './request-reload-children-of-entity.event.js';
 export { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from './default/default.action.kind.js';

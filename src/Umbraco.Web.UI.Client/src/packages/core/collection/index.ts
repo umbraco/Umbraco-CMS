@@ -7,6 +7,7 @@ export * from './collection.element.js';
 export * from './components/index.js';
 
 export * from './default/collection-default.context.js';
+export * from './default/collection-default.context-token.js';
 export * from './collection-filter-model.interface.js';
 
 export { UMB_COLLECTION_ALIAS_CONDITION } from './collection-alias.manifest.js';

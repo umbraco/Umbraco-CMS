@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_CONTEXT } from '../../default/collection-default.context.js';
+import { UMB_COLLECTION_CONTEXT } from '../../default/index.js';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, nothing, state } from '@umbraco-cms/backoffice/external/lit';

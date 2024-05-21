@@ -128,8 +128,4 @@ export const mfaLoginProviders: Array<UserTwoFactorProviderModel> = [
 		isEnabledOnUser: false,
 		providerName: 'sms',
 	},
-	{
-		isEnabledOnUser: true,
-		providerName: 'Email',
-	},
 ];

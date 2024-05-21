@@ -8,7 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbUploadableFileModel } from '@umbraco-cms/backoffice/media';
 
 @customElement('umb-input-media')
 export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -22,9 +21,10 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		identifier: 'Umb.SorterIdentifier.InputMedia',
 		itemSelector: 'uui-card-media',
 		containerSelector: '.container',
+		/** TODO: This component probably needs some grid-like logic for resolve placement... [LI] */
+		resolvePlacement: () => false,
 		onChange: ({ model }) => {
 			this.selection = model;
-
 			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
@@ -89,6 +89,12 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
 
+	@property({ type: String })
+	startNode = '';
+
+	@property({ type: Boolean })
+	multiple = false;
+
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
@@ -99,10 +105,10 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	@state()
-	private _editMediaPath = '';
+	protected editMediaPath = '';
 
 	@state()
-	private _items?: Array<UmbMediaCardItemModel>;
+	protected items?: Array<UmbMediaCardItemModel>;
 
 	#pickerContext = new UmbMediaPickerContext(this);
 
@@ -115,12 +121,12 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 				return { data: { entityType: 'media', preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this._editMediaPath = routeBuilder({});
+				this.editMediaPath = routeBuilder({});
 			});
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
 		this.observe(this.#pickerContext.cardItems, (cardItems) => {
-			this._items = cardItems;
+			this.items = cardItems;
 		});
 
 		this.addValidator(
@@ -149,43 +155,31 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 
 	#openPicker() {
 		this.#pickerContext.openPicker({
-			hideTreeRoot: true,
+			multiple: this.multiple,
+			startNode: this.startNode,
 			pickableFilter: this.#pickableFilter,
 		});
 	}
 
-	async #onUploadCompleted(e: CustomEvent) {
-		const completed = e.detail?.completed as Array<UmbUploadableFileModel>;
-		const uploaded = completed.map((file) => file.unique);
-
-		this.selection = [...this.selection, ...uploaded];
-		this.dispatchEvent(new UmbChangeEvent());
+	protected onRemove(item: UmbMediaCardItemModel) {
+		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
 	render() {
-		return html`${this.#renderDropzone()}
-			<div class="container">${this.#renderItems()} ${this.#renderAddButton()}</div>`;
-	}
-
-	#renderDropzone() {
-		if (this._items && this._items.length >= this.max) return;
-		return html`<umb-dropzone
-			id="dropzone"
-			?multiple=${this.max === 1}
-			@change=${this.#onUploadCompleted}></umb-dropzone>`;
+		return html`<div class="container">${this.#renderItems()} ${this.#renderAddButton()}</div>`;
 	}
 
 	#renderItems() {
-		if (!this._items?.length) return;
+		if (!this.items?.length) return;
 		return html`${repeat(
-			this._items,
+			this.items,
 			(item) => item.unique,
-			(item) => this.#renderItem(item),
+			(item) => this.renderItem(item),
 		)}`;
 	}
 
 	#renderAddButton() {
-		if (this._items && this.max && this._items.length >= this.max) return;
+		if ((this.items && this.max && this.items.length >= this.max) || (this.items?.length && !this.multiple)) return;
 		return html`
 			<uui-button
 				id="btn-add"
@@ -198,22 +192,21 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	#renderItem(item: UmbMediaCardItemModel) {
+	protected renderItem(item: UmbMediaCardItemModel) {
 		return html`
-			<uui-card-media name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.unique)}>
+			<uui-card-media
+				name=${ifDefined(item.name === null ? undefined : item.name)}
+				detail=${ifDefined(item.unique)}
+				href="${this.editMediaPath}edit/${item.unique}">
 				${item.url
 					? html`<img src=${item.url} alt=${item.name} />`
-					: html`<umb-icon name=${ifDefined(item.icon)}></umb-icon>`}
-				${this.#renderIsTrashed(item)}
+					: html`<umb-icon name=${ifDefined(item.mediaType.icon)}></umb-icon>`}
+				${this.renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
-					${this.#renderOpenButton(item)}
-					<uui-button label="Copy media" look="secondary">
-						<uui-icon name="icon-documents"></uui-icon>
-					</uui-button>
 					<uui-button
+						label=${this.localize.term('general_remove')}
 						look="secondary"
-						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
-						label="Remove media ${item.name}">
+						@click=${() => this.onRemove(item)}>
 						<uui-icon name="icon-trash"></uui-icon>
 					</uui-button>
 				</uui-action-bar>
@@ -221,24 +214,12 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	#renderIsTrashed(item: UmbMediaCardItemModel) {
+	protected renderIsTrashed(item: UmbMediaCardItemModel) {
 		if (!item.isTrashed) return;
 		return html`
 			<uui-tag size="s" slot="tag" color="danger">
 				<umb-localize key="mediaPicker_trashed">Trashed</umb-localize>
 			</uui-tag>
-		`;
-	}
-
-	#renderOpenButton(item: UmbMediaCardItemModel) {
-		if (!this.showOpenButton) return;
-		return html`
-			<uui-button
-				compact
-				href="${this._editMediaPath}edit/${item.unique}"
-				label=${this.localize.term('general_edit') + ` ${item.name}`}>
-				<uui-icon name="icon-edit"></uui-icon>
-			</uui-button>
 		`;
 	}
 
@@ -250,8 +231,8 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 			.container {
 				display: grid;
 				gap: var(--uui-size-space-3);
-				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+				grid-auto-rows: 150px;
 			}
 
 			#btn-add {

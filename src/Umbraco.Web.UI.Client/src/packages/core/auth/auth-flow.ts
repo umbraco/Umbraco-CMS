@@ -98,6 +98,11 @@ export class UmbAuthFlow {
 	// tokens
 	#tokenResponse?: TokenResponse;
 
+	// external login
+	#link_endpoint;
+	#link_key_endpoint;
+	#unlink_endpoint;
+
 	/**
 	 * This signal will emit when the authorization flow is complete.
 	 * @remark It will also emit if there is an error during the authorization flow.
@@ -124,6 +129,10 @@ export class UmbAuthFlow {
 			revocation_endpoint: `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/revoke`,
 			end_session_endpoint: `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/signout`,
 		});
+
+		this.#link_endpoint = `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/link-login`;
+		this.#link_key_endpoint = `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/link-login-key`;
+		this.#unlink_endpoint = `${openIdConnectUrl}/umbraco/management/api/v1/security/back-office/unlink-login`;
 
 		this.#notifier = new AuthorizationNotifier();
 		this.#tokenHandler = new BaseTokenRequestHandler(requestor);
@@ -321,6 +330,55 @@ export class UmbAuthFlow {
 	}
 
 	/**
+	 * This method will link the current user to the specified provider by redirecting the user to the link endpoint.
+	 * @param provider The provider to link to.
+	 */
+	async linkLogin(provider: string): Promise<void> {
+		const linkKey = await this.#makeLinkTokenRequest(provider);
+
+		const form = document.createElement('form');
+		form.method = 'POST';
+		form.action = this.#link_endpoint;
+		form.style.display = 'none';
+
+		const providerInput = document.createElement('input');
+		providerInput.name = 'provider';
+		providerInput.value = provider;
+		form.appendChild(providerInput);
+
+		const linkKeyInput = document.createElement('input');
+		linkKeyInput.name = 'linkKey';
+		linkKeyInput.value = linkKey;
+		form.appendChild(linkKeyInput);
+
+		document.body.appendChild(form);
+		form.submit();
+	}
+
+	/**
+	 * This method will unlink the current user from the specified provider.
+	 */
+	async unlinkLogin(loginProvider: string, providerKey: string): Promise<boolean> {
+		const token = await this.performWithFreshTokens();
+		const request = new Request(this.#unlink_endpoint, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+			body: JSON.stringify({ loginProvider, providerKey }),
+		});
+
+		const result = await fetch(request);
+
+		if (!result.ok) {
+			const error = await result.json();
+			throw error;
+		}
+
+		await this.signOut();
+
+		return true;
+	}
+
+	/**
 	 * Save the current token response to local storage.
 	 */
 	async #saveTokenState() {
@@ -383,5 +441,22 @@ export class UmbAuthFlow {
 			this.clearTokenStorage();
 			return false;
 		}
+	}
+
+	async #makeLinkTokenRequest(provider: string) {
+		const token = await this.performWithFreshTokens();
+
+		const request = await fetch(`${this.#link_key_endpoint}?provider=${provider}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+				'Content-Type': 'application/json',
+			},
+		});
+
+		if (!request.ok) {
+			throw new Error('Failed to link login');
+		}
+
+		return request.json();
 	}
 }
