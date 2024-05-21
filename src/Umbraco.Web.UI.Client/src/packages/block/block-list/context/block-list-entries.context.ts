@@ -52,6 +52,13 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 			},
 			'observeParentLayouts',
 		);
+		this.observe(
+			this.layoutEntries,
+			(layouts) => {
+				this._manager?.setLayouts(layouts);
+			},
+			'observeThisLayouts',
+		);
 
 		this.observe(
 			this._manager.propertyAlias,

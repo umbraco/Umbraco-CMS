@@ -14,6 +14,7 @@ import {
 	UmbBooleanState,
 	UmbNumberState,
 	UmbObjectState,
+	appendToFrozenArray,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 
@@ -76,6 +77,20 @@ export class UmbBlockGridEntryContext
 		return this._blockType.asObservablePart((x) => x?.areas?.find((x) => x.key === areaKey));
 	}
 
+	setLayoutsOfArea(areaKey: string, layouts: UmbBlockGridLayoutModel[]) {
+		const frozenValue = this._layout.value;
+		if (!frozenValue) return;
+		const areas = appendToFrozenArray(
+			frozenValue?.areas ?? [],
+			{
+				key: areaKey,
+				items: layouts,
+			},
+			(x) => x.key,
+		);
+		this._layout.update({ areas });
+	}
+
 	/**
 	 * Set the column span of this entry.
 	 * @param columnSpan {number} The new column span.
@@ -88,9 +103,10 @@ export class UmbBlockGridEntryContext
 		columnSpan = this.#calcColumnSpan(columnSpan, this.getRelevantColumnSpanOptions(), layoutColumns);
 		if (columnSpan === this.getColumnSpan()) return;
 		//this._layout.update({ columnSpan });
-		const contentUdi = this.getContentUdi();
-		if (!contentUdi) return;
-		this._manager?.updateLayout({ contentUdi, columnSpan });
+		//const contentUdi = this.getContentUdi();
+		//if (!contentUdi) return;
+		//this._manager?.updateLayout({ contentUdi, columnSpan });
+		this._layout.update({ columnSpan });
 	}
 	/**
 	 * Get the column span of this entry.
@@ -110,9 +126,10 @@ export class UmbBlockGridEntryContext
 		rowSpan = Math.max(minMax[0], Math.min(rowSpan, minMax[1]));
 		if (rowSpan === this.getRowSpan()) return;
 		//this._layout.update({ rowSpan });
-		const contentUdi = this.getContentUdi();
-		if (!contentUdi) return;
-		this._manager?.updateLayout({ contentUdi, rowSpan });
+		//const contentUdi = this.getContentUdi();
+		//if (!contentUdi) return;
+		//this._manager?.updateLayout({ contentUdi, rowSpan });
+		this._layout.update({ rowSpan });
 	}
 	/**
 	 * Get the row span of this entry.
@@ -176,10 +193,15 @@ export class UmbBlockGridEntryContext
 				const areasAreIdentical =
 					areas.length === layoutAreas.length && areas.every((area) => layoutAreas.some((y) => y.key === area.key));
 				if (areasAreIdentical === false) {
+					/*
 					const contentUdi = this.getContentUdi();
 					if (!contentUdi) return;
 					this._manager?.updateLayout({
 						contentUdi,
+						areas: layoutAreas.map((x) => (areas.find((y) => y.key === x.key) ? x : { key: x.key, items: [] })),
+					});
+					*/
+					this._layout.update({
 						areas: layoutAreas.map((x) => (areas.find((y) => y.key === x.key) ? x : { key: x.key, items: [] })),
 					});
 				}
@@ -199,9 +221,10 @@ export class UmbBlockGridEntryContext
 					layoutColumns,
 				);
 				if (newColumnSpan !== columnSpan) {
-					const contentUdi = this.getContentUdi();
-					if (!contentUdi) return;
-					this._manager?.updateLayout({ contentUdi, columnSpan: newColumnSpan });
+					//const contentUdi = this.getContentUdi();
+					//if (!contentUdi) return;
+					//this._manager?.updateLayout({ contentUdi, columnSpan: newColumnSpan });
+					this._layout.update({ columnSpan: newColumnSpan });
 				}
 			},
 			'observeColumnSpanValidation',
@@ -215,9 +238,10 @@ export class UmbBlockGridEntryContext
 				if (minMax) {
 					const newRowSpan = Math.max(minMax[0], Math.min(rowSpan ?? 1, minMax[1]));
 					if (newRowSpan !== rowSpan) {
-						const contentUdi = this.getContentUdi();
-						if (!contentUdi) return;
-						this._manager!.updateLayout({ contentUdi, rowSpan: newRowSpan });
+						//const contentUdi = this.getContentUdi();
+						//if (!contentUdi) return;
+						//this._manager!.updateLayout({ contentUdi, rowSpan: newRowSpan });
+						this._layout.update({ rowSpan: newRowSpan });
 					}
 				}
 			},

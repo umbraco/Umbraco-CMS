@@ -39,11 +39,6 @@ export class UmbBlockListManagerContext<
 
 		return true;
 	}
-
-	updateLayout(layoutEntry: Partial<BlockLayoutType> & Pick<BlockLayoutType, 'contentUdi'>): boolean {
-		this._layouts.updateOne(layoutEntry.contentUdi, layoutEntry);
-		return true; // Should have returned false if it did not find the one to update.. but in this case we just insert it if it does not exist. [NL]
-	}
 }
 
 // TODO: Make discriminator method for this:

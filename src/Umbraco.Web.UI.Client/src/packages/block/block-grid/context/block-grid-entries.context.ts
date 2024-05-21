@@ -163,6 +163,15 @@ export class UmbBlockGridEntriesContext
 				},
 				'observeParentLayouts',
 			);
+			this.observe(
+				this.layoutEntries,
+				(layouts) => {
+					this._manager?.setLayouts(layouts);
+				},
+				'observeThisLayouts',
+			);
+
+			this.removeUmbControllerByAlias('observeAreaType');
 
 			const hostEl = this.getHostElement() as HTMLElement | undefined;
 			if (hostEl) {
@@ -194,6 +203,16 @@ export class UmbBlockGridEntriesContext
 					}
 				},
 				'observeParentLayouts',
+			);
+
+			this.observe(
+				this.layoutEntries,
+				(layouts) => {
+					if (this.#areaKey) {
+						this.#parentEntry?.setLayoutsOfArea(this.#areaKey, layouts);
+					}
+				},
+				'observeThisLayouts',
 			);
 
 			this.observe(
@@ -229,6 +248,7 @@ export class UmbBlockGridEntriesContext
 		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
 	}
 
+	/*
 	async setLayouts(layouts: Array<UmbBlockGridLayoutModel>) {
 		await this._retrieveManager;
 		if (this.#areaKey === null) {
@@ -240,6 +260,7 @@ export class UmbBlockGridEntriesContext
 			this._manager?.setLayoutsOfArea(this.#parentUnique, this.#areaKey, layouts);
 		}
 	}
+	*/
 
 	async create(
 		contentElementTypeKey: string,

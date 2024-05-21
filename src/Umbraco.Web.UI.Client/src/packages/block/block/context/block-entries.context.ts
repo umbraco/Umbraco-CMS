@@ -87,7 +87,12 @@ export abstract class UmbBlockEntriesContext<
 	getLayoutOf(contentUdi: string) {
 		return this._layoutEntries.getValue().find((x) => x.contentUdi === contentUdi);
 	}
-	abstract setLayouts(layouts: Array<BlockLayoutType>): Promise<void>;
+	setLayouts(layouts: Array<BlockLayoutType>) {
+		return this._layoutEntries.setValue(layouts);
+	}
+	setOneLayout(layoutData: BlockLayoutType) {
+		return this._layoutEntries.appendOne(layoutData);
+	}
 
 	public abstract getPathForCreateBlock(index: number): string | undefined;
 	public abstract getPathForClipboard(index: number): string | undefined;

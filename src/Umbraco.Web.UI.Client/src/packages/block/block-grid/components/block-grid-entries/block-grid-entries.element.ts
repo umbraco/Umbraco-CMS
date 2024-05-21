@@ -112,8 +112,6 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 			this.#context.onDragEnd();
 		},
 		onChange: ({ model }) => {
-			// TODO: There is some problem with sorting..
-			console.log('sort change');
 			this.#context.setLayouts(model);
 		},
 		onRequestMove: ({ item }) => {

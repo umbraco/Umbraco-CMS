@@ -208,6 +208,15 @@ export abstract class UmbBlockEntryContext<
 			},
 			'observeParentLayout',
 		);
+		this.observe(
+			this.layout,
+			(layout) => {
+				if (layout) {
+					this._entries?.setOneLayout(layout);
+				}
+			},
+			'observeThisLayout',
+		);
 	}
 
 	#gotManager() {

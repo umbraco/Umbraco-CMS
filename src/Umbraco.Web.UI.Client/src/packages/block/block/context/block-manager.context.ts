@@ -79,10 +79,6 @@ export abstract class UmbBlockManagerContext<
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		this._layouts.setValue(layouts);
 	}
-	// TODO: Remove this as it is just for debug purpose...?
-	getLayouts(): Array<BlockLayoutType> {
-		return this._layouts.getValue();
-	}
 	setContents(contents: Array<UmbBlockDataType>) {
 		this.#contents.setValue(contents);
 	}
@@ -169,8 +165,7 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	setOneLayout(layoutData: BlockLayoutType) {
-		//return this._layouts.appendOne(layoutData);
-		this.updateLayout(layoutData);
+		this._layouts.appendOne(layoutData);
 	}
 	setOneContent(contentData: UmbBlockDataType) {
 		this.#contents.appendOne(contentData);
@@ -235,8 +230,6 @@ export abstract class UmbBlockManagerContext<
 		settings: UmbBlockDataType | undefined,
 		modalData: UmbBlockWorkspaceData,
 	): boolean;
-
-	abstract updateLayout(layoutEntry: Partial<BlockLayoutType> & Pick<BlockLayoutType, 'contentUdi'>): boolean;
 
 	protected insertBlockData<ModalDataType extends UmbBlockWorkspaceData>(
 		layoutEntry: BlockLayoutType,
