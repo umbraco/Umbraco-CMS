@@ -8,6 +8,9 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IEntityXmlSerializer
 {
+    internal const string DocumentTypeElementName = "DocumentType";
+    internal const string MediaTypeElementName = "MediaType";
+
     /// <summary>
     ///     Exports an IContent item as an XElement.
     /// </summary>

@@ -14,7 +14,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptName);
   });
 
-  test('can create a empty script @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a empty script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.script.clickActionsMenuAtRoot();
@@ -50,7 +50,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isScriptRootTreeItemVisible(scriptName);
   });
 
-  test('can update a script @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can update a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.create(scriptName, 'test');
     const updatedScriptContent = 'const test = {\r\n    script = \u0022Test\u0022,\r\n    extension = \u0022.js\u0022,\r\n    scriptPath: function() {\r\n        return this.script \u002B this.extension;\r\n    }\r\n};\r\n';
@@ -67,7 +67,7 @@ test.describe('Script tests', () => {
     expect(updatedScript.content).toBe(updatedScriptContent);
   });
 
-  test('can delete a script @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.create(scriptName, '');
 

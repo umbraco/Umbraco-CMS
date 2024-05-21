@@ -16,7 +16,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   });
 
-  test('can create a empty stylesheet @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a empty stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
@@ -52,7 +52,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName);
   });
 
-  test.skip('can create a new Rich Text Editor stylesheet file @smoke', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a new Rich Text Editor stylesheet file', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
 
@@ -73,7 +73,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName);
   });
 
-  test.skip('can update a stylesheet @smoke', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can update a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
     await umbracoApi.stylesheet.create(stylesheetName, '', '/');
@@ -91,7 +91,7 @@ test.describe('Stylesheets tests', () => {
     expect(stylesheetData.content).toEqual(stylesheetContent);
   });
 
-  test('can delete a stylesheet @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.stylesheet.create(stylesheetName, '', '/');
 
@@ -107,7 +107,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName, false);
   });
 
-  test('can rename a stylesheet @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can rename a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongStylesheetName = 'WrongStylesheetName.css';
     await umbracoApi.stylesheet.ensureNameNotExists(wrongStylesheetName);
