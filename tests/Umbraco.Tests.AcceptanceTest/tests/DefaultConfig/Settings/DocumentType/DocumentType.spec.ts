@@ -2,8 +2,8 @@
 import {expect} from '@playwright/test';
 
 //TODO: Remove this before merging, this way we can test all these test on the smoketest pipeline
-//TODO: Define which test we want to smoke test
-// test.describe('Document Type tests @smoke', () => {
+//TODO: Remove the test.describe after the test have passed on the pipeline
+test.describe('Document Type tests @smoke', () => {
   const documentTypeName = 'TestDocumentType';
   const dataTypeName = 'Approved Color';
   const groupName = 'TestGroup';
@@ -783,4 +783,4 @@ import {expect} from '@playwright/test';
       expect(documentTypeData.allowedTemplates).toHaveLength(0);
     });
   });
-// });
+});
