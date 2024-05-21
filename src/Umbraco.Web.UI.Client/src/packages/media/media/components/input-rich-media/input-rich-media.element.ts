@@ -11,7 +11,7 @@ const elementName = 'umb-input-rich-media';
 
 @customElement(elementName)
 export class UmbInputRichMediaElement extends UmbInputMediaElement {
-	#modal;
+	#modal: UmbModalRouteRegistrationController;
 
 	crop?: UmbCropModel;
 	focalPoint?: UmbFocalPointModel;
@@ -70,6 +70,34 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 
 		this.pickerContextObservers();
 		this.addValidators();
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+
+		this.#modal = new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
+			.addAdditionalPath(`:index`)
+			.addUniquePaths(['propertyAlias', 'variantId'])
+			.onSetup((params) => {
+				const indexParam = params.index;
+				if (!indexParam) return false;
+				const index: number | null = parseInt(params.index);
+				if (Number.isNaN(index)) return false;
+
+				// Use the index to find the item:
+				const unique = this.selection[index];
+
+				return {
+					data: { cropOptions: this.crops, focalPointEnabled: this.focalPointEnabled, unique },
+					value: { crops: this.crops, focalPoint: { left: 0.5, top: 0.5 }, src: '' },
+				};
+			})
+			.onSubmit((value) => {
+				console.log(value);
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._modalRoute = routeBuilder;
+			});
 	}
 
 	async #onUploadCompleted(e: CustomEvent) {

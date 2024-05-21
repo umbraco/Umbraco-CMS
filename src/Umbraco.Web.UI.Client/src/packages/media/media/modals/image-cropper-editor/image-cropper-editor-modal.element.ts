@@ -1,3 +1,4 @@
+import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
 import type { UmbImagingModel } from '../../../../core/imaging/types.js';
 import { UmbMediaUrlRepository } from '../../repository/index.js';
 import type { UmbCropModel } from '../../property-editors/index.js';
@@ -20,6 +21,9 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	#urlRepository = new UmbMediaUrlRepository(this);
 
 	@state()
+	private _imageCropperValue?: UmbImageCropperPropertyEditorValue;
+
+	@state()
 	private _unique: string = '';
 
 	@state()
@@ -31,10 +35,11 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._unique = this.data?.unique ?? '';
-		this.#getSrc();
 
 		this._focalPointEnabled = this.data?.focalPointEnabled ?? false;
 		this._crops = this.data?.cropOptions ?? [];
+
+		this.#getSrc();
 	}
 
 	async #getSrc() {
@@ -42,13 +47,19 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		const item = data?.[0];
 
 		if (!item?.url) return;
-		this.value = { ...this.value, src: item.url, crops: [], focalPoint: { left: 0.5, top: 0.5 } };
+		const value: UmbImageCropperPropertyEditorValue = {
+			...this.value,
+			src: item.url,
+			crops: this._crops,
+			focalPoint: { left: 0.5, top: 0.5 },
+		};
+		this._imageCropperValue = value;
 	}
 
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
-				Render some image cropper stuff here...
+				<umb-image-cropper-field .value=${this._imageCropperValue}></umb-image-cropper-field>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
