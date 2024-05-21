@@ -124,17 +124,23 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 				this.editMediaPath = routeBuilder({});
 			});
 
+		this.pickerContextObservers();
+		this.addValidators();
+	}
+
+	protected pickerContextObservers() {
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
 		this.observe(this.#pickerContext.cardItems, (cardItems) => {
 			this.items = cardItems;
 		});
+	}
 
+	protected addValidators() {
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
 			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
 		);
-
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
@@ -166,15 +172,15 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	render() {
-		return html`<div class="container">${this.#renderItems()} ${this.#renderAddButton()}</div>`;
+		return html`<div class="container">${this.renderItems()} ${this.#renderAddButton()}</div>`;
 	}
 
-	#renderItems() {
+	protected renderItems() {
 		if (!this.items?.length) return;
 		return html`${repeat(
 			this.items,
 			(item) => item.unique,
-			(item) => this.renderItem(item),
+			(item, index) => this.renderItem(item, index),
 		)}`;
 	}
 
@@ -192,7 +198,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	protected renderItem(item: UmbMediaCardItemModel) {
+	protected renderItem(item: UmbMediaCardItemModel, index: number) {
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
@@ -251,6 +257,11 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 
 			uui-card-media[drag-placeholder] {
 				opacity: 0.2;
+			}
+			img {
+				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
+				background-size: 10px 10px;
+				background-repeat: repeat;
 			}
 		`,
 	];

@@ -1,4 +1,5 @@
-import type { UmbInputRichMediaElement } from './components/input-rich-media/input-rich-media.element.js';
+import type { UmbInputRichMediaElement } from '../../components/input-rich-media/input-rich-media.element.js';
+
 import type { UmbCropModel, UmbMediaPickerPropertyValue } from './index.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -8,7 +9,8 @@ import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
-import './components/input-rich-media/input-rich-media.element.js';
+import '../../components/input-rich-media/input-rich-media.element.js';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 /**
  * @element umb-property-editor-ui-media-picker
@@ -70,6 +72,21 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	private _limitMax: number = Infinity;
 
 	#value: Array<UmbMediaPickerPropertyValue> = [];
+
+	@state()
+	private _alias?: string;
+
+	@state()
+	private _variantId?: string;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this.observe(context.alias, (alias) => (this._alias = alias));
+			this.observe(context.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
+		});
+	}
 
 	#onChange(event: CustomEvent & { target: UmbInputRichMediaElement }) {
 		const selection = event.target.selection;

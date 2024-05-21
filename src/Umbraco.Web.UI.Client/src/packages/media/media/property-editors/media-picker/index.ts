@@ -4,7 +4,7 @@ export type UmbMediaPickerPropertyValue = {
 	key: string;
 	mediaKey: string;
 	mediaTypeAlias: string;
-	focalPoint: { left: number; top: number } | null;
+	focalPoint: UmbFocalPointModel | null;
 	crops: Array<UmbCropModel>;
 };
 
@@ -13,4 +13,9 @@ export interface UmbCropModel {
 	alias: string;
 	width: number;
 	height: number;
+}
+
+export interface UmbFocalPointModel {
+	left: number;
+	top: number;
 }
