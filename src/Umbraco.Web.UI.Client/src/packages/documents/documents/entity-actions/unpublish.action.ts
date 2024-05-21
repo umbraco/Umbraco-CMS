@@ -2,10 +2,15 @@ import { UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '..
 import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { UMB_DOCUMENT_UNPUBLISH_MODAL } from '../modals/index.js';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
-import { type UmbEntityActionArgs, UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import {
+	type UmbEntityActionArgs,
+	UmbEntityActionBase,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
@@ -73,6 +78,14 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		if (variantIds.length) {
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
 			await publishingRepository.unpublish(this.args.unique, variantIds);
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.args.unique,
+				entityType: this.args.entityType,
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 	}
 }
