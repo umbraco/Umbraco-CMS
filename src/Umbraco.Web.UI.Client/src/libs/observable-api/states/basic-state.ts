@@ -33,7 +33,7 @@ export class UmbBasicState<T> {
 	 * console.log("Value is: ", myState.value);
 	 */
 	public get value(): BehaviorSubject<T>['value'] {
-		return this._subject.value;
+		return this.getValue();
 	}
 
 	/**
