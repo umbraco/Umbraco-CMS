@@ -1,9 +1,9 @@
+import { UMB_USER_GROUP_COLLECTION_CONTEXT } from '../user-group-collection.context-token.js';
 import type { UmbUserGroupDetailModel } from '../../types.js';
+import type { UmbUserGroupCollectionContext } from '../user-group-collection.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -55,7 +55,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
-	#collectionContext?: UmbDefaultCollectionContext;
+	#collectionContext?: UmbUserGroupCollectionContext;
 
 	// TODO: hardcoded dependencies on document and media modules. We should figure out how these dependencies can be added through extensions.
 	#documentItemRepository = new UmbDocumentItemRepository(this);
@@ -67,7 +67,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_USER_GROUP_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.observe(
 				this.#collectionContext.selection.selection,

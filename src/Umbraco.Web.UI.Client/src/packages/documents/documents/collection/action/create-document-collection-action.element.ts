@@ -1,7 +1,7 @@
+import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../document-collection.context-token.js';
 import { css, customElement, html, map, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_DOCUMENT_ENTITY_TYPE,
@@ -35,9 +35,6 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	@state()
 	private _rootPathName?: string;
 
-	@state()
-	private _useInfiniteEditor = false;
-
 	@property({ attribute: false })
 	manifest?: ManifestCollectionAction;
 
@@ -64,15 +61,12 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 			});
 		});
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (collectionContext) => {
+		this.consumeContext(UMB_DOCUMENT_COLLECTION_CONTEXT, (collectionContext) => {
 			this.observe(collectionContext.view.currentView, (currentView) => {
 				this._currentView = currentView?.meta.pathName;
 			});
 			this.observe(collectionContext.view.rootPathName, (rootPathName) => {
 				this._rootPathName = rootPathName;
-			});
-			this.observe(collectionContext.filter, (filter) => {
-				this._useInfiniteEditor = filter.useInfiniteEditor == true;
 			});
 		});
 	}
@@ -99,22 +93,14 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	}
 
 	#getCreateUrl(item: UmbAllowedDocumentTypeModel) {
-		if (this._useInfiniteEditor) {
-			return (
-				this._createDocumentPath.replace(`${this._rootPathName}`, `${this._rootPathName}/${this._currentView}`) +
-				UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
-					parentEntityType: this._documentUnique ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
-					parentUnique: this._documentUnique ?? 'null',
-					documentTypeUnique: item.unique,
-				})
-			);
-		}
-
-		return UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({
-			parentEntityType: this._documentUnique ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
-			parentUnique: this._documentUnique ?? 'null',
-			documentTypeUnique: item.unique,
-		});
+		return (
+			this._createDocumentPath.replace(`${this._rootPathName}`, `${this._rootPathName}/${this._currentView}`) +
+			UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({
+				parentEntityType: this._documentUnique ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+				parentUnique: this._documentUnique ?? 'null',
+				documentTypeUnique: item.unique,
+			})
+		);
 	}
 
 	render() {

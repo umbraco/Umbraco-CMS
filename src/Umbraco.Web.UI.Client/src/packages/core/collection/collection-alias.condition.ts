@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_CONTEXT } from './default/collection-default.context.js';
+import { UMB_COLLECTION_CONTEXT } from './default/index.js';
 import type { CollectionAliasConditionConfig } from './collection-alias.manifest.js';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';

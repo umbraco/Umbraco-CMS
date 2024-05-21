@@ -1,9 +1,10 @@
+import { UMB_CREATE_USER_MODAL_ALIAS } from './create/constants.js';
 import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.User.Create',
+		alias: UMB_CREATE_USER_MODAL_ALIAS,
 		name: 'Create User Modal',
 		js: () => import('./create/create-user-modal.element.js'),
 	},

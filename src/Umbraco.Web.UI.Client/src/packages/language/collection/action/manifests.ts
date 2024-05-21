@@ -3,13 +3,12 @@ import type { ManifestCollectionAction, ManifestTypes } from '@umbraco-cms/backo
 
 export const createManifest: ManifestCollectionAction = {
 	type: 'collectionAction',
-	kind: 'button',
 	name: 'Create Language Collection Action',
 	alias: 'Umb.CollectionAction.Language.Create',
 	weight: 200,
+	element: () => import('./create-language-collection-action.element.js'),
 	meta: {
 		label: 'Create',
-		href: 'section/settings/workspace/language/create',
 	},
 	conditions: [
 		{
