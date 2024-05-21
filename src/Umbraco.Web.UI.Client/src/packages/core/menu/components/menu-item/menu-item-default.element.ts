@@ -1,4 +1,4 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestMenuItem, UmbMenuItemElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
@@ -43,7 +43,9 @@ export class UmbMenuItemDefaultElement extends UmbLitElement implements UmbMenuI
 
 	render() {
 		return html`<umb-menu-item-layout
-			.label=${this.manifest.meta.label ?? this.manifest.name}
+			label=${ifDefined(
+				this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name,
+			)}
 			.iconName=${this.manifest.meta.icon ?? ''}
 			.href=${this._href}></umb-menu-item-layout>`;
 	}
