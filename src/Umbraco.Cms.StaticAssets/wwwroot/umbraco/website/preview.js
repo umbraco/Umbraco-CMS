@@ -9,10 +9,17 @@
       this.#render();
     }
 
+    async #endPreview() {
+      await fetch(`/umbraco/management/api/v1/preview`, {
+        method: "DELETE"
+      });
+
+      window.location.href = this.getAttribute("url") ?? '/';
+    }
+
     #render() {
       const path = this.getAttribute("path") ?? '/umbraco';
       const unique = this.getAttribute("unique") ?? '';
-      const url = this.getAttribute("url") ?? '';
 
       const shadow = this.attachShadow({ mode: "open" });
 
@@ -35,10 +42,10 @@
 
       wrapper.appendChild(btnOpen);
 
-      const btnExit = document.createElement("a");
+      const btnExit = document.createElement("button");
+      btnExit.type = "button";
       btnExit.classList.add("umbraco-preview-badge__a", "end");
       btnExit.title = "End preview mode";
-      btnExit.href = `${path}/preview/end/?redir=${url}`;
       btnExit.innerHTML = `
 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <title>Click to end preview mode</title>
@@ -47,6 +54,7 @@
   <path fill="#fff" d="M78.2 13l-8.7 11.7a32.5 32.5 0 11-51.9 25.8c0-10.3 4.7-19.7 12.9-25.8L21.8 13a47 47 0 1056.4 0z"/>
   <path fill="#fff" d="M42.7 2.5h14.6v49.4H42.7z"/>
 </svg>`;
+      btnExit.onclick = () => this.#endPreview();
 
       wrapper.appendChild(btnExit);
 
@@ -98,6 +106,7 @@
     pointer-events:none;
 }
 .umbraco-preview-badge__a {
+    background: inherit;
     width: 3em;
     padding: 1em;
     display: flex;
@@ -108,15 +117,17 @@
     color:white;
     text-decoration:none;
     font-weight: bold;
+    border: 0;
     border-left: 1px solid hsla(0,0%,100%,.25);
     pointer-events:all;
+    cursor: pointer;
 }
 .umbraco-preview-badge__a svg {
     width: 1em;
     height:1em;
 }
 .umbraco-preview-badge__a:hover {
-    background: #202d5e;
+    background: #202d5e00;
 }
       `;
 
