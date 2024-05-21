@@ -120,7 +120,7 @@ export class UmbBlockGridEntriesContext
 	protected _gotBlockManager() {
 		if (!this._manager) return;
 
-		this.#allowedBlockTypes.setValue(this.#retrieveAllowedElementTypes());
+		this.#getAllowedBlockTypes();
 
 		this.observe(
 			this._manager.propertyAlias,
@@ -154,6 +154,7 @@ export class UmbBlockGridEntriesContext
 			await this._retrieveManager;
 			if (!this._manager) return;
 
+			this.removeUmbControllerByAlias('observeParentUnique');
 			this.setParentUnique(null);
 			this.observe(
 				this._manager.layouts,
@@ -170,8 +171,6 @@ export class UmbBlockGridEntriesContext
 				'observeThisLayouts',
 			);
 
-			this.removeUmbControllerByAlias('observeAreaType');
-
 			const hostEl = this.getHostElement() as HTMLElement | undefined;
 			if (hostEl) {
 				hostEl.removeAttribute('data-area-alias');
@@ -181,6 +180,9 @@ export class UmbBlockGridEntriesContext
 				hostEl.style.removeProperty('--umb-block-grid--area-column-span');
 				hostEl.style.removeProperty('--umb-block-grid--area-row-span');
 			}
+
+			this.removeUmbControllerByAlias('observeAreaType');
+			this.#getAllowedBlockTypes();
 		} else {
 			if (!this.#parentEntry) return;
 
@@ -221,10 +223,17 @@ export class UmbBlockGridEntriesContext
 					hostEl.style.setProperty('--umb-block-grid--grid-columns', areaType?.columnSpan?.toString() ?? '');
 					hostEl.style.setProperty('--umb-block-grid--area-column-span', areaType?.columnSpan?.toString() ?? '');
 					hostEl.style.setProperty('--umb-block-grid--area-row-span', areaType?.rowSpan?.toString() ?? '');
+					this.#getAllowedBlockTypes();
 				},
 				'observeAreaType',
 			);
 		}
+	}
+
+	#getAllowedBlockTypes() {
+		if (this.#areaKey === undefined || !this._manager) return;
+
+		this.#allowedBlockTypes.setValue(this.#retrieveAllowedElementTypes());
 	}
 
 	getPathForCreateBlock(index: number) {
