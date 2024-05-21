@@ -89,7 +89,7 @@ export abstract class UmbBlockEntriesContext<
 	}
 	abstract setLayouts(layouts: Array<BlockLayoutType>): Promise<void>;
 	setOneLayout(layoutData: BlockLayoutType) {
-		return this._layoutEntries.appendOne(layoutData);
+		return this._manager?.setOneLayout(layoutData);
 	}
 
 	public abstract getPathForCreateBlock(index: number): string | undefined;
@@ -124,7 +124,8 @@ export abstract class UmbBlockEntriesContext<
 
 		this._manager?.removeOneContent(contentUdi);
 
-		this._layoutEntries.removeOne(contentUdi);
+		//this._layoutEntries.removeOne(contentUdi);
+		alert('TODO: Remove layout entry..');
 	}
 	//copy
 }
