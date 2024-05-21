@@ -2055,6 +2055,10 @@ name: "icon-window-popin",
 
 path: "./icons/icon-window-popin.js",
 },{
+name: "icon-window-popout",
+
+path: "./icons/icon-window-popout.js",
+},{
 name: "icon-window-sizes",
 
 path: "./icons/icon-window-sizes.js",

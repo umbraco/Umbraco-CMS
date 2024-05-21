@@ -1,4 +1,8 @@
-import type { UmbCurrentUserMfaProviderModel, UmbCurrentUserModel } from '../types.js';
+import type {
+	UmbCurrentUserExternalLoginProviderModel,
+	UmbCurrentUserMfaProviderModel,
+	UmbCurrentUserModel,
+} from '../types.js';
 import type { UmbUserDetailModel } from '@umbraco-cms/backoffice/user';
 import { UMB_USER_DETAIL_STORE_CONTEXT } from '@umbraco-cms/backoffice/user';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -12,6 +16,12 @@ export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 
 	#mfaProviders = new UmbArrayState<UmbCurrentUserMfaProviderModel>([], (e) => e.providerName);
 	readonly mfaProviders = this.#mfaProviders.asObservable();
+
+	#externalLoginProviders = new UmbArrayState<UmbCurrentUserExternalLoginProviderModel>(
+		[],
+		(e) => e.providerSchemeName,
+	);
+	readonly externalLoginProviders = this.#externalLoginProviders.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CURRENT_USER_STORE_CONTEXT);
@@ -84,6 +94,14 @@ export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 
 	updateMfaProvider(data: Partial<UmbCurrentUserMfaProviderModel>) {
 		this.#mfaProviders.updateOne(data.providerName, data);
+	}
+
+	setExternalLoginProviders(data: Array<UmbCurrentUserExternalLoginProviderModel>) {
+		this.#externalLoginProviders.setValue(data);
+	}
+
+	updateExternalLoginProvider(data: Partial<UmbCurrentUserExternalLoginProviderModel>) {
+		this.#externalLoginProviders.updateOne(data.providerSchemeName, data);
 	}
 }
 
