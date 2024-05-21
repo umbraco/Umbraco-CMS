@@ -5,7 +5,6 @@ import {
 	type UmbMediaPickerModalData,
 	type UmbMediaPickerModalValue,
 } from '../../modals/index.js';
-
 import type { UmbImageCropperCrop, UmbImageCropperCrops } from '../input-image-cropper/types.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -15,7 +14,7 @@ import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api
 
 interface UmbRichMediaItemModel extends UmbMediaCardItemModel {
 	crops: UmbImageCropperCrops;
-	focalPoint: { left: number; top: number };
+	focalPoint?: { left: number; top: number };
 }
 
 export class UmbRichMediaPickerContext extends UmbPickerInputContext<
@@ -38,10 +37,28 @@ export class UmbRichMediaPickerContext extends UmbPickerInputContext<
 				this.#richItems.setValue([]);
 				return;
 			}
+
 			const { data } = await this.#imagingRepository.requestResizedItems(
 				selectedItems.map((x) => x.unique),
 				{ height: 400, width: 400, mode: ImageCropModeModel.CROP },
 			);
+			if (!data) return;
+
+			const previously = this.#richItems.getValue();
+
+			const richItems: Array<UmbRichMediaItemModel> = selectedItems.map((item) => {
+				const url = data.find((x) => x.unique === item.unique)?.url;
+				const previous = previously.find((x) => x.unique === item.unique);
+
+				return {
+					...item,
+					url: url ?? '',
+					crops: previous?.crops ?? [],
+					focalPoint: previous?.focalPoint,
+				};
+			});
+
+			this.#richItems.setValue(richItems);
 		});
 	}
 

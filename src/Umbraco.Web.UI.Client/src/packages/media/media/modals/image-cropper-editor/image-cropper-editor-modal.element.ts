@@ -48,6 +48,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
+				Render some image cropper stuff here...
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button

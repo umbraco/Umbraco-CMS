@@ -111,6 +111,8 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 			<umb-input-rich-media
 				@change=${this.#onChange}
 				?multiple=${this._multiple}
+				.variantId=${this._variantId}
+				.alias=${this._alias}
 				.allowedContentTypeIds=${this._allowedMediaTypes}
 				.startNode=${this._startNode}
 				.focalPointEnabled=${this._focalPointEnabled}
