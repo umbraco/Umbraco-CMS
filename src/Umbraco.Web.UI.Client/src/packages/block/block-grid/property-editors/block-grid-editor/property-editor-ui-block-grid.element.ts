@@ -66,16 +66,16 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		this._value = buildUpValue as UmbBlockGridValueModel;
 
 		// TODO: Remove this temp debounce:
-		if (this.#debounceChangeEvent) return;
-		this.#debounceChangeEvent = true;
-		setTimeout(() => {
-			//const tester = this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS][0];
-			//debugger;
-			this.#context.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS] ?? []);
-			this.#context.setContents(this._value.contentData);
-			this.#context.setSettings(this._value.settingsData);
-			this.#debounceChangeEvent = false;
-		}, 200);
+		//if (this.#debounceChangeEvent) return;
+		//this.#debounceChangeEvent = true;
+		//setTimeout(() => {
+		//const tester = this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS][0];
+		//debugger;
+		this.#context.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS] ?? []);
+		this.#context.setContents(this._value.contentData);
+		this.#context.setSettings(this._value.settingsData);
+		//this.#debounceChangeEvent = false;
+		//}, 200);
 	}
 	public get value(): UmbBlockGridValueModel {
 		return this._value;
