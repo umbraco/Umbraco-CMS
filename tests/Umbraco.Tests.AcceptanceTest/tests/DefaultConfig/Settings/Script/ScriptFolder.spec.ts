@@ -14,7 +14,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
   });
 
-  test('can create a folder @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.script.clickActionsMenuAtRoot();
@@ -28,7 +28,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isScriptRootTreeItemVisible(scriptFolderName);
   });
 
-  test('can delete a folder @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.createFolder(scriptFolderName);
 
@@ -90,7 +90,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.isScriptRootTreeItemVisible(childFolderName);
   });
 
-  test('can create a folder in a folder in a folder @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     const childOfChildFolderName = 'ChildOfChildFolderName';

@@ -28,7 +28,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetFolderName);
   });
 
-  test('can delete a folder @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.stylesheet.createFolder(stylesheetFolderName, '');
 
@@ -64,7 +64,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(childFolderName);
   });
 
-  test('can create a folder in a folder in a folder @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     const childOfChildFolderName = 'ChildOfChildFolderName';

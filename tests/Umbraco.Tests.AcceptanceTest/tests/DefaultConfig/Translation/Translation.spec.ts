@@ -52,7 +52,7 @@ test.describe('Translation tests', () => {
     //expect(await umbracoUi.translation.doesDictionaryListHaveText(dictionaryName)).toBeFalsy();
   });
 
-  test('can create a dictionary item in a dictionary @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a dictionary item in a dictionary', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
     let parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
@@ -94,7 +94,7 @@ test.describe('Translation tests', () => {
     expect(exportData).toEqual(dictionaryId + '.udt');
   });
 
-  test('can export a dictionary item with descendants @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can export a dictionary item with descendants', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
     let parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
@@ -136,7 +136,7 @@ test.describe('Translation tests', () => {
     //expect(await umbracoUi.translation.doesDictionaryListHaveText(importDictionaryName)).toBeTruthy();
   });
 
-  test('can import a dictionary item with descendants @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can import a dictionary item with descendants', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const udtFilePath = './fixtures/dictionary/TestDictionaryWithDescendants.udt';
     // This variable must not be changed as it is declared in the file TestDictionaryWithDescendants.udt
