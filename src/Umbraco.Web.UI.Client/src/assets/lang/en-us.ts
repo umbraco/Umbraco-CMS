@@ -2334,6 +2334,20 @@ export default {
 		fallbackDescription:
 			"Thank you for choosing Umbraco - we think this could be the beginning of something\n      beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast\n      as possible.\n    ",
 	},
+	welcomeDashboard: {
+		ourUmbracoHeadline: 'Our Umbraco - The Friendliest Community',
+		ourUmbracoDescription:
+			"Our Umbraco, the official community site, is your one-stop-shop for everything Umbraco. Whether you need a question answered, cool plugins, or a guide of how to do something in Umbraco, the world's best and friendliest community is just a click away.",
+		ourUmbracoButton: 'Visit Our Umbraco',
+		documentationHeadline: 'Documentation',
+		documentationDescription: 'Find the answers to all your Umbraco questions',
+		communityHeadline: 'Community',
+		communityDescription: 'Get support and inspiration from driven Umbraco experts',
+		resourcesHeadline: 'Resources',
+		resourcesDescription: 'Free video tutorials to jumpstart your journey with the CMS',
+		trainingHeadline: 'Training',
+		trainingDescription: 'Real-life training and official Umbraco certifications',
+	},
 	blockEditor: {
 		headlineCreateBlock: 'Pick Element Type',
 		headlineAddSettingsElementType: 'Attach a settings Element Type',

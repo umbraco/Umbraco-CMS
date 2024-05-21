@@ -2488,6 +2488,20 @@ export default {
 		fallbackDescription:
 			"Thank you for choosing Umbraco - we think this could be the beginning of something\n      beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast\n      as possible.\n    ",
 	},
+	welcomeDashboard: {
+		ourUmbracoHeadline: 'Our Umbraco - Det Venligste Fællesskab',
+		ourUmbracoDescription:
+			'Our Umbraco, den officielle fællesskabsplatform, er dit komplette sted for alt, hvad der vedrører Umbraco. Uanset om du har brug for svar på spørgsmål, spændende tilføjelser eller vejledninger til at udføre noget i Umbraco, er verdens bedste og venligste fællesskab kun et klik væk.',
+		ourUmbracoButton: 'Besøg Our Umbraco',
+		documentationHeadline: 'Dokumentation',
+		documentationDescription: 'Find svarene på alle dine Umbraco-spørgsmål',
+		communityHeadline: 'Fællesskab',
+		communityDescription: 'Få support og inspiration fra engagerede Umbraco-eksperter',
+		resourcesHeadline: 'Ressourcer',
+		resourcesDescription: "Gratis video tutorials til at kickstarte din rejse med CMS'et",
+		trainingHeadline: 'Træning',
+		trainingDescription: 'Praktisk træning og officielle certificeringer fra Umbraco',
+	},
 	analytics: {
 		consentForAnalytics: 'Consent for telemetry data',
 		analyticsLevelSavedSuccess: 'Telemetry level saved!',
