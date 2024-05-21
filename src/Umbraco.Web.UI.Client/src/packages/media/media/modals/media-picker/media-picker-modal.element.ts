@@ -1,16 +1,18 @@
-import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
-import { type UmbMediaItemModel, UmbMediaItemRepository, UmbMediaUrlRepository } from '../../repository/index.js';
+import { UmbMediaItemRepository, UmbMediaUrlRepository } from '../../repository/index.js';
 import { UmbMediaTreeRepository } from '../../tree/media-tree.repository.js';
 import { UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
+import type { UmbDropzoneElement } from '../../dropzone/dropzone.element.js';
+import type { UmbMediaItemModel } from '../../repository/index.js';
 import type { UmbMediaCardItemModel, UmbMediaPathModel } from './types.js';
 import type { UmbMediaPickerFolderPathElement } from './components/media-picker-folder-path.element.js';
 import type { UmbMediaPickerModalData, UmbMediaPickerModalValue } from './media-picker-modal.token.js';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { css, html, customElement, state, repeat, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTENT_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 const root: UmbMediaPathModel = { name: 'Media', unique: null, entityType: UMB_MEDIA_ROOT_ENTITY_TYPE };
 
@@ -154,9 +156,13 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		this._mediaFilteredList = await this.#mapMediaUrls(data.filter((found) => found.isTrashed === false));
 	}
 
+	#debouncedSearch = debounce(() => {
+		this.#filterMediaItems();
+	}, 500);
+
 	#onSearch(e: UUIInputEvent) {
 		this._searchQuery = (e.target.value as string).toLocaleLowerCase();
-		this.#filterMediaItems();
+		this.#debouncedSearch();
 	}
 
 	#onPathChange(e: CustomEvent) {
@@ -203,23 +209,25 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 	#renderToolbar() {
 		/**<umb-media-picker-create-item .node=${this._currentMediaEntity.unique}></umb-media-picker-create-item>
 		 * We cannot route to a workspace without the media picker modal is a routeable. Using regular upload button for now... */
-		return html`<div id="toolbar">
-			<div id="search">
-				<uui-input
-					label=${this.localize.term('general_search')}
-					placeholder=${this.localize.term('placeholders_search')}
-					@change=${this.#onSearch}>
-					<uui-icon slot="prepend" name="icon-search"></uui-icon>
-				</uui-input>
-				<uui-checkbox
-					@change=${() => (this._searchOnlyThisFolder = !this._searchOnlyThisFolder)}
-					label=${this.localize.term('general_excludeFromSubFolders')}></uui-checkbox>
+		return html`
+			<div id="toolbar">
+				<div id="search">
+					<uui-input
+						label=${this.localize.term('general_search')}
+						placeholder=${this.localize.term('placeholders_search')}
+						@input=${this.#onSearch}>
+						<uui-icon slot="prepend" name="icon-search"></uui-icon>
+					</uui-input>
+					<uui-checkbox
+						@change=${() => (this._searchOnlyThisFolder = !this._searchOnlyThisFolder)}
+						label=${this.localize.term('general_excludeFromSubFolders')}></uui-checkbox>
+				</div>
+				<uui-button
+					@click=${() => this._dropzone.browse()}
+					label=${this.localize.term('general_upload')}
+					look="primary"></uui-button>
 			</div>
-			<uui-button
-				@click=${() => this._dropzone.browse()}
-				label=${this.localize.term('general_upload')}
-				look="primary"></uui-button>
-		</div> `;
+		`;
 	}
 
 	#renderCard(item: UmbMediaCardItemModel) {
