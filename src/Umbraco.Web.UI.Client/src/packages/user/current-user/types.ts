@@ -15,6 +15,7 @@ export interface UmbCurrentUserModel {
 	email: string;
 	fallbackPermissions: Array<string>;
 	hasAccessToAllLanguages: boolean;
+	hasAccessToSensitiveData: boolean;
 	hasDocumentRootAccess: boolean;
 	hasMediaRootAccess: boolean;
 	isAdmin: boolean;
