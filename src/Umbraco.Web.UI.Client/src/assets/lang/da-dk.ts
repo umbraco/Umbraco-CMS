@@ -1790,6 +1790,7 @@ export default {
 		partialViews: 'Partial Views',
 		partialViewMacros: 'Partial View makrofiler',
 		repositories: 'Installer fra "repository"',
+		relations: 'Relationer',
 		runway: 'Installer Runway',
 		runwayModules: 'Runway-moduler',
 		scripting: 'Scripting filer',

@@ -1804,6 +1804,7 @@ export default {
 		partialViews: 'Partial Views',
 		partialViewMacros: 'Partial View Macro Files',
 		repositories: 'Install from repository',
+		relations: 'Relations',
 		runway: 'Install Runway',
 		runwayModules: 'Runway modules',
 		scripting: 'Scripting Files',
