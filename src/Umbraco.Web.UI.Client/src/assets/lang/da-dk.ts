@@ -1962,7 +1962,6 @@ export default {
 		passwordRequiresUniqueChars: 'The password must use at least %0% different characters',
 		passwordRequiresUpper: "The password must have at least one uppercase ('A'-'Z')",
 		passwordTooShort: 'The password must be at least %0% characters long',
-		allowAccessToAllLanguages: 'Allow access to all languages',
 		userHasPassword: 'The user already has a password set',
 		userHasGroup: "The user is already in group '%0%'",
 		userLockoutNotEnabled: 'Lockout is not enabled for this user',
