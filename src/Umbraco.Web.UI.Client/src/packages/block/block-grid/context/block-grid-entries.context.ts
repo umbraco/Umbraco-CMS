@@ -166,7 +166,6 @@ export class UmbBlockGridEntriesContext
 			this.observe(
 				this.layoutEntries,
 				(layouts) => {
-					// TODO: CONSIDER await Promise.resolve(); HERE AS WELL, To delay the corrections of layouts in the upward stream. [NL]
 					this._manager?.setLayouts(layouts);
 				},
 				'observeThisLayouts',

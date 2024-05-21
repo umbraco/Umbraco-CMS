@@ -31,7 +31,7 @@ export class UmbBlockGridEntryContext
 {
 	//
 	readonly columnSpan = this._layout.asObservablePart((x) => x?.columnSpan);
-	readonly rowSpan = this._layout.asObservablePart((x) => x?.rowSpan ?? 1);
+	readonly rowSpan = this._layout.asObservablePart((x) => x?.rowSpan);
 	readonly columnSpanOptions = this._blockType.asObservablePart((x) => x?.columnSpanOptions ?? []);
 	readonly areaTypeGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);
 	readonly areas = this._blockType.asObservablePart((x) => x?.areas ?? []);
@@ -71,8 +71,8 @@ export class UmbBlockGridEntryContext
 		this.observe(
 			observeMultiple([this.minMaxRowSpan, this.rowSpan]),
 			([minMax, rowSpan]) => {
-				if (minMax && rowSpan) {
-					const newRowSpan = Math.max(minMax[0], Math.min(rowSpan, minMax[1]));
+				if (minMax) {
+					const newRowSpan = Math.max(minMax[0], Math.min(rowSpan ?? 1, minMax[1]));
 					if (newRowSpan !== rowSpan) {
 						this._layout.update({ rowSpan: newRowSpan });
 					}
@@ -84,7 +84,7 @@ export class UmbBlockGridEntryContext
 	}
 
 	layoutsOfArea(areaKey: string) {
-		return this._layout.asObservablePart((x) => x?.areas.find((x) => x.key === areaKey)?.items);
+		return this._layout.asObservablePart((x) => x?.areas?.find((x) => x.key === areaKey)?.items);
 	}
 
 	areaType(areaKey: string) {
@@ -95,7 +95,7 @@ export class UmbBlockGridEntryContext
 		const frozenValue = this._layout.value;
 		if (!frozenValue) return;
 		const areas = appendToFrozenArray(
-			frozenValue?.areas,
+			frozenValue?.areas ?? [],
 			{
 				key: areaKey,
 				items: layouts,
@@ -115,6 +115,7 @@ export class UmbBlockGridEntryContext
 		if (!layoutColumns) return;
 
 		columnSpan = this.#calcColumnSpan(columnSpan, this.getRelevantColumnSpanOptions(), layoutColumns);
+		if (columnSpan === this.getColumnSpan()) return;
 		this._layout.update({ columnSpan });
 	}
 	/**
@@ -133,6 +134,8 @@ export class UmbBlockGridEntryContext
 		const minMax = this.getMinMaxRowSpan();
 		if (!minMax) return;
 		rowSpan = Math.max(minMax[0], Math.min(rowSpan, minMax[1]));
+		if (rowSpan === this.getRowSpan()) return;
+		this._layoutDataIsFromEntries = false;
 		this._layout.update({ rowSpan });
 	}
 	/**

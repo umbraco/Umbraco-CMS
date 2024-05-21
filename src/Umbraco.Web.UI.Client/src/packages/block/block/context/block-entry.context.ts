@@ -198,6 +198,8 @@ export abstract class UmbBlockEntryContext<
 		}
 	}
 
+	// Local state to ensure the two way binding dosnt go nuts. [NL]
+	_layoutDataIsFromEntries?: boolean;
 	#observeLayout() {
 		if (!this._entries || !this.#contentUdi) return;
 
@@ -212,11 +214,8 @@ export abstract class UmbBlockEntryContext<
 			this.layout,
 			async (layout) => {
 				if (layout) {
-					// Important to await here, as we need to make sure the layout is set for the other blocks of this 'entries-context' before we propagate changes. [NL]
-					await Promise.resolve();
-					const latestValue = layout; //this._layout.getValue();
-					if (latestValue) {
-						this._entries?.setOneLayout(latestValue);
+					if (layout) {
+						this._entries?.setOneLayout(layout);
 					}
 				}
 			},
@@ -362,9 +361,10 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	async requestDelete() {
+		const blockName = this.getLabel();
 		await umbConfirmModal(this, {
-			headline: `Delete ${this.getLabel()}`,
-			content: 'Are you sure you want to delete this [INSERT BLOCK TYPE NAME]?',
+			headline: `Delete ${blockName}`,
+			content: `Are you sure you want to delete this ${blockName}?`,
 			confirmLabel: 'Delete',
 			color: 'danger',
 		});
