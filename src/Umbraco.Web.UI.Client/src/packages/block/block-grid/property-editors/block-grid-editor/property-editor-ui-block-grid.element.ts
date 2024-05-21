@@ -4,10 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, css, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
@@ -65,17 +62,9 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		buildUpValue.settingsData ??= [];
 		this._value = buildUpValue as UmbBlockGridValueModel;
 
-		// TODO: Remove this temp debounce:
-		//if (this.#debounceChangeEvent) return;
-		//this.#debounceChangeEvent = true;
-		//setTimeout(() => {
-		//const tester = this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS][0];
-		//debugger;
 		this.#context.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS] ?? []);
 		this.#context.setContents(this._value.contentData);
 		this.#context.setSettings(this._value.settingsData);
-		//this.#debounceChangeEvent = false;
-		//}, 200);
 	}
 	public get value(): UmbBlockGridValueModel {
 		return this._value;
