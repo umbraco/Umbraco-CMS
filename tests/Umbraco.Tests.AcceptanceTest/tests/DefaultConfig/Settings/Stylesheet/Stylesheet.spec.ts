@@ -1,7 +1,6 @@
 ﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
-test.describe('Stylesheets tests', () => {
   const stylesheetName = 'TestStyleSheetFile.css';
   const styleName = 'TestStyleName';
   const styleSelector = 'h1';
@@ -163,4 +162,3 @@ test.describe('Stylesheets tests', () => {
     const stylesheetData = await umbracoApi.stylesheet.getByName(stylesheetName);
     expect(stylesheetData.content).toEqual('');
   });
-});
