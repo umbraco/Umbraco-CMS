@@ -115,6 +115,7 @@ test.describe('Document Type Folder tests @smoke', () => {
     await umbracoUi.documentType.clickCreateFolderButton();
 
     // Assert
+    await umbracoUi.documentType.isSuccessNotificationVisible();
     await umbracoUi.documentType.reloadTree(parentFolderName);
     await umbracoUi.documentType.isDocumentTreeItemVisible(documentFolderName);
     const grandParentChildren = await umbracoApi.documentType.getChildren(grandParentFolderId);

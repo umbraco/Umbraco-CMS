@@ -228,7 +228,7 @@ test.describe('Document Type tests @smoke', () => {
 
       // Act
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
-      await page.locator('[label="' + tabName + '"] [label="Remove"]').click();
+      await umbracoUi.documentType.clickRemoveTabWithName(tabName);
       await umbracoUi.documentType.clickConfirmToDeleteButton();
       await umbracoUi.documentType.clickSaveButton();
 
@@ -256,7 +256,7 @@ test.describe('Document Type tests @smoke', () => {
       expect(documentTypeData.properties.length).toBe(0);
     });
 
-    test('can create a document type with a property in a tab @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can create a document type with a property in a tab @smoke', async ({page ,umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
       await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -274,6 +274,7 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.isSuccessNotificationVisible();
       expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
       const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+      console.log(documentTypeData);
       expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, dataTypeName, documentTypeData.properties[0].dataType.id, tabName, groupName)).toBeTruthy();
     });
 
@@ -414,10 +415,10 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
       await umbracoUi.documentType.clickReorderButton();
       // Drag and Drop
-      await page.waitForTimeout(5000);
+      await umbracoUi.waitForTimeout(5000);
 
-      const dragFromLocator = page.getByText(dataTypeNameTwo);
-      const dragToLocator = page.getByText(dataTypeName);
+      const dragFromLocator = umbracoUi.documentType.getTextLocatorWithName(dataTypeNameTwo);
+      const dragToLocator = umbracoUi.documentType.getTextLocatorWithName(dataTypeName);
       await umbracoUi.documentType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 5);
       await umbracoUi.documentType.clickIAmDoneReorderingButton();
       await umbracoUi.documentType.clickSaveButton();
@@ -439,8 +440,8 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
 
       // Act
-      const dragToLocator = page.getByRole('tab', {name: tabName});
-      const dragFromLocator = page.getByRole('tab', {name: secondTabName});
+      const dragToLocator = umbracoUi.documentType.getTabLocatorWithName(tabName)
+      const dragFromLocator = umbracoUi.documentType.getTabLocatorWithName(secondTabName)
       await umbracoUi.documentType.clickReorderButton();
       await umbracoUi.documentType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 10);
       await umbracoUi.documentType.clickIAmDoneReorderingButton();
@@ -704,8 +705,8 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
       // Is needed
       await umbracoUi.waitForTimeout(200);
-      await page.locator('umb-body-layout').getByRole('tab', {name: 'Settings'}).click({force: true});
-      await page.getByText('Auto cleanup').click();
+      await umbracoUi.documentType.clickDocumentTypeSettingsTab();
+      await umbracoUi.documentType.clickAutoCleanupButton();
       await umbracoUi.documentType.clickSaveButton();
 
       // Assert
@@ -741,7 +742,28 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoApi.template.ensureNameNotExists(templateName);
     });
 
-    // When removing a template, the defaultTemplateId is set to "" which is not correct
+    test('can set an allowed template as default for document type', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      const templateName = 'TestTemplate';
+      await umbracoApi.template.ensureNameNotExists(templateName);
+      const templateId = await umbracoApi.template.createDefaultTemplate(templateName);
+      await umbracoApi.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId);
+      await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+      // Act
+      await umbracoUi.documentType.goToDocumentType(documentTypeName);
+      await umbracoUi.documentType.clickDocumentTypeTemplatesTab();
+      await umbracoUi.documentType.clickDefaultTemplateButton();
+      await umbracoUi.documentType.clickSaveButton();
+
+      // Assert
+      await umbracoUi.documentType.isSuccessNotificationVisible();
+      const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+      expect(documentTypeData.allowedTemplates[0].id).toBe(templateId);
+      expect(documentTypeData.defaultTemplate.id).toBe(templateId);
+    });
+
+      // When removing a template, the defaultTemplateId is set to "" which is not correct
     test.skip('can remove an allowed template from a document type', async ({page, umbracoApi, umbracoUi}) => {
       // Arrange
       const templateName = 'TestTemplate';
@@ -752,8 +774,8 @@ test.describe('Document Type tests @smoke', () => {
 
       // Act
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
-      await page.getByRole('tab', {name: 'Templates'}).click({force: true});
-      await page.getByLabel('Remove ' + templateName).click({force: true});
+      await umbracoUi.documentType.clickDocumentTypeTemplatesTab();
+      await umbracoUi.documentType.clickRemoveWithName(templateName, true);
       await umbracoUi.documentType.clickSaveButton();
 
       // Assert
