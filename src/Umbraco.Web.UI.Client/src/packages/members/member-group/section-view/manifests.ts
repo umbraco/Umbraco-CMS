@@ -8,7 +8,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		js: () => import('./member-group-section-view.element.js'),
 		weight: 100,
 		meta: {
-			label: 'Member Groups',
+			label: '#treeHeaders_memberGroups',
 			pathname: 'member-groups',
 			icon: 'icon-users',
 		},
