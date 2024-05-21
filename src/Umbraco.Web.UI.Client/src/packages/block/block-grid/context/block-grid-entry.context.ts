@@ -31,6 +31,7 @@ export class UmbBlockGridEntryContext
 	//
 	readonly columnSpan = this._layout.asObservablePart((x) => x?.columnSpan);
 	readonly rowSpan = this._layout.asObservablePart((x) => x?.rowSpan);
+	readonly layoutAreas = this._layout.asObservablePart((x) => x?.areas);
 	readonly columnSpanOptions = this._blockType.asObservablePart((x) => x?.columnSpanOptions ?? []);
 	readonly areaTypeGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);
 	readonly areas = this._blockType.asObservablePart((x) => x?.areas ?? []);
@@ -108,7 +109,6 @@ export class UmbBlockGridEntryContext
 		if (!minMax) return;
 		rowSpan = Math.max(minMax[0], Math.min(rowSpan, minMax[1]));
 		if (rowSpan === this.getRowSpan()) return;
-		this._layoutDataIsFromEntries = false;
 		//this._layout.update({ rowSpan });
 		const contentUdi = this.getContentUdi();
 		if (!contentUdi) return;
@@ -167,13 +167,37 @@ export class UmbBlockGridEntryContext
 	#gotEntriesAndManager() {
 		if (!this._entries || !this._manager) return;
 
+		// Secure areas fits options:
+		// NOLZ
+		this.observe(
+			observeMultiple([this.areas, this.layoutAreas]),
+			([areas, layoutAreas]) => {
+				if (!areas || !layoutAreas) return;
+				const areasAreIdentical =
+					areas.length === layoutAreas.length && areas.every((area) => layoutAreas.some((y) => y.key === area.key));
+				if (areasAreIdentical === false) {
+					const contentUdi = this.getContentUdi();
+					if (!contentUdi) return;
+					this._manager?.updateLayout({
+						contentUdi,
+						areas: layoutAreas.map((x) => (areas.find((y) => y.key === x.key) ? x : { key: x.key, items: [] })),
+					});
+				}
+			},
+			'observeAreaValidation',
+		);
+
 		// Secure columnSpan fits options:
 		// NOLZ
 		this.observe(
-			observeMultiple([this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
-			([columnSpan, relevantColumnSpanOptions, layoutColumns]) => {
-				if (!columnSpan || !layoutColumns) return;
-				const newColumnSpan = this.#calcColumnSpan(columnSpan, relevantColumnSpanOptions, layoutColumns);
+			observeMultiple([this.layout, this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
+			([layout, columnSpan, relevantColumnSpanOptions, layoutColumns]) => {
+				if (!layout || !layoutColumns) return;
+				const newColumnSpan = this.#calcColumnSpan(
+					columnSpan ?? layoutColumns,
+					relevantColumnSpanOptions,
+					layoutColumns,
+				);
 				if (newColumnSpan !== columnSpan) {
 					const contentUdi = this.getContentUdi();
 					if (!contentUdi) return;
@@ -193,7 +217,7 @@ export class UmbBlockGridEntryContext
 					if (newRowSpan !== rowSpan) {
 						const contentUdi = this.getContentUdi();
 						if (!contentUdi) return;
-						this._manager?.updateLayout({ contentUdi, rowSpan: newRowSpan });
+						this._manager!.updateLayout({ contentUdi, rowSpan: newRowSpan });
 					}
 				}
 			},

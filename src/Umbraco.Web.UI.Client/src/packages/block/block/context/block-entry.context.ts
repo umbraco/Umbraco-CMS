@@ -198,28 +198,16 @@ export abstract class UmbBlockEntryContext<
 		}
 	}
 
-	// Local state to ensure the two way binding dosnt go nuts. [NL]
-	_layoutDataIsFromEntries?: boolean;
 	#observeLayout() {
 		if (!this._entries || !this.#contentUdi) return;
 
 		this.observe(
 			this._entries.layoutOf(this.#contentUdi),
 			(layout) => {
+				console.log('setValue', this.#contentUdi, layout);
 				this._layout.setValue(layout);
 			},
 			'observeParentLayout',
-		);
-		this.observe(
-			this.layout,
-			async (layout) => {
-				if (layout) {
-					if (layout) {
-						this._entries?.setOneLayout(layout);
-					}
-				}
-			},
-			'observeThisLayout',
 		);
 	}
 

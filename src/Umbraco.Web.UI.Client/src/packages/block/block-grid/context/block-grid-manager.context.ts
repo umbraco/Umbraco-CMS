@@ -34,11 +34,10 @@ export class UmbBlockGridManagerContext<
 
 	/**
 	 * Inserts a layout entry into an area of a layout entry.
-	 * @param layoutEntry The layout entry to insert.
+	 * @param newEntries The layout entry to insert.
 	 * @param entries The layout entries to search within.
 	 * @param parentUnique The parentUnique to search for.
 	 * @param areaKey The areaKey to insert the layout entry into.
-	 * @param index The index to insert the layout entry at.
 	 * @returns a updated layout entries array if the insert was successful.
 	 *
 	 * @remarks
@@ -50,44 +49,50 @@ export class UmbBlockGridManagerContext<
 	#setLayoutsToArea(
 		newEntries: Array<UmbBlockGridLayoutModel>,
 		entries: Array<UmbBlockGridLayoutModel>,
-		parentId: string,
+		parentUnique: string,
 		areaKey: string,
 	): Array<UmbBlockGridLayoutModel> | undefined {
 		// I'm sorry, this code is not easy to read or maintain [NL]
 		let i: number = entries.length;
 		while (i--) {
-			const layoutEntry = entries[i];
+			const currentEntry = entries[i];
 			// Lets check if we found the right parent layout entry:
-			if (layoutEntry.contentUdi === parentId) {
+			if (currentEntry.contentUdi === parentUnique) {
 				// Append the layout entry to be inserted and unfreeze the rest of the data:
+				const areas = currentEntry.areas.map((x) => (x.key === areaKey ? { ...x, items: newEntries } : x));
 				return appendToFrozenArray(
 					entries,
 					{
-						...layoutEntry,
-						areas: layoutEntry.areas.map((x) => (x.key === areaKey ? { ...x, items: newEntries } : x)),
+						...currentEntry,
+						areas,
 					},
-					(x) => x.contentUdi === layoutEntry.contentUdi,
+					(x) => x.contentUdi === currentEntry.contentUdi,
 				);
 			}
 			// Otherwise check if any items of the areas are the parent layout entry we are looking for. We do so based on parentId, recursively:
-			let y: number = layoutEntry.areas?.length;
+			let y: number = currentEntry.areas?.length;
 			while (y--) {
 				// Recursively ask the items of this area to insert the layout entry, if something returns there was a match in this branch. [NL]
-				const correctedAreaItems = this.#setLayoutsToArea(newEntries, layoutEntry.areas[y].items, parentId, areaKey);
+				const correctedAreaItems = this.#setLayoutsToArea(
+					newEntries,
+					currentEntry.areas[y].items,
+					parentUnique,
+					areaKey,
+				);
 				if (correctedAreaItems) {
 					// This area got a corrected set of items, lets append those to the area and unfreeze the surrounding data:
-					const area = layoutEntry.areas[y];
+					const area = currentEntry.areas[y];
 					return appendToFrozenArray(
 						entries,
 						{
-							...layoutEntry,
+							...currentEntry,
 							areas: appendToFrozenArray(
-								layoutEntry.areas,
+								currentEntry.areas,
 								{ ...area, items: correctedAreaItems },
 								(z) => z.key === area.key,
 							),
 						},
-						(x) => x.contentUdi === layoutEntry.contentUdi,
+						(x) => x.contentUdi === currentEntry.contentUdi,
 					);
 				}
 			}
@@ -137,46 +142,49 @@ export class UmbBlockGridManagerContext<
 		// I'm sorry, this code is not easy to read or maintain [NL]
 		let i: number = entries.length;
 		while (i--) {
-			const layoutEntry = entries[i];
+			const currentEntry = entries[i];
 			// Lets check if we found the right parent layout entry:
-			if (layoutEntry.contentUdi === parentId) {
+			if (currentEntry.contentUdi === parentId) {
 				// Append the layout entry to be inserted and unfreeze the rest of the data:
+				const areas = currentEntry.areas.map((x) =>
+					x.key === areaKey
+						? { ...x, items: appendToFrozenArray(x.items, insert, (x) => x.contentUdi === insert.contentUdi) }
+						: x,
+				);
 				return appendToFrozenArray(
 					entries,
 					{
-						...layoutEntry,
-						areas: layoutEntry.areas.map((x) =>
-							x.key === areaKey ? { ...x, items: appendToFrozenArray(x.items, insert) } : x,
-						),
+						...currentEntry,
+						areas,
 					},
-					(x) => x.contentUdi === layoutEntry.contentUdi,
+					(x) => x.contentUdi === currentEntry.contentUdi,
 				);
 			}
 			// Otherwise check if any items of the areas are the parent layout entry we are looking for. We do so based on parentId, recursively:
-			let y: number = layoutEntry.areas?.length;
+			let y: number = currentEntry.areas?.length;
 			while (y--) {
 				// Recursively ask the items of this area to insert the layout entry, if something returns there was a match in this branch. [NL]
 				const correctedAreaItems = this.#appendLayoutEntryToArea(
 					insert,
-					layoutEntry.areas[y].items,
+					currentEntry.areas[y].items,
 					parentId,
 					areaKey,
 					index,
 				);
 				if (correctedAreaItems) {
 					// This area got a corrected set of items, lets append those to the area and unfreeze the surrounding data:
-					const area = layoutEntry.areas[y];
+					const area = currentEntry.areas[y];
 					return appendToFrozenArray(
 						entries,
 						{
-							...layoutEntry,
+							...currentEntry,
 							areas: appendToFrozenArray(
-								layoutEntry.areas,
+								currentEntry.areas,
 								{ ...area, items: correctedAreaItems },
 								(z) => z.key === area.key,
 							),
 						},
-						(x) => x.contentUdi === layoutEntry.contentUdi,
+						(x) => x.contentUdi === currentEntry.contentUdi,
 					);
 				}
 			}

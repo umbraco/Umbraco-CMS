@@ -168,9 +168,10 @@ export abstract class UmbBlockManagerContext<
 		return this.#contents.value.find((x) => x.udi === contentUdi);
 	}
 
-	/*setOneLayout(layoutData: BlockLayoutType) {
-		return this._layouts.appendOne(layoutData);
-	}*/
+	setOneLayout(layoutData: BlockLayoutType) {
+		//return this._layouts.appendOne(layoutData);
+		this.updateLayout(layoutData);
+	}
 	setOneContent(contentData: UmbBlockDataType) {
 		this.#contents.appendOne(contentData);
 	}
