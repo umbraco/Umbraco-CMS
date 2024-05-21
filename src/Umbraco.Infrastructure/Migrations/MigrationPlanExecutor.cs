@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -42,10 +43,12 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private readonly IUmbracoDatabaseFactory _databaseFactory;
     private readonly IPublishedSnapshotService _publishedSnapshotService;
     private readonly IKeyValueService _keyValueService;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly DistributedCache _distributedCache;
     private readonly IScopeAccessor _scopeAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
     private bool _rebuildCache;
+    private bool _signOutUser;
 
     public MigrationPlanExecutor(
         ICoreScopeProvider scopeProvider,
@@ -55,7 +58,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         IUmbracoDatabaseFactory databaseFactory,
         IPublishedSnapshotService publishedSnapshotService,
         DistributedCache distributedCache,
-        IKeyValueService keyValueService)
+        IKeyValueService keyValueService,
+        IServiceScopeFactory serviceScopeFactory)
     {
         _scopeProvider = scopeProvider;
         _scopeAccessor = scopeAccessor;
@@ -64,6 +68,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _databaseFactory = databaseFactory;
         _publishedSnapshotService = publishedSnapshotService;
         _keyValueService = keyValueService;
+        _serviceScopeFactory = serviceScopeFactory;
         _distributedCache = distributedCache;
         _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
     }
@@ -85,7 +90,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             StaticServiceProvider.Instance.GetRequiredService<IUmbracoDatabaseFactory>(),
             StaticServiceProvider.Instance.GetRequiredService<IPublishedSnapshotService>(),
             StaticServiceProvider.Instance.GetRequiredService<DistributedCache>(),
-            StaticServiceProvider.Instance.GetRequiredService<IKeyValueService>())
+            StaticServiceProvider.Instance.GetRequiredService<IKeyValueService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IServiceScopeFactory>())
     {
     }
 
@@ -103,8 +109,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             StaticServiceProvider.Instance.GetRequiredService<IUmbracoDatabaseFactory>(),
             StaticServiceProvider.Instance.GetRequiredService<IPublishedSnapshotService>(),
             StaticServiceProvider.Instance.GetRequiredService<DistributedCache>(),
-            StaticServiceProvider.Instance.GetRequiredService<IKeyValueService>()
-            )
+            StaticServiceProvider.Instance.GetRequiredService<IKeyValueService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IServiceScopeFactory>())
     {
     }
 
@@ -133,6 +139,12 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         {
             _logger.LogInformation("Starts rebuilding the cache. This can be a long running operation");
             RebuildCache();
+        }
+
+        // If any completed migration requires us to sign out the user we'll do that.
+        if (_signOutUser)
+        {
+            SignOutUser();
         }
 
         return result;
@@ -320,11 +332,23 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         {
             _rebuildCache = true;
         }
+
+        if (migration.SignOutUser)
+        {
+            _signOutUser = true;
+        }
     }
 
     private void RebuildCache()
     {
         _publishedSnapshotService.RebuildAll();
         _distributedCache.RefreshAllPublishedSnapshot();
+    }
+
+    private void SignOutUser()
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        ICoreBackOfficeSignInManager signInManager = scope.ServiceProvider.GetRequiredService<ICoreBackOfficeSignInManager>();
+        signInManager.SignOutAsync();
     }
 }

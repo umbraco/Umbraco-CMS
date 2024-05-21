@@ -91,6 +91,8 @@ public abstract partial class MigrationBase : IDiscoverable
     /// </summary>
     public bool RebuildCache { get; set; }
 
+    public bool SignOutUser { get; set; }
+
     /// <summary>
     ///     Runs the migration.
     /// </summary>
