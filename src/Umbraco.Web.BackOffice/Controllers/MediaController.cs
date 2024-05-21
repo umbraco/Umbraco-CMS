@@ -836,6 +836,11 @@ public class MediaController : ContentControllerBase
                                 continue;
                             }
 
+                        if (allowedContentTypes.Any(x => x.Alias == mediaTypeItem.Alias) == false)
+                        {
+                            continue;
+                        }
+
                             mediaTypeAlias = mediaTypeItem.Alias;
                             break;
                         }
@@ -973,7 +978,6 @@ public class MediaController : ContentControllerBase
     /// <returns></returns>
     private async Task<ActionResult<int?>?> GetParentIdAsIntAsync(string? parentId, bool validatePermissions)
     {
-
         // test for udi
         if (UdiParser.TryParse(parentId, out GuidUdi? parentUdi))
         {
@@ -1183,7 +1187,7 @@ public class MediaController : ContentControllerBase
         var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, pageNumber, pageSize)
         {
             Items = children
-            .Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>).WhereNotNull()
+                .Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>).WhereNotNull()
         };
 
         return pagedResult;
