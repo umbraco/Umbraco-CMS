@@ -235,7 +235,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-card-media
 				class=${ifDefined(disabled ? 'not-allowed' : undefined)}
-				.name=${item.name ?? 'Unnamed Media'}
+				.name=${item.name}
 				@open=${() => this.#onOpen(item)}
 				@selected=${() => this.#onSelected(item)}
 				@deselected=${() => this.#onDeselected(item)}
@@ -299,6 +299,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 			.not-allowed {
 				cursor: not-allowed;
+				opacity: 0.5;
 			}
 		`,
 	];
