@@ -37,7 +37,7 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				detail=${ifDefined(item.unique)}
 				href="${this.editMediaPath}edit/${item.unique}"
-				@click=${() => {
+				@open=${() => {
 					alert('open media crops modal');
 				}}>
 				${item.url
