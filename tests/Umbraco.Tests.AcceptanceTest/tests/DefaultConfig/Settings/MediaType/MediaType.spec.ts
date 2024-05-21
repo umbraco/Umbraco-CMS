@@ -1,6 +1,7 @@
 import {expect} from "@playwright/test";
 import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
+// TODO: Remove this after the tests have passed on the pipeline
 test.describe('Media Type tests @smoke', () => {
   const mediaTypeName = 'TestMediaType';
   const dataTypeName = 'Upload File';
@@ -18,7 +19,7 @@ test.describe('Media Type tests @smoke', () => {
   });
 
   test.describe('Design Tab', () => {
-    test('can create a media type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can create a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Act
       await umbracoUi.mediaType.clickActionsMenuForName('Media Types');
       await umbracoUi.mediaType.clickCreateButton();
@@ -66,7 +67,7 @@ test.describe('Media Type tests @smoke', () => {
       expect(mediaTypeData.alias).toBe(updatedAlias);
     });
 
-    test('can add an icon for a media type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can add an icon for a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const bugIcon = 'icon-bug';
       await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
@@ -83,7 +84,7 @@ test.describe('Media Type tests @smoke', () => {
       await umbracoUi.mediaType.isTreeItemVisible(mediaTypeName, true);
     });
 
-    test('can create a media type with a property @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can create a media type with a property', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
@@ -139,7 +140,7 @@ test.describe('Media Type tests @smoke', () => {
       expect(mediaTypeData.containers[0].name).toBe(updatedGroupName);
     });
 
-    test('can delete a media type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can delete a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
@@ -170,7 +171,7 @@ test.describe('Media Type tests @smoke', () => {
       expect(mediaTypeData.properties.length).toBe(0);
     });
 
-    test('can add a description to property in a media type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can add a description to property in a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const descriptionText = 'Test Description';
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -178,7 +179,6 @@ test.describe('Media Type tests @smoke', () => {
 
       // Act
       await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-
       await umbracoUi.mediaType.clickEditorSettingsButton();
       await umbracoUi.mediaType.enterPropertyEditorDescription(descriptionText);
       await umbracoUi.mediaType.clickUpdateButton();
@@ -192,7 +192,7 @@ test.describe('Media Type tests @smoke', () => {
       expect(mediaTypeData.properties[0].description).toBe(descriptionText);
     });
 
-    test('can set a property as mandatory in a media type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can set a property as mandatory in a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
@@ -234,6 +234,7 @@ test.describe('Media Type tests @smoke', () => {
     });
 
     test('can set appearance as label on top for property in a media type', async ({umbracoApi, umbracoUi}) => {
+      // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
 
@@ -250,7 +251,8 @@ test.describe('Media Type tests @smoke', () => {
       expect(mediaTypeData.properties[0].appearance.labelOnTop).toBeTruthy();
     });
 
-    test('can delete a group in a media type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can delete a group in a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+      // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id, groupName);
 
@@ -267,7 +269,7 @@ test.describe('Media Type tests @smoke', () => {
       expect(mediaTypeData.properties.length).toBe(0);
     });
 
-    test('can create a media type with a property in a tab @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can create a media type with a property in a tab', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
@@ -282,10 +284,10 @@ test.describe('Media Type tests @smoke', () => {
       await umbracoUi.mediaType.isSuccessNotificationVisible();
       // Checks if the media type has the correct tab and property
       const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-      await umbracoApi.mediaType.doesTabContainerCorrectPropertyEditor(mediaTypeName, tabName, mediaTypeData.properties[0].dataType.id);
+      expect(await umbracoApi.mediaType.doesTabContainerCorrectPropertyEditor(mediaTypeName, tabName, mediaTypeData.properties[0].dataType.id)).toBeTruthy();
     });
 
-    test('can create a media type with multiple groups @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can create a media type with multiple groups', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       const secondDataTypeName = 'Image Media Picker';
@@ -333,7 +335,7 @@ test.describe('Media Type tests @smoke', () => {
     });
 
     // TODO: Currently there is no composition button, which makes it impossible to test
-    test.skip('can create a media type with a composition', async ({page, umbracoApi, umbracoUi}) => {
+    test.skip('can create a media type with a composition', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const compositionMediaTypeName = 'CompositionMediaType';
       await umbracoApi.mediaType.ensureNameNotExists(compositionMediaTypeName);
@@ -343,7 +345,6 @@ test.describe('Media Type tests @smoke', () => {
 
       // Act
       await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-      await page.pause();
       await umbracoUi.mediaType.clickCompositionsButton();
       await umbracoUi.mediaType.clickButtonWithName(compositionMediaTypeName);
       await umbracoUi.mediaType.clickSubmitButton();
@@ -383,7 +384,7 @@ test.describe('Media Type tests @smoke', () => {
     });
 
     // TODO: Unskip when it works. Sometimes the properties are not dragged correctly.
-    test.skip('can reorder properties in a media type', async ({page, umbracoApi, umbracoUi}) => {
+    test.skip('can reorder properties in a media type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       const dataTypeNameTwo = "Upload Second File";
@@ -392,12 +393,11 @@ test.describe('Media Type tests @smoke', () => {
 
       // Act
       await umbracoUi.mediaType.clickReorderButton();
-      await page.pause();
       // Drag and Drop
-      const dragFromLocator = page.getByText(dataTypeNameTwo);
-      const dragToLocator = page.getByText(dataTypeName);
+      const dragFromLocator = umbracoUi.mediaType.getTextLocatorWithName(dataTypeNameTwo);
+      const dragToLocator = umbracoUi.mediaType.getTextLocatorWithName(dataTypeName);
       await umbracoUi.mediaType.dragAndDrop(dragFromLocator, dragToLocator, -10, 0, 5);
-      await page.waitForTimeout(200);
+      await umbracoUi.waitForTimeout(200);
       await umbracoUi.mediaType.clickIAmDoneReorderingButton();
       await umbracoUi.mediaType.clickSaveButton();
 
@@ -408,7 +408,7 @@ test.describe('Media Type tests @smoke', () => {
     });
 
     // TODO: Unskip when the frontend does not give the secondTab -1 as the sortOrder
-    test.skip('can reorder tabs in a media type', async ({page, umbracoApi, umbracoUi}) => {
+    test.skip('can reorder tabs in a media type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       const secondTabName = 'SecondTab';
@@ -416,8 +416,8 @@ test.describe('Media Type tests @smoke', () => {
       await umbracoUi.mediaType.goToMediaType(mediaTypeName);
 
       // Act
-      const dragToLocator = page.getByRole('tab', {name: tabName});
-      const dragFromLocator = page.getByRole('tab', {name: secondTabName});
+      const dragToLocator = umbracoUi.mediaType.getTabLocatorWithName(tabName);
+      const dragFromLocator = umbracoUi.mediaType.getTabLocatorWithName(secondTabName);
       await umbracoUi.mediaType.clickReorderButton();
       await umbracoUi.mediaType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 10);
       await umbracoUi.mediaType.clickIAmDoneReorderingButton();
@@ -431,7 +431,7 @@ test.describe('Media Type tests @smoke', () => {
   });
 
   test.describe('Structure Tab', () => {
-    test('can create a media type with allow at root enabled', async ({umbracoApi, umbracoUi}) => {
+    test('can create a media type with allow at root enabled', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
@@ -447,7 +447,7 @@ test.describe('Media Type tests @smoke', () => {
       expect(mediaTypeData.allowedAsRoot).toBeTruthy();
     });
 
-    test('can create a media type with an allowed child node type', async ({umbracoApi, umbracoUi}) => {
+    test('can create a media type with an allowed child node type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
@@ -467,7 +467,7 @@ test.describe('Media Type tests @smoke', () => {
 
     test('can create a media type with multiple allowed child nodes types', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
+      const mediaTypeId = await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
       const secondMediaTypeName = 'SecondMediaType';
       await umbracoApi.mediaType.ensureNameNotExists(secondMediaTypeName);
       const secondMediaTypeId = await umbracoApi.mediaType.createDefaultMediaType(secondMediaTypeName);
@@ -483,15 +483,13 @@ test.describe('Media Type tests @smoke', () => {
 
       // Assert
       await umbracoUi.mediaType.isSuccessNotificationVisible();
-      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-      expect(mediaTypeData.allowedMediaTypes[0].mediaType.id).toBe(mediaTypeData.id);
-      expect(mediaTypeData.allowedMediaTypes[1].mediaType.id).toBe(secondMediaTypeId);
+      expect(await umbracoApi.mediaType.doesMediaTypeContainAllowedChildNodeIds(mediaTypeName, [mediaTypeId, secondMediaTypeId])).toBeTruthy();
 
       // Clean
       await umbracoApi.mediaType.ensureNameNotExists(secondMediaTypeName);
     });
 
-    test('can delete an allowed child note from a media type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can delete an allowed child note from a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const childNodeName = 'MediaChildNode';
       await umbracoApi.mediaType.ensureNameNotExists(childNodeName);
