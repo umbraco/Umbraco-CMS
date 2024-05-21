@@ -1,7 +1,7 @@
 ﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
-test.describe('Document Type Folder tests @smoke', () => {
+// test.describe('Document Type Folder tests @smoke', () => {
   const documentFolderName = 'TestFolder';
 
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
@@ -13,7 +13,7 @@ test.describe('Document Type Folder tests @smoke', () => {
     await umbracoApi.documentType.ensureNameNotExists(documentFolderName);
   });
 
-  test('can create a empty document type folder @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a empty document type folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.documentType.clickActionsMenuForName('Document Types');
@@ -31,7 +31,7 @@ test.describe('Document Type Folder tests @smoke', () => {
     await umbracoUi.documentType.isDocumentTreeItemVisible(documentFolderName);
   });
 
-  test('can delete a document type folder @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a document type folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.documentType.createFolder(documentFolderName);
 
@@ -95,7 +95,7 @@ test.describe('Document Type Folder tests @smoke', () => {
     await umbracoApi.documentType.ensureNameNotExists(childFolderName);
   });
 
-  test('can create a folder in a folder in a folder @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const grandParentFolderName = 'TheGrandFolder';
     const parentFolderName = 'TheParentFolder';
@@ -127,4 +127,4 @@ test.describe('Document Type Folder tests @smoke', () => {
     await umbracoApi.documentType.ensureNameNotExists(grandParentFolderName);
     await umbracoApi.documentType.ensureNameNotExists(parentFolderName);
   });
-});
+// });

@@ -3,7 +3,7 @@ import {expect} from '@playwright/test';
 
 //TODO: Remove this before merging, this way we can test all these test on the smoketest pipeline
 //TODO: Define which test we want to smoke test
-test.describe('Document Type tests @smoke', () => {
+// test.describe('Document Type tests @smoke', () => {
   const documentTypeName = 'TestDocumentType';
   const dataTypeName = 'Approved Color';
   const groupName = 'TestGroup';
@@ -18,7 +18,7 @@ test.describe('Document Type tests @smoke', () => {
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   });
 
-  test('can create a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
@@ -36,7 +36,7 @@ test.describe('Document Type tests @smoke', () => {
     await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName);
   });
 
-  test('can create a document type with a template @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a document type with a template', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
     await umbracoApi.template.ensureNameNotExists(documentTypeName);
@@ -61,7 +61,7 @@ test.describe('Document Type tests @smoke', () => {
     await umbracoApi.template.ensureNameNotExists(documentTypeName);
   });
 
-  test('can create a element type @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a element type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
 
@@ -81,7 +81,7 @@ test.describe('Document Type tests @smoke', () => {
   });
 
   test.describe('Design tab', () => {
-    test('can rename a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can rename a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const wrongName = 'NotADocumentTypeName';
       await umbracoApi.documentType.ensureNameNotExists(wrongName);
@@ -121,7 +121,7 @@ test.describe('Document Type tests @smoke', () => {
       expect(documentTypeDataNew.alias).toBe(newAlias);
     });
 
-    test('can add an icon for a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can add an icon for a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const bugIcon = 'icon-bug';
       await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
@@ -139,7 +139,7 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName, true);
     });
 
-    test('can add a property to a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can add a property to a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
       await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -160,7 +160,7 @@ test.describe('Document Type tests @smoke', () => {
       expect(documentTypeData.properties[0].dataType.id).toBe(dataType.id);
     });
 
-    test('can update a property in a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can update a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       const newDataTypeName = 'Image Media Picker';
@@ -200,7 +200,7 @@ test.describe('Document Type tests @smoke', () => {
       expect(documentTypeData.containers[0].name).toBe(newGroupName);
     });
 
-    test('can delete a group in a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can delete a group in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
@@ -220,7 +220,7 @@ test.describe('Document Type tests @smoke', () => {
     });
 
     // TODO: Currently I am getting an error If I delete a tab that contains children. The children are not cleaned up when deleting the tab.
-    test.skip('can delete a tab in a document type', async ({page, umbracoApi, umbracoUi}) => {
+    test.skip('can delete a tab in a document type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       await umbracoApi.documentType.createDocumentTypeWithPropertyEditorInTab(documentTypeName, dataTypeName, dataTypeData.id, tabName);
@@ -238,7 +238,7 @@ test.describe('Document Type tests @smoke', () => {
       expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
     });
 
-    test('can delete a property editor in a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can delete a property editor in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName);
@@ -256,7 +256,7 @@ test.describe('Document Type tests @smoke', () => {
       expect(documentTypeData.properties.length).toBe(0);
     });
 
-    test('can create a document type with a property in a tab @smoke', async ({page ,umbracoApi, umbracoUi}) => {
+    test('can create a document type with a property in a tab', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
       await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -274,7 +274,6 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.isSuccessNotificationVisible();
       expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
       const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-      console.log(documentTypeData);
       expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, dataTypeName, documentTypeData.properties[0].dataType.id, tabName, groupName)).toBeTruthy();
     });
 
@@ -327,7 +326,7 @@ test.describe('Document Type tests @smoke', () => {
       expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, secondDataTypeName, secondDataType.id, secondTabName, secondGroupName)).toBeTruthy();
     });
 
-    test('can create a document type with a composition @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can create a document type with a composition', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const compositionDocumentTypeName = 'CompositionDocumentType';
       await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
@@ -404,7 +403,7 @@ test.describe('Document Type tests @smoke', () => {
     });
 
     // TODO: Unskip when it works. Sometimes the properties are not dragged correctly.
-    test.skip('can reorder properties in a document type', async ({page, umbracoApi, umbracoUi}) => {
+    test.skip('can reorder properties in a document type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       const dataTypeNameTwo = "Second Color Picker";
@@ -431,7 +430,7 @@ test.describe('Document Type tests @smoke', () => {
     });
 
     // TODO: Unskip when the frontend does not give the secondTab -1 as the sortOrder
-    test.skip('can reorder tabs in a document type @smoke', async ({page, umbracoApi, umbracoUi}) => {
+    test.skip('can reorder tabs in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       const secondTabName = 'SecondTab';
@@ -475,7 +474,7 @@ test.describe('Document Type tests @smoke', () => {
       expect(documentTypeData.properties[0].description).toBe(descriptionText);
     });
 
-    test('can set is mandatory for a property in a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can set is mandatory for a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -518,7 +517,7 @@ test.describe('Document Type tests @smoke', () => {
       expect(documentTypeData.properties[0].validation.regExMessage).toBe(regexMessage);
     });
 
-    test('can allow vary by culture for a property in a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can allow vary by culture for a property in a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, groupName, true);
@@ -558,7 +557,7 @@ test.describe('Document Type tests @smoke', () => {
   });
 
   test.describe('Structure tab', () => {
-    test('can add allow as root to a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can add allow as root to a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
       await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -575,7 +574,7 @@ test.describe('Document Type tests @smoke', () => {
       expect(documentTypeData.allowedAsRoot).toBeTruthy();
     });
 
-    test('can add an allowed child node to a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can add an allowed child node to a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
       await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -644,7 +643,7 @@ test.describe('Document Type tests @smoke', () => {
   });
 
   test.describe('Settings tab', () => {
-    test('can add allow vary by culture for a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can add allow vary by culture for a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
       await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -678,7 +677,7 @@ test.describe('Document Type tests @smoke', () => {
       expect(documentTypeData.variesBySegment).toBeTruthy();
     });
 
-    test('can set is an element type for a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can set is an element type for a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
       await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -696,7 +695,7 @@ test.describe('Document Type tests @smoke', () => {
     });
 
     // TODO: Unskip. Currently The cleanup is not updated upon save
-    test.skip('can disable history cleanup for a document type', async ({page, umbracoApi, umbracoUi}) => {
+    test.skip('can disable history cleanup for a document type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
       await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -717,7 +716,7 @@ test.describe('Document Type tests @smoke', () => {
   });
 
   test.describe('Templates tab', () => {
-    test('can add an allowed template to a document type @smoke', async ({umbracoApi, umbracoUi}) => {
+    test('can add an allowed template to a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
       const templateName = 'TestTemplate';
@@ -742,7 +741,7 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoApi.template.ensureNameNotExists(templateName);
     });
 
-    test('can set an allowed template as default for document type', async ({page, umbracoApi, umbracoUi}) => {
+    test('can set an allowed template as default for document type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const templateName = 'TestTemplate';
       await umbracoApi.template.ensureNameNotExists(templateName);
@@ -763,8 +762,8 @@ test.describe('Document Type tests @smoke', () => {
       expect(documentTypeData.defaultTemplate.id).toBe(templateId);
     });
 
-      // When removing a template, the defaultTemplateId is set to "" which is not correct
-    test.skip('can remove an allowed template from a document type', async ({page, umbracoApi, umbracoUi}) => {
+    // When removing a template, the defaultTemplateId is set to "" which is not correct
+    test.skip('can remove an allowed template from a document type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const templateName = 'TestTemplate';
       await umbracoApi.template.ensureNameNotExists(templateName);
@@ -784,4 +783,4 @@ test.describe('Document Type tests @smoke', () => {
       expect(documentTypeData.allowedTemplates).toHaveLength(0);
     });
   });
-});
+// });
