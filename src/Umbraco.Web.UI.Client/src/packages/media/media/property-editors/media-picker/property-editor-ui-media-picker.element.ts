@@ -3,27 +3,35 @@ import type { UmbCropModel, UmbMediaPickerPropertyValue } from './index.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 import '../../components/input-rich-media/input-rich-media.element.js';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+
+const elementName = 'umb-property-editor-ui-media-picker';
 
 /**
  * @element umb-property-editor-ui-media-picker
  */
-
-@customElement('umb-property-editor-ui-media-picker')
+@customElement(elementName)
 export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	#value: Array<UmbMediaPickerPropertyValue> = [];
-
 	@property({ attribute: false })
-	public set value(value: Array<UmbMediaPickerPropertyValue>) {
-		this.#value = value;
-	}
-	public get value() {
-		return this.#value;
+	value?: Array<UmbMediaPickerPropertyValue>;
+
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		if (!config) return;
+
+		this._allowedMediaTypes = config.getValueByAlias<string>('filter')?.split(',') ?? [];
+		this._focalPointEnabled = Boolean(config.getValueByAlias('enableLocalFocalPoint'));
+		this._multiple = Boolean(config.getValueByAlias('multiple'));
+		this._preselectedCrops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
+		this._startNode = config.getValueByAlias<string>('startNodeId') ?? '';
+
+		const minMax = config.getValueByAlias<NumberRangeValueType>('validationLimit');
+		this._limitMin = minMax?.min ?? 0;
+		this._limitMax = minMax?.max ?? Infinity;
 	}
 
 	@state()
@@ -37,25 +45,6 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 
 	@state()
 	private _allowedMediaTypes: Array<string> = [];
-
-	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		if (!config) return;
-
-		this._multiple = Boolean(config.getValueByAlias('multiple'));
-		this._startNode = config.getValueByAlias<string>('startNodeId') ?? '';
-		this._focalPointEnabled = Boolean(config.getValueByAlias('enableFocalPoint'));
-		this._preselectedCrops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
-
-		const filter = config.getValueByAlias<string>('filter');
-		this._allowedMediaTypes = filter?.split(',') ?? [];
-
-		const minMax = config.getValueByAlias<NumberRangeValueType>('validationLimit');
-		this._limitMin = minMax?.min ?? 0;
-		this._limitMax = minMax?.max ?? Infinity;
-	}
-	public get config() {
-		return undefined;
-	}
 
 	@state()
 	private _multiple: boolean = false;
@@ -82,33 +71,33 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputRichMediaElement }) {
-		this.value = event.target.richValue;
+		this.value = event.target.items;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
 		return html`
 			<umb-input-rich-media
-				@change=${this.#onChange}
-				?multiple=${this._multiple}
-				.richValue=${this.value}
-				.variantId=${this._variantId}
 				.alias=${this._alias}
 				.allowedContentTypeIds=${this._allowedMediaTypes}
-				.startNode=${this._startNode}
 				.focalPointEnabled=${this._focalPointEnabled}
-				.preselectedCrops=${this._preselectedCrops}
+				.items=${this.value ?? []}
+				.max=${this._limitMax}
 				.min=${this._limitMin}
-				.max=${this._limitMax}>
+				.preselectedCrops=${this._preselectedCrops}
+				.startNode=${this._startNode}
+				.variantId=${this._variantId}
+				?multiple=${this._multiple}
+				@change=${this.#onChange}>
 			</umb-input-rich-media>
 		`;
 	}
 }
 
-export default UmbPropertyEditorUIMediaPickerElement;
+export { UmbPropertyEditorUIMediaPickerElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-media-picker': UmbPropertyEditorUIMediaPickerElement;
+		[elementName]: UmbPropertyEditorUIMediaPickerElement;
 	}
 }

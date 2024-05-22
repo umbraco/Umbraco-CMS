@@ -4,12 +4,15 @@ import { UmbMediaPickerContext } from './input-media.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
-@customElement('umb-input-media')
+const elementName = 'umb-input-media';
+
+@customElement(elementName)
 export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
@@ -37,10 +40,10 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
-		this.pickerContext.min = value;
+		this.#pickerContext.min = value;
 	}
 	public get min(): number {
-		return this.pickerContext.min;
+		return this.#pickerContext.min;
 	}
 
 	/**
@@ -60,10 +63,10 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
-		this.pickerContext.max = value;
+		this.#pickerContext.max = value;
 	}
 	public get max(): number {
-		return this.pickerContext.max;
+		return this.#pickerContext.max;
 	}
 
 	/**
@@ -76,11 +79,11 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
-		this.pickerContext.setSelection(ids);
+		this.#pickerContext.setSelection(ids);
 		this.#sorter.setModel(ids);
 	}
 	public get selection(): Array<string> {
-		return this.pickerContext.getSelection();
+		return this.#pickerContext.getSelection();
 	}
 
 	@property({ type: Array })
@@ -105,12 +108,14 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	@state()
-	protected editMediaPath = '';
+	private _editMediaPath = '';
 
 	@state()
-	protected items?: Array<UmbMediaCardItemModel>;
+	private _items?: Array<UmbMediaCardItemModel>;
 
-	pickerContext = new UmbMediaPickerContext(this);
+	#pickerContext = new UmbMediaPickerContext(this);
+
+	#imagingRepository = new UmbImagingRepository(this);
 
 	constructor() {
 		super();
@@ -121,30 +126,41 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 				return { data: { entityType: 'media', preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this.editMediaPath = routeBuilder({});
+				this._editMediaPath = routeBuilder({});
 			});
 
-		this.observeContextItems();
-		this.addValidators();
+		this.#observeContextItems();
+		this.#addValidators();
 	}
 
-	protected observeContextItems() {
-		this.observe(this.pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.pickerContext.cardItems, (cardItems) => {
-			this.items = cardItems;
+	#observeContextItems() {
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
+
+		this.observe(this.#pickerContext.selectedItems, async (selectedItems) => {
+			if (!selectedItems?.length) {
+				return;
+			}
+
+			const uniques = selectedItems.map((x) => x.unique);
+			const { data } = await this.#imagingRepository.requestThumbnailUrls(uniques, 400, 400);
+
+			this._items = selectedItems.map((item) => {
+				const src = data?.find((x) => x.unique === item.unique)?.url;
+				return { ...item, src };
+			});
 		});
 	}
 
-	protected addValidators() {
+	#addValidators() {
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.pickerContext.getSelection().length < this.min,
+			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.pickerContext.getSelection().length > this.max,
+			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 	}
 
@@ -160,32 +176,34 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	};
 
 	#openPicker() {
-		this.pickerContext.openPicker({
+		this.#pickerContext.openPicker({
 			multiple: this.multiple,
 			startNode: this.startNode,
 			pickableFilter: this.#pickableFilter,
 		});
 	}
 
-	protected onRemove(item: UmbMediaCardItemModel) {
-		this.pickerContext.requestRemoveItem(item.unique);
+	#onRemove(item: UmbMediaCardItemModel) {
+		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
 	render() {
-		return html`<div class="container">${this.renderItems()} ${this.#renderAddButton()}</div>`;
+		return html`<div class="container">${this.#renderItems()} ${this.#renderAddButton()}</div>`;
 	}
 
-	protected renderItems() {
-		if (!this.items?.length) return;
-		return html`${repeat(
-			this.items,
-			(item) => item.unique,
-			(item, index) => this.renderItem(item, index),
-		)}`;
+	#renderItems() {
+		if (!this._items?.length) return;
+		return html`
+			${repeat(
+				this._items,
+				(item) => item.unique,
+				(item) => this.#renderItem(item),
+			)}
+		`;
 	}
 
 	#renderAddButton() {
-		if ((this.items && this.max && this.items.length >= this.max) || (this.items?.length && !this.multiple)) return;
+		if ((this._items && this.max && this._items.length >= this.max) || (this._items?.length && !this.multiple)) return;
 		return html`
 			<uui-button
 				id="btn-add"
@@ -198,21 +216,21 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	protected renderItem(item: UmbMediaCardItemModel, index: number) {
+	#renderItem(item: UmbMediaCardItemModel) {
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				detail=${ifDefined(item.unique)}
-				href="${this.editMediaPath}edit/${item.unique}">
+				href="${this._editMediaPath}edit/${item.unique}">
 				${item.src
 					? html`<img src=${item.src} alt=${item.name} />`
 					: html`<umb-icon name=${ifDefined(item.mediaType.icon)}></umb-icon>`}
-				${this.renderIsTrashed(item)}
+				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					<uui-button
 						label=${this.localize.term('general_remove')}
 						look="secondary"
-						@click=${() => this.onRemove(item)}>
+						@click=${() => this.#onRemove(item)}>
 						<uui-icon name="icon-trash"></uui-icon>
 					</uui-button>
 				</uui-action-bar>
@@ -220,7 +238,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	protected renderIsTrashed(item: UmbMediaCardItemModel) {
+	#renderIsTrashed(item: UmbMediaCardItemModel) {
 		if (!item.isTrashed) return;
 		return html`
 			<uui-tag size="s" slot="tag" color="danger">
@@ -267,10 +285,10 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	];
 }
 
-export default UmbInputMediaElement;
+export { UmbInputMediaElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-media': UmbInputMediaElement;
+		[elementName]: UmbInputMediaElement;
 	}
 }
