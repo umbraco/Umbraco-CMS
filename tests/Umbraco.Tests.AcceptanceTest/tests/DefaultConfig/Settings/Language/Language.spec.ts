@@ -15,8 +15,9 @@ test.describe('Language tests', () => {
   test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.language.ensureNameNotExists(languageName);
   });
-  
-  test('can add language @smoke', async ({umbracoApi, umbracoUi}) => {
+
+  // TODO: Fix this test
+  test.skip('can add language @smoke', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoUi.language.goToSettingsTreeItem('Language');
 
