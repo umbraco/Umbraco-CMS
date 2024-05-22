@@ -316,20 +316,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			:host(:not([index='0'])) uui-button-inline-create:not([vertical]) {
 				top: calc(var(--umb-block-grid--row-gap, 0px) * -0.5);
 			}
-
-			:host([at-root]) uui-button-inline-create[vertical] {
-				/* If at root, and full-width then become 40px wider: */
-				--calc: clamp(0, calc(var(--umb-block-grid--item-column-span) - (var(--umb-block-grid--grid-columns)-1)), 1);
-				left: calc(-20px * var(--calc));
-				width: calc(var(--umb-block-grid-editor--inline-create-width, 100%) + 40px * var(--calc));
-			}
 			uui-button-inline-create[vertical] {
 				right: calc(1px - (var(--umb-block-grid--column-gap, 0px) * 0.5));
-			}
-			:host([at-root]) uui-button-inline-create[vertical] {
-				/* If at root, and full-width then move a little out to the right: */
-				--calc: clamp(0, calc(var(--umb-block-grid--item-column-span) - (var(--umb-block-grid--grid-columns)-1)), 1);
-				right: calc(-2px * var(--calc));
 			}
 
 			:host([drag-placeholder]) {
