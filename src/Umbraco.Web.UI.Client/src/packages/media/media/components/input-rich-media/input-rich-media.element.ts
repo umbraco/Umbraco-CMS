@@ -1,5 +1,6 @@
-import type { UmbCropModel, UmbFocalPointModel } from '../../property-editors/index.js';
+import type { UmbCropModel, UmbFocalPointModel, UmbMediaPickerPropertyValue } from '../../property-editors/index.js';
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL, type UmbMediaCardItemModel } from '../../modals/index.js';
+import { UmbRichMediaPickerContext } from './input-rich-media.context.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
@@ -12,15 +13,32 @@ const elementName = 'umb-input-rich-media';
 @customElement(elementName)
 export class UmbInputRichMediaElement extends UmbInputMediaElement {
 	#modal: UmbModalRouteRegistrationController;
+	#pickerContext = new UmbRichMediaPickerContext(this);
 
-	crop?: UmbCropModel;
-	focalPoint?: UmbFocalPointModel;
-
-	@property({ type: Boolean })
-	focalPointEnabled = false;
+	private _value: Array<UmbMediaPickerPropertyValue> = [];
+	@property()
+	public set value(value: any) {
+		this._value = value as Array<UmbMediaPickerPropertyValue>;
+	}
+	public get value() {
+		return this._value;
+	}
 
 	@property({ type: Array })
-	crops: Array<UmbCropModel> = [];
+	public set preselectedCrops(crops: Array<UmbCropModel>) {
+		this.#pickerContext.setPreselectedCrops(crops);
+	}
+	public get preselectedCrops(): Array<UmbCropModel> {
+		return this.#pickerContext.getPreselectedCrops();
+	}
+
+	@property({ type: Boolean })
+	public set focalPointEnabled(enabled: boolean) {
+		this.#pickerContext.setFocalPointEnabled(enabled);
+	}
+	public get focalPointEnabled(): boolean {
+		return this.#pickerContext.getFocalPointEnabled();
+	}
 
 	@state()
 	private _modalRoute?: UmbModalRouteBuilder;
@@ -43,7 +61,6 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 
 	constructor() {
 		super();
-
 		this.#modal = new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
 			.addAdditionalPath(`:index`)
 			.addUniquePaths(['propertyAlias', 'variantId'])
@@ -57,12 +74,12 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 				const unique = this.selection[index];
 
 				return {
-					data: { cropOptions: this.crops, focalPointEnabled: this.focalPointEnabled, unique },
+					data: { cropOptions: this.preselectedCrops, focalPointEnabled: this.focalPointEnabled, unique },
 					value: { crops: [], focalPoint: { left: 0.5, top: 0.5 }, src: '' },
 				};
 			})
 			.onSubmit((value) => {
-				console.log(value);
+				console.log('callback', value);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder;
@@ -70,34 +87,6 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 
 		this.pickerContextObservers();
 		this.addValidators();
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-
-		this.#modal = new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
-			.addAdditionalPath(`:index`)
-			.addUniquePaths(['propertyAlias', 'variantId'])
-			.onSetup((params) => {
-				const indexParam = params.index;
-				if (!indexParam) return false;
-				const index: number | null = parseInt(params.index);
-				if (Number.isNaN(index)) return false;
-
-				// Use the index to find the item:
-				const unique = this.selection[index];
-
-				return {
-					data: { cropOptions: this.crops, focalPointEnabled: this.focalPointEnabled, unique },
-					value: { crops: this.crops, focalPoint: { left: 0.5, top: 0.5 }, src: '' },
-				};
-			})
-			.onSubmit((value) => {
-				console.log(value);
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._modalRoute = routeBuilder;
-			});
 	}
 
 	async #onUploadCompleted(e: CustomEvent) {

@@ -18,6 +18,8 @@ import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 @customElement('umb-property-editor-ui-media-picker')
 export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	#value: Array<UmbMediaPickerPropertyValue> = [];
+
 	@property({ attribute: false })
 	public set value(value: Array<UmbMediaPickerPropertyValue>) {
 		this.#value = value;
@@ -35,7 +37,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	private _focalPointEnabled: boolean = false;
 
 	@state()
-	private _crops: Array<UmbCropModel> = [];
+	private _preselectedCrops: Array<UmbCropModel> = [];
 
 	@state()
 	private _allowedMediaTypes: Array<string> = [];
@@ -46,7 +48,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		this._multiple = Boolean(config.getValueByAlias('multiple'));
 		this._startNode = config.getValueByAlias<string>('startNodeId') ?? '';
 		this._focalPointEnabled = Boolean(config.getValueByAlias('enableFocalPoint'));
-		this._crops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
+		this._preselectedCrops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
 
 		const filter = config.getValueByAlias<string>('filter');
 		this._allowedMediaTypes = filter?.split(',') ?? [];
@@ -70,8 +72,6 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 
 	@state()
 	private _limitMax: number = Infinity;
-
-	#value: Array<UmbMediaPickerPropertyValue> = [];
 
 	@state()
 	private _alias?: string;
@@ -111,12 +111,13 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 			<umb-input-rich-media
 				@change=${this.#onChange}
 				?multiple=${this._multiple}
+				.value=${this.value}
 				.variantId=${this._variantId}
 				.alias=${this._alias}
 				.allowedContentTypeIds=${this._allowedMediaTypes}
 				.startNode=${this._startNode}
 				.focalPointEnabled=${this._focalPointEnabled}
-				.crops=${this._crops}
+				.preselectedCrops=${this._preselectedCrops}
 				.selection=${this._items}
 				.min=${this._limitMin}
 				.max=${this._limitMax}>
