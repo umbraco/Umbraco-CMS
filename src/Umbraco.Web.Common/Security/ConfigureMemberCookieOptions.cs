@@ -60,7 +60,17 @@ public sealed class ConfigureMemberCookieOptions : IConfigureNamedOptions<Cookie
             },
             OnRedirectToAccessDenied = ctx =>
             {
-                new CookieAuthenticationEvents().OnRedirectToAccessDenied(ctx);
+                // When the controller is an UmbracoAPIController, we want to return a StatusCode instead of a redirect.
+                // All other cases should use the default Redirect of the CookieAuthenticationEvent.
+                var controllerDescriptor = ctx.HttpContext.GetEndpoint()?.Metadata
+                    .OfType<ControllerActionDescriptor>()
+                    .FirstOrDefault();
+
+                if (!controllerDescriptor?.ControllerTypeInfo.IsSubclassOf(typeof(UmbracoApiController)) ?? false)
+                {
+                    new CookieAuthenticationEvents().OnRedirectToAccessDenied(ctx);
+                }
+
                 return Task.CompletedTask;
             },
         };

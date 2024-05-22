@@ -15,4 +15,10 @@ public static class TypeLoaderExtensions
     /// </summary>
     internal static IEnumerable<Type> GetSurfaceControllers(this TypeLoader typeLoader)
         => typeLoader.GetTypes<SurfaceController>();
+
+    /// <summary>
+    ///     Gets all types implementing <see cref="UmbracoApiController" />.
+    /// </summary>
+    internal static IEnumerable<Type> GetUmbracoApiControllers(this TypeLoader typeLoader)
+        => typeLoader.GetTypes<UmbracoApiController>();
 }

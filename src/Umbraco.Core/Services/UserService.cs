@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Notifications;
@@ -984,20 +985,30 @@ internal class UserService : RepositoryService, IUserService
 
         // We have to resolve the keys to ids to be compatible with the repository, this could be done in the factory,
         // but I'd rather keep the ids out of the service API as much as possible.
-        int[]? startContentIds = GetIdsFromKeys(model.ContentStartNodeKeys, UmbracoObjectTypes.Document);
+        List<int>? startContentIds = GetIdsFromKeys(model.ContentStartNodeKeys, UmbracoObjectTypes.Document);
 
-        if (startContentIds is null || startContentIds.Length != model.ContentStartNodeKeys.Count)
+        if (startContentIds is null || startContentIds.Count != model.ContentStartNodeKeys.Count)
         {
             scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.ContentStartNodeNotFound, existingUser);
         }
 
-        int[]? startMediaIds = GetIdsFromKeys(model.MediaStartNodeKeys, UmbracoObjectTypes.Media);
+        List<int>? startMediaIds = GetIdsFromKeys(model.MediaStartNodeKeys, UmbracoObjectTypes.Media);
 
-        if (startMediaIds is null || startMediaIds.Length != model.MediaStartNodeKeys.Count)
+        if (startMediaIds is null || startMediaIds.Count != model.MediaStartNodeKeys.Count)
         {
             scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MediaStartNodeNotFound, existingUser);
+        }
+
+        if (model.HasContentRootAccess)
+        {
+            startContentIds.Add(Constants.System.Root);
+        }
+
+        if (model.HasMediaRootAccess)
+        {
+            startMediaIds.Add(Constants.System.Root);
         }
 
         Attempt<string?> isAuthorized = _userEditorAuthorizationHelper.IsAuthorized(
@@ -1085,15 +1096,15 @@ internal class UserService : RepositoryService, IUserService
         UserUpdateModel source,
         ISet<IUserGroup> sourceUserGroups,
         IUser target,
-        int[]? startContentIds,
-        int[]? startMediaIds)
+        List<int> startContentIds,
+        List<int> startMediaIds)
     {
         target.Name = source.Name;
         target.Language = source.LanguageIsoCode;
         target.Email = source.Email;
         target.Username = source.UserName;
-        target.StartContentIds = startContentIds;
-        target.StartMediaIds = startMediaIds;
+        target.StartContentIds = startContentIds.ToArray();
+        target.StartMediaIds = startMediaIds.ToArray();
 
         target.ClearGroups();
         foreach (IUserGroup group in sourceUserGroups)
@@ -1152,13 +1163,13 @@ internal class UserService : RepositoryService, IUserService
 
     private static bool IsEmailValid(string email) => new EmailAddressAttribute().IsValid(email);
 
-    private int[]? GetIdsFromKeys(IEnumerable<Guid>? guids, UmbracoObjectTypes type)
+    private List<int>? GetIdsFromKeys(IEnumerable<Guid>? guids, UmbracoObjectTypes type)
     {
-        int[]? keys = guids?
+        var keys = guids?
             .Select(x => _entityService.GetId(x, type))
             .Where(x => x.Success)
             .Select(x => x.Result)
-            .ToArray();
+            .ToList();
 
         return keys;
     }
@@ -2329,7 +2340,18 @@ internal class UserService : RepositoryService, IUserService
         }
 
         // We don't know what the entity type may be, so we have to get the entire entity :(
-        var idKeyMap = keys.ToDictionary(key => _entityService.Get(key)!.Id);
+        Dictionary<int, Guid> idKeyMap = new();
+        foreach (Guid key in keys)
+        {
+            IEntitySlim? entity = _entityService.Get(key);
+
+            if (entity is null)
+            {
+                return Attempt.FailWithStatus(UserOperationStatus.NodeNotFound, Enumerable.Empty<NodePermissions>());
+            }
+
+            idKeyMap[entity.Id] = key;
+        }
 
         EntityPermissionCollection permissionCollection = _userGroupRepository.GetPermissions(user.Groups.ToArray(), true, idKeyMap.Keys.ToArray());
 

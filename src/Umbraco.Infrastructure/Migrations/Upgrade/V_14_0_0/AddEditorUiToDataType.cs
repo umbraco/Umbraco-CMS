@@ -27,17 +27,9 @@ public class AddEditorUiToDataType : MigrationBase
     protected override void Migrate()
     {
         var dataEditorSplitCollectionData = _keyValueService.GetValue("migrateDataEditorSplitCollectionData");
-        if (dataEditorSplitCollectionData.IsNullOrWhiteSpace())
-        {
-            return;
-        }
-
-        DataTypeEditorAliasMigrationData[]? migrationData = _jsonSerializer.Deserialize<DataTypeEditorAliasMigrationData[]>(dataEditorSplitCollectionData);
-        if (migrationData?.Any() is not true)
-        {
-            _logger.LogError("No migration data was found for the data editor split. Please make sure you're upgrading from the latest V13. Any data types based on custom property editors may not work correctly.");
-            return;
-        }
+        DataTypeEditorAliasMigrationData[]? migrationData = dataEditorSplitCollectionData.IsNullOrWhiteSpace() is false
+            ? _jsonSerializer.Deserialize<DataTypeEditorAliasMigrationData[]>(dataEditorSplitCollectionData)
+            : null;
 
         Sql<ISqlContext> sql = Sql()
             .Select<DataTypeDto>()
@@ -67,7 +59,7 @@ public class AddEditorUiToDataType : MigrationBase
                 Constants.PropertyEditors.Aliases.MediaPicker3 => "Umb.PropertyEditorUi.MediaPicker",
                 Constants.PropertyEditors.Aliases.MemberPicker => "Umb.PropertyEditorUi.MemberPicker",
                 Constants.PropertyEditors.Aliases.MemberGroupPicker => "Umb.PropertyEditorUi.MemberGroupPicker",
-                Constants.PropertyEditors.Aliases.MultiNodeTreePicker => "Umb.PropertyEditorUi.TreePicker",
+                Constants.PropertyEditors.Aliases.MultiNodeTreePicker => "Umb.PropertyEditorUi.ContentPicker",
                 Constants.PropertyEditors.Aliases.MultipleTextstring => "Umb.PropertyEditorUi.MultipleTextString",
                 Constants.PropertyEditors.Aliases.Label => "Umb.PropertyEditorUi.Label",
                 Constants.PropertyEditors.Aliases.RadioButtonList => "Umb.PropertyEditorUi.RadioButtonList",
@@ -88,7 +80,7 @@ public class AddEditorUiToDataType : MigrationBase
 
             if (dataTypeDto.EditorUiAlias is null)
             {
-                DataTypeEditorAliasMigrationData? dataTypeMigrationData = migrationData.FirstOrDefault(md => md.DataTypeId == dataTypeDto.NodeId);
+                DataTypeEditorAliasMigrationData? dataTypeMigrationData = migrationData?.FirstOrDefault(md => md.DataTypeId == dataTypeDto.NodeId);
                 if (dataTypeMigrationData is not null)
                 {
                     // the V13 "data type split data collector" works like this:

@@ -1,8 +1,10 @@
 using Umbraco.Cms.Api.Management.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Api.Management.ViewModels.User.Item;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -68,9 +70,11 @@ public class UserPresentationFactory : IUserPresentationFactory
             CreateDate = user.CreateDate,
             UpdateDate = user.UpdateDate,
             State = user.UserState,
-            UserGroupIds = new HashSet<Guid>(user.Groups.Select(x => x.Key)),
+            UserGroupIds = new HashSet<ReferenceByIdModel>(user.Groups.Select(x => new ReferenceByIdModel(x.Key))),
             DocumentStartNodeIds = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
+            HasDocumentRootAccess = HasRootAccess(user.StartContentIds),
             MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
+            HasMediaRootAccess = HasRootAccess(user.StartMediaIds),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
             LastLockoutDate = user.LastLockoutDate,
@@ -98,7 +102,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Email = requestModel.Email,
             Name = requestModel.Name,
             UserName = requestModel.UserName,
-            UserGroupKeys = requestModel.UserGroupIds,
+            UserGroupKeys = requestModel.UserGroupIds.Select(x => x.Id).ToHashSet(),
         };
 
         return await Task.FromResult(createModel);
@@ -111,7 +115,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Email = requestModel.Email,
             Name = requestModel.Name,
             UserName = requestModel.UserName,
-            UserGroupKeys = requestModel.UserGroupIds,
+            UserGroupKeys = requestModel.UserGroupIds.Select(x => x.Id).ToHashSet(),
             Message = requestModel.Message,
         };
 
@@ -158,11 +162,13 @@ public class UserPresentationFactory : IUserPresentationFactory
             Name = updateModel.Name,
             UserName = updateModel.UserName,
             LanguageIsoCode = updateModel.LanguageIsoCode,
-            ContentStartNodeKeys = updateModel.DocumentStartNodeIds,
-            MediaStartNodeKeys = updateModel.MediaStartNodeIds,
+            ContentStartNodeKeys = updateModel.DocumentStartNodeIds.Select(x => x.Id).ToHashSet(),
+            HasContentRootAccess = updateModel.HasDocumentRootAccess,
+            MediaStartNodeKeys = updateModel.MediaStartNodeIds.Select(x => x.Id).ToHashSet(),
+            HasMediaRootAccess = updateModel.HasMediaRootAccess,
         };
 
-        model.UserGroupKeys = updateModel.UserGroupIds;
+        model.UserGroupKeys = updateModel.UserGroupIds.Select(x => x.Id).ToHashSet();
 
         return await Task.FromResult(model);
     }
@@ -172,8 +178,10 @@ public class UserPresentationFactory : IUserPresentationFactory
         var presentationUser = CreateResponseModel(user);
         var presentationGroups = await _userGroupPresentationFactory.CreateMultipleAsync(user.Groups);
         var languages = presentationGroups.SelectMany(x => x.Languages).Distinct().ToArray();
-        var mediaStartNodeKeys = GetKeysFromIds(user.CalculateMediaStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Media);
-        var documentStartNodeKeys = GetKeysFromIds(user.CalculateContentStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Document);
+        var mediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+        var mediaStartNodeKeys = GetKeysFromIds(mediaStartNodeIds, UmbracoObjectTypes.Media);
+        var contentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
+        var documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
 
         var permissions = presentationGroups.SelectMany(x => x.Permissions).ToHashSet();
         var fallbackPermissions = presentationGroups.SelectMany(x => x.FallbackPermissions).ToHashSet();
@@ -192,7 +200,9 @@ public class UserPresentationFactory : IUserPresentationFactory
             AvatarUrls = presentationUser.AvatarUrls,
             LanguageIsoCode = presentationUser.LanguageIsoCode,
             MediaStartNodeIds = mediaStartNodeKeys,
+            HasMediaRootAccess = HasRootAccess(mediaStartNodeIds),
             DocumentStartNodeIds = documentStartNodeKeys,
+            HasDocumentRootAccess = HasRootAccess(contentStartNodeIds),
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages,
@@ -202,17 +212,19 @@ public class UserPresentationFactory : IUserPresentationFactory
         });
     }
 
-    private ISet<Guid> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
+    private ISet<ReferenceByIdModel> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
     {
-        IEnumerable<Guid>? keys = ids?
+        IEnumerable<ReferenceByIdModel>? models = ids?
             .Select(x => _entityService.GetKey(x, type))
             .Where(x => x.Success)
-            .Select(x => x.Result);
+            .Select(x => x.Result)
+            .Select(x => new ReferenceByIdModel(x));
 
-        return keys is null
-            ? new HashSet<Guid>()
-            : new HashSet<Guid>(keys);
+        return models is null
+            ? new HashSet<ReferenceByIdModel>()
+            : new HashSet<ReferenceByIdModel>(models);
     }
 
-
+    private bool HasRootAccess(IEnumerable<int>? startNodeIds)
+        => startNodeIds?.Contains(Constants.System.Root) is true;
 }

@@ -210,7 +210,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
-    public async Task<UserGroupOperationStatus> UpdateUserGroupsOnUsersAsync(
+    public async Task<Attempt<UserGroupOperationStatus>> UpdateUserGroupsOnUsersAsync(
         ISet<Guid> userGroupKeys,
         ISet<Guid> userKeys)
     {
@@ -233,7 +233,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
                 if (adminGroup is not null && adminGroup.UserCount <= usersToDeAdmin.Length)
                 {
                     scope.Complete();
-                    return UserGroupOperationStatus.AdminGroupCannotBeEmpty;
+                    return Attempt.Fail(UserGroupOperationStatus.AdminGroupCannotBeEmpty);
                 }
             }
         }
@@ -251,7 +251,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         scope.Complete();
 
-        return UserGroupOperationStatus.Success;
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
     private Attempt<UserGroupOperationStatus> ValidateUserGroupDeletion(IUserGroup? userGroup)
@@ -263,7 +263,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         if (userGroup.IsSystemUserGroup())
         {
-            return Attempt.Fail(UserGroupOperationStatus.IsSystemUserGroup);
+            return Attempt.Fail(UserGroupOperationStatus.CanNotDeleteIsSystemUserGroup);
         }
 
         return Attempt.Succeed(UserGroupOperationStatus.Success);
@@ -393,7 +393,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
-    public async Task<UserGroupOperationStatus> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey)
+    public async Task<Attempt<UserGroupOperationStatus>> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -401,7 +401,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         if (resolveAttempt.Success is false)
         {
-            return resolveAttempt.Status;
+            return Attempt.Fail(resolveAttempt.Status);
         }
 
         ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result;
@@ -423,10 +423,10 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         scope.Complete();
 
-        return UserGroupOperationStatus.Success;
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
-    public async Task<UserGroupOperationStatus> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey)
+    public async Task<Attempt<UserGroupOperationStatus>> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -434,7 +434,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         if (resolveAttempt.Success is false)
         {
-            return resolveAttempt.Status;
+            return Attempt.Fail(resolveAttempt.Status);
         }
 
         ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result;
@@ -450,7 +450,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             // We can't remove a user from a group they're not part of.
             if (user.Groups.Select(x => x.Key).Contains(resolvedModel.UserGroup.Key) is false)
             {
-                return UserGroupOperationStatus.UserNotInGroup;
+                return Attempt.Fail(UserGroupOperationStatus.UserNotInGroup);
             }
 
             user.RemoveGroup(resolvedModel.UserGroup.Alias);
@@ -461,14 +461,14 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         if (resolvedModel.UserGroup.Key == Constants.Security.AdminGroupKey
             && resolvedModel.UserGroup.UserCount <= resolvedModel.Users.Length)
         {
-            return UserGroupOperationStatus.AdminGroupCannotBeEmpty;
+            return Attempt.Fail(UserGroupOperationStatus.AdminGroupCannotBeEmpty);
         }
 
         _userService.Save(resolvedModel.Users);
 
         scope.Complete();
 
-        return UserGroupOperationStatus.Success;
+        return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
     /// <summary>
@@ -520,10 +520,16 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return UserGroupOperationStatus.NotFound;
         }
 
-        IUserGroup? existing = _userGroupRepository.Get(userGroup.Alias);
-        if (existing is not null && existing.Key != userGroup.Key)
+        IUserGroup? existingByAlias = _userGroupRepository.Get(userGroup.Alias);
+        if (existingByAlias is not null && existingByAlias.Key != userGroup.Key)
         {
             return UserGroupOperationStatus.DuplicateAlias;
+        }
+
+        IUserGroup? existingByKey = await GetAsync(userGroup.Key);
+        if (existingByKey is not null && existingByKey.IsSystemUserGroup() && existingByKey.Alias != userGroup.Alias)
+        {
+            return UserGroupOperationStatus.CanNotUpdateAliasIsSystemUserGroup;
         }
 
         return UserGroupOperationStatus.Success;
