@@ -93,7 +93,15 @@ export class UmbAppElement extends UmbLitElement {
 							sessionStorage.removeItem(UMB_STORAGE_REDIRECT_URL);
 							currentRoute = savedRoute.endsWith('logout') ? currentRoute : savedRoute;
 						}
-						history.replaceState(null, '', currentRoute);
+
+						const url = new URL(currentRoute);
+						const isLocalRoute = url.origin === window.location.origin && url.pathname.startsWith(this.backofficePath);
+
+						if (isLocalRoute) {
+							history.replaceState(null, '', url.pathname + url.search + url.hash);
+						} else {
+							window.location.href = url.toString();
+						}
 					});
 				}
 
