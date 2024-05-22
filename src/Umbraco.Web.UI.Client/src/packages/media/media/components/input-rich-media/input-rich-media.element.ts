@@ -19,7 +19,7 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 
 	@property({ type: Array })
 	public set richValue(value: Array<UmbMediaPickerPropertyValue>) {
-		this.#pickerContext.setSelection(value.map((x) => x.mediaKey));
+		this.#pickerContext.setSelection(value?.map((x) => x.mediaKey) ?? []);
 		this._richValue = value;
 	}
 	public get richValue(): Array<UmbMediaPickerPropertyValue> {
