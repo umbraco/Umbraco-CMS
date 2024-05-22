@@ -44,7 +44,15 @@ const treeItem: ManifestTreeItem = {
 	name: 'Media Tree Item',
 	element: () => import('./tree-item/media-tree-item.element.js'),
 	api: () => import('./tree-item/media-tree-item.context.js'),
-	forEntityTypes: [UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_ENTITY_TYPE],
+	forEntityTypes: [UMB_MEDIA_ENTITY_TYPE],
+};
+
+const rootTreeItem: ManifestTreeItem = {
+	type: 'treeItem',
+	kind: 'default',
+	alias: 'Umb.TreeItem.Media.Root',
+	name: 'Media Tree Root',
+	forEntityTypes: [UMB_MEDIA_ROOT_ENTITY_TYPE],
 };
 
 export const manifests: Array<ManifestTypes> = [
@@ -52,5 +60,6 @@ export const manifests: Array<ManifestTypes> = [
 	treeStore,
 	tree,
 	treeItem,
+	rootTreeItem,
 	...reloadTreeItemChildrenManifests,
 ];
