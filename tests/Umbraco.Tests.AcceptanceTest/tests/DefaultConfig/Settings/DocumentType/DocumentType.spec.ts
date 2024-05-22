@@ -415,7 +415,6 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.clickReorderButton();
       // Drag and Drop
       await umbracoUi.waitForTimeout(5000);
-
       const dragFromLocator = umbracoUi.documentType.getTextLocatorWithName(dataTypeNameTwo);
       const dragToLocator = umbracoUi.documentType.getTextLocatorWithName(dataTypeName);
       await umbracoUi.documentType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 5);
@@ -439,8 +438,8 @@ test.describe('Document Type tests @smoke', () => {
       await umbracoUi.documentType.goToDocumentType(documentTypeName);
 
       // Act
-      const dragToLocator = umbracoUi.documentType.getTabLocatorWithName(tabName)
-      const dragFromLocator = umbracoUi.documentType.getTabLocatorWithName(secondTabName)
+      const dragToLocator = umbracoUi.documentType.getTabLocatorWithName(tabName);
+      const dragFromLocator = umbracoUi.documentType.getTabLocatorWithName(secondTabName);
       await umbracoUi.documentType.clickReorderButton();
       await umbracoUi.documentType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 10);
       await umbracoUi.documentType.clickIAmDoneReorderingButton();
