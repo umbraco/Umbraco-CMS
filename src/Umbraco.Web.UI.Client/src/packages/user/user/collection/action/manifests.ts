@@ -10,7 +10,7 @@ export const createManifest: ManifestTypes = {
 	api: UmbCreateUserCollectionAction,
 	weight: 200,
 	meta: {
-		label: 'Create',
+		label: '#general_create',
 	},
 	conditions: [
 		{
