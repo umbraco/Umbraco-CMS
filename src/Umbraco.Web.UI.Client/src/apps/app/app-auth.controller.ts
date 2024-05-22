@@ -1,14 +1,10 @@
-import {
-	UMB_AUTH_CONTEXT,
-	UMB_MODAL_APP_AUTH,
-	UMB_STORAGE_REDIRECT_URL,
-	type UmbUserLoginState,
-} from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH, type UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { setStoredPath } from '@umbraco-cms/backoffice/utils';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
@@ -71,7 +67,12 @@ export class UmbAppAuthController extends UmbControllerBase {
 		}
 
 		// Save the current state
-		sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, window.location.href);
+		let currentUrl = window.location.href;
+		const searchParams = new URLSearchParams(window.location.search);
+		if (searchParams.has('returnPath')) {
+			currentUrl = decodeURIComponent(searchParams.get('returnPath') || currentUrl);
+		}
+		setStoredPath(currentUrl);
 
 		// Figure out which providers are available
 		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders(umbExtensionsRegistry));
