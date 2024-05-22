@@ -1,13 +1,13 @@
-import type { UmbInputImageCropperFieldElement } from '../../components/input-image-cropper/image-cropper-field.element.js';
-import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
 import { UmbMediaUrlRepository } from '../../repository/index.js';
 import type { UmbCropModel } from '../../property-editors/index.js';
+import type { UmbInputImageCropperFieldElement } from '../../components/input-image-cropper/image-cropper-field.element.js';
+import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
 import type {
 	UmbImageCropperEditorModalData,
 	UmbImageCropperEditorModalValue,
 } from './image-cropper-editor-modal.token.js';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 /** TODO Make some of the components from property editor image cropper reuseable for this modal... */
 
@@ -22,6 +22,9 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	private _imageCropperValue?: UmbImageCropperPropertyEditorValue;
 
 	@state()
+	private _key: string = '';
+
+	@state()
 	private _unique: string = '';
 
 	@state()
@@ -33,6 +36,8 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 
 	connectedCallback(): void {
 		super.connectedCallback();
+
+		this._key = this.data?.key ?? '';
 		this._unique = this.data?.unique ?? '';
 
 		this._focalPointEnabled = this.data?.focalPointEnabled ?? false;
@@ -42,6 +47,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	}
 
 	async #getSrc() {
+		console.log('getSrc', this.value);
 		const { data } = await this.#urlRepository.requestItems([this._unique]);
 		const item = data?.[0];
 
@@ -49,8 +55,8 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		const value: UmbImageCropperPropertyEditorValue = {
 			...this.value,
 			src: item.url,
-			crops: this._crops,
-			focalPoint: { left: 0.5, top: 0.5 },
+			crops: this.value.crops?.length ? this.value.crops : this._crops,
+			focalPoint: this.value.focalPoint ?? { left: 0.5, top: 0.5 },
 		};
 		this._imageCropperValue = value;
 	}
@@ -59,7 +65,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		const value = (e.target as UmbInputImageCropperFieldElement).value;
 		if (!value) return;
 
-		this.value = { unique: this._unique, crops: value.crops, focalPoint: value.focalPoint };
+		this.value = { key: this._key, unique: this._unique, crops: value.crops, focalPoint: value.focalPoint };
 	}
 
 	render() {
@@ -85,6 +91,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 				min-height: 100px;
 				min-width: 100px;
 			}
+
 			img {
 				max-width: 80%;
 				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');

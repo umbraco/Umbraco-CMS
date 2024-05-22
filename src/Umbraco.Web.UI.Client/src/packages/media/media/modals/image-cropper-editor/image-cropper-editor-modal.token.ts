@@ -3,12 +3,14 @@ import type { UmbCropModel } from '../../property-editors/index.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbImageCropperEditorModalData {
+	key: string;
 	unique: string;
 	focalPointEnabled: boolean;
 	cropOptions: Array<UmbCropModel>;
 }
 
 export interface UmbImageCropperEditorModalValue {
+	key: string;
 	unique: string;
 	crops: Array<UmbImageCropperCrop>;
 	focalPoint: { left: number; top: number };
