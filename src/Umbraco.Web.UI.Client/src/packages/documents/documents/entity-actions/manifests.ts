@@ -86,6 +86,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			},
 		],
 	},
+	/* TODO: Implement Permissions Entity Action
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -108,6 +109,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			},
 		],
 	},
+	*/
 	{
 		type: 'entityAction',
 		kind: 'default',
