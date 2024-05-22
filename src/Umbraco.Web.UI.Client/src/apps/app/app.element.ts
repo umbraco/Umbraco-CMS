@@ -173,9 +173,13 @@ export class UmbAppElement extends UmbLitElement {
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
-			// If the runtime level is "install" we should clear any cached tokens
+			// If the runtime level is "install" or ?status=false is set, we should clear any cached tokens
 			// else we should try and set the auth status
-			if (this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL) {
+			const searchParams = new URLSearchParams(window.location.search);
+			if (
+				(searchParams.has('status') && searchParams.get('status') === 'false') ||
+				this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL
+			) {
 				await this.#authContext.clearTokenStorage();
 			} else {
 				await this.#setAuthStatus();
