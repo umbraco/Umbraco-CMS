@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.SignalR;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Preview;
 
@@ -26,13 +28,17 @@ public class PreviewHubUpdater : INotificationAsyncHandler<ContentCacheRefresher
         IHubContext<PreviewHub, IPreviewHub> hubContextInstance = _hubContext.Value;
         foreach (ContentCacheRefresher.JsonPayload payload in payloads)
         {
-            var key = payload.Key; // keep it simple for now, ignore ChangeTypes
-            if (key.HasValue is false)
+            if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) is false)
+            {
+                continue;
+            }
+
+            if (payload.Key.HasValue is false)
             {
                 throw new InvalidOperationException($"No key is set for payload with id {payload.Id}");
             }
 
-            await hubContextInstance.Clients.All.refreshed(key.Value);
+            await hubContextInstance.Clients.All.refreshed(payload.Key.Value);
         }
     }
 }
