@@ -17,13 +17,13 @@ public class BlocksInRichTextTelemetryProvider : IDetailedTelemetryProvider
 
     public IEnumerable<UsageInformation> GetInformation()
     {
-        IEnumerable<IDataType> richTextDataTypes = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.TinyMce).ToArray();
+        IEnumerable<IDataType> richTextDataTypes = _dataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.RichText).GetAwaiter().GetResult().ToArray();
         int registeredBlocks = 0;
         yield return new UsageInformation(Constants.Telemetry.RichTextEditorCount, richTextDataTypes.Count());
 
         foreach (IDataType richTextDataType in richTextDataTypes)
         {
-            if (richTextDataType.Configuration is not RichTextConfiguration richTextConfiguration)
+            if (richTextDataType.ConfigurationObject is not RichTextConfiguration richTextConfiguration)
             {
                 // Might be some custom data type, skip it
                 continue;

@@ -151,7 +151,7 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
         Endpoint endpoint = _endpointDataSource.Endpoints.First(x =>
         {
             ControllerActionDescriptor? descriptor = x.Metadata.GetMetadata<ControllerActionDescriptor>();
-            return descriptor?.ControllerTypeInfo.Name == "InstallController"
+            return descriptor?.ControllerTypeInfo.Name == "BackOfficeDefaultController"
                    && descriptor.ActionName == "Index";
         });
 
@@ -184,9 +184,8 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
 
             SetEndpoint(candidates, _installEndpoint.Value, new RouteValueDictionary
             {
-                [Constants.Web.Routing.ControllerToken] = "Install",
+                [Constants.Web.Routing.ControllerToken] = "BackOfficeDefault",
                 [Constants.Web.Routing.ActionToken] = "Index",
-                [Constants.Web.Routing.AreaToken] = Constants.Web.Mvc.InstallArea,
             });
 
             return Task.FromResult(true);
