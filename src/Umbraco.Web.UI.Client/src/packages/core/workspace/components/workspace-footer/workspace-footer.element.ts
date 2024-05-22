@@ -80,6 +80,11 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 				width: 100%;
 			}
 
+			/* prevents text in action buttons from wrapping */
+			umb-extension-with-api-slot {
+				text-wrap: nowrap;
+			}
+
 			umb-extension-slot[slot='actions'] {
 				display: flex;
 				gap: var(--uui-size-space-2);
