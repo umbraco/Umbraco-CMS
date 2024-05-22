@@ -57,6 +57,7 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 			},
 		],
 	},
+	/* TODO: implement bulk duplicate action
 	{
 		type: 'entityBulkAction',
 		kind: 'default',
@@ -79,6 +80,8 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 			},
 		],
 	},
+	*/
+	/* TODO: implement bulk move action
 	{
 		type: 'entityBulkAction',
 		kind: 'default',
@@ -101,6 +104,8 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 			},
 		],
 	},
+	*/
+	/* TODO: implement bulk trash action
 	{
 		type: 'entityBulkAction',
 		kind: 'default',
@@ -123,4 +128,5 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 			},
 		],
 	},
+	*/
 ];
