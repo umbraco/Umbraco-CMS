@@ -7,7 +7,5 @@ public interface IPreviewHub
 
     Task refreshed(Guid key);
 
-    Task allRefreshed();
-
     // ReSharper restore InconsistentNaming
 }

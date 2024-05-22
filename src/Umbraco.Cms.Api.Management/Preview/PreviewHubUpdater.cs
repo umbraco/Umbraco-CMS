@@ -38,7 +38,8 @@ public class PreviewHubUpdater : INotificationAsyncHandler<ContentCacheRefresher
         {
             if (payload.ChangeTypes is TreeChangeTypes.RefreshAll)
             {
-                await hubContextInstance.Clients.All.allRefreshed();
+                // pre v14, the payload was checked on the Id (int) resulting in a 0 on RefreshAll, the client on the other hand did not handle this
+                // => ignore refreshAll
                 continue;
             }
 
