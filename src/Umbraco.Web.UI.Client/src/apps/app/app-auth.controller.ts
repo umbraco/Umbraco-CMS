@@ -71,7 +71,13 @@ export class UmbAppAuthController extends UmbControllerBase {
 		}
 
 		// Save the current state
-		sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, window.location.href);
+		let currentUrl = window.location.href;
+		const searchParams = new URLSearchParams(window.location.search);
+		if (searchParams.has('returnPath')) {
+			currentUrl = decodeURIComponent(searchParams.get('returnPath') || currentUrl);
+		}
+		const safeUrl = new URL(currentUrl, window.location.origin);
+		sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, safeUrl.toString());
 
 		// Figure out which providers are available
 		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders(umbExtensionsRegistry));
