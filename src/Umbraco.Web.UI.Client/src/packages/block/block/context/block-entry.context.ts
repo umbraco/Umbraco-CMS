@@ -362,6 +362,7 @@ export abstract class UmbBlockEntryContext<
 
 	async requestDelete() {
 		const blockName = this.getLabel();
+		// TODO: Localizations missing [NL]
 		await umbConfirmModal(this, {
 			headline: `Delete ${blockName}`,
 			content: `Are you sure you want to delete this ${blockName}?`,

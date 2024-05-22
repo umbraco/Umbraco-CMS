@@ -1,7 +1,7 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import type { UmbBlockGridWorkspaceData } from '../index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbArrayState, appendToFrozenArray, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, appendToFrozenArray, pushAtToUniqueArray } from '@umbraco-cms/backoffice/observable-api';
 import { type UmbBlockDataType, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 
@@ -71,7 +71,10 @@ export class UmbBlockGridManagerContext<
 				// Append the layout entry to be inserted and unfreeze the rest of the data:
 				const areas = currentEntry.areas.map((x) =>
 					x.key === areaKey
-						? { ...x, items: appendToFrozenArray(x.items, insert, (x) => x.contentUdi === insert.contentUdi) }
+						? {
+								...x,
+								items: pushAtToUniqueArray([...x.items], insert, (x) => x.contentUdi === insert.contentUdi, index),
+							}
 						: x,
 				);
 				return appendToFrozenArray(
