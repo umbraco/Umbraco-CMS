@@ -37,10 +37,10 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	 */
 	@property({ type: Number })
 	public set min(value: number) {
-		this.#pickerContext.min = value;
+		this.pickerContext.min = value;
 	}
 	public get min(): number {
-		return this.#pickerContext.min;
+		return this.pickerContext.min;
 	}
 
 	/**
@@ -60,10 +60,10 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	 */
 	@property({ type: Number })
 	public set max(value: number) {
-		this.#pickerContext.max = value;
+		this.pickerContext.max = value;
 	}
 	public get max(): number {
-		return this.#pickerContext.max;
+		return this.pickerContext.max;
 	}
 
 	/**
@@ -76,11 +76,11 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public set selection(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+		this.pickerContext.setSelection(ids);
 		this.#sorter.setModel(ids);
 	}
 	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
+		return this.pickerContext.getSelection();
 	}
 
 	@property({ type: Array })
@@ -110,7 +110,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	@state()
 	protected items?: Array<UmbMediaCardItemModel>;
 
-	#pickerContext = new UmbMediaPickerContext(this);
+	pickerContext = new UmbMediaPickerContext(this);
 
 	constructor() {
 		super();
@@ -124,13 +124,13 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 				this.editMediaPath = routeBuilder({});
 			});
 
-		this.pickerContextObservers();
+		this.observeContextItems();
 		this.addValidators();
 	}
 
-	protected pickerContextObservers() {
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.#pickerContext.cardItems, (cardItems) => {
+	protected observeContextItems() {
+		this.observe(this.pickerContext.selection, (selection) => (this.value = selection.join(',')));
+		this.observe(this.pickerContext.cardItems, (cardItems) => {
 			this.items = cardItems;
 		});
 	}
@@ -139,12 +139,12 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => !!this.min && this.pickerContext.getSelection().length < this.min,
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
+			() => !!this.max && this.pickerContext.getSelection().length > this.max,
 		);
 	}
 
@@ -160,7 +160,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	};
 
 	#openPicker() {
-		this.#pickerContext.openPicker({
+		this.pickerContext.openPicker({
 			multiple: this.multiple,
 			startNode: this.startNode,
 			pickableFilter: this.#pickableFilter,
@@ -168,7 +168,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	protected onRemove(item: UmbMediaCardItemModel) {
-		this.#pickerContext.requestRemoveItem(item.unique);
+		this.pickerContext.requestRemoveItem(item.unique);
 	}
 
 	render() {

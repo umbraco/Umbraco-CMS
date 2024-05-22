@@ -1,18 +1,17 @@
 import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../../property-editors/index.js';
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL, type UmbMediaCardItemModel } from '../../modals/index.js';
-import { UmbRichMediaPickerContext } from './input-rich-media.context.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInputMediaElement, type UmbUploadableFileModel } from '@umbraco-cms/backoffice/media';
 import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 const elementName = 'umb-input-rich-media';
 
 @customElement(elementName)
 export class UmbInputRichMediaElement extends UmbInputMediaElement {
 	#modal: UmbModalRouteRegistrationController;
-	#pickerContext = new UmbRichMediaPickerContext(this);
 
 	@state()
 	private _richValue: Array<UmbMediaPickerPropertyValue> = [];
@@ -26,20 +25,24 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 		return this._richValue;
 	}
 
+	_preselectedCrops: Array<UmbCropModel> = [];
+
 	@property({ type: Array })
 	public set preselectedCrops(crops: Array<UmbCropModel>) {
-		this.#pickerContext.setPreselectedCrops(crops);
+		this._preselectedCrops = crops;
 	}
 	public get preselectedCrops(): Array<UmbCropModel> {
-		return this.#pickerContext.getPreselectedCrops();
+		return this._preselectedCrops;
 	}
 
+	_focalPointEnabled: boolean = false;
+
 	@property({ type: Boolean })
-	public set focalPointEnabled(enabled: boolean) {
-		this.#pickerContext.setFocalPointEnabled(enabled);
+	public set focalPointEnabled(isEnabled: boolean) {
+		this._focalPointEnabled = isEnabled;
 	}
 	public get focalPointEnabled(): boolean {
-		return this.#pickerContext.getFocalPointEnabled();
+		return this._focalPointEnabled;
 	}
 
 	@property()
@@ -77,32 +80,40 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 
 				return {
 					data: { cropOptions: this.preselectedCrops, focalPointEnabled: this.focalPointEnabled, unique },
-					value: { crops: [], focalPoint: { left: 0.5, top: 0.5 }, src: '', unique: unique },
+					value: { crops: [], focalPoint: { left: 0.5, top: 0.5 }, src: '', unique },
 				};
 			})
 			.onSubmit((value) => {
-
-// const item = this.richValue.find((x) => x.key === value.unique);
-// item.crops = value.crops;
-
-
-				// this.#pickerContext.updateFocalPointOf(value.unique, value.focalPoint);
-				// this.#pickerContext.updateCropsOf(value.unique, value.crops);
-				//this.dispatchEvent(new UmbChangeEvent());
+				this.richValue = this.richValue.map((richValue) => {
+					//TODO At the moment you can only pick the media item once, previously you were able to pick the same media item multiple times.
+					const adjusted = richValue.mediaKey === value.unique;
+					const focalPoint = this.focalPointEnabled ? value.focalPoint : null;
+					return adjusted ? { ...richValue, ...value, focalPoint } : richValue;
+				});
+				this.dispatchEvent(new UmbChangeEvent());
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder;
 			});
 
-		this.observe(this.#pickerContext.richItems, (richItems) => {
-			this.items = richItems;
-		});
-		this.pickerContextObservers();
-		this.addValidators();
-	}
+		this.observeContextItems();
 
-	connectedCallback(): void {
-		super.connectedCallback();
+		this.observe(this.pickerContext.selectedItems, (cardItems) => {
+			this._richValue = cardItems.map((item) => {
+				const richItem = this.richValue.find((richItem) => richItem.mediaKey === item.unique);
+				return {
+					key: UmbId.new(),
+					mediaKey: item.unique,
+					mediaTypeAlias: '', // Server figures this out by itself.
+					crops: [],
+					focalPoint: null,
+					...richItem,
+				};
+			});
+			this.dispatchEvent(new UmbChangeEvent());
+		});
+
+		this.addValidators();
 	}
 
 	async #onUploadCompleted(e: CustomEvent) {
