@@ -1,11 +1,10 @@
-import { createDOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
+import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 import { Marked } from '@umbraco-cms/backoffice/external/marked';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import type { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 
 const UmbMarked = new Marked({ gfm: true, breaks: true });
-const UmbDomPurify = createDOMPurify(window);
+const UmbDomPurify = DOMPurify(window);
 const UmbDomPurifyConfig: DOMPurify.Config = { USE_PROFILES: { html: true } };
 
 UmbDomPurify.addHook('afterSanitizeAttributes', function (node) {
