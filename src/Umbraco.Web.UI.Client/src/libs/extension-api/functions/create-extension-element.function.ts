@@ -11,7 +11,7 @@ export async function createExtensionElement<ElementType extends HTMLElement>(
 		const elementConstructor = await loadManifestElement<ElementType>(elementPropValue);
 		if (elementConstructor) {
 			return new elementConstructor();
-		} else {
+		} else if (!manifest.elementName) {
 			console.error(
 				`-- Extension of alias "${manifest.alias}" did not succeed creating an element class instance via the extension manifest property '${elementPropValue}'. The imported Element JS file did not export a 'element' or 'default'. Alternatively define the 'elementName' in the manifest.`,
 				manifest,
