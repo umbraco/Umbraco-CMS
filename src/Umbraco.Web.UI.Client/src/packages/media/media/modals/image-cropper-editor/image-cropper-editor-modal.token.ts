@@ -9,6 +9,7 @@ export interface UmbImageCropperEditorModalData {
 }
 
 export interface UmbImageCropperEditorModalValue {
+	unique: string;
 	crops: Array<UmbImageCropperCrop>;
 	focalPoint: { left: number; top: number };
 }

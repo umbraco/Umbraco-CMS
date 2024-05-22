@@ -1,10 +1,13 @@
-import type { UmbCropModel, UmbFocalPointModel, UmbMediaPickerPropertyValue } from '../../property-editors/index.js';
+import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../../property-editors/index.js';
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL, type UmbMediaCardItemModel } from '../../modals/index.js';
 import { UmbRichMediaPickerContext } from './input-rich-media.context.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
-import type { UmbUploadableFileModel } from '@umbraco-cms/backoffice/media';
+import {
+	UmbInputMediaElement,
+	type UmbRichMediaItemModel,
+	type UmbUploadableFileModel,
+} from '@umbraco-cms/backoffice/media';
 import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
@@ -15,13 +18,15 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 	#modal: UmbModalRouteRegistrationController;
 	#pickerContext = new UmbRichMediaPickerContext(this);
 
-	private _value: Array<UmbMediaPickerPropertyValue> = [];
-	@property()
-	public set value(value: any) {
-		this._value = value as Array<UmbMediaPickerPropertyValue>;
+	@state()
+	private _items: Array<UmbRichMediaItemModel> = [];
+
+	@property({ type: Array })
+	public set richValue(value: Array<UmbMediaPickerPropertyValue>) {
+		this.#pickerContext.setSelection(value);
 	}
-	public get value() {
-		return this._value;
+	public get richValue(): Array<UmbMediaPickerPropertyValue> {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property({ type: Array })
@@ -40,9 +45,6 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 		return this.#pickerContext.getFocalPointEnabled();
 	}
 
-	@state()
-	private _modalRoute?: UmbModalRouteBuilder;
-
 	@property()
 	public set alias(value: string | undefined) {
 		this.#modal.setUniquePathValue('propertyAlias', value);
@@ -59,6 +61,8 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 		return this.#modal.getUniquePathValue('variantId');
 	}
 
+	@state()
+	private _modalRoute?: UmbModalRouteBuilder;
 	constructor() {
 		super();
 		this.#modal = new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
@@ -75,11 +79,13 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 
 				return {
 					data: { cropOptions: this.preselectedCrops, focalPointEnabled: this.focalPointEnabled, unique },
-					value: { crops: [], focalPoint: { left: 0.5, top: 0.5 }, src: '' },
+					value: { crops: [], focalPoint: { left: 0.5, top: 0.5 }, src: '', unique: unique },
 				};
 			})
 			.onSubmit((value) => {
-				console.log('callback', value);
+				this.#pickerContext.updateFocalPointOf(value.unique, value.focalPoint);
+				this.#pickerContext.updateCropsOf(value.unique, value.crops);
+				this.dispatchEvent(new UmbChangeEvent());
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder;
@@ -87,6 +93,10 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 
 		this.pickerContextObservers();
 		this.addValidators();
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
 	}
 
 	async #onUploadCompleted(e: CustomEvent) {
@@ -113,8 +123,8 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				detail=${ifDefined(item.unique)}
 				.href=${href}>
-				${item.url
-					? html`<img src=${item.url} alt=${item.name} />`
+				${item.src
+					? html`<img src=${item.src} alt=${item.name} />`
 					: html`<umb-icon name=${ifDefined(item.mediaType.icon)}></umb-icon>`}
 				${this.renderIsTrashed(item)}
 				<uui-action-bar slot="actions">

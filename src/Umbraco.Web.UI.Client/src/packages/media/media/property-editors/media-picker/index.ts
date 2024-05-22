@@ -8,7 +8,19 @@ export type UmbMediaPickerPropertyValue = {
 	crops: Array<UmbCropModel>;
 };
 
-export interface UmbCropModel {
+export type UmbCropModel = {
+	alias: string;
+	height: number;
+	width: number;
+	coordinates?: {
+		x1: number;
+		x2: number;
+		y1: number;
+		y2: number;
+	};
+};
+
+export interface UmbConfiguredCropModel {
 	label: string;
 	alias: string;
 	width: number;

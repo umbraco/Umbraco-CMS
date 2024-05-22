@@ -1,8 +1,6 @@
 import type { UmbInputRichMediaElement } from '../../components/input-rich-media/input-rich-media.element.js';
-
 import type { UmbCropModel, UmbMediaPickerPropertyValue } from './index.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
@@ -23,9 +21,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	@property({ attribute: false })
 	public set value(value: Array<UmbMediaPickerPropertyValue>) {
 		this.#value = value;
-		this._items = this.value ? this.value.map((x) => x.mediaKey) : [];
 	}
-	//TODO: Add support for document specific crops. The server side already supports this.
 	public get value() {
 		return this.#value;
 	}
@@ -65,9 +61,6 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	private _multiple: boolean = false;
 
 	@state()
-	_items: Array<string> = [];
-
-	@state()
 	private _limitMin: number = 0;
 
 	@state()
@@ -89,20 +82,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputRichMediaElement }) {
-		const selection = event.target.selection;
-
-		const result = selection.map((mediaKey) => {
-			return {
-				key: UmbId.new(),
-				mediaKey,
-				mediaTypeAlias: '',
-				focalPoint: null,
-				crops: [],
-			};
-		});
-
-		this.value = result;
-		this._items = this.value ? this.value.map((x) => x.mediaKey) : [];
+		this.value = event.target.richValue;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -111,14 +91,13 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 			<umb-input-rich-media
 				@change=${this.#onChange}
 				?multiple=${this._multiple}
-				.value=${this.value}
+				.richValue=${this.value}
 				.variantId=${this._variantId}
 				.alias=${this._alias}
 				.allowedContentTypeIds=${this._allowedMediaTypes}
 				.startNode=${this._startNode}
 				.focalPointEnabled=${this._focalPointEnabled}
 				.preselectedCrops=${this._preselectedCrops}
-				.selection=${this._items}
 				.min=${this._limitMin}
 				.max=${this._limitMax}>
 			</umb-input-rich-media>

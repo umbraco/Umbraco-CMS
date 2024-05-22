@@ -1,32 +1,27 @@
-import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
-import type { UmbCropModel } from '../../property-editors/index.js';
+import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS, type UmbMediaItemModel } from '../../repository/index.js';
+import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../../property-editors/index.js';
 import {
 	UMB_MEDIA_PICKER_MODAL,
-	type UmbMediaCardItemModel,
 	type UmbMediaPickerModalData,
 	type UmbMediaPickerModalValue,
 } from '../../modals/index.js';
 import type { UmbImageCropperCrop, UmbImageCropperCrops } from '../input-image-cropper/types.js';
+import type { UmbRichMediaItemModel } from './index.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-interface UmbRichMediaItemModel extends UmbMediaCardItemModel {
-	crops: UmbImageCropperCrops;
-	focalPoint?: { left: number; top: number };
-}
-
 export class UmbRichMediaPickerContext extends UmbPickerInputContext<
-	UmbRichMediaItemModel,
-	UmbRichMediaItemModel,
-	UmbMediaPickerModalData<UmbRichMediaItemModel>,
+	UmbMediaItemModel,
+	UmbMediaItemModel,
+	UmbMediaPickerModalData<UmbMediaItemModel>,
 	UmbMediaPickerModalValue
 > {
 	#imagingRepository: UmbImagingRepository;
 
-	#selectedRichItems = new UmbArrayState<UmbRichMediaItemModel>([], (x) => x.unique);
+	#selectedRichItems = new UmbArrayState<UmbRichMediaItemModel>([], (x) => x.key);
 	readonly richItems = this.#selectedRichItems.asObservable();
 
 	#preselectedCrops = new UmbArrayState<UmbCropModel>([], (x) => x.alias);
@@ -35,8 +30,12 @@ export class UmbRichMediaPickerContext extends UmbPickerInputContext<
 	#focalPointEnabled = new UmbBooleanState<boolean>(false);
 	readonly focalPointEnabled = this.#focalPointEnabled.asObservable();
 
+	#mediaPickerValue = new UmbArrayState<UmbMediaPickerPropertyValue>([], (x) => x.key);
+	readonly mediaPickerValue = this.#mediaPickerValue.asObservable();
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEDIA_ITEM_REPOSITORY_ALIAS, UMB_MEDIA_PICKER_MODAL);
+
 		this.#imagingRepository = new UmbImagingRepository(host);
 
 		this.observe(this.selectedItems, async (selectedItems) => {
@@ -59,9 +58,9 @@ export class UmbRichMediaPickerContext extends UmbPickerInputContext<
 
 				return {
 					...item,
-					url: url ?? '',
+					src: url ?? '',
 					crops: previous?.crops ?? [],
-					focalPoint: previous?.focalPoint,
+					focalPoint: previous?.focalPoint ?? null,
 				};
 			});
 
@@ -85,15 +84,15 @@ export class UmbRichMediaPickerContext extends UmbPickerInputContext<
 		return this.#preselectedCrops.getValue();
 	}
 
-	updateFocalPointOfSelectedRichItem(unique: string, focalPoint: { left: number; top: number }) {
+	updateFocalPointOf(unique: string, focalPoint: { left: number; top: number }) {
 		this.#selectedRichItems.updateOne(unique, { focalPoint });
 	}
 
-	updateCropsOfSelectedRichItem(unique: string, crops: UmbImageCropperCrops) {
+	updateCropsOf(unique: string, crops: UmbImageCropperCrops) {
 		this.#selectedRichItems.updateOne(unique, { crops });
 	}
 
-	updateOneCropOfSelectedRichItem(unique: string, alias: string, newCrop: UmbImageCropperCrop) {
+	updateOneCropOf(unique: string, alias: string, newCrop: UmbImageCropperCrop) {
 		const item = this.#selectedRichItems.getValue().find((item) => item.unique);
 		if (!item) return;
 

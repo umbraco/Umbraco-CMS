@@ -1,5 +1,5 @@
+import type { UmbInputImageCropperFieldElement } from '../../components/input-image-cropper/image-cropper-field.element.js';
 import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
-import type { UmbImagingModel } from '../../../../core/imaging/types.js';
 import { UmbMediaUrlRepository } from '../../repository/index.js';
 import type { UmbCropModel } from '../../property-editors/index.js';
 import type {
@@ -8,8 +8,6 @@ import type {
 } from './image-cropper-editor-modal.token.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
-import { ImageCropModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 /** TODO Make some of the components from property editor image cropper reuseable for this modal... */
 
@@ -28,6 +26,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _focalPointEnabled = false;
+	/** TODO  allow to enable/disable focalpoint */
 
 	@state()
 	private _crops: Array<UmbCropModel> = [];
@@ -56,10 +55,17 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		this._imageCropperValue = value;
 	}
 
+	#onChange(e: CustomEvent) {
+		const value = (e.target as UmbInputImageCropperFieldElement).value;
+		if (!value) return;
+
+		this.value = { unique: this._unique, crops: value.crops, focalPoint: value.focalPoint };
+	}
+
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
-				<umb-image-cropper-field .value=${this._imageCropperValue}></umb-image-cropper-field>
+				<umb-image-cropper-field @change=${this.#onChange} .value=${this._imageCropperValue}></umb-image-cropper-field>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
