@@ -8,6 +8,7 @@ import type { ManifestEntityBulkAction, ManifestTypes } from '@umbraco-cms/backo
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 const entityActions: Array<ManifestEntityBulkAction> = [
+	/* TODO: Implement SetGroup entity action
 	{
 		type: 'entityBulkAction',
 		alias: 'Umb.EntityBulkAction.User.SetGroup',
@@ -25,6 +26,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			},
 		],
 	},
+	*/
 	{
 		type: 'entityBulkAction',
 		alias: 'Umb.EntityBulkAction.User.Enable',
