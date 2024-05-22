@@ -249,13 +249,11 @@ export abstract class UmbBlockEntryContext<
 	abstract _gotEntries(): void;
 
 	#observeData() {
-		if (!this._manager) return;
-		const contentUdi = this._layout.value?.contentUdi;
-		if (!contentUdi) return;
+		if (!this._manager || !this.#contentUdi) return;
 
 		// observe content:
 		this.observe(
-			this._manager.contentOf(contentUdi),
+			this._manager.contentOf(this.#contentUdi),
 			(content) => {
 				this.#content.setValue(content);
 			},
