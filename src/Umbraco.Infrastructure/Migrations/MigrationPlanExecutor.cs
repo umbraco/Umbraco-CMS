@@ -1,9 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OpenIddict.Abstractions;
+using Org.BouncyCastle.Utilities;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
@@ -48,7 +51,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private readonly IScopeAccessor _scopeAccessor;
     private readonly ICoreScopeProvider _scopeProvider;
     private bool _rebuildCache;
-    private bool _signOutUser;
+    private bool _invalidateBackofficeUserAccess;
 
     public MigrationPlanExecutor(
         ICoreScopeProvider scopeProvider,
@@ -142,9 +145,9 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         }
 
         // If any completed migration requires us to sign out the user we'll do that.
-        if (_signOutUser)
+        if (_invalidateBackofficeUserAccess)
         {
-            SignOutUser();
+            RevokeBackofficeTokens().GetAwaiter().GetResult(); // should async all the way up at some point
         }
 
         return result;
@@ -333,9 +336,9 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             _rebuildCache = true;
         }
 
-        if (migration.SignOutUser)
+        if (migration.InvalidateBackofficeUserAccess)
         {
-            _signOutUser = true;
+            _invalidateBackofficeUserAccess = true;
         }
     }
 
@@ -345,10 +348,30 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         _distributedCache.RefreshAllPublishedSnapshot();
     }
 
-    private void SignOutUser()
+    private async Task RevokeBackofficeTokens()
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        ICoreBackOfficeSignInManager signInManager = scope.ServiceProvider.GetRequiredService<ICoreBackOfficeSignInManager>();
-        signInManager.SignOutAsync();
+
+        IOpenIddictApplicationManager openIddictApplicationManager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
+        var backOfficeClient = await openIddictApplicationManager.FindByClientIdAsync(Constants.OAuthClientIds.BackOffice);
+        if (backOfficeClient is null)
+        {
+            _logger.LogWarning("Could not get the openIddict Application for {backofficeClientId}. Canceling token revocation. Users might have to manually log out to get proper access to the backoffice", Constants.OAuthClientIds.BackOffice);
+            return;
+        }
+
+        var backOfficeClientId = await openIddictApplicationManager.GetIdAsync(backOfficeClient);
+        if (backOfficeClientId is null)
+        {
+            _logger.LogWarning("Could not extract the clientId from the openIddict backofficelient Application. Canceling token revocation. Users might have to manually log out to get proper access to the backoffice", Constants.OAuthClientIds.BackOffice);
+            return;
+        }
+
+        IOpenIddictTokenManager tokenManager = scope.ServiceProvider.GetRequiredService<IOpenIddictTokenManager>();
+        var tokens = await tokenManager.FindByApplicationIdAsync(backOfficeClientId).ToArrayAsync();
+        foreach (var token in tokens)
+        {
+            await tokenManager.DeleteAsync(token);
+        }
     }
 }

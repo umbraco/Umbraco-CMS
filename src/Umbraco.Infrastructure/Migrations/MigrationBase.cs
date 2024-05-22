@@ -91,7 +91,10 @@ public abstract partial class MigrationBase : IDiscoverable
     /// </summary>
     public bool RebuildCache { get; set; }
 
-    public bool SignOutUser { get; set; }
+    /// <summary>
+    /// If this is set to true, all backoffice client tokens will be revoked upon successful completion of the migration.
+    /// </summary>
+    public bool InvalidateBackofficeUserAccess { get; set; }
 
     /// <summary>
     ///     Runs the migration.
