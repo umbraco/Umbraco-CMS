@@ -4,7 +4,7 @@ import { UmbAppContext } from './app.context.js';
 import { UmbServerConnection } from './server-connection.js';
 import { UmbAppAuthController } from './app-auth.controller.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import { UMB_STORAGE_REDIRECT_URL, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
+import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -18,6 +18,7 @@ import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { retrieveStoredPath } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -87,13 +88,14 @@ export class UmbAppElement extends UmbLitElement {
 
 					this.observe(this.#authContext.authorizationSignal, () => {
 						// Redirect to the saved state or root
-						let currentRoute = '';
-						const savedRoute = sessionStorage.getItem(UMB_STORAGE_REDIRECT_URL);
-						if (savedRoute) {
-							sessionStorage.removeItem(UMB_STORAGE_REDIRECT_URL);
-							currentRoute = savedRoute.endsWith('logout') ? currentRoute : savedRoute;
+						const url = retrieveStoredPath();
+						const isBackofficePath = url?.pathname.startsWith(this.backofficePath) ?? true;
+
+						if (isBackofficePath) {
+							history.replaceState(null, '', url?.toString() ?? '');
+						} else {
+							window.location.href = url?.toString() ?? this.backofficePath;
 						}
-						history.replaceState(null, '', currentRoute);
 					});
 				}
 
@@ -173,9 +175,13 @@ export class UmbAppElement extends UmbLitElement {
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
-			// If the runtime level is "install" we should clear any cached tokens
+			// If the runtime level is "install" or ?status=false is set, we should clear any cached tokens
 			// else we should try and set the auth status
-			if (this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL) {
+			const searchParams = new URLSearchParams(window.location.search);
+			if (
+				(searchParams.has('status') && searchParams.get('status') === 'false') ||
+				this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL
+			) {
 				await this.#authContext.clearTokenStorage();
 			} else {
 				await this.#setAuthStatus();
