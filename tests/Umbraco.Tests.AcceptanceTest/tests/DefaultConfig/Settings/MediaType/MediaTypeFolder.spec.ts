@@ -1,6 +1,7 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
+// TODO: Remove test.describe after the test have passed on the pipeline
 test.describe('Media Type Folder tests @smoke', () => {
   const mediaTypeFolderName = 'TestMediaTypeFolder';
 
@@ -39,7 +40,7 @@ test.describe('Media Type Folder tests @smoke', () => {
 
     // Assert
     await umbracoUi.mediaType.isSuccessNotificationVisible();
-    await umbracoApi.mediaType.doesNameExist(mediaTypeFolderName);
+    expect(await umbracoApi.mediaType.doesNameExist(mediaTypeFolderName)).toBeFalsy();
   });
 
   test('can rename a media type folder', async ({umbracoApi, umbracoUi}) => {
@@ -60,7 +61,7 @@ test.describe('Media Type Folder tests @smoke', () => {
     expect(folder.name).toBe(mediaTypeFolderName);
   });
 
-  test('can create a media type folder in a folder', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a media type folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolder';
     await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
@@ -76,6 +77,7 @@ test.describe('Media Type Folder tests @smoke', () => {
     await umbracoUi.mediaType.isTreeItemVisible(childFolderName, true);
     const parentFolderChildren = await umbracoApi.mediaType.getChildren(parentFolderId);
     expect(parentFolderChildren[0].name).toBe(childFolderName);
+
     // Clean
     await umbracoApi.mediaType.ensureNameNotExists(childFolderName);
   });
