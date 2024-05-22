@@ -115,6 +115,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 
 			uui-label {
 				position: relative;
+				overflow-x: auto;
 			}
 			:host([invalid]) uui-label {
 				color: var(--uui-color-danger);
@@ -125,6 +126,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 
 			#description {
 				color: var(--uui-color-text-alt);
+				overflow-x: auto;
 			}
 
 			#editorColumn {
