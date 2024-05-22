@@ -155,7 +155,7 @@ public static class UserExtensions
 
     public static int[]? CalculateContentStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
-        var cacheKey = CacheKeys.UserAllContentStartNodesPrefix + user.Id;
+        var cacheKey = CacheKeys.UserAllContentStartNodesPrefix + user.Key;
         IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
         var result = runtimeCache.GetCacheItem(
             cacheKey,
