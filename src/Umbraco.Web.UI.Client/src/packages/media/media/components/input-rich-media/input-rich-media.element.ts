@@ -19,7 +19,7 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 
 	@property({ type: Array })
 	public set richValue(value: Array<UmbMediaPickerPropertyValue>) {
-		this.#pickerContext.setSelection(value?.map((x) => x.mediaKey) ?? []);
+		this.selection = value?.map((x) => x.mediaKey) ?? [];
 		this._richValue = value;
 	}
 	public get richValue(): Array<UmbMediaPickerPropertyValue> {
@@ -81,8 +81,13 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 				};
 			})
 			.onSubmit((value) => {
-				//this.#pickerContext.updateFocalPointOf(value.unique, value.focalPoint);
-				//this.#pickerContext.updateCropsOf(value.unique, value.crops);
+
+// const item = this.richValue.find((x) => x.key === value.unique);
+// item.crops = value.crops;
+
+
+				// this.#pickerContext.updateFocalPointOf(value.unique, value.focalPoint);
+				// this.#pickerContext.updateCropsOf(value.unique, value.crops);
 				//this.dispatchEvent(new UmbChangeEvent());
 			})
 			.observeRouteBuilder((routeBuilder) => {
@@ -118,7 +123,7 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 	}
 
 	protected renderItem(item: UmbMediaCardItemModel, index: number) {
-		const href = this._modalRoute?.({ index });
+		const href = this._modalRoute?.({ index }); // TODO: Use `item.key` [LK]
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
