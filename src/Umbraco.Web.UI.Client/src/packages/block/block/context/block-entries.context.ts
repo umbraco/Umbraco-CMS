@@ -121,13 +121,11 @@ export abstract class UmbBlockEntriesContext<
 		}
 
 		if (layout.settingsUdi) {
-			this._manager?.removeOneSettings(layout.settingsUdi);
+			this._manager!.removeOneSettings(layout.settingsUdi);
 		}
+		this._manager!.removeOneContent(contentUdi);
 
-		this._manager?.removeOneContent(contentUdi);
-
-		//this._layoutEntries.removeOne(contentUdi);
-		alert('TODO: Remove layout entry..');
+		this._layoutEntries.removeOne(contentUdi);
 	}
 	//copy
 }

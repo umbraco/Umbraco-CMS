@@ -61,8 +61,10 @@ export abstract class UmbBlockEntryContext<
 		this.#index.setValue(index);
 	}
 
-	#createPath = new UmbStringState(undefined);
-	readonly createPath = this.#createPath.asObservable();
+	#createBeforePath = new UmbStringState(undefined);
+	readonly createBeforePath = this.#createBeforePath.asObservable();
+	#createAfterPath = new UmbStringState(undefined);
+	readonly createAfterPath = this.#createAfterPath.asObservable();
 
 	#contentElementTypeName = new UmbStringState(undefined);
 	public readonly contentElementTypeName = this.#contentElementTypeName.asObservable();
@@ -173,7 +175,7 @@ export abstract class UmbBlockEntryContext<
 		});
 
 		this.observe(this.index, () => {
-			this.#updateCreatePath();
+			this.#updateCreatePaths();
 		});
 	}
 
@@ -181,16 +183,18 @@ export abstract class UmbBlockEntryContext<
 		return this._layout.value?.contentUdi;
 	}
 
-	#updateCreatePath() {
+	#updateCreatePaths() {
 		const index = this.#index.value;
 		if (this._entries && index !== undefined) {
 			this.observe(
 				observeMultiple([this._entries.catalogueRouteBuilder, this._entries.canCreate]),
 				([catalogueRouteBuilder, canCreate]) => {
 					if (catalogueRouteBuilder && canCreate) {
-						this.#createPath.setValue(this._entries!.getPathForCreateBlock(index));
+						this.#createBeforePath.setValue(this._entries!.getPathForCreateBlock(index));
+						this.#createAfterPath.setValue(this._entries!.getPathForCreateBlock(index + 1));
 					} else {
-						this.#createPath.setValue(undefined);
+						this.#createBeforePath.setValue(undefined);
+						this.#createAfterPath.setValue(undefined);
 					}
 				},
 				'observeRouteBuilderCreate',
@@ -227,7 +231,7 @@ export abstract class UmbBlockEntryContext<
 	abstract _gotManager(): void;
 
 	#gotEntries() {
-		this.#updateCreatePath();
+		this.#updateCreatePaths();
 		this.#observeLayout();
 		if (this._entries) {
 			this.observe(
@@ -245,13 +249,11 @@ export abstract class UmbBlockEntryContext<
 	abstract _gotEntries(): void;
 
 	#observeData() {
-		if (!this._manager) return;
-		const contentUdi = this._layout.value?.contentUdi;
-		if (!contentUdi) return;
+		if (!this._manager || !this.#contentUdi) return;
 
 		// observe content:
 		this.observe(
-			this._manager.contentOf(contentUdi),
+			this._manager.contentOf(this.#contentUdi),
 			(content) => {
 				this.#content.setValue(content);
 			},
@@ -358,6 +360,7 @@ export abstract class UmbBlockEntryContext<
 
 	async requestDelete() {
 		const blockName = this.getLabel();
+		// TODO: Localizations missing [NL]
 		await umbConfirmModal(this, {
 			headline: `Delete ${blockName}`,
 			content: `Are you sure you want to delete this ${blockName}?`,

@@ -176,6 +176,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 				(x) => x.contentUdi,
 				(layoutEntry, index) =>
 					html`<uui-button-inline-create
+							label=${this._createButtonLabel}
 							href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}></uui-button-inline-create>
 						<umb-block-list-entry .contentUdi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
 						</umb-block-list-entry> `,

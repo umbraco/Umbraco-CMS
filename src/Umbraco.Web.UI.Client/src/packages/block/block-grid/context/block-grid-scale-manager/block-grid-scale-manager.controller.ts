@@ -128,11 +128,11 @@ export class UmbBlockGridScaleManager extends UmbControllerBase {
 
 		let newColumnSpan = Math.max(blockEndCol - blockStartCol, 1);
 
-		const spanOptions = this._host.getRelevantColumnSpanOptions();
-		if (!spanOptions) return;
+		const columnOptions = this._host.getRelevantColumnSpanOptions();
+		if (!columnOptions) return;
 
 		// Find nearest allowed Column:
-		const bestColumnSpanOption = closestColumnSpanOption(newColumnSpan, spanOptions, layoutColumns - blockStartCol);
+		const bestColumnSpanOption = closestColumnSpanOption(newColumnSpan, columnOptions, layoutColumns - blockStartCol);
 		newColumnSpan = bestColumnSpanOption ?? layoutColumns;
 
 		// Find allowed row spans:

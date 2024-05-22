@@ -8,6 +8,7 @@ export * from './json-string-comparison.function.js';
 export * from './merge-observables.function.js';
 export * from './observe-multiple.function.js';
 export * from './partial-update-frozen-array.function.js';
+export * from './push-at-to-unique-array.function.js';
 export * from './push-to-unique-array.function.js';
 export * from './simple-hash-code.function.js';
 export * from './strict-equality-memoization.function.js';

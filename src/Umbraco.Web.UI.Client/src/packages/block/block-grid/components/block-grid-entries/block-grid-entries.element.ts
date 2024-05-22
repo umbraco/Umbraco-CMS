@@ -208,7 +208,7 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 					(layoutEntry, index) =>
 						html`<umb-block-grid-entry
 							class="umb-block-grid__layout-item"
-							.index=${index}
+							index=${index}
 							.contentUdi=${layoutEntry.contentUdi}
 							.layout=${layoutEntry}>
 						</umb-block-grid-entry>`,
