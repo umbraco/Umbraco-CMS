@@ -97,7 +97,7 @@ export class UmbMemberPropertyDataContext
 	}
 
 	// TODO: Refactor: Not used currently, but should investigate if we can implement this, to spare some energy.
-	async propertyValueByAliasAndCulture<ReturnType = unknown>(propertyAlias: string, propertyVariantId: UmbVariantId) {
+	async propertyValueByAliasAndVariantId<ReturnType = unknown>(propertyAlias: string, propertyVariantId: UmbVariantId) {
 		return this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias, propertyVariantId);
 	}
 

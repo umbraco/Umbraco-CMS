@@ -41,18 +41,18 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 			this._columnsArray,
 			(index) => index,
 			(index) => {
-				const number = index + 1;
+				const colNumber = index + 1;
 				let classes = 'default';
 
 				if (this.value && this.value.length > 0) {
-					const applied = this.value.find((column) => column.columnSpan >= index);
-					const picked = this.value.find((column) => column.columnSpan === index);
+					const applied = this.value.find((column) => column.columnSpan >= colNumber);
+					const picked = this.value.find((column) => column.columnSpan === colNumber);
 					classes = picked ? 'picked applied' : applied ? 'applied' : 'default';
 				}
 
 				return html`<div class="${classes}" data-index=${index}>
-					<span>${number}</span>
-					<button type="button" aria-label=${number} @click=${() => this.#pickColumn(index)}></button>
+					<span>${colNumber}</span>
+					<button type="button" aria-label=${colNumber} @click=${() => this.#pickColumn(colNumber)}></button>
 				</div>`;
 			},
 		);

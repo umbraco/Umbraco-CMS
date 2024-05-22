@@ -204,7 +204,7 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._entries.layoutOf(this.#contentUdi),
 			(layout) => {
-				this._layout.setValue(this._gotLayout(layout));
+				this._layout.setValue(layout);
 			},
 			'observeParentLayout',
 		);
@@ -217,10 +217,6 @@ export abstract class UmbBlockEntryContext<
 			},
 			'observeThisLayout',
 		);
-	}
-
-	protected _gotLayout(layout: BlockLayoutType | undefined) {
-		return layout;
 	}
 
 	#gotManager() {
@@ -361,9 +357,10 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	async requestDelete() {
+		const blockName = this.getLabel();
 		await umbConfirmModal(this, {
-			headline: `Delete ${this.getLabel()}`,
-			content: 'Are you sure you want to delete this [INSERT BLOCK TYPE NAME]?',
+			headline: `Delete ${blockName}`,
+			content: `Are you sure you want to delete this ${blockName}?`,
 			confirmLabel: 'Delete',
 			color: 'danger',
 		});

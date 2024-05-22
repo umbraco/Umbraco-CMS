@@ -98,7 +98,7 @@ export class UmbDocumentBlueprintPropertyDataContext
 	}
 
 	// TODO: Refactor: Not used currently, but should investigate if we can implement this, to spare some energy.
-	async propertyValueByAliasAndCulture<ReturnType = unknown>(
+	async propertyValueByAliasAndVariantId<ReturnType = unknown>(
 		propertyAlias: string,
 		propertyVariantId: UmbVariantId,
 	): Promise<Observable<ReturnType | undefined> | undefined> {

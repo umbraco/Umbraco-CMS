@@ -290,7 +290,7 @@ describe('UmbElementMixin', () => {
 				const check2: CheckType<A, string> = value as string;
 				const check3: CheckType<A, null> = value as null;
 				const check4: CheckType<A, undefined> = value as undefined;
-				expect(check).to.be.equal('hello');
+				expect(check).to.be.equal(null);
 				expect(check2 === check3 && check2 === check4).to.be.true; // Just to use the const for something.
 			});
 			// Because the source is potentially undefined, the controller could be undefined and the value of the callback method could be undefined [NL]

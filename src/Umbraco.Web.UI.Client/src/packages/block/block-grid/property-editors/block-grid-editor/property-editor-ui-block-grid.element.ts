@@ -4,14 +4,13 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, css, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import '../../components/block-grid-entries/index.js';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -63,8 +62,8 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		this._value = buildUpValue as UmbBlockGridValueModel;
 
 		this.#context.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS] ?? []);
-		this.#context.setContents(buildUpValue.contentData);
-		this.#context.setSettings(buildUpValue.settingsData);
+		this.#context.setContents(this._value.contentData);
+		this.#context.setSettings(this._value.settingsData);
 	}
 	public get value(): UmbBlockGridValueModel {
 		return this._value;
@@ -73,29 +72,23 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	constructor() {
 		super();
 
-		// TODO: Prevent initial notification from these observes:
-		this.observe(this.#context.layouts, (layouts) => {
-			this._value = { ...this._value, layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS]: layouts } };
-			this.#fireChangeEvent();
-		});
-		this.observe(this.#context.contents, (contents) => {
-			this._value = { ...this._value, contentData: contents };
-			this.#fireChangeEvent();
-		});
-		this.observe(this.#context.settings, (settings) => {
-			this._value = { ...this._value, settingsData: settings };
-			this.#fireChangeEvent();
+		// TODO: Prevent initial notification from these observes
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
+			this.observe(
+				observeMultiple([this.#context.layouts, this.#context.contents, this.#context.settings]),
+				([layouts, contents, settings]) => {
+					this._value = {
+						...this._value,
+						layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS]: layouts },
+						contentData: contents,
+						settingsData: settings,
+					};
+					propertyContext.setValue(this._value);
+				},
+				'motherObserver',
+			);
 		});
 	}
-
-	#debounceChangeEvent?: boolean;
-	#fireChangeEvent = async () => {
-		if (this.#debounceChangeEvent) return;
-		this.#debounceChangeEvent = true;
-		await Promise.resolve();
-		this.dispatchEvent(new UmbPropertyValueChangeEvent());
-		this.#debounceChangeEvent = false;
-	};
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);

@@ -17,7 +17,7 @@ import { UmbSorterController, type UmbSorterConfig, type resolvePlacementArgs } 
  */
 function resolvePlacementAsGrid(args: resolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>) {
 	// If this has areas, we do not want to move, unless we are at the edge
-	if (args.relatedModel.areas.length > 0 && isWithinRect(args.pointerX, args.pointerY, args.relatedRect, -10)) {
+	if (args.relatedModel.areas?.length > 0 && isWithinRect(args.pointerX, args.pointerY, args.relatedRect, -10)) {
 		return null;
 	}
 
@@ -162,10 +162,10 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.observe(this.#context.layoutEntries, (layoutEntries) => {
-			const oldValue = this._layoutEntries;
+			//const oldValue = this._layoutEntries;
 			this.#sorter.setModel(layoutEntries);
 			this._layoutEntries = layoutEntries;
-			this.requestUpdate('layoutEntries', oldValue);
+			//this.requestUpdate('layoutEntries', oldValue);
 		});
 
 		this.observe(this.#context.amountOfAllowedBlockTypes, (length) => {
@@ -197,7 +197,7 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 		});
 	}
 
-	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type.
+	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type. [NL]
 	render() {
 		return html`
 			${this._styleElement}
