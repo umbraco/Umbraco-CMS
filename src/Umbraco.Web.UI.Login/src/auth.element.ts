@@ -34,7 +34,7 @@ const createInput = (opts: {
 
 const createLabel = (opts: { forId: string; localizeAlias: string; localizeFallback: string; }) => {
   const label = document.createElement('label');
-  const umbLocalize = document.createElement('umb-localize');
+  const umbLocalize: any = document.createElement('umb-localize');
   umbLocalize.key = opts.localizeAlias;
   umbLocalize.innerHTML = opts.localizeFallback;
   label.htmlFor = opts.forId;
@@ -163,7 +163,6 @@ export default class UmbAuthElement extends UmbLitElement {
       ? this.localize.term('auth_email')
       : this.localize.term('auth_username');
     const labelPassword = this.localize.term('auth_password');
-    const requiredMessage = this.localize.term('auth_required');
 
     this._usernameInput = createInput({
       id: 'username-input',
