@@ -204,8 +204,8 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				detail=${ifDefined(item.unique)}
 				href="${this.editMediaPath}edit/${item.unique}">
-				${item.url
-					? html`<img src=${item.url} alt=${item.name} />`
+				${item.src
+					? html`<img src=${item.src} alt=${item.name} />`
 					: html`<umb-icon name=${ifDefined(item.mediaType.icon)}></umb-icon>`}
 				${this.renderIsTrashed(item)}
 				<uui-action-bar slot="actions">

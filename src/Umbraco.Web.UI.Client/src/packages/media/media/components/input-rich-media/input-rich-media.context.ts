@@ -5,7 +5,6 @@ import {
 	type UmbMediaPickerModalData,
 	type UmbMediaPickerModalValue,
 } from '../../modals/index.js';
-import type { UmbImageCropperCrop, UmbImageCropperCrops } from '../input-image-cropper/types.js';
 import type { UmbRichMediaItemModel } from './index.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -21,7 +20,7 @@ export class UmbRichMediaPickerContext extends UmbPickerInputContext<
 > {
 	#imagingRepository: UmbImagingRepository;
 
-	#selectedRichItems = new UmbArrayState<UmbRichMediaItemModel>([], (x) => x.key);
+	#selectedRichItems = new UmbArrayState<UmbRichMediaItemModel>([], (x) => x.unique);
 	readonly richItems = this.#selectedRichItems.asObservable();
 
 	#preselectedCrops = new UmbArrayState<UmbCropModel>([], (x) => x.alias);
@@ -50,17 +49,12 @@ export class UmbRichMediaPickerContext extends UmbPickerInputContext<
 			);
 			if (!data) return;
 
-			const previously = this.#selectedRichItems.getValue();
-
 			const richItems: Array<UmbRichMediaItemModel> = selectedItems.map((item) => {
 				const url = data.find((x) => x.unique === item.unique)?.url;
-				const previous = previously.find((x) => x.unique === item.unique);
 
 				return {
 					...item,
 					src: url ?? '',
-					crops: previous?.crops ?? [],
-					focalPoint: previous?.focalPoint ?? null,
 				};
 			});
 
@@ -83,7 +77,7 @@ export class UmbRichMediaPickerContext extends UmbPickerInputContext<
 	getPreselectedCrops() {
 		return this.#preselectedCrops.getValue();
 	}
-
+	/*
 	updateFocalPointOf(unique: string, focalPoint: { left: number; top: number }) {
 		this.#selectedRichItems.updateOne(unique, { focalPoint });
 	}
@@ -102,4 +96,5 @@ export class UmbRichMediaPickerContext extends UmbPickerInputContext<
 		});
 		this.#selectedRichItems.updateOne(unique, { crops });
 	}
+	*/
 }

@@ -3,11 +3,7 @@ import { UMB_IMAGE_CROPPER_EDITOR_MODAL, type UmbMediaCardItemModel } from '../.
 import { UmbRichMediaPickerContext } from './input-rich-media.context.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbInputMediaElement,
-	type UmbRichMediaItemModel,
-	type UmbUploadableFileModel,
-} from '@umbraco-cms/backoffice/media';
+import { UmbInputMediaElement, type UmbUploadableFileModel } from '@umbraco-cms/backoffice/media';
 import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
@@ -19,14 +15,15 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 	#pickerContext = new UmbRichMediaPickerContext(this);
 
 	@state()
-	private _items: Array<UmbRichMediaItemModel> = [];
+	private _richValue: Array<UmbMediaPickerPropertyValue> = [];
 
 	@property({ type: Array })
 	public set richValue(value: Array<UmbMediaPickerPropertyValue>) {
-		this.#pickerContext.setSelection(value);
+		this.#pickerContext.setSelection(value.map((x) => x.mediaKey));
+		this._richValue = value;
 	}
 	public get richValue(): Array<UmbMediaPickerPropertyValue> {
-		return this.#pickerContext.getSelection();
+		return this._richValue;
 	}
 
 	@property({ type: Array })
@@ -63,6 +60,7 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 
 	@state()
 	private _modalRoute?: UmbModalRouteBuilder;
+
 	constructor() {
 		super();
 		this.#modal = new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
@@ -83,14 +81,17 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 				};
 			})
 			.onSubmit((value) => {
-				this.#pickerContext.updateFocalPointOf(value.unique, value.focalPoint);
-				this.#pickerContext.updateCropsOf(value.unique, value.crops);
-				this.dispatchEvent(new UmbChangeEvent());
+				//this.#pickerContext.updateFocalPointOf(value.unique, value.focalPoint);
+				//this.#pickerContext.updateCropsOf(value.unique, value.crops);
+				//this.dispatchEvent(new UmbChangeEvent());
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder;
 			});
 
+		this.observe(this.#pickerContext.richItems, (richItems) => {
+			this.items = richItems;
+		});
 		this.pickerContextObservers();
 		this.addValidators();
 	}
