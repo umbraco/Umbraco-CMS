@@ -22,7 +22,7 @@ import '../block-scale-handler/index.js';
 @customElement('umb-block-grid-entry')
 export class UmbBlockGridEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
-	@property({ type: Number })
+	@property({ type: Number, reflect: true })
 	public get index(): number | undefined {
 		return this.#context.getIndex();
 	}
@@ -309,8 +309,27 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				--umb-block-grid__block--inline-create-button-display--condition: var(--umb-block-grid--dragging-mode) none;
 				display: var(--umb-block-grid__block--inline-create-button-display--condition);
 			}
+			uui-button-inline-create:not([vertical]) {
+				left: 0;
+				width: var(--umb-block-grid-editor--inline-create-width, 100%);
+			}
+			:host(:not([index='0'])) uui-button-inline-create:not([vertical]) {
+				top: calc(var(--umb-block-grid--row-gap, 0px) * -0.5);
+			}
+
+			:host([at-root]) uui-button-inline-create[vertical] {
+				/* If at root, and full-width then become 40px wider: */
+				--calc: clamp(0, calc(var(--umb-block-grid--item-column-span) - (var(--umb-block-grid--grid-columns)-1)), 1);
+				left: calc(-20px * var(--calc));
+				width: calc(var(--umb-block-grid-editor--inline-create-width, 100%) + 40px * var(--calc));
+			}
 			uui-button-inline-create[vertical] {
 				right: calc(1px - (var(--umb-block-grid--column-gap, 0px) * 0.5));
+			}
+			:host([at-root]) uui-button-inline-create[vertical] {
+				/* If at root, and full-width then move a little out to the right: */
+				--calc: clamp(0, calc(var(--umb-block-grid--item-column-span) - (var(--umb-block-grid--grid-columns)-1)), 1);
+				right: calc(-2px * var(--calc));
 			}
 
 			:host([drag-placeholder]) {
