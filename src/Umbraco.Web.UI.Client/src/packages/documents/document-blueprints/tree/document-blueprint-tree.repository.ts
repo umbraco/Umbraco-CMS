@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentBlueprintTreeServerDataSource } from './document-blueprint-tree.server.data-source.js';
 import { UMB_DOCUMENT_BLUEPRINT_TREE_STORE_CONTEXT } from './document-blueprint-tree.store.js';
 import type { UmbDocumentBlueprintTreeItemModel, UmbDocumentBlueprintTreeRootModel } from './types.js';
@@ -20,7 +20,7 @@ export class UmbDocumentBlueprintTreeRepository
 
 		const data: UmbDocumentBlueprintTreeRootModel = {
 			unique: null,
-			entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
+			entityType: UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
 			name: 'Document Blueprints',
 			hasChildren,
 			isFolder: true,
