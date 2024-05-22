@@ -129,6 +129,8 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		css`
 			:host {
 				margin-left: var(--uui-size-layout-1);
+				/* TODO: Overflow is a temp solution, we need to find a way to properly handle long nested breadcrumbs */
+				overflow: auto;
 			}
 		`,
 	];
