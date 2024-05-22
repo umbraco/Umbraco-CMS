@@ -20,7 +20,7 @@ export class UmbBackofficeHeaderElement extends UmbLitElement {
 			}
 
 			#appHeader {
-				background-color: var(--uui-color-header-surface);
+				background-color: var(--umb-header-background-color, var(--uui-color-header-surface));
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
