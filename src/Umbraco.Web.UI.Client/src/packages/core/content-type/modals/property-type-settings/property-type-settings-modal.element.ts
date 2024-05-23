@@ -85,15 +85,11 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 				return option.selected;
 			});
 			if (newlySelected === undefined) {
-				this._customValidationOptions[4].selected = true;
-				this.updateValue({
-					validation: { ...this.value.validation, regEx: this._customValidationOptions[4].value },
-				});
-			} else {
-				this.updateValue({
-					validation: { ...this.value.validation, regEx: regEx },
-				});
+				this._customValidationOptions[this._customValidationOptions.length - 1].selected = true;
 			}
+			this.updateValue({
+				validation: { ...this.value.validation, regEx },
+			});
 		}
 	}
 
@@ -175,10 +171,6 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 		const value = event.target.value.toString();
 		const regEx = value !== '!NOVALIDATION!' ? value : null;
 
-		this._customValidationOptions.forEach((option) => {
-			option.selected = option.value === regEx;
-		});
-		this.requestUpdate('_customValidationOptions');
 		this.updateValue({
 			validation: { ...this.value.validation, regEx },
 		});
