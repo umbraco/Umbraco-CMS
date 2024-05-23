@@ -367,6 +367,7 @@ export class UmbDocumentWorkspaceContext
 		);
 	}
 	// TODO: Re-evaluate if this is begin used, i wrote this as part of a POC... [NL]
+	/*
 	async propertyIndexByAlias(
 		propertyAlias: string,
 		variantId?: UmbVariantId,
@@ -375,6 +376,7 @@ export class UmbDocumentWorkspaceContext
 			data?.values?.findIndex((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true)),
 		);
 	}
+	*/
 
 	/**
 	 * Get the current value of the property with the given alias and variantId.
