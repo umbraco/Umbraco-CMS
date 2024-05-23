@@ -144,7 +144,8 @@ export class UmbDataTypeWorkspaceContext
 					await this.#observePropertyEditorSchemaAlias();
 				}
 
-				if (this.getIsNew()) {
+				const oldPropertyEditorUIAlias = this.#persistedData.getValue()?.editorUiAlias;
+				if (this.getIsNew() || oldPropertyEditorUIAlias !== propertyEditorUiAlias) {
 					this.#transferConfigDefaultData();
 				}
 				this._mergeConfigProperties();
