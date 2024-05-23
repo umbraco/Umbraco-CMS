@@ -102,6 +102,35 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
 
     }
 
+    public Task<PagedModel<IMediaType>> GetFolderMediaTypes(int skip, int take)
+    {
+        // we'll consider it a "folder" media type if it:
+        // - does not contain an umbracoFile property
+        // - has any allowed types below itself
+        var folderMediaTypes = _mediaTypeService
+            .GetAll()
+            .Where(mt =>
+                mt.CompositionPropertyTypes.Any(pt => pt.Alias == Constants.Conventions.Media.File) is false
+                && mt.AllowedContentTypes?.Any() is true)
+            .ToList();
+
+        // as a special case, the "Folder" system media type must always be included
+        if (folderMediaTypes.Any(mediaType => mediaType.Alias == Constants.Conventions.MediaTypes.Folder) is false)
+        {
+            IMediaType? defaultFolderMediaType = _mediaTypeService.Get(Constants.Conventions.MediaTypes.Folder);
+            if (defaultFolderMediaType is not null)
+            {
+                folderMediaTypes.Add(defaultFolderMediaType);
+            }
+        }
+
+        return Task.FromResult(new PagedModel<IMediaType>
+        {
+            Items = folderMediaTypes.Skip(skip).Take(take),
+            Total = folderMediaTypes.Count
+        });
+    }
+
     protected override IMediaType CreateContentType(IShortStringHelper shortStringHelper, int parentId)
         => new MediaType(shortStringHelper, parentId);
 

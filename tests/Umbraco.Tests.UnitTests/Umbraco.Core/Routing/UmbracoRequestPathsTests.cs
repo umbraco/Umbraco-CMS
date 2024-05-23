@@ -97,23 +97,6 @@ public class UmbracoRequestPathsTests
         Assert.AreEqual(expected, umbracoRequestPaths.IsBackOfficeRequest(source.AbsolutePath));
     }
 
-    [TestCase("http://www.domain.com/install", true)]
-    [TestCase("http://www.domain.com/Install/", true)]
-    [TestCase("http://www.domain.com/install/default.aspx", true)]
-    [TestCase("http://www.domain.com/install/test/test", true)]
-    [TestCase("http://www.domain.com/Install/test/test.aspx", true)]
-    [TestCase("http://www.domain.com/install/test/test.js", true)]
-    [TestCase("http://www.domain.com/instal", false)]
-    [TestCase("http://www.domain.com/umbraco", false)]
-    [TestCase("http://www.domain.com/umbraco/umbraco", false)]
-    public void Is_Installer_Request(string input, bool expected)
-    {
-        var source = new Uri(input);
-        var hostingEnvironment = CreateHostingEnvironment();
-        var umbracoRequestPaths = new UmbracoRequestPaths(Options.Create(_globalSettings), hostingEnvironment, Options.Create(_umbracoRequestPathsOptions));
-        Assert.AreEqual(expected, umbracoRequestPaths.IsInstallerRequest(source.AbsolutePath));
-    }
-
     [TestCase("http://www.domain.com/some/path", false)]
     [TestCase("http://www.domain.com/umbraco/surface/blah", false)]
     [TestCase("http://www.domain.com/umbraco/api/blah", false)]

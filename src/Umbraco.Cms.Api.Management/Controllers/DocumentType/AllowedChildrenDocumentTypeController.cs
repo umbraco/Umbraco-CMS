@@ -14,7 +14,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
 public class AllowedChildrenDocumentTypeController : DocumentTypeControllerBase
 {
     private readonly IContentTypeService _contentTypeService;
