@@ -118,13 +118,6 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 				this._editDocumentPath = routeBuilder({});
 			});
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
@@ -136,6 +129,9 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 			() => this.maxMessage,
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
+
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
 	}
 
 	protected getFormElement() {
