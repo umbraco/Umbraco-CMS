@@ -126,7 +126,6 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 
 			#description {
 				color: var(--uui-color-text-alt);
-				overflow-x: auto;
 			}
 
 			#editorColumn {
