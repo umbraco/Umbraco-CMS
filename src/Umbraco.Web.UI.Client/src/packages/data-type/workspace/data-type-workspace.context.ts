@@ -29,6 +29,7 @@ import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
 type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
@@ -127,10 +128,13 @@ export class UmbDataTypeWorkspaceContext
 		this._mergeConfigProperties();
 	}
 
+	#lastPropertyEditorUIAlias?: string | null;
 	#observePropertyEditorUIAlias() {
 		this.observe(
 			this.propertyEditorUiAlias,
 			async (propertyEditorUiAlias) => {
+				const previousPropertyEditorUIAlias = this.#lastPropertyEditorUIAlias;
+				this.#lastPropertyEditorUIAlias = propertyEditorUiAlias;
 				// we only want to react on the change if the alias is set or null. When it is undefined something is still loading
 				if (propertyEditorUiAlias === undefined) return;
 
@@ -144,8 +148,10 @@ export class UmbDataTypeWorkspaceContext
 					await this.#observePropertyEditorSchemaAlias();
 				}
 
-				const oldPropertyEditorUIAlias = this.#persistedData.getValue()?.editorUiAlias;
-				if (this.getIsNew() || oldPropertyEditorUIAlias !== propertyEditorUiAlias) {
+				if (
+					this.getIsNew() ||
+					(previousPropertyEditorUIAlias && previousPropertyEditorUIAlias !== propertyEditorUiAlias)
+				) {
 					this.#transferConfigDefaultData();
 				}
 				this._mergeConfigProperties();
