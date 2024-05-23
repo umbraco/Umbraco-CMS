@@ -125,7 +125,6 @@ export class UmbDefaultCollectionContext<
 		this.#filter.setValue({
 			...this.#defaultFilter,
 			...this.#config,
-			...this.#filter.getValue(),
 			...filterValue,
 			skip: filterValue.skip ?? 0,
 			take: this.#config.pageSize,
