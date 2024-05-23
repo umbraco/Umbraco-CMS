@@ -1682,6 +1682,7 @@ export default {
 		elementDoesNotSupport: 'This is not applicable for an Element Type',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
 		displaySettingsHeadline: 'Appearance',
+		displaySettingsLabelOnLeft: 'Label to the left',
 		displaySettingsLabelOnTop: 'Label above (full-width)',
 		confirmDeleteTabMessage: 'Are you sure you want to delete the tab <strong>%0%</strong>?',
 		confirmDeleteGroupMessage: 'Are you sure you want to delete the group <strong>%0%</strong>?',
@@ -2034,6 +2035,7 @@ export default {
 	},
 	validation: {
 		validation: 'Validation',
+		validateNothing: 'No validation',
 		validateAsEmail: 'Validate as an email address',
 		validateAsNumber: 'Validate as a number',
 		validateAsUrl: 'Validate as a URL',
