@@ -36,10 +36,7 @@ export class UmbInputRichMediaElement extends UmbInputMediaElement {
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				detail=${ifDefined(item.unique)}
-				href="${this.editMediaPath}edit/${item.unique}"
-				@open=${() => {
-					alert('open media crops modal');
-				}}>
+				href="${this.editMediaPath}edit/${item.unique}">
 				${item.url
 					? html`<img src=${item.url} alt=${item.name} />`
 					: html`<umb-icon name=${ifDefined(item.mediaType.icon)}></umb-icon>`}

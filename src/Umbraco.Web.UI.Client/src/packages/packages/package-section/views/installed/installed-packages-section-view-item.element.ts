@@ -78,7 +78,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		}
 
 		// TODO: add dedicated modal for package views, and register it in a manifest.
-		alert('package view modal temporarily disabled. See comment in code.');
+		throw new Error('package view modal temporarily disabled.');
 		/*
 		this._modalContext?.open(this, element, {
 			data: { name: this.name, version: this.version },
