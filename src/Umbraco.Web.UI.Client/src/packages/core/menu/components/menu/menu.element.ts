@@ -2,7 +2,7 @@ import { html, customElement, property } from '@umbraco-cms/backoffice/external/
 import type { ManifestMenu, ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import './components/menu-item/menu-item-default.element.js';
+import '../menu-item/menu-item-default.element.js';
 
 @customElement('umb-menu')
 export class UmbMenuElement extends UmbLitElement {
