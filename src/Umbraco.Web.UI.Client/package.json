@@ -42,7 +42,7 @@
 		"./extension-registry": "./dist-cms/packages/core/extension-registry/index.js",
 		"./icon": "./dist-cms/packages/core/icon-registry/index.js",
 		"./id": "./dist-cms/packages/core/id/index.js",
-		"./imaging": "./dist-cms/packages/core/imaging/index.js",
+		"./imaging": "./dist-cms/packages/media/imaging/index.js",
 		"./language": "./dist-cms/packages/language/index.js",
 		"./lit-element": "./dist-cms/packages/core/lit-element/index.js",
 		"./localization": "./dist-cms/packages/core/localization/index.js",
