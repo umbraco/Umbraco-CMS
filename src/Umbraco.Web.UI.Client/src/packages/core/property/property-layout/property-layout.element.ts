@@ -62,12 +62,14 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
 			<div id="headerColumn">
-				<uui-label title=${this.alias}>
+				<uui-label id="label" title=${this.alias}>
 					${this.localize.string(this.label)}
 					${when(this.invalid, () => html`<uui-badge color="danger" attention>!</uui-badge>`)}
 				</uui-label>
 				<slot name="action-menu"></slot>
-				<div id="description">${unsafeHTML(localizeAndTransform(this, this.description))}</div>
+				<uui-scroll-container id="description">
+					${unsafeHTML(localizeAndTransform(this, this.description))}
+				</uui-scroll-container>
 				<slot name="description"></slot>
 			</div>
 			<div id="editorColumn">
@@ -113,11 +115,11 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 			}
 			/*}*/
 
-			uui-label {
+			#label {
 				position: relative;
-				overflow-x: auto;
+				word-break: break-word;
 			}
-			:host([invalid]) uui-label {
+			:host([invalid]) #label {
 				color: var(--uui-color-danger);
 			}
 			uui-badge {
@@ -126,7 +128,6 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 
 			#description {
 				color: var(--uui-color-text-alt);
-				overflow-x: auto;
 			}
 
 			#editorColumn {
