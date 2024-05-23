@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Extensions;
+using HttpRequestExtensions = Umbraco.Extensions.HttpRequestExtensions;
 
 namespace Umbraco.Cms.Web.Website.Routing;
 
@@ -71,9 +72,10 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
             }
         }
 
-        // If there's only one candidate, we don't need to do anything.
+        // If there's only one candidate, or the request has the ufprt-token, we don't need to do anything .
+        // The ufprt-token is handled by the the <see cref="UmbracoRouteValueTransformer"/> and should not be discarded.
         var candidateCount = candidates.Count;
-        if (candidateCount < 2)
+        if (candidateCount < 2 || string.IsNullOrEmpty(httpContext.Request.GetUfprt()) is false)
         {
             return;
         }
