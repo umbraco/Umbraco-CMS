@@ -70,9 +70,13 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
                 return ValueSetValidationStatus.Failed;
             }
 
-            ValueSetValidationResult validationResult = ValueSetValidator.Validate(v);
+            if (ValueSetValidator is not null)
+            {
+                ValueSetValidationResult validationResult = ValueSetValidator.Validate(v);
+                return validationResult.Status;
+            }
 
-            return validationResult.Status;
+            return ValueSetValidationStatus.Valid;
         }).ToArray();
 
         var hasDeletes = false;
