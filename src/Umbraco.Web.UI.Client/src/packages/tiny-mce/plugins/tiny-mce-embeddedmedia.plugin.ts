@@ -10,17 +10,11 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 			icon: 'embed',
 			tooltip: 'Embed',
 			onAction: () => this.#onAction(),
-			onSetup: (api) => {
-				const editor = this.editor;
-				const onNodeChange = () => {
-					const selectedElm = editor.selection.getNode();
-					api.setActive(
-						selectedElm.nodeName.toUpperCase() === 'DIV' && selectedElm.classList.contains('umb-embed-holder'),
-					);
-				};
-
-				editor.on('NodeChange', onNodeChange);
-				return () => editor.off('NodeChange', onNodeChange);
+			onSetup: function (api) {
+				const changed = args.editor.selection.selectorChangedWithUnbind('div.umb-embed-holder', (state) =>
+					api.setActive(state),
+				);
+				return () => changed.unbind();
 			},
 		});
 	}
