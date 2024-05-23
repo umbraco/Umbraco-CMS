@@ -19,6 +19,7 @@ const createInput = (opts: {
   autocomplete: AutoFill;
   label: string;
   inputmode: string;
+  autofocus?: boolean;
 }) => {
   const input = document.createElement('input');
   input.type = opts.type;
@@ -28,6 +29,7 @@ const createInput = (opts: {
   input.required = true;
   input.inputMode = opts.inputmode;
   input.ariaLabel = opts.label;
+  input.autofocus = opts.autofocus || false;
 
   return input;
 };
@@ -171,6 +173,7 @@ export default class UmbAuthElement extends UmbLitElement {
       autocomplete: 'username',
       label: labelUsername,
       inputmode: this.usernameIsEmail ? 'email' : '',
+      autofocus: true,
     });
     this._passwordInput = createInput({
       id: 'password-input',
