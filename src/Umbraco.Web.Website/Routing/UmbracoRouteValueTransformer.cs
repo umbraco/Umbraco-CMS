@@ -7,12 +7,10 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Website.Controllers;
@@ -85,22 +83,6 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     public override async ValueTask<RouteValueDictionary> TransformAsync(
         HttpContext httpContext, RouteValueDictionary values)
     {
-        // If we aren't running, then we have nothing to route. We allow the frontend to continue while in upgrade mode.
-        if (_runtime.Level != RuntimeLevel.Run && _runtime.Level != RuntimeLevel.Upgrade)
-        {
-            if (_runtime.Level == RuntimeLevel.Install && !httpContext.Request.IsClientSideRequest())
-            {
-                return new RouteValueDictionary()
-                {
-                    //TODO figure out constants
-                    [ControllerToken] = "BackOfficeDefault",
-                    [ActionToken] = "Index"
-                };
-            }
-
-            return null!;
-        }
-
         // will be null for any client side requests like JS, etc...
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
@@ -115,17 +97,6 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         if (CheckActiveDynamicRoutingAndNoException(httpContext))
         {
             return null!;
-        }
-
-        // Check if the maintenance page should be shown
-        if (_runtime.Level == RuntimeLevel.Upgrade && _globalSettings.ShowMaintenancePageWhenInUpgradeState)
-        {
-            return new RouteValueDictionary
-            {
-                // Redirects to the RenderController who handles maintenance page in a filter, instead of having a dedicated controller
-                [ControllerToken] = ControllerExtensions.GetControllerName<RenderController>(),
-                [ActionToken] = nameof(RenderController.Index),
-            };
         }
 
         // Check if there is no existing content and return the no content controller
