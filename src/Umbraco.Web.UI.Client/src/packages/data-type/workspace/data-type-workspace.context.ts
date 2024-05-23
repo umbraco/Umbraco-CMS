@@ -128,7 +128,9 @@ export class UmbDataTypeWorkspaceContext
 		this._mergeConfigProperties();
 	}
 
+	// Hold the last set property editor ui alias, so we know when it changes, so we can reset values. [NL]
 	#lastPropertyEditorUIAlias?: string | null;
+
 	#observePropertyEditorUIAlias() {
 		this.observe(
 			this.propertyEditorUiAlias,
