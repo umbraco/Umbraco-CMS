@@ -1,5 +1,4 @@
-import { UmbMediaPickerContext } from '../input-media/input-media.context.js';
-import { UMB_IMAGE_CROPPER_EDITOR_MODAL } from '../../modals/index.js';
+import { UMB_IMAGE_CROPPER_EDITOR_MODAL, UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
 import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../../property-editors/index.js';
 import { customElement, html, ifDefined, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -7,11 +6,15 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UmbInputMediaElement, UmbMediaItemRepository } from '@umbraco-cms/backoffice/media';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbModalRouteRegistrationController, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_MANAGER_CONTEXT,
+	UmbModalRouteRegistrationController,
+	umbConfirmModal,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbMediaItemModel, UmbUploadableFileModel } from '@umbraco-cms/backoffice/media';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext, UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 type UmbRichMediaCardModel = {
@@ -83,8 +86,8 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 
 	@property({ type: Array })
 	public set items(value: Array<UmbMediaPickerPropertyValue>) {
-		this.#items = value;
 		this.#sorter.setModel(value);
+		this.#items = value;
 		this.#populateCards();
 	}
 	public get items(): Array<UmbMediaPickerPropertyValue> {
@@ -141,7 +144,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	@state()
-	private _cards?: Array<UmbRichMediaCardModel>;
+	private _cards: Array<UmbRichMediaCardModel> = [];
 
 	@state()
 	private _routeBuilder?: UmbModalRouteBuilder;
@@ -151,11 +154,14 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	#imagingRepository = new UmbImagingRepository(this);
 
 	#modalRouter: UmbModalRouteRegistrationController;
-
-	#pickerContext = new UmbMediaPickerContext(this);
+	#modalManager?: UmbModalManagerContext;
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
+			this.#modalManager = instance;
+		});
 
 		this.#modalRouter = new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
 			.addAdditionalPath(':key')
@@ -208,6 +214,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	async #populateCards() {
+		// TODO This is being called twice when picking an media item. We don't want to call the server unnecessary...
 		if (!this.items?.length) {
 			this._cards = [];
 			return;
@@ -255,39 +262,41 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		}));
 
 		this.items = [...this.#items, ...additions];
-
+		this.#populateCards();
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	async #openPicker() {
-		await this.#pickerContext.openPicker({
-			multiple: this.multiple,
-			startNode: this.startNode,
-			pickableFilter: this.#pickableFilter,
+		const modalHandler = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
+			data: {
+				multiple: this.multiple,
+				startNode: this.startNode,
+				pickableFilter: this.#pickableFilter,
+			},
+			value: { selection: [] },
 		});
 
-		const selection = this.#pickerContext.getSelection();
+		const data = await modalHandler?.onSubmit().catch(() => null);
+		if (!data) return;
 
+		const selection = data.selection;
 		this.#addItems(selection);
-
-		// NOTE: Clear the selection, so that we can support picking the same media item multiple times. [LK]
-		this.#pickerContext.setSelection([]);
 	}
 
 	async #onRemove(item: UmbRichMediaCardModel) {
 		await umbConfirmModal(this, {
 			color: 'danger',
-			headline: `Remove ${item.name}?`,
-			content: 'Are you sure you want to remove this item',
-			confirmLabel: 'Remove',
+			headline: `${this.localize.term('actions_remove')} ${item.name}?`,
+			content: `${this.localize.term('defaultdialogs_confirmremove')} ${item.name}?`,
+			confirmLabel: this.localize.term('actions_remove'),
 		});
 
 		const index = this.items.findIndex((x) => x.key === item.unique);
 		if (index == -1) return;
 
-		const tmp = [...this.items];
-		tmp.splice(index, 1);
-		this.items = tmp;
+		const tmpItems = [...this.items];
+		tmpItems.splice(index, 1);
+		this.items = tmpItems;
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -311,7 +320,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	#renderItems() {
-		if (!this._cards?.length) return;
+		if (!this._cards.length) return;
 		return html`
 			${repeat(
 				this._cards,
@@ -322,7 +331,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	#renderAddButton() {
-		if ((this._cards && this.max && this._cards.length >= this.max) || (this._cards?.length && !this.multiple)) return;
+		if ((this._cards && this.max && this._cards.length >= this.max) || (this._cards.length && !this.multiple)) return;
 		return html`
 			<uui-button
 				id="btn-add"

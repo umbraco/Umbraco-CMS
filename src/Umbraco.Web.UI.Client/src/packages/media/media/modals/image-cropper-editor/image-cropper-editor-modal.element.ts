@@ -47,7 +47,6 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	}
 
 	async #getSrc() {
-		console.log('getSrc', this.value);
 		const { data } = await this.#urlRepository.requestItems([this._unique]);
 		const item = data?.[0];
 
