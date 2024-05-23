@@ -11,6 +11,8 @@ import { html, customElement, state, repeat, css, property, nothing } from '@umb
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../block-grid-entry/index.js';
 import { UmbSorterController, type UmbSorterConfig, type resolvePlacementArgs } from '@umbraco-cms/backoffice/sorter';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
@@ -98,7 +100,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
  * @element umb-block-grid-entries
  */
 @customElement('umb-block-grid-entries')
-export class UmbBlockGridEntriesElement extends UmbLitElement {
+export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElement) {
 	//
 	// TODO: Make sure Sorter callbacks handles columnSpan when retrieving a new entry.
 
@@ -131,6 +133,7 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 	public set areaKey(value: string | null | undefined) {
 		this._areaKey = value;
 		this.#context.setAreaKey(value ?? null);
+		this.#setupValidation();
 	}
 	public get areaKey(): string | null | undefined {
 		return this._areaKey;
@@ -195,6 +198,36 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 				'observeStylesheet',
 			);
 		});
+	}
+
+	async #setupValidation() {
+		if (this._areaKey === null) {
+			// This validation setup is not be as configurable as it should be, but it is a start. Alternatively we should consume the manager and observe the configuration. [NL]
+			const manager = await this.#context.getManager();
+			const config = manager.getEditorConfiguration();
+			const min = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.min ?? 0;
+			const max = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.max ?? Infinity;
+
+			this.addValidator(
+				'rangeUnderflow',
+				() => {
+					return this.localize.term('validation_entriesShort', [min, min - (this._layoutEntries.length ?? 0)]);
+				},
+				() => {
+					return (this._layoutEntries.length ?? 0) < min;
+				},
+			);
+
+			this.addValidator(
+				'rangeOverflow',
+				() => {
+					return this.localize.term('validation_entriesExceed', [max, (this._layoutEntries.length ?? 0) - max]);
+				},
+				() => {
+					return (this._layoutEntries.length ?? 0) > max;
+				},
+			);
+		}
 	}
 
 	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type. [NL]

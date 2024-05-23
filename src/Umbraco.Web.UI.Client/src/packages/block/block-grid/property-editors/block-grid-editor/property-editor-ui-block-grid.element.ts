@@ -7,16 +7,19 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
-import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import '../../components/block-grid-entries/index.js';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
  * @element umb-property-editor-ui-block-grid
  */
 @customElement('umb-property-editor-ui-block-grid')
-export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUIBlockGridElement
+	extends UmbFormControlMixin<UmbBlockGridValueModel, typeof UmbLitElement>(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	#context = new UmbBlockGridManagerContext(this);
 	//
 	private _value: UmbBlockGridValueModel = {
@@ -28,10 +31,10 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const validationLimit = config.getValueByAlias<NumberRangeValueType>('validationLimit');
+		/*const validationLimit = config.getValueByAlias<NumberRangeValueType>('validationLimit');
 
-		this._limitMin = validationLimit?.min;
-		this._limitMax = validationLimit?.max;
+		this.#limitMin = validationLimit?.min;
+		this.#limitMax = validationLimit?.max;*/
 
 		const blocks = config.getValueByAlias<Array<UmbBlockGridTypeModel>>('blocks') ?? [];
 		this.#context.setBlockTypes(blocks);
@@ -45,11 +48,6 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		this.#context.setEditorConfiguration(config);
 	}
 
-	//
-	@state()
-	private _limitMin?: number;
-	@state()
-	private _limitMax?: number;
 	@state()
 	private _layoutColumns?: number;
 

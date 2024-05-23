@@ -68,6 +68,9 @@ export abstract class UmbBlockManagerContext<
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
 		this._editorConfiguration.setValue(configs);
 	}
+	getEditorConfiguration(): UmbPropertyEditorConfigCollection | undefined {
+		return this._editorConfiguration.getValue();
+	}
 
 	setBlockTypes(blockTypes: Array<BlockType>) {
 		this.#blockTypes.setValue(blockTypes);

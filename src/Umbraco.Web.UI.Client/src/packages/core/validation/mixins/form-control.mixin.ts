@@ -96,7 +96,6 @@ export function UmbFormControlMixin<
 
 		/**
 		 * Value of this form control.
-		 * If you dont want the setFormValue to be called on the ElementInternals, then prevent calling this method, by not calling super.value = newValue in your implementation of the value setter method.
 		 * @type {string}
 		 * @attr value
 		 * @default ''
