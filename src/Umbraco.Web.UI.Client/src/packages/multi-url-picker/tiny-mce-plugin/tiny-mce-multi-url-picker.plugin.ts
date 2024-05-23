@@ -30,16 +30,24 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 		// 	return () => editor.off('NodeChange', editorEventCallback);
 		// };
 
-		args.editor.ui.registry.addButton('link', {
+		this.editor.ui.registry.addToggleButton('link', {
 			icon: 'link',
 			tooltip: 'Insert/edit link',
 			onAction: () => this.showDialog(),
+			onSetup: (api) => {
+				const changed = this.editor.selection.selectorChangedWithUnbind('a', (state) => api.setActive(state));
+				return () => changed.unbind();
+			},
 		});
 
-		args.editor.ui.registry.addButton('unlink', {
+		this.editor.ui.registry.addToggleButton('unlink', {
 			icon: 'unlink',
-			tooltip: 'Remove link',
+			tooltip: 'Remove Link',
 			onAction: () => args.editor.execCommand('unlink'),
+			onSetup: (api) => {
+				const changed = this.editor.selection.selectorChangedWithUnbind('a', (state) => api.setActive(state));
+				return () => changed.unbind();
+			},
 		});
 	}
 
