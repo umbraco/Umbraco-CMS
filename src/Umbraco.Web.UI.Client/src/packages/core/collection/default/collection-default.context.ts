@@ -120,11 +120,14 @@ export class UmbDefaultCollectionContext<
 			this.pagination.setPageSize(this.#config.pageSize);
 		}
 
+		const filterValue = this.#filter.getValue() as FilterModelType;
+
 		this.#filter.setValue({
 			...this.#defaultFilter,
 			...this.#config,
 			...this.#filter.getValue(),
-			skip: 0,
+			...filterValue,
+			skip: filterValue.skip ?? 0,
 			take: this.#config.pageSize,
 		});
 
