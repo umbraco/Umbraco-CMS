@@ -2,7 +2,7 @@
 import {expect} from "@playwright/test";
 
 // Remove smoke tag before merging
-test.describe('Culture and Hostnames tests @smoke', () => {
+test.describe('Culture and Hostnames tests', {tag: '@smoke'}, () => {
   let documentTypeId = '';
   let contentId = '';
   const contentName = 'TestCultureAndHostnames';

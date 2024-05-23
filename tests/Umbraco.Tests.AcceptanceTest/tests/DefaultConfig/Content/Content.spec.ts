@@ -2,7 +2,7 @@
 import {expect} from "@playwright/test";
 
 // Remove smoke tag before merging
-test.describe('Content tests @smoke', () => {
+test.describe('Content tests', {tag: '@smoke'}, () => {
   let documentTypeId = '';
   let contentId = '';
   const contentName = 'TestContent';
@@ -15,7 +15,8 @@ test.describe('Content tests @smoke', () => {
   });
 
   test.afterEach(async ({umbracoApi}) => {
-    await umbracoApi.document.ensureNameNotExists(contentName); 
+    await umbracoApi.document.ensureNameNotExists(contentName);
+    await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   });
 
   test('can create an empty content', async ({umbracoApi, umbracoUi}) => {
@@ -54,7 +55,7 @@ test.describe('Content tests @smoke', () => {
     await umbracoUi.content.clickSaveAndPublishButton();
 
     // Assert
-    await umbracoUi.content.isSuccessNotificationVisible();
+    await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
     expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
     const contentData = await umbracoApi.document.getByName(contentName);
     expect(contentData.variants[0].state).toBe(expectedState);

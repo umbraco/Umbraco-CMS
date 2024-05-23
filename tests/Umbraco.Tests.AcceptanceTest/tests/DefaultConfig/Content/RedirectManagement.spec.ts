@@ -2,7 +2,7 @@
 import {expect} from "@playwright/test";
 
 // Remove smoke tag before merging
-test.describe('Redirect Management tests @smoke', () => {
+test.describe('Redirect Management tests', {tag: '@smoke'}, () => {
   const disableStatus = 'Disabled';
   const enableStatus = 'Enabled';
 

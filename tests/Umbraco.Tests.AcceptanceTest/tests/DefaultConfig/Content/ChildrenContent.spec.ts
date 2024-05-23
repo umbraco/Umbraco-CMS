@@ -2,7 +2,7 @@
 import {expect} from "@playwright/test";
 
 // Remove smoke tag before merging
-test.describe('Children content tests @smoke', () => {
+test.describe('Children content tests', {tag: '@smoke'}, () => {
   let documentTypeId = '';
   let childDocumentTypeId = '';
   let contentId = '';
