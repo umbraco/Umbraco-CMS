@@ -44,7 +44,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 					aria-hidden="true"
 					part="auth-logo-background" />
 				<div id="graphic" aria-hidden="true">
-					<img part="auth-logo" id="logo-on-image" src="/umbraco/backoffice/assets/umbraco_logo_blue.svg" alt="Logo" />
+					<img part="auth-logo" id="logo-on-image" src="/umbraco/backoffice/assets/umbraco_logo_white.svg" alt="Logo" />
 					<svg
 						id="curve-top"
 						width="1746"
