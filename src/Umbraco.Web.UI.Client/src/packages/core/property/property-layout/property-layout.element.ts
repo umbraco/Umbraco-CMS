@@ -1,7 +1,8 @@
-import { localizeAndTransform } from '@umbraco-cms/backoffice/formatting-api';
-import { css, customElement, html, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+
+import '@umbraco-cms/backoffice/ufm';
 
 /**
  *  @element umb-property-layout
@@ -59,6 +60,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 	public invalid?: boolean;
 
 	override render() {
+		const ufmValue = { alias: this.alias, label: this.label, description: this.description };
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
 			<div id="headerColumn">
@@ -68,7 +70,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				</uui-label>
 				<slot name="action-menu"></slot>
 				<uui-scroll-container id="description">
-					${unsafeHTML(localizeAndTransform(this, this.description))}
+					<umb-ufm-render .markdown=${this.description} .value=${ufmValue}></umb-ufm-render>
 				</uui-scroll-container>
 				<slot name="description"></slot>
 			</div>
@@ -124,18 +126,6 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 			}
 			uui-badge {
 				right: -30px;
-			}
-
-			#description {
-				color: var(--uui-color-text-alt);
-			}
-
-			#description * {
-				max-width: 100%;
-			}
-
-			#description pre {
-				overflow: auto;
 			}
 
 			#editorColumn {
