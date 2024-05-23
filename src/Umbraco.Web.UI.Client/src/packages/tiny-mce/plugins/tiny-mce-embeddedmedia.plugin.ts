@@ -1,14 +1,16 @@
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue } from '@umbraco-cms/backoffice/modal';
 import { UMB_EMBEDDED_MEDIA_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+		const localize = new UmbLocalizationController(args.host);
 
 		this.editor.ui.registry.addToggleButton('umbembeddialog', {
 			icon: 'embed',
-			tooltip: 'Embed',
+			tooltip: localize.term('general_embed'),
 			onAction: () => this.#onAction(),
 			onSetup: function (api) {
 				const changed = args.editor.selection.selectorChangedWithUnbind('div.umb-embed-holder', (state) =>
