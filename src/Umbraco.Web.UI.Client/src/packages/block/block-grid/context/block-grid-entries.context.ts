@@ -6,7 +6,7 @@ import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js'
 import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import { UmbArrayState, UmbNumberState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 
 export class UmbBlockGridEntriesContext

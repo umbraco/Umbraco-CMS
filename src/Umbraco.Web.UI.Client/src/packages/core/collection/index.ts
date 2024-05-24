@@ -15,4 +15,8 @@ export { UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION } from './collection-bu
 
 export { UmbCollectionActionElement, UmbCollectionActionBase } from './action/index.js';
 export type { UmbCollectionDataSource, UmbCollectionRepository } from './repository/index.js';
-export type { UmbCollectionBulkActionPermissions, UmbCollectionConfiguration } from './types.js';
+export type {
+	UmbCollectionBulkActionPermissions,
+	UmbCollectionConfiguration,
+	UmbCollectionColumnConfiguration,
+} from './types.js';
