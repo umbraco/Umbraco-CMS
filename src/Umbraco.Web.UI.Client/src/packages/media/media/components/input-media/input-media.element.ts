@@ -4,13 +4,16 @@ import { UmbMediaPickerContext } from './input-media.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
-@customElement('umb-input-media')
+const elementName = 'umb-input-media';
+
+@customElement(elementName)
 export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
@@ -106,12 +109,14 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	@state()
-	protected editMediaPath = '';
+	private _editMediaPath = '';
 
 	@state()
-	protected items?: Array<UmbMediaCardItemModel>;
+	private _items?: Array<UmbMediaCardItemModel>;
 
 	#pickerContext = new UmbMediaPickerContext(this);
+
+	#imagingRepository = new UmbImagingRepository(this);
 
 	constructor() {
 		super();
@@ -122,20 +127,38 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 				return { data: { entityType: 'media', preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this.editMediaPath = routeBuilder({});
+				this._editMediaPath = routeBuilder({});
 			});
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
-		this.observe(this.#pickerContext.cardItems, (cardItems) => {
-			this.items = cardItems;
-		});
+		this.#observeContextItems();
+		this.#addValidators();
+	}
 
+	#observeContextItems() {
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
+
+		this.observe(this.#pickerContext.selectedItems, async (selectedItems) => {
+			if (!selectedItems?.length) {
+				this._items = [];
+				return;
+			}
+
+			const uniques = selectedItems.map((x) => x.unique);
+			const { data } = await this.#imagingRepository.requestThumbnailUrls(uniques, 400, 400);
+
+			this._items = selectedItems.map((item) => {
+				const src = data?.find((x) => x.unique === item.unique)?.url;
+				return { ...item, src };
+			});
+		});
+	}
+
+	#addValidators() {
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
 			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
 		);
-
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
@@ -162,7 +185,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		});
 	}
 
-	protected onRemove(item: UmbMediaCardItemModel) {
+	#onRemove(item: UmbMediaCardItemModel) {
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
@@ -171,16 +194,18 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	#renderItems() {
-		if (!this.items?.length) return;
-		return html`${repeat(
-			this.items,
-			(item) => item.unique,
-			(item) => this.renderItem(item),
-		)}`;
+		if (!this._items?.length) return;
+		return html`
+			${repeat(
+				this._items,
+				(item) => item.unique,
+				(item) => this.#renderItem(item),
+			)}
+		`;
 	}
 
 	#renderAddButton() {
-		if ((this.items && this.max && this.items.length >= this.max) || (this.items?.length && !this.multiple)) return;
+		if ((this._items && this.max && this._items.length >= this.max) || (this._items?.length && !this.multiple)) return;
 		return html`
 			<uui-button
 				id="btn-add"
@@ -193,21 +218,21 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	protected renderItem(item: UmbMediaCardItemModel) {
+	#renderItem(item: UmbMediaCardItemModel) {
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				detail=${ifDefined(item.unique)}
-				href="${this.editMediaPath}edit/${item.unique}">
-				${item.url
-					? html`<img src=${item.url} alt=${item.name} />`
+				href="${this._editMediaPath}edit/${item.unique}">
+				${item.src
+					? html`<img src=${item.src} alt=${item.name} />`
 					: html`<umb-icon name=${ifDefined(item.mediaType.icon)}></umb-icon>`}
-				${this.renderIsTrashed(item)}
+				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					<uui-button
 						label=${this.localize.term('general_remove')}
 						look="secondary"
-						@click=${() => this.onRemove(item)}>
+						@click=${() => this.#onRemove(item)}>
 						<uui-icon name="icon-trash"></uui-icon>
 					</uui-button>
 				</uui-action-bar>
@@ -215,7 +240,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		`;
 	}
 
-	protected renderIsTrashed(item: UmbMediaCardItemModel) {
+	#renderIsTrashed(item: UmbMediaCardItemModel) {
 		if (!item.isTrashed) return;
 		return html`
 			<uui-tag size="s" slot="tag" color="danger">
@@ -231,9 +256,9 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 			}
 			.container {
 				display: grid;
-				gap: var(--uui-size-space-3);
 				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 				grid-auto-rows: 150px;
+				gap: var(--uui-size-space-5);
 			}
 
 			#btn-add {
@@ -253,14 +278,19 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 			uui-card-media[drag-placeholder] {
 				opacity: 0.2;
 			}
+			img {
+				background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>');
+				background-size: 10px 10px;
+				background-repeat: repeat;
+			}
 		`,
 	];
 }
 
-export default UmbInputMediaElement;
+export { UmbInputMediaElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-media': UmbInputMediaElement;
+		[elementName]: UmbInputMediaElement;
 	}
 }

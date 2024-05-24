@@ -103,8 +103,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 
 		return items
 			.map((item): UmbMediaCardItemModel => {
-				const url = data?.find((media) => media.unique === item.unique)?.url;
-				return { ...item, url };
+				const src = data?.find((media) => media.unique === item.unique)?.url;
+				return { ...item, src };
 			})
 			.filter((item) => this._filter(item));
 	}
@@ -241,8 +241,8 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 				@deselected=${() => this.#onDeselected(item)}
 				?selected=${this.value?.selection?.find((value) => value === item.unique)}
 				?selectable=${!disabled}>
-				${item.url
-					? html`<img src=${item.url} alt=${ifDefined(item.name)} />`
+				${item.src
+					? html`<img src=${item.src} alt=${ifDefined(item.name)} />`
 					: html`<umb-icon .name=${item.mediaType.icon}></umb-icon>`}
 			</uui-card-media>
 		`;
