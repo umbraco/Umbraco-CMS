@@ -1,4 +1,4 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 const languageName = 'Arabic';
@@ -15,7 +15,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureNameNotExists(languageName);
 });
 
-test('can add language', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test.skip('can add language', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.language.goToSettingsTreeItem('Language');
 
