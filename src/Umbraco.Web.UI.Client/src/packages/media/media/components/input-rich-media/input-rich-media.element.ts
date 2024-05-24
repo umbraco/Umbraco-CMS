@@ -209,7 +209,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 					const crops = value.crops;
 					const mediaKey = value.unique;
 
-					// if the key changes, the card will update
+					// Note: If the mediaKey changes we will change the key which causes cards to update
 					const key = mediaKey === item.mediaKey ? item.key : UmbId.new();
 
 					return { ...item, crops, mediaKey, focalPoint, key };
