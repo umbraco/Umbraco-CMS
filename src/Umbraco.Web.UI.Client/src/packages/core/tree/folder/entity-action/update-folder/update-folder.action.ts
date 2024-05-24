@@ -1,8 +1,8 @@
+import { UMB_FOLDER_UPDATE_MODAL } from '../../modal/index.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import type { MetaEntityActionFolderKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_FOLDER_UPDATE_MODAL } from '@umbraco-cms/backoffice/tree';
 
 export class UmbUpdateFolderEntityAction extends UmbEntityActionBase<MetaEntityActionFolderKind> {
 	async execute() {
