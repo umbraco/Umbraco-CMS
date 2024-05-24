@@ -43,7 +43,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		/** TODO: This component probably needs some grid-like logic for resolve placement... [LI] */
 		resolvePlacement: () => false,
 		onChange: ({ model }) => {
-			this.items = model;
+			this.#items = model;
 			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
@@ -261,8 +261,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 			focalPoint: null,
 		}));
 
-		this.items = [...this.#items, ...additions];
-		this.#populateCards();
+		this.#items = [...this.#items, ...additions];
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -296,7 +295,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 
 		const tmpItems = [...this.items];
 		tmpItems.splice(index, 1);
-		this.items = tmpItems;
+		this.#items = tmpItems;
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
