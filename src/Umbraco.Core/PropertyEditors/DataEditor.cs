@@ -75,6 +75,10 @@ public class DataEditor : IDataEditor
     [DataMember(Name = "supportsReadOnly", IsRequired = true)]
     public bool SupportsReadOnly { get; set; }
 
+    // Adding a virtual method that wraps the default implementation allows derived classes
+    // to override the default implementation without having to explicitly inherit the interface.
+    public virtual bool SupportsConfigurableElements => false;
+
     /// <inheritdoc />
     [IgnoreDataMember]
     public bool IsDeprecated { get; }

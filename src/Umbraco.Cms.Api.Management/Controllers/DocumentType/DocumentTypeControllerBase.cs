@@ -82,6 +82,18 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Operation not permitted")
                     .WithDetail("The attempted operation was not permitted, likely due to a permission/configuration mismatch with the operation.")
                     .Build()),
+                ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid IsElement flag")
+                    .WithDetail("Can not change to Element Type because content has already been created with this documenttype.")
+                    .Build()),
+                ContentTypeOperationStatus.InvalidElementFlagHasDocumentAncestor => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid IsElement flag")
+                    .WithDetail("Can not change to Element Type because it is used in a composition/inheritance chain.")
+                    .Build()),
+                ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid IsElement flag")
+                    .WithDetail("Can not change to Document Type because this Element Type is used in the configuration of Data Types")
+                    .Build()),
                 _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
             });
 

@@ -16,6 +16,8 @@ public interface IDataEditor : IDiscoverable
 
     bool SupportsReadOnly => false;
 
+    bool SupportsConfigurableElements => false;
+
     /// <summary>
     ///     Gets a value indicating whether the editor is deprecated.
     /// </summary>

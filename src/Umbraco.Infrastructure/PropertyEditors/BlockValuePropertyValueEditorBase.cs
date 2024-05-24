@@ -114,6 +114,13 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
         MapBlockItemDataToEditor(property, blockValue.SettingsData);
     }
 
+    protected bool HasElementConfigured(Guid elementTypeKey, IBlockConfiguration configuration)
+    {
+        return configuration.ContentElementTypeKey == elementTypeKey || (configuration.SettingsElementTypeKey is not null &&
+                                                                         configuration.SettingsElementTypeKey.Value ==
+                                                                         elementTypeKey);
+    }
+
     private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items)
     {
         var valEditors = new Dictionary<Guid, IDataValueEditor>();

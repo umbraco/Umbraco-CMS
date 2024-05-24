@@ -1,6 +1,9 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -12,6 +15,10 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentType, IContentTypeService, ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>, IContentTypeEditingService
 {
     private readonly ITemplateService _templateService;
+    private readonly IDataTypeService _dataTypeService;
+    private readonly IEntityService _entityService;
+    private readonly IContentService _contentService;
+    private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IContentTypeService _contentTypeService;
 
     public ContentTypeEditingService(
@@ -19,11 +26,17 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         ITemplateService templateService,
         IDataTypeService dataTypeService,
         IEntityService entityService,
-        IShortStringHelper shortStringHelper)
+        IShortStringHelper shortStringHelper,
+        IContentService contentService,
+        PropertyEditorCollection propertyEditorCollection)
         : base(contentTypeService, contentTypeService, dataTypeService, entityService, shortStringHelper)
     {
         _contentTypeService = contentTypeService;
         _templateService = templateService;
+        _dataTypeService = dataTypeService;
+        _entityService = entityService;
+        _contentService = contentService;
+        _propertyEditorCollection = propertyEditorCollection;
     }
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
@@ -47,13 +60,20 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> UpdateAsync(IContentType contentType, ContentTypeUpdateModel model, Guid userKey)
     {
-        Attempt<IContentType?, ContentTypeOperationStatus> result = await ValidateAndMapForUpdateAsync(contentType, model);
-        if (result.Success is false)
+        // this needs to happen before the base call as that one is not a pure function
+        ContentTypeOperationStatus elementValidationStatus = await ValidateElementStatusForUpdateAsync(contentType, model);
+        if (elementValidationStatus is not ContentTypeOperationStatus.Success)
         {
-            return result;
+            return Attempt<IContentType?, ContentTypeOperationStatus>.Fail(elementValidationStatus);
         }
 
-        contentType = result.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForUpdateAsync)} succeeded but did not yield any result");
+        Attempt<IContentType?, ContentTypeOperationStatus> baseValidationAttempt = await ValidateAndMapForUpdateAsync(contentType, model);
+        if (baseValidationAttempt.Success is false)
+        {
+            return baseValidationAttempt;
+        }
+
+        contentType = baseValidationAttempt.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForUpdateAsync)} succeeded but did not yield any result");
 
         UpdateHistoryCleanup(contentType, model);
         UpdateTemplates(contentType, model);
@@ -92,6 +112,57 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         //       contentType.SetDefaultTemplate() will be called with a null value, which will reset the default template.
         contentType.SetDefaultTemplate(allowedTemplates.FirstOrDefault(t => t.Key == model.DefaultTemplateKey));
     }
+
+    private async Task<ContentTypeOperationStatus> ValidateElementStatusForUpdateAsync(IContentTypeBase contentType, ContentTypeModelBase model)
+    {
+        // no change, ignore rest of validation
+        if (contentType.IsElement == model.IsElement)
+        {
+            return ContentTypeOperationStatus.Success;
+        }
+
+        // if new value is Not Element => Document
+        // => check whether the element was used in a block structure prior to updating
+        if (model.IsElement is false)
+        {
+            return await ValidateElementToDocumentNotUsedInBlockStructuresAsync(contentType);
+        }
+
+        // previous check is true, so we are switching from document to element
+        ContentTypeOperationStatus operationStatus = ValidateDocumentToElementHasNoAncestors(contentType);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return operationStatus;
+        }
+
+        return ValidateDocumentToElementHasNoContent(contentType);
+    }
+
+    private async Task<ContentTypeOperationStatus> ValidateElementToDocumentNotUsedInBlockStructuresAsync(IContentTypeBase contentType)
+    {
+        // get all propertyEditors that support block usage
+        var editors = _propertyEditorCollection.Where(pe => pe.SupportsConfigurableElements).ToArray();
+        var blockEditorAliases = editors.Select(pe => pe.Alias).ToArray();
+
+        // get all dataTypes that are based on those propertyEditors
+        IEnumerable<IDataType> dataTypes = await _dataTypeService.GetByEditorAliasAsync(blockEditorAliases);
+
+        // validate whether any of those configurations have this element selected as a possible block
+        return dataTypes.Any(dataType =>
+            (dataType.Editor ?? editors.First(editor => editor.Alias == dataType.EditorAlias)).GetValueEditor(dataType.ConfigurationObject).HasElementConfigured(contentType.Key) == true)
+            ? ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration
+            : ContentTypeOperationStatus.Success;
+    }
+
+    private ContentTypeOperationStatus ValidateDocumentToElementHasNoAncestors(IContentTypeBase contentType) =>
+        contentType.AncestorIds().Any()
+            ? ContentTypeOperationStatus.InvalidElementFlagHasDocumentAncestor
+            : ContentTypeOperationStatus.Success;
+
+    private ContentTypeOperationStatus ValidateDocumentToElementHasNoContent(IContentTypeBase contentType) =>
+        _contentService.Count(contentType.Alias) > 0
+            ? ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent
+            : ContentTypeOperationStatus.Success;
 
     private async Task SaveAsync(IContentType contentType, Guid userKey)
         => await _contentTypeService.SaveAsync(contentType, userKey);

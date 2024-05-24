@@ -45,6 +45,8 @@ public class RichTextPropertyEditor : DataEditor
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _richTextPropertyIndexValueFactory;
 
+    public override bool SupportsConfigurableElements => true;
+
     /// <summary>
     ///     Create a custom value editor
     /// </summary>
@@ -234,6 +236,12 @@ public class RichTextPropertyEditor : DataEditor
 
             // return json
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(cleanedUpRichTextEditorValue, _jsonSerializer);
+        }
+
+        public override bool HasElementConfigured(Guid elementTypeKey)
+        {
+            var configuration = ConfigurationObject as RichTextConfiguration;
+            return configuration?.Blocks?.Any(blockConfig => HasElementConfigured(elementTypeKey, blockConfig)) is true;
         }
 
         private bool TryParseEditorValue(object? value, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)

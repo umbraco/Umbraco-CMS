@@ -16,5 +16,8 @@ public enum ContentTypeOperationStatus
     MissingContainer,
     DuplicateContainer,
     NotFound,
-    NotAllowed
+    NotAllowed,
+    InvalidElementFlagHasDocumentAncestor,
+    InvalidElementFlagDocumentHasContent,
+    InvalidElementFlagElementIsUsedInPropertyEditorConfiguration
 }
