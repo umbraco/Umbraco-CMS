@@ -1,7 +1,7 @@
-import type { UmbSortChildrenOfArgs } from './types.js';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbSortChildrenOfArgs, UmbSortChildrenOfDataSource } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A server data source for sorting children of a Media
@@ -9,7 +9,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbSortChildrenOfMediaServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbSortChildrenOfMediaServerDataSource {
+export class UmbSortChildrenOfMediaServerDataSource implements UmbSortChildrenOfDataSource {
 	#host: UmbControllerHost;
 
 	/**
