@@ -8,12 +8,8 @@ import type {
 	UmbImageCropperEditorModalValue,
 } from './image-cropper-editor-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_WORKSPACE_MODAL,
-	UmbModalBaseElement,
-	UmbModalRouteRegistrationController,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_WORKSPACE_MODAL, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 /** TODO Make some of the components from property editor image cropper reuseable for this modal... */
