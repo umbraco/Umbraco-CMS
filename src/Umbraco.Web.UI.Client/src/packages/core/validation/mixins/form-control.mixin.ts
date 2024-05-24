@@ -27,7 +27,7 @@ type FlagTypes =
 	| 'valid';
 
 // Acceptable as an internal interface/type, BUT if exposed externally this should be turned into a public interface in a separate file.
-interface UmbFormControlValidatorConfig {
+export interface UmbFormControlValidatorConfig {
 	flagKey: FlagTypes;
 	getMessageMethod: () => string;
 	checkMethod: () => boolean;

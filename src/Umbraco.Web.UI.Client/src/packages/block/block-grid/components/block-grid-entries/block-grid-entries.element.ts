@@ -138,7 +138,6 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	public set areaKey(value: string | null | undefined) {
 		this._areaKey = value;
 		this.#context.setAreaKey(value ?? null);
-		this.#setupValidation();
 	}
 	public get areaKey(): string | null | undefined {
 		return this._areaKey;
@@ -169,27 +168,43 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 
 	constructor() {
 		super();
-		this.observe(this.#context.layoutEntries, (layoutEntries) => {
-			//const oldValue = this._layoutEntries;
-			this.#sorter.setModel(layoutEntries);
-			this._layoutEntries = layoutEntries;
-			//this.requestUpdate('layoutEntries', oldValue);
-		});
+		this.observe(
+			this.#context.layoutEntries,
+			(layoutEntries) => {
+				//const oldValue = this._layoutEntries;
+				this.#sorter.setModel(layoutEntries);
+				this._layoutEntries = layoutEntries;
+				//this.requestUpdate('layoutEntries', oldValue);
+			},
+			null,
+		);
 
-		this.observe(this.#context.amountOfAllowedBlockTypes, (length) => {
-			this._canCreate = length > 0;
-			if (length === 1) {
-				this.observe(
-					this.#context.firstAllowedBlockTypeName(),
-					(firstAllowedName) => {
-						this._singleBlockTypeName = firstAllowedName;
-					},
-					'observeSingleBlockTypeName',
-				);
-			} else {
-				this.removeUmbControllerByAlias('observeSingleBlockTypeName');
-			}
-		});
+		this.observe(
+			this.#context.amountOfAllowedBlockTypes,
+			(length) => {
+				this._canCreate = length > 0;
+				if (length === 1) {
+					this.observe(
+						this.#context.firstAllowedBlockTypeName(),
+						(firstAllowedName) => {
+							this._singleBlockTypeName = firstAllowedName;
+						},
+						'observeSingleBlockTypeName',
+					);
+				} else {
+					this.removeUmbControllerByAlias('observeSingleBlockTypeName');
+				}
+			},
+			null,
+		);
+
+		this.observe(
+			this.#context.rangeLimits,
+			(rangeLimits) => {
+				this.#setupRangeValidation(rangeLimits);
+			},
+			null,
+		);
 
 		this.#context.getManager().then((manager) => {
 			this.observe(
@@ -207,42 +222,25 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 		this.#controlValidator = new UmbFormControlValidator(this, this /*, this.#dataPath*/);
 	}
 
-	async #getLimitValidation() {
-		if (this._areaKey === null) {
-			// This validation setup is not be as configurable as it should be, but it is a start. Alternatively we should consume the manager and observe the configuration. [NL]
-			const manager = await this.#context.getManager();
-			const config = manager.getEditorConfiguration();
-			const min = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.min ?? 0;
-			const max = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.max ?? Infinity;
-			return { min, max };
-		} else {
-			return { min: 3, max: 4 };
-		}
-	}
-
 	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
 	#rangeOverflowValidator?: UmbFormControlValidatorConfig;
-	async #setupValidation() {
-		const rangeLimit = await this.#getLimitValidation();
-
-		console.log('setup validation', this);
-
+	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {
 		if (this.#rangeUnderflowValidator) {
 			this.removeValidator(this.#rangeUnderflowValidator);
 			this.#rangeUnderflowValidator = undefined;
 		}
-		if (rangeLimit.min !== 0) {
+		if (rangeLimit?.min !== 0) {
 			this.#rangeUnderflowValidator = this.addValidator(
 				'rangeUnderflow',
 				() => {
 					return this.localize.term(
 						'validation_entriesShort',
-						rangeLimit.min,
-						rangeLimit.min - (this._layoutEntries.length ?? 0),
+						rangeLimit!.min,
+						(rangeLimit!.min ?? 0) - this._layoutEntries.length,
 					);
 				},
 				() => {
-					return (this._layoutEntries.length ?? 0) < rangeLimit.min;
+					return this._layoutEntries.length < (rangeLimit?.min ?? 0);
 				},
 			);
 		}
@@ -251,18 +249,18 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			this.removeValidator(this.#rangeOverflowValidator);
 			this.#rangeOverflowValidator = undefined;
 		}
-		if (rangeLimit.max !== Infinity) {
+		if (rangeLimit?.max !== Infinity) {
 			this.#rangeOverflowValidator = this.addValidator(
 				'rangeOverflow',
 				() => {
 					return this.localize.term(
 						'validation_entriesExceed',
-						rangeLimit.max,
-						(this._layoutEntries.length ?? 0) - rangeLimit.max,
+						rangeLimit!.max,
+						this._layoutEntries.length - (rangeLimit!.max ?? this._layoutEntries.length),
 					);
 				},
 				() => {
-					return (this._layoutEntries.length ?? 0) > rangeLimit.max;
+					return (this._layoutEntries.length ?? 0) > (rangeLimit?.max ?? Infinity);
 				},
 			);
 		}

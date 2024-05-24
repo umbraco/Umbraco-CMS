@@ -4,10 +4,11 @@ import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridWorkspaceData } from '..
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeAreaType, UmbBlockGridTypeModel } from '../types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
 import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
-import { UmbArrayState, UmbNumberState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbNumberState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 export class UmbBlockGridEntriesContext
 	extends UmbBlockEntriesContext<
@@ -30,6 +31,9 @@ export class UmbBlockGridEntriesContext
 
 	#parentUnique?: string | null;
 	#areaKey?: string | null;
+
+	#rangeLimits = new UmbObjectState<UmbNumberRangeValueType | undefined>(undefined);
+	readonly rangeLimits = this.#rangeLimits.asObservable();
 
 	#allowedBlockTypes = new UmbArrayState<UmbBlockGridTypeModel>([], (x) => x.contentElementTypeKey);
 	public readonly allowedBlockTypes = this.#allowedBlockTypes.asObservable();
@@ -121,6 +125,7 @@ export class UmbBlockGridEntriesContext
 		if (!this._manager) return;
 
 		this.#getAllowedBlockTypes();
+		this.#getRangeLimits();
 
 		this.observe(
 			this._manager.propertyAlias,
@@ -185,6 +190,7 @@ export class UmbBlockGridEntriesContext
 
 			this.removeUmbControllerByAlias('observeAreaType');
 			this.#getAllowedBlockTypes();
+			this.#getRangeLimits();
 		} else {
 			if (!this.#parentEntry) return;
 
@@ -228,6 +234,7 @@ export class UmbBlockGridEntriesContext
 					hostEl.style.setProperty('--umb-block-grid--area-column-span', areaType?.columnSpan?.toString() ?? '');
 					hostEl.style.setProperty('--umb-block-grid--area-row-span', areaType?.rowSpan?.toString() ?? '');
 					this.#getAllowedBlockTypes();
+					this.#getRangeLimits();
 				},
 				'observeAreaType',
 			);
@@ -235,9 +242,13 @@ export class UmbBlockGridEntriesContext
 	}
 
 	#getAllowedBlockTypes() {
-		if (this.#areaKey === undefined || !this._manager) return;
-
+		if (!this._manager) return;
 		this.#allowedBlockTypes.setValue(this.#retrieveAllowedElementTypes());
+	}
+	#getRangeLimits() {
+		if (!this._manager) return;
+		const range = this.#retrieveRangeLimits();
+		this.#rangeLimits.setValue(range);
 	}
 
 	getPathForCreateBlock(index: number) {
@@ -324,10 +335,34 @@ export class UmbBlockGridEntriesContext
 
 			// No specific permissions setup, so we will fallback to items allowed in areas:
 			return this._manager.getBlockTypes().filter((x) => x.allowInAreas);
+		} else if (this.#areaKey === null) {
+			// If AreaKey is null, then we are in the root, looking for items allowed as root:
+			return this._manager.getBlockTypes().filter((x) => x.allowAtRoot);
 		}
 
-		// If no AreaKey, then we are in the root, looking for items allowed as root:
-		return this._manager.getBlockTypes().filter((x) => x.allowAtRoot);
+		return [];
+	}
+
+	/**
+	 * @internal
+	 * @returns an NumberRange of the min and max allowed items in the current area. Or undefined if not ready jet.
+	 */
+	#retrieveRangeLimits(): UmbNumberRangeValueType | undefined {
+		if (this.#areaKey != null) {
+			// Area entries:
+			if (!this.#areaType) return undefined;
+
+			return { min: this.#areaType.minAllowed ?? 0, max: this.#areaType.maxAllowed ?? Infinity };
+		} else if (this.#areaKey === null) {
+			if (!this._manager) return undefined;
+
+			const config = this._manager.getEditorConfiguration();
+			const min = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.min ?? 0;
+			const max = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.max ?? Infinity;
+			return { min, max };
+		}
+
+		return undefined;
 	}
 
 	/**
