@@ -5,6 +5,8 @@ export * from './tree-menu-item-default/index.js';
 export * from './folder/index.js';
 export * from './tree.element.js';
 
+export * from './entity-actions/sort-children-of/sort-children-of.action.js';
+
 export {
 	UmbReloadTreeItemChildrenEntityAction,
 	UmbRequestReloadTreeItemChildrenEvent,
