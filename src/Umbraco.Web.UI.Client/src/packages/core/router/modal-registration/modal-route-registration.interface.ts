@@ -1,7 +1,6 @@
-import type { UmbModalManagerContext } from '../context/modal-manager.context.js';
-import type { UmbModalContext, UmbModalRouteBuilder } from '../index.js';
-import type { UmbModalToken } from '../token/modal-token.js';
-import type { IRouterSlot, Params } from '@umbraco-cms/backoffice/router';
+import type { UmbModalRouteBuilder } from './modal-route-registration.controller.js';
+import type { IRouterSlot, Params } from '@umbraco-cms/backoffice/external/router-slot';
+import type { UmbModalContext, UmbModalManagerContext, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbModalRouteRegistration<
 	UmbModalTokenData extends { [key: string]: any } = { [key: string]: any },

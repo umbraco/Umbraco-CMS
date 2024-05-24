@@ -1,12 +1,15 @@
 import { TimeOptions } from './utils.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import './media-workspace-view-info-history.element.js';
-import './media-workspace-view-info-reference.element.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT, type UmbMediaWorkspaceContext } from '@umbraco-cms/backoffice/media';
 import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
+
+// import of local components
+import './media-workspace-view-info-history.element.js';
+import './media-workspace-view-info-reference.element.js';
 
 @customElement('umb-media-workspace-view-info')
 export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {

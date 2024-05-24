@@ -1,7 +1,7 @@
 import type { UmbBlockTypeCardElement } from '../block-type-card/index.js';
 import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../../types.js';
-import { UmbModalRouteRegistrationController, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import '../block-type-card/index.js';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
@@ -12,6 +12,8 @@ import {
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/document-type';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+
+import '../block-type-card/index.js';
 
 /** TODO: Look into sending a "change" event when there is a change, rather than create, delete, and change event. Make sure it doesn't break move for RTE/List/Grid. [LI] */
 @customElement('umb-input-block-type')
