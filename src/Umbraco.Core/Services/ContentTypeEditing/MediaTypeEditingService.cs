@@ -42,6 +42,11 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
 
     public async Task<Attempt<IMediaType?, ContentTypeOperationStatus>> UpdateAsync(IMediaType mediaType, MediaTypeUpdateModel model, Guid userKey)
     {
+        if (mediaType.IsSystemMediaType() && mediaType.Alias != model.Alias)
+        {
+            return Attempt.FailWithStatus<IMediaType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotAllowed, null);
+        }
+
         Attempt<IMediaType?, ContentTypeOperationStatus> result = await ValidateAndMapForUpdateAsync(mediaType, model);
         if (result.Success)
         {

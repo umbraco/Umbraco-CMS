@@ -38642,12 +38642,14 @@
       "MediaTypeResponseModel": {
         "required": [
           "alias",
+          "aliasCanBeChanged",
           "allowedAsRoot",
           "allowedMediaTypes",
           "compositions",
           "containers",
           "icon",
           "id",
+          "isDeletable",
           "isElement",
           "name",
           "properties",
@@ -38735,6 +38737,12 @@
                 }
               ]
             }
+          },
+          "isDeletable": {
+            "type": "boolean"
+          },
+          "aliasCanBeChanged": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -38765,6 +38773,7 @@
           "hasChildren",
           "icon",
           "id",
+          "isDeletable",
           "isFolder",
           "name"
         ],
@@ -38793,6 +38802,9 @@
           },
           "icon": {
             "type": "string"
+          },
+          "isDeletable": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
