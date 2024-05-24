@@ -1,7 +1,6 @@
-import { UmbEntityActionBase } from '../../../entity-action-base.js';
-import { UmbRequestReloadStructureForEntityEvent } from '../../../request-reload-structure-for-entity.event.js';
 import { UMB_DUPLICATE_TO_MODAL } from './modal/duplicate-to-modal.token.js';
 import type { UmbDuplicateToRepository } from './types.js';
+import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { MetaEntityActionDuplicateToKind } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';

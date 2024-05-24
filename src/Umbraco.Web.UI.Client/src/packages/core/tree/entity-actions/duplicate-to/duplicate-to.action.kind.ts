@@ -1,23 +1,23 @@
-import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../default/default.action.kind.js';
+import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.EntityAction.MoveTo',
-	matchKind: 'moveTo',
+	alias: 'Umb.Kind.EntityAction.DuplicateTo',
+	matchKind: 'duplicateTo',
 	matchType: 'entityAction',
 	manifest: {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
-		kind: 'moveTo',
-		api: () => import('./move-to.action.js'),
-		weight: 700,
+		kind: 'duplicateTo',
+		api: () => import('./duplicate-to.action.js'),
+		weight: 600,
 		forEntityTypes: [],
 		meta: {
 			icon: 'icon-enter',
-			label: '#actions_move',
+			label: '#actions_copyTo',
 			treeRepositoryAlias: '',
-			moveRepositoryAlias: '',
+			duplicateRepositoryAlias: '',
 			treeAlias: '',
 		},
 	},
