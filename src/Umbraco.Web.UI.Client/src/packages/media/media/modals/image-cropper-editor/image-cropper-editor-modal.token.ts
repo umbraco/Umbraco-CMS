@@ -23,6 +23,6 @@ export const UMB_IMAGE_CROPPER_EDITOR_MODAL = new UmbModalToken<
 >('Umb.Modal.ImageCropperEditor', {
 	modal: {
 		type: 'sidebar',
-		size: 'large',
+		size: 'full',
 	},
 });
