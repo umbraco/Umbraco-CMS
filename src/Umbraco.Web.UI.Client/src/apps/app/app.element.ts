@@ -77,7 +77,11 @@ export class UmbAppElement extends UmbLitElement {
 				// The authorization request will be completed in the active window (main or popup) and the authorization signal will be sent.
 				// If we are in a popup window, the storage event in UmbAuthContext will catch the signal and close the window.
 				// If we are in the main window, the signal will be caught right here and the user will be redirected to the root.
-				if (window.opener) {
+				if (
+					window.opener &&
+					window.opener instanceof Window &&
+					window.opener.location.origin === window.location.origin
+				) {
 					(component as UmbAppErrorElement).errorMessage = hasCode
 						? this.localize.term('errors_externalLoginSuccess')
 						: this.localize.term('errors_externalLoginFailed');
