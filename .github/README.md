@@ -37,6 +37,9 @@ Some important documentation links to get you started:
 - [Getting to know Umbraco](https://docs.umbraco.com/umbraco-cms/fundamentals/get-to-know-umbraco)
 - [Tutorials for creating a basic website and customizing the editing experience](https://docs.umbraco.com/umbraco-cms/tutorials/overview)
 
+## Get help
+
+If you need a bit of feedback while building your Umbraco projects, we are [chatty on Discord](https://discord.umbraco.com). Our Discord server serves both a social space but also has channels for questions and answers. Feel free to lurk or join in with your own questions. Or just post your daily Wordle score, up to you!
 
 ## Looking to contribute back to Umbraco?
 
