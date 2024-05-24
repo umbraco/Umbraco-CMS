@@ -1,6 +1,6 @@
 import { UmbDuplicateDocumentTypeServerDataSource } from './document-type-duplicate.server.data-source.js';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { UmbDuplicateToRepository, UmbDuplicateToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbDuplicateToRepository, UmbDuplicateToRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDuplicateDocumentTypeRepository extends UmbRepositoryBase implements UmbDuplicateToRepository {
