@@ -22,9 +22,9 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		this._hideAnchor = config.getValueByAlias('hideAnchor') ?? false;
-		this._minNumber = Number(config.getValueByAlias('minNumber')) ?? 0;
-		this._maxNumber = Number(config.getValueByAlias('maxNumber')) ?? Infinity;
+		this._hideAnchor = Boolean(config.getValueByAlias('hideAnchor')) ?? false;
+		this._minNumber = Number(config.getValueByAlias('minNumber')) || 0;
+		this._maxNumber = Number(config.getValueByAlias('maxNumber')) || Infinity;
 		this._overlaySize = config.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';
 	}
 
