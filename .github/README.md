@@ -27,12 +27,7 @@ cd MyProject
 dotnet run
 ```
 
-## Read more 
-
-<picture>
-    <source srcset="img/documentation-dark.png" media="(prefers-color-scheme: dark)">
-    <img style="padding-bottom: 20px;" src="imd/documentation-light.png" alt="Header saying: Umbraco CMS documentation">
-</picture>
+## Documentation
 
 Our [comprehensive documentation](https://docs.umbraco.com/umbraco-cms) takes you from the fundamentals on how to start with Umbraco to deploying it to production.
 
@@ -52,4 +47,4 @@ You came to the right place! Our GitHub repository is available for all kinds of
 
 Umbraco is contribution-focused and community-driven. If you want to contribute back to the Umbraco source code, please check out our [guide to contributing](CONTRIBUTING.md).
 
-### Tip: You should not run Umbraco from source code found here. Umbraco is extremely extensible to do whatever you need, [install Umbraco as noted above](#looking-to-install-umbraco) and then you can extend it.
+### Tip: You should not run Umbraco from source code found here. Umbraco is extremely extensible and can do whatever you need. Instead, [install Umbraco as noted above](#looking-to-install-umbraco) and then [extend it any way you want to](https://docs.umbraco.com/umbraco-cms/extending/).
