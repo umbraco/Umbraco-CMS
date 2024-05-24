@@ -6,6 +6,6 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.SectionRoute.Workspace',
 		name: 'Section Workspace Route',
 		element: () => import('../workspace.element.js'),
-		api: () => import('./workspace-section-route.api.js'),
+		api: () => import('./workspace-section-route.route-entry.js'),
 	},
 ];
