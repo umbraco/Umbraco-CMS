@@ -15,9 +15,8 @@ import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
+import { UMB_MEDIA_PICKER_MODAL, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
@@ -55,7 +54,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 
 	private _modalContext?: UmbModalManagerContext;
 
-	private serverUrl?: string;
+	#mediaUrlRepository = new UmbMediaUrlRepository(this);
 
 	constructor() {
 		super();
@@ -63,10 +62,6 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
-		});
-
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this.serverUrl = instance.getServerUrl();
 		});
 	}
 
@@ -194,7 +189,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 			label: 'Add Image',
 			id: 'image',
 			//keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyJ], // What keybinding would be good for image?
-			run: () => this._insertMedia(),
+			run: () => this.#insertMedia(),
 			// TODO: Update when media picker is complete.
 		});
 	}
@@ -211,27 +206,31 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 		this.#editor?.monacoEditor?.focus();
 	}
 
-	private _insertMedia() {
+	#insertMedia() {
 		const selection = this.#editor?.getSelections()[0];
 		if (!selection) return;
 
-		const alt = this.#editor?.getValueInRange(selection) || 'alt text';
+		const alt = this.#editor?.getValueInRange(selection) || 'enter image description here';
 
 		this._focusEditor(); // Focus before opening modal, otherwise cannot regain focus back after modal
-		const modalContext = this._modalContext?.open(this, UMB_MEDIA_TREE_PICKER_MODAL);
+		const modalContext = this._modalContext?.open(this, UMB_MEDIA_PICKER_MODAL);
 
 		modalContext
 			?.onSubmit()
-			.then((value) => {
+			.then(async (value) => {
 				if (!value) return;
-				const imgUrl = value.selection[0];
+
+				const uniques = value.selection;
+				const { data: mediaUrls } = await this.#mediaUrlRepository.requestItems(uniques);
+				const mediaUrl = mediaUrls?.length ? mediaUrls[0].url ?? 'URL' : 'URL';
+
 				this.#editor?.monacoEditor?.executeEdits('', [
-					//TODO: Get the correct media URL
 					{
 						range: selection,
-						text: `![${alt}](${imgUrl ? `${this.serverUrl}'/media/'${imgUrl}` : 'URL'})`,
+						text: `![${alt}](${mediaUrl})`,
 					},
 				]);
+
 				this.#editor?.select({
 					startColumn: selection.startColumn + 2,
 					endColumn: selection.startColumn + alt.length + 2, // +2 because of ![
