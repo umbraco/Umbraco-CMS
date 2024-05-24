@@ -20,7 +20,6 @@ import { manifests as textareaManifests } from './textarea/manifests.js';
 import { manifests as textBoxManifests } from './text-box/manifests.js';
 import { manifests as toggleManifests } from './toggle/manifests.js';
 import { manifests as contentPickerManifests } from './content-picker/manifests.js';
-import { manifests as uploadFieldManifests } from './upload-field/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
@@ -40,7 +39,6 @@ export const manifests: Array<ManifestTypes> = [
 	...textBoxManifests,
 	...toggleManifests,
 	...contentPickerManifests,
-	...uploadFieldManifests,
 	colorEditor,
 	numberRange,
 	orderDirection,

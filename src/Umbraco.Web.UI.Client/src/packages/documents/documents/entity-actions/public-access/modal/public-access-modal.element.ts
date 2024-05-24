@@ -1,13 +1,10 @@
 import { UmbDocumentPublicAccessRepository } from '../repository/public-access.repository.js';
+import { UmbDocumentDetailRepository } from '../../../repository/index.js';
+import type { UmbInputDocumentElement } from '../../../components/index.js';
+import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from './public-access-modal.token.js';
 import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import {
-	UmbDocumentDetailRepository,
-	type UmbInputDocumentElement,
-	type UmbPublicAccessModalData,
-	type UmbPublicAccessModalValue,
-} from '@umbraco-cms/backoffice/document';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbInputMemberTypeElement } from '@umbraco-cms/backoffice/member-type';

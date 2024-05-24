@@ -1,5 +1,5 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
-import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
+import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type {
@@ -854,16 +854,11 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	/*
-	concept notes:
-
-	public saveAndPreview() {
-
-	}
-	*/
-
-	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbDocumentPropertyDataContext(host, this, variantId);
+	public createPropertyDatasetContext(
+		host: UmbControllerHost,
+		variantId: UmbVariantId,
+	): UmbDocumentPropertyDatasetContext {
+		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
 	}
 
 	public destroy(): void {

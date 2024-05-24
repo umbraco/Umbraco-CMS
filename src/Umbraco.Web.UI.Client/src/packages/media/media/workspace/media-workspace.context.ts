@@ -1,5 +1,5 @@
 import { UmbMediaTypeDetailRepository } from '../../media-types/repository/detail/media-type-detail.repository.js';
-import { UmbMediaPropertyDataContext } from '../property-dataset-context/media-property-dataset-context.js';
+import { UmbMediaPropertyDatasetContext } from '../property-dataset-context/media-property-dataset-context.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
 import type { UmbMediaDetailModel, UmbMediaVariantModel, UmbMediaVariantOptionModel } from '../types.js';
@@ -453,8 +453,11 @@ export class UmbMediaWorkspaceContext
 	}
 	*/
 
-	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbMediaPropertyDataContext(host, this, variantId);
+	public createPropertyDatasetContext(
+		host: UmbControllerHost,
+		variantId: UmbVariantId,
+	): UmbMediaPropertyDatasetContext {
+		return new UmbMediaPropertyDatasetContext(host, this, variantId);
 	}
 
 	public destroy(): void {
