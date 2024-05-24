@@ -8,6 +8,7 @@ export default {
 } as Meta;
 
 const Template: Story = () => {
+	const approvedIcons = icons.filter((x) => x.legacy !== true);
 	return html`
 		<div
 			style="display: grid;
@@ -17,7 +18,7 @@ const Template: Story = () => {
     place-items: start;
     justify-content: space-between;">
 			${repeat(
-				icons,
+				approvedIcons,
 				(icon) => icon.name,
 				(icon) =>
 					html` <div

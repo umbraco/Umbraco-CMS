@@ -901,6 +901,12 @@ export type EnableUserRequestModel = {
         userIds: Array<ReferenceByIdModel>
     };
 
+export type EntityImportAnalysisResponseModel = {
+        entityType: string
+alias?: string | null
+key?: string | null
+    };
+
 export enum EventMessageTypeModel {
     DEFAULT = 'Default',
     INFO = 'Info',
@@ -1003,6 +1009,14 @@ export enum ImageCropModeModel {
 export type ImportDictionaryRequestModel = {
         temporaryFile: ReferenceByIdModel
 parent?: ReferenceByIdModel | null
+    };
+
+export type ImportDocumentTypeRequestModel = {
+        file: ReferenceByIdModel
+    };
+
+export type ImportMediaTypeRequestModel = {
+        file: ReferenceByIdModel
     };
 
 export type IndexResponseModel = {
@@ -3082,6 +3096,15 @@ PostDocumentTypeByIdCopy: {
 requestBody?: CopyDocumentTypeRequestModel
                         
                     };
+GetDocumentTypeByIdExport: {
+                        id: string
+                        
+                    };
+PutDocumentTypeByIdImport: {
+                        id: string
+requestBody?: ImportDocumentTypeRequestModel
+                        
+                    };
 PutDocumentTypeByIdMove: {
                         id: string
 requestBody?: MoveDocumentTypeRequestModel
@@ -3111,6 +3134,10 @@ DeleteDocumentTypeFolderById: {
 PutDocumentTypeFolderById: {
                         id: string
 requestBody?: UpdateFolderResponseModel
+                        
+                    };
+PostDocumentTypeImport: {
+                        requestBody?: ImportDocumentTypeRequestModel
                         
                     };
 GetItemDocumentType: {
@@ -3152,6 +3179,8 @@ take?: number
                 ,GetDocumentTypeByIdBlueprint: PagedDocumentTypeBlueprintItemResponseModel
                 ,GetDocumentTypeByIdCompositionReferences: Array<DocumentTypeCompositionResponseModel>
                 ,PostDocumentTypeByIdCopy: string
+                ,GetDocumentTypeByIdExport: Blob | File
+                ,PutDocumentTypeByIdImport: string
                 ,PutDocumentTypeByIdMove: string
                 ,GetDocumentTypeAllowedAtRoot: PagedAllowedDocumentTypeModel
                 ,PostDocumentTypeAvailableCompositions: Array<AvailableDocumentTypeCompositionResponseModel>
@@ -3160,6 +3189,7 @@ take?: number
                 ,GetDocumentTypeFolderById: FolderResponseModel
                 ,DeleteDocumentTypeFolderById: string
                 ,PutDocumentTypeFolderById: string
+                ,PostDocumentTypeImport: string
                 ,GetItemDocumentType: Array<DocumentTypeItemResponseModel>
                 ,GetItemDocumentTypeSearch: PagedModelDocumentTypeItemResponseModel
                 ,GetTreeDocumentTypeAncestors: Array<DocumentTypeTreeItemResponseModel>
@@ -3537,6 +3567,23 @@ width?: number
         
     }
 
+export type ImportData = {
+        
+        payloads: {
+            GetImportAnalyze: {
+                        temporaryFileId?: string
+                        
+                    };
+        }
+        
+        
+        responses: {
+            GetImportAnalyze: EntityImportAnalysisResponseModel
+                
+        }
+        
+    }
+
 export type IndexerData = {
         
         payloads: {
@@ -3728,6 +3775,11 @@ skip?: number
 take?: number
                         
                     };
+GetItemMediaTypeFolders: {
+                        skip?: number
+take?: number
+                        
+                    };
 GetItemMediaTypeSearch: {
                         query?: string
 skip?: number
@@ -3766,6 +3818,15 @@ PostMediaTypeByIdCopy: {
 requestBody?: CopyMediaTypeRequestModel
                         
                     };
+GetMediaTypeByIdExport: {
+                        id: string
+                        
+                    };
+PutMediaTypeByIdImport: {
+                        id: string
+requestBody?: ImportMediaTypeRequestModel
+                        
+                    };
 PutMediaTypeByIdMove: {
                         id: string
 requestBody?: MoveMediaTypeRequestModel
@@ -3797,6 +3858,10 @@ PutMediaTypeFolderById: {
 requestBody?: UpdateFolderResponseModel
                         
                     };
+PostMediaTypeImport: {
+                        requestBody?: ImportMediaTypeRequestModel
+                        
+                    };
 GetTreeMediaTypeAncestors: {
                         descendantId?: string
                         
@@ -3820,6 +3885,7 @@ take?: number
         responses: {
             GetItemMediaType: Array<MediaTypeItemResponseModel>
                 ,GetItemMediaTypeAllowed: PagedModelMediaTypeItemResponseModel
+                ,GetItemMediaTypeFolders: PagedModelMediaTypeItemResponseModel
                 ,GetItemMediaTypeSearch: PagedModelMediaTypeItemResponseModel
                 ,PostMediaType: string
                 ,GetMediaTypeById: MediaTypeResponseModel
@@ -3828,6 +3894,8 @@ take?: number
                 ,GetMediaTypeByIdAllowedChildren: PagedAllowedMediaTypeModel
                 ,GetMediaTypeByIdCompositionReferences: Array<MediaTypeCompositionResponseModel>
                 ,PostMediaTypeByIdCopy: string
+                ,GetMediaTypeByIdExport: Blob | File
+                ,PutMediaTypeByIdImport: string
                 ,PutMediaTypeByIdMove: string
                 ,GetMediaTypeAllowedAtRoot: PagedAllowedMediaTypeModel
                 ,PostMediaTypeAvailableCompositions: Array<AvailableMediaTypeCompositionResponseModel>
@@ -3835,6 +3903,7 @@ take?: number
                 ,GetMediaTypeFolderById: FolderResponseModel
                 ,DeleteMediaTypeFolderById: string
                 ,PutMediaTypeFolderById: string
+                ,PostMediaTypeImport: string
                 ,GetTreeMediaTypeAncestors: Array<MediaTypeTreeItemResponseModel>
                 ,GetTreeMediaTypeChildren: PagedMediaTypeTreeItemResponseModel
                 ,GetTreeMediaTypeRoot: PagedMediaTypeTreeItemResponseModel

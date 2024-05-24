@@ -1,3 +1,4 @@
+import type { UmbFolderRepository } from '../../folder-repository.interface.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
@@ -6,7 +7,6 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import type { MetaEntityActionFolderKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import type { UmbFolderRepository } from '@umbraco-cms/backoffice/tree';
 
 export class UmbDeleteFolderEntityAction extends UmbEntityActionBase<MetaEntityActionFolderKind> {
 	// TODO: make base type for item and detail models

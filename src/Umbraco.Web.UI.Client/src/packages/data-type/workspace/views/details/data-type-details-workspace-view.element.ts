@@ -77,6 +77,13 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 						: this.#renderChooseButton()}
 				</umb-property-layout>
 			</uui-box>
+			${this.#renderSettings()}
+		`;
+	}
+
+	#renderSettings() {
+		if (!this._propertyEditorUiAlias || !this._propertyEditorSchemaAlias) return nothing;
+		return html`
 			<uui-box headline=${this.localize.term('general_settings')}>
 				<umb-property-editor-config></umb-property-editor-config>
 			</uui-box>

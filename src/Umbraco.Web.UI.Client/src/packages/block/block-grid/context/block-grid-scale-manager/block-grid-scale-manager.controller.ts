@@ -9,7 +9,7 @@ export interface UmbBlockGridScalableContext extends UmbControllerHost {
 	setRowSpan: (rowSpan: number) => void;
 	getColumnSpan: () => number | undefined;
 	getRowSpan: () => number | undefined;
-	getMinMaxRowSpan: () => [number, number];
+	getMinMaxRowSpan: () => [number, number] | undefined;
 	getRelevantColumnSpanOptions: () => Array<number> | undefined;
 }
 
@@ -128,14 +128,17 @@ export class UmbBlockGridScaleManager extends UmbControllerBase {
 
 		let newColumnSpan = Math.max(blockEndCol - blockStartCol, 1);
 
-		const spanOptions = this._host.getRelevantColumnSpanOptions();
-		if (!spanOptions) return;
+		const columnOptions = this._host.getRelevantColumnSpanOptions();
+		if (!columnOptions) return;
 
 		// Find nearest allowed Column:
-		const bestColumnSpanOption = closestColumnSpanOption(newColumnSpan, spanOptions, layoutColumns - blockStartCol);
+		const bestColumnSpanOption = closestColumnSpanOption(newColumnSpan, columnOptions, layoutColumns - blockStartCol);
 		newColumnSpan = bestColumnSpanOption ?? layoutColumns;
 
-		const [rowMinSpan, rowMaxSpan] = this._host.getMinMaxRowSpan();
+		// Find allowed row spans:
+		const minMaxRowSpan = this._host.getMinMaxRowSpan();
+		if (!minMaxRowSpan) return;
+		const [rowMinSpan, rowMaxSpan] = minMaxRowSpan;
 		let newRowSpan = Math.round(Math.max(blockEndRow - blockStartRow, rowMinSpan));
 		if (rowMaxSpan != null) {
 			newRowSpan = Math.min(newRowSpan, rowMaxSpan);

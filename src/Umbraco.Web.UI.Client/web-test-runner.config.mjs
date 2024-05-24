@@ -16,7 +16,7 @@ if (!['dev', 'prod'].includes(mode)) {
 export default {
 	rootDir: '.',
 	files: ['./src/**/*.test.ts'],
-	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: true },
+	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: false },
 	browsers: [playwrightLauncher({ product: 'chromium' }), playwrightLauncher({ product: 'webkit' })],
 	coverageConfig: {
 		reporters: ['lcovonly', 'text-summary'],
@@ -50,6 +50,7 @@ export default {
 					window.__UMBRACO_TEST_RUN_A11Y_TEST = ${(!devMode).toString()};
 				</script>
 				<script src="/node_modules/msw/lib/iife/index.js"></script>
+				<link rel="stylesheet" href="src/css/user-defined.css">
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
 				<link rel="stylesheet" href="src/css/umb-css.css">
 			</head>

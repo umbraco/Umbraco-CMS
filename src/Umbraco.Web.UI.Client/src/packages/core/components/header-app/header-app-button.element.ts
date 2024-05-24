@@ -1,11 +1,12 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, LitElement, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	ManifestHeaderAppButtonKind,
 	UmbBackofficeManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
@@ -21,7 +22,7 @@ const manifest: UmbBackofficeManifestKind = {
 umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-header-app-button')
-export class UmbHeaderAppButtonElement extends LitElement {
+export class UmbHeaderAppButtonElement extends UmbLitElement {
 	public manifest?: ManifestHeaderAppButtonKind;
 
 	render() {
@@ -41,7 +42,11 @@ export class UmbHeaderAppButtonElement extends LitElement {
 		css`
 			uui-button {
 				font-size: 18px;
-				--uui-button-background-color: transparent;
+				--uui-button-background-color: var(--umb-header-app-button-background-color, transparent);
+				--uui-button-background-color-hover: var(
+					--umb-header-app-button-background-color-hover,
+					var(--uui-color-emphasis)
+				);
 			}
 		`,
 	];

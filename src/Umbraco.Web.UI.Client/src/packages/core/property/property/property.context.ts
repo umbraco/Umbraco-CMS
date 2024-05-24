@@ -147,10 +147,10 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	}
 
 	public resetValue(): void {
-		this.setValue(undefined); // TODO: We should get the value from the server aka. the value from the persisted data.
+		this.setValue(undefined); // TODO: We should get the value from the server aka. the value from the persisted data. (Most workspaces holds this data, via dataset) [NL]
 	}
 	public clearValue(): void {
-		this.setValue(undefined); // TODO: We should get the default value from Property Editor maybe even later the DocumentType, as that would hold the default value for the property.
+		this.setValue(undefined); // TODO: We should get the default value from Property Editor maybe even later the DocumentType, as that would hold the default value for the property. (Get it via the dataset) [NL]
 	}
 
 	public destroy(): void {

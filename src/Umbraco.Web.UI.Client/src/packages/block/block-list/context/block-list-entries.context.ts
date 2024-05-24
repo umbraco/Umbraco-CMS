@@ -87,6 +87,11 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
 	}
 
+	async setLayouts(layouts: Array<UmbBlockListLayoutModel>) {
+		await this._retrieveManager;
+		this._manager?.setLayouts(layouts);
+	}
+
 	async create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<UmbBlockListLayoutModel, 'contentUdi'>,

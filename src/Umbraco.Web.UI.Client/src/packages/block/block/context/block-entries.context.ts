@@ -84,6 +84,9 @@ export abstract class UmbBlockEntriesContext<
 	layoutOf(contentUdi: string) {
 		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.contentUdi === contentUdi));
 	}
+	getLayoutOf(contentUdi: string) {
+		return this._layoutEntries.getValue().find((x) => x.contentUdi === contentUdi);
+	}
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		return this._layoutEntries.setValue(layouts);
 	}
@@ -118,10 +121,9 @@ export abstract class UmbBlockEntriesContext<
 		}
 
 		if (layout.settingsUdi) {
-			this._manager?.removeOneSettings(layout.settingsUdi);
+			this._manager!.removeOneSettings(layout.settingsUdi);
 		}
-
-		this._manager?.removeOneContent(contentUdi);
+		this._manager!.removeOneContent(contentUdi);
 
 		this._layoutEntries.removeOne(contentUdi);
 	}
