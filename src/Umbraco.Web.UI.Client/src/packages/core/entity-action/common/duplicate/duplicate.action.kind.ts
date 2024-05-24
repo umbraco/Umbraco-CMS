@@ -3,21 +3,21 @@ import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extensio
 
 export const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.EntityAction.SortChildrenOf',
-	matchKind: 'sortChildrenOf',
+	alias: 'Umb.Kind.EntityAction.Duplicate',
+	matchKind: 'duplicate',
 	matchType: 'entityAction',
 	manifest: {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
-		kind: 'sortChildrenOf',
-		api: () => import('./sort-children-of.action.js'),
-		weight: 100,
+		kind: 'duplicate',
+		api: () => import('./duplicate.action.js'),
+		weight: 650,
 		forEntityTypes: [],
 		meta: {
-			icon: 'icon-height',
-			label: '#actions_sort',
-			itemRepositoryAlias: '',
-			sortRepositoryAlias: '',
+			icon: 'icon-enter',
+			label: '#actions_copy',
+			treeRepositoryAlias: '',
+			duplicateRepositoryAlias: '',
 		},
 	},
 };
