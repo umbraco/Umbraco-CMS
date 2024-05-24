@@ -138,6 +138,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 
 		this.observe(this.#pickerContext.selectedItems, async (selectedItems) => {
 			if (!selectedItems?.length) {
+				this._items = [];
 				return;
 			}
 
@@ -254,9 +255,9 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 			}
 			.container {
 				display: grid;
-				gap: var(--uui-size-space-3);
 				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 				grid-auto-rows: 150px;
+				gap: var(--uui-size-space-5);
 			}
 
 			#btn-add {

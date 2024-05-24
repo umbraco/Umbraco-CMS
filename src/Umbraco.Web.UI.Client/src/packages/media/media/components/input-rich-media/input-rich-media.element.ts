@@ -44,9 +44,20 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		resolvePlacement: () => false,
 		onChange: ({ model }) => {
 			this.#items = model;
+			this.#sortCards(model);
 			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
+
+	#sortCards(model: Array<UmbMediaPickerPropertyValue>) {
+		const idToIndexMap: { [unique: string]: number } = {};
+		model.forEach((item, index) => {
+			idToIndexMap[item.key] = index;
+		});
+
+		const cards = [...this._cards];
+		this._cards = cards.sort((a, b) => idToIndexMap[a.unique] - idToIndexMap[b.unique]);
+	}
 
 	/**
 	 * This is a minimum amount of selected items in this input.
@@ -214,7 +225,9 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	async #populateCards() {
-		// TODO This is being called twice when picking an media item. We don't want to call the server unnecessary...
+		const missingCards = this.items.filter((item) => !this._cards.find((card) => card.unique === item.key));
+		if (!missingCards.length) return;
+
 		if (!this.items?.length) {
 			this._cards = [];
 			return;
