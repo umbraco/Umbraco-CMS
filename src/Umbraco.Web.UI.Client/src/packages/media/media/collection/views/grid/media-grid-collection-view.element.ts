@@ -119,7 +119,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	#renderItem(item: UmbMediaCollectionItemModel) {
 		return html`
 			<uui-card-media
-				.name=${item.name ?? 'Unnamed Media'}
+				.name=${item.name}
 				selectable
 				?select-only=${this._selection && this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
@@ -127,7 +127,11 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}
 				class="media-item">
-				${item.url ? html`<img src=${item.url} alt=${item.name} />` : html`<umb-icon name=${item.icon}></umb-icon>`}
+				${when(
+					item.url,
+					() => html`<img src=${item.url!} alt=${item.name} draggable="false" />`,
+					() => html`<umb-icon name=${item.icon}></umb-icon>`,
+				)}
 				<!-- TODO: [LK] I'd like to indicate a busy state when bulk actions are triggered. -->
 				<!-- <div class="container"><uui-loader></uui-loader></div> -->
 			</uui-card-media>
