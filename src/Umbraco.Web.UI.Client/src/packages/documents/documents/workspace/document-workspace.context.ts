@@ -676,6 +676,7 @@ export class UmbDocumentWorkspaceContext
 		// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
 		this.#validationRepository ??= new UmbDocumentValidationRepository(this);
 
+		// We ask the server first to get a concatenated set of validation messages. So we see both front-end and back-end validation messages [NL]
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');

@@ -34,7 +34,11 @@ interface UmbFormControlValidatorConfig {
 }
 
 export interface UmbFormControlMixinInterface<ValueType> extends HTMLElement {
-	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
+	addValidator: (
+		flagKey: FlagTypes,
+		getMessageMethod: () => string,
+		checkMethod: () => boolean,
+	) => UmbFormControlValidatorConfig;
 	removeValidator: (obj: UmbFormControlValidatorConfig) => void;
 	//static formAssociated: boolean;
 	//protected getFormElement(): HTMLElement | undefined | null; // allows for null as it makes it simpler to just implement a querySelector as that might return null. [NL]
@@ -56,7 +60,11 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
 {
 	protected _internals: ElementInternals;
 	protected _runValidators(): void;
-	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
+	addValidator: (
+		flagKey: FlagTypes,
+		getMessageMethod: () => string,
+		checkMethod: () => boolean,
+	) => UmbFormControlValidatorConfig;
 	removeValidator: (obj: UmbFormControlValidatorConfig) => void;
 	protected addFormControlElement(element: UmbNativeFormControlElement): void;
 
@@ -209,7 +217,7 @@ export function UmbFormControlMixin<
 				flagKey: flagKey,
 				getMessageMethod: getMessageMethod,
 				checkMethod: checkMethod,
-			};
+			} satisfies UmbFormControlValidatorConfig;
 			this.#validators.push(validator);
 			return validator;
 		}

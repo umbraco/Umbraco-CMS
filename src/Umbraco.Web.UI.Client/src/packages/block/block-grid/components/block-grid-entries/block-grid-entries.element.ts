@@ -11,7 +11,11 @@ import { html, customElement, state, repeat, css, property, nothing } from '@umb
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../block-grid-entry/index.js';
 import { UmbSorterController, type UmbSorterConfig, type resolvePlacementArgs } from '@umbraco-cms/backoffice/sorter';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import {
+	UmbFormControlMixin,
+	UmbFormControlValidator,
+	type UmbFormControlValidatorConfig,
+} from '@umbraco-cms/backoffice/validation';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 /**
@@ -128,6 +132,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	});
 
 	#context = new UmbBlockGridEntriesContext(this);
+	#controlValidator: UmbFormControlValidator;
 
 	@property({ attribute: false })
 	public set areaKey(value: string | null | undefined) {
@@ -198,33 +203,66 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 				'observeStylesheet',
 			);
 		});
+
+		this.#controlValidator = new UmbFormControlValidator(this, this /*, this.#dataPath*/);
 	}
 
-	async #setupValidation() {
+	async #getLimitValidation() {
 		if (this._areaKey === null) {
 			// This validation setup is not be as configurable as it should be, but it is a start. Alternatively we should consume the manager and observe the configuration. [NL]
 			const manager = await this.#context.getManager();
 			const config = manager.getEditorConfiguration();
 			const min = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.min ?? 0;
 			const max = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit')?.max ?? Infinity;
+			return { min, max };
+		} else {
+			return { min: 3, max: 4 };
+		}
+	}
 
-			this.addValidator(
+	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
+	#rangeOverflowValidator?: UmbFormControlValidatorConfig;
+	async #setupValidation() {
+		const rangeLimit = await this.#getLimitValidation();
+
+		console.log('setup validation', this);
+
+		if (this.#rangeUnderflowValidator) {
+			this.removeValidator(this.#rangeUnderflowValidator);
+			this.#rangeUnderflowValidator = undefined;
+		}
+		if (rangeLimit.min !== 0) {
+			this.#rangeUnderflowValidator = this.addValidator(
 				'rangeUnderflow',
 				() => {
-					return this.localize.term('validation_entriesShort', [min, min - (this._layoutEntries.length ?? 0)]);
+					return this.localize.term(
+						'validation_entriesShort',
+						rangeLimit.min,
+						rangeLimit.min - (this._layoutEntries.length ?? 0),
+					);
 				},
 				() => {
-					return (this._layoutEntries.length ?? 0) < min;
+					return (this._layoutEntries.length ?? 0) < rangeLimit.min;
 				},
 			);
+		}
 
-			this.addValidator(
+		if (this.#rangeOverflowValidator) {
+			this.removeValidator(this.#rangeOverflowValidator);
+			this.#rangeOverflowValidator = undefined;
+		}
+		if (rangeLimit.max !== Infinity) {
+			this.#rangeOverflowValidator = this.addValidator(
 				'rangeOverflow',
 				() => {
-					return this.localize.term('validation_entriesExceed', [max, (this._layoutEntries.length ?? 0) - max]);
+					return this.localize.term(
+						'validation_entriesExceed',
+						rangeLimit.max,
+						(this._layoutEntries.length ?? 0) - rangeLimit.max,
+					);
 				},
 				() => {
-					return (this._layoutEntries.length ?? 0) > max;
+					return (this._layoutEntries.length ?? 0) > rangeLimit.max;
 				},
 			);
 		}
@@ -247,6 +285,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						</umb-block-grid-entry>`,
 				)}
 			</div>
+			<uui-form-validation-message .for=${this}></uui-form-validation-message>
 			${this._canCreate ? this.#renderCreateButton() : nothing}
 		`;
 	}
