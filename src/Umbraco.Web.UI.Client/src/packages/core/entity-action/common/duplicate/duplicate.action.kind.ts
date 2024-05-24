@@ -1,4 +1,4 @@
-import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../../default/default.action.kind.js';
+import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../default/default.action.kind.js';
 import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbBackofficeManifestKind = {

@@ -1,2 +1,2 @@
-export { UmbDuplicateEntityAction } from './duplicate/index.js';
-export * from './duplicate/types.js';
+export { UmbDuplicateEntityAction } from './duplicate.action.js';
+export * from './types.js';
