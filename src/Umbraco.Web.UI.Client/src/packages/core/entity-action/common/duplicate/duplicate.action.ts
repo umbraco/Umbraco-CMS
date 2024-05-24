@@ -1,5 +1,5 @@
-import { UmbEntityActionBase } from '../../../entity-action-base.js';
-import { UmbRequestReloadStructureForEntityEvent } from '../../../request-reload-structure-for-entity.event.js';
+import { UmbEntityActionBase } from '../../entity-action-base.js';
+import { UmbRequestReloadStructureForEntityEvent } from '../../request-reload-structure-for-entity.event.js';
 import type { UmbDuplicateRepository } from './duplicate-repository.interface.js';
 import type { MetaEntityActionDuplicateToKind } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
