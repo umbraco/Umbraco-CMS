@@ -8,7 +8,7 @@ import type {
 	UmbCompositionPickerModalValue,
 } from './composition-picker-modal.token.js';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -55,6 +55,27 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 		this.#requestReference();
 		this.#requestAvailableCompositions();
+	}
+
+	protected async _submitModal() {
+		const initSelection = this.data?.selection ?? [];
+		const newSelection = this._selection;
+
+		const setA = new Set(newSelection);
+		const existingCompositionHasBeenRemoved = !initSelection.every((item) => setA.has(item));
+
+		if (existingCompositionHasBeenRemoved) {
+			await umbConfirmModal(this, {
+				headline: this.localize.term('general_remove'),
+				content: html`<div style="max-width:400px">
+					${this.localize.term('contentTypeEditor_compositionRemoveWarning')}
+				</div>`,
+				confirmLabel: this.localize.term('general_submit'),
+				color: 'danger',
+			});
+		}
+
+		super._submitModal();
 	}
 
 	async #requestReference() {
