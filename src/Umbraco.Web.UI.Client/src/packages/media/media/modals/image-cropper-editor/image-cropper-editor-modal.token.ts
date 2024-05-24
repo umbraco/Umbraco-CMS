@@ -2,11 +2,12 @@ import type { UmbImageCropperCrop } from '../../components/index.js';
 import type { UmbCropModel } from '../../property-editors/index.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbImageCropperEditorModalData {
+export interface UmbImageCropperEditorModalData<ItemType> {
 	key: string;
 	unique: string;
 	focalPointEnabled: boolean;
 	cropOptions: Array<UmbCropModel>;
+	pickableFilter?: (item: ItemType) => boolean;
 }
 
 export interface UmbImageCropperEditorModalValue {
@@ -17,7 +18,7 @@ export interface UmbImageCropperEditorModalValue {
 }
 
 export const UMB_IMAGE_CROPPER_EDITOR_MODAL = new UmbModalToken<
-	UmbImageCropperEditorModalData,
+	UmbImageCropperEditorModalData<any>,
 	UmbImageCropperEditorModalValue
 >('Umb.Modal.ImageCropperEditor', {
 	modal: {

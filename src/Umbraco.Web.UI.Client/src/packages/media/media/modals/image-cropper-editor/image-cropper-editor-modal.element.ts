@@ -2,18 +2,25 @@ import { UmbMediaUrlRepository } from '../../repository/index.js';
 import type { UmbCropModel } from '../../property-editors/index.js';
 import type { UmbInputImageCropperFieldElement } from '../../components/input-image-cropper/image-cropper-field.element.js';
 import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
+import { UMB_MEDIA_PICKER_MODAL } from '../media-picker/media-picker-modal.token.js';
 import type {
 	UmbImageCropperEditorModalData,
 	UmbImageCropperEditorModalValue,
 } from './image-cropper-editor-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_MANAGER_CONTEXT,
+	UMB_WORKSPACE_MODAL,
+	UmbModalBaseElement,
+	type UmbModalManagerContext,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
 
 /** TODO Make some of the components from property editor image cropper reuseable for this modal... */
 
 @customElement('umb-image-cropper-editor-modal')
 export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
-	UmbImageCropperEditorModalData,
+	UmbImageCropperEditorModalData<any>,
 	UmbImageCropperEditorModalValue
 > {
 	#urlRepository = new UmbMediaUrlRepository(this);
@@ -34,6 +41,30 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	@state()
 	private _crops: Array<UmbCropModel> = [];
 
+	@state()
+	private _editMediaPath = '';
+
+	@state()
+	private _pickableFilter?: (item: any) => boolean;
+
+	#modalManager?: UmbModalManagerContext;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
+			this.#modalManager = context;
+		});
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('media')
+			.onSetup(() => {
+				return { data: { entityType: 'media', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editMediaPath = routeBuilder({});
+			});
+	}
+
 	connectedCallback(): void {
 		super.connectedCallback();
 
@@ -42,6 +73,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 
 		this._focalPointEnabled = this.data?.focalPointEnabled ?? false;
 		this._crops = this.data?.cropOptions ?? [];
+		this._pickableFilter = this.data?.pickableFilter;
 
 		this.#getSrc();
 	}
@@ -60,6 +92,19 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		this._imageCropperValue = value;
 	}
 
+	async #openMediaPicker() {
+		const modal = this.#modalManager?.open(this, UMB_MEDIA_PICKER_MODAL, {
+			data: { multiple: false, pickableFilter: this._pickableFilter },
+			value: { selection: [this._unique] },
+		});
+		const data = await modal?.onSubmit().catch(() => null);
+		if (!data) return;
+
+		this._unique = data.selection[0];
+		this.value = { ...this.value, unique: this._unique };
+		this.#getSrc();
+	}
+
 	#onChange(e: CustomEvent) {
 		const value = (e.target as UmbInputImageCropperFieldElement).value;
 		if (!value) return;
@@ -70,7 +115,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
-				<umb-image-cropper-field @change=${this.#onChange} .value=${this._imageCropperValue}></umb-image-cropper-field>
+				${this.#renderBody()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -83,12 +128,34 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		`;
 	}
 
+	#renderBody() {
+		return html`<div id="layout">
+			<umb-image-cropper-field @change=${this.#onChange} .value=${this._imageCropperValue}></umb-image-cropper-field>
+			<div id="options">
+				<uui-menu-item @click=${this.#openMediaPicker} label=${this.localize.term('mediaPicker_changeMedia')}>
+					<umb-icon slot="icon" name="icon-search"></umb-icon>
+				</uui-menu-item>
+				<uui-menu-item
+					href=${this._editMediaPath + 'edit/' + this._unique}
+					label=${this.localize.term('mediaPicker_openMedia')}>
+					<umb-icon slot="icon" name="icon-out"></umb-icon>
+				</uui-menu-item>
+			</div>
+		</div>`;
+	}
+
 	static styles = [
 		css`
-			uui-tab {
-				flex: 1;
-				min-height: 100px;
-				min-width: 100px;
+			#layout {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+			}
+
+			#options {
+				display: flex;
+				justify-content: center;
 			}
 
 			img {

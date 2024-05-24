@@ -1,9 +1,9 @@
+import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL, UMB_MEDIA_PICKER_MODAL } from '../../modals/index.js';
 import type { UmbCropModel, UmbMediaPickerPropertyValue } from '../../property-editors/index.js';
 import { customElement, html, ifDefined, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UmbInputMediaElement, UmbMediaItemRepository } from '@umbraco-cms/backoffice/media';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
@@ -190,6 +190,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 						focalPointEnabled: this.focalPointEnabled,
 						key,
 						unique: item.mediaKey,
+						pickableFilter: this.#pickableFilter,
 					},
 					value: {
 						crops: item.crops ?? [],
@@ -202,8 +203,16 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 			})
 			.onSubmit((value) => {
 				this.items = this.items.map((item) => {
+					if (item.key !== value.key) return item;
+
 					const focalPoint = this.focalPointEnabled ? value.focalPoint : null;
-					return item.key === value.key ? { ...item, ...value, focalPoint } : item;
+					const crops = value.crops;
+					const mediaKey = value.unique;
+
+					// if the key changes, the card will update
+					const key = mediaKey === item.mediaKey ? item.key : UmbId.new();
+
+					return { ...item, crops, mediaKey, focalPoint, key };
 				});
 
 				this.dispatchEvent(new UmbChangeEvent());
@@ -303,12 +312,8 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 			confirmLabel: this.localize.term('actions_remove'),
 		});
 
-		const index = this.items.findIndex((x) => x.key === item.unique);
-		if (index == -1) return;
-
-		const tmpItems = [...this.items];
-		tmpItems.splice(index, 1);
-		this.#items = tmpItems;
+		this.#items = this.#items.filter((x) => x.key !== item.unique);
+		this._cards = this._cards.filter((x) => x.unique !== item.unique);
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
