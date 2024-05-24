@@ -30,8 +30,8 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		this._startNode = config.getValueByAlias<string>('startNodeId') ?? '';
 
 		const minMax = config.getValueByAlias<NumberRangeValueType>('validationLimit');
-		this._limitMin = minMax?.min ?? 0;
-		this._limitMax = minMax?.max ?? Infinity;
+		this._min = minMax?.min ?? 0;
+		this._max = minMax?.max ?? Infinity;
 	}
 
 	@state()
@@ -50,10 +50,10 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	private _multiple: boolean = false;
 
 	@state()
-	private _limitMin: number = 0;
+	private _min: number = 0;
 
 	@state()
-	private _limitMax: number = Infinity;
+	private _max: number = Infinity;
 
 	@state()
 	private _alias?: string;
@@ -82,8 +82,8 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 				.allowedContentTypeIds=${this._allowedMediaTypes}
 				.focalPointEnabled=${this._focalPointEnabled}
 				.items=${this.value ?? []}
-				.max=${this._limitMax}
-				.min=${this._limitMin}
+				.max=${this._max}
+				.min=${this._min}
 				.preselectedCrops=${this._preselectedCrops}
 				.startNode=${this._startNode}
 				.variantId=${this._variantId}
