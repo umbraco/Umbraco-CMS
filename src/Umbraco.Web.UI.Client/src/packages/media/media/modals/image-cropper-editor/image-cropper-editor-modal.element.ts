@@ -1,8 +1,8 @@
 import { UmbMediaUrlRepository } from '../../repository/index.js';
+import { UMB_MEDIA_PICKER_MODAL } from '../media-picker/media-picker-modal.token.js';
 import type { UmbCropModel } from '../../property-editors/index.js';
 import type { UmbInputImageCropperFieldElement } from '../../components/input-image-cropper/image-cropper-field.element.js';
 import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
-import { UMB_MEDIA_PICKER_MODAL } from '../media-picker/media-picker-modal.token.js';
 import type {
 	UmbImageCropperEditorModalData,
 	UmbImageCropperEditorModalValue,
@@ -12,9 +12,9 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_WORKSPACE_MODAL,
 	UmbModalBaseElement,
-	type UmbModalManagerContext,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 /** TODO Make some of the components from property editor image cropper reuseable for this modal... */
 
@@ -35,8 +35,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	private _unique: string = '';
 
 	@state()
-	private _focalPointEnabled = false;
-	/** TODO  allow to enable/disable focalpoint */
+	private _hideFocalPoint = false;
 
 	@state()
 	private _crops: Array<UmbCropModel> = [];
@@ -71,7 +70,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		this._key = this.data?.key ?? '';
 		this._unique = this.data?.unique ?? '';
 
-		this._focalPointEnabled = this.data?.focalPointEnabled ?? false;
+		this._hideFocalPoint = this.data?.hideFocalPoint ?? false;
 		this._crops = this.data?.cropOptions ?? [];
 		this._pickableFilter = this.data?.pickableFilter;
 
@@ -130,7 +129,10 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 
 	#renderBody() {
 		return html`<div id="layout">
-			<umb-image-cropper-field @change=${this.#onChange} .value=${this._imageCropperValue}></umb-image-cropper-field>
+			<umb-image-cropper-field
+				.value=${this._imageCropperValue}
+				?hideFocalPoint=${this._hideFocalPoint}
+				@change=${this.#onChange}></umb-image-cropper-field>
 			<div id="options">
 				<uui-menu-item @click=${this.#openMediaPicker} label=${this.localize.term('mediaPicker_changeMedia')}>
 					<umb-icon slot="icon" name="icon-search"></umb-icon>

@@ -5,7 +5,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 export interface UmbImageCropperEditorModalData<ItemType> {
 	key: string;
 	unique: string;
-	focalPointEnabled: boolean;
+	hideFocalPoint: boolean;
 	cropOptions: Array<UmbCropModel>;
 	pickableFilter?: (item: ItemType) => boolean;
 }

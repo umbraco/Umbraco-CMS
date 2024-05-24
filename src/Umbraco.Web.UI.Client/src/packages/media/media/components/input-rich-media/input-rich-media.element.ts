@@ -187,7 +187,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 				return {
 					data: {
 						cropOptions: this.preselectedCrops,
-						focalPointEnabled: this.focalPointEnabled,
+						hideFocalPoint: !this.focalPointEnabled,
 						key,
 						unique: item.mediaKey,
 						pickableFilter: this.#pickableFilter,
