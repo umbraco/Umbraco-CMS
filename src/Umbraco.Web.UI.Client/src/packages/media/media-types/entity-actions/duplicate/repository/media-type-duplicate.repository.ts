@@ -1,6 +1,6 @@
 import { UmbDuplicateMediaTypeServerDataSource } from './media-type-duplicate.server.data-source.js';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { UmbDuplicateToRepository, UmbDuplicateToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbDuplicateToRepository, UmbDuplicateToRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDuplicateMediaTypeRepository extends UmbRepositoryBase implements UmbDuplicateToRepository {
