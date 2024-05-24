@@ -79,8 +79,9 @@ export class UmbAppElement extends UmbLitElement {
 				// If we are in the main window, the signal will be caught right here and the user will be redirected to the root.
 				if (
 					window.opener &&
-					window.opener instanceof Window &&
-					window.opener.location.origin === window.location.origin
+					window.opener !== window &&
+					window.opener.location.origin === window.location.origin &&
+					window.opener.location.pathname.startsWith(this.backofficePath)
 				) {
 					(component as UmbAppErrorElement).errorMessage = hasCode
 						? this.localize.term('errors_externalLoginSuccess')
