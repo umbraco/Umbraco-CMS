@@ -1,18 +1,12 @@
-import {
-	css,
-	html,
-	customElement,
-	query,
-	property,
-	unsafeHTML,
-	when,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
-import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
+import { css, customElement, html, property, query, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
-import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -21,8 +15,6 @@ import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * @element umb-input-markdown
@@ -401,112 +393,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 		this._focusEditor();
 	}
 
-	private _renderBasicActions() {
-		return html`<div>
-				<uui-button
-					compact
-					look="secondary"
-					label="Heading"
-					title="Heading, &lt;Ctrl+Shift+1&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('h1')?.run()}>
-					H
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Bold"
-					title="Bold, &lt;Ctrl+B&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('b')?.run()}>
-					B
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Italic"
-					title="Italic, &lt;Ctrl+I&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('i')?.run()}>
-					I
-				</uui-button>
-			</div>
-			<div>
-				<uui-button
-					compact
-					look="secondary"
-					label="Quote"
-					title="Quote, &lt;Ctrl+Shift+.&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('q')?.run()}>
-					<uui-icon name="icon-quote"></uui-icon>
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Ordered List"
-					title="Ordered List, &lt;Ctrl+Shift+7&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('ol')?.run()}>
-					<uui-icon name="icon-ordered-list"></uui-icon>
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Unordered List"
-					title="Unordered List, &lt;Ctrl+Shift+8&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('ul')?.run()}>
-					<uui-icon name="icon-bulleted-list"></uui-icon>
-				</uui-button>
-			</div>
-			<div>
-				<uui-button
-					compact
-					look="secondary"
-					label="Code"
-					title="Code, &lt;Ctrl+E&gt;"
-					@click=${() => this.#editor?.monacoEditor?.getAction('code')?.run()}>
-					<uui-icon name="icon-code"></uui-icon>
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Line"
-					title="Line"
-					@click=${() => this.#editor?.monacoEditor?.getAction('line')?.run()}>
-					<uui-icon name="icon-width"></uui-icon>
-				</uui-button>
-				<uui-button
-					compact
-					look="secondary"
-					label="Image"
-					title="Image"
-					@click=${() => this.#editor?.monacoEditor?.getAction('image')?.run()}>
-					<uui-icon name="icon-picture"></uui-icon>
-				</uui-button>
-
-				${this._actionExtensions.map(
-					(action) => html`
-						<uui-button
-							compact
-							look="secondary"
-							label=${action.label}
-							@click=${(event: any) => this.#onActionClick(event, action)}>
-							<uui-icon name="icon-link"></uui-icon>
-						</uui-button>
-					`,
-				)}
-			</div>
-			<div>
-				<uui-button
-					compact
-					label="Press F1 for all actions"
-					title="Press F1 for all actions"
-					@click=${() => {
-						this._focusEditor();
-						this.#editor?.monacoEditor?.trigger('', 'editor.action.quickCommand', '');
-					}}>
-					<uui-key>F1</uui-key>
-				</uui-button>
-			</div>`;
-	}
-
-	onKeyPress(e: KeyboardEvent) {
+	#onKeyPress(e: KeyboardEvent) {
 		if (e.key !== 'Enter') return;
 		//TODO: Tab does not seem to trigger keyboard events. We need to make some logic for ordered and unordered lists when tab is being used.
 
@@ -527,25 +414,138 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 	#onInput(e: CustomEvent) {
 		e.stopPropagation();
 		this.value = this.#editor?.monacoEditor?.getValue() ?? '';
-		this.dispatchEvent(new CustomEvent('change'));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	render() {
 		return html`
-			<div id="actions">${this._renderBasicActions()}</div>
+			${this.#renderToolbar()}
 			<umb-code-editor
 				language="markdown"
-				theme="umb-light"
 				.code=${this.value as string}
-				@keypress=${this.onKeyPress}
+				@keypress=${this.#onKeyPress}
 				@input=${this.#onInput}>
 			</umb-code-editor>
-			${when(this.preview && this.value, () => this.renderPreview(this.value as string))}
+			${this.#renderPreview()}
 		`;
 	}
 
-	renderPreview(markdown: string) {
-		const markdownAsHtml = marked.parse(markdown) as string;
+	#renderToolbar() {
+		return html`
+			<div id="toolbar">
+				<uui-button-group>
+					<uui-button
+						compact
+						look="secondary"
+						label="Heading"
+						title="Heading, &lt;Ctrl+Shift+1&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('h1')?.run()}>
+						H
+					</uui-button>
+					<uui-button
+						compact
+						look="secondary"
+						label="Bold"
+						title="Bold, &lt;Ctrl+B&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('b')?.run()}>
+						B
+					</uui-button>
+					<uui-button
+						compact
+						look="secondary"
+						label="Italic"
+						title="Italic, &lt;Ctrl+I&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('i')?.run()}>
+						I
+					</uui-button>
+				</uui-button-group>
+
+				<uui-button-group>
+					<uui-button
+						compact
+						look="secondary"
+						label="Quote"
+						title="Quote, &lt;Ctrl+Shift+.&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('q')?.run()}>
+						<uui-icon name="icon-quote"></uui-icon>
+					</uui-button>
+					<uui-button
+						compact
+						look="secondary"
+						label="Ordered List"
+						title="Ordered List, &lt;Ctrl+Shift+7&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('ol')?.run()}>
+						<uui-icon name="icon-ordered-list"></uui-icon>
+					</uui-button>
+					<uui-button
+						compact
+						look="secondary"
+						label="Unordered List"
+						title="Unordered List, &lt;Ctrl+Shift+8&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('ul')?.run()}>
+						<uui-icon name="icon-bulleted-list"></uui-icon>
+					</uui-button>
+				</uui-button-group>
+				<uui-button-group>
+					<uui-button
+						compact
+						look="secondary"
+						label="Code"
+						title="Code, &lt;Ctrl+E&gt;"
+						@click=${() => this.#editor?.monacoEditor?.getAction('code')?.run()}>
+						<uui-icon name="icon-code"></uui-icon>
+					</uui-button>
+					<uui-button
+						compact
+						look="secondary"
+						label="Line"
+						title="Line"
+						@click=${() => this.#editor?.monacoEditor?.getAction('line')?.run()}>
+						<uui-icon name="icon-width"></uui-icon>
+					</uui-button>
+					<uui-button
+						compact
+						look="secondary"
+						label="Image"
+						title="Image"
+						@click=${() => this.#editor?.monacoEditor?.getAction('image')?.run()}>
+						<uui-icon name="icon-picture"></uui-icon>
+					</uui-button>
+				</uui-button-group>
+
+				<uui-button-group>
+					${this._actionExtensions.map(
+						(action) => html`
+							<uui-button
+								compact
+								look="secondary"
+								label=${action.label}
+								@click=${(event: any) => this.#onActionClick(event, action)}>
+								<uui-icon name="icon-link"></uui-icon>
+							</uui-button>
+						`,
+					)}
+				</uui-button-group>
+
+				<uui-button-group>
+					<uui-button
+						compact
+						label="Press F1 for all actions"
+						title="Press F1 for all actions"
+						@click=${() => {
+							this._focusEditor();
+							this.#editor?.monacoEditor?.trigger('', 'editor.action.quickCommand', '');
+						}}>
+						<uui-key>F1</uui-key>
+					</uui-button>
+				</uui-button-group>
+			</div>
+		`;
+	}
+
+	#renderPreview() {
+		if (!this.preview || !this.value) return;
+		const markdownAsHtml = marked.parse(this.value as string) as string;
 		const sanitizedHtml = markdownAsHtml ? DOMPurify.sanitize(markdownAsHtml) : '';
 		return html`<uui-scroll-container id="preview">${unsafeHTML(sanitizedHtml)}</uui-scroll-container>`;
 	}
@@ -557,22 +557,14 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 				display: flex;
 				flex-direction: column;
 			}
-			#actions {
+
+			#toolbar {
 				background-color: var(--uui-color-background-alt);
 				display: flex;
-				gap: var(--uui-size-6);
+				gap: var(--uui-size-2);
 			}
 
-			#preview {
-				max-height: 400px;
-			}
-
-			#actions div {
-				display: flex;
-				gap: var(--uui-size-1);
-			}
-
-			#actions div:last-child {
+			#toolbar uui-button-group:last-child {
 				margin-left: auto;
 			}
 
@@ -586,23 +578,31 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 				width: 50px;
 			}
 
-			blockquote {
+			#preview {
+				max-height: 400px;
+			}
+
+			#preview blockquote {
 				border-left: 2px solid var(--uui-color-default-emphasis);
 				margin-inline: 0;
 				padding-inline: var(--uui-size-3);
 			}
 
-			p > code,
-			pre {
+			#preview img {
+				max-width: 100%;
+			}
+
+			#preview hr {
+				border: none;
+				border-bottom: 1px solid var(--uui-palette-cocoa-black);
+			}
+
+			#preview p > code,
+			#preview pre {
 				border: 1px solid var(--uui-color-divider-emphasis);
 				border-radius: var(--uui-border-radius);
 				padding: 0 var(--uui-size-1);
 				background-color: var(--uui-color-background);
-			}
-
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-palette-cocoa-black);
 			}
 		`,
 	];
