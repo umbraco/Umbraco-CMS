@@ -1,6 +1,6 @@
-import type { MediaValueType } from '../../../property-editors/upload-field/property-editor-ui-upload-field.element.js';
-import type { UmbTemporaryFileModel } from '../../temporary-file/temporary-file-manager.class.js';
-import { TemporaryFileStatus, UmbTemporaryFileManager } from '../../temporary-file/temporary-file-manager.class.js';
+import type { MediaValueType } from '../../property-editors/upload-field/types.js';
+import { TemporaryFileStatus, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import type { UmbTemporaryFileModel } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	css,
@@ -15,6 +15,7 @@ import {
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+
 import './input-upload-field-file.element.js';
 
 @customElement('umb-input-upload-field')

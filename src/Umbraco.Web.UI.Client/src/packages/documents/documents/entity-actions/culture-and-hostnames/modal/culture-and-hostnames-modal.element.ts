@@ -1,14 +1,14 @@
+import { UmbDocumentCultureAndHostnamesRepository } from '../repository/index.js';
+import type {
+	UmbCultureAndHostnamesModalData,
+	UmbCultureAndHostnamesModalValue,
+} from './culture-and-hostnames-modal.token.js';
 import { html, customElement, state, css, repeat, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import type { DomainPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
-import {
-	UmbDocumentCultureAndHostnamesRepository,
-	type UmbCultureAndHostnamesModalData,
-	type UmbCultureAndHostnamesModalValue,
-} from '@umbraco-cms/backoffice/document';
 import type { UUIInputEvent, UUIPopoverContainerElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-culture-and-hostnames-modal')

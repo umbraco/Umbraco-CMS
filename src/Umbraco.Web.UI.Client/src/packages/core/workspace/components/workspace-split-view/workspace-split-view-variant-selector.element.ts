@@ -1,4 +1,6 @@
-import { UmbVariantId } from '../../../variant/variant-id.class.js';
+import type { ActiveVariant } from '../../controllers/index.js';
+import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import {
 	type UUIInputElement,
@@ -6,7 +8,6 @@ import {
 	type UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, type ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -22,8 +23,9 @@ type UmbDocumentVariantOption = {
 
 type UmbDocumentVariantOptions = Array<UmbDocumentVariantOption>;
 
-@customElement('umb-variant-selector')
-export class UmbVariantSelectorElement extends UmbLitElement {
+const elementName = 'umb-workspace-split-view-variant-selector';
+@customElement(elementName)
+export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 	@query('#variant-selector-popover')
 	private _popoverElement?: UUIPopoverContainerElement;
 
@@ -407,10 +409,8 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	];
 }
 
-export default UmbVariantSelectorElement;
-
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-variant-selector': UmbVariantSelectorElement;
+		[elementName]: UmbWorkspaceSplitViewVariantSelectorElement;
 	}
 }
