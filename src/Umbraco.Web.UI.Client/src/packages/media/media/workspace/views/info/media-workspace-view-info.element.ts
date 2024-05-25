@@ -1,11 +1,13 @@
 import { TimeOptions } from './utils.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbMediaTypeDetailRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_MEDIA_WORKSPACE_CONTEXT, type UmbMediaWorkspaceContext } from '@umbraco-cms/backoffice/media';
+import { UMB_MEDIA_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/media';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbMediaWorkspaceContext } from '@umbraco-cms/backoffice/media';
 
 // import of local components
 import './media-workspace-view-info-history.element.js';
@@ -14,24 +16,32 @@ import './media-workspace-view-info-reference.element.js';
 @customElement('umb-media-workspace-view-info')
 export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
-	private _nodeName = '';
+	private _mediaTypeUnique = '';
 
 	@state()
-	private _mediaTypeId = '';
+	private _mediaTypeName?: string;
+
+	@state()
+	private _mediaTypeIcon?: string;
+
+	@state()
+	private _editMediaTypePath = '';
 
 	@state()
 	private _mediaUnique = '';
 
-	private _workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
+	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
 
-	@state()
-	private _editMediaTypePath = '';
+	#mediaTypeRepository = new UmbMediaTypeDetailRepository(this);
 
 	@state()
 	private _urls?: Array<MediaUrlInfoModel>;
 
 	@state()
 	private _createDate = 'Unknown';
+
+	@state()
+	private _updateDate = 'Unknown';
 
 	constructor() {
 		super();
@@ -46,34 +56,48 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			});
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
-			this._workspaceContext = context;
-			this._observeContent();
+			this.#workspaceContext = context;
+			this._mediaTypeUnique = this.#workspaceContext.getContentTypeId()!;
+			this.#getData();
+			this.#observeContent();
 		});
 	}
 
-	private _observeContent() {
-		if (!this._workspaceContext) return;
+	async #getData() {
+		const { data } = await this.#mediaTypeRepository.requestByUnique(this._mediaTypeUnique);
+		this._mediaTypeName = data?.name;
+		this._mediaTypeIcon = data?.icon;
+	}
 
-		this._nodeName = 'TBD, with variants this is not as simple.';
+	#observeContent() {
+		if (!this.#workspaceContext) return;
 
-		this._mediaTypeId = (this._workspaceContext as UmbMediaWorkspaceContext).getContentTypeId()!;
+		this.observe(
+			this.#workspaceContext.urls,
+			(urls) => {
+				this._urls = urls;
+			},
+			'__urls',
+		);
 
-		this.observe((this._workspaceContext as UmbMediaWorkspaceContext).urls, (urls) => {
-			this._urls = urls;
-		});
-
-		this.observe((this._workspaceContext as UmbMediaWorkspaceContext).unique, (unique) => {
-			this._mediaUnique = unique!;
-		});
+		this.observe(
+			this.#workspaceContext.unique,
+			(unique) => {
+				this._mediaUnique = unique!;
+			},
+			'_mediaUnique',
+		);
 
 		/** TODO: Doubt this is the right way to get the create date... */
-		this.observe((this._workspaceContext as UmbMediaWorkspaceContext).variants, (variants) => {
+		this.observe(this.#workspaceContext.variants, (variants) => {
 			this._createDate = Array.isArray(variants) ? variants[0].createDate || 'Unknown' : 'Unknown';
+			this._updateDate = Array.isArray(variants) ? variants[0].updateDate || 'Unknown' : 'Unknown';
 		});
 	}
 
 	render() {
-		return html`<div class="container">
+		return html`
+			<div class="container">
 				<uui-box headline=${this.localize.term('general_links')} style="--uui-box-default-padding: 0;">
 					<div id="link-section">${this.#renderLinksSection()}</div>
 				</uui-box>
@@ -85,8 +109,11 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 					.mediaUnique=${this._mediaUnique}></umb-media-workspace-view-info-history>
 			</div>
 			<div class="container">
-				<uui-box headline="General" id="general-section">${this.#renderGeneralSection()}</uui-box>
-			</div>`;
+				<uui-box headline=${this.localize.term('general_general')} id="general-section"
+					>${this.#renderGeneralSection()}</uui-box
+				>
+			</div>
+		`;
 	}
 
 	#renderLinksSection() {
@@ -106,23 +133,17 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				)}
 			`;
 		} else {
-			return html`<div class="link-item">
-				<span class="link-language">en-EN</span>
-				<span class="link-content italic"><umb-localize key="content_parentNotPublishedAnomaly"></umb-localize></span>
-			</div>`;
+			return html`
+				<div class="link-item">
+					<span class="link-language">en-EN</span>
+					<span class="link-content italic"><umb-localize key="content_parentNotPublishedAnomaly"></umb-localize></span>
+				</div>
+			`;
 		}
 	}
 
 	#renderGeneralSection() {
 		return html`
-			<div class="general-item">
-				<strong>${this.localize.term('content_publishStatus')}</strong>
-				<span>
-					<uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}>
-						<umb-localize key="content_published"></umb-localize>
-					</uui-tag>
-				</span>
-			</div>
 			<div class="general-item">
 				<strong><umb-localize key="content_createDate"></umb-localize></strong>
 				<span>
@@ -130,11 +151,23 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				</span>
 			</div>
 			<div class="general-item">
-				<strong><umb-localize key="content_mediaType"></umb-localize></strong>
-				<uui-button
-					look="secondary"
-					href=${this._editMediaTypePath + 'edit/' + this._mediaTypeId}
-					label=${this.localize.term('general_edit')}></uui-button>
+				<strong><umb-localize key="content_updateDate"></umb-localize></strong>
+				<span>
+					<umb-localize-date .date=${this._updateDate} .options=${TimeOptions}></umb-localize-date>
+				</span>
+			</div>
+			<div class="general-item">
+				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
+				<uui-ref-node-document-type
+					standalone
+					href=${this._editMediaTypePath + 'edit/' + this._mediaTypeUnique}
+					name=${ifDefined(this._mediaTypeName)}>
+					<umb-icon slot="icon" name=${ifDefined(this._mediaTypeIcon)}></umb-icon>
+				</uui-ref-node-document-type>
+			</div>
+			<div class="general-item">
+				<strong><umb-localize key="template_id">Id</umb-localize></strong>
+				<span>${this._mediaUnique}</span>
 			</div>
 		`;
 	}
