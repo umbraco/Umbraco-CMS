@@ -222,7 +222,8 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					?auto-generate-alias=${this._isNew}
 					?alias-readonly=${this._aliasCanBeChanged === false}
 					@change=${this.#onNameAndAliasChange}
-					${umbFocus()}></umb-input-with-alias>
+					${umbFocus()}>
+				</umb-input-with-alias>
 			</div>
 		`;
 	}
