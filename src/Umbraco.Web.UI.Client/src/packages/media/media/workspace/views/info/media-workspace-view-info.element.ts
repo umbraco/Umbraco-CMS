@@ -1,13 +1,16 @@
 import { TimeOptions } from './utils.js';
-import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbMediaTypeDetailRepository } from '@umbraco-cms/backoffice/media-type';
+import {
+	UMB_MEDIA_TYPE_ENTITY_TYPE,
+	UmbMediaTypeItemModel,
+	UmbMediaTypeItemRepository,
+} from '@umbraco-cms/backoffice/media-type';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/media';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbMediaWorkspaceContext } from '@umbraco-cms/backoffice/media';
 
 // import of local components
 import './media-workspace-view-info-history.element.js';
@@ -16,13 +19,13 @@ import './media-workspace-view-info-reference.element.js';
 @customElement('umb-media-workspace-view-info')
 export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
-	private _mediaTypeUnique = '';
+	private _mediaTypeUnique: string | undefined = undefined;
 
 	@state()
-	private _mediaTypeName?: string;
+	private _mediaTypeName?: UmbMediaTypeItemModel['name'];
 
 	@state()
-	private _mediaTypeIcon?: string;
+	private _mediaTypeIcon?: UmbMediaTypeItemModel['icon'];
 
 	@state()
 	private _editMediaTypePath = '';
@@ -32,7 +35,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 
 	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
 
-	#mediaTypeRepository = new UmbMediaTypeDetailRepository(this);
+	#mediaTypeItemRepository = new UmbMediaTypeItemRepository(this);
 
 	@state()
 	private _urls?: Array<MediaUrlInfoModel>;
@@ -49,7 +52,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('media-type')
 			.onSetup(() => {
-				return { data: { entityType: 'media-type', preset: {} } };
+				return { data: { entityType: UMB_MEDIA_TYPE_ENTITY_TYPE, preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editMediaTypePath = routeBuilder({});
@@ -64,9 +67,10 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	async #getData() {
-		const { data } = await this.#mediaTypeRepository.requestByUnique(this._mediaTypeUnique);
-		this._mediaTypeName = data?.name;
-		this._mediaTypeIcon = data?.icon;
+		if (!this._mediaTypeUnique) throw new Error('Media type unique is not set');
+		const { data } = await this.#mediaTypeItemRepository.requestItems([this._mediaTypeUnique]);
+		this._mediaTypeName = data?.[0].name;
+		this._mediaTypeIcon = data?.[0].icon;
 	}
 
 	#observeContent() {
@@ -157,12 +161,12 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 				</span>
 			</div>
 			<div class="general-item">
-				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
+				<strong><umb-localize key="content_mediaType">Media Type</umb-localize></strong>
 				<uui-ref-node-document-type
 					standalone
 					href=${this._editMediaTypePath + 'edit/' + this._mediaTypeUnique}
 					name=${ifDefined(this._mediaTypeName)}>
-					<umb-icon slot="icon" name=${ifDefined(this._mediaTypeIcon)}></umb-icon>
+					${this._mediaTypeIcon ? html`<umb-icon slot="icon" name=${this._mediaTypeIcon}></umb-icon>` : nothing}
 				</uui-ref-node-document-type>
 			</div>
 			<div class="general-item">
