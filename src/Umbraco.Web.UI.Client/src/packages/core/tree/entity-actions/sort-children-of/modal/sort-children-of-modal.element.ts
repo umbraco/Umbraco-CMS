@@ -5,7 +5,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbTreeRepository, UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeRepository, UmbTreeItemModel, UmbSortChildrenOfRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
@@ -112,7 +112,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		event?.stopPropagation();
 		if (!this.data?.sortChildrenOfRepositoryAlias) throw new Error('sortChildrenOfRepositoryAlias is required');
 
-		const sortChildrenOfRepository = await createExtensionApiByAlias<any>(
+		const sortChildrenOfRepository = await createExtensionApiByAlias<UmbSortChildrenOfRepository>(
 			this,
 			this.data.sortChildrenOfRepositoryAlias,
 		);
