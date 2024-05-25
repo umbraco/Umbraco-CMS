@@ -1,11 +1,8 @@
 import { TimeOptions } from './utils.js';
 import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UMB_MEDIA_TYPE_ENTITY_TYPE,
-	UmbMediaTypeItemModel,
-	UmbMediaTypeItemRepository,
-} from '@umbraco-cms/backoffice/media-type';
+import type { UmbMediaTypeItemModel } from '@umbraco-cms/backoffice/media-type';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE, UmbMediaTypeItemRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/media';
