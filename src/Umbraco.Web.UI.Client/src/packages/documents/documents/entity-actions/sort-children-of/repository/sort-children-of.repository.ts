@@ -1,12 +1,11 @@
 import { UmbSortChildrenOfDocumentServerDataSource } from './sort-children-of.server.data.js';
-import type { UmbSortChildrenOfArgs } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbSortChildrenOfArgs, UmbSortChildrenOfRepository } from '@umbraco-cms/backoffice/tree';
 
-export class UmbSortChildrenOfDocumentRepository extends UmbControllerBase implements UmbApi {
+export class UmbSortChildrenOfDocumentRepository extends UmbControllerBase implements UmbSortChildrenOfRepository {
 	#dataSource: UmbSortChildrenOfDocumentServerDataSource;
 
 	#notificationContext?: UmbNotificationContext;
