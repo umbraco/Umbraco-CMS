@@ -1,30 +1,30 @@
-import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbSortChildrenOfArgs, UmbSortChildrenOfDataSource } from '@umbraco-cms/backoffice/tree';
 
 /**
- * A server data source for sorting children of a Document
+ * A server data source for sorting children of a Media
  * @export
- * @class UmbSortChildrenOfDocumentServerDataSource
+ * @class UmbSortChildrenOfMediaServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbSortChildrenOfDocumentServerDataSource implements UmbSortChildrenOfDataSource {
+export class UmbSortChildrenOfMediaServerDataSource implements UmbSortChildrenOfDataSource {
 	#host: UmbControllerHost;
 
 	/**
-	 * Creates an instance of UmbSortChildrenOfDocumentServerDataSource.
+	 * Creates an instance of UmbSortChildrenOfMediaServerDataSource.
 	 * @param {UmbControllerHost} host
-	 * @memberof UmbSortChildrenOfDocumentServerDataSource
+	 * @memberof UmbSortChildrenOfMediaServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 
 	/**
-	 * Creates the Public Access for the given Document unique
+	 * Creates the Public Access for the given Media unique
 	 * @param {UmbSortChildrenOfArgs} args
-	 * @memberof UmbSortChildrenOfDocumentServerDataSource
+	 * @memberof UmbSortChildrenOfMediaServerDataSource
 	 */
 	async sortChildrenOf(args: UmbSortChildrenOfArgs) {
 		if (args.unique === undefined) throw new Error('unique is missing');
@@ -33,7 +33,7 @@ export class UmbSortChildrenOfDocumentServerDataSource implements UmbSortChildre
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DocumentService.putDocumentSort({
+			MediaService.putMediaSort({
 				requestBody: {
 					parent: args.unique ? { id: args.unique } : null,
 					sorting: sortingMapping,
