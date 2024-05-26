@@ -25,7 +25,7 @@ export interface UmbRichTextEditorValueType {
 @customElement('umb-property-editor-ui-tiny-mce')
 export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
-	// No need to registerer as a LIT- property, as we are calling it directly and no need for it to be reactive [NL]
+	// No need to registerer as a LIT-property, as we are calling it directly and no need for it to be reactive [NL]
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
