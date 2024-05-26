@@ -8,9 +8,11 @@ import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockListLayoutModel } from '@umbraco-cms/backoffice/block-list';
 
 /**
- * @element umb-block-rte-entry
+ * @element umb-rte-block
+ * @element umb-rte-block-inline
  */
-@customElement('umb-block-rte-entry')
+@customElement('umb-rte-block')
+@customElement('umb-rte-block-inline')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
 	@property({ attribute: false })
@@ -138,6 +140,7 @@ export default UmbBlockRteEntryElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-rte-entry': UmbBlockRteEntryElement;
+		'umb-rte-block': UmbBlockRteEntryElement;
+		'umb-rte-block-inline': UmbBlockRteEntryElement;
 	}
 }
