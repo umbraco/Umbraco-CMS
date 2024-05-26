@@ -1,10 +1,16 @@
 import { UMB_BLOCK_RTE_WORKSPACE_MODAL } from '../workspace/index.js';
+import { UMB_BLOCK_RTE_ENTRIES_CONTEXT } from '../context/block-rte-entries.context-token.js';
+import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from '../context/block-rte-manager.context.js';
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 
 export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase {
 	#localize = new UmbLocalizationController(this._host);
+
+	private _blocks?: Array<UmbBlockTypeBaseModel>;
+	#entriesContext?: typeof UMB_BLOCK_RTE_ENTRIES_CONTEXT.TYPE;
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
@@ -35,6 +41,19 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 				);
 				return () => changed.unbind();
 			},
+		});
+
+		this.consumeContext(UMB_BLOCK_RTE_MANAGER_CONTEXT, (context) => {
+			this.observe(
+				context.blockTypes,
+				(blockTypes) => {
+					this._blocks = blockTypes;
+				},
+				'blockType',
+			);
+		});
+		this.consumeContext(UMB_BLOCK_RTE_ENTRIES_CONTEXT, (context) => {
+			this.#entriesContext = context;
 		});
 	}
 
@@ -73,7 +92,21 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 		}
 	}
 
-	#createBlock() {}
+	#createBlock() {
+		// TODO: Missing solution to skip catalogue if only one type available. [NL]
+		let createPath: string | undefined = undefined;
+
+		if (this._blocks?.length === 1) {
+			const elementKey = this._blocks[0].contentElementTypeKey;
+			createPath = this.#entriesContext?.getPathForCreateBlock() + 'modal/umb-modal-workspace/create/' + elementKey;
+		} else {
+			createPath = this.#entriesContext?.getPathForCreateBlock();
+		}
+
+		if (createPath) {
+			window.history.pushState({}, '', createPath);
+		}
+	}
 
 	#insertBlockInEditor(blockContentUdi: string, displayInline = false) {
 		if (!blockContentUdi) {

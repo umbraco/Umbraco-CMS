@@ -5,7 +5,11 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
-import { UmbBlockRteEntriesContext, UmbBlockRteManagerContext } from '@umbraco-cms/backoffice/block-rte';
+import {
+	UmbBlockRteEntriesContext,
+	UmbBlockRteManagerContext,
+	type UmbBlockRteTypeModel,
+} from '@umbraco-cms/backoffice/block-rte';
 import type { UmbBlockDataBaseValueType } from '@umbraco-cms/backoffice/block';
 
 export interface UmbRichTextEditorValueType extends UmbBlockDataBaseValueType {
@@ -17,7 +21,18 @@ export interface UmbRichTextEditorValueType extends UmbBlockDataBaseValueType {
  */
 @customElement('umb-property-editor-ui-tiny-mce')
 export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	#configuration?: UmbPropertyEditorConfigCollection;
+	//
+	// No need to registerer as a LIT- property, as we are calling it directly and no need for it to be reactive [NL]
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		if (!config) return;
+
+		this._config = config;
+
+		const blocks = config.getValueByAlias<Array<UmbBlockRteTypeModel>>('blocks') ?? [];
+		this.#managerContext.setBlockTypes(blocks);
+
+		this.#managerContext.setEditorConfiguration(config);
+	}
 
 	@property({ attribute: false })
 	public set value(value: UmbRichTextEditorValueType | undefined) {
@@ -34,13 +49,8 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		return this._value;
 	}
 
-	@property({ attribute: false })
-	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this.#configuration = config;
-	}
-	public get config() {
-		return this.#configuration;
-	}
+	@state()
+	_config?: UmbPropertyEditorConfigCollection;
 
 	@state()
 	private _value: UmbRichTextEditorValueType = {
@@ -54,11 +64,6 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 
 	constructor() {
 		super();
-
-		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
-			// Update manager:
-			this.#managerContext.setLayouts(layouts);
-		});
 
 		this.observe(this.#managerContext.contents, (contents) => {
 			this._value = { ...this._value, contentData: contents };
@@ -84,10 +89,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 
 	render() {
 		return html`
-			<umb-input-tiny-mce
-				.configuration=${this.#configuration}
-				.value=${this._value?.markup ?? ''}
-				@change=${this.#onChange}>
+			<umb-input-tiny-mce .configuration=${this._config} .value=${this._value?.markup ?? ''} @change=${this.#onChange}>
 			</umb-input-tiny-mce>
 		`;
 	}

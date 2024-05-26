@@ -33,7 +33,7 @@ export class UmbBlockRteManagerContext<
 		settings: UmbBlockDataType | undefined,
 		modalData: UmbBlockRteWorkspaceData,
 	) {
-		this._layouts.appendOneAt(layoutEntry, modalData.originData.index ?? -1);
+		this._layouts.appendOne(layoutEntry);
 
 		this.insertBlockData(layoutEntry, content, settings, modalData);
 

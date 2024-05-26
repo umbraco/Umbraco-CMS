@@ -24,16 +24,14 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
 			.addUniquePaths(['propertyAlias', 'variantId'])
-			.addAdditionalPath(':view/:index')
+			.addAdditionalPath(':view')
 			.onSetup((routingInfo) => {
-				// Idea: Maybe on setup should be async, so it can retrieve the values when needed? [NL]
-				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				return {
 					data: {
 						blocks: this._manager?.getBlockTypes() ?? [],
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
-						blockOriginData: { index: index },
+						blockOriginData: {},
 					},
 				};
 			})
@@ -79,12 +77,12 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		);
 	}
 
-	getPathForCreateBlock(index: number) {
-		return this._catalogueRouteBuilderState.getValue()?.({ view: 'create', index: index });
+	getPathForCreateBlock() {
+		return this._catalogueRouteBuilderState.getValue()?.({ view: 'create' });
 	}
 
-	getPathForClipboard(index: number) {
-		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
+	getPathForClipboard() {
+		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard' });
 	}
 
 	async setLayouts(layouts: Array<UmbBlockRteLayoutModel>) {
