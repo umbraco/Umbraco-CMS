@@ -1,8 +1,8 @@
-import type { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
-import '../../../block-type/components/input-block-type/index.js';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import { UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import { UMB_BLOCK_RTE_TYPE } from '@umbraco-cms/backoffice/block-rte';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
@@ -61,12 +61,14 @@ export class UmbPropertyEditorUIBlockRteBlockConfigurationElement
 	}
 
 	render() {
-		return html`<umb-input-block-type
-			entity-type="block-rte-type"
-			.value=${this.value}
-			@create=${this.#onCreate}
-			@change=${this.#onChange}
-			@delete=${this.#onChange}></umb-input-block-type>`;
+		return UmbInputBlockTypeElement
+			? html`<umb-input-block-type
+					.value=${this.value}
+					.workspacePath=${this._workspacePath}
+					@create=${this.#onCreate}
+					@change=${this.#onChange}
+					@delete=${this.#onChange}></umb-input-block-type>`
+			: nothing;
 	}
 }
 
