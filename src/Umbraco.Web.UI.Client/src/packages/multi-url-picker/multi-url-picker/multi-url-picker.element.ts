@@ -273,8 +273,7 @@ export class UmbMultiUrlPickerElement extends UUIFormControlMixin(UmbLitElement,
 				id=${unique}
 				href=${href}
 				name=${link.name || ''}
-				detail=${(link.url || '') + (link.queryString || '')}
-				?disabled=${!link.published}>
+				detail=${(link.url || '') + (link.queryString || '')}>
 				<umb-icon slot="icon" name=${link.icon || 'icon-link'}></umb-icon>
 				<uui-action-bar slot="actions">
 					<uui-button href=${href} label=${this.localize.term('general_edit')}></uui-button>
