@@ -7,7 +7,6 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-
 export class UmbBlockRteTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	render() {
 		return html`
-			<h5>for RTE blocks</h5>
 			<uui-box headline="Editor Appearance">
 				<umb-property
 					label="Label"
