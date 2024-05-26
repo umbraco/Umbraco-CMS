@@ -1,5 +1,9 @@
-import type { UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
-import type { UmbWorkspaceModalData, UmbWorkspaceModalValue } from '@umbraco-cms/backoffice/modal';
+import type {
+	UmbBlockLayoutBaseModel,
+	UmbBlockViewPropsType,
+	UmbBlockWorkspaceData,
+} from '@umbraco-cms/backoffice/block';
+import type { UmbWorkspaceModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbBlockRTEWorkspaceData
@@ -7,7 +11,9 @@ export interface UmbBlockRTEWorkspaceData
 		index: number;
 	}> {}
 
-export const UMB_BLOCK_RTE_WORKSPACE_MODAL = new UmbModalToken<UmbBlockRTEWorkspaceData, UmbWorkspaceModalValue>(
+export type UmbBlockRTEWorkspaceValue = Array<UmbBlockViewPropsType<UmbBlockLayoutBaseModel>>;
+
+export const UMB_BLOCK_RTE_WORKSPACE_MODAL = new UmbModalToken<UmbBlockRTEWorkspaceData, UmbBlockRTEWorkspaceValue>(
 	'Umb.Modal.Workspace',
 	{
 		modal: {
@@ -17,4 +23,4 @@ export const UMB_BLOCK_RTE_WORKSPACE_MODAL = new UmbModalToken<UmbBlockRTEWorksp
 		data: { entityType: 'block', preset: {}, originData: { index: -1 } },
 		// Recast the type, so the entityType data prop is not required:
 	},
-) as UmbModalToken<Omit<UmbWorkspaceModalData, 'entityType'>, UmbWorkspaceModalValue>;
+) as UmbModalToken<Omit<UmbWorkspaceModalData, 'entityType'>, UmbBlockRTEWorkspaceValue>;

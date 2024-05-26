@@ -90,7 +90,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 				p.meta.toolbar.forEach((t: any) => {
 					this._toolbarConfig.push({
 						alias: t.alias,
-						label: t.label,
+						label: this.localize.string(t.label),
 						icon: t.icon ?? 'icon-autofill',
 						selected: this.value.includes(t.alias),
 					});
