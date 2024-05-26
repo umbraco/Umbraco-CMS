@@ -3,7 +3,7 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
@@ -16,7 +16,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const minMax = config.getValueByAlias<NumberRangeValueType>('validationLimit');
+		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		if (minMax) {
 			this._min = minMax.min && minMax.min > 0 ? minMax.min : 0;
 			this._max = minMax.max && minMax.max > 0 ? minMax.max : 1;

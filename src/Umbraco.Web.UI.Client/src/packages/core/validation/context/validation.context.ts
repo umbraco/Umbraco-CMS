@@ -68,12 +68,13 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 
 		const resultsStatus = await Promise.all(this.#validators.map((v) => v.validate())).then(
 			() => Promise.resolve(true),
-			() => Promise.reject(false),
+			() => Promise.resolve(false),
 		);
 
 		// If we have any messages then we are not valid, otherwise lets check the validation results: [NL]
 		// This enables us to keep client validations though UI is not present anymore — because the client validations got defined as messages. [NL]
 		const isValid = this.messages.getHasAnyMessages() ? false : resultsStatus;
+
 		this.#isValid = isValid;
 
 		if (isValid === false) {
