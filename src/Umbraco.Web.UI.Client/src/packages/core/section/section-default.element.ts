@@ -1,4 +1,4 @@
-import type { UmbWorkspaceElement } from '../workspace/workspace.element.js';
+import type { ManifestSectionRoute } from '../extension-registry/models/section-route.model.js';
 import type { UmbSectionMainViewElement } from './section-main-views/section-main-views.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -9,11 +9,14 @@ import type {
 	UmbSectionElement,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import type { IRoute, IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbExtensionsElementAndApiInitializer,
+	UmbExtensionsElementInitializer,
+} from '@umbraco-cms/backoffice/extension-api';
+import { aliasToPath, debounce } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @export
@@ -47,6 +50,10 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	@state()
 	_splitPanelPosition = '300px';
 
+	#routeExtensionsController:
+		| UmbExtensionsElementAndApiInitializer<ManifestSectionRoute, 'sectionRoute', ManifestSectionRoute>
+		| undefined;
+
 	constructor() {
 		super();
 
@@ -56,7 +63,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 			this.requestUpdate('_sidebarApps', oldValue);
 		});
 
-		this.#createRoutes();
+		this.#observeRoutes();
 
 		const splitPanelPosition = localStorage.getItem('umb-split-panel-position');
 		if (splitPanelPosition) {
@@ -64,15 +71,44 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		}
 	}
 
-	#createRoutes() {
-		this._routes = [
-			{
-				path: UMB_WORKSPACE_PATH_PATTERN.toString(),
-				component: () => import('../workspace/workspace.element.js'),
-				setup: (element, info) => {
-					(element as UmbWorkspaceElement).entityType = info.match.params.entityType;
-				},
+	#observeRoutes(): void {
+		this.#routeExtensionsController?.destroy();
+
+		this.#routeExtensionsController = new UmbExtensionsElementAndApiInitializer<
+			ManifestSectionRoute,
+			'sectionRoute',
+			ManifestSectionRoute
+		>(
+			this,
+			umbExtensionsRegistry,
+			'sectionRoute',
+			undefined,
+			undefined,
+			(sectionRouteExtensions) => {
+				const routes: Array<IRoute> = sectionRouteExtensions.map((extensionController) => {
+					return {
+						path:
+							extensionController.api?.getPath?.() ||
+							extensionController.manifest.meta?.path ||
+							aliasToPath(extensionController.manifest.alias),
+						component: extensionController.component,
+						setup: (element: PageComponent, info: IRoutingInfo) => {
+							extensionController.api?.setup?.(element, info);
+						},
+					};
+				});
+
+				this.#debouncedCreateRoutes(routes);
 			},
+			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
+		);
+	}
+
+	#debouncedCreateRoutes = debounce(this.#createRoutes, 50);
+
+	#createRoutes(routes: Array<IRoute>) {
+		this._routes = [
+			...routes,
 			{
 				path: '**',
 				component: () => import('./section-main-views/section-main-views.element.js'),

@@ -13,7 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
-import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -75,7 +75,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const validationLimit = config.getValueByAlias<NumberRangeValueType>('validationLimit');
+		const validationLimit = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 
 		this._limitMin = validationLimit?.min;
 		this._limitMax = validationLimit?.max;
