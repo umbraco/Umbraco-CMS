@@ -80,7 +80,8 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 						alias=${this._alias}
 						?auto-generate-alias=${this._isNew}
 						@change="${this.#onNameAndAliasChange}"
-						${umbFocus()}></umb-input-with-alias>
+						${umbFocus()}>
+					</umb-input-with-alias>
 				</div>
 			</umb-workspace-editor>
 		`;
