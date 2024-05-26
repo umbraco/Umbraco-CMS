@@ -158,9 +158,3 @@ export class UmbBlockGridManagerContext<
 		(this.getHostElement() as HTMLElement).style.removeProperty('--umb-block-grid--is-dragging');
 	}
 }
-
-// TODO: Make discriminator method for this:
-export const UMB_BLOCK_GRID_MANAGER_CONTEXT = new UmbContextToken<
-	UmbBlockGridManagerContext,
-	UmbBlockGridManagerContext
->('UmbBlockManagerContext');
