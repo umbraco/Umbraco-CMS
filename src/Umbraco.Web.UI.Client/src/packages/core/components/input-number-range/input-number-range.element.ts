@@ -2,7 +2,7 @@ import { css, customElement, html, ifDefined, property, state } from '@umbraco-c
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 function getNumberOrUndefined(value: string) {
@@ -43,7 +43,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	@property({ type: Object })
-	validationRange?: NumberRangeValueType;
+	validationRange?: UmbNumberRangeValueType;
 
 	private updateValue() {
 		const newValue =

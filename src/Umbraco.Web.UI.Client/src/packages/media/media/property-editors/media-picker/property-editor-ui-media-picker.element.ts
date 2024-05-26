@@ -4,7 +4,7 @@ import { customElement, html, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -29,7 +29,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		this._preselectedCrops = config?.getValueByAlias<Array<UmbCropModel>>('crops') ?? [];
 		this._startNode = config.getValueByAlias<string>('startNodeId') ?? '';
 
-		const minMax = config.getValueByAlias<NumberRangeValueType>('validationLimit');
+		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		this._limitMin = minMax?.min ?? 0;
 		this._limitMax = minMax?.max ?? Infinity;
 	}
