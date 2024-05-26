@@ -40,16 +40,20 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 
 	async showDialog() {
 		const blockEl = this.editor.selection.getNode();
-		let blockUdi: string | undefined;
 
 		if (blockEl.nodeName === 'UMB-RTE-BLOCK' || blockEl.nodeName === 'UMB-RTE-BLOCK-INLINE') {
-			blockUdi = blockEl.getAttribute('data-content-udi') ?? undefined;
+			const blockUdi = blockEl.getAttribute('data-content-udi') ?? undefined;
+			if (blockUdi) {
+				this.#editBlock(blockUdi);
+				return;
+			}
 		}
 
-		this.#openBlockPicker(blockUdi);
+		// If no block is selected, open the block picker:
+		this.#createBlock();
 	}
 
-	async #openBlockPicker(blockUdi?: string) {
+	async #editBlock(blockUdi?: string) {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalHandler = modalManager.open(this, UMB_BLOCK_RTE_WORKSPACE_MODAL, {
 			data: {
@@ -68,6 +72,8 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 			this.#insertBlockInEditor(block.layout?.contentUdi ?? '', (block.layout as any)?.displayInline ?? false);
 		}
 	}
+
+	#createBlock() {}
 
 	#insertBlockInEditor(blockContentUdi: string, displayInline = false) {
 		if (!blockContentUdi) {
