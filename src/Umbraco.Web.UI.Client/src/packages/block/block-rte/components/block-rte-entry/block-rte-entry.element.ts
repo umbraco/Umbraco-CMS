@@ -3,7 +3,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../ref-rte-block/index.js';
-import '../inline-rte-block/index.js';
 import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockListLayoutModel } from '@umbraco-cms/backoffice/block-list';
 

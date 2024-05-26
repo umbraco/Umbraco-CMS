@@ -2,8 +2,9 @@ import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
 import type { UmbBlockRteWorkspaceData } from '../index.js';
 import type { UmbBlockDataType } from '../../block/types.js';
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
+
+import '../components/block-rte-entry/block-rte-entry.element.js';
 
 /**
  * A implementation of the Block Manager specifically for the Rich Text Editor.
@@ -51,8 +52,3 @@ export class UmbBlockRteManagerContext<
 		return true;
 	}
 }
-
-// TODO: Make discriminator method for this:
-export const UMB_BLOCK_RTE_MANAGER_CONTEXT = new UmbContextToken<UmbBlockRteManagerContext, UmbBlockRteManagerContext>(
-	'UmbBlockManagerContext',
-);
