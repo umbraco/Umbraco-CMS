@@ -44,6 +44,8 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 		});
 
 		this.consumeContext(UMB_BLOCK_RTE_MANAGER_CONTEXT, (context) => {
+			context.setTinyMceEditor(args.editor);
+
 			this.observe(
 				context.blockTypes,
 				(blockTypes) => {
@@ -60,36 +62,17 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 	async showDialog() {
 		const blockEl = this.editor.selection.getNode();
 
-		if (blockEl.nodeName === 'UMB-RTE-BLOCK' || blockEl.nodeName === 'UMB-RTE-BLOCK-INLINE') {
+		/*if (blockEl.nodeName === 'UMB-RTE-BLOCK' || blockEl.nodeName === 'UMB-RTE-BLOCK-INLINE') {
 			const blockUdi = blockEl.getAttribute('data-content-udi') ?? undefined;
 			if (blockUdi) {
+				// TODO: Missing a solution to edit a block from this scope. [NL]
 				this.#editBlock(blockUdi);
 				return;
 			}
-		}
+		}*/
 
 		// If no block is selected, open the block picker:
 		this.#createBlock();
-	}
-
-	async #editBlock(blockUdi?: string) {
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalHandler = modalManager.open(this, UMB_BLOCK_RTE_WORKSPACE_MODAL, {
-			data: {
-				preset: {
-					blockUdi,
-				},
-			},
-		});
-
-		if (!modalHandler) return;
-
-		const blockPickerData = await modalHandler.onSubmit().catch(() => undefined);
-		if (!blockPickerData) return;
-
-		for (const block of blockPickerData) {
-			this.#insertBlockInEditor(block.layout?.contentUdi ?? '', (block.layout as any)?.displayInline ?? false);
-		}
 	}
 
 	#createBlock() {
@@ -106,24 +89,5 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 		if (createPath) {
 			window.history.pushState({}, '', createPath);
 		}
-	}
-
-	#insertBlockInEditor(blockContentUdi: string, displayInline = false) {
-		if (!blockContentUdi) {
-			return;
-		}
-		if (displayInline) {
-			this.editor.selection.setContent(
-				'<umb-rte-block-inline data-content-udi="' + blockContentUdi + '"><!--Umbraco-Block--></umb-rte-block-inline>',
-			);
-		} else {
-			this.editor.selection.setContent(
-				'<umb-rte-block data-content-udi="' + blockContentUdi + '"><!--Umbraco-Block--></umb-rte-block>',
-			);
-		}
-
-		// angularHelper.safeApply($rootScope, function () {
-		// 	editor.dispatch("Change");
-		// });
 	}
 }

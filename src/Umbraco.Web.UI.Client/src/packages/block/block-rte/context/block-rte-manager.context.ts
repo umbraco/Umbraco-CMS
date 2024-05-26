@@ -1,8 +1,8 @@
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
 import type { UmbBlockRteWorkspaceData } from '../index.js';
 import type { UmbBlockDataType } from '../../block/types.js';
+import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
 /**
@@ -12,11 +12,10 @@ export class UmbBlockRteManagerContext<
 	BlockLayoutType extends UmbBlockRteLayoutModel = UmbBlockRteLayoutModel,
 > extends UmbBlockManagerContext<UmbBlockRteTypeModel, BlockLayoutType> {
 	//
-	#inlineEditingMode = new UmbBooleanState(undefined);
-	readonly inlineEditingMode = this.#inlineEditingMode.asObservable();
+	#editor?: Editor;
 
-	setInlineEditingMode(inlineEditingMode: boolean | undefined) {
-		this.#inlineEditingMode.setValue(inlineEditingMode ?? false);
+	setTinyMceEditor(editor: Editor) {
+		this.#editor = editor;
 	}
 
 	create(
@@ -33,7 +32,17 @@ export class UmbBlockRteManagerContext<
 		settings: UmbBlockDataType | undefined,
 		modalData: UmbBlockRteWorkspaceData,
 	) {
-		this._layouts.appendOne(layoutEntry);
+		if (!this.#editor) return false;
+
+		if (layoutEntry.displayInline) {
+			this.#editor.selection.setContent(
+				`<umb-rte-block-inline data-content-udi="${layoutEntry.contentUdi}"><!--Umbraco-Block--></umb-rte-block-inline>`,
+			);
+		} else {
+			this.#editor.selection.setContent(
+				`<umb-rte-block data-content-udi="${layoutEntry.contentUdi}"><!--Umbraco-Block--></umb-rte-block>`,
+			);
+		}
 
 		this.insertBlockData(layoutEntry, content, settings, modalData);
 
