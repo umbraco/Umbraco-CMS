@@ -3,11 +3,9 @@ import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/b
 import type { UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue } from '@umbraco-cms/backoffice/block';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import {
-	UMB_MODAL_CONTEXT,
-	UmbModalBaseElement,
-	UmbModalRouteRegistrationController,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+
 // TODO: This is across packages, how should we go about getting just a single element from another package? like here we just need the umb-block-type-card element
 import '@umbraco-cms/backoffice/block-type';
 

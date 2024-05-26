@@ -37,7 +37,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 	 * @attr
 	 * @default ''
 	 */
-	@property({ type: String })
+	@property({ type: String, reflect: true })
 	public orientation: 'horizontal' | 'vertical' = 'horizontal';
 
 	/**

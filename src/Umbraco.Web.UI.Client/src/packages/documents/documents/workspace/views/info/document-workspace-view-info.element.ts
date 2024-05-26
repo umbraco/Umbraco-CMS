@@ -2,13 +2,8 @@ import { TimeOptions } from './utils.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_WORKSPACE_MODAL,
-	UmbModalRouteRegistrationController,
-} from '@umbraco-cms/backoffice/modal';
-import './document-workspace-view-info-history.element.js';
-import './document-workspace-view-info-reference.element.js';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import {
 	UMB_DOCUMENT_WORKSPACE_CONTEXT,
 	type UmbDocumentVariantModel,
@@ -20,6 +15,10 @@ import {
 	UmbDocumentTypeDetailRepository,
 } from '@umbraco-cms/backoffice/document-type';
 import { UmbTemplateDetailRepository, UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
+
+// import of local components
+import './document-workspace-view-info-history.element.js';
+import './document-workspace-view-info-reference.element.js';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {

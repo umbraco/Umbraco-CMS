@@ -8,7 +8,8 @@ import {
 	UMB_DOCUMENT_ROOT_ENTITY_TYPE,
 	UMB_DOCUMENT_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/document';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbAllowedDocumentTypeModel } from '@umbraco-cms/backoffice/document-type';
 

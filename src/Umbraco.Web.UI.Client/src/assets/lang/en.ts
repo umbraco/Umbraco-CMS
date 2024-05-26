@@ -177,6 +177,7 @@ export default {
 		save: 'Media saved',
 	},
 	auditTrails: {
+		assigndomain: 'Domain assigned: %0%',
 		atViewingFor: 'Viewing for',
 		delete: 'Content deleted',
 		unpublish: 'Content unpublished',
@@ -193,6 +194,7 @@ export default {
 		custom: '%0%',
 		contentversionpreventcleanup: 'Cleanup disabled for version: %0%',
 		contentversionenablecleanup: 'Cleanup enabled for version: %0%',
+		smallAssignDomain: 'Assign Domain',
 		smallCopy: 'Copy',
 		smallPublish: 'Publish',
 		smallPublishVariant: 'Publish',

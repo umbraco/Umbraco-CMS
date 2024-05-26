@@ -1,16 +1,28 @@
 import type { UmbImageCropperFocalPoint } from './index.js';
 import { clamp } from '@umbraco-cms/backoffice/utils';
+import { css, customElement, html, nothing, property, query, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { LitElement, css, html, nothing, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-image-cropper-focus-setter')
 export class UmbImageCropperFocusSetterElement extends LitElement {
-	@query('#image') imageElement!: HTMLImageElement;
-	@query('#wrapper') wrapperElement?: HTMLImageElement;
-	@query('#focal-point') focalPointElement!: HTMLImageElement;
+	@query('#image')
+	imageElement!: HTMLImageElement;
 
-	@property({ type: String }) src?: string;
-	@property({ attribute: false }) focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
+	@query('#wrapper')
+	wrapperElement?: HTMLImageElement;
+
+	@query('#focal-point')
+	focalPointElement!: HTMLImageElement;
+
+	@property({ attribute: false })
+	focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
+
+	// TODO: [LK] Temporary fix; to be reviewed.
+	@property({ type: Boolean })
+	hideFocalPoint = false;
+
+	@property({ type: String })
+	src?: string;
 
 	#DOT_RADIUS = 6 as const;
 
@@ -126,7 +138,7 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 		return html`
 			<div id="wrapper">
 				<img id="image" @click=${this.#onSetFocalPoint} @keydown=${() => nothing} src=${this.src} alt="" />
-				<div id="focal-point"></div>
+				<div id="focal-point" class=${this.hideFocalPoint ? 'hidden' : ''}></div>
 			</div>
 		`;
 	}
@@ -164,6 +176,9 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 			border-radius: 50%;
 			pointer-events: none;
 			background-color: white;
+		}
+		#focal-point.hidden {
+			display: none;
 		}
 	`;
 }

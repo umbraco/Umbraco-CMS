@@ -1,12 +1,19 @@
-import type { UmbModalToken } from '../token/index.js';
-import type { UmbModalConfig, UmbModalContext, UmbModalManagerContext, UmbModalRouteRegistration } from '../index.js';
-import type { UmbModalContextClassArgs } from '../context/modal.context.js';
-import { type Params, type IRouterSlot, UMB_ROUTE_CONTEXT, encodeFolderName } from '@umbraco-cms/backoffice/router';
+import { UMB_ROUTE_CONTEXT } from '../route.context.js';
+import { encodeFolderName } from '../encode-folder-name.function.js';
+import type { UmbModalRouteRegistration } from './modal-route-registration.interface.js';
+import type {
+	UmbModalConfig,
+	UmbModalContext,
+	UmbModalContextClassArgs,
+	UmbModalManagerContext,
+	UmbModalToken,
+} from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
+import type { IRouterSlot, Params } from '@umbraco-cms/backoffice/external/router-slot';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
