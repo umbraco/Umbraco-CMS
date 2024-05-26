@@ -9,13 +9,10 @@ export interface UmbBlockDataType {
 	[key: string]: unknown;
 }
 
-export interface UmbBlockDataBaseValueType {
+export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseModel> {
+	layout: { [key: string]: Array<BlockLayoutType> | undefined };
 	contentData: Array<UmbBlockDataType>;
 	settingsData: Array<UmbBlockDataType>;
-}
-
-export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseModel> extends UmbBlockDataBaseValueType {
-	layout: { [key: string]: Array<BlockLayoutType> | undefined };
 }
 
 export interface UmbBlockViewUrlsPropType {

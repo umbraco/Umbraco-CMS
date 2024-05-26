@@ -1,3 +1,4 @@
+import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from './manifests.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -7,13 +8,15 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 import {
 	UmbBlockRteEntriesContext,
+	type UmbBlockRteLayoutModel,
 	UmbBlockRteManagerContext,
 	type UmbBlockRteTypeModel,
 } from '@umbraco-cms/backoffice/block-rte';
-import type { UmbBlockDataBaseValueType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 
-export interface UmbRichTextEditorValueType extends UmbBlockDataBaseValueType {
+export interface UmbRichTextEditorValueType {
 	markup: string;
+	blocks: UmbBlockValueType<UmbBlockRteLayoutModel>;
 }
 
 /**
@@ -38,12 +41,15 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	public set value(value: UmbRichTextEditorValueType | undefined) {
 		const buildUpValue: Partial<UmbRichTextEditorValueType> = value ? { ...value } : {};
 		buildUpValue.markup ??= '';
-		buildUpValue.contentData ??= [];
-		buildUpValue.settingsData ??= [];
+		buildUpValue.blocks ??= { layout: {}, contentData: [], settingsData: [] };
+		buildUpValue.blocks.layout ??= {};
+		buildUpValue.blocks.contentData ??= [];
+		buildUpValue.blocks.settingsData ??= [];
 		this._value = buildUpValue as UmbRichTextEditorValueType;
 
-		this.#managerContext.setContents(buildUpValue.contentData);
-		this.#managerContext.setSettings(buildUpValue.settingsData);
+		this.#managerContext.setLayouts(buildUpValue.blocks.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
+		this.#managerContext.setContents(buildUpValue.blocks.contentData);
+		this.#managerContext.setSettings(buildUpValue.blocks.settingsData);
 	}
 	public get value(): UmbRichTextEditorValueType {
 		return this._value;
@@ -55,8 +61,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	@state()
 	private _value: UmbRichTextEditorValueType = {
 		markup: '',
-		contentData: [],
-		settingsData: [],
+		blocks: { layout: {}, contentData: [], settingsData: [] },
 	};
 
 	#managerContext = new UmbBlockRteManagerContext(this);
@@ -65,12 +70,19 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	constructor() {
 		super();
 
+		this.observe(this.#managerContext.layouts, (layouts) => {
+			this._value = {
+				...this._value,
+				blocks: { ...this._value.blocks, layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts } },
+			};
+			this.#fireChangeEvent();
+		});
 		this.observe(this.#managerContext.contents, (contents) => {
-			this._value = { ...this._value, contentData: contents };
+			this._value = { ...this._value, blocks: { ...this._value.blocks, contentData: contents } };
 			this.#fireChangeEvent();
 		});
 		this.observe(this.#managerContext.settings, (settings) => {
-			this._value = { ...this._value, settingsData: settings };
+			this._value = { ...this._value, blocks: { ...this._value.blocks, settingsData: settings } };
 			this.#fireChangeEvent();
 		});
 	}
@@ -80,7 +92,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	}
 
 	#onChange(event: InputEvent & { target: HTMLInputElement }) {
-		this.value = {
+		this._value = {
 			...this._value,
 			markup: event.target.value,
 		};

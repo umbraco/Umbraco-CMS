@@ -44,6 +44,8 @@ export class UmbBlockRteManagerContext<
 			);
 		}
 
+		this._layouts.appendOne(layoutEntry);
+
 		this.insertBlockData(layoutEntry, content, settings, modalData);
 
 		return true;
