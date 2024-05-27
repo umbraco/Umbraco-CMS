@@ -1,4 +1,3 @@
-import { UmbBlockRteEntryElement, UmbBlockRteEntryInlineElement } from '@umbraco-cms/backoffice/block-rte';
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 
 //export const UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH = '/umbraco/backoffice/packages/block/block-rte/index.js';
@@ -32,9 +31,20 @@ export const defaultFallbackConfig: RawEditorOptions = {
 	init_instance_callback: function (editor) {
 		console.log('editor', editor, editor.dom.doc);
 
+		const importMapTag = document.head.querySelector('script[type="importmap"]');
+		console.log('impoartmap tag', importMapTag);
+		/*if (importMapTag) {
+			//const p = JSON.parse(importMapTag.innerHTML ?? '');
+			const script = document.createElement('script');
+			script.type = 'importmap';
+			script.text = importMapTag.innerHTML;
+		}*/
+
 		const script = document.createElement('script');
 		script.type = 'text/javascript';
-		script.src = UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH;
+		script.setAttribute('type', 'module');
+		//script.src = UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH;
+		script.text = `import { UmbBlockRteEntryElement, UmbBlockRteEntryInlineElement } from "${UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH}";`;
 
 		editor.dom.doc.head.appendChild(script);
 
