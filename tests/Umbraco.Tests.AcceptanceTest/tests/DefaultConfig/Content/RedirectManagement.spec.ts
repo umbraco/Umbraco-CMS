@@ -5,14 +5,29 @@ import {expect} from "@playwright/test";
 test.describe('Redirect Management tests', {tag: '@smoke'}, () => {
   const disableStatus = 'Disabled';
   const enableStatus = 'Enabled';
+  let documentTypeId = '';
+  let contentId = '';
+  const contentName = 'TestContent';
+  const documentTypeName = 'TestDocumentType';
+  const updatedContentName = 'UpdatedContentName';
 
   test.beforeEach(async ({umbracoApi, umbracoUi}) => {
     await umbracoApi.redirectManagement.setStatus(enableStatus);
     await umbracoUi.goToBackOffice();
+    // Create a content
+    await umbracoApi.documentType.ensureNameNotExists(documentTypeName); 
+    documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
+    contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+    // Publish the content
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.clickActionsMenuForContent(contentName);
+    await umbracoUi.content.clickPublishButton();
   });
 
   test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.redirectManagement.setStatus(enableStatus);
+    await umbracoApi.document.ensureNameNotExists(contentName);
+    await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   });
 
   test('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
@@ -21,9 +36,20 @@ test.describe('Redirect Management tests', {tag: '@smoke'}, () => {
     await umbracoUi.redirectManagement.clickRedirectManagementTab();
     await umbracoUi.redirectManagement.clickDisableURLTrackerButton();
     await umbracoUi.redirectManagement.clickDisableButton();
-    await umbracoUi.waitForTimeout(1000);
 
     // Assert
+    // Verfiy that if renaming a published page, there are no redirects have been made
+    // rename the published content 
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.openContent(contentName);
+    await umbracoUi.content.enterContentName(updatedContentName);
+    await umbracoUi.content.clickSaveAndPublishButton();
+    // verify that there is no redirects have been made
+    const contentData = await umbracoApi.document.get(contentId);
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.redirectManagement.clickRedirectManagementTab();
+    await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentData.urls[0].url, false);
+    // Veridy that the status is Disable
     const statusData = await umbracoApi.redirectManagement.getStatus();
     expect(statusData.status).toBe(disableStatus);
   });
@@ -36,13 +62,25 @@ test.describe('Redirect Management tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.redirectManagement.clickRedirectManagementTab();
     await umbracoUi.redirectManagement.clickEnableURLTrackerButton();
-    await umbracoUi.waitForTimeout(1000);
 
     // Assert
+    // Verfiy that if renaming a published page, there are one redirects have been made
+    // rename the published content 
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.openContent(contentName);
+    await umbracoUi.content.enterContentName(updatedContentName);
+    await umbracoUi.content.clickSaveAndPublishButton();
+    // verify that there is no redirects have been made
+    const contentData = await umbracoApi.document.get(contentId);
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.redirectManagement.clickRedirectManagementTab();
+    await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentData.urls[0].url);
+    // Veridy that the status is Disable
     const statusData = await umbracoApi.redirectManagement.getStatus();
     expect(statusData.status).toBe(enableStatus);
   });
 
+  // TODO: Remove skip and update this when the front-end is ready. Currently it always return "No redirects matching this search criteria" when searching.
   test.skip('can search for original URL', async ({umbracoUi}) => {
     // Arrange
     const searchKeyword = '/test-content/';
@@ -58,7 +96,21 @@ test.describe('Redirect Management tests', {tag: '@smoke'}, () => {
     // TODO: verify the search result
   });
 
-  test.skip('can delete a redirect', async ({umbracoApi, umbracoUi}) => {
-    // TODO: implement this tests when front-end is ready
+  test('can delete a redirect', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    // Rename the published content 
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.openContent(contentName);
+    await umbracoUi.content.enterContentName(updatedContentName);
+    await umbracoUi.content.clickSaveAndPublishButton();
+
+    // Act
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.redirectManagement.clickRedirectManagementTab();
+    await umbracoUi.redirectManagement.deleteFirstRedirectURL();
+
+    // Assert
+    const contentData = await umbracoApi.document.get(contentId);
+    await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentData.urls[0].url, false);
   });
 });
