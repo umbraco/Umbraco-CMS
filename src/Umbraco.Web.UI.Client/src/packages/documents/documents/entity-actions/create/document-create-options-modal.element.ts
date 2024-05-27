@@ -3,7 +3,7 @@ import type {
 	UmbDocumentCreateOptionsModalData,
 	UmbDocumentCreateOptionsModalValue,
 } from './document-create-options-modal.token.js';
-import { html, nothing, customElement, state, ifDefined, repeat, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, ifDefined, repeat, css, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import {
@@ -128,16 +128,30 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 
 	#renderDocumentTypes() {
 		return html`<uui-box .headline=${this._headline}>
-			${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
-			${this._allowedDocumentTypes.map(
-				(documentType) => html`
-					<uui-menu-item
-						data-id=${ifDefined(documentType.unique)}
-						label="${documentType.name}"
-						@click=${() => this.#onSelectDocumentType(documentType.unique)}>
-						<umb-icon slot="icon" name=${documentType.icon || 'icon-circle-dotted'}></umb-icon>
-					</uui-menu-item>
+			${when(
+				this._allowedDocumentTypes.length === 0,
+				() => html`
+					<umb-localize key="create_noDocumentTypes">
+						There are no allowed Document Types available for creating content here. You must enable these in
+						<strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the
+						<strong>Allowed child node types</strong> under <strong>Permissions</strong>
+					</umb-localize>
 				`,
+				() =>
+					repeat(
+						this._allowedDocumentTypes,
+						(documentType) => documentType.unique,
+						(documentType) =>
+							html` <uui-ref-node-document-type
+								data-id=${ifDefined(documentType.unique)}
+								.name=${documentType.name}
+								.alias=${documentType.description}
+								select-only
+								selectable
+								@selected=${() => this.#onSelectDocumentType(documentType.unique)}>
+								<umb-icon slot="icon" name=${documentType.icon || 'icon-circle-dotted'}></umb-icon>
+							</uui-ref-node-document-type>`,
+					),
 			)}
 		</uui-box>`;
 	}
