@@ -13,7 +13,7 @@ import { UMB_SECTION_PATH_PATTERN } from '@umbraco-cms/backoffice/section';
 export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext> {
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
-
+	readonly allowedSections = this.#currentUser.asObservablePart((user) => user?.allowedSections);
 	readonly unique = this.#currentUser.asObservablePart((user) => user?.unique);
 	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode);
 	readonly hasDocumentRootAccess = this.#currentUser.asObservablePart((user) => user?.hasDocumentRootAccess);
@@ -99,7 +99,7 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 		if (!currentUser) return;
 
 		/* TODO: this solution is not bullet proof as we still rely on the "correct" section to be registered at this point in time so we can get the path.
-		 It probably would have been better if we used the section alias instead as the path. 
+		 It probably would have been better if we used the section alias instead as the path.
 		 Then we would have it available at all times and it also ensured a unique path. */
 		const sections = await this.observe(
 			umbExtensionsRegistry.byTypeAndAliases('section', currentUser.allowedSections),
