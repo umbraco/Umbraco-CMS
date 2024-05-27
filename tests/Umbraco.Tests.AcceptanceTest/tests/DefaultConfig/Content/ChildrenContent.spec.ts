@@ -112,4 +112,25 @@ test.describe('Children content tests', {tag: '@smoke'}, () => {
     const contentData = await umbracoApi.document.getByName(childContentName);
     expect(contentData.variants[0].state).toBe('Draft');
   });
+
+  test('can publish with descendants', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
+    documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId, true);
+    contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+    await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
+
+    // Act
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.clickActionsMenuForContent(contentName);
+    await umbracoUi.content.clickPublishButton();
+
+    // Assert
+    await umbracoUi.content.isSuccessNotificationVisible();
+    const contentData = await umbracoApi.document.getByName(contentName);
+    expect(contentData.variants[0].state).toBe('Published');
+    const childContentData = await umbracoApi.document.getByName(contentName);
+    expect(childContentData.variants[0].state).toBe('Published');
+  });
 });

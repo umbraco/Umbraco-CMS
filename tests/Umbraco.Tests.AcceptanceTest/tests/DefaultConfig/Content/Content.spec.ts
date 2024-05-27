@@ -117,10 +117,49 @@ test.describe('Content tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.enterTextstring(contentText);
     await umbracoUi.content.clickSaveButton();
 
-        // Assert
+    // Assert
     await umbracoUi.content.isSuccessNotificationVisible();
     const updatedContentData = await umbracoApi.document.get(contentId);
     expect(updatedContentData.variants[0].name).toEqual(contentName);
     expect(updatedContentData.values[0].value).toBe(contentText);
+  });
+
+  test('can publish a content', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+    contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
+
+    // Act
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.clickActionsMenuForContent(contentName);
+    await umbracoUi.content.clickPublishButton();
+
+    // Assert
+    await umbracoUi.content.isSuccessNotificationVisible();
+    const contentData = await umbracoApi.document.getByName(contentName);
+    expect(contentData.variants[0].state).toBe('Published');
+  });
+
+  test('can unpublish a content', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+    contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
+    const publishData = {"publishSchedules":[{"culture":null}]};
+    await umbracoApi.document.publish(contentId, publishData);
+
+    // Act
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.clickActionsMenuForContent(contentName);
+    await umbracoUi.content.clickUnpublishButton();
+    await umbracoUi.content.clickConfirmToUnpublishButton();
+
+    // Assert
+    await umbracoUi.content.isSuccessNotificationVisible();
+    const contentData = await umbracoApi.document.getByName(contentName);
+    expect(contentData.variants[0].state).toBe('Draft');
   });
 });
