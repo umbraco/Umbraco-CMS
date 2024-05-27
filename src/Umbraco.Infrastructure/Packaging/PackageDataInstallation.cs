@@ -1259,7 +1259,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                     var editorUiAlias = dataTypeElement.Attribute("EditorUiAlias")?.Value?.Trim() ?? editorAlias;
 
-
                     var dataType = new DataType(editor, _serializer)
                     {
                         Key = dataTypeDefinitionId,
