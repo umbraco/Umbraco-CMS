@@ -110,6 +110,12 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
                 return validationResults;
             }
         }
+
+        public override bool HasElementConfigured(Guid elementTypeKey)
+        {
+            var configuration = ConfigurationObject as BlockGridConfiguration;
+            return configuration?.Blocks?.Any(blockConfig => HasElementConfigured(elementTypeKey, blockConfig)) is true;
+        }
     }
 
     #endregion

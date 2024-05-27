@@ -121,7 +121,7 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
             return ContentTypeOperationStatus.Success;
         }
 
-        // if new value is Not Element => Document
+        // if nConfigurationObject = {object} Exception of type 'System.InvalidOperationException' was thrown ew value is Not Element => Document
         // => check whether the element was used in a block structure prior to updating
         if (model.IsElement is false)
         {
@@ -147,9 +147,9 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         // get all dataTypes that are based on those propertyEditors
         IEnumerable<IDataType> dataTypes = await _dataTypeService.GetByEditorAliasAsync(blockEditorAliases);
 
-        // validate whether any of those configurations have this element selected as a possible block
+        // check whether any of the configurations on those dataTypes have this element selected as a possible block
         return dataTypes.Any(dataType =>
-            (dataType.Editor ?? editors.First(editor => editor.Alias == dataType.EditorAlias)).GetValueEditor(dataType.ConfigurationObject).HasElementConfigured(contentType.Key) == true)
+            editors.First(editor => editor.Alias == dataType.EditorAlias).GetValueEditor(dataType.ConfigurationObject).HasElementConfigured(contentType.Key))
             ? ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration
             : ContentTypeOperationStatus.Success;
     }
