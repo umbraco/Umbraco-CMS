@@ -1,6 +1,5 @@
-import { UMB_CONTENT_REQUEST_EVENT_TYPE, UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
+import { UMB_CONTENT_REQUEST_EVENT_TYPE, type UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
-import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 //export const UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH = '/umbraco/backoffice/packages/block/block-rte/index.js';
 export const UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH = '@umbraco-cms/backoffice/block-rte';
@@ -103,7 +102,6 @@ export const defaultFallbackConfig: RawEditorOptions = {
 
 		// Load the umb-rte-block component inside the iframe [NL]
 		appendScript('@umbraco-cms/backoffice/extension-registry');
-		appendScript('@umbraco-cms/backoffice/external/router-slot');
 		appendScript(UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH);
 	},
 
