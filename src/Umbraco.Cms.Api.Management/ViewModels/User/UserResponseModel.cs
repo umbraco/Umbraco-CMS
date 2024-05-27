@@ -8,11 +8,11 @@ public class UserResponseModel : UserPresentationBase
 
     public string? LanguageIsoCode { get; set; }
 
-    public ISet<Guid> DocumentStartNodeIds { get; set; } = new HashSet<Guid>();
+    public ISet<ReferenceByIdModel> DocumentStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
 
     public bool HasDocumentRootAccess { get; set; }
 
-    public ISet<Guid> MediaStartNodeIds { get; set; } = new HashSet<Guid>();
+    public ISet<ReferenceByIdModel> MediaStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
 
     public bool HasMediaRootAccess { get; set; }
 
