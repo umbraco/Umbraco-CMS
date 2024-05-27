@@ -3,6 +3,7 @@ import type { UmbInputWithAliasElement } from '@umbraco-cms/backoffice/component
 import { umbFocus, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-type-workspace-editor')
 export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
@@ -11,6 +12,9 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	private _alias?: string;
+
+	@state()
+	private _description?: string;
 
 	@state()
 	private _icon?: string;
@@ -33,6 +37,11 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		if (!this.#workspaceContext) return;
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeName');
 		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias), '_observeAlias');
+		this.observe(
+			this.#workspaceContext.description,
+			(description) => (this._description = description),
+			'_observeDescription',
+		);
 		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon), '_observeIcon');
 		this.observe(this.#workspaceContext.isNew, (isNew) => (this._isNew = isNew), '_observeIsNew');
 	}
@@ -61,6 +70,10 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.setAlias(event.target.alias ?? '');
 	}
 
+	#onDescriptionChange(event: InputEvent & { target: UUITextareaElement }) {
+		this.#workspaceContext?.setDescription(event.target.value.toString() ?? '');
+	}
+
 	render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.DocumentType">
@@ -69,15 +82,24 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 						<umb-icon name=${ifDefined(this._icon)}></umb-icon>
 					</uui-button>
 
-					<umb-input-with-alias
-						id="name"
-						label="name"
-						value=${this._name}
-						alias=${this._alias}
-						?auto-generate-alias=${this._isNew}
-						@change="${this.#onNameAndAliasChange}"
-						${umbFocus()}>
-					</umb-input-with-alias>
+					<div id="editors">
+						<umb-input-with-alias
+							id="name"
+							label="name"
+							value=${this._name}
+							alias=${this._alias}
+							?auto-generate-alias=${this._isNew}
+							@change="${this.#onNameAndAliasChange}"
+							${umbFocus()}>
+						</umb-input-with-alias>
+
+						<uui-input
+							id="description"
+							.label=${this.localize.term('placeholders_enterDescription')}
+							.value=${this._description}
+							.placeholder=${this.localize.term('placeholders_enterDescription')}
+							@input=${this.#onDescriptionChange}></uui-input>
+					</div>
 				</div>
 			</umb-workspace-editor>
 		`;
@@ -96,8 +118,25 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 				flex: 1 1 auto;
 			}
 
+			#editors {
+				display: flex;
+				flex: 1 1 auto;
+				flex-direction: column;
+				gap: var(--uui-size-space-1);
+			}
+
 			#name {
 				width: 100%;
+			}
+
+			#description {
+				width: 100%;
+				--uui-input-height: var(--uui-size-8);
+				--uui-input-border-color: transparent;
+			}
+
+			#description:hover {
+				--uui-input-border-color: var(--uui-color-border);
 			}
 
 			#icon {
