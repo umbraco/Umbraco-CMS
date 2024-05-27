@@ -276,7 +276,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 						@blur=${() => this.#setShowFakeCursor(true)}
 						@focus=${() => this.#setShowFakeCursor(false)}
 						type="text"
-						placeholder="Search..."
+						placeholder=${this.localize.term('placeholders_search')}
 						autocomplete="off" />
 				</div>
 			</div>
@@ -343,7 +343,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 	#renderNavigationTips() {
 		return html`<div id="navigation-tips">
 			<div class="navigation-tips-key" style="grid-column: span 2;">Tab</div>
-			<span>Navigate search providers</span>
+			<span>${this.localize.term('globalSearch_navigateSearchProviders')}</span>
 			<div class="navigation-tips-key">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -374,7 +374,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 					<path d="m19 12-7 7-7-7" />
 				</svg>
 			</div>
-			<span>Navigate search results</span>
+			<span>${this.localize.term('globalSearch_navigateSearchResults')}</span>
 		</div>`;
 	}
 
