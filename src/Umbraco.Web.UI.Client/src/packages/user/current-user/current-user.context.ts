@@ -9,6 +9,8 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SECTION_PATH_PATTERN } from '@umbraco-cms/backoffice/section';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
 
 export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext> {
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
@@ -82,7 +84,10 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 	async #redirectToFirstAllowedSectionIfNeeded() {
 		const url = new URL(window.location.href);
 
-		if (url.pathname === '/') {
+		const appContext = await this.getContext(UMB_APP_CONTEXT);
+		const backofficePath = appContext.getBackofficePath();
+
+		if (url.pathname === backofficePath || url.pathname === ensurePathEndsWithSlash(backofficePath)) {
 			const sectionManifest = await this.#firstAllowedSection();
 			if (!sectionManifest) return;
 
