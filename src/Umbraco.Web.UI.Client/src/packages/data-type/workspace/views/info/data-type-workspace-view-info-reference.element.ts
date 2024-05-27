@@ -65,7 +65,9 @@ export class UmbDataTypeWorkspaceViewInfoReferenceElement extends UmbLitElement 
 
 	#getEditPath(item: UmbDataTypeReferenceModel) {
 		// TODO: [LK] Ask NL for a reminder on how the route constants work.
-		return this.#routeBuilder ? this.#routeBuilder({ entityType: item.entityType }) + `edit/${item.unique}` : '#';
+		return this.#routeBuilder && item.entityType
+			? this.#routeBuilder({ entityType: item.entityType }) + `edit/${item.unique}`
+			: '#';
 	}
 
 	#renderItems() {
@@ -85,8 +87,8 @@ export class UmbDataTypeWorkspaceViewInfoReferenceElement extends UmbLitElement 
 					(item) => html`
 						<uui-table-row>
 							<uui-table-cell>
-								<uui-ref-node-document-type href=${this.#getEditPath(item)} name=${item.unique}>
-									<umb-icon slot="icon" name="icon-document"></umb-icon>
+								<uui-ref-node-document-type href=${this.#getEditPath(item)} name=${item.name ?? item.unique}>
+									<umb-icon slot="icon" name=${item.icon ?? 'icon-document'}></umb-icon>
 								</uui-ref-node-document-type>
 							</uui-table-cell>
 							<uui-table-cell>${item.entityType}</uui-table-cell>

@@ -5,7 +5,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type UmbDataTypeReferenceModel = {
 	unique: string;
-	entityType: string;
+	entityType: string | null;
+	name: string | null;
+	icon: string | null;
 	properties: Array<{ name: string; alias: string }>;
 };
 
@@ -29,8 +31,10 @@ export class UmbDataTypeReferenceRepository extends UmbControllerBase {
 
 const mapper = (item: DataTypeReferenceResponseModel): UmbDataTypeReferenceModel => {
 	return {
-		unique: item.id,
-		entityType: item.type,
+		unique: item.contentType.id,
+		entityType: item.contentType.type,
+		name: item.contentType.name,
+		icon: item.contentType.icon,
 		properties: item.properties,
 	};
 };
