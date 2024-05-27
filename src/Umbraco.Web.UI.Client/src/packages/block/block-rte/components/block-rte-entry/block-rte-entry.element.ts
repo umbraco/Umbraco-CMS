@@ -98,6 +98,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.classList.add('uui-font');
 		// eslint-disable-next-line wc/no-self-class
 		this.classList.add('uui-text');
+
+		this.setAttribute('contenteditable', 'false');
 	}
 
 	#renderRefBlock() {
