@@ -936,6 +936,10 @@ export default {
 		font: 'Skrifttype',
 		text: 'Tekst',
 	},
+	globalSearch: {
+		navigateSearchProviders: 'Naviger søgeudbydere',
+		navigateSearchResults: 'Naviger søgeresultater',
+	},
 	headers: {
 		page: 'Side',
 	},
