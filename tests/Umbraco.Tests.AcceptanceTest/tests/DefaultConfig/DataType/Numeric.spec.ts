@@ -1,7 +1,6 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-// Skip all tests as there is no configuration for this data type.
 const dataTypeName = 'Numeric';
 let dataTypeDefaultData = null;
 let dataTypeData = null;
@@ -19,7 +18,7 @@ test.afterEach(async ({umbracoApi}) => {
   }   
 });
 
-test.skip('can update Minimum value', async ({umbracoApi, umbracoUi}) => {
+test('can update Minimum value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = -5;
   const expectedDataTypeValues = {
@@ -36,7 +35,7 @@ test.skip('can update Minimum value', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test.skip('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
+test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const maximumValue = 1000000;
   const expectedDataTypeValues = {
@@ -53,7 +52,7 @@ test.skip('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test.skip('can update Step Size value', async ({umbracoApi, umbracoUi}) => {
+test('can update Step Size value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stepSizeValue = 5;
   const expectedDataTypeValues = {
@@ -84,4 +83,18 @@ test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
   // Assert
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+});
+
+test('cannot update the minimum greater than the maximum', async ({umbracoUi}) => {
+  // Arrange
+  const minimumValue = 5;
+  const maximumValue = 2;
+
+  // Act
+  await umbracoUi.dataType.enterMinimumValue(minimumValue.toString());
+  await umbracoUi.dataType.enterMaximumValue(maximumValue.toString());
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isErrorNotificationVisible();
 });
