@@ -85,3 +85,17 @@ test('can update Max height (pixels) value', async ({umbracoApi, umbracoUi}) => 
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
+
+test('cannot update the min height greater than the max height', async ({umbracoUi}) => {
+  // Arrange
+  const minHeightValue = 150;
+  const maxHeightValue = 100;
+
+  // Act
+  await umbracoUi.dataType.enterMinHeightValue(minHeightValue.toString());
+  await umbracoUi.dataType.enterMaxHeightValue(maxHeightValue.toString());
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isErrorNotificationVisible();
+});
