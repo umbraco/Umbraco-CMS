@@ -40,15 +40,16 @@ export const defaultFallbackConfig: RawEditorOptions = {
 			editor.iframeElement.dispatchEvent(event.clone());
 		}) as EventListener);
 
+		// Transfer our import-map to the iframe: [NL]
 		const importMapTag = document.head.querySelector('script[type="importmap"]');
 		if (importMapTag) {
-			//const p = JSON.parse(importMapTag.innerHTML ?? '');
 			const importMap = document.createElement('script');
 			importMap.type = 'importmap';
 			importMap.text = importMapTag.innerHTML;
 			editor.dom.doc.head.appendChild(importMap);
 		}
 
+		// Load the umb-rte-block component inside the iframe [NL]
 		const script = document.createElement('script');
 		script.type = 'text/javascript';
 		script.setAttribute('type', 'module');
@@ -56,9 +57,6 @@ export const defaultFallbackConfig: RawEditorOptions = {
 		script.text = `import { UmbBlockRteEntryElement, UmbBlockRteEntryInlineElement } from "${UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH}";`;
 
 		editor.dom.doc.head.appendChild(script);
-
-		//editor.iframeElement?.contentWindow?.customElements.define('umb-rte-block', UmbBlockRteEntryElement);
-		//editor.iframeElement?.contentWindow?.customElements.define('umb-rte-block-inline', UmbBlockRteEntryInlineElement);
 	},
 
 	style_formats: [
