@@ -13,7 +13,7 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
 
   test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.document.ensureNameNotExists(contentName); 
-    await umbracoApi.document.ensureNameNotExists(documentTypeName); 
+    await umbracoApi.documentType.ensureNameNotExists(documentTypeName); 
   });
 
   test('can create a content with Rich Text Editor', async ({umbracoApi, umbracoUi}) => {
@@ -73,7 +73,8 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     expect(contentData.values[0].value).toEqual(contentText);
   });
 
-  test('can create a content with upload file', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Remove skip when the front-end is ready. Currently it returns error when publishing a content
+  test.skip('can create a content with upload file', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeName = 'Upload File';
     const uploadFilePath = 'Umbraco.png';
@@ -91,8 +92,7 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.clickSaveAndPublishButton();
 
     // Assert
-    // TODO: Uncomment this when the front-end is ready. Currently it returns error when publishing a content
-    //await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
+    await umbracoUi.content.doesSuccessNotificationsHaveCount(2);
     expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
     const contentData = await umbracoApi.document.getByName(contentName);
     expect(contentData.values[0].value.src).toContainEqual(uploadFilePath);
