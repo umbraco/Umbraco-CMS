@@ -2,86 +2,84 @@
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'True/false';
-test.describe(`${dataTypeName} tests`, () => {
-  let dataTypeDefaultData = null;
-  let dataTypeData = null;
+let dataTypeDefaultData = null;
+let dataTypeData = null;
 
-  test.beforeEach(async ({umbracoUi, umbracoApi}) => {
-    await umbracoUi.goToBackOffice();
-    await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
-    await umbracoUi.dataType.goToDataType(dataTypeName);
-    dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
-  });
+test.beforeEach(async ({umbracoUi, umbracoApi}) => {
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
+  await umbracoUi.dataType.goToDataType(dataTypeName);
+  dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
+});
 
-  test.afterEach(async ({umbracoApi}) => {
-    if (dataTypeDefaultData !== null) {
-      await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
-    }   
-  });
+test.afterEach(async ({umbracoApi}) => {
+  if (dataTypeDefaultData !== null) {
+    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
+  }   
+});
 
-  test('can update initial state', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    const expectedDataTypeValues = {
-      "alias": "default",
-      "value": true,
-    };
+test('can update initial state', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const expectedDataTypeValues = {
+    "alias": "default",
+    "value": true,
+  };
 
-    // Act
-    await umbracoUi.dataType.clickInitialStateSlider();
-    await umbracoUi.dataType.clickSaveButton();
+  // Act
+  await umbracoUi.dataType.clickInitialStateSlider();
+  await umbracoUi.dataType.clickSaveButton();
 
-    // Assert
-    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-  });
-  
-  test('can update show toggle labels', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    const expectedDataTypeValues = {
-      "alias": "showLabels",
-      "value": true,
-    };
+  // Assert
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+});
 
-    // Act
-    await umbracoUi.dataType.clickShowToggleLabelsSlider();
-    await umbracoUi.dataType.clickSaveButton();
+test('can update show toggle labels', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const expectedDataTypeValues = {
+    "alias": "showLabels",
+    "value": true,
+  };
 
-    // Assert
-    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-  });
+  // Act
+  await umbracoUi.dataType.clickShowToggleLabelsSlider();
+  await umbracoUi.dataType.clickSaveButton();
 
-  test('can update label on', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    const labelOnValue = 'Test Label On';
-    const expectedDataTypeValues = {
-      "alias": "labelOn",
-      "value": labelOnValue,
-    };
+  // Assert
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+});
 
-    // Act
-    await umbracoUi.dataType.enterLabelOnValue(labelOnValue);
-    await umbracoUi.dataType.clickSaveButton();
+test('can update label on', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const labelOnValue = 'Test Label On';
+  const expectedDataTypeValues = {
+    "alias": "labelOn",
+    "value": labelOnValue,
+  };
 
-    // Assert
-    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-  });
+  // Act
+  await umbracoUi.dataType.enterLabelOnValue(labelOnValue);
+  await umbracoUi.dataType.clickSaveButton();
 
-  test('can update label off', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    const labelOffValue = 'Test Label Off';
-    const expectedDataTypeValues = {
-      "alias": "labelOff",
-      "value": labelOffValue,
-    };
+  // Assert
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+});
 
-    // Act
-    await umbracoUi.dataType.enterLabelOffValue(labelOffValue);
-    await umbracoUi.dataType.clickSaveButton();
+test('can update label off', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const labelOffValue = 'Test Label Off';
+  const expectedDataTypeValues = {
+    "alias": "labelOff",
+    "value": labelOffValue,
+  };
 
-    // Assert
-    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-  });
+  // Act
+  await umbracoUi.dataType.enterLabelOffValue(labelOffValue);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
