@@ -130,7 +130,13 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		return html`<uui-box .headline=${this._headline}>
 			${when(
 				this._allowedDocumentTypes.length === 0,
-				() => html`<p>No allowed types</p>`,
+				() => html`
+					<umb-localize key="create_noDocumentTypes">
+						There are no allowed Document Types available for creating content here. You must enable these in
+						<strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the
+						<strong>Allowed child node types</strong> under <strong>Permissions</strong>
+					</umb-localize>
+				`,
 				() =>
 					repeat(
 						this._allowedDocumentTypes,
