@@ -15,10 +15,13 @@ export class UmbMenuElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` <umb-extension-slot
-			type="menuItem"
-			.filter=${(items: ManifestMenuItem) => items.meta.menus.includes(this.manifest!.alias)}
-			default-element="umb-menu-item-default"></umb-extension-slot>`;
+		return html`
+			<umb-extension-slot
+				type="menuItem"
+				default-element="umb-menu-item-default"
+				.filter=${(items: ManifestMenuItem) => items.meta.menus.includes(this.manifest!.alias)}>
+			</umb-extension-slot>
+		`;
 	}
 }
 

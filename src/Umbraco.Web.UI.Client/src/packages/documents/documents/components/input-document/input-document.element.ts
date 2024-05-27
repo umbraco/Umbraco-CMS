@@ -1,5 +1,5 @@
 import { UmbDocumentPickerContext } from './input-document.context.js';
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { classMap, css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -139,6 +139,10 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		return undefined;
 	}
 
+	#isDraft(item: UmbDocumentItemModel) {
+		return item.variants[0]?.state === 'Draft';
+	}
+
 	#pickableFilter: (item: UmbDocumentItemModel) => boolean = (item) => {
 		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
 			return this.allowedContentTypeIds.includes(item.documentType.unique);
@@ -189,7 +193,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 	#renderItem(item: UmbDocumentItemModel) {
 		if (!item.unique) return;
 		return html`
-			<uui-ref-node name=${item.name} id=${item.unique}>
+			<uui-ref-node name=${item.name} id=${item.unique} class=${classMap({ draft: this.#isDraft(item) })}>
 				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
@@ -228,6 +232,10 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 
 			uui-ref-node[drag-placeholder] {
 				opacity: 0.2;
+			}
+
+			.draft {
+				opacity: 0.6;
 			}
 		`,
 	];
