@@ -13,7 +13,7 @@ import type { UmbBlockListLayoutModel } from '@umbraco-cms/backoffice/block-list
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
-	@property({ attribute: 'data-content-udi', reflect: true })
+	@property({ type: String, attribute: 'data-content-udi', reflect: true })
 	public get contentUdi(): string | undefined {
 		return this._contentUdi;
 	}
