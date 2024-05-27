@@ -14,7 +14,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('can create a data type @smoke', async ({umbracoApi, umbracoUi}) => {
+test('can create a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
   await umbracoUi.dataType.clickCreateButton();
@@ -27,7 +27,7 @@ test('can create a data type @smoke', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 });
 
-test('can rename a data type @smoke', async ({umbracoApi, umbracoUi}) => {
+test('can rename a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongDataTypeName = 'Wrong Data Type';
   await umbracoApi.dataType.ensureNameNotExists(wrongDataTypeName);
@@ -44,7 +44,7 @@ test('can rename a data type @smoke', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeName)).toBeFalsy();
 });
 
-test('can delete a data type @smoke', async ({umbracoApi, umbracoUi}) => {
+test('can delete a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.create(dataTypeName, editorAlias, []);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
@@ -58,7 +58,7 @@ test('can delete a data type @smoke', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeFalsy();
 });
 
-test('can change Property Editor in a data type @smoke', async ({umbracoApi, umbracoUi}) => {
+test('can change Property Editor in a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedEditorName = 'Text Area';
   const updatedEditorAlias = 'Umbraco.TextArea';
