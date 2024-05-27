@@ -18,10 +18,7 @@ test.afterEach(async ({umbracoApi}) => {
 test('can create a data type folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
-  await umbracoUi.dataType.clickCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeFolderButton();
-  await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
-  await umbracoUi.dataType.clickCreateFolderButton();
+  await umbracoUi.dataType.createFolder(dataTypeFolderName);
 
   // Assert
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
@@ -46,7 +43,7 @@ test('can rename a data type folder', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeFolderName)).toBeFalsy();
 });
 
-test('can delete a data type folder @smoke', async ({umbracoApi, umbracoUi}) => {
+test('can delete a data type folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.createFolder(dataTypeFolderName);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
@@ -90,10 +87,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickRootFolderCaretButton();
   await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
-  await umbracoUi.dataType.clickCreateButton();
-  await umbracoUi.dataType.clickNewDataTypeFolderButton();
-  await umbracoUi.dataType.enterFolderName(childFolderName);
-  await umbracoUi.dataType.clickCreateFolderButton();
+  await umbracoUi.dataType.createFolder(childFolderName);
 
   // Assert
   expect(await umbracoApi.dataType.doesNameExist(childFolderName)).toBeTruthy();
