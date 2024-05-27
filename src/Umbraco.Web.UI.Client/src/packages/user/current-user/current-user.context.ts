@@ -87,7 +87,7 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 		const appContext = await this.getContext(UMB_APP_CONTEXT);
 		const backofficePath = appContext.getBackofficePath();
 
-		if (url.pathname === ensurePathEndsWithSlash(backofficePath)) {
+		if (url.pathname === backofficePath || url.pathname === ensurePathEndsWithSlash(backofficePath)) {
 			const sectionManifest = await this.#firstAllowedSection();
 			if (!sectionManifest) return;
 
