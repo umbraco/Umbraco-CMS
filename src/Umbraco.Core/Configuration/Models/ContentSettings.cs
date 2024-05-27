@@ -20,8 +20,8 @@ public class ContentSettings
     internal const string StaticDisallowedUploadFiles = "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx";
     internal const bool StaticShowDeprecatedPropertyEditors = false;
     internal const string StaticLoginBackgroundImage = "login/login.jpg";
-    internal const string StaticLoginLogoImage = "login/logo_dark.svg";
-    internal const string StaticLoginLogoImageAlternative = "login/logo_light.svg";
+    internal const string StaticLoginLogoImage = "login/logo_light.svg";
+    internal const string StaticLoginLogoImageAlternative = "login/logo_dark.svg";
     internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
@@ -80,8 +80,8 @@ public class ContentSettings
     ///     of a light background (e.g. in mobile resolutions).
     /// </summary>
     /// <remarks>This is the alternative version to the regular logo found at <see cref="LoginLogoImage"/>.</remarks>
-    [DefaultValue(StaticLoginLogoImage)]
-    public string LoginLogoImageAlternative { get; set; } = StaticLoginLogoImage;
+    [DefaultValue(StaticLoginLogoImageAlternative)]
+    public string LoginLogoImageAlternative { get; set; } = StaticLoginLogoImageAlternative;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.

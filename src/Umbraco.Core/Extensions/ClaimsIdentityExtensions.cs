@@ -65,7 +65,7 @@ public static class ClaimsIdentityExtensions
         if (identity is ClaimsIdentity claimsIdentity)
         {
             userId = claimsIdentity.FindFirstValue(ClaimTypes.NameIdentifier)
-                     ?? claimsIdentity.FindFirstValue("sub");
+                     ?? claimsIdentity.FindFirstValue(Constants.Security.OpenIdDictSubClaimType);
         }
 
         return userId;
@@ -88,7 +88,7 @@ public static class ClaimsIdentityExtensions
         string? userKey = null;
         if (identity is ClaimsIdentity claimsIdentity)
         {
-            userKey = claimsIdentity.FindFirstValue("sub");
+            userKey = claimsIdentity.FindFirstValue(Constants.Security.OpenIdDictSubClaimType);
         }
 
         return Guid.TryParse(userKey, out Guid result)
