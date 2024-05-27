@@ -49,14 +49,62 @@ export const defaultFallbackConfig: RawEditorOptions = {
 			editor.dom.doc.head.appendChild(importMap);
 		}
 
-		// Load the umb-rte-block component inside the iframe [NL]
-		const script = document.createElement('script');
-		script.type = 'text/javascript';
-		script.setAttribute('type', 'module');
-		//script.src = UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH;
-		script.text = `import { UmbBlockRteEntryElement, UmbBlockRteEntryInlineElement } from "${UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH}";`;
+		// TODO: Lets use/adapt the router-slot logic so we do not need to add this here [NL]
+		// TODO: When transfering this code, make sure that we check for target='_parent' or target='top' if its happening within a iframe. [NL]
+		editor.dom.doc.addEventListener('click', (e: MouseEvent) => {
+			// If we try to open link in a new tab, then we want to skip skip:
+			//if ((isWindows && e.ctrlKey) || (!isWindows && e.metaKey)) return;
 
-		editor.dom.doc.head.appendChild(script);
+			// Find the target by using the composed path to get the element through the shadow boundaries.
+			// Notice the difference here compared to RouterSlots implementation [NL]
+			const $anchor: HTMLAnchorElement = (('composedPath' in e) as any)
+				? (e
+						.composedPath()
+						.find(($elem) => $elem instanceof HTMLAnchorElement || ($elem as any).tagName === 'A') as HTMLAnchorElement)
+				: (e.target as HTMLAnchorElement);
+
+			// Abort if the event is not about the anchor tag
+			if ($anchor == null || !($anchor instanceof HTMLAnchorElement || ($anchor as any).tagName === 'A')) {
+				return;
+			}
+
+			// Get the HREF value from the anchor tag
+			const href = $anchor.href;
+
+			// Only handle the anchor tag if the follow holds true:
+			// - The HREF is relative to the origin of the current location.
+			// - The target is targeting the current frame.
+			// - The anchor doesn't have the attribute [data-router-slot]="disabled"
+			if (
+				!href.startsWith(location.origin) ||
+				($anchor.target !== '' && $anchor.target !== '_self') ||
+				$anchor.dataset['routerSlot'] === 'disabled'
+			) {
+				return;
+			}
+
+			// Remove the origin from the start of the HREF to get the path
+			const path = $anchor.pathname + $anchor.search + $anchor.hash;
+
+			// Prevent the default behavior
+			e.preventDefault();
+
+			// Change the history!
+			window.history.pushState(null, '', path);
+		});
+
+		function appendScript(path: string) {
+			const script = document.createElement('script');
+			script.type = 'text/javascript';
+			script.setAttribute('type', 'module');
+			script.text = `import "${path}";`;
+			editor.dom.doc.head.appendChild(script);
+		}
+
+		// Load the umb-rte-block component inside the iframe [NL]
+		appendScript('@umbraco-cms/backoffice/extension-registry');
+		appendScript('@umbraco-cms/backoffice/external/router-slot');
+		appendScript(UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH);
 	},
 
 	style_formats: [
