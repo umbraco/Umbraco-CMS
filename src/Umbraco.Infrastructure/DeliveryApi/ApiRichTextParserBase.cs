@@ -52,7 +52,7 @@ internal abstract partial class ApiRichTextParserBase
                 if (media != null)
                 {
                     handled = true;
-                    handleMediaUrl(_publishedUrlProvider.GetMediaUrl(media, UrlMode.Absolute));
+                    handleMediaUrl(_publishedUrlProvider.GetMediaUrl(media, UrlMode.Default));
                 }
 
                 break;
@@ -77,7 +77,7 @@ internal abstract partial class ApiRichTextParserBase
             return;
         }
 
-        handleMediaUrl(_publishedUrlProvider.GetMediaUrl(media, UrlMode.Absolute));
+        handleMediaUrl(_publishedUrlProvider.GetMediaUrl(media, UrlMode.Default));
     }
 
     [GeneratedRegex("{localLink:(?<udi>umb:.+)}")]
