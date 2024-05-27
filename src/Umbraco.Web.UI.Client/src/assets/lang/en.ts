@@ -962,6 +962,10 @@ export default {
 		font: 'Font',
 		text: 'Text',
 	},
+	globalSearch: {
+		navigateSearchProviders: 'Navigate search providers',
+		navigateSearchResults: 'Navigate search results',
+	},
 	headers: {
 		page: 'Page',
 	},
