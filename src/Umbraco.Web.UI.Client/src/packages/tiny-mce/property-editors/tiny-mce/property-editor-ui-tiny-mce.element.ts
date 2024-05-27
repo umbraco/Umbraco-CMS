@@ -19,6 +19,8 @@ export interface UmbRichTextEditorValueType {
 	blocks: UmbBlockValueType<UmbBlockRteLayoutModel>;
 }
 
+const UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS = 'Umbraco.TinyMCE'; // Not rich text, cause this has not been migrated [NL]
+
 /**
  * @element umb-property-editor-ui-tiny-mce
  */
@@ -47,7 +49,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		buildUpValue.blocks.settingsData ??= [];
 		this._value = buildUpValue as UmbRichTextEditorValueType;
 
-		this.#managerContext.setLayouts(buildUpValue.blocks.layout[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS] ?? []);
+		this.#managerContext.setLayouts(buildUpValue.blocks.layout[UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS] ?? []);
 		this.#managerContext.setContents(buildUpValue.blocks.contentData);
 		this.#managerContext.setSettings(buildUpValue.blocks.settingsData);
 	}
@@ -73,7 +75,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		this.observe(this.#managerContext.layouts, (layouts) => {
 			this._value = {
 				...this._value,
-				blocks: { ...this._value.blocks, layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layouts } },
+				blocks: { ...this._value.blocks, layout: { [UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS]: layouts } },
 			};
 			this.#fireChangeEvent();
 		});
