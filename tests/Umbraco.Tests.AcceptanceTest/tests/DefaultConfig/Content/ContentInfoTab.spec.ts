@@ -1,4 +1,5 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import { expect } from '@playwright/test';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 // Remove smoke tag before merging
 test.describe('Content info tab tests', {tag: '@smoke'}, () => {
@@ -9,7 +10,6 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
 
   test.beforeEach(async ({umbracoApi}) => {
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-    await umbracoApi.document.ensureNameNotExists(contentName);
   });
 
   test.afterEach(async ({umbracoApi}) => {
@@ -17,7 +17,7 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   });
 
-  test.skip('can see correct link is shown when published', async ({umbracoApi, umbracoUi}) => {
+  test('can correct information when pu', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const notPublishContentLink = 'This document is published but is not in the cache';
     documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
@@ -30,31 +30,116 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.clickInfoTab();
     await umbracoUi.content.doesLinkHaveText(notPublishContentLink);
     await umbracoUi.content.clickSaveAndPublishButton();
-    await umbracoUi.reloadPage();
     
     // Assert
     const contentData = await umbracoApi.document.get(contentId);
-    // verify the content link
-    await umbracoUi.content.doesLinkHaveText(contentData.urls[0].url);
-    // TODO: verify history of content when the front-end is ready
-    // TODO: verify publication status when the front-end is ready
-    // TODO: verify created date/time when the front-end is ready
-    // TODO: verify content id when the front-end is ready 
+    // TODO: Uncomment this when front-end is ready. Currently the link is not updated immediately after publishing
+    //await umbracoUi.content.doesLinkHaveText(contentData.urls[0].url);
+    await umbracoUi.content.doesIdHaveText(contentData.id);
+    await umbracoUi.content.doesPublicationStatusHaveText(contentData.variants[0].state === 'Draft' ? 'Unpublished' : contentData.variants[0].state);
+    const expectedCreatedDate = new Date(contentData.variants[0].createDate).toLocaleString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: true,
+    });
+    await umbracoUi.content.doesCreatedDateHaveText(expectedCreatedDate);
   });
 
-  test.skip('can open document type', async ({umbracoApi, umbracoUi}) => {
-    // TODO: implement this test when the front-end is ready
+  test('can open document type', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
+    contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+
+    // Act
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.openContent(contentName);
+    await umbracoUi.content.clickInfoTab();
+    await umbracoUi.content.clickDocumentTypeByName(documentTypeName);
+
+    // Assert
+    await umbracoUi.content.isDocumentTypeModalVisible(documentTypeName);
   });
 
-  test.skip('can switch template', async ({umbracoApi, umbracoUi}) => {
-    // TODO: implement this test when the front-end is ready
+  test('can open template', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const templateName = "TestTemplateForContent";
+    await umbracoApi.template.ensureNameNotExists(templateName);
+    const templateId = await umbracoApi.template.createDefaultTemplate(templateName);
+    documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId, true);
+    contentId = await umbracoApi.document.createDocumentWithTemplate(contentName, documentTypeId, templateId);
+    
+    // Act
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.openContent(contentName);
+    await umbracoUi.content.clickInfoTab();
+    await umbracoUi.content.clickTemplateByName(templateName);
+
+    // Assert
+    await umbracoUi.content.isTemplateModalVisible(templateName);
+
+    // Clean
+    await umbracoApi.template.delete(templateId);
   });
 
-  test.skip('cannot switch to a template that is not allowed in the document type', async ({umbracoApi, umbracoUi}) => {
-    // TODO: implement this test when the front-end is ready
+  test('can switch template', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const firstTemplateName = "TestTemplateOneForContent";
+    const secondTemplateName = "TestTemplateTwoForContent";
+    await umbracoApi.template.ensureNameNotExists(firstTemplateName);
+    await umbracoApi.template.ensureNameNotExists(secondTemplateName);
+    const firstTemplateId = await umbracoApi.template.createDefaultTemplate(firstTemplateName);
+    const secondTemplateId = await umbracoApi.template.createDefaultTemplate(secondTemplateName);
+    documentTypeId = await umbracoApi.documentType.createDocumentTypeWithTwoAllowedTemplates(documentTypeName, firstTemplateId, secondTemplateId, true);
+    contentId = await umbracoApi.document.createDocumentWithTemplate(contentName, documentTypeId, firstTemplateId);
+
+    // Act
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.openContent(contentName);
+    await umbracoUi.content.clickInfoTab();
+    await umbracoUi.content.switchTemplate(firstTemplateName, secondTemplateName);
+    await umbracoUi.content.clickSaveButton();
+
+    // Assert
+    const contentData = await umbracoApi.document.getByName(contentName);
+    expect(contentData.template.id).toBe(secondTemplateId);
+
+    // Clean
+    await umbracoApi.template.delete(firstTemplateId);
+    await umbracoApi.template.delete(secondTemplateId);
   });
 
-  test.skip('can open template', async ({umbracoApi, umbracoUi}) => {
-    // TODO: implement this test when the front-end is ready
+  test('cannot switch to a template that is not allowed in the document type', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const firstTemplateName = "TestTemplateOneForContent";
+    const secondTemplateName = "TestTemplateTwoForContent";
+    await umbracoApi.template.ensureNameNotExists(firstTemplateName);
+    await umbracoApi.template.ensureNameNotExists(secondTemplateName);
+    const firstTemplateId = await umbracoApi.template.createDefaultTemplate(firstTemplateName);
+    const secondTemplateId = await umbracoApi.template.createDefaultTemplate(secondTemplateName);
+    documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, firstTemplateId, true);
+    contentId = await umbracoApi.document.createDocumentWithTemplate(contentName, documentTypeId, firstTemplateId);
+
+    // Act
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.openContent(contentName);
+    await umbracoUi.content.clickInfoTab();
+    await umbracoUi.content.clickEditTemplateByName(firstTemplateName);
+
+    // Assert
+    // This wait is needed to make sure the template name is visible when the modal is opened
+    await umbracoUi.waitForTimeout(1000);
+    await umbracoUi.content.isTemplateNameDisabled(secondTemplateName);
+
+    // Clean
+    await umbracoApi.template.delete(firstTemplateId);
+    await umbracoApi.template.delete(secondTemplateId);
   });
 });
