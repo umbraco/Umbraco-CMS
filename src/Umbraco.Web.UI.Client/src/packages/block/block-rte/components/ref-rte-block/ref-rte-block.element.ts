@@ -11,6 +11,9 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	@property({ type: String })
 	label?: string;
 
+	@property({ type: String })
+	icon?: string;
+
 	@state()
 	_workspaceEditPath?: string;
 
@@ -29,10 +32,9 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<uui-ref-node
-			standalone
-			.name=${this.label ?? ''}
-			href=${this._workspaceEditPath ?? '#'}></uui-ref-node>`;
+		return html`<uui-ref-node standalone .name=${this.label ?? ''} href=${this._workspaceEditPath ?? '#'}
+			><uui-icon slot="icon" .name=${this.icon ?? null}></uui-icon
+		></uui-ref-node>`;
 	}
 
 	static styles = [

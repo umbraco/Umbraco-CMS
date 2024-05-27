@@ -1,5 +1,6 @@
 import { UMB_CONTENT_REQUEST_EVENT_TYPE, type UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
+import { UUIIconRequestEvent } from '@umbraco-cms/backoffice/external/uui';
 
 //export const UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH = '/umbraco/backoffice/packages/block/block-rte/index.js';
 export const UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH = '@umbraco-cms/backoffice/block-rte';
@@ -13,6 +14,7 @@ export const defaultFallbackConfig: RawEditorOptions = {
 	invalid_elements: 'font',
 	extended_valid_elements:
 		'@[id|class|style],umb-rte-block[!data-content-udi],-umb-rte-block-inline[!data-content-udi],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption',
+	custom_elements: 'umb-rte-block[!data-content-udi],~umb-rte-block-inline[!data-content-udi]',
 	toolbar: [
 		'styles',
 		'bold',
@@ -30,13 +32,26 @@ export const defaultFallbackConfig: RawEditorOptions = {
 	],
 
 	init_instance_callback: function (editor) {
-		// The following code is the context api proxy.
+		// The following code is the context api proxy. [NL]
 		// It re-dispatches the context api request event to the origin target of this modal, in other words the element that initiated the modal. [NL]
 		editor.dom.doc.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, ((event: UmbContextRequestEvent) => {
 			if (!editor.iframeElement) return;
 
 			event.stopImmediatePropagation();
 			editor.iframeElement.dispatchEvent(event.clone());
+		}) as EventListener);
+
+		// Proxy for retrieving icons from outside the iframe [NL]
+		editor.dom.doc.addEventListener(UUIIconRequestEvent.ICON_REQUEST, ((event: UUIIconRequestEvent) => {
+			if (!editor.iframeElement) return;
+
+			const newEvent = new UUIIconRequestEvent(UUIIconRequestEvent.ICON_REQUEST, {
+				detail: event.detail,
+			});
+			editor.iframeElement.dispatchEvent(newEvent);
+			if (newEvent.icon !== null) {
+				event.acceptRequest(newEvent.icon);
+			}
 		}) as EventListener);
 
 		// Transfer our import-map to the iframe: [NL]
@@ -48,8 +63,17 @@ export const defaultFallbackConfig: RawEditorOptions = {
 			editor.dom.doc.head.appendChild(importMap);
 		}
 
+		// Transfer our stylesheets to the iframe: [NL]
+		const stylesheetTags = document.head.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]');
+		stylesheetTags.forEach((stylesheetTag) => {
+			const stylesheet = document.createElement('link');
+			stylesheet.rel = 'stylesheet';
+			stylesheet.href = stylesheetTag.href;
+			editor.dom.doc.head.appendChild(stylesheet);
+		});
+
 		// TODO: Lets use/adapt the router-slot logic so we do not need to add this here [NL]
-		// TODO: When transfering this code, make sure that we check for target='_parent' or target='top' if its happening within a iframe. [NL]
+		// TODO: When transferring this code, make sure that we check for target='_parent' or target='top' if its happening within a iframe. [NL]
 		editor.dom.doc.addEventListener('click', (e: MouseEvent) => {
 			// If we try to open link in a new tab, then we want to skip skip:
 			//if ((isWindows && e.ctrlKey) || (!isWindows && e.metaKey)) return;
@@ -92,17 +116,14 @@ export const defaultFallbackConfig: RawEditorOptions = {
 			window.history.pushState(null, '', path);
 		});
 
-		function appendScript(path: string) {
-			const script = document.createElement('script');
-			script.type = 'text/javascript';
-			script.setAttribute('type', 'module');
-			script.text = `import "${path}";`;
-			editor.dom.doc.head.appendChild(script);
-		}
-
-		// Load the umb-rte-block component inside the iframe [NL]
-		appendScript('@umbraco-cms/backoffice/extension-registry');
-		appendScript(UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH);
+		// Load backoffice JS so we can get the umb-rte-block component registered inside the iframe [NL]
+		const script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.setAttribute('type', 'module');
+		// TODO: Check that we actually get the same extension registry, or find a way so we can make it do so. — It could be some kind of iframe detection? [NL]
+		script.text = `import "@umbraco-cms/backoffice/extension-registry";`;
+		script.text = `import "${UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH}";`;
+		editor.dom.doc.head.appendChild(script);
 	},
 
 	style_formats: [

@@ -19,7 +19,7 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 		(x) => !!x?.forceHideContentEditorInOverlay,
 	);
 
-	readonly showContentEdit = this.forceHideContentEditorInOverlay;
+	readonly showContentEdit = this._blockType.asObservablePart((x) => !x?.forceHideContentEditorInOverlay);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_RTE_MANAGER_CONTEXT, UMB_BLOCK_RTE_ENTRIES_CONTEXT);

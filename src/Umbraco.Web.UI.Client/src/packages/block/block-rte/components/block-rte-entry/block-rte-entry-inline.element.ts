@@ -11,7 +11,7 @@ export class UmbBlockRteEntryInlineElement extends UmbBlockRteEntryElement {
 		...UmbBlockRteEntryElement.styles,
 		css`
 			:host {
-				display: inline;
+				display: inline-block;
 			}
 		`,
 	];

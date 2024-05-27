@@ -1,10 +1,10 @@
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
+import type { UmbBlockRteLayoutModel } from '../../types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, property, state, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../ref-rte-block/index.js';
 import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
-import type { UmbBlockListLayoutModel } from '@umbraco-cms/backoffice/block-list';
 
 /**
  * @element umb-rte-block
@@ -35,6 +35,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	_label = '';
 
 	@state()
+	_icon?: string;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -42,7 +45,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	// TODO: use this type on the Element Interface for the Manifest.
 	@state()
-	_blockViewProps: UmbBlockViewPropsType<UmbBlockListLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
+	_blockViewProps: UmbBlockViewPropsType<UmbBlockRteLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
 
 	constructor() {
 		super();
@@ -57,10 +60,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			this._hasSettings = !!settingsElementTypeKey;
 		});
 		this.observe(this.#context.label, (label) => {
-			const oldValue = this._label;
-			this._blockViewProps.label = label;
 			this._label = label;
-			this.requestUpdate('label', oldValue);
+			this._blockViewProps.label = label;
+			this.requestUpdate('_blockViewProps');
+		});
+		this.observe(this.#context.contentElementTypeIcon, (icon) => {
+			this._icon = icon;
+			this._blockViewProps.icon = icon;
+			this.requestUpdate('_blockViewProps');
 		});
 		// Data props:
 		this.observe(this.#context.layout, (layout) => {
@@ -84,8 +91,17 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		});
 	}
 
+	connectedCallback() {
+		super.connectedCallback();
+
+		// eslint-disable-next-line wc/no-self-class
+		this.classList.add('uui-font');
+		// eslint-disable-next-line wc/no-self-class
+		this.classList.add('uui-text');
+	}
+
 	#renderRefBlock() {
-		return html`<umb-ref-rte-block .label=${this._label}></umb-ref-rte-block>`;
+		return html`<umb-ref-rte-block .label=${this._label} .icon=${this._icon}></umb-ref-rte-block>`;
 	}
 
 	#renderBlock() {
@@ -123,6 +139,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			:host {
 				position: relative;
 				display: block;
+				user-select: none;
+				user-drag: auto;
 			}
 			uui-action-bar {
 				position: absolute;

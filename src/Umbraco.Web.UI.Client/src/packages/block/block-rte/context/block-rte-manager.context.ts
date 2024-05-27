@@ -24,7 +24,19 @@ export class UmbBlockRteManagerContext<
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
 		modalData?: UmbBlockRteWorkspaceData,
 	) {
-		return super.createBlockData(contentElementTypeKey, partialLayoutEntry);
+		const data = super.createBlockData(contentElementTypeKey, partialLayoutEntry);
+
+		// Find block type.
+		const blockType = this.getBlockTypes().find((x) => x.contentElementTypeKey === contentElementTypeKey);
+		if (!blockType) {
+			throw new Error(`Cannot create block, missing block type for ${contentElementTypeKey}`);
+		}
+
+		if (blockType.displayInline) {
+			data.layout.displayInline = true;
+		}
+
+		return data;
 	}
 
 	insert(
@@ -34,6 +46,10 @@ export class UmbBlockRteManagerContext<
 		modalData: UmbBlockRteWorkspaceData,
 	) {
 		if (!this.#editor) return false;
+
+		this._layouts.appendOne(layoutEntry);
+
+		this.insertBlockData(layoutEntry, content, settings, modalData);
 
 		if (layoutEntry.displayInline) {
 			this.#editor.selection.setContent(
@@ -45,9 +61,7 @@ export class UmbBlockRteManagerContext<
 			);
 		}
 
-		this._layouts.appendOne(layoutEntry);
-
-		this.insertBlockData(layoutEntry, content, settings, modalData);
+		this.#editor.fire('change');
 
 		return true;
 	}
