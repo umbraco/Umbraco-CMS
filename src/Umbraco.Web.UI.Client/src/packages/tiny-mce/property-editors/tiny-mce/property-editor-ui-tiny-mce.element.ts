@@ -1,4 +1,3 @@
-import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from './manifests.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -94,9 +93,39 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	}
 
 	#onChange(event: InputEvent & { target: HTMLInputElement }) {
+		const editor = this.#managerContext.getTinyMceEditor();
+		if (!editor) return;
+
+		// Clone the DOM, to remove the classes and attributes on the original:
+		//const clonedDoc = editor.dom.doc.cloneNode(true);
+		const range = document.createRange();
+		range.selectNode(editor.getBody());
+		const clonedDoc = range.cloneContents();
+
+		// Loop through used, to remove the classes on these.
+		const blockEls = clonedDoc.querySelectorAll(`umb-rte-block, umb-rte-block-inline`);
+		blockEls.forEach((blockEl) => {
+			blockEl.removeAttribute('contenteditable');
+			blockEl.classList.remove('umb-rte-block', 'umb-rte-block-inline');
+		});
+		const div = document.createElement('div');
+		div.appendChild(clonedDoc);
+		const markup = div.innerHTML;
+
+		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
+		//const blockElements = editor.dom.select(`umb-rte-block, umb-rte-block-inline`);
+		const usedContentUdis = Array.from(blockEls).map((blockElement) => blockElement.getAttribute('data-content-udi'));
+		const unusedBlocks = this.#managerContext.getLayouts().filter((x) => usedContentUdis.indexOf(x.contentUdi) === -1);
+		unusedBlocks.forEach((blockLayout) => {
+			this.#managerContext.removeOneLayout(blockLayout.contentUdi);
+		});
+
+		// Then get the content of the editor and update the value.
+		// maybe in this way doc.body.innerHTML;
+
 		this._value = {
 			...this._value,
-			markup: event.target.value,
+			markup: markup,
 		};
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
