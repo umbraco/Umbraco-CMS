@@ -34,7 +34,8 @@ test('can select ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test('can enable all toolbar options', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove skip when the front-end is ready. Currently it is impossible to uncheck all the toolbar options.
+test.skip('can enable all toolbar options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const toolbarValues: string[] = ["undo", "redo", "cut", "copy"];
   const expectedDataTypeValues = [
@@ -48,6 +49,7 @@ test('can enable all toolbar options', async ({umbracoApi, umbracoUi}) => {
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   dataTypeData.values = [];
   await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Act
@@ -200,7 +202,30 @@ test('can select mode', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-// TODO: Implement it when the fron-end is ready
-test.skip('can add available blocks', async ({umbracoApi, umbracoUi}) => {
+test('can add available blocks', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const elementTypeName = 'TestElementType';
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createElementType(elementTypeName);
+  const expectedDataTypeValues = {
+    "alias": "blocks",
+    "value": [
+      {
+          "contentElementTypeKey": elementTypeId,
+          "forceHideContentEditorInOverlay": false
+      }
+    ]
+  };
+  await umbracoUi.dataType.goToDataType(dataTypeName);
 
+  // Act
+  await umbracoUi.dataType.addAvailablBlocks(elementTypeName);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+
+  // Clean
+  await umbracoApi.documentType.delete(elementTypeId);
 });
