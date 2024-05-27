@@ -100,3 +100,17 @@ test('can update hide anchor/query string input', async ({umbracoApi, umbracoUi}
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
+
+test('cannot update the minimum number of items greater than the Maximum', async ({umbracoUi}) => {
+  // Arrange
+  const minimumValue = 5;
+  const maximumValue = 2;
+
+  // Act
+  await umbracoUi.dataType.enterMinimumNumberOfItemsValue(minimumValue.toString());
+  await umbracoUi.dataType.enterMaximumNumberOfItemsValue(maximumValue.toString());
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isErrorNotificationVisible();
+});
