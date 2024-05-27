@@ -1,4 +1,8 @@
+import { UmbBlockRteEntryElement, UmbBlockRteEntryInlineElement } from '@umbraco-cms/backoffice/block-rte';
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
+
+//export const UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH = '/umbraco/backoffice/packages/block/block-rte/index.js';
+export const UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH = '@umbraco-cms/backoffice/block-rte';
 
 //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
 //so we don't have to specify all the normal elements again
@@ -8,7 +12,7 @@ export const defaultFallbackConfig: RawEditorOptions = {
 		'+a[id|style|rel|data-id|data-udi|rev|charset|hreflang|dir|lang|tabindex|accesskey|type|name|href|target|title|class|onfocus|onblur|onclick|ondblclick|onmousedown|onmouseup|onmouseover|onmousemove|onmouseout|onkeypress|onkeydown|onkeyup],-strong/-b[class|style],-em/-i[class|style],-strike[class|style],-s[class|style],-u[class|style],#p[id|style|dir|class|align],-ol[class|reversed|start|style|type],-ul[class|style],-li[class|style],br[class],img[id|dir|lang|longdesc|usemap|style|class|src|onmouseover|onmouseout|border|alt=|title|hspace|vspace|width|height|align|umbracoorgwidth|umbracoorgheight|onresize|onresizestart|onresizeend|rel|data-id],-sub[style|class],-sup[style|class],-blockquote[dir|style|class],-table[border=0|cellspacing|cellpadding|width|height|class|align|summary|style|dir|id|lang|bgcolor|background|bordercolor],-tr[id|lang|dir|class|rowspan|width|height|align|valign|style|bgcolor|background|bordercolor],tbody[id|class],thead[id|class],tfoot[id|class],#td[id|lang|dir|class|colspan|rowspan|width|height|align|valign|style|bgcolor|background|bordercolor|scope],-th[id|lang|dir|class|colspan|rowspan|width|height|align|valign|style|scope],caption[id|lang|dir|class|style],-div[id|dir|class|align|style],-span[class|align|style],-pre[class|align|style],address[class|align|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align|style],hr[class|style],small[class|style],dd[id|class|title|style|dir|lang],dl[id|class|title|style|dir|lang],dt[id|class|title|style|dir|lang],object[class|id|width|height|codebase|*],param[name|value|_value|class],embed[type|width|height|src|class|*],map[name|class],area[shape|coords|href|alt|target|class],bdo[class],button[class],iframe[*],figure,figcaption,cite,video[*],audio[*],picture[*],source[*],canvas[*]',
 	invalid_elements: 'font',
 	extended_valid_elements:
-		'@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption',
+		'@[id|class|style],umb-rte-block[!data-content-udi],-umb-rte-block-inline[!data-content-udi],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption',
 	toolbar: [
 		'styles',
 		'bold',
@@ -24,6 +28,20 @@ export const defaultFallbackConfig: RawEditorOptions = {
 		'umbmediapicker',
 		'umbembeddialog',
 	],
+
+	init_instance_callback: function (editor) {
+		console.log('editor', editor, editor.dom.doc);
+
+		const script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.src = UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH;
+
+		editor.dom.doc.head.appendChild(script);
+
+		//editor.iframeElement?.contentWindow?.customElements.define('umb-rte-block', UmbBlockRteEntryElement);
+		//editor.iframeElement?.contentWindow?.customElements.define('umb-rte-block-inline', UmbBlockRteEntryInlineElement);
+	},
+
 	style_formats: [
 		{
 			title: 'Headers',

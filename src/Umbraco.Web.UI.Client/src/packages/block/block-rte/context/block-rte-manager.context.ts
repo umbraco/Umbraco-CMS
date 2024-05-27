@@ -4,7 +4,7 @@ import type { UmbBlockDataType } from '../../block/types.js';
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
-import '../components/block-rte-entry/block-rte-entry.element.js';
+import '../components/block-rte-entry/index.js';
 
 /**
  * A implementation of the Block Manager specifically for the Rich Text Editor.

@@ -1,6 +1,6 @@
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../ref-rte-block/index.js';
 import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
@@ -10,8 +10,6 @@ import type { UmbBlockListLayoutModel } from '@umbraco-cms/backoffice/block-list
  * @element umb-rte-block
  * @element umb-rte-block-inline
  */
-@customElement('umb-rte-block')
-@customElement('umb-rte-block-inline')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
 	@property({ attribute: false })
@@ -140,6 +138,5 @@ export default UmbBlockRteEntryElement;
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-rte-block': UmbBlockRteEntryElement;
-		'umb-rte-block-inline': UmbBlockRteEntryElement;
 	}
 }
