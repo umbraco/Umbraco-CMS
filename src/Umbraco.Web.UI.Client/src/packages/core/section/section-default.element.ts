@@ -13,8 +13,10 @@ import type { IRoute, IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import {
-	UmbExtensionsElementAndApiInitializer,
+	UmbExtensionsApiInitializer,
 	UmbExtensionsElementInitializer,
+	UmbExtensionsManifestInitializer,
+	createExtensionApi,
 } from '@umbraco-cms/backoffice/extension-api';
 import { aliasToPath, debounce } from '@umbraco-cms/backoffice/utils';
 
@@ -50,10 +52,6 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	@state()
 	_splitPanelPosition = '300px';
 
-	#routeExtensionsController:
-		| UmbExtensionsElementAndApiInitializer<ManifestSectionRoute, 'sectionRoute', ManifestSectionRoute>
-		| undefined;
-
 	constructor() {
 		super();
 
@@ -72,35 +70,41 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	}
 
 	#observeRoutes(): void {
-		this.#routeExtensionsController?.destroy();
-
-		this.#routeExtensionsController = new UmbExtensionsElementAndApiInitializer<
-			ManifestSectionRoute,
-			'sectionRoute',
-			ManifestSectionRoute
-		>(
+		new UmbExtensionsManifestInitializer<ManifestSectionRoute, 'sectionRoute', ManifestSectionRoute>(
 			this,
 			umbExtensionsRegistry,
 			'sectionRoute',
-			undefined,
-			undefined,
-			(sectionRouteExtensions) => {
-				const routes: Array<IRoute> = sectionRouteExtensions.map((extensionController) => {
-					return {
-						path:
-							extensionController.api?.getPath?.() ||
-							extensionController.manifest.meta?.path ||
-							aliasToPath(extensionController.manifest.alias),
-						component: extensionController.component,
-						setup: (element: PageComponent, info: IRoutingInfo) => {
-							extensionController.api?.setup?.(element, info);
-						},
-					};
-				});
+			null,
+			async (sectionRouteExtensions) => {
+				// TODO: we only support extensions with an element prop
+				const extensionsWithElement = sectionRouteExtensions.filter((extension) => extension.manifest.element);
+				const extensionsWithoutElement = sectionRouteExtensions.filter((extension) => !extension.manifest.element);
+				if (extensionsWithoutElement.length > 0) throw new Error('sectionRoute extensions must have an element');
+
+				const routes: Array<IRoute> = await Promise.all(
+					extensionsWithElement.map(async (extensionController) => {
+						const api = await createExtensionApi(this, extensionController.manifest);
+
+						return {
+							path:
+								api?.getPath?.() ||
+								extensionController.manifest.meta?.path ||
+								aliasToPath(extensionController.manifest.alias),
+							// TODO: look into removing the "as PageComponent" type hack
+							// be aware that this is kind of a hack to pass the manifest element to the router. But as the two resolve components
+							// in a similar way. I currently find it more safe to let the router do the component resolving instead
+							// of replicating it as a custom resolver here.
+							component: extensionController.manifest.element as PageComponent | PromiseLike<PageComponent>,
+							setup: (element: PageComponent, info: IRoutingInfo) => {
+								api?.setup?.(element, info);
+							},
+						};
+					}),
+				);
 
 				this.#debouncedCreateRoutes(routes);
 			},
-			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
+			'umbRouteExtensionApisInitializer',
 		);
 	}
 

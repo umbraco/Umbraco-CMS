@@ -39,10 +39,10 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 	#editor?: UmbCodeEditorController;
 
 	@query('umb-code-editor')
-	_codeEditor?: UmbCodeEditorElement;
+	private _codeEditor?: UmbCodeEditorElement;
 
 	@state()
-	_actionExtensions: Array<monaco.editor.IActionDescriptor> = [];
+	private _actionExtensions: Array<monaco.editor.IActionDescriptor> = [];
 
 	private _modalContext?: UmbModalManagerContext;
 
@@ -79,7 +79,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 						id: api.getUnique(),
 						label: api.getLabel(),
 						keybindings: api.getKeybindings(),
-						run: async () => await api.execute({ editor: this.#editor }),
+						run: async () => await api.execute({ editor: this.#editor, overlaySize: this.overlaySize }),
 					};
 					this.#editor?.monacoEditor?.addAction(action);
 					this._actionExtensions.push(action);

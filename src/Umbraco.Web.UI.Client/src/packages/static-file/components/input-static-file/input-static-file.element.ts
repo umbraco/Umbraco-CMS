@@ -4,9 +4,12 @@ import { css, customElement, html, nothing, property, repeat, state } from '@umb
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 
 @customElement('umb-input-static-file')
 export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement, '') {
+	#serializer = new UmbServerFilePathUniqueSerializer();
+
 	/**
 	 * This is a minimum amount of selected files in this input.
 	 * @type {number}
@@ -70,6 +73,9 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 		return this.selection.join(',');
 	}
 
+	@property()
+	public pickableFilter?: (item: UmbStaticFileItemModel) => boolean;
+
 	@state()
 	private _items?: Array<UmbStaticFileItemModel>;
 
@@ -112,13 +118,21 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 		`;
 	}
 
+	#openPicker() {
+		this.#pickerContext.openPicker({
+			pickableFilter: this.pickableFilter,
+			multiple: this.max === 1 ? false : true,
+			hideTreeRoot: true,
+		});
+	}
+
 	#renderAddButton() {
 		if (this.max === 1 && this.selection.length >= this.max) return;
 		return html`
 			<uui-button
 				id="btn-add"
 				look="placeholder"
-				@click=${() => this.#pickerContext.openPicker()}
+				@click=${this.#openPicker}
 				label=${this.localize.term('general_choose')}></uui-button>
 		`;
 	}
@@ -126,7 +140,7 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 	private _renderItem(item: UmbStaticFileItemModel) {
 		if (!item.unique) return;
 		return html`
-			<uui-ref-node name=${item.name} detail=${item.unique}>
+			<uui-ref-node name=${item.name} .detail=${this.#serializer.toServerPath(item.unique) || ''}>
 				<!-- TODO: implement is trashed <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
 				<uui-action-bar slot="actions">
 					<uui-button
