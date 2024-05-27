@@ -91,7 +91,10 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 								extensionController.manifest.meta?.path ||
 								aliasToPath(extensionController.manifest.alias),
 							// TODO: look into removing the "as PageComponent" type hack
-							component: extensionController.manifest.element as PageComponent,
+							// be aware that this is kind of a hack to pass the manifest element to the router. But as the two resolve components
+							// in a similar way. I currently find it more safe to let the router do the component resolving instead
+							// of replicating it as a custom resolver here.
+							component: extensionController.manifest.element as PageComponent | PromiseLike<PageComponent>,
 							setup: (element: PageComponent, info: IRoutingInfo) => {
 								api?.setup?.(element, info);
 							},
