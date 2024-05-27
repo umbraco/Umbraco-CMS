@@ -90,6 +90,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 								api?.getPath?.() ||
 								extensionController.manifest.meta?.path ||
 								aliasToPath(extensionController.manifest.alias),
+							// TODO: look into removing the "as PageComponent" type hack
 							component: extensionController.manifest.element as PageComponent,
 							setup: (element: PageComponent, info: IRoutingInfo) => {
 								api?.setup?.(element, info);
