@@ -1,4 +1,6 @@
+import { UMB_CONTENT_REQUEST_EVENT_TYPE, UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 //export const UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH = '/umbraco/backoffice/packages/block/block-rte/index.js';
 export const UMB_BLOCK_ENTRY_WEB_COMPONENTS_ABSOLUTE_PATH = '@umbraco-cms/backoffice/block-rte';
@@ -29,16 +31,23 @@ export const defaultFallbackConfig: RawEditorOptions = {
 	],
 
 	init_instance_callback: function (editor) {
-		console.log('editor', editor, editor.dom.doc);
+		// The following code is the context api proxy.
+		// It re-dispatches the context api request event to the origin target of this modal, in other words the element that initiated the modal. [NL]
+		editor.dom.doc.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, ((event: UmbContextRequestEvent) => {
+			if (!editor.iframeElement) return;
+
+			event.stopImmediatePropagation();
+			editor.iframeElement.dispatchEvent(event.clone());
+		}) as EventListener);
 
 		const importMapTag = document.head.querySelector('script[type="importmap"]');
-		console.log('impoartmap tag', importMapTag);
-		/*if (importMapTag) {
+		if (importMapTag) {
 			//const p = JSON.parse(importMapTag.innerHTML ?? '');
-			const script = document.createElement('script');
-			script.type = 'importmap';
-			script.text = importMapTag.innerHTML;
-		}*/
+			const importMap = document.createElement('script');
+			importMap.type = 'importmap';
+			importMap.text = importMapTag.innerHTML;
+			editor.dom.doc.head.appendChild(importMap);
+		}
 
 		const script = document.createElement('script');
 		script.type = 'text/javascript';

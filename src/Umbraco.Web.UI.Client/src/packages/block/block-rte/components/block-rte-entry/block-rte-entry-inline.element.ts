@@ -1,10 +1,11 @@
 import { UmbBlockRteEntryElement } from './block-rte-entry.element.js';
-import { css } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 /**
- * @element umb-rte-block
+ * Implementation for the inline component, inherited code from the umb-rte-block element.
  * @element umb-rte-block-inline
  */
+@customElement('umb-rte-block-inline')
 export class UmbBlockRteEntryInlineElement extends UmbBlockRteEntryElement {
 	static styles = [
 		...UmbBlockRteEntryElement.styles,

@@ -1,6 +1,6 @@
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, property, state, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../ref-rte-block/index.js';
 import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
@@ -10,9 +10,10 @@ import type { UmbBlockListLayoutModel } from '@umbraco-cms/backoffice/block-list
  * @element umb-rte-block
  * @element umb-rte-block-inline
  */
+@customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
-	@property({ attribute: false })
+	@property({ attribute: 'data-content-udi', reflect: true })
 	public get contentUdi(): string | undefined {
 		return this._contentUdi;
 	}
@@ -45,6 +46,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	constructor() {
 		super();
+
+		// We do not have index for RTE Blocks at the moment.
+		this.#context.setIndex(0);
 
 		this.observe(this.#context.showContentEdit, (showContentEdit) => {
 			this._showContentEdit = showContentEdit;
