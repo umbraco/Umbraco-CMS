@@ -115,5 +115,6 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 	async delete(contentUdi: string) {
 		// TODO: Loop through children and delete them as well?
 		await super.delete(contentUdi);
+		this._manager?.deleteLayoutElement(contentUdi);
 	}
 }

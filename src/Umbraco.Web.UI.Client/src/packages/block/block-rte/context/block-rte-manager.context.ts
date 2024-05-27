@@ -19,6 +19,18 @@ export class UmbBlockRteManagerContext<
 		this.#editor = editor;
 	}
 
+	getTinyMceEditor() {
+		return this.#editor;
+	}
+
+	removeOneLayout(contentUdi: string) {
+		this._layouts.removeOne(contentUdi);
+	}
+
+	getLayouts(): Array<BlockLayoutType> {
+		return this._layouts.getValue();
+	}
+
 	create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
@@ -64,5 +76,17 @@ export class UmbBlockRteManagerContext<
 		this.#editor.fire('change');
 
 		return true;
+	}
+
+	/** @internal */
+	public deleteLayoutElement(contentUdi: string) {
+		if (!this.#editor) return;
+
+		const blockElementsOfThisUdi = this.#editor.dom.select(
+			`umb-rte-block[data-content-udi='${contentUdi}'], umb-rte-block-inline[data-content-udi='${contentUdi}']`,
+		);
+		blockElementsOfThisUdi.forEach((blockElement) => {
+			this.#editor?.dom.remove(blockElement);
+		});
 	}
 }
