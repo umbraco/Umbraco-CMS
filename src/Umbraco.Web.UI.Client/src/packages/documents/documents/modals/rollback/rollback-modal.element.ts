@@ -262,15 +262,17 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 		return html`
 			${unsafeHTML(this.localize.term('rollback_diffHelp'))}
-			<div id="diff">
+			<div id="diff-grid">
+				<span class="diff-grid-top">Alias</span>
+				<span class="diff-grid-top">Value</span>
 				${repeat(
 					diffs,
 					(item) => item.alias,
 					(item) => {
 						const diff = diffs.find((x) => x?.alias === item.alias);
 						return html`
-							<p>
-								${item.alias}:
+							<span>${item.alias}</span>
+							<span>
 								${diff
 									? diff.diff.map((part) =>
 											part.added
@@ -280,7 +282,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 													: part.value,
 										)
 									: nothing}
-							</p>
+							</span>
 						`;
 					},
 				)}
@@ -335,11 +337,50 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				gap: var(--uui-size-space-2);
 				font-size: 15px;
 			}
-			#diff .added,
-			ins {
-				background-color: #29ff6d5a;
+			#diff-grid {
+				display: grid;
+				grid-template-columns: auto 1fr;
+				border: 1px solid var(--uui-color-border);
+				margin-bottom: var(--uui-size-space-3);
+				border-radius: var(--uui-border-radius);
+				margin-top: var(--uui-size-space-4);
 			}
-			#diff .removed,
+
+			.diff-grid-top {
+				background-color: var(--uui-color-surface-alt);
+			}
+
+			#diff-grid > * {
+				border-right: 1px solid var(--uui-color-border);
+				border-bottom: 1px solid var(--uui-color-border);
+			}
+
+			#diff-grid > *:nth-child(2) {
+				border-top-right-radius: var(--uui-border-radius);
+			}
+
+			#diff-grid > *:nth-child(1) {
+				border-top-left-radius: var(--uui-border-radius);
+			}
+
+			/* Remove borders from last column */
+			#diff-grid > *:nth-child(2n) {
+				border-right: none;
+			}
+
+			/* Remove borders from last row */
+			#diff-grid > *:nth-child(2n + 1):nth-last-child(-n + 2),
+			#diff-grid > *:nth-child(2n + 1):nth-last-child(-n + 2) ~ * {
+				border-bottom: none;
+			}
+			#diff-grid > * {
+				padding: var(--uui-size-2) var(--uui-size-space-4);
+			}
+			#diff-grid .added,
+			ins {
+				background-color: #00c43e63;
+			}
+			#diff-grid .removed,
 			del {
 				background-color: #ff35356a;
 			}
