@@ -142,8 +142,8 @@ test('can create a document type with a property in a tab', {tag: '@smoke'}, asy
   await umbracoUi.documentType.clickAddTabButton();
   await umbracoUi.documentType.enterTabName(tabName);
   await umbracoUi.documentType.clickAddGroupButton();
-  await umbracoUi.documentType.addPropertyEditor(dataTypeName, 1);
   await umbracoUi.documentType.enterGroupName(groupName);
+  await umbracoUi.documentType.addPropertyEditor(dataTypeName, 1);
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert

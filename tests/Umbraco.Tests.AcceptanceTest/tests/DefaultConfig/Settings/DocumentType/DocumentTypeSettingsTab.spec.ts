@@ -54,7 +54,7 @@ test('can set is an element type for a document type', {tag: '@smoke'}, async ({
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypeSettingsTab();
-  await umbracoUi.documentType.clickTextButtonWithName('Element type');
+  await umbracoUi.documentType.clickTextButtonWithName('Element Type');
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
