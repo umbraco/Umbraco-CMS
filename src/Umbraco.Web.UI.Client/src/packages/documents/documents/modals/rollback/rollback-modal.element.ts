@@ -314,6 +314,9 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	static styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				color: var(--uui-color-text);
+			}
 			#language-select {
 				display: flex;
 				flex-direction: column;
@@ -323,10 +326,10 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				font-size: 15px;
 			}
 			#diff .added {
-				background-color: #d1ffdb;
+				background-color: #29ff6d5a;
 			}
 			#diff .removed {
-				background-color: #ffd1d1;
+				background-color: #ff35356a;
 			}
 			.rollback-item {
 				position: relative;
