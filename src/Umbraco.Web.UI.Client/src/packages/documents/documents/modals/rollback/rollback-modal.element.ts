@@ -215,8 +215,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 							@click=${(event: Event) => this.#onPreventCleanup(event, item.id, !item.preventCleanup)}
 							label=${item.preventCleanup
 								? this.localize.term('contentTypeEditor_historyCleanupEnableCleanup')
-								: this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}>
-						</uui-button>
+								: this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}></uui-button>
 					</div>
 				`;
 			},
