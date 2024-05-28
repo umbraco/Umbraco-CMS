@@ -103,7 +103,7 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.openContent(contentName);
     await umbracoUi.content.clickInfoTab();
-    await umbracoUi.content.switchTemplate(firstTemplateName, secondTemplateName);
+    await umbracoUi.content.changeTemplate(firstTemplateName, secondTemplateName);
     await umbracoUi.content.clickSaveButton();
 
     // Assert
