@@ -295,14 +295,15 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task SetFileContentAsync(string filepath, Stream content)
+    public Task SetFileContentAsync(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             _templateRepository.SetFileContent(filepath, content);
             scope.Complete();
-            await Task.CompletedTask;
         }
+
+        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
