@@ -124,9 +124,16 @@ export class UmbBlockGridManagerContext<
 		settings: UmbBlockDataType | undefined,
 		modalData: UmbBlockGridWorkspaceData,
 	) {
-		const index = modalData.originData.index ?? -1;
+		this.setOneLayout(layoutEntry, modalData);
+		this.insertBlockData(layoutEntry, content, settings, modalData);
 
-		if (modalData.originData.parentUnique && modalData.originData.areaKey) {
+		return true;
+	}
+
+	setOneLayout(layoutEntry: BlockLayoutType, modalData?: UmbBlockGridWorkspaceData) {
+		const index = modalData?.originData.index ?? -1;
+
+		if (modalData?.originData.parentUnique && modalData?.originData.areaKey) {
 			// Find layout entry based on parentUnique, recursively, as it needs to check layout of areas as well:
 			const layoutEntries = this.#appendLayoutEntryToArea(
 				layoutEntry,
@@ -143,10 +150,6 @@ export class UmbBlockGridManagerContext<
 		} else {
 			this._layouts.appendOneAt(layoutEntry, index);
 		}
-
-		this.insertBlockData(layoutEntry, content, settings, modalData);
-
-		return true;
 	}
 
 	onDragStart() {
