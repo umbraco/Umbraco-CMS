@@ -29,7 +29,14 @@ public interface IPackagingService : IService
     ///     Returns the advertised installed packages
     /// </summary>
     /// <returns></returns>
+    [Obsolete("Use GetAllInstalledPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
     IEnumerable<InstalledPackage> GetAllInstalledPackages();
+
+    /// <summary>
+    ///     Returns the advertised installed packages
+    /// </summary>
+    /// <returns></returns>
+    Task<IEnumerable<InstalledPackage>> GetAllInstalledPackagesAsync();
 
     /// <summary>
     ///     Returns installed packages collected from the package migration plans.
