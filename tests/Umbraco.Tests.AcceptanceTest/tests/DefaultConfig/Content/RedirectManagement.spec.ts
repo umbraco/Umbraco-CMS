@@ -49,7 +49,7 @@ test.describe('Redirect Management tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.redirectManagement.clickRedirectManagementTab();
     await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentData.urls[0].url, false);
-    // Veridy that the status is Disable
+    // Verify that the status is Disable
     const statusData = await umbracoApi.redirectManagement.getStatus();
     expect(statusData.status).toBe(disableStatus);
   });
@@ -75,7 +75,7 @@ test.describe('Redirect Management tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.redirectManagement.clickRedirectManagementTab();
     await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentData.urls[0].url);
-    // Veridy that the status is Disable
+    // Verify that the status is Disable
     const statusData = await umbracoApi.redirectManagement.getStatus();
     expect(statusData.status).toBe(enableStatus);
   });
