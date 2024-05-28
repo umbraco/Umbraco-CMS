@@ -35399,6 +35399,34 @@
         ],
         "type": "string"
       },
+      "DataTypeContentTypeReferenceModel": {
+        "required": [
+          "icon",
+          "id",
+          "name",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DataTypeItemResponseModel": {
         "required": [
           "id",
@@ -35457,18 +35485,17 @@
       },
       "DataTypeReferenceResponseModel": {
         "required": [
-          "id",
-          "properties",
-          "type"
+          "contentType",
+          "properties"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "type": "string"
+          "contentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DataTypeContentTypeReferenceModel"
+              }
+            ]
           },
           "properties": {
             "type": "array",

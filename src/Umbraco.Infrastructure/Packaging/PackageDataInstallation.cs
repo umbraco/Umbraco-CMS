@@ -1257,12 +1257,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         editor = new VoidEditor(_dataValueEditorFactory) {Alias = editorAlias ?? string.Empty};
                     }
 
+                    var editorUiAlias = dataTypeElement.Attribute("EditorUiAlias")?.Value?.Trim() ?? editorAlias;
+
                     var dataType = new DataType(editor, _serializer)
                     {
                         Key = dataTypeDefinitionId,
                         Name = dataTypeDefinitionName,
                         DatabaseType = databaseType,
-                        ParentId = parentId
+                        ParentId = parentId,
+                        EditorUiAlias = editorUiAlias,
                     };
 
                     var configurationAttributeValue = dataTypeElement.Attribute("Configuration")?.Value;

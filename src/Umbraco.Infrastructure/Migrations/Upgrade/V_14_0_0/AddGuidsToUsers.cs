@@ -26,6 +26,7 @@ internal class AddGuidsToUsers : UnscopedMigrationBase
 
     protected override void Migrate()
     {
+        InvalidateBackofficeUserAccess = true;
         using IScope scope = _scopeProvider.CreateScope();
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
         ScopeDatabase(scope);
