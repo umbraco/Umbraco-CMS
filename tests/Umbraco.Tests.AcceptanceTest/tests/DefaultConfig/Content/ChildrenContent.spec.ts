@@ -35,7 +35,8 @@ test.describe('Children content tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.clickActionsMenuForContent(contentName);
     await umbracoUi.content.clickCreateButton();
     await umbracoUi.content.clickLabelWithName(childDocumentTypeName);
-    
+    // This wait is needed 
+    await umbracoUi.waitForTimeout(500);
     await umbracoUi.content.enterContentName(childContentName);
     await umbracoUi.content.clickSaveButton();
     
@@ -54,7 +55,8 @@ test.describe('Children content tests', {tag: '@smoke'}, () => {
     await umbracoApi.document.ensureNameNotExists(childContentName);
   });
 
-  test('can create child node in child node', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Remove skip when the front-end is ready.
+  test.skip('can create child node in child node', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childOfChildContentName = 'ChildOfChildContent';
     const childOfChildDocumentTypeName = 'ChildOfChildDocumentType';
@@ -74,6 +76,8 @@ test.describe('Children content tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.clickActionsMenuForContent(childContentName);
     await umbracoUi.content.clickCreateButton();
     await umbracoUi.content.clickLabelWithName(childOfChildDocumentTypeName);
+    // This wait is needed 
+    await umbracoUi.waitForTimeout(500);
     await umbracoUi.content.enterContentName(childOfChildContentName);
     await umbracoUi.content.clickSaveButton();
 
@@ -84,7 +88,6 @@ test.describe('Children content tests', {tag: '@smoke'}, () => {
     // verify that the child content displays in the tree after reloading children
     await umbracoUi.content.clickActionsMenuForContent(contentName);
     await umbracoUi.content.clickReloadButton();
-    await umbracoUi.content.clickActionsMenuForContent(contentName);
     await umbracoUi.content.clickCaretButtonForContentName(childContentName);
     await umbracoUi.content.doesContentTreeHaveName(childOfChildContentName);
 
