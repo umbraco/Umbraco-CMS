@@ -106,19 +106,16 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		if (!editor) return;
 
 		// Clone the DOM, to remove the classes and attributes on the original:
-		//const clonedDoc = editor.dom.doc.cloneNode(true);
-		const range = document.createRange();
-		range.selectNode(editor.getBody());
-		const clonedDoc = range.cloneContents();
+		const div = document.createElement('div');
+		div.innerHTML = editor.getContent();
 
 		// Loop through used, to remove the classes on these.
-		const blockEls = clonedDoc.querySelectorAll(`umb-rte-block, umb-rte-block-inline`);
+		const blockEls = div.querySelectorAll(`umb-rte-block, umb-rte-block-inline`);
 		blockEls.forEach((blockEl) => {
 			blockEl.removeAttribute('contenteditable');
-			blockEl.classList.remove('umb-rte-block', 'umb-rte-block-inline');
+			blockEl.classList.remove('uui-text', 'uui-font');
 		});
-		const div = document.createElement('div');
-		div.appendChild(clonedDoc);
+
 		const markup = div.innerHTML;
 
 		// Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
