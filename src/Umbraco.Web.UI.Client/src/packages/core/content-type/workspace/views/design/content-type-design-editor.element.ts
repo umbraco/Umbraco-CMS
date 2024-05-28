@@ -556,7 +556,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			#header {
 				width: 100%;
-				min-height: var(--uui-size-15);
+				min-height: var(--uui-size-16);
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
