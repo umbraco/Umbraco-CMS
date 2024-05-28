@@ -20,6 +20,7 @@ import {
 	UMB_CONTENT_TYPE_WORKSPACE_CONTEXT,
 	UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/content-type';
+import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 
 interface GroupedItems<T> {
 	[key: string]: Array<T>;
@@ -46,7 +47,12 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	private _submitLabel = 'Select';
 
 	@state()
+	private _currentPage = 1;
+
+	@state()
 	private _dataTypePickerModalRouteBuilder?: UmbModalRouteBuilder;
+
+	pagination = new UmbPaginationManager();
 
 	private _createDataTypeModal!: UmbModalRouteRegistrationController;
 
@@ -73,15 +79,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	async #init() {
+		this.pagination.setCurrentPageNumber(1);
+		this.pagination.setPageSize(100);
+
 		this.#initPromise = Promise.all([
-			this.observe(
-				(await this.#collectionRepository.requestCollection({ skip: 0, take: 100 })).asObservable(),
-				(dataTypes) => {
-					this.#dataTypes = dataTypes;
-					this._performFiltering();
-				},
-				'_repositoryItemsObserver',
-			).asPromise(),
 			this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
 				// Only include Property Editor UIs which has Property Editor Schema Alias
 				this.#propertyEditorUIs = propertyEditorUIs.filter(
@@ -144,6 +145,24 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			});
 	}
 
+	async #getDataTypes() {
+		this.pagination.setCurrentPageNumber(this._currentPage);
+
+		const { data } = await this.#collectionRepository.requestCollection({
+			skip: this.pagination.getSkip(),
+			take: this.pagination.getPageSize(),
+			name: this.#currentFilterQuery,
+		});
+
+		this.pagination.setTotalItems(data?.total ?? 0);
+
+		if (this.pagination.getCurrentPageNumber() > 1) {
+			this.#dataTypes = [...this.#dataTypes, ...(data?.items ?? [])];
+		} else {
+			this.#dataTypes = data?.items ?? [];
+		}
+	}
+
 	private _handleDataTypeClick(dataType: UmbDataTypeItemModel) {
 		if (dataType.unique) {
 			this._select(dataType.unique);
@@ -155,11 +174,26 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		this.value = { selection: unique ? [unique] : [] };
 	}
 
-	private _handleFilterInput(event: UUIInputEvent) {
-		const query = (event.target.value as string) || '';
-		this.#currentFilterQuery = query.toLowerCase();
+	async #onLoadMore() {
+		this._currentPage = this._currentPage + 1;
+		this.#handleFiltering();
+	}
+
+	#onFilterInput(event: UUIInputEvent) {
+		this.#currentFilterQuery = (event.target.value as string).toLocaleLowerCase();
+		this.#debouncedFilterInput();
+	}
+
+	#debouncedFilterInput = debounce(() => {
+		this._currentPage = 1;
+		this.#handleFiltering();
+	}, 250);
+
+	async #handleFiltering() {
+		await this.#getDataTypes();
 		this._performFiltering();
 	}
+
 	private _performFiltering() {
 		if (this.#currentFilterQuery) {
 			const filteredDataTypes = this.#dataTypes.filter((dataType) =>
@@ -213,7 +247,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		return html` <uui-input
 			type="search"
 			id="filter"
-			@input="${this._handleFilterInput}"
+			@input="${this.#onFilterInput}"
 			placeholder="Type to filter..."
 			label="Type to filter icons"
 			${umbFocus()}>
@@ -238,7 +272,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				dataTypesEntries.length > 0,
 				() =>
 					html` <h5 class="choice-type-headline">Available configurations</h5>
-						${this._renderDataTypes()}`,
+						${this._renderDataTypes()}${this.#renderLoadMore()}`,
 			)}
 			${when(
 				editorUIEntries.length > 0,
@@ -247,6 +281,11 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 						${this._renderUIs()}`,
 			)}
 		`;
+	}
+
+	#renderLoadMore() {
+		if (this._currentPage >= this.pagination.getTotalPages()) return;
+		return html`<uui-button @click=${this.#onLoadMore} look="secondary" label="Load more"></uui-button>`;
 	}
 
 	private _renderDataTypes() {
