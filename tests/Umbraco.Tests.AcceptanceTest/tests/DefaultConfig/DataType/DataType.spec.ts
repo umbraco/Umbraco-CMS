@@ -20,11 +20,12 @@ test('can create a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   await umbracoUi.dataType.clickCreateButton();
   await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
+  
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
+  await umbracoUi.dataType.isFailedStateButtonVisible();
+  expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeFalsy();
 });
 
 test('can rename a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -78,4 +79,17 @@ test('can change Property Editor in a data type', {tag: '@smoke'}, async ({umbra
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.editorAlias).toBe(updatedEditorAlias);
   expect(dataTypeData.editorUiAlias).toBe(updatedEditorUiAlias);
+});
+
+test('cannot create a data type without seleting the property editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // Act
+  await umbracoUi.dataType.clickActionsMenuAtRoot();
+  await umbracoUi.dataType.clickCreateButton();
+  await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
+  await umbracoUi.dataType.enterDataTypeName(dataTypeName);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isFailedStateButtonVisible();
+  expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeFalsy();
 });
