@@ -39,7 +39,7 @@ test.describe('Culture and Hostnames tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.clickActionsMenuForContent(contentName);
     await umbracoUi.content.clickCultureAndHostnamesButton();
     await umbracoUi.content.selectCultureLanguageOption(languageName);
-    await umbracoUi.content.clickSaveButton();
+    await umbracoUi.content.clickSaveModalButton();
 
     // Assert
     const domainsData = await umbracoApi.document.getDomains(contentId);
@@ -53,7 +53,7 @@ test.describe('Culture and Hostnames tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.clickAddNewDomainButton();
     await umbracoUi.content.enterDomain(domainName);
     await umbracoUi.content.selectDomainLanguageOption(languageName);
-    await umbracoUi.content.clickSaveButton();
+    await umbracoUi.content.clickSaveModalButton();
 
     // Assert
     const domainsData = await umbracoApi.document.getDomains(contentId);
@@ -73,7 +73,7 @@ test.describe('Culture and Hostnames tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.clickActionsMenuForContent(contentName);
     await umbracoUi.content.clickCultureAndHostnamesButton();
     await umbracoUi.content.enterDomain(updatedDomainName);
-    await umbracoUi.content.clickSaveButton();
+    await umbracoUi.content.clickSaveModalButton();
 
     // Assert
     domainsData = await umbracoApi.document.getDomains(contentId);
@@ -91,7 +91,7 @@ test.describe('Culture and Hostnames tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.clickActionsMenuForContent(contentName);
     await umbracoUi.content.clickCultureAndHostnamesButton();
     await umbracoUi.content.clickDeleteDomainButton();
-    await umbracoUi.content.clickSaveButton();
+    await umbracoUi.content.clickSaveModalButton();
 
     // Assert
     domainsData = await umbracoApi.document.getDomains(contentId);
@@ -115,7 +115,7 @@ test.describe('Culture and Hostnames tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.clickAddNewDomainButton();
     await umbracoUi.content.enterDomain(secondDomainName, 1);
     await umbracoUi.content.selectDomainLanguageOption(secondLanguageName, 1);
-    await umbracoUi.content.clickSaveButton();
+    await umbracoUi.content.clickSaveModalButton();
 
     // Assert
     const domainsData = await umbracoApi.document.getDomains(contentId);
