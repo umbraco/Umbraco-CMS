@@ -3,6 +3,7 @@ import {expect} from "@playwright/test";
 
 const dataTypeName = 'TestDataType';
 const editorAlias = 'Umbraco.DateTime';
+const propertyEditorName = 'Date Picker';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
@@ -20,12 +21,13 @@ test('can create a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   await umbracoUi.dataType.clickCreateButton();
   await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
-  
+  await umbracoUi.dataType.clickSelectAPropertyEditorButton();
+  await umbracoUi.dataType.selectAPropertyEditor(propertyEditorName);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isFailedStateButtonVisible();
-  expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeFalsy();
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 });
 
 test('can rename a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
