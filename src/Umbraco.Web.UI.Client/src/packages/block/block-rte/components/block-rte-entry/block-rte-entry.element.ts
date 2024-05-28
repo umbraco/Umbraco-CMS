@@ -1,27 +1,19 @@
-import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
+import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
+import type { UmbBlockRteLayoutModel } from '../../types.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, property, state, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import '../ref-list-block/index.js';
-import '../inline-list-block/index.js';
+import '../ref-rte-block/index.js';
 import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
-import type { UmbBlockListLayoutModel } from '@umbraco-cms/backoffice/block-list';
 
 /**
- * @element umb-block-list-entry
+ * @element umb-rte-block
+ * @element umb-rte-block-inline
  */
-@customElement('umb-block-list-entry')
-export class UmbBlockListEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+@customElement('umb-rte-block')
+export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
-	@property({ type: Number })
-	public get index(): number | undefined {
-		return this.#context.getIndex();
-	}
-	public set index(value: number | undefined) {
-		this.#context.setIndex(value);
-	}
-
-	@property({ attribute: false })
+	@property({ type: String, attribute: 'data-content-udi', reflect: true })
 	public get contentUdi(): string | undefined {
 		return this._contentUdi;
 	}
@@ -32,7 +24,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 	private _contentUdi?: string | undefined;
 
-	#context = new UmbBlockListEntryContext(this);
+	#context = new UmbBlockRteEntryContext(this);
 
 	@state()
 	_showContentEdit = false;
@@ -51,15 +43,15 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	_workspaceEditSettingsPath?: string;
 
-	@state()
-	_inlineEditingMode?: boolean;
-
 	// TODO: use this type on the Element Interface for the Manifest.
 	@state()
-	_blockViewProps: UmbBlockViewPropsType<UmbBlockListLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
+	_blockViewProps: UmbBlockViewPropsType<UmbBlockRteLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
 
 	constructor() {
 		super();
+
+		// We do not have index for RTE Blocks at the moment.
+		this.#context.setIndex(0);
 
 		this.observe(this.#context.showContentEdit, (showContentEdit) => {
 			this._showContentEdit = showContentEdit;
@@ -76,9 +68,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			this._icon = icon;
 			this._blockViewProps.icon = icon;
 			this.requestUpdate('_blockViewProps');
-		});
-		this.observe(this.#context.inlineEditingMode, (inlineEditingMode) => {
-			this._inlineEditingMode = inlineEditingMode;
 		});
 		// Data props:
 		this.observe(this.#context.layout, (layout) => {
@@ -102,21 +91,28 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		});
 	}
 
-	#renderRefBlock() {
-		return html`<umb-ref-list-block .label=${this._label}></umb-ref-list-block>`;
+	connectedCallback() {
+		super.connectedCallback();
+
+		// eslint-disable-next-line wc/no-self-class
+		this.classList.add('uui-font');
+		// eslint-disable-next-line wc/no-self-class
+		this.classList.add('uui-text');
+
+		this.setAttribute('contenteditable', 'false');
 	}
 
-	#renderInlineBlock() {
-		return html`<umb-inline-list-block .label=${this._label}></umb-inline-list-block>`;
+	#renderRefBlock() {
+		return html`<umb-ref-rte-block .label=${this._label} .icon=${this._icon}></umb-ref-rte-block>`;
 	}
 
 	#renderBlock() {
 		return html`
 			<umb-extension-slot
 				type="blockEditorCustomView"
-				default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
+				default-element=${'umb-ref-rte-block'}
 				.props=${this._blockViewProps}
-				>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
+				>${this.#renderRefBlock()}</umb-extension-slot
 			>
 			<uui-action-bar>
 				${this._showContentEdit && this._workspaceEditContentPath
@@ -145,6 +141,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host {
 				position: relative;
 				display: block;
+				user-select: none;
+				user-drag: auto;
 			}
 			uui-action-bar {
 				position: absolute;
@@ -159,10 +157,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	];
 }
 
-export default UmbBlockListEntryElement;
+export default UmbBlockRteEntryElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-list-entry': UmbBlockListEntryElement;
+		'umb-rte-block': UmbBlockRteEntryElement;
 	}
 }

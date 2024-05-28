@@ -1,7 +1,7 @@
-import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import type { UmbMediaCardItemModel } from '../../modals/index.js';
 import type { UmbMediaItemModel } from '../../repository/index.js';
 import { UmbMediaPickerContext } from './input-media.context.js';
+import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';

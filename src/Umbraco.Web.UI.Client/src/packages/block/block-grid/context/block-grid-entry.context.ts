@@ -1,5 +1,5 @@
 import { closestColumnSpanOption } from '../utils/index.js';
-import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
+import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context-token.js';
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from './block-grid-entries.context-token.js';
 import {
 	type UmbBlockGridScalableContext,

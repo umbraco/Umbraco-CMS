@@ -1,39 +1,37 @@
 import type { UmbBlockDataType } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
-import type { UmbBlockListWorkspaceData } from '../index.js';
-import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
-import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-token.js';
+import type { UmbBlockRteWorkspaceData } from '../index.js';
+import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
+import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
-export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
-	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
-	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT.TYPE,
-	UmbBlockListTypeModel,
-	UmbBlockListLayoutModel
+export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
+	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,
+	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT.TYPE,
+	UmbBlockRteTypeModel,
+	UmbBlockRteLayoutModel
 > {
 	//
 	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 
-	// We will just say its always allowed for list for now: [NL]
+	// We will just say its always allowed for RTE for now: [NL]
 	public readonly canCreate = new UmbBooleanState(true).asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT);
+		super(host, UMB_BLOCK_RTE_MANAGER_CONTEXT);
 
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
 			.addUniquePaths(['propertyAlias', 'variantId'])
-			.addAdditionalPath(':view/:index')
+			.addAdditionalPath(':view')
 			.onSetup((routingInfo) => {
-				// Idea: Maybe on setup should be async, so it can retrieve the values when needed? [NL]
-				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				return {
 					data: {
 						blocks: this._manager?.getBlockTypes() ?? [],
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
-						blockOriginData: { index: index },
+						blockOriginData: {},
 					},
 				};
 			})
@@ -79,23 +77,23 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 		);
 	}
 
-	getPathForCreateBlock(index: number) {
-		return this._catalogueRouteBuilderState.getValue()?.({ view: 'create', index: index });
+	getPathForCreateBlock() {
+		return this._catalogueRouteBuilderState.getValue()?.({ view: 'create' });
 	}
 
-	getPathForClipboard(index: number) {
-		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
+	getPathForClipboard() {
+		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard' });
 	}
 
-	async setLayouts(layouts: Array<UmbBlockListLayoutModel>) {
+	async setLayouts(layouts: Array<UmbBlockRteLayoutModel>) {
 		await this._retrieveManager;
 		this._manager?.setLayouts(layouts);
 	}
 
 	async create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<UmbBlockListLayoutModel, 'contentUdi'>,
-		modalData?: UmbBlockListWorkspaceData,
+		partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentUdi'>,
+		modalData?: UmbBlockRteWorkspaceData,
 	) {
 		await this._retrieveManager;
 		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, modalData);
@@ -104,10 +102,10 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	// insert Block?
 
 	async insert(
-		layoutEntry: UmbBlockListLayoutModel,
+		layoutEntry: UmbBlockRteLayoutModel,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
-		modalData: UmbBlockListWorkspaceData,
+		modalData: UmbBlockRteWorkspaceData,
 	) {
 		await this._retrieveManager;
 		return this._manager?.insert(layoutEntry, content, settings, modalData) ?? false;
@@ -117,5 +115,6 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	async delete(contentUdi: string) {
 		// TODO: Loop through children and delete them as well?
 		await super.delete(contentUdi);
+		this._manager?.deleteLayoutElement(contentUdi);
 	}
 }

@@ -61,6 +61,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	_label = '';
 
 	@state()
+	_icon?: string;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -104,6 +107,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.label, (label) => {
 			this.#updateBlockViewProps({ label });
 			this._label = label;
+		});
+		this.observe(this.#context.contentElementTypeIcon, (icon) => {
+			this.#updateBlockViewProps({ icon });
+			this._icon = icon;
 		});
 		this.observe(this.#context.inlineEditingMode, (mode) => {
 			this._inlineEditingMode = mode;
