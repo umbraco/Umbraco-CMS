@@ -29,4 +29,10 @@ export interface UmbOpenApiConfiguration {
 	 * @returns A resolver for the token to use for the Authorization header.
 	 */
 	readonly token: () => Promise<string>;
+
+	/**
+	 * The encoder to use for the request URLs.
+	 * @returns A resolver for the encoder to use for the request URLs.
+	 */
+	readonly encodePath?: (value: string) => string;
 }

@@ -225,6 +225,7 @@ export class UmbAppElement extends UmbLitElement {
 		// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
 		OpenAPI.TOKEN = () => this.#authContext!.getLatestToken();
 		OpenAPI.WITH_CREDENTIALS = true;
+		OpenAPI.ENCODE_PATH = (path: string) => path;
 	}
 
 	#redirect() {
