@@ -81,6 +81,10 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	@query('.editor', true)
 	private _editorElement?: HTMLElement;
 
+	getEditor() {
+		return this.#editorRef;
+	}
+
 	protected async firstUpdated(): Promise<void> {
 		await Promise.all([...(await this.#loadPlugins())]);
 		await this.#setTinyConfig();

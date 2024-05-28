@@ -24,6 +24,12 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 		typeof UMB_WORKSPACE_MODAL.VALUE
 	>;
 
+	@property({ attribute: false })
+	value: UmbBlockTypeBaseModel[] = [];
+
+	@property({ type: Object, attribute: false })
+	public config?: UmbPropertyEditorConfigCollection;
+
 	@state()
 	private _workspacePath?: string;
 
@@ -41,12 +47,6 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 				this._workspacePath = newpath;
 			});
 	}
-
-	@property({ attribute: false })
-	value: UmbBlockTypeBaseModel[] = [];
-
-	@property({ type: Object, attribute: false })
-	public config?: UmbPropertyEditorConfigCollection;
 
 	#onCreate(e: CustomEvent) {
 		const selectedElementType = e.detail.contentElementTypeKey;

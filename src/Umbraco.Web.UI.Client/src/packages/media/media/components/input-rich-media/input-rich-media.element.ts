@@ -233,6 +233,10 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		);
 	}
 
+	protected getFormElement() {
+		return undefined;
+	}
+
 	async #populateCards() {
 		const missingCards = this.items.filter((item) => !this._cards.find((card) => card.unique === item.key));
 		if (!missingCards.length) return;
@@ -259,10 +263,6 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 				isTrashed: media?.isTrashed ?? false,
 			};
 		});
-	}
-
-	protected getFormElement() {
-		return undefined;
 	}
 
 	#pickableFilter: (item: UmbMediaItemModel) => boolean = (item) => {

@@ -1,14 +1,14 @@
 import type { UmbMediaCardItemModel } from '../../modals/index.js';
 import type { UmbMediaItemModel } from '../../repository/index.js';
 import { UmbMediaPickerContext } from './input-media.context.js';
-import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
+import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbImagingRepository } from '@umbraco-cms/backoffice/imaging';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 const elementName = 'umb-input-media';
@@ -29,9 +29,20 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		resolvePlacement: () => false,
 		onChange: ({ model }) => {
 			this.selection = model;
+			this.#sortCards(model);
 			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
+
+	#sortCards(model: Array<string>) {
+		const idToIndexMap: { [unique: string]: number } = {};
+		model.forEach((item, index) => {
+			idToIndexMap[item] = index;
+		});
+
+		const cards = [...this._cards];
+		this._cards = cards.sort((a, b) => idToIndexMap[a.unique] - idToIndexMap[b.unique]);
+	}
 
 	/**
 	 * This is a minimum amount of selected items in this input.
@@ -96,12 +107,8 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	@property({ type: String })
 	startNode = '';
 
-	@property({ type: Boolean })
-	multiple = false;
-
 	@property()
 	public set value(idsString: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selection = splitStringToArray(idsString);
 	}
 	public get value() {
@@ -112,7 +119,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	private _editMediaPath = '';
 
 	@state()
-	private _items?: Array<UmbMediaCardItemModel>;
+	private _cards: Array<UmbMediaCardItemModel> = [];
 
 	#pickerContext = new UmbMediaPickerContext(this);
 
@@ -130,30 +137,30 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 				this._editMediaPath = routeBuilder({});
 			});
 
-		this.#observeContextItems();
-		this.#addValidators();
-	}
-
-	#observeContextItems() {
 		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')));
 
 		this.observe(this.#pickerContext.selectedItems, async (selectedItems) => {
+			const missingCards = selectedItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
+			if (!missingCards.length) return;
+
 			if (!selectedItems?.length) {
-				this._items = [];
+				this._cards = [];
 				return;
 			}
 
 			const uniques = selectedItems.map((x) => x.unique);
-			const { data } = await this.#imagingRepository.requestThumbnailUrls(uniques, 400, 400);
 
-			this._items = selectedItems.map((item) => {
-				const src = data?.find((x) => x.unique === item.unique)?.url;
-				return { ...item, src };
+			const { data: thumbnails } = await this.#imagingRepository.requestThumbnailUrls(uniques, 400, 400);
+
+			this._cards = selectedItems.map((item) => {
+				const thumbnail = thumbnails?.find((x) => x.unique === item.unique);
+				return {
+					...item,
+					src: thumbnail?.url,
+				};
 			});
 		});
-	}
 
-	#addValidators() {
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
@@ -179,7 +186,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 
 	#openPicker() {
 		this.#pickerContext.openPicker({
-			multiple: this.multiple,
+			multiple: this.max > 1,
 			startNode: this.startNode,
 			pickableFilter: this.#pickableFilter,
 		});
@@ -194,10 +201,10 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	#renderItems() {
-		if (!this._items?.length) return;
+		if (!this._cards?.length) return;
 		return html`
 			${repeat(
-				this._items,
+				this._cards,
 				(item) => item.unique,
 				(item) => this.#renderItem(item),
 			)}
@@ -205,7 +212,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 	}
 
 	#renderAddButton() {
-		if ((this._items && this.max && this._items.length >= this.max) || (this._items?.length && !this.multiple)) return;
+		if (this._cards && this.max && this._cards.length >= this.max) return;
 		return html`
 			<uui-button
 				id="btn-add"

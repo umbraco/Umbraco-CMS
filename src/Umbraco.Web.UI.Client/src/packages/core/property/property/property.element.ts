@@ -302,7 +302,7 @@ export class UmbPropertyElement extends UmbLitElement {
 				.description=${this._description}
 				.orientation=${this._orientation ?? 'horizontal'}
 				?invalid=${this._invalid}>
-				${this._renderPropertyActionMenu()}
+				${this.#renderPropertyActionMenu()}
 				${this._variantDifference
 					? html`<uui-tag look="secondary" slot="description">${this._variantDifference}</uui-tag>`
 					: ''}
@@ -311,13 +311,15 @@ export class UmbPropertyElement extends UmbLitElement {
 		`;
 	}
 
-	private _renderPropertyActionMenu() {
-		return this._propertyEditorUiAlias
-			? html`<umb-property-action-menu
-					slot="action-menu"
-					id="action-menu"
-					.propertyEditorUiAlias=${this._propertyEditorUiAlias}></umb-property-action-menu>`
-			: nothing;
+	#renderPropertyActionMenu() {
+		if (!this._propertyEditorUiAlias) return nothing;
+		return html`
+			<umb-property-action-menu
+				slot="action-menu"
+				id="action-menu"
+				.propertyEditorUiAlias=${this._propertyEditorUiAlias}>
+			</umb-property-action-menu>
+		`;
 	}
 
 	static styles = [

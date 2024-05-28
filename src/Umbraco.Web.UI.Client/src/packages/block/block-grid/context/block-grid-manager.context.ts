@@ -1,6 +1,5 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import type { UmbBlockGridWorkspaceData } from '../index.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, appendToFrozenArray, pushAtToUniqueArray } from '@umbraco-cms/backoffice/observable-api';
 import { type UmbBlockDataType, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
@@ -158,9 +157,3 @@ export class UmbBlockGridManagerContext<
 		(this.getHostElement() as HTMLElement).style.removeProperty('--umb-block-grid--is-dragging');
 	}
 }
-
-// TODO: Make discriminator method for this:
-export const UMB_BLOCK_GRID_MANAGER_CONTEXT = new UmbContextToken<
-	UmbBlockGridManagerContext,
-	UmbBlockGridManagerContext
->('UmbBlockManagerContext');

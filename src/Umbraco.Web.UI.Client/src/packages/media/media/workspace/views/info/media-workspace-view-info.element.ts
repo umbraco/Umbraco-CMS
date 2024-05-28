@@ -123,11 +123,10 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			return html`
 				${repeat(
 					this._urls,
-					(url) => url.culture,
+					(url) => url.url,
 					(url) => html`
 						<a href=${url.url} target="_blank" class="link-item with-href">
-							<span class="link-language">${url.culture}</span>
-							<span class="link-content"> ${url.url}</span>
+							<span class="link-content">${url.url}</span>
 							<uui-icon name="icon-out"></uui-icon>
 						</a>
 					`,
@@ -136,8 +135,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 		} else {
 			return html`
 				<div class="link-item">
-					<span class="link-language">en-EN</span>
-					<span class="link-content italic"><umb-localize key="content_parentNotPublishedAnomaly"></umb-localize></span>
+					<span class="link-content italic"><umb-localize key="content_noMediaLink"></umb-localize></span>
 				</div>
 			`;
 		}
@@ -217,7 +215,7 @@ export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
 			.link-item {
 				padding: var(--uui-size-space-4) var(--uui-size-space-6);
 				display: grid;
-				grid-template-columns: auto 1fr auto;
+				grid-template-columns: 1fr auto;
 				gap: var(--uui-size-6);
 				color: inherit;
 				text-decoration: none;
