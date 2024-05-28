@@ -2,8 +2,8 @@
 import {expect} from "@playwright/test";
 
 const dataTypeName = 'TestDataType';
-const editorAlias = 'Umbraco.DateTime';
-const propertyEditorName = 'Date Picker';
+const editorAlias = 'Umbraco.ColorPicker';
+const propertyEditorName = 'Color Picker';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
@@ -73,7 +73,7 @@ test('can change Property Editor in a data type', {tag: '@smoke'}, async ({umbra
   // Act
   await umbracoUi.dataType.goToDataType(dataTypeName);
   await umbracoUi.dataType.clickChangeButton();
-  await umbracoUi.dataType.selectPropertyEditorUIByName(updatedEditorName);
+  await umbracoUi.dataType.selectAPropertyEditor(updatedEditorName);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
@@ -94,4 +94,24 @@ test('cannot create a data type without seleting the property editor', {tag: '@s
   // Assert
   await umbracoUi.dataType.isFailedStateButtonVisible();
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeFalsy();
+});
+
+test('can change settings', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const expectedDataTypeValues = {
+    alias: "useLabel",
+    value: true,
+  };
+  await umbracoApi.dataType.create(dataTypeName, editorAlias, []);
+  expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
+
+  // Act
+  await umbracoUi.dataType.goToDataType(dataTypeName);
+  await umbracoUi.dataType.clickIncludeLabelsSlider();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
