@@ -113,7 +113,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		const blockEls = div.querySelectorAll(`umb-rte-block, umb-rte-block-inline`);
 		blockEls.forEach((blockEl) => {
 			blockEl.removeAttribute('contenteditable');
-			blockEl.classList.remove('uui-text', 'uui-font');
+			blockEl.removeAttribute('class');
 		});
 
 		const markup = div.innerHTML;
