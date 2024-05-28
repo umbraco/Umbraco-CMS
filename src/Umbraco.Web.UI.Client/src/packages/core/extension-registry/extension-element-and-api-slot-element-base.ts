@@ -36,6 +36,9 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 	#extensionController?: UmbExtensionElementAndApiInitializer<ManifestType>;
 
 	@state()
+	_api: ManifestType['API_TYPE'] | undefined;
+
+	@state()
 	_element: ManifestType['ELEMENT_TYPE'] | undefined;
 
 	abstract getExtensionType(): string;
@@ -49,13 +52,17 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 			umbExtensionsRegistry,
 			this._alias,
 			[this],
-			this.#extensionChanged,
+			this.extensionChanged,
 			this.getDefaultElementName(),
 		);
 		this.#extensionController.elementProps = this.#props;
 	}
 
-	#extensionChanged = (isPermitted: boolean, controller: UmbExtensionElementAndApiInitializer<ManifestType>) => {
+	protected extensionChanged = (
+		isPermitted: boolean,
+		controller: UmbExtensionElementAndApiInitializer<ManifestType>,
+	) => {
+		this._api = isPermitted ? controller.api : undefined;
 		this._element = isPermitted ? controller.component : undefined;
 		this.requestUpdate('_element');
 	};

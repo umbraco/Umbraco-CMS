@@ -1,24 +1,18 @@
 import type { UmbCollectionConfiguration, UmbCollectionContext } from './types.js';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { createExtensionApi, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbExtensionElementAndApiSlotElementBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-collection')
-export class UmbCollectionElement extends UmbLitElement {
-	#alias?: string;
-
-	@property({ type: String, reflect: true })
-	set alias(newVal) {
-		this.#alias = newVal;
-		this.#observeManifest();
-	}
-	get alias() {
-		return this.#alias;
+export class UmbCollectionElement extends UmbExtensionElementAndApiSlotElementBase<ManifestCollection> {
+	getExtensionType() {
+		return 'collection';
 	}
 
-	#config?: UmbCollectionConfiguration;
+	getDefaultElementName() {
+		return 'umb-collection-default';
+	}
 
 	@property({ type: Object, attribute: false })
 	set config(newVal: UmbCollectionConfiguration | undefined) {
@@ -28,50 +22,27 @@ export class UmbCollectionElement extends UmbLitElement {
 	get config() {
 		return this.#config;
 	}
-
-	@state()
-	_element: HTMLElement | undefined;
-
-	#manifest?: ManifestCollection;
-
-	#api?: UmbCollectionContext;
-
-	#observeManifest() {
-		if (!this.#alias) return;
-		this.observe(
-			umbExtensionsRegistry.byTypeAndAlias('collection', this.#alias),
-			async (manifest) => {
-				if (!manifest) return;
-				this.#manifest = manifest;
-				this.#createApi();
-				this.#createElement();
-			},
-			'umbObserveCollectionManifest',
-		);
-	}
-
-	async #createApi() {
-		if (!this.#manifest) throw new Error('No manifest');
-		this.#api = (await createExtensionApi(this, this.#manifest)) as unknown as UmbCollectionContext;
-		if (!this.#api) throw new Error('No api');
-		this.#api.setManifest(this.#manifest);
-		this.#setConfig();
-	}
-
-	async #createElement() {
-		if (!this.#manifest) throw new Error('No manifest');
-		this._element = await createExtensionElement(this.#manifest);
-		this.requestUpdate();
-	}
+	#config?: UmbCollectionConfiguration;
 
 	#setConfig() {
-		if (!this.#config || !this.#api) return;
-		this.#api.setConfig(this.#config);
+		if (!this.#config || !this._api) return;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._api.setConfig(this.#config);
 	}
 
-	render() {
-		return this._element;
-	}
+	protected extensionChanged = (
+		isPermitted: boolean,
+		controller: UmbExtensionElementAndApiInitializer<ManifestCollection>,
+	) => {
+		// TODO: [v15] Once `UmbCollectionContext` extends `UmbApi`, then we can remove this type casting. [LK]
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._api = isPermitted ? (controller.api as unknown as UmbCollectionContext) : undefined;
+		this._element = isPermitted ? controller.component : undefined;
+		this.requestUpdate('_element');
+		this.#setConfig();
+	};
 }
 
 declare global {
