@@ -458,6 +458,13 @@ export enum DataTypeChangeModeModel {
     FALSE_WITH_HELP_TEXT = 'FalseWithHelpText'
 }
 
+export type DataTypeContentTypeReferenceModel = {
+        id: string
+type: string | null
+name: string | null
+icon: string | null
+    };
+
 export type DataTypeItemResponseModel = {
         id: string
 name: string
@@ -476,8 +483,7 @@ alias: string
     };
 
 export type DataTypeReferenceResponseModel = {
-        id: string
-type: string
+        contentType: DataTypeContentTypeReferenceModel
 properties: Array<DataTypePropertyReferenceModel>
     };
 
@@ -1245,6 +1251,8 @@ containers: Array<MediaTypePropertyTypeContainerResponseModel>
 id: string
 allowedMediaTypes: Array<MediaTypeSortModel>
 compositions: Array<MediaTypeCompositionModel>
+isDeletable: boolean
+aliasCanBeChanged: boolean
     };
 
 export type MediaTypeSortModel = {
@@ -1259,6 +1267,7 @@ parent?: ReferenceByIdModel | null
 name: string
 isFolder: boolean
 icon: string
+isDeletable: boolean
     };
 
 export type MediaUrlInfoModel = {
