@@ -253,6 +253,7 @@ export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 			withCredentials: OpenAPI.WITH_CREDENTIALS,
 			credentials: OpenAPI.CREDENTIALS,
 			token: () => this.getLatestToken(),
+			encodePath: OpenAPI.ENCODE_PATH,
 		};
 	}
 
