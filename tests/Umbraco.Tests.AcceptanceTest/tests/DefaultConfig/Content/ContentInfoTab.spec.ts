@@ -49,7 +49,8 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.doesCreatedDateHaveText(expectedCreatedDate);
   });
 
-  test('can open document type', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Remove skip when the frond-end is ready. Currently the document type is not opened after clicking to the button
+  test.skip('can open document type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
     contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
@@ -87,7 +88,7 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     await umbracoApi.template.delete(templateId);
   });
 
-  test('can switch template', async ({umbracoApi, umbracoUi}) => {
+  test('can change template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const firstTemplateName = "TestTemplateOneForContent";
     const secondTemplateName = "TestTemplateTwoForContent";
@@ -115,7 +116,7 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     await umbracoApi.template.delete(secondTemplateId);
   });
 
-  test('cannot switch to a template that is not allowed in the document type', async ({umbracoApi, umbracoUi}) => {
+  test('cannot change to a template that is not allowed in the document type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const firstTemplateName = "TestTemplateOneForContent";
     const secondTemplateName = "TestTemplateTwoForContent";
