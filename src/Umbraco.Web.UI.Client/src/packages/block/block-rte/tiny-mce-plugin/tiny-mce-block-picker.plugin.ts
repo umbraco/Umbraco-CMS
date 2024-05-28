@@ -13,21 +13,6 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		args.editor.on('preInit', () => {
-			args.editor.serializer.addRules('umb-rte-block');
-
-			/** This checks if the div is a block element*/
-			args.editor.serializer.addNodeFilter('umb-rte-block', function (nodes) {
-				for (let i = 0; i < nodes.length; i++) {
-					const blockEl = nodes[i];
-					/* if the block is set to display inline, checks if its wrapped in a p tag and then unwraps it (removes p tag) */
-					if (blockEl.parent && blockEl.parent.name.toUpperCase() === 'P') {
-						blockEl.parent.unwrap();
-					}
-				}
-			});
-		});
-
 		args.editor.ui.registry.addToggleButton('umbblockpicker', {
 			icon: 'visualblocks',
 			tooltip: this.#localize.term('blockEditor_insertBlock'),
