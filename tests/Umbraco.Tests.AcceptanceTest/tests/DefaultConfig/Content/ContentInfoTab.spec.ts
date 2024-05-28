@@ -17,7 +17,7 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   });
 
-  test('can correct information when pu', async ({umbracoApi, umbracoUi}) => {
+  test('can see correct information when published', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const notPublishContentLink = 'This document is published but is not in the cache';
     documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
