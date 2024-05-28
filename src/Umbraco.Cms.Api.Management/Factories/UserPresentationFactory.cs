@@ -94,7 +94,7 @@ public class UserPresentationFactory : IUserPresentationFactory
                 .Select(url => _absoluteUrlBuilder.ToAbsoluteUrl(url).ToString()),
         };
 
-    public async Task<UserCreateModel> CreateCreationModelAsync(CreateUserRequestModel requestModel)
+    public Task<UserCreateModel> CreateCreationModelAsync(CreateUserRequestModel requestModel)
     {
         var createModel = new UserCreateModel
         {
@@ -105,10 +105,10 @@ public class UserPresentationFactory : IUserPresentationFactory
             UserGroupKeys = requestModel.UserGroupIds.Select(x => x.Id).ToHashSet(),
         };
 
-        return await Task.FromResult(createModel);
+        return Task.FromResult(createModel);
     }
 
-    public async Task<UserInviteModel> CreateInviteModelAsync(InviteUserRequestModel requestModel)
+    public Task<UserInviteModel> CreateInviteModelAsync(InviteUserRequestModel requestModel)
     {
         var inviteModel = new UserInviteModel
         {
@@ -119,10 +119,10 @@ public class UserPresentationFactory : IUserPresentationFactory
             Message = requestModel.Message,
         };
 
-        return await Task.FromResult(inviteModel);
+        return Task.FromResult(inviteModel);
     }
 
-    public async Task<UserResendInviteModel> CreateResendInviteModelAsync(ResendInviteUserRequestModel requestModel)
+    public Task<UserResendInviteModel> CreateResendInviteModelAsync(ResendInviteUserRequestModel requestModel)
     {
         var inviteModel = new UserResendInviteModel
         {
@@ -130,10 +130,10 @@ public class UserPresentationFactory : IUserPresentationFactory
             Message = requestModel.Message,
         };
 
-        return await Task.FromResult(inviteModel);
+        return Task.FromResult(inviteModel);
     }
 
-    public async Task<CurrenUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync()
+    public Task<CurrenUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync()
     {
         var model = new CurrenUserConfigurationResponseModel
         {
@@ -142,7 +142,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
         };
 
-        return await Task.FromResult(model);
+        return Task.FromResult(model);
     }
 
     public Task<UserConfigurationResponseModel> CreateUserConfigurationModelAsync() =>
@@ -153,7 +153,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
         });
 
-    public async Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)
+    public Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)
     {
         var model = new UserUpdateModel
         {
@@ -170,7 +170,7 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         model.UserGroupKeys = updateModel.UserGroupIds.Select(x => x.Id).ToHashSet();
 
-        return await Task.FromResult(model);
+        return Task.FromResult(model);
     }
 
     public async Task<CurrentUserResponseModel> CreateCurrentUserResponseModelAsync(IUser user)
@@ -190,7 +190,7 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         var allowedSections = presentationGroups.SelectMany(x => x.Sections).ToHashSet();
 
-        return await Task.FromResult(new CurrentUserResponseModel()
+        return new CurrentUserResponseModel()
         {
             Id = presentationUser.Id,
             Email = presentationUser.Email,
@@ -209,7 +209,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasAccessToSensitiveData = user.HasAccessToSensitiveData(),
             AllowedSections = allowedSections,
             IsAdmin = user.IsAdmin()
-        });
+        };
     }
 
     private ISet<ReferenceByIdModel> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)

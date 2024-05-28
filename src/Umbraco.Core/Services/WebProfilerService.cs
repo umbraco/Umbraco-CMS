@@ -15,30 +15,30 @@ internal sealed class WebProfilerService : IWebProfilerService
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    public async Task<Attempt<bool, WebProfilerOperationStatus>> GetStatus()
+    public Task<Attempt<bool, WebProfilerOperationStatus>> GetStatus()
     {
         Attempt<int> userIdAttempt = GetExecutingUserId();
 
         if (userIdAttempt.Success is false)
         {
-            return Attempt.FailWithStatus(WebProfilerOperationStatus.ExecutingUserNotFound, false);
+            return Task.FromResult(Attempt.FailWithStatus(WebProfilerOperationStatus.ExecutingUserNotFound, false));
         }
 
         var result = _webProfilerRepository.GetStatus(userIdAttempt.Result);
-        return await Task.FromResult(Attempt.SucceedWithStatus(WebProfilerOperationStatus.Success, result));
+        return Task.FromResult(Attempt.SucceedWithStatus(WebProfilerOperationStatus.Success, result));
     }
 
-    public async Task<Attempt<bool, WebProfilerOperationStatus>> SetStatus(bool status)
+    public Task<Attempt<bool, WebProfilerOperationStatus>> SetStatus(bool status)
     {
         Attempt<int> userIdAttempt = GetExecutingUserId();
 
         if (userIdAttempt.Success is false)
         {
-            return Attempt.FailWithStatus(WebProfilerOperationStatus.ExecutingUserNotFound, false);
+            return Task.FromResult(Attempt.FailWithStatus(WebProfilerOperationStatus.ExecutingUserNotFound, false));
         }
 
         _webProfilerRepository.SetStatus(userIdAttempt.Result, status);
-        return await Task.FromResult(Attempt.SucceedWithStatus(WebProfilerOperationStatus.Success, status));
+        return Task.FromResult(Attempt.SucceedWithStatus(WebProfilerOperationStatus.Success, status));
     }
 
     private Attempt<int> GetExecutingUserId()

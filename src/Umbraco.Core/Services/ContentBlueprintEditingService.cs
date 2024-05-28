@@ -25,10 +25,10 @@ internal sealed class ContentBlueprintEditingService
         : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService)
         => _containerService = containerService;
 
-    public async Task<IContent?> GetAsync(Guid key)
+    public Task<IContent?> GetAsync(Guid key)
     {
         IContent? blueprint = ContentService.GetBlueprintById(key);
-        return await Task.FromResult(blueprint);
+        return Task.FromResult(blueprint);
     }
 
     public async Task<Attempt<PagedModel<IContent>?, ContentEditingOperationStatus>> GetPagedByContentTypeAsync(Guid contentTypeKey, int skip, int take)

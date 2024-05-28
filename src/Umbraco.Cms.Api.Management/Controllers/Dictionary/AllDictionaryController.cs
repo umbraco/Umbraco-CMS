@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
@@ -38,6 +38,6 @@ public class AllDictionaryController : DictionaryControllerBase
             Total = items.Length,
             Items = _umbracoMapper.MapEnumerable<IDictionaryItem, DictionaryOverviewResponseModel>(items.Skip(skip).Take(take))
         };
-        return await Task.FromResult(model);
+        return model;
     }
 }

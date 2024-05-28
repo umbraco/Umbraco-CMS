@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -42,6 +42,6 @@ public class ByQueryTagController : TagControllerBase
             Total = responseModels.Count,
         };
 
-        return await Task.FromResult(Ok(pagedViewModel));
+        return Ok(pagedViewModel);
     }
 }

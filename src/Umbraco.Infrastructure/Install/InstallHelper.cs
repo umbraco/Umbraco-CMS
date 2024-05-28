@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             _databaseProviderMetadata = databaseProviderMetadata;
         }
 
-        public async Task SetInstallStatusAsync(bool isCompleted, string errorMsg)
+        public Task SetInstallStatusAsync(bool isCompleted, string errorMsg)
         {
             try
             {
@@ -91,6 +91,8 @@ namespace Umbraco.Cms.Infrastructure.Install
             {
                 _logger.LogError(ex, "An error occurred in InstallStatus trying to check upgrades");
             }
+
+            return Task.CompletedTask;
         }
 
         /// <summary>

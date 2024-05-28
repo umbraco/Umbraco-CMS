@@ -81,7 +81,7 @@ public class EFCoreScopeTest : UmbracoIntegrationTest
             using (IEfCoreScope<TestUmbracoDbContext> scope = EfCoreScopeProvider.CreateScope())
             {
                 // scopeProvider.Context.Enlist("test", completed => scopeCompleted = completed);
-                await scope.ExecuteWithContextAsync(async database =>
+                await scope.ExecuteWithContextAsync(database =>
                 {
                     scope.ScopeContext!.Enlist("test", completed => scopeCompleted = completed);
                     Assert.IsInstanceOf<EFCoreScope<TestUmbracoDbContext>>(scope);
@@ -97,7 +97,7 @@ public class EFCoreScopeTest : UmbracoIntegrationTest
                         throw new Exception("bang!");
                     }
 
-                    return true;
+                    return Task.FromResult(true);
                 });
 
                 scope.Complete();

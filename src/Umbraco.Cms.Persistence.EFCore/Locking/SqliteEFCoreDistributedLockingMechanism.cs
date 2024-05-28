@@ -122,13 +122,14 @@ internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingM
                 throw new PanicException("No current ambient scope");
             }
 
-            efCoreScope.ExecuteWithContextAsync<Task>(async database =>
-            {
+            efCoreScope.ExecuteWithContextAsync<Task>(database => {
                 if (database.Database.CurrentTransaction is null)
                 {
                     throw new InvalidOperationException(
                         "SqliteDistributedLockingMechanism requires a transaction to function.");
                 }
+
+                return Task.CompletedTask;
             });
         }
 

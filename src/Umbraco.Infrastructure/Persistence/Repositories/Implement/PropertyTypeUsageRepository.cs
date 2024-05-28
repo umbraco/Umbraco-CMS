@@ -45,7 +45,7 @@ internal class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
         return database.ExecuteScalar<bool>(hasValuesQuery);
     }
 
-    public async Task<bool> HasSavedPropertyValuesAsync(Guid contentTypeKey, string propertyAlias)
+    public Task<bool> HasSavedPropertyValuesAsync(Guid contentTypeKey, string propertyAlias)
     {
         IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
 
@@ -67,10 +67,10 @@ internal class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
         Sql<ISqlContext> hasValuesQuery = database.SqlContext.Sql()
             .SelectAnyIfExists(selectQuery);
 
-        return database.ExecuteScalar<bool>(hasValuesQuery);
+        return Task.FromResult(database.ExecuteScalar<bool>(hasValuesQuery));
     }
 
-    public async Task<bool> ContentTypeExistAsync(Guid contentTypeKey)
+    public Task<bool> ContentTypeExistAsync(Guid contentTypeKey)
     {
         IUmbracoDatabase? database = _scopeAccessor.AmbientScope?.Database;
 
@@ -88,7 +88,7 @@ internal class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
         Sql<ISqlContext> hasValuesQuery = database.SqlContext.Sql()
             .SelectAnyIfExists(selectQuery);
 
-        return database.ExecuteScalar<bool>(hasValuesQuery);
+        return Task.FromResult(database.ExecuteScalar<bool>(hasValuesQuery));
     }
 
 

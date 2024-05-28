@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -19,21 +19,19 @@ internal sealed class DocumentNotificationPresentationFactory : IDocumentNotific
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    public async Task<IEnumerable<DocumentNotificationResponseModel>> CreateNotificationModelsAsync(IContent content)
+    public Task<IEnumerable<DocumentNotificationResponseModel>> CreateNotificationModelsAsync(IContent content)
     {
         var subscribedActionIds = _notificationService
-                                          .GetUserNotifications(_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, content.Path)?
-                                          .Select(n => n.Action)
-                                          .ToArray()
-                                      ?? Array.Empty<string>();
+            .GetUserNotifications(_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, content.Path)?
+            .Select(n => n.Action)
+            .ToArray() ?? Array.Empty<string>();
 
         var availableActionIds = _actionCollection.Where(a => a.ShowInNotifier).Select(a => a.Letter.ToString()).ToArray();
 
-        return await Task.FromResult(
-            availableActionIds.Select(actionId => new DocumentNotificationResponseModel
-            {
-                ActionId = actionId,
-                Subscribed = subscribedActionIds.Contains(actionId)
-            }).ToArray());
+        return Task.FromResult<IEnumerable<DocumentNotificationResponseModel>>(availableActionIds.Select(actionId => new DocumentNotificationResponseModel
+        {
+            ActionId = actionId,
+            Subscribed = subscribedActionIds.Contains(actionId)
+        }).ToArray());
     }
 }

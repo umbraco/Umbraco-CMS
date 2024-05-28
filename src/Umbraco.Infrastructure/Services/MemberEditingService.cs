@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -40,8 +40,8 @@ internal sealed class MemberEditingService : IMemberEditingService
         _memberGroupService = memberGroupService;
     }
 
-    public async Task<IMember?> GetAsync(Guid key)
-        => await Task.FromResult(_memberService.GetByKey(key));
+    public Task<IMember?> GetAsync(Guid key)
+        => Task.FromResult(_memberService.GetByKey(key));
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MemberCreateModel createModel)
         => await _memberContentEditingService.ValidateAsync(createModel, createModel.ContentTypeKey);

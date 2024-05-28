@@ -112,46 +112,45 @@ internal class ContentVersionService : IContentVersionService
     public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = Constants.Security.SuperUserId)
         => HandleSetPreventCleanup(versionId, preventCleanup, userId);
 
-    public async Task<Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>> GetPagedContentVersionsAsync(Guid contentId, string? culture, int skip, int take)
+    public Task<Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>> GetPagedContentVersionsAsync(Guid contentId, string? culture, int skip, int take)
     {
-        IEntitySlim? document = await Task.FromResult(_entityService.Get(contentId, UmbracoObjectTypes.Document));
+        IEntitySlim? document = _entityService.Get(contentId, UmbracoObjectTypes.Document);
         if (document is null)
         {
-            return Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.ContentNotFound);
+            return Task.FromResult(Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.ContentNotFound));
         }
 
         if (PaginationConverter.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize) == false)
         {
-            return Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.InvalidSkipTake);
+            return Task.FromResult(Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.InvalidSkipTake));
         }
 
         IEnumerable<ContentVersionMeta>? versions =
-            await Task.FromResult(HandleGetPagedContentVersions(
+            HandleGetPagedContentVersions(
                 document.Id,
                 pageNumber,
                 pageSize,
                 out var total,
-                culture));
+                culture);
 
         if (versions is null)
         {
-            return Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound);
+            return Task.FromResult(Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound));
         }
 
-        return Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Succeed(
-            ContentVersionOperationStatus.Success, new PagedModel<ContentVersionMeta>(total, versions));
+        return Task.FromResult(Attempt<PagedModel<ContentVersionMeta>?, ContentVersionOperationStatus>.Succeed(
+            ContentVersionOperationStatus.Success, new PagedModel<ContentVersionMeta>(total, versions)));
     }
 
-    public async Task<Attempt<IContent?, ContentVersionOperationStatus>> GetAsync(Guid versionId)
+    public Task<Attempt<IContent?, ContentVersionOperationStatus>> GetAsync(Guid versionId)
     {
-        IContent? version = await Task.FromResult(_contentService.GetVersion(versionId.ToInt()));
+        IContent? version = _contentService.GetVersion(versionId.ToInt());
         if (version is null)
         {
-            return Attempt<IContent?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus
-                .NotFound);
+            return Task.FromResult(Attempt<IContent?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound));
         }
 
-        return Attempt<IContent?, ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success, version);
+        return Task.FromResult(Attempt<IContent?, ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success, version));
     }
 
     public async Task<Attempt<ContentVersionOperationStatus>> SetPreventCleanupAsync(Guid versionId, bool preventCleanup, Guid userKey)

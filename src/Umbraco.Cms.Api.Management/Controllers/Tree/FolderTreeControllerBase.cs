@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -63,14 +63,14 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         return viewModel;
     }
 
-    protected override async Task<IEntitySlim[]> GetAncestorEntitiesAsync(Guid descendantKey, bool includeSelf = true)
+    protected override Task<IEntitySlim[]> GetAncestorEntitiesAsync(Guid descendantKey, bool includeSelf = true)
     {
         IEntitySlim? entity = EntityService.Get(descendantKey, ItemObjectType)
                               ?? EntityService.Get(descendantKey, FolderObjectType);
         if (entity is null)
         {
             // not much else we can do here but return nothing
-            return await Task.FromResult(Array.Empty<IEntitySlim>());
+            return Task.FromResult(Array.Empty<IEntitySlim>());
         }
 
         var ancestorIds = entity.AncestorIds();
@@ -81,9 +81,12 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
                 .GetAll(ItemObjectType, ancestorIds)
                 .Union(containers)
             : Array.Empty<IEntitySlim>();
-        ancestors = ancestors.Union(includeSelf ? new[] { entity } : Array.Empty<IEntitySlim>());
+        if (includeSelf)
+        {
+            ancestors = ancestors.Append(entity);
+        }
 
-        return ancestors.OrderBy(item => item.Level).ToArray();
+        return Task.FromResult(ancestors.OrderBy(item => item.Level).ToArray());
     }
 
     private IEntitySlim[] GetEntities(Guid? parentKey, int skip, int take, out long totalItems)
@@ -94,7 +97,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
 
         IEntitySlim[] itemEntities = EntityService.GetPagedChildren(
                     parentKey,
-                    new [] { FolderObjectType, ItemObjectType },
+                    [FolderObjectType, ItemObjectType],
                     childObjectTypes,
                     skip,
                     take,

@@ -69,11 +69,11 @@ internal class TelemetryService : ITelemetryService
 
 
 
-    private async Task<IEnumerable<PackageTelemetry>?> GetPackageTelemetryAsync()
+    private Task<IEnumerable<PackageTelemetry>?> GetPackageTelemetryAsync()
     {
         if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
         {
-            return null;
+            return Task.FromResult<IEnumerable<PackageTelemetry>?>(null);
         }
 
         List<PackageTelemetry> packages = new();
@@ -94,6 +94,6 @@ internal class TelemetryService : ITelemetryService
             });
         }
 
-        return packages;
+        return Task.FromResult<IEnumerable<PackageTelemetry>?>(packages);
     }
 }

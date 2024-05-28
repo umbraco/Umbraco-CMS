@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -43,16 +43,15 @@ public class ByRelationTypeKeyRelationController : RelationControllerBase
 
         if (relationsAttempt.Success is false)
         {
-            return await Task.FromResult(RelationOperationStatusResult(relationsAttempt.Status));
+            return RelationOperationStatusResult(relationsAttempt.Status);
         }
 
         IEnumerable<RelationResponseModel> mappedRelations = relationsAttempt.Result.Items.Select(_relationPresentationFactory.Create);
 
-        return await Task.FromResult(Ok(new PagedViewModel<RelationResponseModel>
+        return Ok(new PagedViewModel<RelationResponseModel>
         {
             Total = relationsAttempt.Result.Total,
             Items = mappedRelations,
-        }));
-
+        });
     }
 }

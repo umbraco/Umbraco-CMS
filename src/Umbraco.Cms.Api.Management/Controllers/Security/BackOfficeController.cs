@@ -397,7 +397,7 @@ public class BackOfficeController : SecurityControllerBase
         return new ChallengeResult(provider, properties);
     }
 
-    private async Task<IActionResult> SignInBackOfficeUser(ClaimsPrincipal backOfficePrincipal, OpenIddictRequest request)
+    private Task<IActionResult> SignInBackOfficeUser(ClaimsPrincipal backOfficePrincipal, OpenIddictRequest request)
     {
         Claim[] backOfficeClaims = backOfficePrincipal.Claims.ToArray();
         foreach (Claim backOfficeClaim in backOfficeClaims)
@@ -411,7 +411,7 @@ public class BackOfficeController : SecurityControllerBase
             backOfficePrincipal.SetScopes(OpenIddictConstants.Scopes.OfflineAccess);
         }
 
-        return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, backOfficePrincipal);
+        return Task.FromResult<IActionResult>(new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, backOfficePrincipal));
     }
 
     private async Task<IActionResult> SignInBackOfficeUser(BackOfficeIdentityUser backOfficeUser, OpenIddictRequest request)

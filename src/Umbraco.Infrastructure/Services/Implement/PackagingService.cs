@@ -150,12 +150,12 @@ public class PackagingService : IPackagingService
     }
 
     /// <inheritdoc/>
-    public async Task<PagedModel<PackageDefinition>> GetCreatedPackagesAsync(int skip, int take)
+    public Task<PagedModel<PackageDefinition>> GetCreatedPackagesAsync(int skip, int take)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         PackageDefinition[] packages = _createdPackages.GetAll().WhereNotNull().ToArray();
         var pagedModel = new PagedModel<PackageDefinition>(packages.Length, packages.Skip(skip).Take(take));
-        return await Task.FromResult(pagedModel);
+        return Task.FromResult(pagedModel);
     }
 
     /// <inheritdoc/>
@@ -193,7 +193,7 @@ public class PackagingService : IPackagingService
         int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
         _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
         scope.Complete();
-        return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
+        return Attempt.SucceedWithStatus(PackageOperationStatus.Success, package);
 
     }
 
@@ -209,7 +209,7 @@ public class PackagingService : IPackagingService
         int currentUserId = (await _userService.GetRequiredUserAsync(userKey)).Id;
         _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
         scope.Complete();
-        return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
+        return Attempt.SucceedWithStatus(PackageOperationStatus.Success, package);
     }
 
     public string ExportCreatedPackage(PackageDefinition definition)
@@ -284,7 +284,7 @@ public class PackagingService : IPackagingService
     #endregion
 
     /// <inheritdoc/>
-    public async Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
+    public Task<PagedModel<InstalledPackage>> GetInstalledPackagesFromMigrationPlansAsync(int skip, int take)
     {
         IReadOnlyDictionary<string, string?>? keyValues =
             _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
@@ -311,7 +311,7 @@ public class PackagingService : IPackagingService
                 return package;
             }).ToArray();
 
-        return await Task.FromResult(new PagedModel<InstalledPackage>
+        return Task.FromResult(new PagedModel<InstalledPackage>
         {
             Total = installedPackages.Count(),
             Items = installedPackages.Skip(skip).Take(take),

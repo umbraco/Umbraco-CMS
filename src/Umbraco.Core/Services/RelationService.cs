@@ -126,22 +126,22 @@ public class RelationService : RepositoryService, IRelationService
     /// Gets the Relation types in a paged manner.
     /// Currently implements the paging in memory on the name property because the underlying repository does not support paging yet
     /// </summary>
-    public async Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids)
+    public Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         if (take == 0)
         {
-            return new PagedModel<IRelationType>(CountRelationTypes(), Enumerable.Empty<IRelationType>());
+            return Task.FromResult(new PagedModel<IRelationType>(CountRelationTypes(), Enumerable.Empty<IRelationType>()));
         }
 
-        IRelationType[] items = await Task.FromResult(_relationTypeRepository.GetMany(ids).ToArray());
+        IRelationType[] items = _relationTypeRepository.GetMany(ids).ToArray();
 
-        return new PagedModel<IRelationType>(
+        return Task.FromResult(new PagedModel<IRelationType>(
             items.Length,
             items.OrderBy(relationType => relationType.Name)
                 .Skip(skip)
-                .Take(take));
+                .Take(take)));
     }
 
     public int CountRelationTypes()
@@ -308,21 +308,21 @@ public class RelationService : RepositoryService, IRelationService
         }
     }
 
-    public async Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKeyAsync(Guid key, int skip, int take, Ordering? ordering = null)
+    public Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKeyAsync(Guid key, int skip, int take, Ordering? ordering = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IRelationType? relationType = _relationTypeRepository.Get(key);
             if (relationType is null)
             {
-                return await Task.FromResult(Attempt.FailWithStatus<PagedModel<IRelation>, RelationOperationStatus>(RelationOperationStatus.RelationTypeNotFound, null!));
+                return Task.FromResult(Attempt.FailWithStatus<PagedModel<IRelation>, RelationOperationStatus>(RelationOperationStatus.RelationTypeNotFound, null!));
             }
 
             PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
             IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
             IEnumerable<IRelation> relations = _relationRepository.GetPagedRelationsByQuery(query, pageNumber, pageSize, out var totalRecords, ordering);
-            return await Task.FromResult(Attempt.SucceedWithStatus(RelationOperationStatus.Success, new PagedModel<IRelation>(totalRecords, relations)));
+            return Task.FromResult(Attempt.SucceedWithStatus(RelationOperationStatus.Success, new PagedModel<IRelation>(totalRecords, relations)));
         }
     }
 
@@ -663,7 +663,7 @@ public class RelationService : RepositoryService, IRelationService
                 new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
         }
 
-        return await Task.FromResult(Attempt.SucceedWithStatus(RelationTypeOperationStatus.Success, relationType));
+        return Attempt.SucceedWithStatus(RelationTypeOperationStatus.Success, relationType);
     }
 
     /// <inheritdoc />
@@ -729,7 +729,7 @@ public class RelationService : RepositoryService, IRelationService
             Audit(AuditType.Delete, currentUser, relationType.Id, "Deleted relation type");
             scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
             scope.Complete();
-            return await Task.FromResult(Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType));
+            return Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType);
         }
     }
 
