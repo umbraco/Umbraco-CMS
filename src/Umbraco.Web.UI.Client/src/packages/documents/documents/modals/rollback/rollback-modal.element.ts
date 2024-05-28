@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/index.js';
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './rollback-modal.token.js';
 import { UmbRollbackRepository } from './repository/rollback.repository.js';
 import { diffWords } from '@umbraco-cms/backoffice/external/diff';
@@ -10,7 +11,7 @@ import '../shared/document-variant-language-picker.element.js';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
+import { Change } from 'diff';
 
 type DocumentVersion = {
 	id: string;
@@ -228,7 +229,12 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 		draftValues = draftValues.filter((x) => x.culture === this.currentCulture || !x.culture); // When invariant, culture is undefined or null.
 
-		const diffs = this.currentVersion.properties.map((item) => {
+		const diffs: Array<{ alias: string; diff: Change[] }> = [];
+
+		const nameDiff = diffWords(this.#workspaceContext?.getName() ?? '', this.currentVersion.name);
+		diffs.push({ alias: 'name', diff: nameDiff });
+
+		this.currentVersion.properties.forEach((item) => {
 			const draftValue = draftValues.find((x) => x.alias === item.alias);
 
 			if (!draftValue) return;
@@ -237,7 +243,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			const versionValueString = trimQuotes(JSON.stringify(item.value));
 
 			const diff = diffWords(draftValueString, versionValueString);
-			return { alias: item.alias, diff };
+			diffs.push({ alias: item.alias, diff });
 		});
 
 		function trimQuotes(str: string): string {
@@ -246,9 +252,8 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 		return html`
 			<div id="diff">
-				<p>name: ${this.currentVersion.name}</p>
 				${repeat(
-					this.currentVersion.properties,
+					diffs,
 					(item) => item.alias,
 					(item) => {
 						const diff = diffs.find((x) => x?.alias === item.alias);
@@ -263,7 +268,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 													? html`<span class="removed">${part.value}</span>`
 													: part.value,
 										)
-									: JSON.stringify(item.value)}
+									: nothing}
 							</p>
 						`;
 					},
