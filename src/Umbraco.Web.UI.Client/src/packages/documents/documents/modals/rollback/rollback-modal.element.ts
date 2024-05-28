@@ -98,6 +98,8 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		const { data: userItems } = await this.#userItemRepository.requestItems(uniqueUserIds);
 
 		data?.items.forEach((item: any) => {
+			if (item.isCurrentDraftVersion) return;
+
 			tempItems.push({
 				date: item.versionDate,
 				user:
