@@ -48,6 +48,10 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		buildUpValue.blocks.settingsData ??= [];
 		this._value = buildUpValue as UmbRichTextEditorValueType;
 
+		if (this._latestMarkup !== this._value.markup) {
+			this._markup = this._value.markup;
+		}
+
 		this.#managerContext.setLayouts(buildUpValue.blocks.layout[UMB_BLOCK_RTE_BLOCK_LAYOUT_ALIAS] ?? []);
 		this.#managerContext.setContents(buildUpValue.blocks.contentData);
 		this.#managerContext.setSettings(buildUpValue.blocks.settingsData);
@@ -64,6 +68,11 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		markup: '',
 		blocks: { layout: {}, contentData: [], settingsData: [] },
 	};
+
+	// Separate state for markup, to avoid re-rendering/re-setting the value of the TinyMCE editor when the value does not really change.
+	@state()
+	private _markup = '';
+	private _latestMarkup = ''; // The latest value gotten from the TinyMCE editor.
 
 	#managerContext = new UmbBlockRteManagerContext(this);
 	#entriesContext = new UmbBlockRteEntriesContext(this);
@@ -123,6 +132,8 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		// Then get the content of the editor and update the value.
 		// maybe in this way doc.body.innerHTML;
 
+		this._latestMarkup = markup;
+
 		this._value = {
 			...this._value,
 			markup: markup,
@@ -132,7 +143,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 
 	render() {
 		return html`
-			<umb-input-tiny-mce .configuration=${this._config} .value=${this._value?.markup ?? ''} @change=${this.#onChange}>
+			<umb-input-tiny-mce .configuration=${this._config} .value=${this._markup} @change=${this.#onChange}>
 			</umb-input-tiny-mce>
 		`;
 	}
