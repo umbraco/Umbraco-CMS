@@ -1,6 +1,8 @@
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Manifest;
@@ -32,6 +34,30 @@ public class PackagingService : IPackagingService
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly IUserService _userService;
+
+    [Obsolete("Use the constructor with IPackageManifestReader instead.")]
+    public PackagingService(
+        IAuditService auditService,
+        ICreatedPackagesRepository createdPackages,
+        IPackageInstallation packageInstallation,
+        IEventAggregator eventAggregator,
+        IKeyValueService keyValueService,
+        ICoreScopeProvider coreScopeProvider,
+        PackageMigrationPlanCollection packageMigrationPlans,
+        IHostEnvironment hostEnvironment,
+        IUserService userService)
+        : this(
+            auditService,
+            createdPackages,
+            packageInstallation,
+            eventAggregator,
+            keyValueService,
+            coreScopeProvider,
+            packageMigrationPlans,
+            StaticServiceProvider.Instance.GetRequiredService<IPackageManifestReader>(),
+            hostEnvironment,
+            userService)
+    { }
 
     public PackagingService(
         IAuditService auditService,

@@ -1,5 +1,7 @@
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
@@ -26,6 +28,18 @@ public class ReportSiteJob : IRecurringBackgroundJob
     private readonly ITelemetryService _telemetryService;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IHttpClientFactory _httpClientFactory;
+
+    [Obsolete("Use the constructor with IHttpClientFactory instead.")]
+    public ReportSiteJob(
+        ILogger<ReportSiteJob> logger,
+        ITelemetryService telemetryService,
+        IJsonSerializer jsonSerializer)
+        : this(
+            logger,
+            telemetryService,
+            jsonSerializer,
+            StaticServiceProvider.Instance.GetRequiredService<IHttpClientFactory>())
+    { }
 
     public ReportSiteJob(
         ILogger<ReportSiteJob> logger,
