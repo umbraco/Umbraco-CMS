@@ -262,31 +262,38 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 		return html`
 			${unsafeHTML(this.localize.term('rollback_diffHelp'))}
-			<div id="diff-grid">
-				<span class="diff-grid-top">Alias</span>
-				<span class="diff-grid-top">Value</span>
+			<uui-table>
+				<uui-table-column style="width: 0"></uui-table-column>
+				<uui-table-column></uui-table-column>
+
+				<uui-table-head>
+					<uui-table-head-cell>${this.localize.term('general_alias')}</uui-table-head-cell>
+					<uui-table-head-cell>${this.localize.term('general_value')}</uui-table-head-cell>
+				</uui-table-head>
 				${repeat(
 					diffs,
 					(item) => item.alias,
 					(item) => {
 						const diff = diffs.find((x) => x?.alias === item.alias);
 						return html`
-							<span>${item.alias}</span>
-							<span>
-								${diff
-									? diff.diff.map((part) =>
-											part.added
-												? html`<span class="added">${part.value}</span>`
-												: part.removed
-													? html`<span class="removed">${part.value}</span>`
-													: part.value,
-										)
-									: nothing}
-							</span>
+							<uui-table-row>
+								<uui-table-cell>${item.alias}</uui-table-cell>
+								<uui-table-cell>
+									${diff
+										? diff.diff.map((part) =>
+												part.added
+													? html`<span class="diff-added">${part.value}</span>`
+													: part.removed
+														? html`<span class="diff-removed">${part.value}</span>`
+														: part.value,
+											)
+										: nothing}
+								</uui-table-cell>
+							</uui-table-row>
 						`;
 					},
 				)}
-			</div>
+			</uui-table>
 		`;
 	}
 
@@ -337,50 +344,43 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				gap: var(--uui-size-space-2);
 				font-size: 15px;
 			}
-			#diff-grid {
-				display: grid;
-				grid-template-columns: auto 1fr;
-				border: 1px solid var(--uui-color-border);
-				margin-bottom: var(--uui-size-space-3);
-				border-radius: var(--uui-border-radius);
-				margin-top: var(--uui-size-space-4);
+			uui-table {
+				--uui-table-cell-padding: var(--uui-size-space-1) var(--uui-size-space-4);
+				margin-top: var(--uui-size-space-5);
 			}
-
-			.diff-grid-top {
-				background-color: var(--uui-color-surface-alt);
-			}
-
-			#diff-grid > * {
-				border-right: 1px solid var(--uui-color-border);
-				border-bottom: 1px solid var(--uui-color-border);
-			}
-
-			#diff-grid > *:nth-child(2) {
-				border-top-right-radius: var(--uui-border-radius);
-			}
-
-			#diff-grid > *:nth-child(1) {
+			uui-table-head-cell:first-child {
 				border-top-left-radius: var(--uui-border-radius);
 			}
-
-			/* Remove borders from last column */
-			#diff-grid > *:nth-child(2n) {
-				border-right: none;
+			uui-table-head-cell:last-child {
+				border-top-right-radius: var(--uui-border-radius);
+			}
+			uui-table-head-cell {
+				background-color: var(--uui-color-surface-alt);
+			}
+			uui-table-head-cell:last-child,
+			uui-table-cell:last-child {
+				border-right: 1px solid var(--uui-color-border);
+			}
+			uui-table-head-cell,
+			uui-table-cell {
+				border-top: 1px solid var(--uui-color-border);
+				border-left: 1px solid var(--uui-color-border);
+			}
+			uui-table-row:last-child uui-table-cell {
+				border-bottom: 1px solid var(--uui-color-border);
+			}
+			uui-table-row:last-child uui-table-cell:last-child {
+				border-bottom-right-radius: var(--uui-border-radius);
+			}
+			uui-table-row:last-child uui-table-cell:first-child {
+				border-bottom-left-radius: var(--uui-border-radius);
 			}
 
-			/* Remove borders from last row */
-			#diff-grid > *:nth-child(2n + 1):nth-last-child(-n + 2),
-			#diff-grid > *:nth-child(2n + 1):nth-last-child(-n + 2) ~ * {
-				border-bottom: none;
-			}
-			#diff-grid > * {
-				padding: var(--uui-size-2) var(--uui-size-space-4);
-			}
-			#diff-grid .added,
+			.diff-added,
 			ins {
 				background-color: #00c43e63;
 			}
-			#diff-grid .removed,
+			.diff-removed,
 			del {
 				background-color: #ff35356a;
 			}
