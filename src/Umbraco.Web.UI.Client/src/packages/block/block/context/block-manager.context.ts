@@ -167,7 +167,7 @@ export abstract class UmbBlockManagerContext<
 		return this.#contents.value.find((x) => x.udi === contentUdi);
 	}
 
-	setOneLayout(layoutData: BlockLayoutType) {
+	setOneLayout(layoutData: BlockLayoutType, modalData?: UmbBlockWorkspaceData) {
 		this._layouts.appendOne(layoutData);
 	}
 	setOneContent(contentData: UmbBlockDataType) {
@@ -190,10 +190,7 @@ export abstract class UmbBlockManagerContext<
 		modalData?: UmbBlockWorkspaceData,
 	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
 
-	protected createBlockData<ModalDataType extends UmbBlockWorkspaceData>(
-		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
-	) {
+	protected createBlockData(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
