@@ -324,7 +324,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			} else {
 				// Update data:
 
-				this.#blockManager.setOneLayout(layoutData, this.#modalContext?.data as UmbBlockWorkspaceData);
+				this.#blockManager.setOneLayout(layoutData, this.#modalContext.data as UmbBlockWorkspaceData);
 				if (contentData) {
 					this.#blockManager.setOneContent(contentData);
 				}

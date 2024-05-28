@@ -1,7 +1,10 @@
 import type { UmbBlockDataType } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
-import type { UmbBlockRteWorkspaceData } from '../index.js';
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
+import {
+	UMB_BLOCK_RTE_WORKSPACE_MODAL,
+	type UmbBlockRteWorkspaceData,
+} from '../workspace/block-rte-workspace.modal-token.js';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -15,6 +18,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 > {
 	//
 	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
+	#workspaceModal: UmbModalRouteRegistrationController;
 
 	// We will just say its always allowed for RTE for now: [NL]
 	public readonly canCreate = new UmbBooleanState(true).asObservable();
@@ -37,6 +41,17 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._catalogueRouteBuilderState.setValue(routeBuilder);
+			});
+
+		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_RTE_WORKSPACE_MODAL)
+			.addUniquePaths(['propertyAlias', 'variantId'])
+			.addAdditionalPath('block')
+			.onSetup(() => {
+				return { data: { entityType: 'block', preset: {} }, modal: { size: 'medium' } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				const newPath = routeBuilder({});
+				this._workspacePath.setValue(newPath);
 			});
 	}
 
@@ -62,6 +77,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 			this._manager.propertyAlias,
 			(alias) => {
 				this.#catalogueModal.setUniquePathValue('propertyAlias', alias ?? 'null');
+				this.#workspaceModal.setUniquePathValue('propertyAlias', alias ?? 'null');
 			},
 			'observePropertyAlias',
 		);
@@ -69,9 +85,9 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 		this.observe(
 			this._manager.variantId,
 			(variantId) => {
-				if (variantId) {
-					this.#catalogueModal.setUniquePathValue('variantId', variantId.toString());
-				}
+				// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense?
+				this.#catalogueModal.setUniquePathValue('variantId', variantId?.toString());
+				this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
 			},
 			'observePropertyAlias',
 		);
