@@ -3,7 +3,16 @@ import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './rollback-modal.token.js';
 import { UmbRollbackRepository } from './repository/rollback.repository.js';
 import { diffWords } from '@umbraco-cms/backoffice/external/diff';
-import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	PropertyValueMap,
+	css,
+	customElement,
+	html,
+	nothing,
+	repeat,
+	state,
+	unsafeHTML,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -252,6 +261,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		}
 
 		return html`
+			${unsafeHTML(this.localize.term('rollback_diffHelp'))}
 			<div id="diff">
 				${repeat(
 					diffs,
@@ -325,10 +335,12 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				gap: var(--uui-size-space-2);
 				font-size: 15px;
 			}
-			#diff .added {
+			#diff .added,
+			ins {
 				background-color: #29ff6d5a;
 			}
-			#diff .removed {
+			#diff .removed,
+			del {
 				background-color: #ff35356a;
 			}
 			.rollback-item {
