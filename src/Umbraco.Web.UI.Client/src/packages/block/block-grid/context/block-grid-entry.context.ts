@@ -206,9 +206,9 @@ export class UmbBlockGridEntryContext
 
 		// Secure columnSpan fits options:
 		this.observe(
-			observeMultiple([this.layout, this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
-			([layout, columnSpan, relevantColumnSpanOptions, layoutColumns]) => {
-				if (!layout || !layoutColumns) return;
+			observeMultiple([this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
+			([columnSpan, relevantColumnSpanOptions, layoutColumns]) => {
+				if (!layoutColumns) return;
 				const newColumnSpan = this.#calcColumnSpan(
 					columnSpan ?? layoutColumns,
 					relevantColumnSpanOptions,

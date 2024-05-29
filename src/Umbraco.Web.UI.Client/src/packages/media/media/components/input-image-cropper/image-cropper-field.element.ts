@@ -8,7 +8,7 @@ import type {
 	UmbImageCropperFocalPoint,
 	UmbImageCropperPropertyEditorValue,
 } from './index.js';
-import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -151,11 +151,13 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 			</umb-image-cropper-focus-setter>
 			<div id="actions">
 				<slot name="actions"></slot>
-				${!this.hideFocalPoint
-					? html`<uui-button
+				${when(
+					!this.hideFocalPoint,
+					() =>
+						html`<uui-button
 							label=${this.localize.term('content_resetFocalPoint')}
-							@click=${this.#onResetFocalPoint}></uui-button>`
-					: nothing}
+							@click=${this.#onResetFocalPoint}></uui-button>`,
+				)}
 			</div>
 		`;
 	}

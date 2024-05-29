@@ -100,9 +100,14 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		this.#getSrc();
 	}
 
-	#onChange(e: CustomEvent) {
-		const value = (e.target as UmbInputImageCropperFieldElement).value;
+	#onChange(e: CustomEvent & { target: UmbInputImageCropperFieldElement }) {
+		const value = e.target.value;
 		if (!value) return;
+
+		if (this._imageCropperValue) {
+			this._imageCropperValue.crops = value.crops;
+			this._imageCropperValue.focalPoint = value.focalPoint;
+		}
 
 		this.value = { key: this._key, unique: this._unique, crops: value.crops, focalPoint: value.focalPoint };
 	}
@@ -124,22 +129,24 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 	}
 
 	#renderBody() {
-		return html`<div id="layout">
-			<umb-image-cropper-field
-				.value=${this._imageCropperValue}
-				?hideFocalPoint=${this._hideFocalPoint}
-				@change=${this.#onChange}></umb-image-cropper-field>
-			<div id="options">
-				<uui-menu-item @click=${this.#openMediaPicker} label=${this.localize.term('mediaPicker_changeMedia')}>
-					<umb-icon slot="icon" name="icon-search"></umb-icon>
-				</uui-menu-item>
-				<uui-menu-item
-					href=${this._editMediaPath + 'edit/' + this._unique}
-					label=${this.localize.term('mediaPicker_openMedia')}>
-					<umb-icon slot="icon" name="icon-out"></umb-icon>
-				</uui-menu-item>
+		return html`
+			<div id="layout">
+				<umb-image-cropper-field
+					.value=${this._imageCropperValue}
+					?hideFocalPoint=${this._hideFocalPoint}
+					@change=${this.#onChange}></umb-image-cropper-field>
+				<div id="options">
+					<uui-menu-item @click=${this.#openMediaPicker} label=${this.localize.term('mediaPicker_changeMedia')}>
+						<umb-icon slot="icon" name="icon-search"></umb-icon>
+					</uui-menu-item>
+					<uui-menu-item
+						href=${this._editMediaPath + 'edit/' + this._unique}
+						label=${this.localize.term('mediaPicker_openMedia')}>
+						<umb-icon slot="icon" name="icon-out"></umb-icon>
+					</uui-menu-item>
+				</div>
 			</div>
-		</div>`;
+		`;
 	}
 
 	static styles = [

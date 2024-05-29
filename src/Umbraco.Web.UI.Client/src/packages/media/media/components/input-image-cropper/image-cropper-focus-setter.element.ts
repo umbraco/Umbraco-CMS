@@ -34,7 +34,7 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
-		if (!this.hideFocalPoint) return;
+		if (this.hideFocalPoint) return;
 
 		if (_changedProperties.has('focalPoint') && this.focalPointElement) {
 			this.focalPointElement.style.left = `calc(${this.focalPoint.left * 100}% - ${this.#DOT_RADIUS}px)`;
@@ -142,7 +142,6 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 
 	render() {
 		if (!this.src) return nothing;
-
 		return html`
 			<div id="wrapper">
 				<img id="image" @click=${this.#onSetFocalPoint} @keydown=${() => nothing} src=${this.src} alt="" />
@@ -150,6 +149,7 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 			</div>
 		`;
 	}
+
 	static styles = css`
 		:host {
 			display: flex;
