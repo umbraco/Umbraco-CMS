@@ -48,6 +48,7 @@
 				"local-rules/prefer-import-aliases": "error",
 				"local-rules/prefer-static-styles-last": "warn",
 				"local-rules/umb-class-prefix": "error",
+				"local-rules/no-relative-import-to-import-map-module": "error",
 				"local-rules/enforce-umbraco-external-imports": [
 					"error",
 					{
