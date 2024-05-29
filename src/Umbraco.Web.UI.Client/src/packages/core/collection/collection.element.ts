@@ -4,7 +4,8 @@ import { UmbExtensionElementAndApiSlotElementBase } from '@umbraco-cms/backoffic
 import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-@customElement('umb-collection')
+const elementName = 'umb-collection';
+@customElement(elementName)
 export class UmbCollectionElement extends UmbExtensionElementAndApiSlotElementBase<ManifestCollection> {
 	getExtensionType() {
 		return 'collection';
@@ -39,6 +40,6 @@ export class UmbCollectionElement extends UmbExtensionElementAndApiSlotElementBa
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection': UmbCollectionElement;
+		[elementName]: UmbCollectionElement;
 	}
 }
