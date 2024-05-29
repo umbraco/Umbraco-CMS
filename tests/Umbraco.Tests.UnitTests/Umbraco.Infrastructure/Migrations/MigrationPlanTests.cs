@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -76,7 +77,7 @@ public class MigrationPlanTests
             loggerFactory,
             migrationBuilder,
             databaseFactory,
-            Mock.Of<IPublishedSnapshotService>(), distributedCache, Mock.Of<IKeyValueService>());
+            Mock.Of<IPublishedSnapshotService>(), distributedCache, Mock.Of<IKeyValueService>(), Mock.Of<IServiceScopeFactory>());
 
         var plan = new MigrationPlan("default")
             .From(string.Empty)

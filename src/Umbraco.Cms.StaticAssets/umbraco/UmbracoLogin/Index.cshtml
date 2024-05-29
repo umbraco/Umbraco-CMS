@@ -1,4 +1,3 @@
-@using System.Globalization
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.Extensions.Options;
 @using Umbraco.Cms.Api.Management.Extensions
@@ -35,7 +34,7 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
-<html lang="@CultureInfo.CurrentCulture.Name.ToLowerInvariant()">
+<html lang="@GlobalSettings.Value.DefaultUILanguage">
 <head>
     <meta charset="UTF-8"/>
     <base href="@backOfficePath.EnsureEndsWith('/')"/>

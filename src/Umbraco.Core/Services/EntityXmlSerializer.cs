@@ -211,6 +211,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
 
         // The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
         xml.Add(new XAttribute("Id", dataType.EditorAlias));
+        xml.Add(new XAttribute("EditorUiAlias", dataType.EditorUiAlias ?? dataType.EditorAlias));
         xml.Add(new XAttribute("Definition", dataType.Key));
         xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
         xml.Add(new XAttribute("Configuration", _configurationEditorJsonSerializer.Serialize(dataType.ConfigurationObject)));
@@ -396,7 +397,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         {
             foreach (ContentTypeSort allowedType in mediaType.AllowedContentTypes)
             {
-                structure.Add(new XElement("MediaType", allowedType.Alias));
+                structure.Add(new XElement(IEntityXmlSerializer.MediaTypeElementName, allowedType.Alias));
             }
         }
 
@@ -409,7 +410,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             SerializePropertyGroups(mediaType.PropertyGroups)); // TODO Rename to PropertyGroups
 
         var xml = new XElement(
-            "MediaType",
+            IEntityXmlSerializer.MediaTypeElementName,
             info,
             structure,
             genericProperties,
@@ -474,7 +475,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         {
             foreach (ContentTypeSort allowedType in contentType.AllowedContentTypes)
             {
-                structure.Add(new XElement("DocumentType", allowedType.Alias));
+                structure.Add(new XElement(IEntityXmlSerializer.DocumentTypeElementName, allowedType.Alias));
             }
         }
 
@@ -487,7 +488,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             SerializePropertyGroups(contentType.PropertyGroups)); // TODO Rename to PropertyGroups
 
         var xml = new XElement(
-            "DocumentType",
+            IEntityXmlSerializer.DocumentTypeElementName,
             info,
             structure,
             genericProperties,
