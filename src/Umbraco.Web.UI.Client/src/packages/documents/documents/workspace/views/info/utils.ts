@@ -127,7 +127,7 @@ export function getDocumentHistoryTagStyleAndText(type: UmbDocumentAuditLogType)
 		case UmbDocumentAuditLog.CUSTOM:
 			return {
 				style: { look: 'placeholder', color: 'default' },
-				text: { label: 'auditTrails_custom', desc: '' },
+				text: { label: 'auditTrails_smallCustom', desc: 'auditTrails_custom' },
 			};
 
 		default:
