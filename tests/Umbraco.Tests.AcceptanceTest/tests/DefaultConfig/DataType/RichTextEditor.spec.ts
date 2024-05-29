@@ -206,7 +206,7 @@ test('can add available blocks', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementTypeName = 'TestElementType';
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
-  const elementTypeId = await umbracoApi.documentType.createElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
   const expectedDataTypeValues = {
     "alias": "blocks",
     "value": [
@@ -219,7 +219,7 @@ test('can add available blocks', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Act
-  await umbracoUi.dataType.addAvailablBlocks(elementTypeName);
+  await umbracoUi.dataType.addAvailableBlocks(elementTypeName);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
