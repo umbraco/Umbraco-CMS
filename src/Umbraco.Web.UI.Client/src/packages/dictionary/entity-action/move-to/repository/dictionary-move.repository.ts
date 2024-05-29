@@ -18,3 +18,5 @@ export class UmbMoveDictionaryRepository extends UmbRepositoryBase implements Um
 		return { error };
 	}
 }
+
+export { UmbMoveDictionaryRepository as api };
