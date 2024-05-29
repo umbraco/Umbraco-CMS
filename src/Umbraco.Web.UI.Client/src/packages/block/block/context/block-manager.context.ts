@@ -190,6 +190,18 @@ export abstract class UmbBlockManagerContext<
 		modalData?: UmbBlockWorkspaceData,
 	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
 
+	public createBlockSettingsData(contentElementTypeKey: string) {
+		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
+		if (!blockType) {
+			throw new Error(`Cannot create block settings, missing block type for ${contentElementTypeKey}`);
+		}
+
+		return {
+			udi: buildUdi('element', UmbId.new()),
+			contentTypeKey: blockType.settingsElementTypeKey,
+		};
+	}
+
 	protected createBlockData(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
