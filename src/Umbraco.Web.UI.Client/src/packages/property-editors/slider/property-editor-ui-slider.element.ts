@@ -5,13 +5,15 @@ import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-ed
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
+export type UmbSliderValue = { from: number; to: number } | undefined;
+
 /**
  * @element umb-property-editor-ui-slider
  */
 @customElement('umb-property-editor-ui-slider')
 export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
-	value: { to?: number; from?: number } | undefined = undefined;
+	value: UmbSliderValue | undefined;
 
 	@state()
 	_enableRange = false;
@@ -37,9 +39,20 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 		this._enableRange = Boolean(config.getValueByAlias('enableRange')) ?? false;
 		this._initVal1 = Number(config.getValueByAlias('initVal1'));
 		this._initVal2 = Number(config.getValueByAlias('initVal2'));
-		this._step = Number(config.getValueByAlias('step')) ?? 1;
+
+		// Make sure that step is higher than 0.
+		const step = (config.getValueByAlias('step') ?? 1) as number;
+		this._step = step > 0 ? step : 1;
+
 		this._min = Number(config.getValueByAlias('minVal')) ?? 0;
 		this._max = Number(config.getValueByAlias('maxVal')) ?? 100;
+
+		if (this._min === this._max) {
+			// Why is the configuration giving us a 0 as default, rather than just undefined..?
+
+			console.log(this._min, this._max, this._step, this._initVal1, this._initVal2);
+			throw new Error('Property Editor Slider: min and max are currently equal. Please change your configuration.');
+		}
 	}
 
 	#getValueObject(value: string) {
@@ -56,7 +69,7 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 		return html`
 			<umb-input-slider
 				.valueLow=${this.value?.from ?? this._initVal1 ?? 0}
-				.valueHigh=${this.value?.to ?? this._initVal2 ?? 0}
+				.valueHigh=${this.value?.to ?? this._initVal2 ?? this._step}
 				.step=${this._step}
 				.min=${this._min}
 				.max=${this._max}
