@@ -1,8 +1,9 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/index.js';
+import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import type { UmbRollbackModalData, UmbRollbackModalValue } from './rollback-modal.token.js';
 import { UmbRollbackRepository } from './repository/rollback.repository.js';
-import { diffWords } from '@umbraco-cms/backoffice/external/diff';
-import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { diffWords, type Change } from '@umbraco-cms/backoffice/external/diff';
+import { css, customElement, html, nothing, repeat, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -10,7 +11,6 @@ import '../shared/document-variant-language-picker.element.js';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 
 type DocumentVersion = {
 	id: string;
@@ -97,6 +97,8 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		const { data: userItems } = await this.#userItemRepository.requestItems(uniqueUserIds);
 
 		data?.items.forEach((item: any) => {
+			if (item.isCurrentDraftVersion) return;
+
 			tempItems.push({
 				date: item.versionDate,
 				user:
@@ -212,8 +214,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 							@click=${(event: Event) => this.#onPreventCleanup(event, item.id, !item.preventCleanup)}
 							label=${item.preventCleanup
 								? this.localize.term('contentTypeEditor_historyCleanupEnableCleanup')
-								: this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}>
-						</uui-button>
+								: this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}></uui-button>
 					</div>
 				`;
 			},
@@ -228,7 +229,12 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 
 		draftValues = draftValues.filter((x) => x.culture === this.currentCulture || !x.culture); // When invariant, culture is undefined or null.
 
-		const diffs = this.currentVersion.properties.map((item) => {
+		const diffs: Array<{ alias: string; diff: Change[] }> = [];
+
+		const nameDiff = diffWords(this.#workspaceContext?.getName() ?? '', this.currentVersion.name);
+		diffs.push({ alias: 'name', diff: nameDiff });
+
+		this.currentVersion.properties.forEach((item) => {
 			const draftValue = draftValues.find((x) => x.alias === item.alias);
 
 			if (!draftValue) return;
@@ -237,7 +243,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 			const versionValueString = trimQuotes(JSON.stringify(item.value));
 
 			const diff = diffWords(draftValueString, versionValueString);
-			return { alias: item.alias, diff };
+			diffs.push({ alias: item.alias, diff });
 		});
 
 		function trimQuotes(str: string): string {
@@ -245,30 +251,39 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		}
 
 		return html`
-			<div id="diff">
-				<p>name: ${this.currentVersion.name}</p>
+			${unsafeHTML(this.localize.term('rollback_diffHelp'))}
+			<uui-table>
+				<uui-table-column style="width: 0"></uui-table-column>
+				<uui-table-column></uui-table-column>
+
+				<uui-table-head>
+					<uui-table-head-cell>${this.localize.term('general_alias')}</uui-table-head-cell>
+					<uui-table-head-cell>${this.localize.term('general_value')}</uui-table-head-cell>
+				</uui-table-head>
 				${repeat(
-					this.currentVersion.properties,
+					diffs,
 					(item) => item.alias,
 					(item) => {
 						const diff = diffs.find((x) => x?.alias === item.alias);
 						return html`
-							<p>
-								${item.alias}:
-								${diff
-									? diff.diff.map((part) =>
-											part.added
-												? html`<span class="added">${part.value}</span>`
-												: part.removed
-													? html`<span class="removed">${part.value}</span>`
-													: part.value,
-										)
-									: JSON.stringify(item.value)}
-							</p>
+							<uui-table-row>
+								<uui-table-cell>${item.alias}</uui-table-cell>
+								<uui-table-cell>
+									${diff
+										? diff.diff.map((part) =>
+												part.added
+													? html`<span class="diff-added">${part.value}</span>`
+													: part.removed
+														? html`<span class="diff-removed">${part.value}</span>`
+														: part.value,
+											)
+										: nothing}
+								</uui-table-cell>
+							</uui-table-row>
 						`;
 					},
 				)}
-			</div>
+			</uui-table>
 		`;
 	}
 
@@ -308,6 +323,9 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 	static styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				color: var(--uui-color-text);
+			}
 			#language-select {
 				display: flex;
 				flex-direction: column;
@@ -316,11 +334,45 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 				gap: var(--uui-size-space-2);
 				font-size: 15px;
 			}
-			#diff .added {
-				background-color: #d1ffdb;
+			uui-table {
+				--uui-table-cell-padding: var(--uui-size-space-1) var(--uui-size-space-4);
+				margin-top: var(--uui-size-space-5);
 			}
-			#diff .removed {
-				background-color: #ffd1d1;
+			uui-table-head-cell:first-child {
+				border-top-left-radius: var(--uui-border-radius);
+			}
+			uui-table-head-cell:last-child {
+				border-top-right-radius: var(--uui-border-radius);
+			}
+			uui-table-head-cell {
+				background-color: var(--uui-color-surface-alt);
+			}
+			uui-table-head-cell:last-child,
+			uui-table-cell:last-child {
+				border-right: 1px solid var(--uui-color-border);
+			}
+			uui-table-head-cell,
+			uui-table-cell {
+				border-top: 1px solid var(--uui-color-border);
+				border-left: 1px solid var(--uui-color-border);
+			}
+			uui-table-row:last-child uui-table-cell {
+				border-bottom: 1px solid var(--uui-color-border);
+			}
+			uui-table-row:last-child uui-table-cell:last-child {
+				border-bottom-right-radius: var(--uui-border-radius);
+			}
+			uui-table-row:last-child uui-table-cell:first-child {
+				border-bottom-left-radius: var(--uui-border-radius);
+			}
+
+			.diff-added,
+			ins {
+				background-color: #00c43e63;
+			}
+			.diff-removed,
+			del {
+				background-color: #ff35356a;
 			}
 			.rollback-item {
 				position: relative;
