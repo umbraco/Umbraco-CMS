@@ -6,7 +6,7 @@ import { type UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/ext
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-with-alias')
-export class UmbInputWithAliasElement extends UmbFormControlMixin<string>(UmbLitElement) {
+export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof UmbLitElement>(UmbLitElement) {
 	@property({ type: String })
 	label: string = '';
 
@@ -68,9 +68,13 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string>(UmbLit
 	}
 
 	render() {
-		// Localizations: [NL]
 		return html`
-			<uui-input id="name" placeholder="Enter a name..." label=${this.label} .value=${this.value} @input="${this.#onNameChange}">
+			<uui-input
+				id="name"
+				placeholder=${this.localize.term('placeholders_entername')}
+				label=${this.label}
+				.value=${this.value}
+				@input=${this.#onNameChange}>
 				<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 				<uui-input
 					name="alias"
@@ -78,7 +82,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string>(UmbLit
 					label="alias"
 					@input=${this.#onAliasChange}
 					.value=${this.alias}
-					placeholder="Enter alias..."
+					placeholder=${this.localize.term('placeholders_enterAlias')}
 					?disabled=${this._aliasLocked && !this.aliasReadonly}
 					?readonly=${this.aliasReadonly}>
 					<!-- TODO: validation for bad characters -->
