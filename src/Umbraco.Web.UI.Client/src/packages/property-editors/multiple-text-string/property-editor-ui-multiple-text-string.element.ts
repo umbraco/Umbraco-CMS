@@ -1,4 +1,4 @@
-import { UmbPropertyValueChangeEvent } from '../../core/property-editor/index.js';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
