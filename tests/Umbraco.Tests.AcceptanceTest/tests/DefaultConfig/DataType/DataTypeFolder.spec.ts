@@ -3,7 +3,8 @@ import {expect} from "@playwright/test";
 
 const dataTypeName = 'TestDataType';
 const dataTypeFolderName = 'TestDataTypeFolder';
-const editorAlias = 'Umbraco.DateTime';
+const editorAlias = 'Umbraco.ColorPicker';
+const propertyEditorName = 'Color Picker';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);
@@ -68,6 +69,8 @@ test('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickCreateButton();
   await umbracoUi.dataType.clickNewDataTypeThreeDotsButton();
   await umbracoUi.dataType.enterDataTypeName(dataTypeName);
+  await umbracoUi.dataType.clickSelectAPropertyEditorButton();
+  await umbracoUi.dataType.selectAPropertyEditor(propertyEditorName);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
