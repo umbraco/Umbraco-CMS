@@ -65,7 +65,7 @@ test('can add stylesheet', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'StylesheetForDataType.css';
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
-  const stylesheetPath = await umbracoApi.stylesheet.create(stylesheetName, 'content');
+  const stylesheetPath = await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
 
   const expectedDataTypeValues = {
     "alias": "stylesheets",
