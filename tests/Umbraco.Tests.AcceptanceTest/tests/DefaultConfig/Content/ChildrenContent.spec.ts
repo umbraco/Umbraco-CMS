@@ -34,9 +34,7 @@ test.describe('Children content tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.clickActionsMenuForContent(contentName);
     await umbracoUi.content.clickCreateButton();
-    await umbracoUi.content.clickLabelWithName(childDocumentTypeName);
-    // This wait is needed 
-    await umbracoUi.waitForTimeout(500);
+    await umbracoUi.content.chooseDocumentType(documentTypeName);
     await umbracoUi.content.enterContentName(childContentName);
     await umbracoUi.content.clickSaveButton();
     

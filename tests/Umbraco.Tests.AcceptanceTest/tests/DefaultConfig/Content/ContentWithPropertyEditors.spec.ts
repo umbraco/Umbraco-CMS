@@ -37,7 +37,7 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
-    await umbracoUi.content.clickLabelWithName(documentTypeName);
+    await umbracoUi.content.chooseDocumentType(documentTypeName);
     await umbracoUi.content.enterContentName(contentName);
     await umbracoUi.content.enterRichTextArea(contentText);
     await umbracoUi.content.clickSaveAndPublishButton();
@@ -61,7 +61,7 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
-    await umbracoUi.content.clickLabelWithName(documentTypeName);
+    await umbracoUi.content.chooseDocumentType(documentTypeName);
     await umbracoUi.content.enterContentName(contentName);
     await umbracoUi.content.enterTextArea(contentText);
     await umbracoUi.content.clickSaveAndPublishButton();
@@ -86,7 +86,7 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
-    await umbracoUi.content.clickLabelWithName(documentTypeName);
+    await umbracoUi.content.chooseDocumentType(documentTypeName);
     await umbracoUi.content.enterContentName(contentName);
     await umbracoUi.content.changeFileTypeWithFileChooser('./fixtures/mediaLibrary/' + uploadFilePath);
     await umbracoUi.content.clickSaveAndPublishButton();
@@ -110,7 +110,7 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
-    await umbracoUi.content.clickLabelWithName(documentTypeName);
+    await umbracoUi.content.chooseDocumentType(documentTypeName);
     await umbracoUi.content.enterContentName(contentName);
     await umbracoUi.content.addTags(tagName);
     await umbracoUi.content.clickSaveAndPublishButton();
@@ -135,7 +135,7 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
-    await umbracoUi.content.clickLabelWithName(documentTypeName);
+    await umbracoUi.content.chooseDocumentType(documentTypeName);
     await umbracoUi.content.enterContentName(contentName);
     await umbracoUi.content.addContentPicker(contentPickerName);
     await umbracoUi.content.clickSaveAndPublishButton();
@@ -164,7 +164,7 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
-    await umbracoUi.content.clickLabelWithName(documentTypeName);
+    await umbracoUi.content.chooseDocumentType(documentTypeName);
     await umbracoUi.content.enterContentName(contentName);
     // TODO: add step to interact with the list
     await umbracoUi.content.clickSaveAndPublishButton();

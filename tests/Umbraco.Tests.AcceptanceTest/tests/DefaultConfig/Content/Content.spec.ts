@@ -29,7 +29,7 @@ test.describe('Content tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
-    await umbracoUi.content.clickLabelWithName(documentTypeName);
+    await umbracoUi.content.chooseDocumentType(documentTypeName);
     await umbracoUi.content.enterContentName(contentName);
     await umbracoUi.content.clickSaveButton();
 
@@ -50,7 +50,7 @@ test.describe('Content tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
-    await umbracoUi.content.clickLabelWithName(documentTypeName);
+    await umbracoUi.content.chooseDocumentType(documentTypeName);
     await umbracoUi.content.enterContentName(contentName);
     await umbracoUi.content.clickSaveAndPublishButton();
 
@@ -71,7 +71,7 @@ test.describe('Content tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
-    await umbracoUi.content.clickLabelWithName(documentTypeName);
+    await umbracoUi.content.chooseDocumentType(documentTypeName);
     await umbracoUi.content.enterContentName(contentName);
     await umbracoUi.content.enterTextstring(contentText);
     await umbracoUi.content.clickSaveButton();
