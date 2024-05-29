@@ -68,6 +68,8 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	}
 
 	render() {
+		const aliasLabel = this.localize.term('placeholders_enterAlias');
+
 		return html`
 			<uui-input
 				id="name"
@@ -79,10 +81,10 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 				<uui-input
 					name="alias"
 					slot="append"
-					label="alias"
+					label=${aliasLabel}
 					@input=${this.#onAliasChange}
 					.value=${this.alias}
-					placeholder=${this.localize.term('placeholders_enterAlias')}
+					placeholder=${aliasLabel}
 					?disabled=${this._aliasLocked && !this.aliasReadonly}
 					?readonly=${this.aliasReadonly}>
 					<!-- TODO: validation for bad characters -->
