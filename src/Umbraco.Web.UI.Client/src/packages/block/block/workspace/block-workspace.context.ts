@@ -143,24 +143,26 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 				// Content:
 				const contentUdi = layoutData?.contentUdi;
-				if (contentUdi) {
+				if (!contentUdi) {
+					return;
+				}
+
+				this.observe(
+					this.#blockManager!.contentOf(contentUdi),
+					(contentData) => {
+						this.content.setData(contentData);
+					},
+					'observeContent',
+				);
+				if (!this.#initialContent) {
 					this.observe(
 						this.#blockManager!.contentOf(contentUdi),
 						(contentData) => {
-							this.content.setData(contentData);
+							this.#initialContent ??= contentData;
+							this.removeUmbControllerByAlias('observeContentInitially');
 						},
-						'observeContent',
+						'observeContentInitially',
 					);
-					if (!this.#initialContent) {
-						this.observe(
-							this.#blockManager!.contentOf(contentUdi),
-							(contentData) => {
-								this.#initialContent ??= contentData;
-								this.removeUmbControllerByAlias('observeContentInitially');
-							},
-							'observeContentInitially',
-						);
-					}
 				}
 
 				// Settings:
@@ -175,8 +177,17 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					);
 					if (!this.#initialSettings) {
 						this.observe(
-							this.#blockManager!.contentOf(settingsUdi),
+							this.#blockManager!.settingsOf(settingsUdi),
 							(settingsData) => {
+								// Check for if settings data is based on the elementTypeKey as configuration:
+								const blockType = this.#blockManager!.getBlockTypeOf(contentUdi);
+								if (!blockType) {
+									throw new Error('Block type not found');
+								}
+								if (settingsData?.contentTypeKey !== blockType.settingsElementTypeKey) {
+									throw new Error('Settings contentTypeKey does not match the configured settings element type key');
+								}
+
 								this.#initialSettings ??= settingsData;
 								this.removeUmbControllerByAlias('observeSettingsInitially');
 							},
