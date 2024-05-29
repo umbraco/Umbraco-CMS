@@ -198,11 +198,12 @@ for (const listViewType of listViewTypes) {
       const expectedDataTypeValues = {
         "alias": "bulkActionPermissions",
         "value": {
-          "allowBulkPublish": true,
-          "allowBulkUnpublish": true,
-          "allowBulkCopy": true,
-          "allowBulkDelete": true
-        },
+          "allowBulkCopy": false, 
+          "allowBulkDelete": true, 
+          "allowBulkMove": false, 
+          "allowBulkPublish": false, 
+          "allowBulkUnpublish": false
+        }
       };
 
       // Act
@@ -269,7 +270,8 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test('can enable edit in infinite editor', async ({umbracoApi, umbracoUi}) => {
+    // Skip this test as there are no setting for infinite editor
+    test.skip('can enable edit in infinite editor', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const expectedDataTypeValues = {
         "alias": "useInfiniteEditor",
