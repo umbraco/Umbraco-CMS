@@ -1,69 +1,22 @@
-// TODO: figure out how to automatically generate this list of module paths
-const modulePathIdentifiers = [
-	'/core/action/',
-	'/core/audit-log/',
-	'/core/auth/',
-	'/core/collection/',
-	'/core/components/',
-	'/core/content-type/',
-	'/core/content/',
-	'/core/culture/',
-	'/core/debug/',
-	'/core/entity-action/',
-	'/core/entity-bulk-action/',
-	'/core/entity/',
-	'/core/event/',
-	'/core/extension-registry/',
-	'/core/icon-registry/',
-	'/core/id/',
-	'/core/lit-element/',
-	'/core/localization/',
-	'/core/menu/',
-	'/core/modal/',
-	'/core/models/',
-	'/core/notification/',
-	'/core/picker-input/',
-	'/core/property/',
-	'/core/property-editor/',
-	'/core/recycle-bin/',
-	'/core/repository/',
-	'/core/resources/',
-	'/core/router/',
-	'/core/section/',
-	'/core/server-file-system/',
-	'/core/settings/',
-	'/core/sorter/',
-	'/core/store/',
-	'/core/style/',
-	'/core/temporary-file/',
-	'/core/themes/',
-	'/core/tree/',
-	'/core/utils/',
-	'/core/validation/',
-	'/core/variant/',
-	'/core/workspace/',
-	'/class-api/',
-	'/context-api/',
-	'/controller-api/',
-	'/element-api/',
-	'/extension-api/',
-	'/formatting-api/',
-	'/localization-api/',
-	'/observable-api/',
-	'/backend-api/',
-	'/base64-js/',
-	'/diff/',
-	'/dompurify/',
-	'/lit/',
-	'/marked/',
-	'/monaco-editor/',
-	'/openid/',
-	'/router-slot/',
-	'/rxjs/',
-	'/tinymce/',
-	'/uui/',
-	'/uuid/',
-];
+const fs = require('fs');
+const path = require('path');
+
+const getDirectories = (source) =>
+	fs
+		.readdirSync(source, { withFileTypes: true })
+		.filter((dirent) => dirent.isDirectory())
+		.map((dirent) => dirent.name);
+
+// TODO: get the correct list of modules. This is a temporary solution where we assume that a directory is equivalent to a module
+// TODO: include package modules in this list
+const coreRoot = path.join(__dirname, '../../../', 'src/packages/core');
+const externalRoot = path.join(__dirname, '../../../', 'src/external');
+const libsRoot = path.join(__dirname, '../../../', 'src/libs');
+const coreModules = getDirectories(coreRoot).map((dir) => `/core/${dir}/`);
+const externalModules = getDirectories(externalRoot).map((dir) => `/${dir}/`);
+const libsModules = getDirectories(libsRoot).map((dir) => `/${dir}/`);
+
+const modulePathIdentifiers = [...coreModules, ...externalModules, ...libsModules];
 
 /** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
