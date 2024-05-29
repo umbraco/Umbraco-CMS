@@ -1,13 +1,13 @@
 import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
-import { UMB_BLOCK_WORKSPACE_MODAL } from '../workspace/block-workspace.modal-token.js';
-import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
+import type { UmbBlockWorkspaceData } from '../workspace/block-workspace.modal-token.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
+import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
+import { type Observable, UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { type Observable, UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 export abstract class UmbBlockEntriesContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType, BlockManagerContextType>,
@@ -21,13 +21,11 @@ export abstract class UmbBlockEntriesContext<
 	_manager?: BlockManagerContextType;
 	_retrieveManager;
 
-	_workspaceModal: UmbModalRouteRegistrationController;
-
 	protected _catalogueRouteBuilderState = new UmbBasicState<UmbModalRouteBuilder | undefined>(undefined);
 	readonly catalogueRouteBuilder = this._catalogueRouteBuilderState.asObservable();
 
-	#workspacePath = new UmbStringState(undefined);
-	workspacePath = this.#workspacePath.asObservable();
+	protected _workspacePath = new UmbStringState(undefined);
+	workspacePath = this._workspacePath.asObservable();
 
 	public abstract readonly canCreate: Observable<boolean>;
 
@@ -42,34 +40,7 @@ export abstract class UmbBlockEntriesContext<
 		this._retrieveManager = this.consumeContext(blockManagerContextToken, (blockGridManager) => {
 			this._manager = blockGridManager;
 			this._gotBlockManager();
-
-			this.observe(
-				this._manager.propertyAlias,
-				(alias) => {
-					this._workspaceModal.setUniquePathValue('propertyAlias', alias);
-				},
-				'observePropertyAlias',
-			);
-			this.observe(
-				this._manager.variantId,
-				(variantId) => {
-					// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense?
-					this._workspaceModal.setUniquePathValue('variantId', variantId?.toString());
-				},
-				'observePropertyVariantId',
-			);
 		}).asPromise();
-
-		this._workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
-			.addUniquePaths(['propertyAlias', 'variantId'])
-			.addAdditionalPath('block')
-			.onSetup(() => {
-				return { data: { entityType: 'block', preset: {} }, modal: { size: 'medium' } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				const newPath = routeBuilder({});
-				this.#workspacePath.setValue(newPath);
-			});
 	}
 
 	async getManager() {
@@ -100,14 +71,14 @@ export abstract class UmbBlockEntriesContext<
 	public abstract create(
 		contentElementTypeKey: string,
 		layoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
-		modalData?: typeof UMB_BLOCK_WORKSPACE_MODAL.DATA,
+		modalData?: UmbBlockWorkspaceData,
 	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
 
 	abstract insert(
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
-		modalData: typeof UMB_BLOCK_WORKSPACE_MODAL.DATA,
+		modalData: UmbBlockWorkspaceData,
 	): Promise<boolean>;
 	//edit?
 	//editSettings
