@@ -4,6 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { setStoredPath } from '@umbraco-cms/backoffice/utils';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
@@ -64,6 +65,14 @@ export class UmbAppAuthController extends UmbControllerBase {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
+
+		// Save the current state
+		let currentUrl = window.location.href;
+		const searchParams = new URLSearchParams(window.location.search);
+		if (searchParams.has('returnPath')) {
+			currentUrl = decodeURIComponent(searchParams.get('returnPath') || currentUrl);
+		}
+		setStoredPath(currentUrl);
 
 		// Figure out which providers are available
 		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders(umbExtensionsRegistry));

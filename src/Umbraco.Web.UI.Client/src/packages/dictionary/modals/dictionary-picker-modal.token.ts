@@ -1,8 +1,8 @@
-import type { UmbTreeItemModel } from '../../core/tree/types.js';
-import { UmbModalToken } from '../../core/modal/token/modal-token.js';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import {
 	type UmbTreePickerModalValue,
 	type UmbTreePickerModalData,
+	type UmbTreeItemModel,
 	UMB_TREE_PICKER_MODAL_ALIAS,
 } from '@umbraco-cms/backoffice/tree';
 

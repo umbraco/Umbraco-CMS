@@ -6,3 +6,6 @@ export * from './router-slot-change.event.js';
 export * from './router-slot-init.event.js';
 export * from './router-slot.element.js';
 export * from './path-pattern.class.js';
+export * from './modal-registration/modal-route-registration.interface.js';
+export * from './modal-registration/modal-route-registration.controller.js';
+export * from './types.js';

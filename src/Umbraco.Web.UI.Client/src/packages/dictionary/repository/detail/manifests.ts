@@ -1,23 +1,18 @@
-import { UmbDictionaryDetailRepository } from './dictionary-detail.repository.js';
-import { UmbDictionaryDetailStore } from './dictionary-detail.store.js';
+import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, UMB_DICTIONARY_DETAIL_STORE_ALIAS } from './constants.js';
 import type { ManifestRepository, ManifestStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.Dictionary.Detail';
 
 const repository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
 	name: 'Dictionary Detail Repository',
-	api: UmbDictionaryDetailRepository,
+	api: () => import('./dictionary-detail.repository.js'),
 };
-
-export const UMB_DICTIONARY_DETAIL_STORE_ALIAS = 'Umb.Store.Dictionary.Detail';
 
 const store: ManifestStore = {
 	type: 'store',
 	alias: UMB_DICTIONARY_DETAIL_STORE_ALIAS,
 	name: 'Dictionary Detail Store',
-	api: UmbDictionaryDetailStore,
+	api: () => import('./dictionary-detail.store.js'),
 };
 
 export const manifests: Array<ManifestTypes> = [repository, store];

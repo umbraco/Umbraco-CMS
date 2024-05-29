@@ -64,10 +64,10 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 			unique: '',
 			dataTypeId: '',
 			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
+			layouts: config?.getValueByAlias('layouts'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
 			pageSize: Number(config?.getValueByAlias('pageSize')) ?? 50,
-			useInfiniteEditor: config?.getValueByAlias('useInfiniteEditor') ?? false,
 			userDefinedProperties: config?.getValueByAlias('includeProperties'),
 		};
 	}

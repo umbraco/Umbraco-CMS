@@ -13,7 +13,7 @@ export const handlers = [
 		const userStates = req.url.searchParams.getAll('userStates');
 		const filter = req.url.searchParams.get('filter');
 
-		const options = {
+		const options: any = {
 			skip: skip || undefined,
 			take: take || undefined,
 			orderBy: orderBy || undefined,

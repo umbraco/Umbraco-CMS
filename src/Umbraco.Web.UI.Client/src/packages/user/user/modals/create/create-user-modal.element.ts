@@ -4,6 +4,7 @@ import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-grou
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-create-user-modal')
 export class UmbCreateUserModalElement extends UmbModalBaseElement {
@@ -27,7 +28,9 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		const email = formData.get('email') as string;
 
 		const userGroupPicker = form.querySelector('#userGroups') as UmbUserGroupInputElement;
-		const userGroups = userGroupPicker?.selection;
+		const userGroupReferences: Array<UmbReferenceByUnique> = userGroupPicker?.selection.map((unique) => {
+			return { unique };
+		});
 
 		const { data: userScaffold } = await this.#userDetailRepository.createScaffold();
 		if (!userScaffold) return;
@@ -35,7 +38,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		userScaffold.name = name;
 		userScaffold.email = email;
 		userScaffold.userName = email;
-		userScaffold.userGroupUniques = userGroups;
+		userScaffold.userGroupUniques = userGroupReferences;
 
 		// TODO: figure out when to use email or username
 		const { data } = await this.#userDetailRepository.create(userScaffold);

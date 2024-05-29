@@ -23,8 +23,6 @@ export class UmbMediaCollectionRepository extends UmbRepositoryBase implements U
 	async requestCollection(query: UmbMediaCollectionFilterModel) {
 		return this.#collectionSource.getCollection(query);
 	}
-
-	destroy(): void {}
 }
 
 export default UmbMediaCollectionRepository;

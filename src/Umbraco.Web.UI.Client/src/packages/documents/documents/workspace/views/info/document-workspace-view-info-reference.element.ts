@@ -3,7 +3,8 @@ import { css, html, customElement, state, nothing, repeat, property } from '@umb
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import {
 	isDefaultReference,
 	isDocumentReference,

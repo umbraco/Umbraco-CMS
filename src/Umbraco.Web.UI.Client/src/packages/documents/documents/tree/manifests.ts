@@ -29,9 +29,10 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
-	kind: 'default',
 	alias: UMB_DOCUMENT_TREE_ALIAS,
 	name: 'Document Tree',
+	api: () => import('./document-tree.context.js'),
+	element: () => import('./document-tree.element.js'),
 	meta: {
 		repositoryAlias: UMB_DOCUMENT_TREE_REPOSITORY_ALIAS,
 	},
@@ -50,7 +51,7 @@ const rootTreeItem: ManifestTreeItem = {
 	type: 'treeItem',
 	kind: 'default',
 	alias: 'Umb.TreeItem.Document.Root',
-	name: 'Document Tree Item',
+	name: 'Document Tree Root',
 	forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE],
 };
 

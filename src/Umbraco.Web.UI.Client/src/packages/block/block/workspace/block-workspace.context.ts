@@ -242,7 +242,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#establishLiveSync() {
 		this.observe(this.layout, (layoutData) => {
 			if (layoutData) {
-				this.#blockEntries?.setOneLayout(layoutData);
+				this.#blockManager?.setOneLayout(layoutData, this.#modalContext?.data as UmbBlockWorkspaceData);
 			}
 		});
 		this.observe(this.content.data, (contentData) => {
@@ -324,7 +324,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			} else {
 				// Update data:
 
-				this.#blockEntries.setOneLayout(layoutData);
+				this.#blockManager.setOneLayout(layoutData, this.#modalContext.data as UmbBlockWorkspaceData);
 				if (contentData) {
 					this.#blockManager.setOneContent(contentData);
 				}
@@ -350,7 +350,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			} else {
 				// TODO: Revert the layout, content & settings data to the original state.
 				if (this.#initialLayout) {
-					this.#blockEntries?.setOneLayout(this.#initialLayout);
+					this.#blockManager?.setOneLayout(this.#initialLayout, this.#modalContext?.data as UmbBlockWorkspaceData);
 				}
 				if (this.#initialContent) {
 					this.#blockManager?.setOneContent(this.#initialContent);

@@ -10,6 +10,7 @@ const collectionManifest: ManifestCollection = {
 	kind: 'default',
 	alias: UMB_RELATION_TYPE_COLLECTION_ALIAS,
 	name: 'Relation Type Collection',
+	element: () => import('./relation-type-collection.element.js'),
 	meta: {
 		repositoryAlias: UMB_RELATION_TYPE_COLLECTION_REPOSITORY_ALIAS,
 	},

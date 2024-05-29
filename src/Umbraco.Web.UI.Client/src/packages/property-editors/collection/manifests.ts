@@ -38,7 +38,7 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 					alias: 'pageSize',
 					label: 'Page Size',
 					description: 'Number of items per page.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 					config: [{ alias: 'min', value: 0 }],
 				},
 				{
@@ -63,12 +63,6 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 					alias: 'showContentFirst',
 					label: 'Show Content App First',
 					description: 'Enable this to show the content app by default instead of the list view app.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-				},
-				{
-					alias: 'useInfiniteEditor',
-					label: 'Edit in Infinite Editor',
-					description: 'Enable this to use infinite editing to edit the content of the list view.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
@@ -101,26 +95,11 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 	},
 };
 
-/**
- * Legacy property editor UI manifest for the collection view property editor.
- * @deprecated Use the property editor UI alias of 'Umb.PropertyEditorUi.Collection' instead.
- */
-const legacyPropertyEditorUiManifest: ManifestPropertyEditorUi = {
-	...propertyEditorUiManifest,
-	alias: 'Umb.PropertyEditorUi.CollectionView',
-	element: () => import('./legacy-property-editor-ui-collection.element.js'),
-};
-
-const config: Array<ManifestPropertyEditorUi> = [
+export const manifests: Array<ManifestTypes> = [
+	propertyEditorUiManifest,
 	bulkActionPermissions,
 	columnConfiguration,
 	layoutConfiguration,
 	orderBy,
-];
-
-export const manifests: Array<ManifestTypes> = [
-	propertyEditorUiManifest,
-	legacyPropertyEditorUiManifest,
-	...config,
 	schema,
 ];

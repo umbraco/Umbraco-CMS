@@ -6,12 +6,8 @@ import type { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from '@umbraco-cms
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import {
-	sizeImageInEditor,
-	uploadBlobImages,
-	UMB_MEDIA_TREE_PICKER_MODAL,
-	UMB_MEDIA_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/media';
+import { sizeImageInEditor, uploadBlobImages, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/media';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -38,6 +34,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+		const localize = new UmbLocalizationController(args.host);
 
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(args.host);
 
@@ -54,7 +51,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 		this.editor.ui.registry.addToggleButton('umbmediapicker', {
 			icon: 'image',
-			tooltip: 'Media Picker',
+			tooltip: localize.term('general_mediaPicker'),
 			onAction: () => this.#onAction(),
 			onSetup: (api) => {
 				const changed = this.editor.selection.selectorChangedWithUnbind('img[data-udi]', (state) =>

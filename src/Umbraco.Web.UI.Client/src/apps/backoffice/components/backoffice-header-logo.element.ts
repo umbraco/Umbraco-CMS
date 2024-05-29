@@ -44,6 +44,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			#logo {
+				display: var(--umb-header-logo-display, inline);
 				--uui-button-padding-top-factor: 1;
 				--uui-button-padding-bottom-factor: 0.5;
 				margin-right: var(--uui-size-space-2);
@@ -61,6 +62,7 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 				flex-direction: column;
 				align-items: center;
 				gap: var(--uui-size-space-3);
+				min-width: var(--uui-size-100);
 			}
 		`,
 	];

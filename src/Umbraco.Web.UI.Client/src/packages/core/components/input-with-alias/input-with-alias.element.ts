@@ -70,7 +70,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string>(UmbLit
 	render() {
 		// Localizations: [NL]
 		return html`
-			<uui-input id="name" label=${this.label} .value=${this.value} @input="${this.#onNameChange}">
+			<uui-input id="name" placeholder="Enter a name..." label=${this.label} .value=${this.value} @input="${this.#onNameChange}">
 				<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 				<uui-input
 					name="alias"

@@ -1,7 +1,7 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
-import { UMB_DEFAULT_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/default-tree.context.js';
+import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
-import { UmbRequestReloadTreeItemChildrenEvent } from '../../reload-tree-item-children/index.js';
+import { UmbRequestReloadTreeItemChildrenEvent } from '../../entity-actions/reload-tree-item-children/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
@@ -12,7 +12,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbPaginationManager, debounce } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -172,6 +175,7 @@ export abstract class UmbTreeItemContextBase<
 
 		const skip = loadMore ? this.#paging.skip : 0;
 		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
+		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
 		const { data } = await repository.requestTreeItemsOf({
 			parent: {
@@ -180,6 +184,7 @@ export abstract class UmbTreeItemContextBase<
 			},
 			skip,
 			take,
+			...additionalArgs,
 		});
 
 		if (data) {
@@ -229,7 +234,7 @@ export abstract class UmbTreeItemContextBase<
 			this.#sectionSidebarContext = instance;
 		});
 
-		this.consumeContext(UMB_DEFAULT_TREE_CONTEXT, (treeContext) => {
+		this.consumeContext(UMB_TREE_CONTEXT, (treeContext) => {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			this.treeContext = treeContext;
@@ -244,6 +249,11 @@ export abstract class UmbTreeItemContextBase<
 			);
 
 			this.#actionEventContext?.removeEventListener(
+				UmbRequestReloadChildrenOfEntityEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+
+			this.#actionEventContext?.removeEventListener(
 				UmbRequestReloadStructureForEntityEvent.TYPE,
 				this.#onReloadStructureRequest as unknown as EventListener,
 			);
@@ -252,6 +262,11 @@ export abstract class UmbTreeItemContextBase<
 
 			this.#actionEventContext.addEventListener(
 				UmbRequestReloadTreeItemChildrenEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+
+			this.#actionEventContext.addEventListener(
+				UmbRequestReloadChildrenOfEntityEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 
@@ -339,9 +354,8 @@ export abstract class UmbTreeItemContextBase<
 		It does not look like there is a way to have a "dynamic" parent context that will stop when a
 		specific parent is reached (a tree item unique that matches the parentUnique of this item) */
 		const treeItem = this.getTreeItem();
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		const parentUnique = treeItem?.parentUnique;
+		const parentUnique = treeItem?.parent.unique;
+
 		const customEvent = new CustomEvent('temp-reload-tree-item-parent', {
 			detail: { unique: parentUnique },
 			bubbles: true,
@@ -383,6 +397,12 @@ export abstract class UmbTreeItemContextBase<
 			UmbRequestReloadTreeItemChildrenEvent.TYPE,
 			this.#onReloadRequest as EventListener,
 		);
+
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadChildrenOfEntityEvent.TYPE,
+			this.#onReloadRequest as EventListener,
+		);
+
 		this.#actionEventContext?.removeEventListener(
 			UmbRequestReloadStructureForEntityEvent.TYPE,
 			this.#onReloadStructureRequest as unknown as EventListener,

@@ -11,7 +11,7 @@ import {
 	UMB_PROPERTY_TYPE_SETTINGS_MODAL,
 } from '@umbraco-cms/backoffice/content-type';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeDesignEditorPropertyElement> = {
 	getUniqueOfElement: (element) => {

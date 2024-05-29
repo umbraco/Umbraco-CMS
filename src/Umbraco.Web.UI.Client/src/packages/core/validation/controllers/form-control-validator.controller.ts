@@ -7,7 +7,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbFormControlValidator extends UmbControllerBase implements UmbValidator {
-	// The path to the data that this validator is validating. Public so the ValidationContext can access it.
+	// The path to the data that this validator is validating.
 	readonly #dataPath?: string;
 
 	#context?: typeof UMB_VALIDATION_CONTEXT.TYPE;

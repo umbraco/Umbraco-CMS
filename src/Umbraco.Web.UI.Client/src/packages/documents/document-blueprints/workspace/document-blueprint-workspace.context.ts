@@ -1,4 +1,4 @@
-import { UmbDocumentBlueprintPropertyDataContext } from '../property-dataset-context/document-blueprint-property-dataset-context.js';
+import { UmbDocumentBlueprintPropertyDatasetContext } from '../property-dataset-context/document-blueprint-property-dataset-context.js';
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentBlueprintDetailRepository } from '../repository/index.js';
 import type {
@@ -25,8 +25,10 @@ import {
 	UmbDocumentTypeDetailRepository,
 } from '@umbraco-cms/backoffice/document-type';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
-import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -73,9 +75,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
-	//#variesByCulture?: boolean;
 	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
-	//#variesBySegment?: boolean;
 	readonly varies = this.structure.ownerContentTypePart((x) =>
 		x ? x.variesByCulture || x.variesBySegment : undefined,
 	);
@@ -247,14 +247,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
-		// const oldVariants = this.#currentData.getValue()?.variants || [];
-		// const variants = partialUpdateFrozenArray(
-		// 	oldVariants,
-		// 	{ name },
-		// 	variantId ? (x) => variantId.compare(x) : () => true,
-		// );
-		// this.#currentData.update({ variants });
-
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
@@ -309,6 +301,25 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 			// TODO: We should move this type of logic to the act of saving [NL]
 			this.#updateVariantData(variantId);
+		}
+	}
+
+	#updateLock = 0;
+	initiatePropertyValueChange() {
+		this.#updateLock++;
+		this.#currentData.mute();
+		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
+		/*return {
+			[Symbol.dispose]: this.finishPropertyValueChange,
+		};*/
+	}
+	finishPropertyValueChange = () => {
+		this.#updateLock--;
+		this.#triggerPropertyValueChanges();
+	};
+	#triggerPropertyValueChanges() {
+		if (this.#updateLock === 0) {
+			this.#currentData.unmute();
 		}
 	}
 
@@ -398,7 +409,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 
 				// TODO: this might not be the right place to alert the tree, but it works for now
 				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-				const event = new UmbRequestReloadTreeItemChildrenEvent({
+				const event = new UmbRequestReloadChildrenOfEntityEvent({
 					entityType: parent.entityType,
 					unique: parent.unique,
 				});
@@ -430,8 +441,11 @@ export class UmbDocumentBlueprintWorkspaceContext
 		}
 	}
 
-	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbDocumentBlueprintPropertyDataContext(host, this, variantId);
+	public createPropertyDatasetContext(
+		host: UmbControllerHost,
+		variantId: UmbVariantId,
+	): UmbDocumentBlueprintPropertyDatasetContext {
+		return new UmbDocumentBlueprintPropertyDatasetContext(host, this, variantId);
 	}
 
 	public destroy(): void {

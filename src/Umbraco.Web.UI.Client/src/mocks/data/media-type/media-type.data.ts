@@ -96,5 +96,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		isFolder: false,
 		hasChildren: false,
 		collection: { id: 'dt-collectionView' },
+		isDeletable: false,
+		aliasCanBeChanged: false,
 	},
 ];

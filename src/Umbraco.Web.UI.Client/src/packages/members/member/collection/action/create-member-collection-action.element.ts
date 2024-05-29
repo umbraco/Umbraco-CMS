@@ -15,7 +15,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		//TODO: Should we use the tree repository or make a collection repository?
 		//TODO: And how would we get all the member types?
 		//TODO: This only works because member types can't have folders.
-		const { data } = await this.#memberTypeTreeRepository.requestRootTreeItems({});
+		const { data } = await this.#memberTypeTreeRepository.requestTreeRootItems({});
 		if (!data) return;
 
 		this._options = data.items.map((item) => {
@@ -63,7 +63,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-button
-				label="Create"
+				label=${this.localize.term('general_create')}
 				@click=${this.#onButtonClick}
 				look="outline"
 				popovertarget="create-popover"></uui-button>

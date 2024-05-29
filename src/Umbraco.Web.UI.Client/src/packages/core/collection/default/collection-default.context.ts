@@ -6,23 +6,31 @@ import type {
 	UmbCollectionContext,
 	UmbCollectionLayoutConfiguration,
 } from '../types.js';
+import type { UmbCollectionFilterModel } from '../collection-filter-model.interface.js';
+import type { UmbCollectionRepository } from '../repository/collection-repository.interface.js';
+import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import type { ManifestCollection, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbCollectionFilterModel, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
+import type { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 
 const LOCAL_STORAGE_KEY = 'umb-collection-view';
 
 export class UmbDefaultCollectionContext<
-		CollectionItemType = any,
-		FilterModelType extends UmbCollectionFilterModel = any,
+		CollectionItemType extends { entityType: string; unique: string } = any,
+		FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
 	>
 	extends UmbContextBase<UmbDefaultCollectionContext>
 	implements UmbCollectionContext, UmbApi
@@ -34,7 +42,7 @@ export class UmbDefaultCollectionContext<
 	#loading = new UmbObjectState<boolean>(false);
 	public readonly loading = this.#loading.asObservable();
 
-	#items = new UmbArrayState<CollectionItemType>([], (x) => x);
+	#items = new UmbArrayState<CollectionItemType>([], (x) => x.unique);
 	public readonly items = this.#items.asObservable();
 
 	#totalItems = new UmbNumberState(0);
@@ -63,6 +71,8 @@ export class UmbDefaultCollectionContext<
 		this.#initialized ? resolve() : (this.#initResolver = resolve);
 	});
 
+	#actionEventContext: UmbActionEventContext | undefined;
+
 	constructor(host: UmbControllerHost, defaultViewAlias: string, defaultFilter: Partial<FilterModelType> = {}) {
 		super(host, UMB_COLLECTION_CONTEXT);
 
@@ -70,6 +80,33 @@ export class UmbDefaultCollectionContext<
 		this.#defaultFilter = defaultFilter;
 
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
+		this.#listenToEntityEvents();
+	}
+
+	async #listenToEntityEvents() {
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
+			this.#actionEventContext = context;
+
+			context?.removeEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadStructureRequest as unknown as EventListener,
+			);
+
+			context?.removeEventListener(
+				UmbRequestReloadChildrenOfEntityEvent.TYPE,
+				this.#onReloadChildrenRequest as unknown as EventListener,
+			);
+
+			context?.addEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadStructureRequest as unknown as EventListener,
+			);
+
+			context?.addEventListener(
+				UmbRequestReloadChildrenOfEntityEvent.TYPE,
+				this.#onReloadChildrenRequest as unknown as EventListener,
+			);
+		});
 	}
 
 	#configured = false;
@@ -83,11 +120,13 @@ export class UmbDefaultCollectionContext<
 			this.pagination.setPageSize(this.#config.pageSize);
 		}
 
+		const filterValue = this.#filter.getValue() as FilterModelType;
+
 		this.#filter.setValue({
 			...this.#defaultFilter,
 			...this.#config,
-			...this.#filter.getValue(),
-			skip: 0,
+			...filterValue,
+			skip: filterValue.skip ?? 0,
 			take: this.#config.pageSize,
 		});
 
@@ -113,7 +152,9 @@ export class UmbDefaultCollectionContext<
 		}
 	}
 
-	#observeRepository(repositoryAlias: string) {
+	#observeRepository(repositoryAlias?: string) {
+		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
+
 		new UmbExtensionApiInitializer<ManifestRepository<UmbCollectionRepository>>(
 			this,
 			umbExtensionsRegistry,
@@ -145,25 +186,12 @@ export class UmbDefaultCollectionContext<
 		return this.#config;
 	}
 
-	/**
-	 * Sets the manifest for the collection.
-	 * @param {ManifestCollection} manifest
-	 * @memberof UmbCollectionContext
-	 */
-	public setManifest(manifest: ManifestCollection | undefined) {
+	public set manifest(manifest: ManifestCollection | undefined) {
 		if (this.#manifest === manifest) return;
 		this.#manifest = manifest;
-
-		if (!this.#manifest) return;
-		this.#observeRepository(this.#manifest.meta.repositoryAlias);
+		this.#observeRepository(this.#manifest?.meta.repositoryAlias);
 	}
-
-	/**
-	 * Returns the manifest for the collection.
-	 * @return {ManifestCollection}
-	 * @memberof UmbCollectionContext
-	 */
-	public getManifest() {
+	public get manifest() {
 		return this.#manifest;
 	}
 
@@ -222,11 +250,61 @@ export class UmbDefaultCollectionContext<
 
 		localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(layouts));
 	}
+
+	#onReloadStructureRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
+		const items = this.#items.getValue();
+		const hasItem = items.some((item) => item.unique === event.getUnique());
+		if (hasItem) {
+			this.requestCollection();
+		}
+	};
+
+	#onReloadChildrenRequest = async (event: UmbRequestReloadChildrenOfEntityEvent) => {
+		// check if the collection is in the same context as the entity from the event
+		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
+		const unique = entityContext.getUnique();
+		const entityType = entityContext.getEntityType();
+
+		if (unique === event.getUnique() && entityType === event.getEntityType()) {
+			this.requestCollection();
+		}
+	};
+
+	destroy(): void {
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureRequest as unknown as EventListener,
+		);
+
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadChildrenOfEntityEvent.TYPE,
+			this.#onReloadChildrenRequest as unknown as EventListener,
+		);
+
+		super.destroy();
+	}
+
+	/**
+	 * Sets the manifest for the collection.
+	 * @param {ManifestCollection} manifest
+	 * @memberof UmbCollectionContext
+	 * @deprecated Use set the `.manifest` property instead.
+	 */
+	public setManifest(manifest: ManifestCollection | undefined) {
+		if (this.#manifest === manifest) return;
+		this.#manifest = manifest;
+
+		if (!this.#manifest) return;
+		this.#observeRepository(this.#manifest.meta.repositoryAlias);
+	}
+
+	/**
+	 * Returns the manifest for the collection.
+	 * @return {ManifestCollection}
+	 * @memberof UmbCollectionContext
+	 * @deprecated Use get the `.manifest` property instead.
+	 */
+	public getManifest() {
+		return this.#manifest;
+	}
 }
-
-export const UMB_COLLECTION_CONTEXT = new UmbContextToken<UmbDefaultCollectionContext>('UmbCollectionContext');
-
-/**
- * @deprecated Use UMB_COLLECTION_CONTEXT instead.
- */
-export { UMB_COLLECTION_CONTEXT as UMB_DEFAULT_COLLECTION_CONTEXT };

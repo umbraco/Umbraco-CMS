@@ -26,6 +26,10 @@ export abstract class UmbBlockManagerContext<
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 > extends UmbContextBase<UmbBlockManagerContext> {
 	//
+	get contentTypesLoaded() {
+		return Promise.all(this.#contentTypeRequests);
+	}
+	#contentTypeRequests: Array<Promise<unknown>> = [];
 	#contentTypeRepository = new UmbDocumentTypeDetailRepository(this);
 
 	#propertyAlias = new UmbStringState(undefined);
@@ -63,6 +67,9 @@ export abstract class UmbBlockManagerContext<
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
 		this._editorConfiguration.setValue(configs);
+	}
+	getEditorConfiguration(): UmbPropertyEditorConfigCollection | undefined {
+		return this._editorConfiguration.getValue();
 	}
 
 	setBlockTypes(blockTypes: Array<BlockType>) {
@@ -115,7 +122,9 @@ export abstract class UmbBlockManagerContext<
 	async #ensureContentType(unique: string) {
 		if (this.#contentTypes.getValue().find((x) => x.unique === unique)) return;
 
-		const { data } = await this.#contentTypeRepository.requestByUnique(unique);
+		const contentTypeRequest = this.#contentTypeRepository.requestByUnique(unique);
+		this.#contentTypeRequests.push(contentTypeRequest);
+		const { data } = await contentTypeRequest;
 		if (!data) {
 			this.#contentTypes.removeOne(unique);
 			return;
@@ -131,6 +140,9 @@ export abstract class UmbBlockManagerContext<
 	}
 	contentTypeNameOf(contentTypeKey: string) {
 		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeKey)?.name);
+	}
+	getContentTypeNameOf(contentTypeKey: string) {
+		return this.#contentTypes.getValue().find((x) => x.unique === contentTypeKey)?.name;
 	}
 	blockTypeOf(contentTypeKey: string) {
 		return this.#blockTypes.asObservablePart((source) =>
@@ -155,9 +167,9 @@ export abstract class UmbBlockManagerContext<
 		return this.#contents.value.find((x) => x.udi === contentUdi);
 	}
 
-	/*setOneLayout(layoutData: BlockLayoutType) {
-		return this._layouts.appendOne(layoutData);
-	}*/
+	setOneLayout(layoutData: BlockLayoutType, modalData?: UmbBlockWorkspaceData) {
+		this._layouts.appendOne(layoutData);
+	}
 	setOneContent(contentData: UmbBlockDataType) {
 		this.#contents.appendOne(contentData);
 	}
@@ -178,10 +190,7 @@ export abstract class UmbBlockManagerContext<
 		modalData?: UmbBlockWorkspaceData,
 	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
 
-	protected createBlockData<ModalDataType extends UmbBlockWorkspaceData>(
-		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
-	) {
+	protected createBlockData(contentElementTypeKey: string, partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {

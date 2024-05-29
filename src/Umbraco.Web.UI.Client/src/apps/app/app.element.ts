@@ -18,6 +18,7 @@ import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { filter, first, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { hasOwnOpener, retrieveStoredPath } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -76,7 +77,7 @@ export class UmbAppElement extends UmbLitElement {
 				// The authorization request will be completed in the active window (main or popup) and the authorization signal will be sent.
 				// If we are in a popup window, the storage event in UmbAuthContext will catch the signal and close the window.
 				// If we are in the main window, the signal will be caught right here and the user will be redirected to the root.
-				if (window.opener) {
+				if (hasOwnOpener(this.backofficePath)) {
 					(component as UmbAppErrorElement).errorMessage = hasCode
 						? this.localize.term('errors_externalLoginSuccess')
 						: this.localize.term('errors_externalLoginFailed');
@@ -86,7 +87,15 @@ export class UmbAppElement extends UmbLitElement {
 						: this.localize.term('errors_externalLoginFailed');
 
 					this.observe(this.#authContext.authorizationSignal, () => {
-						history.replaceState(null, '', '');
+						// Redirect to the saved state or root
+						const url = retrieveStoredPath();
+						const isBackofficePath = url?.pathname.startsWith(this.backofficePath) ?? true;
+
+						if (isBackofficePath) {
+							history.replaceState(null, '', url?.toString() ?? '');
+						} else {
+							window.location.href = url?.toString() ?? this.backofficePath;
+						}
 					});
 				}
 
@@ -97,6 +106,11 @@ export class UmbAppElement extends UmbLitElement {
 		{
 			path: 'upgrade',
 			component: () => import('../upgrader/upgrader.element.js'),
+			guards: [this.#isAuthorizedGuard()],
+		},
+		{
+			path: 'preview',
+			component: () => import('../preview/preview.element.js'),
 			guards: [this.#isAuthorizedGuard()],
 		},
 		{
@@ -161,9 +175,13 @@ export class UmbAppElement extends UmbLitElement {
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
-			// If the runtime level is "install" we should clear any cached tokens
+			// If the runtime level is "install" or ?status=false is set, we should clear any cached tokens
 			// else we should try and set the auth status
-			if (this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL) {
+			const searchParams = new URLSearchParams(window.location.search);
+			if (
+				(searchParams.has('status') && searchParams.get('status') === 'false') ||
+				this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL
+			) {
 				await this.#authContext.clearTokenStorage();
 			} else {
 				await this.#setAuthStatus();
@@ -207,6 +225,7 @@ export class UmbAppElement extends UmbLitElement {
 		// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
 		OpenAPI.TOKEN = () => this.#authContext!.getLatestToken();
 		OpenAPI.WITH_CREDENTIALS = true;
+		OpenAPI.ENCODE_PATH = (path: string) => path;
 	}
 
 	#redirect() {

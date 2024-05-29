@@ -229,7 +229,10 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		return html`
 			<umb-property-layout label="Media">
 				<div slot="editor">
-					<umb-input-media .selection=${this._package.mediaIds ?? []} @change=${this.#onMediaChange}></umb-input-media>
+					<umb-input-media
+						multiple
+						.selection=${this._package.mediaIds ?? []}
+						@change=${this.#onMediaChange}></umb-input-media>
 					<uui-checkbox
 						label="Include child nodes"
 						.checked=${this._package.mediaLoadChildNodes ?? false}

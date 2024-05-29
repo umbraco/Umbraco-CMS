@@ -3,7 +3,7 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
@@ -16,13 +16,12 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const minMax = config.getValueByAlias<NumberRangeValueType>('validationLimit');
+		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		if (minMax) {
 			this._min = minMax.min && minMax.min > 0 ? minMax.min : 0;
-			this._max = minMax.max && minMax.max > 0 ? minMax.max : Infinity;
+			this._max = minMax.max && minMax.max > 0 ? minMax.max : 1;
 		}
 
-		this._ignoreUserStartNodes = config.getValueByAlias('ignoreUserStartNodes') ?? false;
 		this._startNodeId = config.getValueByAlias('startNodeId');
 		this._showOpenButton = config.getValueByAlias('showOpenButton') ?? false;
 	}
@@ -30,17 +29,16 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	@state()
 	private _min = 0;
 
+	// NOTE: The legacy "Content Picker" property-editor only supported 1 item,
+	// so that's why it's being enforced here. We'll evolve this in a future version. [LK]
 	@state()
-	private _max = Infinity;
+	private _max = 1;
 
 	@state()
 	private _startNodeId?: string;
 
 	@state()
 	private _showOpenButton?: boolean;
-
-	@state()
-	private _ignoreUserStartNodes?: boolean;
 
 	#onChange(event: CustomEvent & { target: UmbInputDocumentElement }) {
 		this.value = event.target.selection.join(',');
@@ -58,7 +56,6 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 				.max=${this._max}
 				.startNode=${startNode}
 				.value=${this.value ?? ''}
-				?ignoreUserStartNodes=${this._ignoreUserStartNodes}
 				?showOpenButton=${this._showOpenButton}
 				@change=${this.#onChange}>
 			</umb-input-document>

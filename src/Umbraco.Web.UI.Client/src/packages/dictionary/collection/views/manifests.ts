@@ -1,7 +1,6 @@
+import { UMB_DICTIONARY_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import type { ManifestCollectionView, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_DICTIONARY_TABLE_COLLECTION_VIEW_ALIAS = 'Umb.CollectionView.Dictionary.Table';
 
 const tableCollectionView: ManifestCollectionView = {
 	type: 'collectionView',

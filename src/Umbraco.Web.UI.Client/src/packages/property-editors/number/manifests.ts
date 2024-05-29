@@ -14,7 +14,14 @@ export const manifests: Array<ManifestTypes> = [
 			icon: 'icon-autofill',
 			group: 'common',
 			settings: {
-				properties: [],
+				properties: [
+					{
+						alias: 'placeholder',
+						label: 'Placeholder text',
+						description: 'Enter the text to be displayed when the value is empty',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+					},
+				],
 				defaultData: [
 					{
 						alias: 'step',
@@ -26,11 +33,11 @@ export const manifests: Array<ManifestTypes> = [
 	},
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.Number',
-		name: 'Number Property Editor UI',
+		alias: 'Umb.PropertyEditorUi.Integer',
+		name: 'Numeric Property Editor UI',
 		element: () => import('./property-editor-ui-number.element.js'),
 		meta: {
-			label: 'Number',
+			label: 'Numeric',
 			icon: 'icon-autofill',
 			group: 'common',
 			propertyEditorSchemaAlias: 'Umbraco.Integer',

@@ -16,14 +16,14 @@ export const themes: Array<ManifestGlobalContext | ManifestTheme> = [
 	{
 		type: 'theme',
 		alias: 'umb-dark-theme',
-		name: 'Dark',
+		name: 'Dark (Experimental)',
 		css: '/umbraco/backoffice/css/dark.theme.css',
 		weight: 200,
 	},
 	{
 		type: 'theme',
 		alias: 'umb-high-contrast-theme',
-		name: 'High contrast',
+		name: 'High contrast (Experimental)',
 		css: '/umbraco/backoffice/css/high-contrast.theme.css',
 		weight: 100,
 	},

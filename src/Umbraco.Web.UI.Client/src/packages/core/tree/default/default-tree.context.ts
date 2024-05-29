@@ -1,7 +1,9 @@
-import { UmbRequestReloadTreeItemChildrenEvent } from '../reload-tree-item-children/index.js';
+import { UmbRequestReloadTreeItemChildrenEvent } from '../entity-actions/reload-tree-item-children/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
+import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
+import { UMB_TREE_CONTEXT } from './default-tree.context-token.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	type ManifestRepository,
@@ -12,15 +14,24 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbPaginationManager, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
-import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	type UmbEntityActionEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRootType extends UmbTreeRootModel>
-	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType, TreeRootType>>
+export class UmbDefaultTreeContext<
+		TreeItemType extends UmbTreeItemModel,
+		TreeRootType extends UmbTreeRootModel,
+		RequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+	>
+	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType, TreeRootType, RequestArgsType>>
 	implements UmbTreeContext
 {
+	#additionalRequestArgs = new UmbObjectState<Partial<RequestArgsType> | object>({});
+	public readonly additionalRequestArgs = this.#additionalRequestArgs.asObservable();
+
 	#treeRoot = new UmbObjectState<TreeRootType | undefined>(undefined);
 	treeRoot = this.#treeRoot.asObservable();
 
@@ -57,7 +68,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 	constructor(host: UmbControllerHost) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		super(host, UMB_DEFAULT_TREE_CONTEXT);
+		super(host, UMB_TREE_CONTEXT);
 		this.pagination.setPageSize(this.#paging.take);
 		this.#consumeContexts();
 
@@ -136,7 +147,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 	public loadMore = () => this.#debouncedLoadTree(true);
 
 	#debouncedLoadTree(reload = false) {
-		if (this.getStartFrom()) {
+		if (this.getStartNode()) {
 			this.#loadRootItems(reload);
 			return;
 		}
@@ -166,10 +177,12 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
 
 		// If we have a start node get children of that instead of the root
-		const startNode = this.getStartFrom();
+		const startNode = this.getStartNode();
+		const additionalArgs = this.#additionalRequestArgs.getValue();
 
 		const { data } = startNode?.unique
 			? await this.#repository!.requestTreeItemsOf({
+					...additionalArgs,
 					parent: {
 						unique: startNode.unique,
 						entityType: startNode.entityType,
@@ -177,7 +190,8 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 					skip,
 					take,
 				})
-			: await this.#repository!.requestRootTreeItems({
+			: await this.#repository!.requestTreeRootItems({
+					...additionalArgs,
 					skip,
 					take,
 				});
@@ -220,7 +234,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 	 * @param {UmbTreeStartNode} startNode
 	 * @memberof UmbDefaultTreeContext
 	 */
-	setStartFrom(startNode: UmbTreeStartNode | undefined) {
+	setStartNode(startNode: UmbTreeStartNode | undefined) {
 		this.#startNode.setValue(startNode);
 		// we need to reset the tree if this config changes
 		this.#resetTree();
@@ -228,11 +242,24 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 	}
 
 	/**
+	 * Updates the requestArgs config and reloads the tree.
+	 */
+	public updateAdditionalRequestArgs(args: Partial<RequestArgsType>) {
+		this.#additionalRequestArgs.setValue({ ...this.#additionalRequestArgs.getValue(), ...args });
+		this.#resetTree();
+		this.loadTree();
+	}
+
+	public getAdditionalRequestArgs() {
+		return this.#additionalRequestArgs.getValue();
+	}
+
+	/**
 	 * Gets the startNode config
 	 * @return {UmbTreeStartNode}
 	 * @memberof UmbDefaultTreeContext
 	 */
-	getStartFrom() {
+	getStartNode() {
 		return this.#startNode.getValue();
 	}
 
@@ -245,12 +272,24 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 	#consumeContexts() {
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
 			this.#actionEventContext = instance;
+
 			this.#actionEventContext.removeEventListener(
 				UmbRequestReloadTreeItemChildrenEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
+
+			this.#actionEventContext.removeEventListener(
+				UmbRequestReloadChildrenOfEntityEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+
 			this.#actionEventContext.addEventListener(
 				UmbRequestReloadTreeItemChildrenEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+
+			this.#actionEventContext.addEventListener(
+				UmbRequestReloadChildrenOfEntityEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 		});
@@ -291,12 +330,14 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModel, TreeRo
 			UmbRequestReloadTreeItemChildrenEvent.TYPE,
 			this.#onReloadRequest as EventListener,
 		);
+
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadChildrenOfEntityEvent.TYPE,
+			this.#onReloadRequest as EventListener,
+		);
+
 		super.destroy();
 	}
 }
 
-export default UmbDefaultTreeContext;
-
-export const UMB_DEFAULT_TREE_CONTEXT = new UmbContextToken<UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel>>(
-	'UmbTreeContext',
-);
+export { UmbDefaultTreeContext as api };

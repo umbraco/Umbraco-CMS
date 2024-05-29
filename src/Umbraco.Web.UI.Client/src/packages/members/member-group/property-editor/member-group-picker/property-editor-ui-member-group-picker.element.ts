@@ -1,7 +1,7 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -17,7 +17,7 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const minMax = config?.getValueByAlias<NumberRangeValueType>('validationLimit');
+		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		this.min = minMax?.min ?? 0;
 		this.max = minMax?.max ?? Infinity;
 	}

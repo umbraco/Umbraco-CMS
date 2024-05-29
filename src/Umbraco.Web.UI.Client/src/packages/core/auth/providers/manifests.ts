@@ -8,7 +8,7 @@ export const manifests: Array<ManifestAuthProvider> = [
 		forProviderName: 'Umbraco',
 		weight: 1000,
 		meta: {
-			label: 'Sign in with Umbraco',
+			label: 'Umbraco',
 			defaultView: {
 				icon: 'icon-umbraco',
 				look: 'primary',

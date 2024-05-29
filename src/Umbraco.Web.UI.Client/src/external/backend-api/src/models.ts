@@ -403,7 +403,7 @@ export type CreateUserRequestModel = {
         email: string
 userName: string
 name: string
-userGroupIds: Array<string>
+userGroupIds: Array<ReferenceByIdModel>
 id?: string | null
     };
 
@@ -438,9 +438,9 @@ email: string
 userName: string
 name: string
 languageIsoCode?: string | null
-documentStartNodeIds: Array<string>
+documentStartNodeIds: Array<ReferenceByIdModel>
 hasDocumentRootAccess: boolean
-mediaStartNodeIds: Array<string>
+mediaStartNodeIds: Array<ReferenceByIdModel>
 hasMediaRootAccess: boolean
 avatarUrls: Array<string>
 languages: Array<string>
@@ -457,6 +457,13 @@ export enum DataTypeChangeModeModel {
     FALSE = 'False',
     FALSE_WITH_HELP_TEXT = 'FalseWithHelpText'
 }
+
+export type DataTypeContentTypeReferenceModel = {
+        id: string
+type: string | null
+name: string | null
+icon: string | null
+    };
 
 export type DataTypeItemResponseModel = {
         id: string
@@ -476,8 +483,7 @@ alias: string
     };
 
 export type DataTypeReferenceResponseModel = {
-        id: string
-type: string
+        contentType: DataTypeContentTypeReferenceModel
 properties: Array<DataTypePropertyReferenceModel>
     };
 
@@ -541,11 +547,11 @@ icon?: string | null
     };
 
 export type DeleteUserGroupsRequestModel = {
-        userGroupIds: Array<string>
+        userGroupIds: Array<ReferenceByIdModel>
     };
 
 export type DeleteUsersRequestModel = {
-        userIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
     };
 
 export type DictionaryItemItemResponseModel = {
@@ -577,7 +583,7 @@ export enum DirectionModel {
 }
 
 export type DisableUserRequestModel = {
-        userIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
     };
 
 export type DocumentBlueprintItemResponseModel = {
@@ -898,7 +904,13 @@ secret: string
     };
 
 export type EnableUserRequestModel = {
-        userIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
+    };
+
+export type EntityImportAnalysisResponseModel = {
+        entityType: string
+alias?: string | null
+key?: string | null
     };
 
 export enum EventMessageTypeModel {
@@ -991,9 +1003,26 @@ url?: string | null
 type?: string | null
     };
 
+export enum ImageCropModeModel {
+    CROP = 'Crop',
+    MAX = 'Max',
+    STRETCH = 'Stretch',
+    PAD = 'Pad',
+    BOX_PAD = 'BoxPad',
+    MIN = 'Min'
+}
+
 export type ImportDictionaryRequestModel = {
         temporaryFile: ReferenceByIdModel
 parent?: ReferenceByIdModel | null
+    };
+
+export type ImportDocumentTypeRequestModel = {
+        file: ReferenceByIdModel
+    };
+
+export type ImportMediaTypeRequestModel = {
+        file: ReferenceByIdModel
     };
 
 export type IndexResponseModel = {
@@ -1021,7 +1050,7 @@ export type InviteUserRequestModel = {
         email: string
 userName: string
 name: string
-userGroupIds: Array<string>
+userGroupIds: Array<ReferenceByIdModel>
 id?: string | null
 message?: string | null
     };
@@ -1046,15 +1075,6 @@ isDefault: boolean
 isMandatory: boolean
 fallbackIsoCode?: string | null
 isoCode: string
-    };
-
-export type LinkedLoginModel = {
-        providerName: string
-providerKey: string
-    };
-
-export type LinkedLoginsRequestModel = {
-        linkedLogins: Array<LinkedLoginModel>
     };
 
 export type LogLevelCountsReponseModel = {
@@ -1231,6 +1251,8 @@ containers: Array<MediaTypePropertyTypeContainerResponseModel>
 id: string
 allowedMediaTypes: Array<MediaTypeSortModel>
 compositions: Array<MediaTypeCompositionModel>
+isDeletable: boolean
+aliasCanBeChanged: boolean
     };
 
 export type MediaTypeSortModel = {
@@ -1245,6 +1267,7 @@ parent?: ReferenceByIdModel | null
 name: string
 isFolder: boolean
 icon: string
+isDeletable: boolean
     };
 
 export type MediaUrlInfoModel = {
@@ -2268,7 +2291,7 @@ context: string
     };
 
 export type UnlockUsersRequestModel = {
-        userIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
     };
 
 export type UnpublishDocumentRequestModel = {
@@ -2517,19 +2540,19 @@ permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPr
     };
 
 export type UpdateUserGroupsOnUserRequestModel = {
-        userIds: Array<string>
-userGroupIds: Array<string>
+        userIds: Array<ReferenceByIdModel>
+userGroupIds: Array<ReferenceByIdModel>
     };
 
 export type UpdateUserRequestModel = {
         email: string
 userName: string
 name: string
-userGroupIds: Array<string>
+userGroupIds: Array<ReferenceByIdModel>
 languageIsoCode: string
-documentStartNodeIds: Array<string>
+documentStartNodeIds: Array<ReferenceByIdModel>
 hasDocumentRootAccess: boolean
-mediaStartNodeIds: Array<string>
+mediaStartNodeIds: Array<ReferenceByIdModel>
 hasMediaRootAccess: boolean
     };
 
@@ -2572,6 +2595,13 @@ export type UserDataResponseModel = {
 identifier: string
 value: string
 key: string
+    };
+
+export type UserExternalLoginProviderModel = {
+        providerSchemeName: string
+providerKey?: string | null
+isLinkedOnUser: boolean
+hasManualLinkingEnabled: boolean
     };
 
 export type UserGroupItemResponseModel = {
@@ -2638,12 +2668,12 @@ export type UserResponseModel = {
         email: string
 userName: string
 name: string
-userGroupIds: Array<string>
+userGroupIds: Array<ReferenceByIdModel>
 id: string
 languageIsoCode?: string | null
-documentStartNodeIds: Array<string>
+documentStartNodeIds: Array<ReferenceByIdModel>
 hasDocumentRootAccess: boolean
-mediaStartNodeIds: Array<string>
+mediaStartNodeIds: Array<ReferenceByIdModel>
 hasMediaRootAccess: boolean
 avatarUrls: Array<string>
 state: UserStateModel
@@ -3075,6 +3105,15 @@ PostDocumentTypeByIdCopy: {
 requestBody?: CopyDocumentTypeRequestModel
                         
                     };
+GetDocumentTypeByIdExport: {
+                        id: string
+                        
+                    };
+PutDocumentTypeByIdImport: {
+                        id: string
+requestBody?: ImportDocumentTypeRequestModel
+                        
+                    };
 PutDocumentTypeByIdMove: {
                         id: string
 requestBody?: MoveDocumentTypeRequestModel
@@ -3104,6 +3143,10 @@ DeleteDocumentTypeFolderById: {
 PutDocumentTypeFolderById: {
                         id: string
 requestBody?: UpdateFolderResponseModel
+                        
+                    };
+PostDocumentTypeImport: {
+                        requestBody?: ImportDocumentTypeRequestModel
                         
                     };
 GetItemDocumentType: {
@@ -3145,6 +3188,8 @@ take?: number
                 ,GetDocumentTypeByIdBlueprint: PagedDocumentTypeBlueprintItemResponseModel
                 ,GetDocumentTypeByIdCompositionReferences: Array<DocumentTypeCompositionResponseModel>
                 ,PostDocumentTypeByIdCopy: string
+                ,GetDocumentTypeByIdExport: Blob | File
+                ,PutDocumentTypeByIdImport: string
                 ,PutDocumentTypeByIdMove: string
                 ,GetDocumentTypeAllowedAtRoot: PagedAllowedDocumentTypeModel
                 ,PostDocumentTypeAvailableCompositions: Array<AvailableDocumentTypeCompositionResponseModel>
@@ -3153,6 +3198,7 @@ take?: number
                 ,GetDocumentTypeFolderById: FolderResponseModel
                 ,DeleteDocumentTypeFolderById: string
                 ,PutDocumentTypeFolderById: string
+                ,PostDocumentTypeImport: string
                 ,GetItemDocumentType: Array<DocumentTypeItemResponseModel>
                 ,GetItemDocumentTypeSearch: PagedModelDocumentTypeItemResponseModel
                 ,GetTreeDocumentTypeAncestors: Array<DocumentTypeTreeItemResponseModel>
@@ -3510,6 +3556,43 @@ tree?: string
         
     }
 
+export type ImagingData = {
+        
+        payloads: {
+            GetImagingResizeUrls: {
+                        height?: number
+id?: Array<string>
+mode?: ImageCropModeModel
+width?: number
+                        
+                    };
+        }
+        
+        
+        responses: {
+            GetImagingResizeUrls: Array<MediaUrlInfoResponseModel>
+                
+        }
+        
+    }
+
+export type ImportData = {
+        
+        payloads: {
+            GetImportAnalyze: {
+                        temporaryFileId?: string
+                        
+                    };
+        }
+        
+        
+        responses: {
+            GetImportAnalyze: EntityImportAnalysisResponseModel
+                
+        }
+        
+    }
+
 export type IndexerData = {
         
         payloads: {
@@ -3701,6 +3784,11 @@ skip?: number
 take?: number
                         
                     };
+GetItemMediaTypeFolders: {
+                        skip?: number
+take?: number
+                        
+                    };
 GetItemMediaTypeSearch: {
                         query?: string
 skip?: number
@@ -3739,6 +3827,15 @@ PostMediaTypeByIdCopy: {
 requestBody?: CopyMediaTypeRequestModel
                         
                     };
+GetMediaTypeByIdExport: {
+                        id: string
+                        
+                    };
+PutMediaTypeByIdImport: {
+                        id: string
+requestBody?: ImportMediaTypeRequestModel
+                        
+                    };
 PutMediaTypeByIdMove: {
                         id: string
 requestBody?: MoveMediaTypeRequestModel
@@ -3770,6 +3867,10 @@ PutMediaTypeFolderById: {
 requestBody?: UpdateFolderResponseModel
                         
                     };
+PostMediaTypeImport: {
+                        requestBody?: ImportMediaTypeRequestModel
+                        
+                    };
 GetTreeMediaTypeAncestors: {
                         descendantId?: string
                         
@@ -3793,6 +3894,7 @@ take?: number
         responses: {
             GetItemMediaType: Array<MediaTypeItemResponseModel>
                 ,GetItemMediaTypeAllowed: PagedModelMediaTypeItemResponseModel
+                ,GetItemMediaTypeFolders: PagedModelMediaTypeItemResponseModel
                 ,GetItemMediaTypeSearch: PagedModelMediaTypeItemResponseModel
                 ,PostMediaType: string
                 ,GetMediaTypeById: MediaTypeResponseModel
@@ -3801,6 +3903,8 @@ take?: number
                 ,GetMediaTypeByIdAllowedChildren: PagedAllowedMediaTypeModel
                 ,GetMediaTypeByIdCompositionReferences: Array<MediaTypeCompositionResponseModel>
                 ,PostMediaTypeByIdCopy: string
+                ,GetMediaTypeByIdExport: Blob | File
+                ,PutMediaTypeByIdImport: string
                 ,PutMediaTypeByIdMove: string
                 ,GetMediaTypeAllowedAtRoot: PagedAllowedMediaTypeModel
                 ,PostMediaTypeAvailableCompositions: Array<AvailableMediaTypeCompositionResponseModel>
@@ -3808,6 +3912,7 @@ take?: number
                 ,GetMediaTypeFolderById: FolderResponseModel
                 ,DeleteMediaTypeFolderById: string
                 ,PutMediaTypeFolderById: string
+                ,PostMediaTypeImport: string
                 ,GetTreeMediaTypeAncestors: Array<MediaTypeTreeItemResponseModel>
                 ,GetTreeMediaTypeChildren: PagedMediaTypeTreeItemResponseModel
                 ,GetTreeMediaTypeRoot: PagedMediaTypeTreeItemResponseModel
@@ -5015,12 +5120,12 @@ requestBody?: UpdateUserGroupRequestModel
                     };
 DeleteUserGroupByIdUsers: {
                         id: string
-requestBody?: Array<string>
+requestBody?: Array<ReferenceByIdModel>
                         
                     };
 PostUserGroupByIdUsers: {
                         id: string
-requestBody?: Array<string>
+requestBody?: Array<ReferenceByIdModel>
                         
                     };
         }
@@ -5205,7 +5310,7 @@ PostUserUnlock: {
                 ,PostUserCurrentAvatar: string
                 ,PostUserCurrentChangePassword: string
                 ,GetUserCurrentConfiguration: CurrenUserConfigurationResponseModel
-                ,GetUserCurrentLogins: LinkedLoginsRequestModel
+                ,GetUserCurrentLoginProviders: Array<UserExternalLoginProviderModel>
                 ,GetUserCurrentPermissions: UserPermissionsResponseModel
                 ,GetUserCurrentPermissionsDocument: Array<UserPermissionsResponseModel>
                 ,GetUserCurrentPermissionsMedia: UserPermissionsResponseModel

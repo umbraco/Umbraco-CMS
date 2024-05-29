@@ -1,7 +1,6 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import type { UmbBlockGridWorkspaceData } from '../index.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbArrayState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, appendToFrozenArray, pushAtToUniqueArray } from '@umbraco-cms/backoffice/observable-api';
 import { type UmbBlockDataType, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 
@@ -43,9 +42,10 @@ export class UmbBlockGridManagerContext<
 	/**
 	 * Inserts a layout entry into an area of a layout entry.
 	 * @param layoutEntry The layout entry to insert.
-	 * @param content The content data to insert.
-	 * @param settings The settings data to insert.
-	 * @param modalData The modal data.
+	 * @param entries The layout entries to search within.
+	 * @param parentUnique The parentUnique to search for.
+	 * @param areaKey The areaKey to insert the layout entry into.
+	 * @param index The index to insert the layout entry at.
 	 * @returns a updated layout entries array if the insert was successful.
 	 *
 	 * @remarks
@@ -63,62 +63,77 @@ export class UmbBlockGridManagerContext<
 	): Array<UmbBlockGridLayoutModel> | undefined {
 		// I'm sorry, this code is not easy to read or maintain [NL]
 		let i: number = entries.length;
-		while (--i) {
-			const layoutEntry = entries[i];
-			if (layoutEntry.contentUdi === parentId) {
+		while (i--) {
+			const currentEntry = entries[i];
+			// Lets check if we found the right parent layout entry:
+			if (currentEntry.contentUdi === parentId) {
 				// Append the layout entry to be inserted and unfreeze the rest of the data:
+				const areas = currentEntry.areas.map((x) =>
+					x.key === areaKey
+						? {
+								...x,
+								items: pushAtToUniqueArray([...x.items], insert, (x) => x.contentUdi === insert.contentUdi, index),
+							}
+						: x,
+				);
 				return appendToFrozenArray(
 					entries,
 					{
-						...layoutEntry,
-						areas: layoutEntry.areas.map((x) =>
-							x.key === areaKey ? { ...x, items: appendToFrozenArray(x.items, insert) } : x,
-						),
+						...currentEntry,
+						areas,
 					},
-					(x) => x.contentUdi === layoutEntry.contentUdi,
+					(x) => x.contentUdi === currentEntry.contentUdi,
 				);
 			}
-			let y: number = layoutEntry.areas?.length;
-			while (--y) {
+			// Otherwise check if any items of the areas are the parent layout entry we are looking for. We do so based on parentId, recursively:
+			let y: number = currentEntry.areas?.length;
+			while (y--) {
 				// Recursively ask the items of this area to insert the layout entry, if something returns there was a match in this branch. [NL]
 				const correctedAreaItems = this.#appendLayoutEntryToArea(
 					insert,
-					layoutEntry.areas[y].items,
+					currentEntry.areas[y].items,
 					parentId,
 					areaKey,
 					index,
 				);
 				if (correctedAreaItems) {
 					// This area got a corrected set of items, lets append those to the area and unfreeze the surrounding data:
-					const area = layoutEntry.areas[y];
+					const area = currentEntry.areas[y];
 					return appendToFrozenArray(
 						entries,
 						{
-							...layoutEntry,
+							...currentEntry,
 							areas: appendToFrozenArray(
-								layoutEntry.areas,
+								currentEntry.areas,
 								{ ...area, items: correctedAreaItems },
 								(z) => z.key === area.key,
 							),
 						},
-						(x) => x.contentUdi === layoutEntry.contentUdi,
+						(x) => x.contentUdi === currentEntry.contentUdi,
 					);
 				}
 			}
 		}
-		// Find layout entry based on parentId, recursively, as it needs to check layout of areas as well:
 		return undefined;
 	}
 
+	// TODO: Remove dependency on modalData object here. [NL] Maybe change it into requiring the originData object instead.
 	insert(
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
 		modalData: UmbBlockGridWorkspaceData,
 	) {
-		const index = modalData.originData.index ?? -1;
+		this.setOneLayout(layoutEntry, modalData);
+		this.insertBlockData(layoutEntry, content, settings, modalData);
 
-		if (modalData.originData.parentUnique && modalData.originData.areaKey) {
+		return true;
+	}
+
+	setOneLayout(layoutEntry: BlockLayoutType, modalData?: UmbBlockGridWorkspaceData) {
+		const index = modalData?.originData.index ?? -1;
+
+		if (modalData?.originData.parentUnique && modalData?.originData.areaKey) {
 			// Find layout entry based on parentUnique, recursively, as it needs to check layout of areas as well:
 			const layoutEntries = this.#appendLayoutEntryToArea(
 				layoutEntry,
@@ -135,10 +150,6 @@ export class UmbBlockGridManagerContext<
 		} else {
 			this._layouts.appendOneAt(layoutEntry, index);
 		}
-
-		this.insertBlockData(layoutEntry, content, settings, modalData);
-
-		return true;
 	}
 
 	onDragStart() {
@@ -149,9 +160,3 @@ export class UmbBlockGridManagerContext<
 		(this.getHostElement() as HTMLElement).style.removeProperty('--umb-block-grid--is-dragging');
 	}
 }
-
-// TODO: Make discriminator method for this:
-export const UMB_BLOCK_GRID_MANAGER_CONTEXT = new UmbContextToken<
-	UmbBlockGridManagerContext,
-	UmbBlockGridManagerContext
->('UmbBlockManagerContext');

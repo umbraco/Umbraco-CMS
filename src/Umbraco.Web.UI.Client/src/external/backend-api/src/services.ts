@@ -1,7 +1,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { CultureData, DataTypeData, DictionaryData, DocumentBlueprintData, DocumentTypeData, DocumentVersionData, DocumentData, DynamicRootData, HealthCheckData, HelpData, IndexerData, InstallData, LanguageData, LogViewerData, ManifestData, MediaTypeData, MediaData, MemberGroupData, MemberTypeData, MemberData, ModelsBuilderData, ObjectTypesData, OembedData, PackageData, PartialViewData, PreviewData, ProfilingData, PropertyTypeData, PublishedCacheData, RedirectManagementData, RelationTypeData, RelationData, ScriptData, SearcherData, SecurityData, SegmentData, ServerData, StaticFileData, StylesheetData, TagData, TelemetryData, TemplateData, TemporaryFileData, UpgradeData, UserDataData, UserGroupData, UserData, WebhookData } from './models';
+import type { CultureData, DataTypeData, DictionaryData, DocumentBlueprintData, DocumentTypeData, DocumentVersionData, DocumentData, DynamicRootData, HealthCheckData, HelpData, ImagingData, ImportData, IndexerData, InstallData, LanguageData, LogViewerData, ManifestData, MediaTypeData, MediaData, MemberGroupData, MemberTypeData, MemberData, ModelsBuilderData, ObjectTypesData, OembedData, PackageData, PartialViewData, PreviewData, ProfilingData, PropertyTypeData, PublishedCacheData, RedirectManagementData, RelationTypeData, RelationData, ScriptData, SearcherData, SecurityData, SegmentData, ServerData, StaticFileData, StylesheetData, TagData, TelemetryData, TemplateData, TemporaryFileData, UpgradeData, UserDataData, UserGroupData, UserData, WebhookData } from './models';
 
 export class CultureService {
 
@@ -1348,6 +1348,57 @@ requestBody
 	}
 
 	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getDocumentTypeByIdExport(data: DocumentTypeData['payloads']['GetDocumentTypeByIdExport']): CancelablePromise<DocumentTypeData['responses']['GetDocumentTypeByIdExport']> {
+		const {
+                    
+                    id
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/document-type/{id}/export',
+			path: {
+				id
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns string Success
+	 * @throws ApiError
+	 */
+	public static putDocumentTypeByIdImport(data: DocumentTypeData['payloads']['PutDocumentTypeByIdImport']): CancelablePromise<DocumentTypeData['responses']['PutDocumentTypeByIdImport']> {
+		const {
+                    
+                    id,
+requestBody
+                } = data;
+		return __request(OpenAPI, {
+			method: 'PUT',
+			url: '/umbraco/management/api/v1/document-type/{id}/import',
+			path: {
+				id
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			responseHeader: 'Umb-Notifications',
+			errors: {
+				400: `Bad Request`,
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
 	 * @returns string Success
 	 * @throws ApiError
 	 */
@@ -1526,6 +1577,30 @@ requestBody
 			body: requestBody,
 			mediaType: 'application/json',
 			responseHeader: 'Umb-Notifications',
+			errors: {
+				400: `Bad Request`,
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns string Created
+	 * @throws ApiError
+	 */
+	public static postDocumentTypeImport(data: DocumentTypeData['payloads']['PostDocumentTypeImport'] = {}): CancelablePromise<DocumentTypeData['responses']['PostDocumentTypeImport']> {
+		const {
+                    
+                    requestBody
+                } = data;
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/umbraco/management/api/v1/document-type/import',
+			body: requestBody,
+			mediaType: 'application/json',
+			responseHeader: 'Umb-Generated-Resource',
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
@@ -2917,6 +2992,62 @@ baseUrl
 
 }
 
+export class ImagingService {
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getImagingResizeUrls(data: ImagingData['payloads']['GetImagingResizeUrls'] = {}): CancelablePromise<ImagingData['responses']['GetImagingResizeUrls']> {
+		const {
+                    
+                    id,
+height,
+width,
+mode
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/imaging/resize/urls',
+			query: {
+				id, height, width, mode
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+			},
+		});
+	}
+
+}
+
+export class ImportService {
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getImportAnalyze(data: ImportData['payloads']['GetImportAnalyze'] = {}): CancelablePromise<ImportData['responses']['GetImportAnalyze']> {
+		const {
+                    
+                    temporaryFileId
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/import/analyze',
+			query: {
+				temporaryFileId
+			},
+			errors: {
+				400: `Bad Request`,
+				401: `The resource is protected and requires an authentication token`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+}
+
 export class IndexerService {
 
 	/**
@@ -3536,6 +3667,29 @@ take
 	 * @returns unknown Success
 	 * @throws ApiError
 	 */
+	public static getItemMediaTypeFolders(data: MediaTypeData['payloads']['GetItemMediaTypeFolders'] = {}): CancelablePromise<MediaTypeData['responses']['GetItemMediaTypeFolders']> {
+		const {
+                    
+                    skip,
+take
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/item/media-type/folders',
+			query: {
+				skip, take
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
 	public static getItemMediaTypeSearch(data: MediaTypeData['payloads']['GetItemMediaTypeSearch'] = {}): CancelablePromise<MediaTypeData['responses']['GetItemMediaTypeSearch']> {
 		const {
                     
@@ -3736,6 +3890,57 @@ requestBody
 	}
 
 	/**
+	 * @returns unknown Success
+	 * @throws ApiError
+	 */
+	public static getMediaTypeByIdExport(data: MediaTypeData['payloads']['GetMediaTypeByIdExport']): CancelablePromise<MediaTypeData['responses']['GetMediaTypeByIdExport']> {
+		const {
+                    
+                    id
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/media-type/{id}/export',
+			path: {
+				id
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns string Success
+	 * @throws ApiError
+	 */
+	public static putMediaTypeByIdImport(data: MediaTypeData['payloads']['PutMediaTypeByIdImport']): CancelablePromise<MediaTypeData['responses']['PutMediaTypeByIdImport']> {
+		const {
+                    
+                    id,
+requestBody
+                } = data;
+		return __request(OpenAPI, {
+			method: 'PUT',
+			url: '/umbraco/management/api/v1/media-type/{id}/import',
+			path: {
+				id
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			responseHeader: 'Umb-Notifications',
+			errors: {
+				400: `Bad Request`,
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
 	 * @returns string Success
 	 * @throws ApiError
 	 */
@@ -3898,6 +4103,30 @@ requestBody
 			body: requestBody,
 			mediaType: 'application/json',
 			responseHeader: 'Umb-Notifications',
+			errors: {
+				400: `Bad Request`,
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns string Created
+	 * @throws ApiError
+	 */
+	public static postMediaTypeImport(data: MediaTypeData['payloads']['PostMediaTypeImport'] = {}): CancelablePromise<MediaTypeData['responses']['PostMediaTypeImport']> {
+		const {
+                    
+                    requestBody
+                } = data;
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/umbraco/management/api/v1/media-type/import',
+			body: requestBody,
+			mediaType: 'application/json',
+			responseHeader: 'Umb-Generated-Resource',
 			errors: {
 				400: `Bad Request`,
 				401: `The resource is protected and requires an authentication token`,
@@ -5981,9 +6210,6 @@ export class PreviewService {
 			method: 'DELETE',
 			url: '/umbraco/management/api/v1/preview',
 			responseHeader: 'Umb-Notifications',
-			errors: {
-				401: `The resource is protected and requires an authentication token`,
-			},
 		});
 	}
 
@@ -8661,11 +8887,11 @@ requestBody
 	 * @returns unknown Success
 	 * @throws ApiError
 	 */
-	public static getUserCurrentLogins(): CancelablePromise<UserData['responses']['GetUserCurrentLogins']> {
+	public static getUserCurrentLoginProviders(): CancelablePromise<UserData['responses']['GetUserCurrentLoginProviders']> {
 		
 		return __request(OpenAPI, {
 			method: 'GET',
-			url: '/umbraco/management/api/v1/user/current/logins',
+			url: '/umbraco/management/api/v1/user/current/login-providers',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
 			},

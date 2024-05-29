@@ -376,6 +376,7 @@ export class UmbImageCropperElement extends LitElement {
 		#image {
 			display: block;
 			position: absolute;
+			user-select: none;
 		}
 
 		#slider {

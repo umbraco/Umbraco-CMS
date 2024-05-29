@@ -1,5 +1,6 @@
 import type { UmbUserCollectionContext } from '../../user-collection.context.js';
 import type { UmbUserDetailModel } from '../../../types.js';
+import { UMB_USER_COLLECTION_CONTEXT } from '../../user-collection.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
@@ -11,10 +12,10 @@ import type {
 	UmbTableConfig,
 	UmbTableOrderedEvent,
 } from '@umbraco-cms/backoffice/components';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbUserGroupItemModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserGroupItemRepository } from '@umbraco-cms/backoffice/user-group';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 import './column-layouts/name/user-table-name-column-layout.element.js';
 import './column-layouts/status/user-table-status-column-layout.element.js';
@@ -67,8 +68,8 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance as UmbUserCollectionContext;
+		this.consumeContext(UMB_USER_COLLECTION_CONTEXT, (instance) => {
+			this.#collectionContext = instance;
 			this.observe(
 				this.#collectionContext.selection.selection,
 				(selection) => (this._selection = selection),
@@ -87,7 +88,9 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 
 	async #observeUserGroups() {
 		if (this._users.length === 0) return;
-		const userGroupsUniques = [...new Set(this._users.flatMap((user) => user.userGroupUniques))];
+		const userGroupsUniques = [
+			...new Set(this._users.flatMap((user) => user.userGroupUniques.map((reference) => reference.unique))),
+		];
 		const { asObservable } = await this.#userGroupItemRepository.requestItems(userGroupsUniques);
 		this.observe(
 			asObservable(),
@@ -99,10 +102,10 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		);
 	}
 
-	#getUserGroupNames(uniques: Array<string>) {
-		return uniques
-			.map((unique: string) => {
-				return this._userGroupItems.find((x) => x.unique === unique)?.name;
+	#getUserGroupNames(references: Array<UmbReferenceByUnique>) {
+		return references
+			.map((reference) => {
+				return this._userGroupItems.find((x) => x.unique === reference.unique)?.name;
 			})
 			.join(', ');
 	}

@@ -1,8 +1,9 @@
-import { html, customElement, property, css, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css, repeat, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { generateAlias } from '@umbraco-cms/backoffice/utils';
 
 export type UmbCrop = {
 	label: string;
@@ -19,12 +20,17 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+	@query('#label')
+	private _labelInput!: HTMLInputElement;
+
 	//TODO MAKE TYPE
 	@property({ attribute: false })
 	value: UmbCrop[] = [];
 
 	@state()
 	editCropAlias = '';
+
+	#oldInputValue = '';
 
 	#onRemove(alias: string) {
 		this.value = [...this.value.filter((item) => item.alias !== alias)];
@@ -92,6 +98,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 
 		form.reset();
+		this._labelInput.focus();
 	}
 
 	#renderActions() {
@@ -99,6 +106,24 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 			? html`<uui-button @click=${this.#onEditCancel}>Cancel</uui-button>
 					<uui-button look="secondary" type="submit" label="Save"></uui-button>`
 			: html`<uui-button look="secondary" type="submit" label="Add"></uui-button>`;
+	}
+
+	#onLabelInput() {
+		const value = this._labelInput.value ?? '';
+
+		const aliasValue = generateAlias(value);
+
+		const alias = this.shadowRoot?.querySelector('#alias') as HTMLInputElement;
+
+		if (!alias) return;
+
+		const oldAliasValue = generateAlias(this.#oldInputValue);
+
+		if (alias.value === oldAliasValue || !alias.value) {
+			alias.value = aliasValue;
+		}
+
+		this.#oldInputValue = value;
 	}
 
 	render() {
@@ -109,7 +134,14 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 				<form @submit=${this.#onSubmit}>
 					<div class="input">
 						<uui-label for="label">Label</uui-label>
-						<uui-input label="Label" id="label" name="label" type="text" autocomplete="false" value=""></uui-input>
+						<uui-input
+							@input=${this.#onLabelInput}
+							label="Label"
+							id="label"
+							name="label"
+							type="text"
+							autocomplete="false"
+							value=""></uui-input>
 					</div>
 					<div class="input">
 						<uui-label for="alias">Alias</uui-label>

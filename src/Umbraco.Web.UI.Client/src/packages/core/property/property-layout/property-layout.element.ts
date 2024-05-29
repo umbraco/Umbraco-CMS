@@ -1,4 +1,6 @@
-import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { localizeAndTransform } from '@umbraco-cms/backoffice/formatting-api';
+import { css, customElement, html, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
@@ -9,7 +11,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
  *  @slot action-menu - Slot for rendering the Property Action Menu
  */
 @customElement('umb-property-layout')
-export class UmbPropertyLayoutElement extends LitElement {
+export class UmbPropertyLayoutElement extends UmbLitElement {
 	/**
 	 * Alias. The technical name of the property.
 	 * @type {string}
@@ -35,7 +37,7 @@ export class UmbPropertyLayoutElement extends LitElement {
 	 * @attr
 	 * @default ''
 	 */
-	@property({ type: String })
+	@property({ type: String, reflect: true })
 	public orientation: 'horizontal' | 'vertical' = 'horizontal';
 
 	/**
@@ -60,11 +62,14 @@ export class UmbPropertyLayoutElement extends LitElement {
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
 			<div id="headerColumn">
-				<uui-label title=${this.alias}>
-					${this.label} ${this.invalid ? html`<uui-badge color="danger" attention>!</uui-badge>` : ''}
+				<uui-label id="label" title=${this.alias}>
+					${this.localize.string(this.label)}
+					${when(this.invalid, () => html`<uui-badge color="danger" attention>!</uui-badge>`)}
 				</uui-label>
 				<slot name="action-menu"></slot>
-				<div id="description">${this.description}</div>
+				<uui-scroll-container id="description">
+					${unsafeHTML(localizeAndTransform(this, this.description))}
+				</uui-scroll-container>
 				<slot name="description"></slot>
 			</div>
 			<div id="editorColumn">
@@ -104,16 +109,17 @@ export class UmbPropertyLayoutElement extends LitElement {
 				height: min-content;
 			}
 			/*@container (width > 600px) {*/
-			#headerColumn {
+			:host(:not([orientation='vertical'])) #headerColumn {
 				position: sticky;
 				top: calc(var(--uui-size-space-2) * -1);
 			}
 			/*}*/
 
-			uui-label {
+			#label {
 				position: relative;
+				word-break: break-word;
 			}
-			:host([invalid]) uui-label {
+			:host([invalid]) #label {
 				color: var(--uui-color-danger);
 			}
 			uui-badge {
@@ -128,7 +134,7 @@ export class UmbPropertyLayoutElement extends LitElement {
 				margin-top: var(--uui-size-space-3);
 			}
 			/*@container (width > 600px) {*/
-			#editorColumn {
+			:host(:not([orientation='vertical'])) #editorColumn {
 				margin-top: 0;
 			}
 			/*}*/

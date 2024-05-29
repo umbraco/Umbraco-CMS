@@ -1,5 +1,5 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
-import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
+import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type {
@@ -24,6 +24,7 @@ import {
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 } from '../paths.js';
 import { UMB_DOCUMENTS_SECTION_PATH } from '../../paths.js';
+import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -47,8 +48,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { type Observable, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadTreeItemChildrenEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbServerModelValidationContext,
@@ -114,9 +117,7 @@ export class UmbDocumentWorkspaceContext
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
-	//#variesByCulture?: boolean;
 	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
-	//#variesBySegment?: boolean;
 	readonly varies = this.structure.ownerContentTypePart((x) =>
 		x ? x.variesByCulture || x.variesBySegment : undefined,
 	);
@@ -339,15 +340,6 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
-		/*
-		const oldVariants = this.#currentData.getValue()?.variants || [];
-		const variants = partialUpdateFrozenArray(
-			oldVariants,
-			{ name },
-			variantId ? (x) => variantId.compare(x) : () => true,
-		);
-		this.#currentData.update({ variants });
-		*/
 		// TODO: We should move this type of logic to the act of saving [NL]
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
@@ -375,6 +367,7 @@ export class UmbDocumentWorkspaceContext
 		);
 	}
 	// TODO: Re-evaluate if this is begin used, i wrote this as part of a POC... [NL]
+	/*
 	async propertyIndexByAlias(
 		propertyAlias: string,
 		variantId?: UmbVariantId,
@@ -383,6 +376,7 @@ export class UmbDocumentWorkspaceContext
 			data?.values?.findIndex((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true)),
 		);
 	}
+	*/
 
 	/**
 	 * Get the current value of the property with the given alias and variantId.
@@ -415,6 +409,25 @@ export class UmbDocumentWorkspaceContext
 
 			// TODO: We should move this type of logic to the act of saving [NL]
 			this.#updateVariantData(variantId);
+		}
+	}
+
+	#updateLock = 0;
+	initiatePropertyValueChange() {
+		this.#updateLock++;
+		this.#currentData.mute();
+		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
+		/*return {
+			[Symbol.dispose]: this.finishPropertyValueChange,
+		};*/
+	}
+	finishPropertyValueChange = () => {
+		this.#updateLock--;
+		this.#triggerPropertyValueChanges();
+	};
+	#triggerPropertyValueChanges() {
+		if (this.#updateLock === 0) {
+			this.#currentData.unmute();
 		}
 	}
 
@@ -579,7 +592,7 @@ export class UmbDocumentWorkspaceContext
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-			const event = new UmbRequestReloadTreeItemChildrenEvent({
+			const event = new UmbRequestReloadChildrenOfEntityEvent({
 				entityType: parent.entityType,
 				unique: parent.unique,
 			});
@@ -602,6 +615,28 @@ export class UmbDocumentWorkspaceContext
 
 			eventContext.dispatchEvent(event);
 		}
+	}
+
+	async #handleSaveAndPreview() {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		let culture = UMB_INVARIANT_CULTURE;
+
+		// Save document (the active variant) before previewing.
+		const { selected } = await this.#determineVariantOptions();
+		if (selected.length > 0) {
+			culture = selected[0];
+			const variantId = UmbVariantId.FromString(culture);
+			const saveData = this.#buildSaveData([variantId]);
+			await this.#performSaveOrCreate(saveData);
+		}
+
+		// Tell the server that we're entering preview mode.
+		await new UmbDocumentPreviewRepository(this).enter();
+
+		const preview = window.open(`preview?id=${unique}&culture=${culture}`, 'umbpreview');
+		preview?.focus();
 	}
 
 	async #handleSaveAndPublish() {
@@ -641,6 +676,7 @@ export class UmbDocumentWorkspaceContext
 		// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
 		this.#validationRepository ??= new UmbDocumentValidationRepository(this);
 
+		// We ask the server first to get a concatenated set of validation messages. So we see both front-end and back-end validation messages [NL]
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
@@ -672,6 +708,7 @@ export class UmbDocumentWorkspaceContext
 			},
 		);
 	}
+
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
@@ -730,6 +767,10 @@ export class UmbDocumentWorkspaceContext
 
 	public async publish() {
 		throw new Error('Method not implemented.');
+	}
+
+	public async saveAndPreview(): Promise<void> {
+		return this.#handleSaveAndPreview();
 	}
 
 	public async saveAndPublish(): Promise<void> {
@@ -813,16 +854,11 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	/*
-	concept notes:
-
-	public saveAndPreview() {
-
-	}
-	*/
-
-	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbDocumentPropertyDataContext(host, this, variantId);
+	public createPropertyDatasetContext(
+		host: UmbControllerHost,
+		variantId: UmbVariantId,
+	): UmbDocumentPropertyDatasetContext {
+		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
 	}
 
 	public destroy(): void {

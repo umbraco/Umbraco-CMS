@@ -1,44 +1,48 @@
 import { umbExtensionsRegistry } from '../../registry.js';
-import type { ManifestTypes } from '../../models/index.js';
+import type { UmbExtensionCollectionFilterModel, UmbExtensionDetailModel } from '../types.js';
+import { UMB_EXTENSION_ENTITY_TYPE } from '../../entity.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 
-export interface UmbExtensionCollectionFilter {
-	query?: string;
-	skip: number;
-	take: number;
-	type?: ManifestTypes['type'];
-}
-
-export class UmbExtensionCollectionRepository extends UmbRepositoryBase implements UmbCollectionRepository {
+export class UmbExtensionCollectionRepository
+	extends UmbRepositoryBase
+	implements UmbCollectionRepository<UmbExtensionDetailModel, UmbExtensionCollectionFilterModel>
+{
 	constructor(host: UmbControllerHost) {
 		super(host);
 	}
 
-	async requestCollection(filter: UmbExtensionCollectionFilter) {
-		let extensions = umbExtensionsRegistry.getAllExtensions();
+	async requestCollection(query: UmbExtensionCollectionFilterModel) {
+		let extensions: Array<UmbExtensionDetailModel> = umbExtensionsRegistry.getAllExtensions().map((manifest) => {
+			return {
+				...manifest,
+				unique: manifest.alias,
+				entityType: UMB_EXTENSION_ENTITY_TYPE,
+			};
+		});
 
-		if (filter.query) {
-			const query = filter.query.toLowerCase();
+		const skip = query.skip || 0;
+		const take = query.take || 100;
+
+		if (query.filter) {
+			const text = query.filter.toLowerCase();
 			extensions = extensions.filter(
-				(x) => x.name.toLowerCase().includes(query) || x.alias.toLowerCase().includes(query),
+				(x) => x.name.toLowerCase().includes(text) || x.alias.toLowerCase().includes(text),
 			);
 		}
 
-		if (filter.type) {
-			extensions = extensions.filter((x) => x.type === filter.type);
+		if (query.type) {
+			extensions = extensions.filter((x) => x.type === query.type);
 		}
 
 		extensions.sort((a, b) => a.type.localeCompare(b.type) || a.alias.localeCompare(b.alias));
 
 		const total = extensions.length;
-		const items = extensions.slice(filter.skip, filter.skip + filter.take);
+		const items = extensions.slice(skip, skip + take);
 		const data = { items, total };
 		return { data };
 	}
-
-	destroy(): void {}
 }
 
-export default UmbExtensionCollectionRepository;
+export { UmbExtensionCollectionRepository as api };
