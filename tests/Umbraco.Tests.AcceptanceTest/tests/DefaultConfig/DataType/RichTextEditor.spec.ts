@@ -208,13 +208,12 @@ test('can add available blocks', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
   const expectedDataTypeValues = {
-    "alias": "blocks",
-    "value": [
+    alias: "blocks",
+    value: [
       {
-          "contentElementTypeKey": elementTypeId,
-          "forceHideContentEditorInOverlay": false
-      }
-    ]
+        contentElementTypeKey: elementTypeId,
+      },
+    ],
   };
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
