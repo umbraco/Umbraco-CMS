@@ -151,9 +151,11 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 			</umb-image-cropper-focus-setter>
 			<div id="actions">
 				<slot name="actions"></slot>
-				<uui-button
-					label=${this.localize.term('content_resetFocalPoint')}
-					@click=${this.#onResetFocalPoint}></uui-button>
+				${!this.hideFocalPoint
+					? html`<uui-button
+							label=${this.localize.term('content_resetFocalPoint')}
+							@click=${this.#onResetFocalPoint}></uui-button>`
+					: nothing}
 			</div>
 		`;
 	}
