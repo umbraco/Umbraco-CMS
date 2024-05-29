@@ -57,7 +57,8 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	#templateRepository = new UmbTemplateItemRepository(this);
 
-	#routeBuilder?: UmbModalRouteBuilder;
+	@state()
+	private _routeBuilder?: UmbModalRouteBuilder;
 
 	constructor() {
 		super();
@@ -68,7 +69,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				return { data: { entityType: params.entityType, preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this.#routeBuilder = routeBuilder;
+				this._routeBuilder = routeBuilder;
 			});
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
@@ -232,8 +233,8 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	#renderGeneralSection() {
-		const editDocumentTypePath = this.#routeBuilder?.({ entityType: 'document-type' }) ?? '';
-		const editTemplatePath = this.#routeBuilder?.({ entityType: 'template' }) ?? '';
+		const editDocumentTypePath = this._routeBuilder?.({ entityType: 'document-type' }) ?? '';
+		const editTemplatePath = this._routeBuilder?.({ entityType: 'template' }) ?? '';
 
 		return html`
 			<div class="general-item">
