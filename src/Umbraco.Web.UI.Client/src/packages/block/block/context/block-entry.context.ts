@@ -76,7 +76,9 @@ export abstract class UmbBlockEntryContext<
 	_blockType = new UmbObjectState<BlockType | undefined>(undefined);
 	public readonly blockType = this._blockType.asObservable();
 	public readonly contentElementTypeKey = this._blockType.asObservablePart((x) => x?.contentElementTypeKey);
-	public readonly settingsElementTypeKey = this._blockType.asObservablePart((x) => x?.settingsElementTypeKey);
+	public readonly settingsElementTypeKey = this._blockType.asObservablePart((x) =>
+		x ? x.settingsElementTypeKey ?? undefined : null,
+	);
 
 	_layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
 	public readonly layout = this._layout.asObservable();
@@ -84,6 +86,7 @@ export abstract class UmbBlockEntryContext<
 	 * @obsolete Use `unique` instead. Cause we will most likely rename this in the future.
 	 */
 	public readonly contentUdi = this._layout.asObservablePart((x) => x?.contentUdi);
+	public readonly settingsUdi = this._layout.asObservablePart((x) => x?.settingsUdi);
 	public readonly unique = this._layout.asObservablePart((x) => x?.contentUdi);
 
 	#label = new UmbStringState('');
@@ -114,8 +117,10 @@ export abstract class UmbBlockEntryContext<
 
 	#settings = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
 	public readonly settings = this.#settings.asObservable();
+	private readonly settingsContentTypeKey = this.#settings.asObservablePart((x) => x?.contentTypeKey);
 
 	abstract readonly showContentEdit: Observable<boolean>;
+
 	/**
 	 * Set the contentUdi of this entry.
 	 * @method setContentUdi
@@ -176,8 +181,28 @@ export abstract class UmbBlockEntryContext<
 			this.#observeBlockTypeLabel();
 		});
 
-		this.observe(this.index, () => {
-			this.#updateCreatePaths();
+		this.observe(
+			observeMultiple([this.settingsElementTypeKey, this.settingsContentTypeKey]),
+			([settingsElementTypeKey, settingsContentTypeKey]) => {
+				if (settingsElementTypeKey === undefined || !settingsContentTypeKey) return;
+				if (settingsElementTypeKey !== null && settingsElementTypeKey !== settingsContentTypeKey) {
+					console.error('Settings model has changed');
+				}
+			},
+		);
+
+		this.observe(observeMultiple([this.layout, this.settingsElementTypeKey]), ([layout, settingsElementTypeKey]) => {
+			if (!layout || settingsElementTypeKey === undefined) return;
+			if (layout.settingsUdi === undefined && settingsElementTypeKey !== undefined) {
+				// Make sure we get a settings UDI and data:
+				const settingsData = this._manager!.createBlockSettingsData(this.#contentUdi);
+				this.#settings.setValue(settingsData);
+				this._layout.update({ settingsUdi: settingsData.udi });
+			} else if (layout.settingsUdi && settingsElementTypeKey === undefined) {
+				// Make sure we remove the settings UDI from the layout.
+				this.#settings.setValue(undefined);
+				this._layout.update({ settingsUdi: undefined });
+			}
 		});
 	}
 
