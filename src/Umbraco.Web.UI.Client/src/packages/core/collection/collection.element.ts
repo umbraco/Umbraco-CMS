@@ -1,8 +1,8 @@
-import type { UmbCollectionConfiguration, UmbCollectionContext } from './types.js';
+import type { UmbCollectionConfiguration } from './types.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionElementAndApiSlotElementBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbExtensionElementAndApiSlotElementBase<ManifestCollection> {
@@ -24,25 +24,17 @@ export class UmbCollectionElement extends UmbExtensionElementAndApiSlotElementBa
 	}
 	#config?: UmbCollectionConfiguration;
 
+	protected apiChanged(api: UmbApi | undefined): void {
+		super.apiChanged(api);
+		this.#setConfig();
+	}
+
 	#setConfig() {
 		if (!this.#config || !this._api) return;
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		this._api.setConfig(this.#config);
 	}
-
-	protected extensionChanged = (
-		isPermitted: boolean,
-		controller: UmbExtensionElementAndApiInitializer<ManifestCollection>,
-	) => {
-		// TODO: [v15] Once `UmbCollectionContext` extends `UmbApi`, then we can remove this type casting. [LK]
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this._api = isPermitted ? (controller.api as unknown as UmbCollectionContext) : undefined;
-		this._element = isPermitted ? controller.component : undefined;
-		this.requestUpdate('_element');
-		this.#setConfig();
-	};
 }
 
 declare global {

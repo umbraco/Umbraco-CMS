@@ -52,21 +52,44 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 			umbExtensionsRegistry,
 			this._alias,
 			[this],
-			this.extensionChanged,
+			this.#extensionChanged,
 			this.getDefaultElementName(),
 		);
 		this.#extensionController.elementProps = this.#props;
 	}
 
-	protected extensionChanged = (
-		isPermitted: boolean,
-		controller: UmbExtensionElementAndApiInitializer<ManifestType>,
-	) => {
-		this._api = isPermitted ? controller.api : undefined;
-		this._element = isPermitted ? controller.component : undefined;
-		this.requestUpdate('_element');
+	#extensionChanged = (isPermitted: boolean, controller: UmbExtensionElementAndApiInitializer<ManifestType>) => {
+		this.apiChanged(isPermitted ? controller.api : undefined);
+		this.elementChanged(isPermitted ? controller.component : undefined);
 	};
 
+	/**
+	 * Called when the API is changed.
+	 * @protected
+	 * @param {(ManifestType['API_TYPE'] | undefined)} api
+	 * @memberof UmbExtensionElementAndApiSlotElementBase
+	 */
+	protected apiChanged(api: ManifestType['API_TYPE'] | undefined) {
+		this._api = api;
+	}
+
+	/**
+	 * Called when the element is changed.
+	 * @protected
+	 * @param {(ManifestType['ELEMENT_TYPE'] | undefined)} element
+	 * @memberof UmbExtensionElementAndApiSlotElementBase
+	 */
+	protected elementChanged(element: ManifestType['ELEMENT_TYPE'] | undefined) {
+		this._element = element;
+		this.requestUpdate('_element');
+	}
+
+	/**
+	 * Render the element.
+	 * @protected
+	 * @return {*}
+	 * @memberof UmbExtensionElementAndApiSlotElementBase
+	 */
 	protected render() {
 		return this._element;
 	}
