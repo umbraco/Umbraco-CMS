@@ -104,7 +104,7 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 					look="secondary"
 					slot="actions"
 					@click=${this.#onRollbackModalOpen}>
-					<uui-icon name="icon-undo"></uui-icon>
+					<uui-icon name="icon-undo"></uui-icon> ${this.localize.term('actions_rollback')}
 				</uui-button>
 			</div>
 			${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}

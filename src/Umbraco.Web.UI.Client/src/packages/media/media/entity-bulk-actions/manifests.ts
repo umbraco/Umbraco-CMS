@@ -1,8 +1,8 @@
-import type { UmbCollectionBulkActionPermissions } from '../../../core/collection/types.js';
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbMediaMoveEntityBulkAction } from './move/move.action.js';
 import { UmbDuplicateMediaEntityBulkAction } from './duplicate/duplicate.action.js';
 import { UmbMediaDeleteEntityBulkAction } from './delete/delete.action.js';
+import type { UmbCollectionBulkActionPermissions } from '@umbraco-cms/backoffice/collection';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UMB_COLLECTION_ALIAS_CONDITION,

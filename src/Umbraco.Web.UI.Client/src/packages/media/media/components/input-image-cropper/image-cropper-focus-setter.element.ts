@@ -34,6 +34,8 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
+		if (!this.hideFocalPoint) return;
+
 		if (_changedProperties.has('focalPoint') && this.focalPointElement) {
 			this.focalPointElement.style.left = `calc(${this.focalPoint.left * 100}% - ${this.#DOT_RADIUS}px)`;
 			this.focalPointElement.style.top = `calc(${this.focalPoint.top * 100}% - ${this.#DOT_RADIUS}px)`;
@@ -59,8 +61,10 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 	async #initializeImage() {
 		await this.updateComplete; // Wait for the @query to be resolved
 
-		this.focalPointElement.style.left = `calc(${this.focalPoint.left * 100}% - ${this.#DOT_RADIUS}px)`;
-		this.focalPointElement.style.top = `calc(${this.focalPoint.top * 100}% - ${this.#DOT_RADIUS}px)`;
+		if (!this.hideFocalPoint) {
+			this.focalPointElement.style.left = `calc(${this.focalPoint.left * 100}% - ${this.#DOT_RADIUS}px)`;
+			this.focalPointElement.style.top = `calc(${this.focalPoint.top * 100}% - ${this.#DOT_RADIUS}px)`;
+		}
 
 		this.imageElement.onload = () => {
 			if (!this.imageElement || !this.wrapperElement) return;
@@ -79,7 +83,9 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 			this.wrapperElement.style.aspectRatio = `${imageAspectRatio}`;
 		};
 
-		this.#addEventListeners();
+		if (!this.hideFocalPoint) {
+			this.#addEventListeners();
+		}
 	}
 
 	async #addEventListeners() {
@@ -110,6 +116,8 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 
 	#onSetFocalPoint(event: MouseEvent) {
 		event.preventDefault();
+		if (this.hideFocalPoint) return;
+
 		if (!this.focalPointElement || !this.imageElement) return;
 
 		const image = this.imageElement.getBoundingClientRect();
