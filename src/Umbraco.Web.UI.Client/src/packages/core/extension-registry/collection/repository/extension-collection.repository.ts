@@ -43,8 +43,6 @@ export class UmbExtensionCollectionRepository
 		const data = { items, total };
 		return { data };
 	}
-
-	destroy(): void {}
 }
 
 export { UmbExtensionCollectionRepository as api };
