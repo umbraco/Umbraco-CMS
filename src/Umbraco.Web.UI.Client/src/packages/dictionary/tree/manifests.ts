@@ -4,7 +4,6 @@ import {
 	UMB_DICTIONARY_TREE_REPOSITORY_ALIAS,
 	UMB_DICTIONARY_TREE_STORE_ALIAS,
 } from './constants.js';
-import { UmbDictionaryTreeRepository } from './dictionary-tree.repository.js';
 import { UmbDictionaryTreeStore } from './dictionary-tree.store.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
 import type {
@@ -19,14 +18,14 @@ const treeRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DICTIONARY_TREE_REPOSITORY_ALIAS,
 	name: 'Dictionary Tree Repository',
-	api: UmbDictionaryTreeRepository,
+	api: () => import('./dictionary-tree.repository.js'),
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: UMB_DICTIONARY_TREE_STORE_ALIAS,
 	name: 'Dictionary Tree Store',
-	api: UmbDictionaryTreeStore,
+	api: () => import('./dictionary-tree.store.js'),
 };
 
 const tree: ManifestTree = {

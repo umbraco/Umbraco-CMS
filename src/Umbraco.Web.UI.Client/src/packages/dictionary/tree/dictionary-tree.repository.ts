@@ -29,3 +29,5 @@ export class UmbDictionaryTreeRepository
 		return { data };
 	}
 }
+
+export { UmbDictionaryTreeRepository as api };
