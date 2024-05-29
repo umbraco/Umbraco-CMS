@@ -82,6 +82,11 @@ module.exports = {
 	create: function (context) {
 		return {
 			ImportDeclaration(node) {
+				// exclude test  and story files
+				if (context.filename.endsWith('.test.ts') || context.filename.endsWith('.stories.ts')) {
+					return {};
+				}
+
 				const importPath = node.source.value;
 
 				if (importPath.startsWith('./') || importPath.startsWith('../')) {
