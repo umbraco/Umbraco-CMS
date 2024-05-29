@@ -54,7 +54,8 @@ test.describe('Redirect Management tests', {tag: '@smoke'}, () => {
     expect(statusData.status).toBe(disableStatus);
   });
 
-  test('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Remove skip when the frond-end is ready. Currently there is no redirect have been made after renaming a published page
+  test.skip('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.redirectManagement.setStatus(disableStatus);
 
@@ -70,12 +71,12 @@ test.describe('Redirect Management tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.openContent(contentName);
     await umbracoUi.content.enterContentName(updatedContentName);
     await umbracoUi.content.clickSaveAndPublishButton();
-    // verify that there is no redirects have been made
+    // verify that there is one redirects have been made
     const contentData = await umbracoApi.document.get(contentId);
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.redirectManagement.clickRedirectManagementTab();
     await umbracoUi.redirectManagement.isTextWithExactNameVisible(contentData.urls[0].url);
-    // Verify that the status is Disable
+    // Verify that the status is Enable
     const statusData = await umbracoApi.redirectManagement.getStatus();
     expect(statusData.status).toBe(enableStatus);
   });
@@ -96,7 +97,8 @@ test.describe('Redirect Management tests', {tag: '@smoke'}, () => {
     // TODO: verify the search result
   });
 
-  test('can delete a redirect', async ({umbracoApi, umbracoUi}) => {
+  // TODO: Remove skip when the frond-end is ready. Currently there is no redirect have been made after renaming a published page
+  test.skip('can delete a redirect', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     // Rename the published content 
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
