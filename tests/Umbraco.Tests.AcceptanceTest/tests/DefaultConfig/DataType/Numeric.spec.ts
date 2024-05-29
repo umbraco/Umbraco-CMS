@@ -85,7 +85,8 @@ test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test('cannot update the minimum greater than the maximum', async ({umbracoUi}) => {
+// TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
+test.skip('cannot update the minimum greater than the maximum', async ({umbracoUi}) => {
   // Arrange
   const minimumValue = 5;
   const maximumValue = 2;

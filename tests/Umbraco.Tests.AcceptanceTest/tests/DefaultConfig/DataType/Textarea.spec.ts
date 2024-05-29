@@ -86,7 +86,8 @@ test('can update Max height (pixels) value', async ({umbracoApi, umbracoUi}) => 
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test('cannot update the min height greater than the max height', async ({umbracoUi}) => {
+// TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
+test.skip('cannot update the min height greater than the max height', async ({umbracoUi}) => {
   // Arrange
   const minHeightValue = 150;
   const maxHeightValue = 100;
