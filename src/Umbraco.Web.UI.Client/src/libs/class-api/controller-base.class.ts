@@ -1,5 +1,5 @@
-import type { UmbController } from '../controller-api/controller.interface.js';
 import { UmbClassMixin } from './class.mixin.js';
+import type { UmbController } from '@umbraco-cms/backoffice/controller-api';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 
 /**
