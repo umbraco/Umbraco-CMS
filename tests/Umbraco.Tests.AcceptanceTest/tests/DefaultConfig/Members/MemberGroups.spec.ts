@@ -14,7 +14,7 @@ test.describe('Member Group tests', () => {
     await umbracoApi.memberGroup.ensureNameNotExists(memberGroupName);
   });
 
-  test('can create a member group @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can create a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.memberGroup.clickMemberGroupsTab();
     await umbracoUi.memberGroup.clickCreateButton();
@@ -28,7 +28,7 @@ test.describe('Member Group tests', () => {
     expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
   });
 
-  test('can delete a member group @smoke', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.memberGroup.create(memberGroupName);
     expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
