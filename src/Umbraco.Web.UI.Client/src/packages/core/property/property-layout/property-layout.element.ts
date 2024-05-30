@@ -130,6 +130,10 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				color: var(--uui-color-text-alt);
 			}
 
+			#description * {
+				max-width: 100%;
+			}
+
 			#editorColumn {
 				margin-top: var(--uui-size-space-3);
 			}
