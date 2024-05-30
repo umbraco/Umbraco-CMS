@@ -153,15 +153,15 @@ export abstract class UmbBlockEntryContext<
 		// Consume block manager:
 		this.consumeContext(blockManagerContextToken, (manager) => {
 			this._manager = manager;
-			this.#gotManager();
 			this._gotManager();
+			this.#gotManager();
 		});
 
 		// Consume block entries:
 		this.consumeContext(blockEntriesContextToken, (entries) => {
 			this._entries = entries;
-			this.#gotEntries();
 			this._gotEntries();
+			this.#gotEntries();
 		});
 
 		// Observe UDI:

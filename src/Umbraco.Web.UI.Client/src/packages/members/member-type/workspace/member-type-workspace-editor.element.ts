@@ -22,10 +22,6 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _isNew?: boolean;
 
-	@state()
-	private _iconColorAlias?: string;
-	// TODO: Color should be using an alias, and look up in some dictionary/key/value) of project-colors.
-
 	#workspaceContext?: typeof UMB_MEMBER_TYPE_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -82,14 +78,14 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.MemberType">
 				<div id="header" slot="header">
-					<uui-button id="icon" @click=${this._handleIconClick} label="icon" compact>
-						<uui-icon name="${ifDefined(this._icon)}" style="color: ${this._iconColorAlias}"></uui-icon>
+					<uui-button id="icon" compact label="icon" look="outline" @click=${this._handleIconClick}>
+						<umb-icon name=${ifDefined(this._icon)}></umb-icon>
 					</uui-button>
 
 					<div id="editors">
 						<umb-input-with-alias
 							id="name"
-							label="name"
+							label=${this.localize.term('placeholders_entername')}
 							value=${this._name}
 							alias=${this._alias}
 							?auto-generate-alias=${this._isNew}
@@ -120,6 +116,7 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 			#header {
 				display: flex;
 				flex: 1 1 auto;
+				gap: var(--uui-size-space-2);
 			}
 
 			#editors {
@@ -156,9 +153,9 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			#icon {
-				font-size: calc(var(--uui-size-layout-3) / 2);
-				margin-right: var(--uui-size-space-2);
-				margin-left: calc(var(--uui-size-space-4) * -1);
+				font-size: var(--uui-size-8);
+				height: 60px;
+				width: 60px;
 			}
 		`,
 	];

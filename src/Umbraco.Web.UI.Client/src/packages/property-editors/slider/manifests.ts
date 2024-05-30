@@ -50,7 +50,7 @@ export const manifests: Array<ManifestTypes> = [
 					},
 					{
 						alias: 'step',
-						value: 0,
+						value: 1,
 					},
 				],
 			},

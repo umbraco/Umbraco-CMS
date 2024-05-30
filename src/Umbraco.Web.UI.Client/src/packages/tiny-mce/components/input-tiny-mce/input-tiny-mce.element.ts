@@ -1,9 +1,9 @@
-import { loadManifestApi } from '../../../../libs/extension-api/functions/load-manifest-api.function.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
 import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
 import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import type { TinyMcePluginArguments, UmbTinyMcePluginBase } from './tiny-mce-plugin.js';
+import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';

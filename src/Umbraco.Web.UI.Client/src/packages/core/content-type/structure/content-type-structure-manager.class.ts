@@ -46,6 +46,8 @@ export class UmbContentTypeStructureManager<
 	private readonly _contentTypeContainers = this.#contentTypes.asObservablePart((x) =>
 		x.flatMap((x) => x.containers ?? []),
 	);
+	readonly contentTypeUniques = this.#contentTypes.asObservablePart((x) => x.map((y) => y.unique));
+	readonly contentTypeAliases = this.#contentTypes.asObservablePart((x) => x.map((y) => y.alias));
 
 	#containers: UmbArrayState<UmbPropertyTypeContainerModel> = new UmbArrayState<UmbPropertyTypeContainerModel>(
 		[],
@@ -204,6 +206,12 @@ export class UmbContentTypeStructureManager<
 
 	getContentTypes() {
 		return this.#contentTypes.getValue();
+	}
+	getContentTypeUniques() {
+		return this.#contentTypes.getValue().map((x) => x.unique);
+	}
+	getContentTypeAliases() {
+		return this.#contentTypes.getValue().map((x) => x.alias);
 	}
 
 	// TODO: We could move the actions to another class?

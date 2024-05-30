@@ -15,6 +15,7 @@ const entityActions: Array<ManifestTypes> = [
 			treeRepositoryAlias: UMB_MEDIA_TYPE_TREE_REPOSITORY_ALIAS,
 			moveRepositoryAlias: UMB_MOVE_MEDIA_TYPE_REPOSITORY_ALIAS,
 			treeAlias: UMB_MEDIA_TYPE_TREE_ALIAS,
+			foldersOnly: true,
 		},
 	},
 ];

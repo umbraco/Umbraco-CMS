@@ -15,6 +15,7 @@ const entityActions: Array<ManifestTypes> = [
 			treeRepositoryAlias: UMB_DOCUMENT_BLUEPRINT_TREE_REPOSITORY_ALIAS,
 			moveRepositoryAlias: UMB_MOVE_DOCUMENT_BLUEPRINT_REPOSITORY_ALIAS,
 			treeAlias: UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS,
+			foldersOnly: true,
 		},
 	},
 ];

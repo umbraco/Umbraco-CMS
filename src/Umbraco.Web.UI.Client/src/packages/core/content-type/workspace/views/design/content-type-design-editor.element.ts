@@ -369,7 +369,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
-					<div id="container-list" class="flex">${this.renderTabsNavigation()} ${this.renderAddButton()}</div>
+					<div id="container-list">${this.renderTabsNavigation()} ${this.renderAddButton()}</div>
 					${this.renderActions()}
 				</div>
 				<umb-router-slot
@@ -388,10 +388,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	renderAddButton() {
 		// TODO: Localize this:
 		if (this._sortModeActive) return;
-		return html`<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab">
-			<uui-icon name="icon-add"></uui-icon>
-			Add tab
-		</uui-button>`;
+		return html`
+			<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab">
+				<uui-icon name="icon-add"></uui-icon>
+				Add tab
+			</uui-button>
+		`;
 	}
 
 	renderActions() {
@@ -399,37 +401,41 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			? this.localize.term('general_reorderDone')
 			: this.localize.term('general_reorder');
 
-		return html`<div>
-			${this._compositionRepositoryAlias
-				? html`<uui-button
-						look="outline"
-						label=${this.localize.term('contentTypeEditor_compositions')}
-						compact
-						@click=${this.#openCompositionModal}>
-						<uui-icon name="icon-merge"></uui-icon>
-						${this.localize.term('contentTypeEditor_compositions')}
-					</uui-button>`
-				: ''}
-			<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
-				<uui-icon name="icon-navigation"></uui-icon>
-				${sortButtonText}
-			</uui-button>
-		</div>`;
+		return html`
+			<div id="actions">
+				${this._compositionRepositoryAlias
+					? html` <uui-button
+							look="outline"
+							label=${this.localize.term('contentTypeEditor_compositions')}
+							compact
+							@click=${this.#openCompositionModal}>
+							<uui-icon name="icon-merge"></uui-icon>
+							${this.localize.term('contentTypeEditor_compositions')}
+						</uui-button>`
+					: ''}
+				<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
+					<uui-icon name="icon-navigation"></uui-icon>
+					${sortButtonText}
+				</uui-button>
+			</div>
+		`;
 	}
 
 	renderTabsNavigation() {
 		if (!this._tabs || this._tabs.length === 0) return;
 
-		return html`<div id="tabs-group" class="flex">
-			<uui-tab-group>
-				${this.renderRootTab()}
-				${repeat(
-					this._tabs,
-					(tab) => tab.id,
-					(tab) => this.renderTab(tab),
-				)}
-			</uui-tab-group>
-		</div>`;
+		return html`
+			<div id="tabs-group">
+				<uui-tab-group>
+					${this.renderRootTab()}
+					${repeat(
+						this._tabs,
+						(tab) => tab.id,
+						(tab) => this.renderTab(tab),
+					)}
+				</uui-tab-group>
+			</div>
+		`;
 	}
 
 	renderRootTab() {
@@ -439,14 +445,16 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			// If we don't have any root groups and we are not in sort mode, then we don't want to render the root tab.
 			return nothing;
 		}
-		return html`<uui-tab
-			id="root-tab"
-			class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
-			label=${this.localize.term('general_generic')}
-			.active=${rootTabActive}
-			href=${rootTabPath}>
-			${this.localize.term('general_generic')}
-		</uui-tab>`;
+		return html`
+			<uui-tab
+				id="root-tab"
+				class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
+				label=${this.localize.term('general_generic')}
+				.active=${rootTabActive}
+				href=${rootTabPath}>
+				${this.localize.term('general_generic')}
+			</uui-tab>
+		`;
 	}
 
 	renderTab(tab: UmbPropertyTypeContainerModel) {
@@ -556,15 +564,24 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			#header {
 				width: 100%;
-				min-height: var(--uui-size-15);
+				min-height: var(--uui-size-16);
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
 				flex-wrap: nowrap;
 			}
 
-			.flex {
+			#container-list {
 				display: flex;
+			}
+
+			#tabs-group {
+				display: flex;
+			}
+
+			#actions {
+				display: flex;
+				gap: var(--uui-size-space-2);
 			}
 
 			uui-tab-group {

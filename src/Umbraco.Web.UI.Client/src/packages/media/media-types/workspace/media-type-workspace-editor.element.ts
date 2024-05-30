@@ -80,32 +80,34 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-workspace-editor alias="Umb.Workspace.MediaType">
-			<div id="header" slot="header">
-				<uui-button id="icon" @click=${this._handleIconClick} label="icon" compact>
-					<umb-icon name=${ifDefined(this._icon)}></umb-icon>
-				</uui-button>
+		return html`
+			<umb-workspace-editor alias="Umb.Workspace.MediaType">
+				<div id="header" slot="header">
+					<uui-button id="icon" compact label="icon" look="outline" @click=${this._handleIconClick}>
+						<umb-icon name=${ifDefined(this._icon)}></umb-icon>
+					</uui-button>
 
-				<div id="editors">
-					<umb-input-with-alias
-						id="name"
-						label="name"
-						value=${this._name}
-						alias=${this._alias}
-						?auto-generate-alias=${this._isNew}
-						@change="${this.#onNameAndAliasChange}"
-						${umbFocus()}>
-					</umb-input-with-alias>
+					<div id="editors">
+						<umb-input-with-alias
+							id="name"
+							label=${this.localize.term('placeholders_entername')}
+							value=${this._name}
+							alias=${this._alias}
+							?auto-generate-alias=${this._isNew}
+							@change="${this.#onNameAndAliasChange}"
+							${umbFocus()}>
+						</umb-input-with-alias>
 
-					<uui-input
-						id="description"
-						.label=${this.localize.term('placeholders_enterDescription')}
-						.value=${this._description}
-						.placeholder=${this.localize.term('placeholders_enterDescription')}
-						@input=${this.#onDescriptionChange}></uui-input>
+						<uui-input
+							id="description"
+							.label=${this.localize.term('placeholders_enterDescription')}
+							.value=${this._description}
+							.placeholder=${this.localize.term('placeholders_enterDescription')}
+							@input=${this.#onDescriptionChange}></uui-input>
+					</div>
 				</div>
-			</div>
-		</umb-workspace-editor>`;
+			</umb-workspace-editor>
+		`;
 	}
 
 	static styles = [
@@ -119,6 +121,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 			#header {
 				display: flex;
 				flex: 1 1 auto;
+				gap: var(--uui-size-space-2);
 			}
 
 			#editors {
@@ -143,9 +146,9 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			#icon {
-				font-size: calc(var(--uui-size-layout-3) / 2);
-				margin-right: var(--uui-size-space-2);
-				margin-left: calc(var(--uui-size-space-4) * -1);
+				font-size: var(--uui-size-8);
+				height: 60px;
+				width: 60px;
 			}
 		`,
 	];

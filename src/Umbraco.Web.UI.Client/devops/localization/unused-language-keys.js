@@ -26,7 +26,7 @@ const mainMap = buildMap(mainKeys);
 const keys = Array.from(mainMap.keys());
 const usedKeys = new Set();
 
-const elementAndControllerFiles = await glob(`${__dirname}/../../src/**/*.ts`);
+const elementAndControllerFiles = await glob(`${__dirname}/../../src/**/*.ts`, { filesOnly: true });
 
 console.log(`Checking ${elementAndControllerFiles.length} files for unused keys`);
 

@@ -21,6 +21,7 @@ export interface UmbTreePickerModalData<
 	// Consider if it makes sense to move this into the UmbPickerModalData interface, but for now this is a TreePicker feature. [NL]
 	createAction?: UmbTreePickerModalCreateActionData<PathPatternParamsType>;
 	startNode?: UmbTreeStartNode;
+	foldersOnly?: boolean;
 }
 
 export interface UmbTreePickerModalValue extends UmbPickerModalValue {}
