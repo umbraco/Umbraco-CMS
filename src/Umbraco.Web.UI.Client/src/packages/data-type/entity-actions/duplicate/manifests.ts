@@ -15,6 +15,7 @@ const entityActions: Array<ManifestTypes> = [
 			duplicateRepositoryAlias: UMB_DUPLICATE_DATA_TYPE_REPOSITORY_ALIAS,
 			treeAlias: UMB_DATA_TYPE_TREE_ALIAS,
 			treeRepositoryAlias: UMB_DATA_TYPE_TREE_REPOSITORY_ALIAS,
+			foldersOnly: true,
 		},
 	},
 ];
