@@ -31,11 +31,4 @@ public interface ITemporaryFileRepository
     /// </summary>
     /// <returns>The keys of the delete temporary files.</returns>
     Task<IEnumerable<Guid>> CleanUpOldTempFiles(DateTime dateTime);
-
-    /// <summary>
-    /// Fast way of checking whether a temporary file exists. Should be more performant then a <see cref="GetAsync"/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    bool Exists(Guid key);
 }
