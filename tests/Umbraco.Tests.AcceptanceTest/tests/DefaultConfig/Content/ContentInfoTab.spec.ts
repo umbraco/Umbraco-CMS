@@ -85,7 +85,7 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.isTemplateModalVisible(templateName);
 
     // Clean
-    await umbracoApi.template.delete(templateId);
+    await umbracoApi.template.ensureNameNotExists(templateName);
   });
 
   test('can change template', async ({umbracoApi, umbracoUi}) => {
@@ -112,8 +112,8 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     expect(contentData.template.id).toBe(secondTemplateId);
 
     // Clean
-    await umbracoApi.template.delete(firstTemplateId);
-    await umbracoApi.template.delete(secondTemplateId);
+    await umbracoApi.template.ensureNameNotExists(firstTemplateName);
+    await umbracoApi.template.ensureNameNotExists(secondTemplateName);
   });
 
   test('cannot change to a template that is not allowed in the document type', async ({umbracoApi, umbracoUi}) => {
