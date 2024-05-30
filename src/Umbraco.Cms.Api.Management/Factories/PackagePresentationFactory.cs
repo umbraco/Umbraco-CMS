@@ -26,12 +26,11 @@ internal class PackagePresentationFactory : IPackagePresentationFactory
 
     public PackageDefinition CreatePackageDefinition(CreatePackageRequestModel createPackageRequestModel)
     {
-        // Macros are not included!
         PackageDefinition packageDefinition = _umbracoMapper.Map<PackageDefinition>(createPackageRequestModel)!;
 
         // Temp Id, PackageId and PackagePath for the newly created package
         packageDefinition.Id = 0;
-        packageDefinition.PackageId = Guid.Empty;
+        packageDefinition.PackageId = createPackageRequestModel.Id ?? Guid.Empty;
         packageDefinition.PackagePath = string.Empty;
 
         return packageDefinition;

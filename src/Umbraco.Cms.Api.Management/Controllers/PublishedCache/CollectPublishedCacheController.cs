@@ -16,7 +16,7 @@ public class CollectPublishedCacheController : PublishedCacheControllerBase
     [HttpPost("collect")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult> Collect()
+    public async Task<IActionResult> Collect(CancellationToken cancellationToken)
     {
         GC.Collect();
         await _publishedSnapshotService.CollectAsync();

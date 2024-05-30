@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Deploy;
 public abstract class ArtifactBase<TUdi> : IArtifact
     where TUdi : Udi
 {
-    private IEnumerable<ArtifactDependency> _dependencies;
+    private IEnumerable<ArtifactDependency>? _dependencies;
     private readonly Lazy<string> _checksum;
 
     /// <summary>
@@ -20,7 +20,7 @@ public abstract class ArtifactBase<TUdi> : IArtifact
         Udi = udi ?? throw new ArgumentNullException(nameof(udi));
         Name = Udi.ToString();
 
-        _dependencies = dependencies ?? Enumerable.Empty<ArtifactDependency>();
+        _dependencies = dependencies;
         _checksum = new Lazy<string>(GetChecksum);
     }
 
@@ -33,8 +33,8 @@ public abstract class ArtifactBase<TUdi> : IArtifact
     /// <inheritdoc />
     public IEnumerable<ArtifactDependency> Dependencies
     {
-        get => _dependencies;
-        set => _dependencies = value.OrderBy(x => x.Udi);
+        get => _dependencies ??= Array.Empty<ArtifactDependency>();
+        set => _dependencies = value.OrderBy(x => x.Udi).ToArray();
     }
 
     /// <inheritdoc />
@@ -44,7 +44,7 @@ public abstract class ArtifactBase<TUdi> : IArtifact
     public string Name { get; set; }
 
     /// <inheritdoc />
-    public string Alias { get; set; } = string.Empty;
+    public string? Alias { get; set; }
 
     /// <summary>
     /// Gets the checksum.
@@ -53,17 +53,4 @@ public abstract class ArtifactBase<TUdi> : IArtifact
     /// The checksum.
     /// </returns>
     protected abstract string GetChecksum();
-
-    /// <summary>
-    /// Prevents the <see cref="Checksum" /> property from being serialized.
-    /// </summary>
-    /// <returns>
-    /// Returns <c>false</c> to prevent the property from being serialized.
-    /// </returns>
-    /// <remarks>
-    /// Note that we can't use <see cref="NonSerializedAttribute" /> here as that works only on fields, not properties.  And we want to avoid using [JsonIgnore]
-    /// as that would require an external dependency in Umbraco.Cms.Core.
-    /// So using this method of excluding properties from serialized data, documented here: https://www.newtonsoft.com/json/help/html/ConditionalProperties.htm
-    /// </remarks>
-    public bool ShouldSerializeChecksum() => false;
 }

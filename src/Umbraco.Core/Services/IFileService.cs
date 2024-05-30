@@ -8,18 +8,11 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IFileService : IService
 {
-    [Obsolete("Please use SnippetCollection.GetPartialViewSnippetNames() or SnippetCollection.GetPartialViewMacroSnippetNames() instead. Scheduled for removal in V12.")]
-    IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
-
     [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     void CreatePartialViewFolder(string folderPath);
 
-    void CreatePartialViewMacroFolder(string folderPath);
-
     [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     void DeletePartialViewFolder(string folderPath);
-
-    void DeletePartialViewMacroFolder(string folderPath);
 
     /// <summary>
     ///     Gets a list of all <see cref="IPartialView" /> objects
@@ -31,22 +24,14 @@ public interface IFileService : IService
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     IPartialView? GetPartialView(string path);
 
-    IPartialView? GetPartialViewMacro(string path);
-
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId);
-
-    Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId);
 
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     bool DeletePartialView(string path, int? userId = null);
 
-    bool DeletePartialViewMacro(string path, int? userId = null);
-
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null);
-
-    Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int? userId = null);
 
     /// <summary>
     ///     Gets the content of a partial view as a stream.
@@ -71,27 +56,6 @@ public interface IFileService : IService
     /// <returns>The size of the partial view.</returns>
     [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     long GetPartialViewFileSize(string filepath);
-
-    /// <summary>
-    ///     Gets the content of a macro partial view as a stream.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the macro partial view.</param>
-    /// <returns>The content of the macro partial view.</returns>
-    Stream GetPartialViewMacroFileContentStream(string filepath);
-
-    /// <summary>
-    ///     Sets the content of a macro partial view.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the macro partial view.</param>
-    /// <param name="content">The content of the macro partial view.</param>
-    void SetPartialViewMacroFileContent(string filepath, Stream content);
-
-    /// <summary>
-    ///     Gets the size of a macro partial view.
-    /// </summary>
-    /// <param name="filepath">The filesystem path to the macro partial view.</param>
-    /// <returns>The size of the macro partial view.</returns>
-    long GetPartialViewMacroFileSize(string filepath);
 
     /// <summary>
     ///     Gets a list of all <see cref="IStylesheet" /> objects
@@ -344,20 +308,4 @@ public interface IFileService : IService
     /// <returns>The size of the template.</returns>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     long GetTemplateFileSize(string filepath);
-
-    /// <summary>
-    ///     Gets the content of a macro partial view snippet as a string
-    /// </summary>
-    /// <param name="snippetName">The name of the snippet</param>
-    /// <returns></returns>
-    [Obsolete("Please use SnippetCollection.GetPartialViewMacroSnippetContent instead. Scheduled for removal in V12.")]
-    string GetPartialViewMacroSnippetContent(string snippetName);
-
-    /// <summary>
-    ///     Gets the content of a partial view snippet as a string.
-    /// </summary>
-    /// <param name="snippetName">The name of the snippet</param>
-    /// <returns>The content of the partial view.</returns>
-    [Obsolete("Please use SnippetCollection.GetPartialViewSnippetContent instead. Scheduled for removal in V12.")]
-    string GetPartialViewSnippetContent(string snippetName);
 }

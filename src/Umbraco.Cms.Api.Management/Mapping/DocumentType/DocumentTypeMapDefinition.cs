@@ -1,9 +1,9 @@
-﻿using Umbraco.Cms.Api.Management.Extensions;
-using Umbraco.Cms.Api.Management.Mapping.ContentType;
+﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.DocumentType;
@@ -17,6 +17,9 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         mapper.Define<ISimpleContentType, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
         mapper.Define<IContentType, AllowedDocumentType>((_, _) => new AllowedDocumentType(), Map);
         mapper.Define<ISimpleContentType, DocumentTypeCollectionReferenceResponseModel>((_, _) => new DocumentTypeCollectionReferenceResponseModel(), Map);
+        mapper.Define<IContentEntitySlim, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
+        mapper.Define<IDocumentEntitySlim, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
+        mapper.Define<IContent, DocumentTypeBlueprintItemResponseModel>((_, _) => new DocumentTypeBlueprintItemResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -37,11 +40,14 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.AllowedDocumentTypes = source.AllowedContentTypes?.Select(ct =>
                 new DocumentTypeSort { DocumentType = new ReferenceByIdModel(ct.Key), SortOrder = ct.SortOrder })
             .ToArray() ?? Enumerable.Empty<DocumentTypeSort>();
-        target.Compositions = source.ContentTypeComposition.Select(contentTypeComposition => new DocumentTypeComposition
-        {
-            DocumentType = new ReferenceByIdModel(contentTypeComposition.Key),
-            CompositionType = CalculateCompositionType(source, contentTypeComposition)
-        }).ToArray();
+        target.Compositions = MapNestedCompositions(
+            source.ContentTypeComposition,
+            source.ParentId,
+            (referenceByIdModel, compositionType) => new DocumentTypeComposition
+            {
+                DocumentType = referenceByIdModel,
+                CompositionType = compositionType,
+            });
 
         if (source.AllowedTemplates != null)
         {
@@ -70,6 +76,22 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
     }
 
     // Umbraco.Code.MapAll
+    private void Map(IContentEntitySlim source, DocumentTypeReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.ContentTypeKey;
+        target.Icon = source.ContentTypeIcon ?? string.Empty;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListViewKey);
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(IDocumentEntitySlim source, DocumentTypeReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.ContentTypeKey;
+        target.Icon = source.ContentTypeIcon ?? string.Empty;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListViewKey);
+    }
+
+    // Umbraco.Code.MapAll
     private void Map(ISimpleContentType source, DocumentTypeReferenceResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -92,5 +114,12 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.Id = source.Key;
         target.Alias = source.Alias;
         target.Icon = source.Icon ?? string.Empty;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(IContent source, DocumentTypeBlueprintItemResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Name = source.Name ?? string.Empty;
     }
 }

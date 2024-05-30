@@ -21,7 +21,7 @@ public class ValidateUpdateMediaController : UpdateMediaControllerBase
         IAuthorizationService authorizationService,
         IMediaEditingService mediaEditingService,
         IMediaEditingPresentationFactory mediaEditingPresentationFactory)
-        : base(authorizationService, mediaEditingService)
+        : base(authorizationService)
     {
         _mediaEditingService = mediaEditingService;
         _mediaEditingPresentationFactory = mediaEditingPresentationFactory;
@@ -32,11 +32,11 @@ public class ValidateUpdateMediaController : UpdateMediaControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Validate(Guid id, UpdateMediaRequestModel requestModel)
-        => await HandleRequest(id, async content =>
+    public async Task<IActionResult> Validate(CancellationToken cancellationToken, Guid id, UpdateMediaRequestModel requestModel)
+        => await HandleRequest(id, async () =>
         {
             MediaUpdateModel model = _mediaEditingPresentationFactory.MapUpdateModel(requestModel);
-            Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _mediaEditingService.ValidateUpdateAsync(content, model);
+            Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _mediaEditingService.ValidateUpdateAsync(id, model);
 
             return result.Success
                 ? Ok()

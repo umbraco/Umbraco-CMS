@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web.Mvc;
@@ -22,9 +24,7 @@ public sealed class FrontEndRoutes : IAreaRoutes
     private readonly SurfaceControllerTypeCollection _surfaceControllerTypeCollection;
     private readonly string _umbracoPathSegment;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="FrontEndRoutes" /> class.
-    /// </summary>
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
     public FrontEndRoutes(
         IOptions<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment,
@@ -36,6 +36,23 @@ public sealed class FrontEndRoutes : IAreaRoutes
         _surfaceControllerTypeCollection = surfaceControllerTypeCollection;
         _apiControllers = apiControllers;
         _umbracoPathSegment = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="FrontEndRoutes" /> class.
+    /// </summary>
+    public FrontEndRoutes(
+        IOptions<GlobalSettings> globalSettings,
+        IHostingEnvironment hostingEnvironment,
+        IRuntimeState runtimeState,
+        SurfaceControllerTypeCollection surfaceControllerTypeCollection)
+        : this(
+            globalSettings,
+            hostingEnvironment,
+            runtimeState,
+            surfaceControllerTypeCollection,
+            StaticServiceProvider.Instance.GetRequiredService<UmbracoApiControllerTypeCollection>())
+    {
     }
 
     /// <inheritdoc />

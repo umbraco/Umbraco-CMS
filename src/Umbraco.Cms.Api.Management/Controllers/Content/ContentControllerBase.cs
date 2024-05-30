@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -8,7 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
-public class ContentControllerBase : ManagementApiControllerBase
+public abstract class ContentControllerBase : ManagementApiControllerBase
 {
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
@@ -18,7 +17,7 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithDetail("A notification handler prevented the content operation.")
                 .Build()),
             ContentEditingOperationStatus.ContentTypeNotFound => NotFound(problemDetailsBuilder
-                .WithTitle("The requested content could not be found")
+                .WithTitle("The requested content type could not be found")
                 .Build()),
             ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch => BadRequest(problemDetailsBuilder
                 .WithTitle("Content type culture variance mismatch")
@@ -60,6 +59,18 @@ public class ContentControllerBase : ManagementApiControllerBase
             ContentEditingOperationStatus.SortingInvalid => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid sorting options")
                 .WithDetail("The supplied sorting operations were invalid. Additional details can be found in the log.")
+                .Build()),
+            ContentEditingOperationStatus.InvalidCulture => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid culture")
+                .WithDetail("One or more of the supplied culture codes did not match the configured languages.")
+                .Build()),
+            ContentEditingOperationStatus.DuplicateKey => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid Id")
+                .WithDetail("The supplied id is already in use.")
+                .Build()),
+            ContentEditingOperationStatus.DuplicateName => BadRequest(problemDetailsBuilder
+                .WithTitle("Duplicate name")
+                .WithDetail("The supplied name is already in use for the same content type.")
                 .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,

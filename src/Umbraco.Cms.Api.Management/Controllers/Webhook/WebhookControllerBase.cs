@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("webhook")]
 [ApiExplorerSettings(GroupName = "Webhook")]
 public abstract class WebhookControllerBase : ManagementApiControllerBase

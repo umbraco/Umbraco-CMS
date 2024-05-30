@@ -16,11 +16,13 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
-[Authorize(Policy = "New" + AuthorizationPolicies.BackOfficeAccess)]
-[Authorize(Policy = "New" + AuthorizationPolicies.UmbracoFeatureEnabled)]
+[ApiController]
+[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+[Authorize(Policy = AuthorizationPolicies.UmbracoFeatureEnabled)]
 [MapToApi(ManagementApiConfiguration.ApiName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 [AppendEventMessages]
+[Produces("application/json")]
 public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {
     protected IActionResult CreatedAtId<T>(Expression<Func<T, string>> action, Guid id)
@@ -61,4 +63,13 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
     protected static IActionResult OperationStatusResult<TEnum>(TEnum status, Func<ProblemDetailsBuilder, IActionResult> result)
         where TEnum : Enum
         => result(new ProblemDetailsBuilder().WithOperationStatus(status));
+
+    protected BadRequestObjectResult SkipTakeToPagingProblem() =>
+        BadRequest(new ProblemDetails
+        {
+            Title = "Invalid skip/take",
+            Detail = "Skip must be a multiple of take - i.e. skip = 10, take = 5",
+            Status = StatusCodes.Status400BadRequest,
+            Type = "Error",
+        });
 }

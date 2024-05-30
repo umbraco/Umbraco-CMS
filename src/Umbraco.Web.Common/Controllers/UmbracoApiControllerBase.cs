@@ -13,8 +13,9 @@ namespace Umbraco.Cms.Web.Common.Controllers;
 ///     <para>These controllers are NOT auto-routed.</para>
 ///     <para>The base class is <see cref="ControllerBase" /> which are netcore API controllers without any view support</para>
 /// </remarks>
-[Authorize(Policy = AuthorizationPolicies.UmbracoFeatureEnabled)] // TODO: This could be part of our conventions
+[Authorize(Policy = AuthorizationPolicies.UmbracoFeatureEnabled)]
 [UmbracoApiController]
+[Obsolete("This will be removed in Umbraco 15.")]
 public abstract class UmbracoApiControllerBase : ControllerBase, IUmbracoFeature
 {
     /// <summary>

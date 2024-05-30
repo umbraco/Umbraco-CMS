@@ -40,8 +40,6 @@ public class DatabaseSchemaCreator
         typeof(LanguageTextDto),
         typeof(DomainDto),
         typeof(LogDto),
-        typeof(MacroDto),
-        typeof(MacroPropertyDto),
         typeof(MemberPropertyTypeDto),
         typeof(MemberDto),
         typeof(Member2MemberGroupDto),
@@ -89,6 +87,7 @@ public class DatabaseSchemaCreator
         typeof(Webhook2HeadersDto),
         typeof(WebhookLogDto),
         typeof(WebhookRequestDto),
+        typeof(UserDataDto),
     };
 
     private readonly IUmbracoDatabase _database;

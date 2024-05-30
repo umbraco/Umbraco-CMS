@@ -343,6 +343,11 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
 
     private ContentTypeOperationStatus ValidateContainers(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, IContentTypeComposition[] allContentTypeCompositions)
     {
+        if (model.Containers.Any(container => Enum.TryParse<PropertyGroupType>(container.Type, out _) is false))
+        {
+            return ContentTypeOperationStatus.InvalidContainerType;
+        }
+
         // all property container keys must be present in the model
         Guid[] modelContainerKeys = model.Containers.Select(c => c.Key).ToArray();
         if (model.Properties.Any(p => p.ContainerKey is not null && modelContainerKeys.Contains(p.ContainerKey.Value) is false))
@@ -653,7 +658,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         => model.Properties.Select(property => property.DataTypeKey).Distinct().ToArray();
 
     private async Task<IDataType[]> GetDataTypesAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
-        => (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray();
+    {
+        Guid[] dataTypeKeys = GetDataTypeKeys(model);
+        return dataTypeKeys.Any()
+            ? (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray()
+            : Array.Empty<IDataType>();
+    }
 
     private int? GetParentId(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? containerKey)
     {

@@ -8,10 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script.Tree;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Script}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Script))]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessScripts)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessScripts)]
 public class ScriptTreeControllerBase : FileSystemTreeControllerBase
 {
     public ScriptTreeControllerBase(FileSystems fileSystems)
@@ -19,6 +18,4 @@ public class ScriptTreeControllerBase : FileSystemTreeControllerBase
                         throw new ArgumentException("Missing scripts file system", nameof(fileSystems));
 
     protected override IFileSystem FileSystem { get; }
-
-    protected override string ItemType(string path) => Constants.UdiEntityType.Script;
 }

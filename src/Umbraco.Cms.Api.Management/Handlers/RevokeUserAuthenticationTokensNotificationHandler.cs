@@ -1,6 +1,9 @@
 using System.Data.Common;
+using System.Globalization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -14,7 +17,8 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         INotificationAsyncHandler<UserSavedNotification>,
         INotificationAsyncHandler<UserDeletedNotification>,
         INotificationAsyncHandler<UserGroupDeletingNotification>,
-        INotificationAsyncHandler<UserGroupDeletedNotification>
+        INotificationAsyncHandler<UserGroupDeletedNotification>,
+        INotificationAsyncHandler<UserLoginSuccessNotification>
 {
     private const string NotificationStateKey = "Umbraco.Cms.Api.Management.Handlers.RevokeUserAuthenticationTokensNotificationHandler";
 
@@ -22,17 +26,20 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
     private readonly IUserGroupService _userGroupService;
     private readonly IOpenIddictTokenManager _tokenManager;
     private readonly ILogger<RevokeUserAuthenticationTokensNotificationHandler> _logger;
+    private readonly SecuritySettings _securitySettings;
 
     public RevokeUserAuthenticationTokensNotificationHandler(
         IUserService userService,
         IUserGroupService userGroupService,
         IOpenIddictTokenManager tokenManager,
-        ILogger<RevokeUserAuthenticationTokensNotificationHandler> logger)
+        ILogger<RevokeUserAuthenticationTokensNotificationHandler> logger,
+        IOptions<SecuritySettings> securitySettingsOptions)
     {
         _userService = userService;
         _userGroupService = userGroupService;
         _tokenManager = tokenManager;
         _logger = logger;
+        _securitySettings = securitySettingsOptions.Value;
     }
 
     // We need to know the pre-saving state of the saved users in order to compare if their access has changed
@@ -112,7 +119,6 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         {
             _logger.LogWarning(e, "This is expected when we upgrade from < Umbraco 14. Otherwise it should not happen");
         }
-
     }
 
     // We can only delete non-logged in users in Umbraco, meaning that such will not have a token,
@@ -168,6 +174,22 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         }
     }
 
+    public async Task HandleAsync(UserLoginSuccessNotification notification, CancellationToken cancellationToken)
+    {
+        if (_securitySettings.AllowConcurrentLogins is false)
+        {
+            var userId = notification.AffectedUserId;
+            IUser? user = userId is not null ? await FindUserFromString(userId) : null;
+
+            if (user is null)
+            {
+                return;
+            }
+
+            await RevokeTokensAsync(user);
+        }
+    }
+
     // Get data about the user before saving
     private async Task<UserStartNodesAndGroupAccess?> GetRelevantUserAccessDataByUserKeyAsync(Guid userKey)
     {
@@ -193,17 +215,26 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
 
     private async Task RevokeTokensAsync(IUser user)
     {
-        var tokens = await _tokenManager.FindBySubjectAsync(user.Key.ToString()).ToArrayAsync();
-        if (tokens.Length == 0)
+        _logger.LogInformation("Revoking active tokens for user with ID {id}", user.Id);
+
+        await _tokenManager.RevokeUmbracoUserTokens(user.Key);
+    }
+
+    private async Task<IUser?> FindUserFromString(string userId)
+    {
+        if (int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
         {
-            return;
+            return _userService.GetUserById(id);
         }
 
-        _logger.LogInformation("Revoking {count} active tokens for user with ID {id}", tokens.Length, user.Id);
-        foreach (var token in tokens)
+        // We couldn't directly convert the ID to an int, this is because the user logged in with external login.
+        // So we need to look up the user by key.
+        if (Guid.TryParse(userId, out Guid key))
         {
-            await _tokenManager.DeleteAsync(token);
+            return await _userService.GetAsync(key);
         }
+
+        return null;
     }
 
     private class UserStartNodesAndGroupAccess

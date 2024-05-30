@@ -1,5 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentPublishing;
+﻿using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -26,11 +25,11 @@ public interface IContentPublishingService
     Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, bool force, Guid userKey);
 
     /// <summary>
-    ///     Unpublishes a single content item.
+    ///     Unpublishes multiple cultures of a single content item.
     /// </summary>
     /// <param name="key">The key of the root content.</param>
-    /// <param name="culture">The culture to unpublish. Use null to unpublish all cultures.</param>
+    /// <param name="cultures">The cultures to unpublish. Use null to unpublish all cultures.</param>
     /// <param name="userKey">The identifier of the user performing the operation.</param>
     /// <returns>Status of the publish operation.</returns>
-    Task<Attempt<ContentPublishingOperationStatus>> UnpublishAsync(Guid key, string? culture, Guid userKey);
+    Task<Attempt<ContentPublishingOperationStatus>> UnpublishAsync(Guid key, ISet<string>? cultures, Guid userKey);
 }

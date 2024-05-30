@@ -1,12 +1,11 @@
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
+using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -20,18 +19,20 @@ public class TelemetryServiceTests : UmbracoIntegrationTest
         builder.Services.Configure<GlobalSettings>(options => options.Id = Guid.NewGuid().ToString());
 
     private ITelemetryService TelemetryService => GetRequiredService<ITelemetryService>();
+
     private IMetricsConsentService MetricsConsentService => GetRequiredService<IMetricsConsentService>();
 
+    private WebhookEventCollection WebhookEventCollection => GetRequiredService<WebhookEventCollection>();
+
     [Test]
-    public void Expected_Detailed_Telemetry_Exists()
+    public async Task Expected_Detailed_Telemetry_Exists()
     {
-        var expectedData = new[]
+        var expectedData = new List<string>
         {
             Constants.Telemetry.RootCount,
             Constants.Telemetry.DomainCount,
             Constants.Telemetry.ExamineIndexCount,
             Constants.Telemetry.LanguageCount,
-            Constants.Telemetry.MacroCount,
             Constants.Telemetry.MediaCount,
             Constants.Telemetry.MediaCount,
             Constants.Telemetry.TemplateCount,
@@ -52,10 +53,21 @@ public class TelemetryServiceTests : UmbracoIntegrationTest
             Constants.Telemetry.BackofficeExternalLoginProviderCount,
             Constants.Telemetry.RuntimeMode,
             Constants.Telemetry.DeliverApiEnabled,
-            Constants.Telemetry.DeliveryApiPublicAccess
+            Constants.Telemetry.DeliveryApiPublicAccess,
+            Constants.Telemetry.WebhookTotal,
+            Constants.Telemetry.WebhookCustomHeaders,
+            Constants.Telemetry.WebhookCustomEvent,
+            Constants.Telemetry.RichTextEditorCount,
+            Constants.Telemetry.RichTextBlockCount,
+            Constants.Telemetry.TotalPropertyCount,
+            Constants.Telemetry.HighestPropertyCount,
+            Constants.Telemetry.TotalCompositions,
         };
 
-        MetricsConsentService.SetConsentLevel(TelemetryLevel.Detailed);
+        // Add the default webhook events.
+        expectedData.AddRange(WebhookEventCollection.Select(eventInfo => $"{Constants.Telemetry.WebhookPrefix}{eventInfo.Alias}"));
+
+        await MetricsConsentService.SetConsentLevelAsync(TelemetryLevel.Detailed);
         var success = TelemetryService.TryGetTelemetryReportData(out var telemetryReportData);
         var detailed = telemetryReportData.Detailed.ToArray();
 
@@ -63,7 +75,7 @@ public class TelemetryServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(detailed);
-            Assert.AreEqual(expectedData.Length, detailed.Length);
+            Assert.AreEqual(expectedData.Count, detailed.Length);
 
             foreach (var expectedInfo in expectedData)
             {

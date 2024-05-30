@@ -6,5 +6,5 @@ public class MediaConfigurationResponseModel
 
     public required bool DisableUnpublishWhenReferenced { get; set; }
 
-    public required bool SanitizeTinyMce { get; set; }
+    public required ISet<string> ReservedFieldNames { get; set; }
 }

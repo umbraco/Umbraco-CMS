@@ -554,6 +554,47 @@ public partial class ContentEditingServiceTests
         Assert.IsNull(result.Result.Content);
     }
 
+    [Test]
+    public async Task Cannot_Create_Culture_Variant_With_Incorrect_Culture_Casing()
+    {
+        var contentType = await CreateVariantContentType();
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" }
+            },
+            Variants = new[]
+            {
+                new VariantModel
+                {
+                    Culture = "en-us",
+                    Name = "The English Name",
+                    Properties = new[]
+                    {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The English Title" }
+                    }
+                },
+                new VariantModel
+                {
+                    Culture = "da-dk",
+                    Name = "The Danish Name",
+                    Properties = new[]
+                    {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The Danish Title" }
+                    }
+                }
+            }
+        };
+
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status);
+    }
+
     private void AssertBodyTextEquals(string expected, IContent content)
     {
         var bodyTextValue = content.GetValue<string>("bodyText");

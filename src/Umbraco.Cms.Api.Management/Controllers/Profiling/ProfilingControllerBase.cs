@@ -7,10 +7,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Profiling;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("profiling")]
 [ApiExplorerSettings(GroupName = "Profiling")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessSettings)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
 public class ProfilingControllerBase : ManagementApiControllerBase
 {
     protected IActionResult WebProfilerOperationStatusResult(WebProfilerOperationStatus status) =>

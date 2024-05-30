@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
-[ApiController]
 [ApiExplorerSettings(GroupName = "User")]
 public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerBase
 {
@@ -19,6 +18,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
             UserOperationStatus.MissingUserGroup => NotFound(problemDetailsBuilder
                 .WithTitle("Missing User Group")
                 .WithDetail("The specified user group was not found.")
+                .Build()),
+            UserOperationStatus.AdminUserGroupMustNotBeEmpty => BadRequest(problemDetailsBuilder
+                .WithTitle("Admin User Group Must Not Be Empty")
+                .WithDetail("The admin user group must not be empty.")
                 .Build()),
             UserOperationStatus.NoUserGroup => BadRequest(problemDetailsBuilder
                 .WithTitle("No User Group Specified")
@@ -113,6 +116,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Content node not found")
                 .WithDetail("The specified content node was not found.")
                 .Build()),
+            UserOperationStatus.NodeNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("Node not found")
+                .WithDetail("The specified node was not found.")
+                .Build()),
             UserOperationStatus.NotInInviteState => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid user state")
                 .WithDetail("The target user is not in the invite state.")
@@ -143,6 +150,18 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithDetail("The specified 2fa code was invalid in combination with the provider.")
                 .Build()),
             TwoFactorOperationStatus.UserNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("User not found")
+                .WithDetail("The specified user id was not found.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                .WithTitle("Unknown two factor operation status.")
+                .Build()),
+        });
+
+    protected IActionResult ExternalLoginOperationStatusResult(ExternalLoginOperationStatus status) =>
+        OperationStatusResult(status, problemDetailsBuilder => status switch
+        {
+            ExternalLoginOperationStatus.UserNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("User not found")
                 .WithDetail("The specified user id was not found.")
                 .Build()),

@@ -36,19 +36,19 @@ public class UnlockUserController : UserControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UnlockUsers(UnlockUsersRequestModel model)
+    public async Task<IActionResult> UnlockUsers(CancellationToken cancellationToken, UnlockUsersRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            UserPermissionResource.WithKeys(model.UserIds),
-            AuthorizationPolicies.AdminUserEditsRequireAdmin);
+            UserPermissionResource.WithKeys(model.UserIds.Select(x => x.Id)),
+            AuthorizationPolicies.UserPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {
             return Forbidden();
         }
 
-        Attempt<UserUnlockResult, UserOperationStatus> attempt = await _userService.UnlockAsync(CurrentUserKey(_backOfficeSecurityAccessor), model.UserIds.ToArray());
+        Attempt<UserUnlockResult, UserOperationStatus> attempt = await _userService.UnlockAsync(CurrentUserKey(_backOfficeSecurityAccessor), model.UserIds.Select(x => x.Id).ToArray());
 
         return attempt.Success
             ? Ok()

@@ -14,6 +14,8 @@ public enum ContentPublishingOperationStatus
     CultureAwaitingRelease,
     InTrash,
     InvalidCulture,
+    CannotPublishInvariantWhenVariant,
+    CannotPublishVariantWhenNotVariant,
     CultureMissing,
     PathNotPublished,
     ConcurrencyViolation,

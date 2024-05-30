@@ -86,13 +86,14 @@ public class MigrateDataTypeConfigurations : MigrationBase
                 updated |= dataTypeDto.EditorAlias switch
                 {
                     PropertyEditorAliases.Boolean => HandleBoolean(ref configurationData),
+                    PropertyEditorAliases.CheckBoxList => HandleCheckBoxList(ref configurationData),
                     PropertyEditorAliases.ColorPicker => HandleColorPicker(ref configurationData),
                     PropertyEditorAliases.ContentPicker => HandleContentPicker(ref configurationData),
                     PropertyEditorAliases.DateTime => HandleDateTime(ref configurationData),
                     PropertyEditorAliases.DropDownListFlexible => HandleDropDown(ref configurationData),
                     PropertyEditorAliases.EmailAddress => HandleEmailAddress(ref configurationData),
                     PropertyEditorAliases.Label => HandleLabel(ref configurationData),
-                    PropertyEditorAliases.ListView => HandleListView(ref configurationData, dataTypeDto.NodeDto?.UniqueId, allMediaTypes, allMemberTypes),
+                    PropertyEditorAliases.ListView => HandleListView(ref configurationData, dataTypeDto.NodeDto?.UniqueId, allMediaTypes),
                     PropertyEditorAliases.MediaPicker3 => HandleMediaPicker(ref configurationData, allMediaTypes),
                     PropertyEditorAliases.MultiNodeTreePicker => HandleMultiNodeTreePicker(ref configurationData, allContentTypes, allMediaTypes, allMemberTypes),
                     PropertyEditorAliases.MultiUrlPicker => HandleMultiUrlPicker(ref configurationData),
@@ -125,6 +126,10 @@ public class MigrateDataTypeConfigurations : MigrationBase
     // translate "default value" to a proper boolean value
     private bool HandleBoolean(ref Dictionary<string, object> configurationData)
         => ReplaceIntegerStringWithBoolean(ref configurationData, "default");
+
+    // translate "selectable items" from old "value list" format to string array
+    private bool HandleCheckBoxList(ref Dictionary<string, object> configurationData)
+        => ReplaceValueListArrayWithStringArray(ref configurationData, "items");
 
     // translate "allowed colors" configuration from multiple old formats
     private bool HandleColorPicker(ref Dictionary<string, object> configurationData)
@@ -303,13 +308,11 @@ public class MigrateDataTypeConfigurations : MigrationBase
 
     // ensure that list view configs have all configurations, as some have never been added by means of migration.
     // also performs a re-formatting of "layouts" and "includeProperties" to a V14 format
-    private bool HandleListView(ref Dictionary<string, object> configurationData, Guid? dataTypeKey, IMediaType[] allMediaTypes, IMemberType[] allMemberTypes)
+    private bool HandleListView(ref Dictionary<string, object> configurationData, Guid? dataTypeKey, IMediaType[] allMediaTypes)
     {
         var collectionViewType = dataTypeKey == Constants.DataTypes.Guids.ListViewMediaGuid || allMediaTypes.Any(mt => mt.ListView == dataTypeKey)
             ? "Media"
-            : dataTypeKey == Constants.DataTypes.Guids.ListViewMembersGuid || allMemberTypes.Any(mt => mt.ListView == dataTypeKey)
-                ? "Member"
-                : "Document";
+            : "Document";
 
         string? LayoutPathToCollectionView(string? path)
             => "views/propertyeditors/listview/layouts/list/list.html".InvariantEquals(path)

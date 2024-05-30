@@ -9,7 +9,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.RequireAdminAccess)]
+[Authorize(Policy = AuthorizationPolicies.RequireAdminAccess)]
 public class ConfigurationUserController : UserControllerBase
 {
     private readonly IUserPresentationFactory _userPresentationFactory;
@@ -19,5 +19,6 @@ public class ConfigurationUserController : UserControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UserConfigurationResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Configuration() => Ok(await _userPresentationFactory.CreateUserConfigurationModelAsync());
+    public async Task<IActionResult> Configuration(CancellationToken cancellationToken)
+        => Ok(await _userPresentationFactory.CreateUserConfigurationModelAsync());
 }

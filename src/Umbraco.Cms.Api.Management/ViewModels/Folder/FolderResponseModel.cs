@@ -3,6 +3,4 @@
 public class FolderResponseModel : FolderModelBase
 {
     public Guid Id { get; set; }
-
-    public ReferenceByIdModel? Parent { get; set; }
 }

@@ -1,5 +1,4 @@
 ﻿using Asp.Versioning;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -7,12 +6,10 @@ using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
 public class AllowedAtRootMediaTypeController : MediaTypeControllerBase
 {
     private readonly IMediaTypeService _mediaTypeService;
@@ -27,7 +24,7 @@ public class AllowedAtRootMediaTypeController : MediaTypeControllerBase
     [HttpGet("allowed-at-root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AllowedMediaType>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> AllowedAtRoot(int skip = 0, int take = 100)
+    public async Task<IActionResult> AllowedAtRoot(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         PagedModel<IMediaType> result = await _mediaTypeService.GetAllAllowedAsRootAsync(skip, take);
 

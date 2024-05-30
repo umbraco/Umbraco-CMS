@@ -756,6 +756,13 @@ namespace Umbraco.Cms.Core.Services
                 scope.WriteLock(Constants.Locks.MediaTree);
                 if (media.HasIdentity == false)
                 {
+                    if (_entityRepository.Get(media.Key, UmbracoObjectTypes.Media.GetGuid()) is not null)
+                    {
+                        scope.Complete();
+                        return Attempt.Fail<OperationResult?>(
+                            new OperationResult(OperationResultType.FailedDuplicateKey, eventMessages));
+                    }
+
                     media.CreatorId = userId;
                 }
 

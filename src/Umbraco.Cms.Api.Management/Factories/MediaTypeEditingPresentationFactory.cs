@@ -24,7 +24,7 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
         >(requestModel);
 
         createModel.Key = requestModel.Id;
-        createModel.ContainerKey = requestModel.Folder?.Id;
+        createModel.ContainerKey = requestModel.Parent?.Id;
         createModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedMediaTypes);
         createModel.Compositions = MapCompositions(requestModel.Compositions);
         createModel.ListView = requestModel.Collection?.Id;

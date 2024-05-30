@@ -34,19 +34,19 @@ public class BulkDeleteUserController : UserControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> DeleteUsers(DeleteUsersRequestModel model)
+    public async Task<IActionResult> DeleteUsers(CancellationToken cancellationToken, DeleteUsersRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            UserPermissionResource.WithKeys(model.UserIds),
-            AuthorizationPolicies.AdminUserEditsRequireAdmin);
+            UserPermissionResource.WithKeys(model.UserIds.Select(x => x.Id)),
+            AuthorizationPolicies.UserPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {
             return Forbidden();
         }
 
-        UserOperationStatus result = await _userService.DeleteAsync(CurrentUserKey(_backOfficeSecurityAccessor), model.UserIds);
+        UserOperationStatus result = await _userService.DeleteAsync(CurrentUserKey(_backOfficeSecurityAccessor), model.UserIds.Select(x => x.Id).ToHashSet());
 
         return result is UserOperationStatus.Success
             ? Ok()

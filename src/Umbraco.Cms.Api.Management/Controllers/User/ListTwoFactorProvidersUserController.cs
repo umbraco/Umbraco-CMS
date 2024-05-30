@@ -31,12 +31,12 @@ public class ListTwoFactorProvidersUserController : UserControllerBase
     [HttpGet("{id:guid}/2fa")]
     [ProducesResponseType(typeof(IEnumerable<UserTwoFactorProviderModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ListTwoFactorProviders(Guid id)
+    public async Task<IActionResult> ListTwoFactorProviders(CancellationToken cancellationToken, Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             UserPermissionResource.WithKeys(id),
-            AuthorizationPolicies.AdminUserEditsRequireAdmin);
+            AuthorizationPolicies.UserPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

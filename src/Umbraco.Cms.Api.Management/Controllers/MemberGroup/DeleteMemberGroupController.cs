@@ -15,14 +15,14 @@ public class DeleteMemberGroupController : MemberGroupControllerBase
 
     public DeleteMemberGroupController(IMemberGroupService memberGroupService) => _memberGroupService = memberGroupService;
 
-    [HttpDelete("{key:guid}")]
+    [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Delete(Guid key)
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
-        Attempt<IMemberGroup?, MemberGroupOperationStatus> result = await _memberGroupService.DeleteAsync(key);
+        Attempt<IMemberGroup?, MemberGroupOperationStatus> result = await _memberGroupService.DeleteAsync(id);
         return result.Success
             ? Ok()
             : MemberGroupOperationStatusResult(result.Status);

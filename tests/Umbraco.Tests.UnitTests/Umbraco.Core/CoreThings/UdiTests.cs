@@ -1,14 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Deploy;
-using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings;
 
@@ -82,12 +78,12 @@ public class UdiTests
         // we want to keep the / in string udis
         var r = string.Join("/", "path/to/View[1].cshtml".Split('/').Select(Uri.EscapeDataString));
         Assert.AreEqual("path/to/View%5B1%5D.cshtml", r);
-        Assert.IsTrue(Uri.IsWellFormedUriString("umb://partial-view-macro/" + r, UriKind.Absolute));
+        Assert.IsTrue(Uri.IsWellFormedUriString("umb://partial-view/" + r, UriKind.Absolute));
 
         // with the proper fix in StringUdi this should work:
-        var udi1 = new StringUdi("partial-view-macro", "path/to/View[1].cshtml");
-        Assert.AreEqual("umb://partial-view-macro/path/to/View%5B1%5D.cshtml", udi1.ToString());
-        var udi2 = UdiParser.Parse("umb://partial-view-macro/path/to/View%5B1%5D.cshtml");
+        var udi1 = new StringUdi("partial-view", "path/to/View[1].cshtml");
+        Assert.AreEqual("umb://partial-view/path/to/View%5B1%5D.cshtml", udi1.ToString());
+        var udi2 = UdiParser.Parse("umb://partial-view/path/to/View%5B1%5D.cshtml");
         Assert.AreEqual("path/to/View[1].cshtml", ((StringUdi)udi2).Id);
     }
 

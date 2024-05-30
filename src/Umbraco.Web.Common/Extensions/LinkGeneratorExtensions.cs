@@ -13,49 +13,21 @@ namespace Umbraco.Extensions;
 public static class LinkGeneratorExtensions
 {
     /// <summary>
-    /// Gets the Umbraco backoffice URL (if Umbraco is installed).
-    /// </summary>
-    /// <param name="linkGenerator">The link generator.</param>
-    /// <returns>
-    /// The Umbraco backoffice URL.
-    /// </returns>
-    public static string? GetUmbracoBackOfficeUrl(this LinkGenerator linkGenerator)
-        => linkGenerator.GetPathByAction("Default", "BackOffice", new { area = Constants.Web.Mvc.BackOfficeArea });
-
-    /// <summary>
-    /// Gets the Umbraco backoffice URL (if Umbraco is installed) or application virtual path (in most cases just <c>"/"</c>).
-    /// </summary>
-    /// <param name="linkGenerator">The link generator.</param>
-    /// <param name="hostingEnvironment">The hosting environment.</param>
-    /// <returns>
-    /// The Umbraco backoffice URL.
-    /// </returns>
-    public static string GetUmbracoBackOfficeUrl(this LinkGenerator linkGenerator, IHostingEnvironment hostingEnvironment)
-         => GetUmbracoBackOfficeUrl(linkGenerator) ?? hostingEnvironment.ApplicationVirtualPath;
-
-    /// <summary>
-    ///     Return the back office url if the back office is installed
-    /// </summary>
-    /// <remarks>
-    /// This method contained a bug that would result in always returning "/".
-    /// </remarks>
-    [Obsolete("Use the GetUmbracoBackOfficeUrl extension method instead. This method will be removed in Umbraco 13.")]
-    public static string? GetBackOfficeUrl(this LinkGenerator linkGenerator, IHostingEnvironment hostingEnvironment)
-        => "/";
-
-    /// <summary>
     ///     Return the Url for a Web Api service
     /// </summary>
     /// <typeparam name="T">The <see cref="UmbracoApiControllerBase" /></typeparam>
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName, object? id = null)
         where T : UmbracoApiControllerBase => linkGenerator.GetUmbracoControllerUrl(
         actionName,
         typeof(T),
         new Dictionary<string, object?> { ["id"] = id });
 
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService<T>(this LinkGenerator linkGenerator, string actionName, IDictionary<string, object?>? values)
         where T : UmbracoApiControllerBase => linkGenerator.GetUmbracoControllerUrl(actionName, typeof(T), values);
 
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiServiceBaseUrl<T>(
         this LinkGenerator linkGenerator,
         Expression<Func<T, object?>> methodSelector)
@@ -160,6 +132,7 @@ public static class LinkGeneratorExtensions
         return linkGenerator.GetUmbracoControllerUrl(actionName, ControllerExtensions.GetControllerName(controllerType), area, values);
     }
 
+    [Obsolete("This will be removed in Umbraco 15.")]
     public static string? GetUmbracoApiService<T>(
         this LinkGenerator linkGenerator,
         Expression<Func<T, object>> methodSelector)

@@ -123,6 +123,14 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             MethodInfo? method = ExpressionHelper.GetMethodInfo(methodSelector);
             IDictionary<string, object?> methodParams = ExpressionHelper.GetMethodParams(methodSelector) ?? new Dictionary<string, object?>();
 
+            // Remove the CancellationToken from the method params, this is automatically added by the framework
+            // So we do not want to add this to the query string
+            var cancellationTokenKey = methodParams.FirstOrDefault(x => x.Value is CancellationToken).Key;
+            if (cancellationTokenKey is not null)
+            {
+                methodParams.Remove(cancellationTokenKey);
+            }
+
 
             methodParams["version"] = method?.GetCustomAttribute<MapToApiVersionAttribute>()?.Versions?.First().MajorVersion.ToString();
             if (method == null)

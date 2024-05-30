@@ -9,8 +9,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.DenyLocalLoginIfConfigured)]
-// FIXME: Add requiring password reset token policy when its implemented
+[Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
 public class ConfigurationSecurityController : SecurityControllerBase
 {
     private readonly IPasswordConfigurationPresentationFactory _passwordConfigurationPresentationFactory;
@@ -21,7 +20,7 @@ public class ConfigurationSecurityController : SecurityControllerBase
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(SecurityConfigurationResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Configuration()
+    public async Task<IActionResult> Configuration(CancellationToken cancellationToken)
     {
         var viewModel = new SecurityConfigurationResponseModel
         {

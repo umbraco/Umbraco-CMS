@@ -16,7 +16,7 @@ public class ReloadPublishedCacheController : PublishedCacheControllerBase
     [HttpPost("reload")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult> Reload()
+    public async Task<IActionResult> Reload(CancellationToken cancellationToken)
     {
         _distributedCache.RefreshAllPublishedSnapshot();
         return await Task.FromResult(Ok());

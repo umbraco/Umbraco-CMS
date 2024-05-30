@@ -1,58 +1,33 @@
-﻿using Microsoft.Extensions.Options;
-using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal sealed class MediaPresentationFactory
-    : ContentPresentationFactoryBase<IMediaType, IMediaTypeService>, IMediaPresentationFactory
+internal sealed class MediaPresentationFactory : IMediaPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly ContentSettings _contentSettings;
-    private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
-    private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
-    private readonly IMediaTypeService _mediaTypeService;
+    private readonly IMediaUrlFactory _mediaUrlFactory;
 
     public MediaPresentationFactory(
         IUmbracoMapper umbracoMapper,
-        IOptions<ContentSettings> contentSettings,
-        MediaUrlGeneratorCollection mediaUrlGenerators,
-        IAbsoluteUrlBuilder absoluteUrlBuilder,
-        IMediaTypeService mediaTypeService)
-        : base(mediaTypeService, umbracoMapper)
+        IMediaUrlFactory mediaUrlFactory)
     {
         _umbracoMapper = umbracoMapper;
-        _contentSettings = contentSettings.Value;
-        _mediaUrlGenerators = mediaUrlGenerators;
-        _absoluteUrlBuilder = absoluteUrlBuilder;
-        _mediaTypeService = mediaTypeService;
+        _mediaUrlFactory = mediaUrlFactory;
     }
 
-    public Task<MediaResponseModel> CreateResponseModelAsync(IMedia media)
+    public MediaResponseModel CreateResponseModel(IMedia media)
     {
         MediaResponseModel responseModel = _umbracoMapper.Map<MediaResponseModel>(media)!;
 
-        responseModel.Urls = media
-            .GetUrls(_contentSettings, _mediaUrlGenerators)
-            .WhereNotNull()
-            .Select(mediaUrl => new MediaUrlInfo
-            {
-                Culture = null,
-                Url = _absoluteUrlBuilder.ToAbsoluteUrl(mediaUrl).ToString(),
-            })
-            .ToArray();
+        responseModel.Urls = _mediaUrlFactory.CreateUrls(media);
 
-        return Task.FromResult(responseModel);
+        return responseModel;
     }
 
     public MediaItemResponseModel CreateItemResponseModel(IMediaEntitySlim entity)
@@ -63,11 +38,7 @@ internal sealed class MediaPresentationFactory
             IsTrashed = entity.Trashed
         };
 
-        IMediaType? mediaType = _mediaTypeService.Get(entity.ContentTypeAlias);
-        if (mediaType is not null)
-        {
-            responseModel.MediaType = _umbracoMapper.Map<MediaTypeReferenceResponseModel>(mediaType)!;
-        }
+        responseModel.MediaType = _umbracoMapper.Map<MediaTypeReferenceResponseModel>(entity)!;
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
@@ -85,5 +56,5 @@ internal sealed class MediaPresentationFactory
         };
 
     public MediaTypeReferenceResponseModel CreateMediaTypeReferenceResponseModel(IMediaEntitySlim entity)
-        => CreateContentTypeReferenceResponseModel<MediaTypeReferenceResponseModel>(entity);
+        => _umbracoMapper.Map<MediaTypeReferenceResponseModel>(entity)!;
 }

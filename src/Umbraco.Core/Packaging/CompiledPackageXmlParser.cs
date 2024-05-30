@@ -48,8 +48,6 @@ public class CompiledPackageXmlParser
             // this value is irrelevant during install.
             PackageFile = null,
             Name = package.Element("name")?.Value ?? string.Empty,
-            Macros = xml.Root.Element("Macros")?.Elements("macro") ?? Enumerable.Empty<XElement>(),
-            MacroPartialViews = xml.Root.Element("MacroPartialViews")?.Elements("View") ?? Enumerable.Empty<XElement>(),
             PartialViews = xml.Root.Element("PartialViews")?.Elements("View") ?? Enumerable.Empty<XElement>(),
             Templates = xml.Root.Element("Templates")?.Elements("Template") ?? Enumerable.Empty<XElement>(),
             Stylesheets = xml.Root.Element("Stylesheets")?.Elements("Stylesheet") ?? Enumerable.Empty<XElement>(),
@@ -76,7 +74,6 @@ public class CompiledPackageXmlParser
     {
         var installWarnings = new InstallWarnings
         {
-            ConflictingMacros = _conflictingPackageData.FindConflictingMacros(package.Macros),
             ConflictingTemplates = _conflictingPackageData.FindConflictingTemplates(package.Templates),
             ConflictingStylesheets = _conflictingPackageData.FindConflictingStylesheets(package.Stylesheets),
         };

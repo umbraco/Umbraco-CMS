@@ -12,7 +12,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
 public class AllowedAtRootDocumentTypeController : DocumentTypeControllerBase
 {
     private readonly IContentTypeService _contentTypeService;
@@ -27,7 +26,7 @@ public class AllowedAtRootDocumentTypeController : DocumentTypeControllerBase
     [HttpGet("allowed-at-root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<AllowedDocumentType>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> AllowedAtRoot(int skip = 0, int take = 100)
+    public async Task<IActionResult> AllowedAtRoot(CancellationToken cancellationToken, int skip = 0, int take = 100)
     {
         PagedModel<IContentType> result = await _contentTypeService.GetAllAllowedAsRootAsync(skip, take);
 

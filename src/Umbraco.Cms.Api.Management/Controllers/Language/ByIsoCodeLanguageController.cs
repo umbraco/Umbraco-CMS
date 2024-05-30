@@ -24,7 +24,7 @@ public class ByIsoCodeLanguageController : LanguageControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(LanguageResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ByIsoCode(string isoCode)
+    public async Task<IActionResult> ByIsoCode(CancellationToken cancellationToken, string isoCode)
     {
         ILanguage? language = await _languageService.GetAsync(isoCode);
         if (language == null)

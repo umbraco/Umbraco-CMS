@@ -441,7 +441,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         empty. If the content type is invariant, then culture can be either '*' or null or empty.
     ///     </para>
     /// </remarks>
-    PublishResult Unpublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId);
+    PublishResult Unpublish(IContent content, string? culture = "*", int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets a value indicating whether a document is path-publishable.

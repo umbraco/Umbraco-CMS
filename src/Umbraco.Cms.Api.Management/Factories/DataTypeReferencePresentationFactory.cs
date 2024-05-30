@@ -47,8 +47,13 @@ public class DataTypeReferencePresentationFactory : IDataTypeReferencePresentati
                 IEnumerable<string> propertyAliases = propertyAliasesByGuid[contentType.Key];
                 yield return new DataTypeReferenceResponseModel
                 {
-                    Id = contentType.Key,
-                    Type = usagesByEntityType.Key,
+                    ContentType = new DataTypeContentTypeReferenceModel
+                    {
+                        Id = contentType.Key,
+                        Name = contentType.Name,
+                        Icon = contentType.Icon,
+                        Type = usagesByEntityType.Key,
+                    },
                     Properties = contentType
                         .PropertyTypes
                         .Where(propertyType => propertyAliases.InvariantContains(propertyType.Alias))

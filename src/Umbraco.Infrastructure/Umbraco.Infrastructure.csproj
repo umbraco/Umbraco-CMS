@@ -23,7 +23,6 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" />
     <PackageReference Include="MiniProfiler.Shared" />
     <PackageReference Include="ncrontab" />
-    <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="NPoco" />
     <PackageReference Include="OpenIddict.Abstractions" />
     <PackageReference Include="Serilog" />
@@ -65,5 +64,9 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Umbraco.Cms.Infrastructure</_Parameter1>
     </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Persistence\Mappers\MacroMapper.cs" />
   </ItemGroup>
 </Project>

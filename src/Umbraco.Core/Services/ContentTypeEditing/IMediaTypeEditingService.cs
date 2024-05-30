@@ -14,4 +14,8 @@ public interface IMediaTypeEditingService
         Guid? key,
         IEnumerable<Guid> currentCompositeKeys,
         IEnumerable<string> currentPropertyAliases);
+
+    Task<PagedModel<IMediaType>> GetMediaTypesForFileExtensionAsync(string fileExtension, int skip, int take);
+
+    Task<PagedModel<IMediaType>> GetFolderMediaTypes(int skip, int take);
 }

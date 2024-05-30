@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -18,15 +19,6 @@ public partial class PartialViewSnippetCollectionBuilder : LazyCollectionBuilder
     {
         var embeddedSnippets = new List<PartialViewSnippet>(base.CreateItems(factory));
 
-        // Ignore these
-        var filterNames = new List<string>
-        {
-            "Gallery",
-            "ListChildPagesFromChangeableSource",
-            "ListChildPagesOrderedByProperty",
-            "ListImagesFromMediaFolder"
-        };
-
         var snippetProvider = new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
         IEnumerable<IFileInfo> embeddedFiles = snippetProvider.GetDirectoryContents(string.Empty)
             .Where(x => !x.IsDirectory && x.Name.EndsWith(".cshtml"));
@@ -35,11 +27,6 @@ public partial class PartialViewSnippetCollectionBuilder : LazyCollectionBuilder
         foreach (IFileInfo file in embeddedFiles)
         {
             var id = Path.GetFileNameWithoutExtension(file.Name);
-            if (filterNames.Contains(id))
-            {
-                continue;
-            }
-
             var name = id.SplitPascalCasing(shortStringHelper).ToFirstUpperInvariant();
             using var stream = new StreamReader(file.CreateReadStream());
             var content = CleanUpSnippetContent(stream.ReadToEnd().Trim());
@@ -52,6 +39,7 @@ public partial class PartialViewSnippetCollectionBuilder : LazyCollectionBuilder
     private string CleanUpSnippetContent(string content)
     {
         const string partialViewHeader = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage";
+        content = content.EnsureNativeLineEndings();
 
         // Strip the @inherits if it's there
         Regex headerMatch = HeaderRegex();

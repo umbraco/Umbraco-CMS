@@ -5,10 +5,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Telemetry;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("telemetry")]
 [ApiExplorerSettings(GroupName = "Telemetry")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessSettings)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
 public abstract class TelemetryControllerBase : ManagementApiControllerBase
 {
 }

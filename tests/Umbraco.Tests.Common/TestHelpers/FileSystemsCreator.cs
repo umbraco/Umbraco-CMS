@@ -15,7 +15,6 @@ public static class FileSystemsCreator
     /// <param name="ioHelper"></param>
     /// <param name="globalSettings"></param>
     /// <param name="hostingEnvironment"></param>
-    /// <param name="macroPartialFileSystem"></param>
     /// <param name="partialViewsFileSystem"></param>
     /// <param name="stylesheetFileSystem"></param>
     /// <param name="scriptsFileSystem"></param>
@@ -26,10 +25,9 @@ public static class FileSystemsCreator
         IIOHelper ioHelper,
         IOptions<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment,
-        IFileSystem macroPartialFileSystem,
         IFileSystem partialViewsFileSystem,
         IFileSystem stylesheetFileSystem,
         IFileSystem scriptsFileSystem,
         IFileSystem mvcViewFileSystem) =>
-        new(loggerFactory, ioHelper, globalSettings, hostingEnvironment, macroPartialFileSystem, partialViewsFileSystem, stylesheetFileSystem, scriptsFileSystem, mvcViewFileSystem);
+        new(loggerFactory, ioHelper, globalSettings, hostingEnvironment, partialViewsFileSystem, stylesheetFileSystem, scriptsFileSystem, mvcViewFileSystem);
 }

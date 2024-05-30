@@ -29,11 +29,11 @@ public class BulkDeleteUserGroupsController : UserGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> BulkDelete(DeleteUserGroupsRequestModel model)
+    public async Task<IActionResult> BulkDelete(CancellationToken cancellationToken, DeleteUserGroupsRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            new UserGroupPermissionResource(model.UserGroupIds),
+            new UserGroupPermissionResource(model.UserGroupIds.Select(x => x.Id)),
             AuthorizationPolicies.UserBelongsToUserGroupInRequest);
 
         if (!authorizationResult.Succeeded)
@@ -41,7 +41,7 @@ public class BulkDeleteUserGroupsController : UserGroupControllerBase
             return Forbidden();
         }
 
-        Attempt<UserGroupOperationStatus> result = await _userGroupService.DeleteAsync(model.UserGroupIds);
+        Attempt<UserGroupOperationStatus> result = await _userGroupService.DeleteAsync(model.UserGroupIds.Select(x => x.Id).ToHashSet());
 
         return result.Success
             ? Ok()

@@ -90,19 +90,20 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
             .Select(p => p.Alias)
             .WhereNotNull();
 
-        // Service layer expects "owner" instead of "creator", so make sure to pass in the correct field
-        if (orderBy.InvariantEquals("creator"))
-        {
-            orderBy = "owner";
-        }
 
         if (listViewPropertyAliases.Contains(orderBy) == false && orderBy.InvariantEquals("name") == false)
         {
             return Attempt.FailWithStatus<Ordering?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.OrderByNotPartOfCollectionConfiguration, null);
         }
 
+        // Service layer expects "owner" instead of "creator", so make sure to pass in the correct field
+        if (orderBy.InvariantEquals("creator"))
+        {
+            orderBy = "owner";
+        }
+
         var orderByCustomField = listViewProperties
-            .Any(p => p.Alias == orderBy && p.IsSystem);
+            .Any(p => p.Alias == orderBy && p.IsSystem is false);
 
         var ordering = Ordering.By(
             orderBy,
@@ -203,32 +204,16 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
 
     private async Task<IDataType?> GetConfiguredListViewDataTypeAsync(TContentType? contentType)
     {
-        string? listViewSuffix = null;
-
-        // FIXME: Remove. This is a workaround to construct the custom list view name (content type - alias; media type- name)
-        // until we have the concrete content type + list view binding.
-        if (DefaultListViewKey == Constants.DataTypes.Guids.ListViewContentGuid)
+        // When contentType is not configured as a list view
+        if (contentType is not null && contentType.ListView is null)
         {
-            listViewSuffix = contentType?.Alias;
-        }
-        else if (DefaultListViewKey == Constants.DataTypes.Guids.ListViewMediaGuid)
-        {
-            listViewSuffix = contentType?.Name;
+            return null;
         }
 
-        // If we don't have a suffix (content type name or alias), we cannot look for the custom list view by name.
-        // So return the default one.
-        if (string.IsNullOrEmpty(listViewSuffix))
-        {
-            return await _dataTypeService.GetAsync(DefaultListViewKey);
-        }
+        // When we don't have a contentType (i.e. when root), we will get the default list view
+        Guid configuredListViewKey = contentType?.ListView ?? DefaultListViewKey;
 
-        // FIXME: Clean up! Get the configured list view from content type once the binding task AB#37205 is done.
-        // This is a hack based on legacy (same thing can be seen in ListViewContentAppFactory) - we cannot infer the list view associated with a content type otherwise.
-        // We can use the fact that when a custom list view is removed as the content type list view configuration, the corresponding list view data type gets deleted.
-        var customListViewName = Constants.Conventions.DataTypes.ListViewPrefix + listViewSuffix;
-
-        return _dataTypeService.GetDataType(customListViewName) ?? await _dataTypeService.GetAsync(DefaultListViewKey);
+        return await _dataTypeService.GetAsync(configuredListViewKey);
     }
 
     private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, int contentId, string? filter, Ordering? ordering, int skip, int take)

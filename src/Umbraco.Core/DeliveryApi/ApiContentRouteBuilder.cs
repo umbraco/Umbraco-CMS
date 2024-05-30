@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -10,13 +12,14 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 
 public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 {
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly IApiContentPathProvider _apiContentPathProvider;
     private readonly GlobalSettings _globalSettings;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IRequestPreviewService _requestPreviewService;
     private RequestHandlerSettings _requestSettings;
 
+    [Obsolete($"Use the constructor that does not accept {nameof(IPublishedUrlProvider)}. Will be removed in V15.")]
     public ApiContentRouteBuilder(
         IPublishedUrlProvider publishedUrlProvider,
         IOptions<GlobalSettings> globalSettings,
@@ -24,8 +27,32 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IRequestPreviewService requestPreviewService,
         IOptionsMonitor<RequestHandlerSettings> requestSettings)
+        : this(StaticServiceProvider.Instance.GetRequiredService<IApiContentPathProvider>(), globalSettings, variationContextAccessor, publishedSnapshotAccessor, requestPreviewService, requestSettings)
     {
-        _publishedUrlProvider = publishedUrlProvider;
+    }
+
+    [Obsolete($"Use the constructor that does not accept {nameof(IPublishedUrlProvider)}. Will be removed in V15.")]
+    public ApiContentRouteBuilder(
+        IPublishedUrlProvider publishedUrlProvider,
+        IApiContentPathProvider apiContentPathProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IRequestPreviewService requestPreviewService,
+        IOptionsMonitor<RequestHandlerSettings> requestSettings)
+        : this(apiContentPathProvider, globalSettings, variationContextAccessor, publishedSnapshotAccessor, requestPreviewService, requestSettings)
+    {
+    }
+
+    public ApiContentRouteBuilder(
+        IApiContentPathProvider apiContentPathProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IRequestPreviewService requestPreviewService,
+        IOptionsMonitor<RequestHandlerSettings> requestSettings)
+    {
+        _apiContentPathProvider = apiContentPathProvider;
         _variationContextAccessor = variationContextAccessor;
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _requestPreviewService = requestPreviewService;
@@ -72,7 +99,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         }
 
         // grab the content path from the URL provider
-        var contentPath = _publishedUrlProvider.GetUrl(content, UrlMode.Relative, culture);
+        var contentPath = _apiContentPathProvider.GetContentPath(content, culture);
 
         // in some scenarios the published content is actually routable, but due to the built-in handling of i.e. lacking culture setup
         // the URL provider resolves the content URL as empty string or "#". since the Delivery API handles routing explicitly,
@@ -96,7 +123,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 
     private string ContentPreviewPath(IPublishedContent content) => $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}{(_requestSettings.AddTrailingSlash ? "/" : string.Empty)}";
 
-    private static bool IsInvalidContentPath(string path) => path.IsNullOrWhiteSpace() || "#".Equals(path);
+    private static bool IsInvalidContentPath(string? path) => path.IsNullOrWhiteSpace() || "#".Equals(path);
 
     private IPublishedContent GetRoot(IPublishedContent content, bool isPreview)
     {

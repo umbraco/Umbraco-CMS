@@ -142,6 +142,10 @@ public static class UdiGetterExtensions
         {
             entityType = Constants.UdiEntityType.MediaTypeContainer;
         }
+        else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentBlueprint)
+        {
+            entityType = Constants.UdiEntityType.DocumentBlueprintContainer;
+        }
         else
         {
             throw new NotSupportedException(string.Format("Contained object type {0} is not supported.", entity.ContainedObjectType));
@@ -258,32 +262,11 @@ public static class UdiGetterExtensions
     /// <returns>
     /// The entity identifier of the entity.
     /// </returns>
-    public static GuidUdi GetUdi(this IMacro entity)
-    {
-        ArgumentNullException.ThrowIfNull(entity);
-
-        return new GuidUdi(Constants.UdiEntityType.Macro, entity.Key).EnsureClosed();
-    }
-
-    /// <summary>
-    /// Gets the entity identifier of the entity.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    /// <returns>
-    /// The entity identifier of the entity.
-    /// </returns>
     public static StringUdi GetUdi(this IPartialView entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        // TODO: We should throw on Unknown, but for the time being, assume it means PartialView
-        string entityType = entity.ViewType switch
-        {
-            PartialViewType.PartialViewMacro => Constants.UdiEntityType.PartialViewMacro,
-            _ => Constants.UdiEntityType.PartialView,
-        };
-
-        return GetUdiFromPath(entityType, entity.Path);
+        return GetUdiFromPath(Constants.UdiEntityType.PartialView, entity.Path);
     }
 
     /// <summary>
@@ -381,7 +364,6 @@ public static class UdiGetterExtensions
             IDataType dataTypeComposition => dataTypeComposition.GetUdi(),
             IDictionaryItem dictionaryItem => dictionaryItem.GetUdi(),
             ILanguage language => language.GetUdi(),
-            IMacro macro => macro.GetUdi(),
             IMemberGroup memberGroup => memberGroup.GetUdi(),
             IPartialView partialView => partialView.GetUdi(),
             IRelationType relationType => relationType.GetUdi(),

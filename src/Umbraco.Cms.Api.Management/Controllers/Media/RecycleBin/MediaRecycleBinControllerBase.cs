@@ -1,23 +1,22 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Media.RecycleBin;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Media}")]
 [RequireMediaTreeRootAccess]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMedia)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
 public class MediaRecycleBinControllerBase : RecycleBinControllerBase<MediaRecycleBinItemResponseModel>
 {
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
@@ -28,7 +27,7 @@ public class MediaRecycleBinControllerBase : RecycleBinControllerBase<MediaRecyc
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Media;
 
-    protected override int RecycleBinRootId => Constants.System.RecycleBinMedia;
+    protected override Guid RecycleBinRootKey => Constants.System.RecycleBinMediaKey;
 
     protected override MediaRecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
     {
