@@ -195,7 +195,7 @@ for (const dataTypeName of dataTypes) {
       // Act
       await umbracoUi.dataType.goToDataType(dataTypeName);
       await umbracoUi.dataType.clickChooseStartNodeButton();
-      await umbracoUi.dataType.addStartNode(mediaName);
+      await umbracoUi.dataType.addMediaStartNode(mediaName);
       await umbracoUi.dataType.clickSaveButton();
   
       // Assert

@@ -70,7 +70,7 @@ test('can add start node', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.dataType.clickChooseButton();
-  await umbracoUi.dataType.addStartNode(contentName);
+  await umbracoUi.dataType.addContentStartNode(contentName);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
