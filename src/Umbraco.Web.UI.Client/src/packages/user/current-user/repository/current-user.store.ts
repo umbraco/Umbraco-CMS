@@ -105,4 +105,6 @@ export class UmbCurrentUserStore extends UmbContextBase<UmbCurrentUserStore> {
 	}
 }
 
+export default UmbCurrentUserStore;
+
 export const UMB_CURRENT_USER_STORE_CONTEXT = new UmbContextToken<UmbCurrentUserStore>('UmbCurrentUserStore');
