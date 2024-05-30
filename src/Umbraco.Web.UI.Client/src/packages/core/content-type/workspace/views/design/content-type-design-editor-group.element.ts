@@ -1,15 +1,15 @@
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
-import { css, html, customElement, property, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbContentTypeContainerStructureHelper,
 	UmbContentTypeModel,
 	UmbPropertyTypeContainerModel,
 } from '@umbraco-cms/backoffice/content-type';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import './content-type-design-editor-properties.element.js';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-content-type-design-editor-group')
 export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
@@ -147,64 +147,78 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	}
 
 	render() {
-		return this._inherited !== undefined && this._groupId
-			? html`
-					<uui-box>
-						${this.#renderContainerHeader()}
-						<umb-content-type-design-editor-properties
-							.editContentTypePath=${this.editContentTypePath}
-							container-id=${this._groupId}></umb-content-type-design-editor-properties>
-					</uui-box>
-				`
-			: '';
+		if (this._inherited === undefined || !this._groupId) return nothing;
+		return html`
+			<uui-box>
+				${this.#renderContainerHeader()}
+				<umb-content-type-design-editor-properties
+					.editContentTypePath=${this.editContentTypePath}
+					container-id=${this._groupId}></umb-content-type-design-editor-properties>
+			</uui-box>
+		`;
 	}
 
 	// TODO: impl UMB_EDIT_DOCUMENT_TYPE_PATH_PATTERN, but we need either a generic type or a way to get the path pattern.... [NL]
 	#renderContainerHeader() {
-		return html`<div slot="header">
+		return html`
+			<div slot="header">
 				<div>
-					${this.sortModeActive && this._hasOwnerContainer ? html`<uui-icon name="icon-navigation"></uui-icon>` : null}
+					${when(
+						this.sortModeActive && this._hasOwnerContainer,
+						() => html`<uui-icon name="icon-navigation"></uui-icon>`,
+					)}
 					<uui-input
+						id="group-name"
 						label=${this.localize.term('contentTypeEditor_group')}
 						placeholder=${this.localize.term('placeholders_entername')}
 						.value=${this._group!.name}
 						?disabled=${!this._hasOwnerContainer}
-						@change=${this.#renameGroup}
 						@blur=${this.#blurGroup}
+						@change=${this.#renameGroup}
 						${this._group!.name === '' ? umbFocus() : nothing}></uui-input>
 				</div>
 			</div>
 			<div slot="header-actions">
-				${this._hasOwnerContainer === false && this._inheritedFrom
-					? html`<uui-tag look="default" class="inherited">
+				${when(
+					this._hasOwnerContainer === false && this._inheritedFrom,
+					() => html`
+						<uui-tag look="default" class="inherited">
 							<uui-icon name="icon-merge"></uui-icon>
 							<span
 								>${this.localize.term('contentTypeEditor_inheritedFrom')}
 								${repeat(
-									this._inheritedFrom,
+									this._inheritedFrom!,
 									(inherited) => inherited.unique,
 									(inherited) => html`
 										<a href=${this.editContentTypePath + 'edit/' + inherited.unique}>${inherited.name}</a>
 									`,
 								)}
 							</span>
-						</uui-tag>`
-					: null}
-				${!this._inherited && !this.sortModeActive
-					? html`<uui-button compact label="${this.localize.term('actions_delete')}" @click="${this.#requestRemove}">
+						</uui-tag>
+					`,
+				)}
+				${when(
+					!this._inherited && !this.sortModeActive,
+					() => html`
+						<uui-button compact label=${this.localize.term('actions_delete')} @click=${this.#requestRemove}>
 							<uui-icon name="delete"></uui-icon>
-						</uui-button>`
-					: nothing}
-				${this.sortModeActive
-					? html` <uui-input
+						</uui-button>
+					`,
+				)}
+				${when(
+					this.sortModeActive,
+					() => html`
+						<uui-input
 							type="number"
 							label=${this.localize.term('sort_sortOrder')}
-							@change=${(e: UUIInputEvent) =>
-								this._singleValueUpdate('sortOrder', parseInt(e.target.value as string) || 0)}
 							.value=${this.group!.sortOrder ?? 0}
-							?disabled=${!this._hasOwnerContainer}></uui-input>`
-					: nothing}
-			</div> `;
+							?disabled=${!this._hasOwnerContainer}
+							@change=${(e: UUIInputEvent) =>
+								this._singleValueUpdate('sortOrder', parseInt(e.target.value as string) || 0)}></uui-input>
+					`,
+				)}
+			</div>
+		`;
 	}
 
 	static styles = [
@@ -229,6 +243,12 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				gap: var(--uui-size-3);
+				width: 100%;
+			}
+
+			#group-name {
+				--uui-input-border-color: transparent;
+				width: 100%;
 			}
 
 			uui-input[type='number'] {
