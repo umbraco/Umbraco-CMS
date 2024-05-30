@@ -62,6 +62,7 @@ export abstract class UmbBlockEntriesContext<
 		return this._layoutEntries.setValue(layouts);
 	}
 	setOneLayout(layoutData: BlockLayoutType) {
+		console.log('setOneLayout', layoutData);
 		return this._layoutEntries.appendOne(layoutData);
 	}
 

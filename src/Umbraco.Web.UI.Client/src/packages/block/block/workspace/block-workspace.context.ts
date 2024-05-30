@@ -168,9 +168,12 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				// Settings:
 				const settingsUdi = layoutData?.settingsUdi;
 				if (settingsUdi) {
+					console.log(settingsUdi);
+					console.log(this.#blockManager);
 					this.observe(
 						this.#blockManager!.settingsOf(settingsUdi),
 						(settingsData) => {
+							console.log('settingsData', settingsData);
 							this.settings.setData(settingsData);
 						},
 						'observeSettings',
@@ -179,15 +182,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 						this.observe(
 							this.#blockManager!.settingsOf(settingsUdi),
 							(settingsData) => {
-								// Check for if settings data is based on the elementTypeKey as configuration:
-								const blockType = this.#blockManager!.getBlockTypeOf(contentUdi);
-								if (!blockType) {
-									throw new Error('Block type not found');
-								}
-								if (settingsData?.contentTypeKey !== blockType.settingsElementTypeKey) {
-									throw new Error('Settings contentTypeKey does not match the configured settings element type key');
-								}
-
 								this.#initialSettings ??= settingsData;
 								this.removeUmbControllerByAlias('observeSettingsInitially');
 							},

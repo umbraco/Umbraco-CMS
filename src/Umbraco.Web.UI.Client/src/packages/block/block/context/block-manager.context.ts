@@ -80,6 +80,7 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	setLayouts(layouts: Array<BlockLayoutType>) {
+		console.log('setLayouts', layouts);
 		this._layouts.setValue(layouts);
 	}
 	setContents(contents: Array<UmbBlockDataType>) {
@@ -174,6 +175,7 @@ export abstract class UmbBlockManagerContext<
 		this.#contents.appendOne(contentData);
 	}
 	setOneSettings(settingsData: UmbBlockDataType) {
+		console.log('update one settings', settingsData);
 		this.#settings.appendOne(settingsData);
 	}
 
@@ -194,6 +196,9 @@ export abstract class UmbBlockManagerContext<
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
 			throw new Error(`Cannot create block settings, missing block type for ${contentElementTypeKey}`);
+		}
+		if (!blockType.settingsElementTypeKey) {
+			throw new Error(`Cannot create block settings, missing settings element type for ${contentElementTypeKey}`);
 		}
 
 		return {
