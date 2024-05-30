@@ -135,7 +135,7 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	}
 
 	#renderItems() {
-		if (!this._items?.length) return html`<p>${this.localize.term('references_DataTypeNoReferences')}</p>`;
+		if (!this._items?.length) return html`<p>${this.localize.term('references_itemHasNoReferences')}</p>`;
 		return html`
 			<uui-table>
 				<uui-table-head>
