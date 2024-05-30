@@ -28,10 +28,10 @@ test.describe('Children content tests', {tag: '@smoke'}, () => {
     childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId, true);
     contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickActionsMenuForContent(contentName);
     await umbracoUi.content.clickCreateButton();
     await umbracoUi.content.chooseDocumentType(documentTypeName);
@@ -66,10 +66,10 @@ test.describe('Children content tests', {tag: '@smoke'}, () => {
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId, true);
     contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);  
     childContentId = await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickCaretButtonForContentName(contentName);
     await umbracoUi.content.clickActionsMenuForContent(childContentName);
     await umbracoUi.content.clickCreateButton();
@@ -100,10 +100,10 @@ test.describe('Children content tests', {tag: '@smoke'}, () => {
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId, true);
     contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
     await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickCaretButtonForContentName(contentName);
     await umbracoUi.content.clickActionsMenuForContent(childContentName);
     await umbracoUi.content.clickPublishButton();
@@ -120,10 +120,10 @@ test.describe('Children content tests', {tag: '@smoke'}, () => {
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId, true);
     contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
     await umbracoApi.document.createDefaultDocumentWithParent(childContentName, childDocumentTypeId, contentId);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickActionsMenuForContent(contentName);
     await umbracoUi.content.clickPublishButton();
 
