@@ -4,6 +4,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbFolderModel, UmbFolderRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 export abstract class UmbFolderModalElementBase<
 	FolderModalDataType extends { folderRepositoryAlias: string },
@@ -69,7 +70,8 @@ export abstract class UmbFolderModalElementBase<
 									placeholder="Enter folder name..."
 									.value="${this.value?.folder?.name || ''}"
 									required
-									required-message="Folder name is required"></uui-input>
+									required-message="Folder name is required"
+									${umbFocus()}></uui-input>
 							</uui-form-layout-item>
 						</form>
 					</uui-form>
