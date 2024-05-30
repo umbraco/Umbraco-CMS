@@ -78,7 +78,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
-					<uui-button id="icon" @click=${this._handleIconClick} label="icon" compact>
+					<uui-button id="icon" compact label="icon" look="outline" @click=${this._handleIconClick}>
 						<umb-icon name=${ifDefined(this._icon)}></umb-icon>
 					</uui-button>
 
@@ -116,6 +116,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			#header {
 				display: flex;
 				flex: 1 1 auto;
+				gap: var(--uui-size-space-2);
 			}
 
 			#editors {
@@ -140,9 +141,9 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			#icon {
-				font-size: calc(var(--uui-size-layout-3) / 2);
-				margin-right: var(--uui-size-space-2);
-				margin-left: calc(var(--uui-size-space-4) * -1);
+				font-size: var(--uui-size-8);
+				height: 60px;
+				width: 60px;
 			}
 		`,
 	];

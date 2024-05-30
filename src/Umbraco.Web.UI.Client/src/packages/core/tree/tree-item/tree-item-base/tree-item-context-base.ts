@@ -65,6 +65,9 @@ export abstract class UmbTreeItemContextBase<
 	#path = new UmbStringState('');
 	readonly path = this.#path.asObservable();
 
+	#foldersOnly = new UmbBooleanState(false);
+	readonly foldersOnly = this.#foldersOnly.asObservable();
+
 	treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
 	#sectionContext?: UmbSectionContext;
 	#sectionSidebarContext?: UmbSectionSidebarContext;
@@ -175,6 +178,7 @@ export abstract class UmbTreeItemContextBase<
 
 		const skip = loadMore ? this.#paging.skip : 0;
 		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
+		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
 		const { data } = await repository.requestTreeItemsOf({
@@ -182,6 +186,7 @@ export abstract class UmbTreeItemContextBase<
 				unique: this.unique,
 				entityType: this.entityType,
 			},
+			foldersOnly,
 			skip,
 			take,
 			...additionalArgs,
@@ -240,6 +245,7 @@ export abstract class UmbTreeItemContextBase<
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
+			this.#observeFoldersOnly();
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
@@ -308,6 +314,18 @@ export abstract class UmbTreeItemContextBase<
 				this.#isSelected.setValue(isSelected);
 			},
 			'observeIsSelected',
+		);
+	}
+
+	#observeFoldersOnly() {
+		if (!this.treeContext || this.unique === undefined) return;
+
+		this.observe(
+			this.treeContext.foldersOnly,
+			(foldersOnly) => {
+				this.#foldersOnly.setValue(foldersOnly);
+			},
+			'observeFoldersOnly',
 		);
 	}
 
