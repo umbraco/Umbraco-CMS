@@ -33,7 +33,7 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 	/**
 	 * Orientation: Horizontal is the default where label goes left and editor right.
 	 * Vertical is where label goes above the editor.
-	 * @type {string}
+	 * @enum ['horizontal', 'vertical']
 	 * @attr
 	 * @default ''
 	 */
