@@ -134,6 +134,7 @@ export interface MetaEntityActionMoveToKind extends MetaEntityActionDefaultKind 
 	moveRepositoryAlias: string;
 	treeRepositoryAlias: string;
 	treeAlias: string;
+	foldersOnly?: boolean;
 }
 
 // FOLDER
