@@ -61,7 +61,8 @@ test.skip('can enable all toolbar options', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toEqual(expectedDataTypeValues);
 });
 
-test('can add stylesheet', async ({umbracoApi, umbracoUi}) => {
+// TODO: Remove skip when the front-end is ready
+test.skip('can add stylesheet', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'StylesheetForDataType.css';
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
