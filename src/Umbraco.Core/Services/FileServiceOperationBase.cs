@@ -82,7 +82,7 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
 
     protected async Task<Attempt<TEntity?, TOperationStatus>> HandleCreateAsync(string name, string? parentPath, string? content, Guid userKey)
     {
-        if (name.Contains("/"))
+        if (name.Contains('/'))
         {
             return Attempt.FailWithStatus<TEntity?, TOperationStatus>(InvalidName, default);
         }
@@ -153,6 +153,11 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
 
     protected async Task<Attempt<TEntity?, TOperationStatus>> HandleRenameAsync(string path, string newName, Guid userKey)
     {
+        if (newName.Contains('/'))
+        {
+            return Attempt.FailWithStatus<TEntity?, TOperationStatus>(InvalidName, default);
+        }
+
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         TEntity? entity = Repository.Get(path);
