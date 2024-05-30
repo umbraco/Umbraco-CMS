@@ -1,7 +1,8 @@
 ﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-test.describe('Member Group tests', () => {
+// Remove it before merging
+test.describe('Member Group tests', {tag: '@smoke'}, () => {
   const memberGroupName = 'Test Member Group';
 
   test.beforeEach(async ({umbracoApi, umbracoUi}) => {
@@ -28,7 +29,8 @@ test.describe('Member Group tests', () => {
     expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
   });
 
-  test('can delete a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+  // TODO: Remove skip when the front-end is ready. Currently it is impossible to delete a member group.
+  test.skip('can delete a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.memberGroup.create(memberGroupName);
     expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();

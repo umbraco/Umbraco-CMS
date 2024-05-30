@@ -1,7 +1,8 @@
 ﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-test.describe('Members tests', () => {
+// Remove it before merging
+test.describe('Members tests', {tag: '@smoke'}, () => {
   let memberId = '';
   let memberTypeId = '';
   const defaultMemberTypeName = 'Member';
