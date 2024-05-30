@@ -121,15 +121,17 @@ for (const listViewType of listViewTypes) {
 
     test('can add layouts', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      let layoutsData = ['Document Grid Collection View', 'Umb.CollectionView.Document.Grid'];
+      let layoutsData = 'Document Grid Collection View';
       if (listViewType === 'List View - Media') {
-        layoutsData = ['Media Grid Collection View', 'Umb.CollectionView.Media.Grid'];
+        layoutsData = 'Media Grid Collection View';
       }
 
       const expectedIncludePropertiesValues = {
-        "icon": "icon-grid",
-        "name": layoutsData[0],
-        "collectionView": layoutsData[1],
+        "icon": "icon-thumbnails-small",
+        "collectionView": layoutsData,
+        "isSystem": true,
+        "name": "Grid", 
+        "selected": true
       };
 
       // Act
@@ -145,17 +147,19 @@ for (const listViewType of listViewTypes) {
 
     test('can remove layouts', async ({umbracoApi, umbracoUi}) => {
       // Arrange
-      let layoutsData = ['Document Grid Collection View', 'Umb.CollectionView.Document.Grid'];
+      let layoutsData = 'Document Grid Collection View';
       if (listViewType === 'List View - Media') {
-        layoutsData = ['Media Grid Collection View', 'Umb.CollectionView.Media.Grid'];
+        layoutsData = 'Media Grid Collection View';
       }
 
       const removedDataTypeValues = [{
         "alias": "layouts",
         "value": [{
-          "icon": "icon-grid",
-          "name": layoutsData[0],
-          "collectionView": layoutsData[1],
+          "icon": "icon-thumbnails-small",
+          "collectionView": layoutsData,
+          "isSystem": true,
+          "name": "Grid", 
+          "selected": true
         }]
       }];
   
