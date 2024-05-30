@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -14,7 +13,6 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
-using DataType = Umbraco.Cms.Core.Models.DataType;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -224,27 +222,29 @@ namespace Umbraco.Cms.Core.Services.Implement
             => GetAsync(name).GetAwaiter().GetResult();
 
         /// <inheritdoc />
-        public async Task<IDataType?> GetAsync(string name)
+        public Task<IDataType?> GetAsync(string name)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name))?.FirstOrDefault();
             ConvertMissingEditorOfDataTypeToLabel(dataType);
-            return await Task.FromResult(dataType);
+
+            return Task.FromResult(dataType);
         }
 
         /// <inheritdoc />
         public Task<IEnumerable<IDataType>> GetAllAsync(params Guid[] keys)
         {
-            // Nothing requested, return nothing
-            if (keys.Any() is false)
-            {
-                return Task.FromResult(Enumerable.Empty<IDataType>());
-            }
-
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
-            IDataType[] dataTypes = _dataTypeRepository.Get(Query<IDataType>().Where(x => keys.Contains(x.Key))).ToArray();
+            IQuery<IDataType> query = Query<IDataType>();
+            if (keys.Length > 0)
+            {
+                query = query.Where(x => keys.Contains(x.Key));
+            }
+
+            IDataType[] dataTypes = _dataTypeRepository.Get(query).ToArray();
             ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+
             return Task.FromResult<IEnumerable<IDataType>>(dataTypes);
         }
 
@@ -288,6 +288,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = _dataTypeRepository.Get(id);
             ConvertMissingEditorOfDataTypeToLabel(dataType);
+
             return dataType;
         }
 
@@ -301,12 +302,13 @@ namespace Umbraco.Cms.Core.Services.Implement
             => GetAsync(id).GetAwaiter().GetResult();
 
         /// <inheritdoc />
-        public async Task<IDataType?> GetAsync(Guid id)
+        public Task<IDataType?> GetAsync(Guid id)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IDataType? dataType = GetDataTypeFromRepository(id);
             ConvertMissingEditorOfDataTypeToLabel(dataType);
-            return await Task.FromResult(dataType);
+
+            return Task.FromResult(dataType);
         }
 
         /// <summary>
@@ -319,23 +321,25 @@ namespace Umbraco.Cms.Core.Services.Implement
             => GetByEditorAliasAsync(propertyEditorAlias).GetAwaiter().GetResult();
 
         /// <inheritdoc />
-        public async Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias)
+        public Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IQuery<IDataType> query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
             ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
-            return await Task.FromResult(dataTypes);
+
+            return Task.FromResult(dataTypes);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<IDataType>> GetByEditorUiAlias(string editorUiAlias)
+        public Task<IEnumerable<IDataType>> GetByEditorUiAlias(string editorUiAlias)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IQuery<IDataType> query = Query<IDataType>().Where(x => x.EditorUiAlias == editorUiAlias);
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.Get(query).ToArray();
             ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
-            return await Task.FromResult(dataTypes);
+
+            return Task.FromResult(dataTypes);
         }
 
         /// <summary>
@@ -347,8 +351,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.GetMany(ids).ToArray();
-
             ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+
             return dataTypes;
         }
 
@@ -366,8 +370,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             // Any data types that don't have an associated editor are created of a specific type.
             // We convert them to labels to make clear to the user why the data type cannot be used.
-            IEnumerable<IDataType> dataTypesWithMissingEditors = dataTypes
-                .Where(x => x.Editor is MissingPropertyEditor);
+            IEnumerable<IDataType> dataTypesWithMissingEditors = dataTypes.Where(x => x.Editor is MissingPropertyEditor);
             foreach (IDataType dataType in dataTypesWithMissingEditors)
             {
                 dataType.Editor = new LabelPropertyEditor(_dataValueEditorFactory, _ioHelper);
@@ -398,7 +401,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 DataTypeOperationStatus.Success => OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs),
                 DataTypeOperationStatus.CancelledByNotification => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs),
                 DataTypeOperationStatus.ParentNotFound => OperationResult.Attempt.Fail(MoveOperationStatusType.FailedParentNotFound, evtMsgs),
-                _ =>  OperationResult.Attempt.Fail<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}")),
+                _ => OperationResult.Attempt.Fail<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath, evtMsgs, new InvalidOperationException($"Invalid operation status: {result.Status}")),
             };
         }
 
@@ -448,9 +451,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         [Obsolete("Use the method which specifies the userId parameter")]
         public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId)
-        {
-            return Copy(copying, containerId, Constants.Security.SuperUserId);
-        }
+            => Copy(copying, containerId, Constants.Security.SuperUserId);
 
         public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId, int userId = Constants.Security.SuperUserId)
         {
@@ -670,7 +671,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             _dataTypeRepository.Delete(dataType);
 
             scope.Notifications.Publish(new DataTypeDeletedNotification(dataType, eventMessages).WithStateFrom(deletingDataTypeNotification));
-
 
             var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
             Audit(AuditType.Delete, currentUserId, dataType.Id);

@@ -148,6 +148,12 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentBlueprintEditingServiceTests.Update.cs">
       <DependentUpon>ContentBlueprintEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.GetMediaTypesForFileExtension.cs">
+      <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.GetFolderMediaTypes.cs">
+      <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

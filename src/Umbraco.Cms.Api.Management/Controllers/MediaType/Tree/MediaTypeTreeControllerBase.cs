@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Tree;
 
@@ -38,6 +39,7 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
             if (mediaTypes.TryGetValue(entity.Id, out IMediaType? mediaType))
             {
                 responseModel.Icon = mediaType.Icon ?? responseModel.Icon;
+                responseModel.IsDeletable = mediaType.IsSystemMediaType() is false;
             }
 
             return responseModel;

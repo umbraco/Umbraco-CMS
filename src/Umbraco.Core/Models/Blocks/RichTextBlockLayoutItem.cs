@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Models.Blocks;
@@ -11,4 +11,14 @@ public class RichTextBlockLayoutItem : IBlockLayoutItem
     public Udi? ContentUdi { get; set; }
 
     public Udi? SettingsUdi { get; set; }
+
+    public RichTextBlockLayoutItem()
+    { }
+
+    public RichTextBlockLayoutItem(Udi contentUdi)
+        => ContentUdi = contentUdi;
+
+    public RichTextBlockLayoutItem(Udi contentUdi, Udi settingsUdi)
+        : this(contentUdi)
+        => SettingsUdi = settingsUdi;
 }
