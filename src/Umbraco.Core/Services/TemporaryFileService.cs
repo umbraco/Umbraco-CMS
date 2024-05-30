@@ -43,7 +43,7 @@ internal sealed class TemporaryFileService : ITemporaryFileService
         {
             createModel.Key = Guid.NewGuid();
         }
-        else if (_temporaryFileRepository.Exists(createModel.Key.Value))
+        else if (await _temporaryFileRepository.GetAsync(createModel.Key.Value) is not null)
         {
             return Attempt.FailWithStatus<TemporaryFileModel?, TemporaryFileOperationStatus>(TemporaryFileOperationStatus.KeyAlreadyUsed, null);
         }
