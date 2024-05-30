@@ -122,6 +122,7 @@ export interface MetaEntityActionDuplicateToKind extends MetaEntityActionDefault
 	duplicateRepositoryAlias: string;
 	treeRepositoryAlias: string;
 	treeAlias: string;
+	foldersOnly?: boolean;
 }
 
 // MOVE TO
