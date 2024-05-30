@@ -400,6 +400,10 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
             .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
 
+        // Handlers for publish warnings
+        builder
+            .AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
+
         return builder;
     }
 
