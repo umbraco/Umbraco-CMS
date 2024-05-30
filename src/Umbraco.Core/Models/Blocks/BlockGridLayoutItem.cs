@@ -17,4 +17,14 @@ public class BlockGridLayoutItem : IBlockLayoutItem
     public int? RowSpan { get; set; }
 
     public BlockGridLayoutAreaItem[] Areas { get; set; } = Array.Empty<BlockGridLayoutAreaItem>();
+
+    public BlockGridLayoutItem()
+    { }
+
+    public BlockGridLayoutItem(Udi contentUdi)
+        => ContentUdi = contentUdi;
+
+    public BlockGridLayoutItem(Udi contentUdi, Udi settingsUdi)
+        : this(contentUdi)
+        => SettingsUdi = settingsUdi;
 }

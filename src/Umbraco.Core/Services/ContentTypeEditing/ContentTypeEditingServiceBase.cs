@@ -658,7 +658,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         => model.Properties.Select(property => property.DataTypeKey).Distinct().ToArray();
 
     private async Task<IDataType[]> GetDataTypesAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
-        => (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray();
+    {
+        Guid[] dataTypeKeys = GetDataTypeKeys(model);
+        return dataTypeKeys.Any()
+            ? (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray()
+            : Array.Empty<IDataType>();
+    }
 
     private int? GetParentId(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? containerKey)
     {
