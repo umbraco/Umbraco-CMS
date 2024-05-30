@@ -136,7 +136,7 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.dataType.addLayouts(layoutsData[1]);
+      await umbracoUi.dataType.addLayouts(layoutsData);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
@@ -170,7 +170,7 @@ for (const listViewType of listViewTypes) {
 
       // Act
       await umbracoUi.dataType.goToDataType(listViewType);
-      await umbracoUi.dataType.removeLayouts(layoutsData[1]);
+      await umbracoUi.dataType.removeLayouts(layoutsData);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
