@@ -16,7 +16,7 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName); 
   });
 
-  test('can create a content with Rich Text Editor', async ({umbracoApi, umbracoUi}) => {
+  test('can create content with the Rich Text Editor datatype', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeName = 'Richtext editor';
     const contentText = 'This is Rich Text Editor content!';
@@ -31,10 +31,10 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     };
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
     await umbracoUi.content.chooseDocumentType(documentTypeName);
@@ -49,16 +49,16 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     expect(contentData.values[0].value).toEqual(expectedContentValue);
   });
 
-  test('can create a content with text area', async ({umbracoApi, umbracoUi}) => {
+  test('can create content with the text area datatype', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeName = 'Textarea';
     const contentText = 'This is Textarea content!';
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
     await umbracoUi.content.chooseDocumentType(documentTypeName);
@@ -74,16 +74,16 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
   });
 
   // TODO: Remove skip when the front-end is ready. Currently it returns error when publishing a content
-  test.skip('can create a content with upload file', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create content with the upload file datatype', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeName = 'Upload File';
     const uploadFilePath = 'Umbraco.png';
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
     await umbracoUi.content.chooseDocumentType(documentTypeName);
@@ -98,16 +98,16 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     expect(contentData.values[0].value.src).toContainEqual(uploadFilePath);
   });
 
-  test('can create a content with tags', async ({umbracoApi, umbracoUi}) => {
+  test('can create content with the tags datatype', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeName = 'Tags';
     const tagName = 'test';
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
     await umbracoUi.content.chooseDocumentType(documentTypeName);
@@ -122,17 +122,17 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     expect(contentData.values[0].value).toEqual([tagName]);
   });
 
-  test('can create a content with content picker', async ({umbracoApi, umbracoUi}) => {
+  test('can create content with the content picker datatype', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeName = 'Content Picker';
     const contentPickerName = 'TestContentPicker';
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
     const contentPickerId = await umbracoApi.document.createDefaultDocument(contentPickerName, documentTypeId);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
     await umbracoUi.content.chooseDocumentType(documentTypeName);
@@ -147,21 +147,21 @@ test.describe('Content with property editors tests', {tag: '@smoke'}, () => {
     expect(contentData.values[0].value).toEqual(contentPickerId);
 
     // Clean
-    await umbracoApi.document.delete(contentPickerId);
+    await umbracoApi.document.ensureNameNotExists(contentPickerName);
   });
 
   // TODO: Remove skip and update the test when the front-end is ready. Currently the list of content is not displayed.
-  test.skip('can create a content with list view - content', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create content with the list view - content datatype', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeName = 'List View - Content';
     const contentListViewName = 'TestListViewContent';
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
     const contentPickerId = await umbracoApi.document.createDefaultDocument(contentListViewName, documentTypeId);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    
+    // Act
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
     await umbracoUi.content.chooseDocumentType(documentTypeName);

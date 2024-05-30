@@ -19,14 +19,14 @@ test.describe('Content tests', {tag: '@smoke'}, () => {
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   });
 
-  test('can create an empty content', async ({umbracoApi, umbracoUi}) => {
+  test('can create empty content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedState = 'Draft';
     await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
     await umbracoUi.content.chooseDocumentType(documentTypeName);
@@ -40,14 +40,14 @@ test.describe('Content tests', {tag: '@smoke'}, () => {
     expect(contentData.variants[0].state).toBe(expectedState);
   });
 
-  test('can save and publish an empty content', async ({umbracoApi, umbracoUi}) => {
+  test('can save and publish empty content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedState = 'Published';
     await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
     await umbracoUi.content.chooseDocumentType(documentTypeName);
@@ -61,14 +61,14 @@ test.describe('Content tests', {tag: '@smoke'}, () => {
     expect(contentData.variants[0].state).toBe(expectedState);
   });
 
-  test('can create a content', async ({umbracoApi, umbracoUi}) => {
+  test('can create content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickActionsMenuAtRoot();
     await umbracoUi.content.clickCreateButton();
     await umbracoUi.content.chooseDocumentType(documentTypeName);
@@ -83,16 +83,16 @@ test.describe('Content tests', {tag: '@smoke'}, () => {
     expect(contentData.values[0].value).toBe(contentText);
   });
 
-  test('can rename an empty content', async ({umbracoApi, umbracoUi}) => {
+  test('can rename content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const wrongContentName = 'Wrong Content Name'
+    const wrongContentName = 'Wrong Content Name';
     documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
     contentId = await umbracoApi.document.createDefaultDocument(wrongContentName, documentTypeId);
     expect(await umbracoApi.document.doesNameExist(wrongContentName)).toBeTruthy();
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.openContent(wrongContentName);
     await umbracoUi.content.enterContentName(contentName);
     await umbracoUi.content.clickSaveButton();
@@ -109,10 +109,10 @@ test.describe('Content tests', {tag: '@smoke'}, () => {
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
     contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, wrongContentText, dataTypeName);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.openContent(contentName);
     await umbracoUi.content.enterTextstring(contentText);
     await umbracoUi.content.clickSaveButton();
@@ -124,15 +124,15 @@ test.describe('Content tests', {tag: '@smoke'}, () => {
     expect(updatedContentData.values[0].value).toBe(contentText);
   });
 
-  test('can publish a content', async ({umbracoApi, umbracoUi}) => {
+  test('can publish content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
     contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickActionsMenuForContent(contentName);
     await umbracoUi.content.clickPublishButton();
 
@@ -142,17 +142,17 @@ test.describe('Content tests', {tag: '@smoke'}, () => {
     expect(contentData.variants[0].state).toBe('Published');
   });
 
-  test('can unpublish a content', async ({umbracoApi, umbracoUi}) => {
+  test('can unpublish content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
     contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, contentText, dataTypeName);
     const publishData = {"publishSchedules":[{"culture":null}]};
     await umbracoApi.document.publish(contentId, publishData);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.clickActionsMenuForContent(contentName);
     await umbracoUi.content.clickUnpublishButton();
     await umbracoUi.content.clickConfirmToUnpublishButton();

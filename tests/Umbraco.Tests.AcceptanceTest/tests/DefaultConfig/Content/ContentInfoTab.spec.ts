@@ -22,10 +22,10 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     const notPublishContentLink = 'This document is published but is not in the cache';
     documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
     contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.openContent(contentName);
     await umbracoUi.content.clickInfoTab();
     await umbracoUi.content.doesLinkHaveText(notPublishContentLink);
@@ -54,10 +54,10 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     // Arrange
     documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
     contentId = await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.openContent(contentName);
     await umbracoUi.content.clickInfoTab();
     await umbracoUi.content.clickDocumentTypeByName(documentTypeName);
@@ -73,10 +73,10 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     const templateId = await umbracoApi.template.createDefaultTemplate(templateName);
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId, true);
     contentId = await umbracoApi.document.createDocumentWithTemplate(contentName, documentTypeId, templateId);
-    
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    
+    // Act
     await umbracoUi.content.openContent(contentName);
     await umbracoUi.content.clickInfoTab();
     await umbracoUi.content.clickTemplateByName(templateName);
@@ -98,10 +98,10 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     const secondTemplateId = await umbracoApi.template.createDefaultTemplate(secondTemplateName);
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithTwoAllowedTemplates(documentTypeName, firstTemplateId, secondTemplateId, true);
     contentId = await umbracoApi.document.createDocumentWithTemplate(contentName, documentTypeId, firstTemplateId);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.openContent(contentName);
     await umbracoUi.content.clickInfoTab();
     await umbracoUi.content.changeTemplate(firstTemplateName, secondTemplateName);
@@ -126,10 +126,10 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     const secondTemplateId = await umbracoApi.template.createDefaultTemplate(secondTemplateName);
     documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, firstTemplateId, true);
     contentId = await umbracoApi.document.createDocumentWithTemplate(contentName, documentTypeId, firstTemplateId);
-
-    // Act
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+    // Act
     await umbracoUi.content.openContent(contentName);
     await umbracoUi.content.clickInfoTab();
     await umbracoUi.content.clickEditTemplateByName(firstTemplateName);
@@ -140,7 +140,7 @@ test.describe('Content info tab tests', {tag: '@smoke'}, () => {
     await umbracoUi.content.isTemplateNameDisabled(secondTemplateName);
 
     // Clean
-    await umbracoApi.template.delete(firstTemplateId);
-    await umbracoApi.template.delete(secondTemplateId);
+    await umbracoApi.template.ensureNameNotExists(firstTemplateName);
+    await umbracoApi.template.ensureNameNotExists(secondTemplateName);
   });
 });
