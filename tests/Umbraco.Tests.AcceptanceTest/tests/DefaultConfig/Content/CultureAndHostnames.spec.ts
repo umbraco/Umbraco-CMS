@@ -32,7 +32,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.language.ensureNameNotExists(languageName);
 });
 
-test('can add a culture', async ({umbracoApi, umbracoUi}) => {
+test('can add a culture', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCultureAndHostnamesButton();
@@ -44,7 +44,7 @@ test('can add a culture', async ({umbracoApi, umbracoUi}) => {
   expect(domainsData.defaultIsoCode).toEqual(isoCode);
 });
 
-test('can add a domain', async ({umbracoApi, umbracoUi}) => {
+test('can add a domain', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickCultureAndHostnamesButton();

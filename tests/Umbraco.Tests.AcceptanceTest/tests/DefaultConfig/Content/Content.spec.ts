@@ -38,7 +38,7 @@ test('can create empty content', async ({umbracoApi, umbracoUi}) => {
   expect(contentData.variants[0].state).toBe(expectedState);
 });
 
-test('can save and publish empty content', async ({umbracoApi, umbracoUi}) => {
+test('can save and publish empty content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
@@ -59,7 +59,7 @@ test('can save and publish empty content', async ({umbracoApi, umbracoUi}) => {
   expect(contentData.variants[0].state).toBe(expectedState);
 });
 
-test('can create content', async ({umbracoApi, umbracoUi}) => {
+test('can create content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
@@ -101,7 +101,7 @@ test('can rename content', async ({umbracoApi, umbracoUi}) => {
   expect(updatedContentData.variants[0].name).toEqual(contentName);
 });
 
-test('can update content', async ({umbracoApi, umbracoUi}) => {
+test('can update content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongContentText = 'This is wrong test content text';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -140,7 +140,7 @@ test('can publish content', async ({umbracoApi, umbracoUi}) => {
   expect(contentData.variants[0].state).toBe('Published');
 });
 
-test('can unpublish content', async ({umbracoApi, umbracoUi}) => {
+test('can unpublish content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);

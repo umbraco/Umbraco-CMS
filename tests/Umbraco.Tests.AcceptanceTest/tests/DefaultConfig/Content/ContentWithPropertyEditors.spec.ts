@@ -14,7 +14,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName); 
 });
 
-test('can create content with the Rich Text Editor datatype', async ({umbracoApi, umbracoUi}) => {
+test('can create content with the Rich Text Editor datatype', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeName = 'Richtext editor';
   const contentText = 'This is Rich Text Editor content!';

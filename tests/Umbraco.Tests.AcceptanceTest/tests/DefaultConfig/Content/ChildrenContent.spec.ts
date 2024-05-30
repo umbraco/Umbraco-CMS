@@ -21,7 +21,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create child node', async ({umbracoApi, umbracoUi}) => {
+test('can create child node', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId, true);
@@ -112,7 +112,7 @@ test('cannot publish child if the parent is not published', async ({umbracoApi, 
   expect(contentData.variants[0].state).toBe('Draft');
 });
 
-test('can publish with descendants', async ({umbracoApi, umbracoUi}) => {
+test('can publish with descendants', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   childDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentType(childDocumentTypeName);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId, true);
