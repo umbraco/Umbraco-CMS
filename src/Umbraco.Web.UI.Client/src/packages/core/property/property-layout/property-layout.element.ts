@@ -134,6 +134,10 @@ export class UmbPropertyLayoutElement extends UmbLitElement {
 				max-width: 100%;
 			}
 
+			#description pre {
+				overflow: auto;
+			}
+
 			#editorColumn {
 				margin-top: var(--uui-size-space-3);
 			}
