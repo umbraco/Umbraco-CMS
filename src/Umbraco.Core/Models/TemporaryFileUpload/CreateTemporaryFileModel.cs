@@ -2,4 +2,5 @@
 
 public class CreateTemporaryFileModel : TemporaryFileModelBase
 {
+    public Guid? Key { get; set; }
 }

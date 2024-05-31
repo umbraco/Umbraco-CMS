@@ -39,12 +39,14 @@ internal sealed class TemporaryFileService : ITemporaryFileService
             return Attempt.FailWithStatus<TemporaryFileModel?, TemporaryFileOperationStatus>(validationResult, null);
         }
 
-        TemporaryFileModel? temporaryFileModel = await _temporaryFileRepository.GetAsync(createModel.Key);
-        if (temporaryFileModel is not null)
+        if (createModel.Key is null)
+        {
+            createModel.Key = Guid.NewGuid();
+        }
+        else if (await _temporaryFileRepository.GetAsync(createModel.Key.Value) is not null)
         {
             return Attempt.FailWithStatus<TemporaryFileModel?, TemporaryFileOperationStatus>(TemporaryFileOperationStatus.KeyAlreadyUsed, null);
         }
-
 
         await using Stream dataStream = createModel.OpenReadStream();
         dataStream.Seek(0, SeekOrigin.Begin);
@@ -53,10 +55,9 @@ internal sealed class TemporaryFileService : ITemporaryFileService
             return Attempt.FailWithStatus<TemporaryFileModel?, TemporaryFileOperationStatus>(TemporaryFileOperationStatus.UploadBlocked, null);
         }
 
-
-        temporaryFileModel = new TemporaryFileModel
+        var temporaryFileModel = new TemporaryFileModel
         {
-            Key = createModel.Key,
+            Key = createModel.Key.Value,
             FileName = createModel.FileName,
             OpenReadStream = createModel.OpenReadStream,
             AvailableUntil = DateTime.Now.Add(_runtimeSettings.TemporaryFileLifeTime)
