@@ -4,6 +4,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDuplicateToModalData extends UmbEntityModel {
 	treeAlias: string;
+	foldersOnly?: boolean;
 }
 
 export interface UmbDuplicateToModalValue {
