@@ -4,7 +4,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDocumentBlueprintRequestModel,
-	UpdateDocumentRequestModel,
+	UpdateDocumentBlueprintRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -161,7 +161,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateDocumentRequestModel = {
+		const requestBody: UpdateDocumentBlueprintRequestModel = {
 			values: model.values,
 			variants: model.variants,
 		};
