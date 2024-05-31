@@ -3,7 +3,7 @@ import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
-	CreateDocumentRequestModel,
+	CreateDocumentBlueprintRequestModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentBlueprintService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -41,7 +41,6 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 				unique: '',
 				collection: null,
 			},
-			template: null,
 			values: [],
 			variants: [],
 			...preset,
@@ -114,7 +113,6 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 				unique: data.documentType.id,
 				collection: data.documentType.collection ? { unique: data.documentType.collection.id } : null,
 			},
-			template: null, // TODO: Should this be returned from the server?
 		};
 
 		return { data: document };
@@ -131,11 +129,10 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 		if (!model.unique) throw new Error('Document unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateDocumentRequestModel = {
+		const requestBody: CreateDocumentBlueprintRequestModel = {
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
-			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
 		};
