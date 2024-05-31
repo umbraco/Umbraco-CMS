@@ -10,6 +10,7 @@ export interface UmbDocumentBlueprintDetailModel {
 		collection: UmbReferenceByUnique | null;
 	};
 	entityType: UmbDocumentBlueprintEntityType;
+	template: UmbReferenceByUnique | null;
 	unique: string;
 	values: Array<UmbDocumentBlueprintValueModel>;
 	variants: Array<UmbDocumentBlueprintVariantModel>;

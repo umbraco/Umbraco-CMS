@@ -41,6 +41,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 				unique: '',
 				collection: null,
 			},
+			template: null,
 			values: [],
 			variants: [],
 			...preset,
@@ -113,6 +114,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 				unique: data.documentType.id,
 				collection: data.documentType.collection ? { unique: data.documentType.collection.id } : null,
 			},
+			template: null, // TODO: Should this be returned from the server?
 		};
 
 		return { data: document };
@@ -133,7 +135,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 			id: model.unique,
 			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
-
+			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
 		};
