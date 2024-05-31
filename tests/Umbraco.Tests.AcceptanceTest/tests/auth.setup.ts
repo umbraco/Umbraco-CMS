@@ -5,7 +5,6 @@ import {ConstantHelper, UiHelpers} from "@umbraco/playwright-testhelpers";
 setup('authenticate', async ({page}) => {
   const umbracoUi = new UiHelpers(page);
 
-  await umbracoUi.page.route("**/*.{png,jpg,jpeg,webp}",(route) => route.abort());
   await umbracoUi.goToBackOffice();
   await page.waitForTimeout(10000);
   await umbracoUi.login.enterEmail(process.env.UMBRACO_USER_LOGIN);
