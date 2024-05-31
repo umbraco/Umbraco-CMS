@@ -42,6 +42,12 @@ export default class UmbLoginPageElement extends UmbLitElement {
 
     if (!this.#formElement) return;
 
+    // We need to listen for the enter key to submit the form, because the uui-button does not support the native input fields submit event
+    this.#formElement.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        this.#onSubmitClick();
+      }
+    });
     this.#formElement.onsubmit = this.#handleSubmit;
   }
 
@@ -91,7 +97,6 @@ export default class UmbLoginPageElement extends UmbLitElement {
     }
 
     if (response.error) {
-      this.dispatchEvent(new CustomEvent('umb-login-failed', {bubbles: true, composed: true}));
       return;
     }
 
@@ -100,8 +105,6 @@ export default class UmbLoginPageElement extends UmbLitElement {
     if (returnPath) {
       location.href = returnPath;
     }
-
-    this.dispatchEvent(new CustomEvent('umb-login-success', {bubbles: true, composed: true, detail: response.data}));
   };
 
   get #greetingLocalizationKey() {

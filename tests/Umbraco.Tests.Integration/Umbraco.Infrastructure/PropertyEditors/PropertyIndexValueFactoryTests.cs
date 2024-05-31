@@ -171,28 +171,15 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
         var editor = dataType.Editor!;
 
         var contentElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
-        var blockListValue = new BlockListValue
+        var blockListValue = new BlockListValue(
+        [
+            new BlockListLayoutItem(contentElementUdi)
+        ])
         {
-            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
-            {
-                {
-                    Constants.PropertyEditors.Aliases.BlockList,
-                    new IBlockLayoutItem[]
-                    {
-                        new BlockListLayoutItem()
-                        {
-                            ContentUdi = contentElementUdi
-                        }
-                    }
-                }
-            },
             ContentData =
             [
-                new()
+                new(contentElementUdi, elementType.Key, elementType.Alias)
                 {
-                    Udi = contentElementUdi,
-                    ContentTypeAlias = elementType.Alias,
-                    ContentTypeKey = elementType.Key,
                     RawPropertyValues = new Dictionary<string, object?>
                     {
                         {"singleLineText", "The single line of text in the block"},
@@ -287,65 +274,48 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
 
         var contentElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
         var contentAreaElementUdi = new GuidUdi(Constants.UdiEntityType.Element, Guid.NewGuid());
-        var blockGridValue = new BlockGridValue
-        {
-            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+        var blockGridValue = new BlockGridValue(
+        [
+            new BlockGridLayoutItem(contentElementUdi)
             {
-                {
-                    Constants.PropertyEditors.Aliases.BlockGrid,
-                    new IBlockLayoutItem[]
+                ColumnSpan = 12,
+                RowSpan = 1,
+                Areas =
+                [
+                    new BlockGridLayoutAreaItem(Guid.NewGuid())
                     {
-                        new BlockGridLayoutItem
-                        {
-                            ColumnSpan = 12,
-                            RowSpan = 1,
-                            ContentUdi = contentElementUdi,
-                            Areas = new []
+                        Items =
+                        [
+                            new BlockGridLayoutItem(contentAreaElementUdi)
                             {
-                                new BlockGridLayoutAreaItem
-                                {
-                                    Key = Guid.NewGuid(),
-                                    Items = new []
-                                    {
-                                        new BlockGridLayoutItem
-                                        {
-                                            ContentUdi = contentAreaElementUdi,
-                                            ColumnSpan = 12,
-                                            RowSpan = 1
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                                ColumnSpan = 12,
+                                RowSpan = 1,
+                            },
+                        ],
+                    },
+                ],
             },
+        ])
+        {
             ContentData =
             [
-                new()
+                new(contentElementUdi, elementType.Key, elementType.Alias)
                 {
-                    Udi = contentElementUdi,
-                    ContentTypeAlias = elementType.Alias,
-                    ContentTypeKey = elementType.Key,
-                    RawPropertyValues = new Dictionary<string, object?>
+                    RawPropertyValues = new()
                     {
-                        {"singleLineText", "The single line of text in the grid root"},
-                        {"bodyText", "<p>The body text in the grid root</p>"}
-                    }
+                        { "singleLineText", "The single line of text in the grid root" },
+                        { "bodyText", "<p>The body text in the grid root</p>" },
+                    },
                 },
-                new()
+                new(contentAreaElementUdi, elementType.Key, elementType.Alias)
                 {
-                    Udi = contentAreaElementUdi,
-                    ContentTypeAlias = elementType.Alias,
-                    ContentTypeKey = elementType.Key,
-                    RawPropertyValues = new Dictionary<string, object?>
+                    RawPropertyValues = new()
                     {
-                        {"singleLineText", "The single line of text in the grid area"},
-                        {"bodyText", "<p>The body text in the grid area</p>"}
-                    }
-                }
+                        { "singleLineText", "The single line of text in the grid area" },
+                        { "bodyText", "<p>The body text in the grid area</p>" },
+                    },
+                },
             ],
-            SettingsData = []
         };
         var propertyValue = JsonSerializer.Serialize(blockGridValue);
 
