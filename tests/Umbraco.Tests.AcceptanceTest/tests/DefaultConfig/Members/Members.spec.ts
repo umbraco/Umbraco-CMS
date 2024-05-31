@@ -25,8 +25,10 @@ test.describe('Members tests', {tag: '@smoke'}, () => {
   });
 
   test('can create a member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-    // Act
+    // Arrange
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
+
+    // Act
     await umbracoUi.member.clickCreateButton();
     await umbracoUi.member.enterMemberName(memberName);
     await umbracoUi.member.enterUsername(username);
@@ -37,7 +39,6 @@ test.describe('Members tests', {tag: '@smoke'}, () => {
     await umbracoUi.member.enterComments(comment);
     await umbracoUi.member.clickSaveButton();
 
-
     // Assert
     await umbracoUi.member.isSuccessNotificationVisible();
     expect(await umbracoApi.member.doesNameExist(memberName)).toBeTruthy();
@@ -47,9 +48,9 @@ test.describe('Members tests', {tag: '@smoke'}, () => {
     // Arrange
     const defaultMemberTypeData = await umbracoApi.memberType.getByName(defaultMemberTypeName);
     memberId = await umbracoApi.member.createDefaultMember(memberName, defaultMemberTypeData.id, email, username, password);
+    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
 
     // Act
-    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
     await umbracoUi.member.clickDetailsTab();
     await umbracoUi.member.enterComments(comment);
@@ -66,9 +67,9 @@ test.describe('Members tests', {tag: '@smoke'}, () => {
     const updatedUsername = 'updatedusername';
     memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
     memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
+    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
 
     // Act
-    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
     await umbracoUi.member.enterUsername(updatedUsername);
     await umbracoUi.member.clickSaveButton();
@@ -84,9 +85,9 @@ test.describe('Members tests', {tag: '@smoke'}, () => {
     const updatedEmail = 'updated@acceptance.test';
     memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
     memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
+    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
 
     // Act
-    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
     await umbracoUi.member.enterEmail(updatedEmail);
     await umbracoUi.member.clickSaveButton();
@@ -102,9 +103,9 @@ test.describe('Members tests', {tag: '@smoke'}, () => {
     const updatedPassword = '9876543210';
     memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
     memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
+    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
 
     // Act
-    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
     await umbracoUi.member.clickChangePasswordButton();
     await umbracoUi.member.enterNewPassword(updatedPassword);
@@ -122,9 +123,9 @@ test.describe('Members tests', {tag: '@smoke'}, () => {
     const memberGroupId = await umbracoApi.memberGroup.create(memberGroupName);
     memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
     memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
+    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
 
     // Act
-    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
     await umbracoUi.member.chooseMemberGroup(memberGroupName);
     await umbracoUi.member.clickSaveButton();
@@ -145,9 +146,9 @@ test.describe('Members tests', {tag: '@smoke'}, () => {
     const memberGroupId = await umbracoApi.memberGroup.create(memberGroupName);
     memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
     memberId = await umbracoApi.member.createMemberWithMemberGroup(memberName, memberTypeId, email, username, password, memberGroupId);
+    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
 
     // Act
-    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
     await umbracoUi.member.clickRemoveMemberGroupByName(memberGroupName);
     await umbracoUi.member.clickConfirmRemoveButton();
@@ -166,9 +167,9 @@ test.describe('Members tests', {tag: '@smoke'}, () => {
     // Arrange
     memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
     memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
+    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
 
     // Act
-    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
 
     // Assert
@@ -183,9 +184,9 @@ test.describe('Members tests', {tag: '@smoke'}, () => {
     // Arrange
     memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
     memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
+    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
 
     // Act
-    await umbracoUi.member.goToSection(ConstantHelper.sections.members);
     await umbracoUi.member.clickMemberLinkByName(memberName);
     await umbracoUi.member.clickApprovedSlider();
     await umbracoUi.member.clickSaveButton();
@@ -200,9 +201,9 @@ test.describe('Members tests', {tag: '@smoke'}, () => {
     // Arrange
     memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
     memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
-
-    // Act
     await umbracoUi.member.goToSection(ConstantHelper.sections.members);
+    
+    // Act
     await umbracoUi.member.clickMemberLinkByName(memberName);
     await umbracoUi.memberGroup.clickActionsButton();
     await umbracoUi.memberGroup.clickDeleteButton();
