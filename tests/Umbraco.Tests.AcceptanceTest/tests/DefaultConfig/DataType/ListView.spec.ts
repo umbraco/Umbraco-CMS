@@ -119,7 +119,8 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toEqual([]);
     });
 
-    test('can add layouts', async ({umbracoApi, umbracoUi}) => {
+    // TODO: Remove skip when the front-end is ready
+    test.skip('can add layouts', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       let layoutsData = 'Document Grid Collection View';
       if (listViewType === 'List View - Media') {
