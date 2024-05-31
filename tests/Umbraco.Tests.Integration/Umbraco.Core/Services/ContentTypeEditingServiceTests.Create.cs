@@ -774,7 +774,7 @@ public partial class ContentTypeEditingServiceTests
 
         var result = await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.InvalidPropertyTypeAlias, result.Status);
+        Assert.AreEqual(ContentTypeOperationStatus.PropertyTypeAliasCannotEqualContentTypeAlias, result.Status);
     }
 
     [Test]
