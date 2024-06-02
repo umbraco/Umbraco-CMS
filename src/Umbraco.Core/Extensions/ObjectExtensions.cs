@@ -41,13 +41,30 @@ public static class ObjectExtensions
     public static IEnumerable<T> AsEnumerableOfOne<T>(this T input) => Enumerable.Repeat(input, 1);
 
     /// <summary>
+    /// Disposes the object if it implements <see cref="IDisposable" />.
     /// </summary>
-    /// <param name="input"></param>
+    /// <param name="input">The object.</param>
     public static void DisposeIfDisposable(this object input)
     {
         if (input is IDisposable disposable)
         {
             disposable.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Disposes the object if it implements <see cref="IAsyncDisposable" /> or <see cref="IDisposable" />.
+    /// </summary>
+    /// <param name="input">The object.</param>
+    public static async Task DisposeAsyncIfDisposable(this object input)
+    {
+        if (input is IAsyncDisposable disposable)
+        {
+            await disposable.DisposeAsync();
+        }
+        else
+        {
+            input.DisposeIfDisposable();
         }
     }
 
