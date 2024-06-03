@@ -8,6 +8,7 @@ rmSync(dist, { recursive: true, force: true });
 
 export default defineConfig({
 	build: {
+		target: 'es2022',
 		lib: {
 			entry: ['index.ts', 'manifests.ts', 'umbraco-package.ts'],
 			formats: ['es'],
