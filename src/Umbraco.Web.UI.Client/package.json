@@ -124,12 +124,17 @@
 		"email": "backoffice@umbraco.com",
 		"url": "https://umbraco.com"
 	},
+	"workspaces": [
+		"./src/packages/language"
+	],
 	"scripts": {
 		"backoffice:test:e2e": "npx playwright test",
 		"build-storybook": "npm run wc-analyze && storybook build",
-		"build:for:cms": "npm run build && node ./devops/build/copy-to-cms.js",
+		"build:for:cms": "npm run build && npm run build:workspaces && node ./devops/build/copy-to-cms.js",
+		"build:for:npm": "npm run build",
 		"build:for:static": "vite build",
 		"build:vite": "tsc && vite build --mode staging",
+		"build:workspaces": "npm run build -ws --if-present",
 		"build": "tsc --project ./src/tsconfig.build.json && rollup -c ./src/rollup.config.js && npm run package:validate && npm run generate:manifest && npm run check:paths",
 		"check": "npm run lint:errors && npm run compile && npm run build-storybook && npm run generate:jsonschema:dist",
 		"check:paths": "node ./devops/build/check-path-length.js src 140",
