@@ -330,13 +330,14 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 				}
 			});
 		});
-		editor.on('init', () => editor.setContent(this.value?.toString() ?? ''));
+
 	}
 
 	#onInit(editor: Editor) {
 		//enable browser based spell checking
 		editor.getBody().setAttribute('spellcheck', 'true');
 		uriAttributeSanitizer(editor);
+		editor.setContent(this.value?.toString() ?? '');
 	}
 
 	#onChange(value: string) {
