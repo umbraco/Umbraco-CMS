@@ -52,7 +52,7 @@ const privateManifests: PackageManifestResponse = [
 				js: '/App_Plugins/tinyMcePlugin.js',
 				meta: {
 					config: {
-						plugins: 'wordcount',
+						plugins: ['wordcount'],
 						statusbar: true,
 					},
 				},
