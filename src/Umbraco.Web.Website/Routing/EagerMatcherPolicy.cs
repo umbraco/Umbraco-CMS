@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
@@ -8,8 +9,8 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
-using HttpRequestExtensions = Umbraco.Extensions.HttpRequestExtensions;
 
 namespace Umbraco.Cms.Web.Website.Routing;
 
@@ -102,6 +103,18 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
             if (candidate.Endpoint is not RouteEndpoint routeEndpoint)
             {
                 continue;
+            }
+
+            // We have to ensure that none of the candidates is a render controller or surface controller
+            // Normally these shouldn't be statically routed, however some people do it.
+            // So we should probably be friendly and check for it.
+            // Do not add this to V14.
+            ControllerActionDescriptor? controllerDescriptor = routeEndpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
+            TypeInfo? controllerTypeInfo = controllerDescriptor?.ControllerTypeInfo;
+            if (controllerTypeInfo is not null &&
+                (controllerTypeInfo.IsType<RenderController>() || controllerTypeInfo.IsType<SurfaceController>()))
+            {
+                return;
             }
 
             if (routeEndpoint.Order < lowestOrder)
