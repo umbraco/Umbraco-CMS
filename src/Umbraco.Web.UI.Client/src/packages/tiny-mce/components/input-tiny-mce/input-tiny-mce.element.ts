@@ -53,10 +53,6 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	@property({ attribute: false })
 	configuration?: UmbPropertyEditorConfigCollection;
 
-	@state()
-	private _tinyConfig: RawEditorOptions = {};
-
-	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 	#editorRef?: Editor | null = null;
 	#stylesheetRepository = new UmbStylesheetDetailRepository(this);
 	#umbStylesheetRuleManager = new UmbStylesheetRuleManager();
@@ -230,7 +226,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		}
 
 		// set the default values that will not be modified via configuration
-		this._tinyConfig = {
+		const config: RawEditorOptions = {
 			autoresize_bottom_margin: 10,
 			body_class: 'umb-rte',
 			contextMenu: false,
@@ -249,13 +245,13 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			...configurationOptions,
 		};
 
-		this.#setLanguage();
+		config.language = this.#getLanguage();
 
 		if (this.#editorRef) {
 			this.#editorRef.destroy();
 		}
 
-		const editors = await renderEditor(this._tinyConfig).catch((error) => {
+		const editors = await renderEditor(config).catch((error) => {
 			console.error('Failed to render TinyMCE', error);
 			return [];
 		});
@@ -263,8 +259,9 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	}
 
 	/**
-	 * Sets the language to use for TinyMCE */
-	#setLanguage() {
+	 * Gets the language to use for TinyMCE
+	 **/
+	#getLanguage() {
 		const localeId = this.localize.lang();
 		//try matching the language using full locale format
 		let languageMatch = availableLanguages.find((x) => localeId?.localeCompare(x) === 0);
@@ -277,10 +274,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			}
 		}
 
-		// only set if language exists, will fall back to tiny default
-		if (languageMatch) {
-			this._tinyConfig.language = languageMatch;
-		}
+		return languageMatch;
 	}
 
 	#editorSetup(editor: Editor) {
