@@ -367,14 +367,6 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 				border: var(--uui-input-border-width, 1px) solid var(--uui-input-border-color, var(--uui-color-border, #d8d7d9));
 			}
 
-			.tox-tinymce-aux {
-				z-index: 9000;
-			}
-
-			.tox-tinymce-inline {
-				z-index: 900;
-			}
-
 			.tox-tinymce-fullscreen {
 				position: absolute;
 			}
@@ -382,11 +374,6 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			/* FIXME: Remove this workaround when https://github.com/tinymce/tinymce/issues/6431 has been fixed */
 			.tox .tox-collection__item-label {
 				line-height: 1 !important;
-			}
-
-			/* Solves issue 1019 by lowering un-needed z-index on header.*/
-			.tox.tox-tinymce .tox-editor-header {
-				z-index: 0;
 			}
 		`,
 	];
