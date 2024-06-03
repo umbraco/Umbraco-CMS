@@ -1,4 +1,4 @@
-import { UserConfig } from 'vite';
+import type { UserConfig } from 'vite';
 
 interface UmbViteDefaultConfigArgs {
 	dist: string;
