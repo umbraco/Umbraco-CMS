@@ -128,9 +128,9 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         // processing below instead of one by one.
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            creatorIds = _userService.GetProfilesById(content.Select(x => x.CreatorId).ToArray())
+            creatorIds = _userService.GetProfilesById(content.Select(x => x.CreatorId).Distinct().ToArray())
                 .ToDictionary(x => x.Id, x => x);
-            writerIds = _userService.GetProfilesById(content.Select(x => x.WriterId).ToArray())
+            writerIds = _userService.GetProfilesById(content.Select(x => x.WriterId).Distinct().ToArray())
                 .ToDictionary(x => x.Id, x => x);
             scope.Complete();
         }

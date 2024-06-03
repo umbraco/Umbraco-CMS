@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Cache.PropertyEditors;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Services;
 
@@ -6,11 +7,11 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 internal abstract class BlockEditorValidatorBase : ComplexEditorValidator
 {
-    private readonly IContentTypeService _contentTypeService;
+    private readonly IBlockEditorElementTypeCache _elementTypeCache;
 
-    protected BlockEditorValidatorBase(IPropertyValidationService propertyValidationService, IContentTypeService contentTypeService)
+    protected BlockEditorValidatorBase(IPropertyValidationService propertyValidationService, IBlockEditorElementTypeCache elementTypeCache)
         : base(propertyValidationService)
-        => _contentTypeService = contentTypeService;
+        => _elementTypeCache = elementTypeCache;
 
     protected IEnumerable<ElementTypeValidationModel> GetBlockEditorDataValidation(BlockEditorData blockEditorData)
     {
@@ -18,7 +19,7 @@ internal abstract class BlockEditorValidatorBase : ComplexEditorValidator
         // need to validate that data for each property especially for things like 'required' data to work.
         // Lookup all element types for all content/settings and then we can populate any empty properties.
         var allElements = blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData).ToList();
-        var allElementTypes = _contentTypeService.GetAll(allElements.Select(x => x.ContentTypeKey).ToArray()).ToDictionary(x => x.Key);
+        var allElementTypes = _elementTypeCache.GetAll(allElements.Select(x => x.ContentTypeKey).ToArray()).ToDictionary(x => x.Key);
 
         foreach (BlockItemData row in allElements)
         {
