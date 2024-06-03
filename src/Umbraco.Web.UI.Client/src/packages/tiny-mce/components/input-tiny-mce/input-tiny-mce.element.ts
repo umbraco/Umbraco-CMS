@@ -5,7 +5,7 @@ import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import type { UmbTinyMcePluginBase } from './tiny-mce-plugin.js';
 import { type ClassConstructor, loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { css, customElement, html, property, query } from '@umbraco-cms/backoffice/external/lit';
-import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';
+import { getProcessedImageUrl, umbDeepMerge } from '@umbraco-cms/backoffice/utils';
 import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -95,10 +95,10 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			let config: RawEditorOptions = {};
 			manifests.forEach((manifest) => {
 				if (manifest.meta?.config) {
-					// TODO: Deep merge config
-					config = { ...config, ...manifest.meta.config };
+					config = umbDeepMerge(manifest.meta.config, config);
 				}
 			});
+
 			this.#setTinyConfig(config);
 		});
 	}
@@ -227,7 +227,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		}
 
 		// set the default values that will not be modified via configuration
-		const config: RawEditorOptions = {
+		let config: RawEditorOptions = {
 			autoresize_bottom_margin: 10,
 			body_class: 'umb-rte',
 			contextMenu: false,
@@ -245,12 +245,12 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 
 			// Extend with configuration options
 			...configurationOptions,
-
-			// Extend with additional configuration options
-			//...additionalConfig, // TODO: Deep merge
 		};
 
-		console.log('tried to set config', additionalConfig);
+		// Extend with additional configuration options
+		if (additionalConfig) {
+			config = umbDeepMerge(additionalConfig, config);
+		}
 
 		this.#editorRef?.destroy();
 
