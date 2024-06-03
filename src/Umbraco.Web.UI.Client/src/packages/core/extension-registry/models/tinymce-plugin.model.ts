@@ -1,5 +1,6 @@
 import type { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
+import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 
 export interface MetaTinyMcePlugin {
 	/**
@@ -26,6 +27,20 @@ export interface MetaTinyMcePlugin {
 		 */
 		icon?: string;
 	}>;
+
+	/**
+	 * Sets the default configuration for the TinyMCE editor. This configuration will be used when the editor is initialized.
+	 *
+	 * @see [TinyMCE Configuration](https://www.tiny.cloud/docs/configure/) for more information.
+	 * @optional
+	 * @examples [
+	 * {
+	 *   "plugins": "wordcount",
+	 *   "statusbar": true
+	 * }
+	 * ]
+	 */
+	config?: RawEditorOptions;
 }
 
 /**
