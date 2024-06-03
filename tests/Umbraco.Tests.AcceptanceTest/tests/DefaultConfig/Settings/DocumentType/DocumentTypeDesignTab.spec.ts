@@ -229,7 +229,7 @@ test('can create a document type with a composition', {tag: '@smoke'}, async ({u
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
 });
 
-test('can remove a composition form a document type', async ({umbracoApi, umbracoUi}) => {
+test('can remove a composition form a document type', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
   const compositionDocumentTypeName = 'CompositionDocumentType';
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
@@ -243,6 +243,7 @@ test('can remove a composition form a document type', async ({umbracoApi, umbrac
   await umbracoUi.documentType.clickCompositionsButton();
   await umbracoUi.documentType.clickButtonWithName(compositionDocumentTypeName);
   await umbracoUi.documentType.clickSubmitButton();
+  await umbracoUi.documentType.clickConfirmToSubmitButton();
   await umbracoUi.documentType.clickSaveButton();
 
   // Assert
@@ -420,7 +421,7 @@ test('can set appearance to label on top for a property in a document type', asy
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickEditorSettingsButton();
-  await umbracoUi.documentType.clickLabelOnTopButton();
+  await umbracoUi.documentType.clickLabelAboveButton();
   await umbracoUi.documentType.clickUpdateButton();
   await umbracoUi.documentType.clickSaveButton();
 
