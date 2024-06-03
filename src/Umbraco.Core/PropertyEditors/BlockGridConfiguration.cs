@@ -26,6 +26,10 @@ public class BlockGridConfiguration
         public Guid ContentElementTypeKey { get; set; }
 
         public Guid? SettingsElementTypeKey { get; set; }
+
+        public bool AllowAtRoot { get; set; }
+
+        public bool AllowInAreas { get; set; }
     }
 
     public class NumberRange
