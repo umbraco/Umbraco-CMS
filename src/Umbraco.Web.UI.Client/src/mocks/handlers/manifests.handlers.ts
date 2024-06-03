@@ -45,6 +45,18 @@ const privateManifests: PackageManifestResponse = [
 					propertyEditorSchema: 'Umbraco.TextBox',
 				},
 			},
+			{
+				type: 'tinyMcePlugin',
+				alias: 'My.TinyMcePlugin.Custom',
+				name: 'My Custom TinyMce Plugin',
+				js: '/App_Plugins/tinyMcePlugin.js',
+				meta: {
+					config: {
+						plugins: 'wordcount',
+						statusbar: true,
+					},
+				},
+			},
 		],
 	},
 	{
