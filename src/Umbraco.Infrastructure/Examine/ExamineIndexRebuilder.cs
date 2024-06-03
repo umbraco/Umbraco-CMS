@@ -2,8 +2,10 @@
 // See LICENSE for more details.
 
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HostedServices;
@@ -16,6 +18,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
     private readonly IExamineManager _examineManager;
     private readonly ILogger<ExamineIndexRebuilder> _logger;
+    private readonly IIndexRebuildStatusManager _indexRebuildStatusManager;
     private readonly IMainDom _mainDom;
     private readonly IEnumerable<IIndexPopulator> _populators;
     private readonly object _rebuildLocker = new();
@@ -24,10 +27,21 @@ public class ExamineIndexRebuilder : IIndexRebuilder
     /// <summary>
     ///     Initializes a new instance of the <see cref="ExamineIndexRebuilder" /> class.
     /// </summary>
+    [Obsolete("Use constructor with IIndexRebuildStatusManager. This is scheduled for removal in Umbraco 15.")]
     public ExamineIndexRebuilder(
         IMainDom mainDom,
         IRuntimeState runtimeState,
         ILogger<ExamineIndexRebuilder> logger,
+        IExamineManager examineManager,
+        IEnumerable<IIndexPopulator> populators,
+        IBackgroundTaskQueue backgroundTaskQueue) : this(mainDom, runtimeState, logger, StaticServiceProvider.Instance.GetRequiredService<IIndexRebuildStatusManager>(), examineManager, populators, backgroundTaskQueue)
+    {
+    }
+    public ExamineIndexRebuilder(
+        IMainDom mainDom,
+        IRuntimeState runtimeState,
+        ILogger<ExamineIndexRebuilder> logger,
+        IIndexRebuildStatusManager indexRebuildStatusManager,
         IExamineManager examineManager,
         IEnumerable<IIndexPopulator> populators,
         IBackgroundTaskQueue backgroundTaskQueue)
@@ -35,6 +49,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
         _mainDom = mainDom;
         _runtimeState = runtimeState;
         _logger = logger;
+        _indexRebuildStatusManager = indexRebuildStatusManager;
         _examineManager = examineManager;
         _populators = populators;
         _backgroundTaskQueue = backgroundTaskQueue;
@@ -147,7 +162,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
                 {
                     throw new InvalidOperationException($"No index found with name {indexName}");
                 }
-
+                _indexRebuildStatusManager.SetRebuildingIndexStatus([indexName], true);
                 index.CreateIndex(); // clear the index
                 foreach (IIndexPopulator populator in _populators)
                 {
@@ -158,6 +173,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
 
                     populator.Populate(index);
                 }
+                _indexRebuildStatusManager.SetRebuildingIndexStatus([indexName], false);
             }
         }
         finally
@@ -175,6 +191,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
         {
             Thread.Sleep(delay);
         }
+        IEnumerable<string>? rebuildedIndex = null;
 
         try
         {
@@ -190,7 +207,8 @@ public class ExamineIndexRebuilder : IIndexRebuilder
                     ? _examineManager.Indexes.Where(x =>
                         !x.IndexExists() || (x is IIndexStats stats && stats.GetDocumentCount() == 0))
                     : _examineManager.Indexes).ToArray();
-
+                rebuildedIndex = indexes.Select(x => x.Name);
+                _indexRebuildStatusManager.SetRebuildingIndexStatus(rebuildedIndex, true);
                 if (indexes.Length == 0)
                 {
                     return;
@@ -218,10 +236,15 @@ public class ExamineIndexRebuilder : IIndexRebuilder
                         _logger.LogError(e, "Index populating failed for populator {Populator}", populator.GetType());
                     }
                 }
+
             }
         }
         finally
         {
+            if (rebuildedIndex != null && rebuildedIndex.Any())
+            {
+                _indexRebuildStatusManager.SetRebuildingIndexStatus(rebuildedIndex, false);
+            }
             if (Monitor.IsEntered(_rebuildLocker))
             {
                 Monitor.Exit(_rebuildLocker);

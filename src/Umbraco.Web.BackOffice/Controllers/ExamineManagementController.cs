@@ -3,9 +3,11 @@ using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -22,23 +24,32 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
     private readonly IExamineManager _examineManager;
     private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
     private readonly IIndexRebuilder _indexRebuilder;
+    private readonly IIndexRebuildStatusManager _rebuildStatusManager;
     private readonly ILogger<ExamineManagementController> _logger;
     private readonly IAppPolicyCache _runtimeCache;
-
+    [Obsolete("Use the ctor with IOptionsMonitor<IIndexRebuildOptions>>")]
     public ExamineManagementController(
         IExamineManager examineManager,
         ILogger<ExamineManagementController> logger,
         IIndexDiagnosticsFactory indexDiagnosticsFactory,
         AppCaches appCaches,
-        IIndexRebuilder indexRebuilder)
+        IIndexRebuilder indexRebuilder) : this(examineManager, logger, indexDiagnosticsFactory, appCaches, indexRebuilder, StaticServiceProvider.Instance.GetRequiredService<IIndexRebuildStatusManager>())
+    {
+    }
+    public ExamineManagementController(
+        IExamineManager examineManager,
+        ILogger<ExamineManagementController> logger,
+        IIndexDiagnosticsFactory indexDiagnosticsFactory,
+        AppCaches appCaches,
+        IIndexRebuilder indexRebuilder, IIndexRebuildStatusManager rebuildStatusManager)
     {
         _examineManager = examineManager;
         _logger = logger;
         _indexDiagnosticsFactory = indexDiagnosticsFactory;
         _runtimeCache = appCaches.RuntimeCache;
         _indexRebuilder = indexRebuilder;
+        _rebuildStatusManager = rebuildStatusManager;
     }
-
     /// <summary>
     ///     Get the details for indexers
     /// </summary>
@@ -129,11 +140,8 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
             return validate;
         }
 
-        var cacheKey = "temp_indexing_op_" + indexName;
-        var found = _runtimeCache.Get(cacheKey);
-
         //if its still there then it's not done
-        return found != null
+        return _rebuildStatusManager.GetRebuildingIndexStatus(indexName)
             ? null
             : CreateModel(index!);
     }
@@ -167,12 +175,7 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
 
         try
         {
-            var cacheKey = "temp_indexing_op_" + index.Name;
-            //put temp val in cache which is used as a rudimentary way to know when the indexing is done
-            _runtimeCache.Insert(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5));
-
             _indexRebuilder.RebuildIndex(indexName);
-
             return new OkResult();
         }
         catch (Exception ex)
@@ -307,8 +310,5 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
         }
 
         _logger.LogInformation("Rebuilding index '{indexerName}' done.", indexer?.Name);
-
-        var cacheKey = "temp_indexing_op_" + indexer?.Name;
-        _runtimeCache.Clear(cacheKey);
     }
 }

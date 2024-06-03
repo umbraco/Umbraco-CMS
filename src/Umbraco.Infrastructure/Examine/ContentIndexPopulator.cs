@@ -1,5 +1,9 @@
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
@@ -14,6 +18,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 {
     private readonly IContentService _contentService;
     private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
+    private IndexingSettings _indexingSettings;
     private readonly ILogger<ContentIndexPopulator> _logger;
     private readonly int? _parentId;
 
@@ -28,6 +33,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     /// <summary>
     ///     Default constructor to lookup all content data
     /// </summary>
+    [Obsolete("Use the constructor with IOptionsMonitor<IndexingSettings>")]
     public ContentIndexPopulator(
         ILogger<ContentIndexPopulator> logger,
         IContentService contentService,
@@ -40,13 +46,14 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     /// <summary>
     ///     Optional constructor allowing specifying custom query parameters
     /// </summary>
+    [Obsolete("Use the constructor with IOptionsMonitor<IndexingSettings>")]
     public ContentIndexPopulator(
         ILogger<ContentIndexPopulator> logger,
         bool publishedValuesOnly,
         int? parentId,
         IContentService contentService,
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
-        IValueSetBuilder<IContent> contentValueSetBuilder)
+        IValueSetBuilder<IContent> contentValueSetBuilder) : this(logger, publishedValuesOnly, parentId, contentService, umbracoDatabaseFactory, contentValueSetBuilder, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
     {
         _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
         _umbracoDatabaseFactory = umbracoDatabaseFactory ?? throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
@@ -55,7 +62,37 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         _publishedValuesOnly = publishedValuesOnly;
         _parentId = parentId;
     }
+    public ContentIndexPopulator(
+        ILogger<ContentIndexPopulator> logger,
+        IContentService contentService,
+        IUmbracoDatabaseFactory umbracoDatabaseFactory,
+        IContentValueSetBuilder contentValueSetBuilder,
+        IOptionsMonitor<IndexingSettings> indexingSettings)
+        : this(logger, false, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder,indexingSettings)
+    {
+    }
+    public ContentIndexPopulator(
+        ILogger<ContentIndexPopulator> logger,
+        bool publishedValuesOnly,
+        int? parentId,
+        IContentService contentService,
+        IUmbracoDatabaseFactory umbracoDatabaseFactory,
+        IValueSetBuilder<IContent> contentValueSetBuilder,
+        IOptionsMonitor<IndexingSettings> indexingSettings)
+    {
+        _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+        _umbracoDatabaseFactory = umbracoDatabaseFactory ?? throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
+        _contentValueSetBuilder = contentValueSetBuilder ?? throw new ArgumentNullException(nameof(contentValueSetBuilder));
+        _indexingSettings = indexingSettings.CurrentValue;
+        indexingSettings.OnChange(change =>
+        {
+            _indexingSettings = change;
+        });
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _publishedValuesOnly = publishedValuesOnly;
+        _parentId = parentId;
 
+    }
     private IQuery<IContent> PublishedQuery => _publishedQuery ??=
         _umbracoDatabaseFactory.SqlContext.Query<IContent>().Where(x => x.Published);
 
@@ -75,7 +112,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
             return;
         }
 
-        const int pageSize = 10000;
+
         var pageIndex = 0;
 
         var contentParentId = -1;
@@ -86,11 +123,11 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 
         if (_publishedValuesOnly)
         {
-            IndexPublishedContent(contentParentId, pageIndex, pageSize, indexes);
+            IndexPublishedContent(contentParentId, pageIndex, _indexingSettings.IndexingPageSize, indexes);
         }
         else
         {
-            IndexAllContent(contentParentId, pageIndex, pageSize, indexes);
+            IndexAllContent(contentParentId, pageIndex, _indexingSettings.IndexingPageSize, indexes);
         }
     }
 

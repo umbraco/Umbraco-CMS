@@ -15,4 +15,8 @@ public class IndexingSettings
     /// </summary>
     [DefaultValue(StaticExplicitlyIndexEachNestedProperty)]
     public bool ExplicitlyIndexEachNestedProperty { get; set; } = StaticExplicitlyIndexEachNestedProperty;
+    /// <summary>
+    /// Defines how many items to index in a single page
+    /// </summary>
+    public int IndexingPageSize { get; set; } = 10000;
 }
