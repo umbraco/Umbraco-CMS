@@ -170,7 +170,7 @@ internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLocki
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-                var rowsAffected = await dbContext.Database.ExecuteSqlAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
+                var rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
 
                 if (rowsAffected == 0)
                 {
