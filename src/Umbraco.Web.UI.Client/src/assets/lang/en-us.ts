@@ -60,7 +60,7 @@ export default {
 		sendToTranslate: 'Send To Translation',
 		setGroup: 'Set group',
 		setPermissions: 'Set permissions',
-		sort: 'Sort children of',
+		sort: 'Sort children',
 		toInTheTreeStructureBelow: 'to in the tree structure below',
 		translate: 'Translate',
 		trash: 'Trash',

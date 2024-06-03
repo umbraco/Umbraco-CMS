@@ -17,6 +17,7 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 				unique: this.args.unique,
 				entityType: this.args.entityType,
 				treeAlias: this.args.meta.treeAlias,
+				foldersOnly: this.args.meta.foldersOnly,
 			},
 		});
 

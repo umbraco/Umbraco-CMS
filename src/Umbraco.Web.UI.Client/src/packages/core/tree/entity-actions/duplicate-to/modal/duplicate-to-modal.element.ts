@@ -22,7 +22,12 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 		return html`
 			<umb-body-layout headline="Duplicate">
 				<uui-box>
-					<umb-tree alias=${this.data.treeAlias} @selection-change=${this.#onTreeSelectionChange}></umb-tree>
+					<umb-tree
+						alias=${this.data.treeAlias}
+						.props=${{
+							foldersOnly: this.data?.foldersOnly,
+						}}
+						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
 
 				${this.#renderActions()}
