@@ -112,5 +112,5 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   const partialViewChildren = await umbracoApi.partialView.getChildren('/' + folderName + '/' + childFolderName);
   expect(partialViewChildren[0].path).toBe('/' + folderName + '/' + childFolderName + '/' + childOfChildFolderName);
   await umbracoUi.partialView.clickCaretButtonForName(childFolderName);
-  await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(childOfChildFolderName);
+  await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(childOfChildFolderName, true, false);
 });
