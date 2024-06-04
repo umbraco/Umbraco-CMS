@@ -80,7 +80,6 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	setLayouts(layouts: Array<BlockLayoutType>) {
-		console.log('setLayouts', layouts);
 		this._layouts.setValue(layouts);
 	}
 	setContents(contents: Array<UmbBlockDataType>) {
@@ -175,7 +174,6 @@ export abstract class UmbBlockManagerContext<
 		this.#contents.appendOne(contentData);
 	}
 	setOneSettings(settingsData: UmbBlockDataType) {
-		console.log('update one settings', settingsData);
 		this.#settings.appendOne(settingsData);
 	}
 

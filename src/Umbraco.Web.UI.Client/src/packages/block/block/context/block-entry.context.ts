@@ -43,15 +43,18 @@ export abstract class UmbBlockEntryContext<
 	getUnique() {
 		return this.getContentUdi();
 	}
+	/*
+	// TODO: Does not make sense as we both need to handle content and settings properties.
 	propertyValueByAlias<ReturnType>(propertyAlias: string) {
 		return this.#content.asObservablePart((x) => x?.[propertyAlias] as ReturnType | undefined);
 	}
 	setPropertyValue(propertyAlias: string, value: unknown) {
-		this.#content.setValue({
+		this._manager?.setValue({
 			...this.#content.getValue()!,
 			[propertyAlias]: value,
 		});
 	}
+	*/
 
 	#index = new UmbNumberState(undefined);
 	readonly index = this.#index.asObservable();
@@ -189,9 +192,10 @@ export abstract class UmbBlockEntryContext<
 				if (settingsElementTypeKey === undefined || settingsDataContentTypeKey === undefined) return;
 				if (settingsElementTypeKey !== null && settingsElementTypeKey !== settingsDataContentTypeKey) {
 					// Update the settings model with latest elementTypeKey, so data is up to date with configuration: [NL]
-					/*this.#settings.update({
-						contentTypeKey: settingsElementTypeKey,
-					});*/
+					const currentSettings = this.#settings.getValue();
+					if (currentSettings) {
+						this._manager?.setOneSettings({ ...currentSettings, contentTypeKey: settingsElementTypeKey });
+					}
 				}
 			},
 		);
@@ -201,12 +205,11 @@ export abstract class UmbBlockEntryContext<
 			if (layout.settingsUdi == null && blockType.settingsElementTypeKey) {
 				// We have a settings ElementType in config but not in data, so lets create the scaffold for that: [NL]
 				const settingsData = this._manager!.createBlockSettingsData(blockType.contentElementTypeKey); // Yes its on purpose we use the contentElementTypeKey here, as this is our identifier for a BlockType. [NL]
-				console.log('make new settingsData and set:', settingsData);
-				this.#settings.setValue(settingsData);
+				this._manager?.setOneSettings(settingsData);
 				this._layout.update({ settingsUdi: settingsData.udi } as Partial<BlockLayoutType>);
 			} else if (layout.settingsUdi && blockType.settingsElementTypeKey === undefined) {
 				// We no longer have settings ElementType in config. So we remove the settingsData and settings UDI from the layout. [NL]
-				//this.#settings.setValue(undefined);
+				this._manager?.removeOneSettings(layout.settingsUdi);
 				this._layout.update({ settingsUdi: undefined } as Partial<BlockLayoutType>);
 			}
 		});
@@ -312,16 +315,19 @@ export abstract class UmbBlockEntryContext<
 				},
 				'observeSettings',
 			);
+			/*
+
+			This two way binding does not work well, might need to further investigate what the exact problem is.
 			this.observe(
 				this.settings,
 				(settings) => {
 					if (settings) {
-						console.log('settings to be set', settings);
+						console.log('settings to be set', this.#contentUdi, settings);
 						this._manager?.setOneSettings(settings);
 					}
 				},
 				'observeInternalSettings',
-			);
+			);*/
 		}
 	}
 
