@@ -38042,6 +38042,10 @@
             "minLength": 1,
             "type": "string"
           },
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
           "version": {
             "type": "string",
             "nullable": true
