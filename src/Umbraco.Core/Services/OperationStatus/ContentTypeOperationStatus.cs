@@ -18,5 +18,6 @@ public enum ContentTypeOperationStatus
     NotFound,
     NotAllowed,
     InvalidElementFlagDocumentHasContent,
-    InvalidElementFlagElementIsUsedInPropertyEditorConfiguration
+    InvalidElementFlagElementIsUsedInPropertyEditorConfiguration,
+    InvalidElementFlagComparedToParent
 }

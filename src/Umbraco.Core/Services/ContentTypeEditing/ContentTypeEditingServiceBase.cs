@@ -91,6 +91,13 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
         }
 
+        // validate if the parent documentType (if set) has the same element status as the documentType being created
+        operationStatus = await ValidateCreateParentElementStatusAsync(model);
+        if (operationStatus is not ContentTypeOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<TContentType?, ContentTypeOperationStatus>(operationStatus, null);
+        }
+
         // get the ID of the parent to create the content type under (we already validated that it exists)
         var parentId = GetParentId(model, containerKey) ?? throw new ArgumentException("Parent ID could not be found", nameof(model));
         TContentType contentType = CreateContentType(_shortStringHelper, parentId);
@@ -416,6 +423,25 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
 
     private bool IsUnsafeAlias(string alias) => alias.IsNullOrWhiteSpace()
                                                 || alias.Length != alias.ToSafeAlias(_shortStringHelper).Length;
+
+    /// <summary>
+    /// Should be called after it has been established that the composition list is in a valid state and the (composition) parent exists
+    /// </summary>
+    private async Task<ContentTypeOperationStatus> ValidateCreateParentElementStatusAsync(
+        ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
+    {
+        Guid? parentId = model.Compositions
+            .SingleOrDefault(composition => composition.CompositionType == CompositionType.Inheritance)?.Key;
+        if (parentId is null)
+        {
+            return ContentTypeOperationStatus.Success;
+        }
+
+        IContentType? parent = await _contentTypeService.GetAsync(parentId.Value);
+        return parent!.IsElement == model.IsElement
+            ? ContentTypeOperationStatus.Success
+            : ContentTypeOperationStatus.InvalidElementFlagComparedToParent;
+    }
 
     #endregion
 

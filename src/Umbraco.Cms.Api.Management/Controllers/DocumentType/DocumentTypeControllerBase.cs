@@ -88,7 +88,11 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .Build()),
                 ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")
-                    .WithDetail("Can not change to Document Type because this Element Type is used in the configuration of Data Types")
+                    .WithDetail("Can not change to Document Type because this Element Type is used in the configuration of Data Types.")
+                    .Build()),
+                ContentTypeOperationStatus.InvalidElementFlagComparedToParent => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid IsElement flag")
+                    .WithDetail("Can not create a documentType with inheritance composition where the parent and the new type's IsElement flag are different.")
                     .Build()),
                 _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
             });
