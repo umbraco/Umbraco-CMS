@@ -127,6 +127,7 @@
 	"workspaces": [
 		"./src/packages/data-type",
 		"./src/packages/dictionary",
+		"./src/packages/umbraco-news",
 		"./src/packages/webhook"
 	],
 	"scripts": {
