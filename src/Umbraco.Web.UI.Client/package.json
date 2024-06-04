@@ -125,6 +125,7 @@
 		"url": "https://umbraco.com"
 	},
 	"workspaces": [
+		"./src/packages/data-type",
 		"./src/packages/dictionary",
 		"./src/packages/webhook"
 	],
