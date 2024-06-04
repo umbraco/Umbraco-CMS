@@ -84,7 +84,7 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
 
         if (misMatchingAncestors.Any())
         {
-            // todo update this message when the format has been aligned on with the client
+            // todo update this message when the format has been agreed upon on with the client
             eventMessages.Add(new EventMessage(
                 "DocumentType saved",
                 "One or more ancestors have a mismatching element flag",
@@ -98,7 +98,7 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
 
         if (descendants.Any(descendant => descendant.IsElement != contentType.IsElement))
         {
-            // todo update this message when the format has been aligned on with the client
+            // todo update this message when the format has been agreed upon on with the client
             eventMessages.Add(new EventMessage(
                 "DocumentType saved",
                 "One or more descendants have a mismatching element flag",

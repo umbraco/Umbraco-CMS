@@ -17,7 +17,6 @@ public enum ContentTypeOperationStatus
     DuplicateContainer,
     NotFound,
     NotAllowed,
-    InvalidElementFlagHasDocumentAncestor,
     InvalidElementFlagDocumentHasContent,
     InvalidElementFlagElementIsUsedInPropertyEditorConfiguration
 }

@@ -1,5 +1,5 @@
-﻿using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
@@ -16,8 +16,6 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
 {
     private readonly ITemplateService _templateService;
     private readonly IDataTypeService _dataTypeService;
-    private readonly IEntityService _entityService;
-    private readonly IContentService _contentService;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IContentTypeService _contentTypeService;
 
@@ -27,16 +25,28 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         IDataTypeService dataTypeService,
         IEntityService entityService,
         IShortStringHelper shortStringHelper,
-        IContentService contentService,
         PropertyEditorCollection propertyEditorCollection)
         : base(contentTypeService, contentTypeService, dataTypeService, entityService, shortStringHelper)
     {
         _contentTypeService = contentTypeService;
         _templateService = templateService;
         _dataTypeService = dataTypeService;
-        _entityService = entityService;
-        _contentService = contentService;
         _propertyEditorCollection = propertyEditorCollection;
+    }
+
+    [Obsolete("Use the constructor that is not marked obsolete, will be removed in v16")]
+    public ContentTypeEditingService(
+        IContentTypeService contentTypeService,
+        ITemplateService templateService,
+        IDataTypeService dataTypeService,
+        IEntityService entityService,
+        IShortStringHelper shortStringHelper)
+        : base(contentTypeService, contentTypeService, dataTypeService, entityService, shortStringHelper)
+    {
+        _contentTypeService = contentTypeService;
+        _templateService = templateService;
+        _dataTypeService = dataTypeService;
+        _propertyEditorCollection = StaticServiceProvider.Instance.GetRequiredService<PropertyEditorCollection>();
     }
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
