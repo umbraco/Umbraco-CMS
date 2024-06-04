@@ -11,8 +11,8 @@ import type {
 /**
  * Condition to apply workspace extension based on a content type alias
  */
-export class UmbWorkspaceContentTypeAliasCondition extends UmbConditionBase<WorkspaceEntityContentTypeConditionConfig> implements UmbExtensionCondition {
-	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<WorkspaceEntityContentTypeConditionConfig>) {
+export class UmbWorkspaceContentTypeAliasCondition extends UmbConditionBase<WorkspaceContentTypeAliasConditionConfig> implements UmbExtensionCondition {
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<WorkspaceContentTypeAliasConditionConfig>) {
 		super(host, args);
 
 		let permissionCheck: ((contentTypeAliases: string[]) => boolean) | undefined = undefined;
@@ -37,7 +37,7 @@ export class UmbWorkspaceContentTypeAliasCondition extends UmbConditionBase<Work
 	}
 }
 
-export type WorkspaceEntityContentTypeConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceContentTypeAlias'> & {
+export type WorkspaceContentTypeAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceContentTypeAlias'> & {
 	/**
 	 * Define a content type alias in which workspace this extension should be available
 	 *

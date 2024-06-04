@@ -3,6 +3,7 @@ import { manifests as memberManifests } from './member/manifests.js';
 import { manifests as memberSectionManifests } from './member-section/manifests.js';
 import { manifests as memberTypeManifests } from './member-type/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import {manifests as tempRemoveMe} from '../../../examples/entity-content-type-condition/manifest.js';
 
 import './member/components/index.js';
 import './member-group/components/index.js';
@@ -12,4 +13,5 @@ export const manifests: Array<ManifestTypes> = [
 	...memberManifests,
 	...memberSectionManifests,
 	...memberTypeManifests,
+	...tempRemoveMe
 ];

@@ -69,8 +69,7 @@ export class UmbDocumentWorkspaceContext
 	implements
 		UmbContentWorkspaceContext<UmbDocumentTypeDetailModel, UmbDocumentVariantModel>,
 		UmbPublishableWorkspaceContext,
-		UmbCollectionWorkspaceContext<UmbDocumentTypeDetailModel>,
-		UmbEntityWithContentTypeWorkspaceContext
+		UmbCollectionWorkspaceContext<UmbDocumentTypeDetailModel>
 {
 	public readonly IS_CONTENT_WORKSPACE_CONTEXT = true as const;
 
