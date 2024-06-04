@@ -11,5 +11,5 @@ export const manifests: Array<ManifestTypes> = [
 	...memberGroupManifests,
 	...memberManifests,
 	...memberSectionManifests,
-	...memberTypeManifests
+	...memberTypeManifests,
 ];
