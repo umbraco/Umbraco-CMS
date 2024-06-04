@@ -84,11 +84,11 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .Build()),
                 ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")
-                    .WithDetail("Can not change to Element Type because content has already been created with this documenttype.")
+                    .WithDetail("Cannot change to element type because content has already been created with this document type.")
                     .Build()),
                 ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")
-                    .WithDetail("Can not change to Document Type because this Element Type is used in the configuration of Data Types.")
+                    .WithDetail("Cannot change to document type because this element type is used in the configuration of a data type.")
                     .Build()),
                 ContentTypeOperationStatus.InvalidElementFlagComparedToParent => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")
