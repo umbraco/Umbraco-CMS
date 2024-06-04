@@ -242,6 +242,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			target: this._editorElement,
 			paste_data_images: false,
 			language: this.#getLanguage(),
+			promotion: false,
 
 			// Extend with configuration options
 			...configurationOptions,
