@@ -121,18 +121,12 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
             return ContentTypeOperationStatus.Success;
         }
 
-        // if nConfigurationObject = {object} Exception of type 'System.InvalidOperationException' was thrown ew value is Not Element => Document
+        // this method should only contain blocking validation, warnings are handles by ...
+
         // => check whether the element was used in a block structure prior to updating
         if (model.IsElement is false)
         {
             return await ValidateElementToDocumentNotUsedInBlockStructuresAsync(contentType);
-        }
-
-        // previous check is true, so we are switching from document to element
-        ContentTypeOperationStatus operationStatus = ValidateDocumentToElementHasNoAncestors(contentType);
-        if (operationStatus is not ContentTypeOperationStatus.Success)
-        {
-            return operationStatus;
         }
 
         return ValidateDocumentToElementHasNoContent(contentType);
@@ -154,13 +148,8 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
             : ContentTypeOperationStatus.Success;
     }
 
-    private ContentTypeOperationStatus ValidateDocumentToElementHasNoAncestors(IContentTypeBase contentType) =>
-        contentType.AncestorIds().Any()
-            ? ContentTypeOperationStatus.InvalidElementFlagHasDocumentAncestor
-            : ContentTypeOperationStatus.Success;
-
     private ContentTypeOperationStatus ValidateDocumentToElementHasNoContent(IContentTypeBase contentType) =>
-        _contentService.Count(contentType.Alias) > 0
+        _contentTypeService.HasContentNodes(contentType.Id)
             ? ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent
             : ContentTypeOperationStatus.Success;
 
