@@ -1,65 +1,62 @@
 import { UmbConditionBase } from '../../extension-registry/conditions/condition-base.controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_ENTITY_WITH_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 /**
- * Condition to apply extension based on a entities content type unique
+ * Condition to apply workspace extension based on a content type alias
  */
-export class UmbWorkspaceEntityContentTypeCondition extends UmbConditionBase<WorkspaceEntityContentTypeConditionConfig> implements UmbExtensionCondition {
+export class UmbWorkspaceContentTypeAliasCondition extends UmbConditionBase<WorkspaceEntityContentTypeConditionConfig> implements UmbExtensionCondition {
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<WorkspaceEntityContentTypeConditionConfig>) {
 		super(host, args);
 
-		let permissionCheck: ((contentTypeUnique: string) => boolean) | undefined = undefined;
+		let permissionCheck: ((contentTypeAliases: string[]) => boolean) | undefined = undefined;
 		if (this.config.match) {
-			permissionCheck = (contentTypeUnique: string) => contentTypeUnique === this.config.match;
+			permissionCheck = (contentTypeAliases: string[]) => contentTypeAliases.includes(this.config.match!);
 		} else if (this.config.oneOf) {
-			permissionCheck = (contentTypeUnique: string) => this.config.oneOf!.indexOf(contentTypeUnique) !== -1;
+			permissionCheck = (contentTypeAliases: string[]) => contentTypeAliases.some(item => this.config.oneOf!.includes(item));
 		}
 
 		if (permissionCheck !== undefined) {
-			
-			this.consumeContext(UMB_ENTITY_WITH_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
-
-				this.observe(context.contentTypeUnique,(contentTypeUnique)=> {
-					this.permitted = contentTypeUnique ? permissionCheck(contentTypeUnique) : false;
+			this.consumeContext(UMB_PROPERTY_STRUCTURE_WORKSPACE_CONTEXT, (context) => {
+				this.observe(context.structure.contentTypeAliases,(contentTypeAliases) => {
+					this.permitted = contentTypeAliases ? permissionCheck(contentTypeAliases) : false;
 				},
-				'workspaceContentTypeUniqueConditionObserver');
+				'workspaceContentTypeAliasConditionObserver');
 			});
-
 		} else {
 			throw new Error(
-				'Condition `Umb.Condition.EntityContentType` could not be initialized properly. Either "match" or "oneOf" must be defined',
+				'Condition `Umb.Condition.WorkspaceContentTypeAlias` could not be initialized properly. Either "match" or "oneOf" must be defined',
 			);
 		}
 	}
 }
 
-export type WorkspaceEntityContentTypeConditionConfig = UmbConditionConfigBase<'Umb.Condition.EntityContentType'> & {
+export type WorkspaceEntityContentTypeConditionConfig = UmbConditionConfigBase<'Umb.Condition.WorkspaceContentTypeAlias'> & {
 	/**
-	 * Define the unique content type key where this extension should be available in
+	 * Define a content type alias in which workspace this extension should be available
 	 *
 	 * @example
-	 * "a1eb4175-3ec1-40ea-8dda-083df6648973"
+	 * Depends on implementation, but i.e. "article", "image", "blockPage"
 	 */
 	match?: string;
 	/**
-	 * Define one or more content type keys that this extension should be available in
+	 * Define one or more content type aliases in which workspace this extension should be available
 	 *
 	 * @example
-	 * ["a1eb4175-3ec1-40ea-8dda-083df6648973", "2ac00e5d-8763-42d9-a38c-adaaee02cfae"]
+	 * ["article", "image", "blockPage"]
 	 */
 	oneOf?: Array<string>;
 };
 
 export const manifest: ManifestCondition = {
 	type: 'condition',
-	name: 'Workspace Entity Content Type Condition',
-	alias: 'Umb.Condition.EntityContentType',
-	api: UmbWorkspaceEntityContentTypeCondition,
+	name: 'Workspace Content Type Alias Condition',
+	alias: 'Umb.Condition.WorkspaceContentTypeAlias',
+	api: UmbWorkspaceContentTypeAliasCondition,
 };

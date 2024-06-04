@@ -12,8 +12,9 @@ const workspace: ManifestWorkspaceView = {
   },
   conditions : [
     {
-      alias : 'Umb.Condition.EntityContentType',
-      oneOf : ['29643452-cff9-47f2-98cd-7de4b6807681','media-type-1-id']
+      alias : 'Umb.Condition.WorkspaceContentTypeAlias',
+			//match : 'blogPost'
+      oneOf : ['blogPost','mediaType1']
     }
   ]
 };
