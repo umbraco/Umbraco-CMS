@@ -248,7 +248,7 @@ public static class ClaimsIdentityExtensions
                 identity));
         }
 
-        // NOTe: this can be removed when the obsolete claim type has been deleted
+        // NOTE: this can be removed when the obsolete claim type has been deleted
         if (identity.HasClaim(x => x.Type == Constants.Security.StartContentNodeIdClaimType) == false &&
             startContentNodes != null)
         {
@@ -264,7 +264,7 @@ public static class ClaimsIdentityExtensions
             }
         }
 
-        // NOTe: this can be removed when the obsolete claim type has been deleted
+        // NOTE: this can be removed when the obsolete claim type has been deleted
         if (identity.HasClaim(x => x.Type == Constants.Security.StartMediaNodeIdClaimType) == false &&
             startMediaNodes != null)
         {
@@ -304,7 +304,7 @@ public static class ClaimsIdentityExtensions
         }
 
         // Add each app as a separate claim
-        // NOTe: this can be removed when the obsolete claim type has been deleted
+        // NOTE: this can be removed when the obsolete claim type has been deleted
         if (identity.HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false && allowedApps != null)
         {
             foreach (var application in allowedApps)
