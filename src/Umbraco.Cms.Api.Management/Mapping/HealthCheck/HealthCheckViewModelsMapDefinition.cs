@@ -23,7 +23,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
         mapper.Define<IGrouping<string?, Core.HealthChecks.HealthCheck>, HealthCheckGroupResponseModel>((_, _) => new HealthCheckGroupResponseModel { Name = string.Empty }, Map);
     }
 
-    // Umbraco.Code.MapAll -ActionParameters
+    // Umbraco.Code.MapAll
     private static void Map(HealthCheckActionRequestModel source, HealthCheckAction target, MapperContext context)
     {
         target.Alias = source.Alias;
