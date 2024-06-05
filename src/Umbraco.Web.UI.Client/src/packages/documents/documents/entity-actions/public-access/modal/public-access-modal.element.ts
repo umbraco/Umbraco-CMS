@@ -112,9 +112,9 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 		this.modalContext?.submit();
 	}
 
-	#handleDelete() {
+	async #handleDelete() {
 		if (!this.#unique) return;
-		this.#publicAccessRepository.delete(this.#unique);
+		await this.#publicAccessRepository.delete(this.#unique);
 		this.modalContext?.submit();
 	}
 
