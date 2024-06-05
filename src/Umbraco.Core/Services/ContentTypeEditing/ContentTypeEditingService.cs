@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -12,8 +14,24 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<IContentType, IContentTypeService, ContentTypePropertyTypeModel, ContentTypePropertyContainerModel>, IContentTypeEditingService
 {
     private readonly ITemplateService _templateService;
+    private readonly IReservedFieldNamesService _reservedFieldNamesService;
     private readonly IContentTypeService _contentTypeService;
 
+    public ContentTypeEditingService(
+        IContentTypeService contentTypeService,
+        ITemplateService templateService,
+        IDataTypeService dataTypeService,
+        IEntityService entityService,
+        IShortStringHelper shortStringHelper,
+        IReservedFieldNamesService reservedFieldNamesService)
+        : base(contentTypeService, contentTypeService, dataTypeService, entityService, shortStringHelper)
+    {
+        _contentTypeService = contentTypeService;
+        _templateService = templateService;
+        _reservedFieldNamesService = reservedFieldNamesService;
+    }
+
+    [Obsolete("Use the non obsolete constructor instead. Scheduled for removal in v16")]
     public ContentTypeEditingService(
         IContentTypeService contentTypeService,
         ITemplateService templateService,
@@ -24,6 +42,7 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
     {
         _contentTypeService = contentTypeService;
         _templateService = templateService;
+        _reservedFieldNamesService = StaticServiceProvider.Instance.GetRequiredService<IReservedFieldNamesService>();
     }
 
     public async Task<Attempt<IContentType?, ContentTypeOperationStatus>> CreateAsync(ContentTypeCreateModel model, Guid userKey)
@@ -104,4 +123,6 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
     protected override UmbracoObjectTypes ContentTypeObjectType => UmbracoObjectTypes.DocumentType;
 
     protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.DocumentTypeContainer;
+
+    protected override ISet<string> GetReservedFieldNames() => _reservedFieldNamesService.GetDocumentReservedFieldNames();
 }
