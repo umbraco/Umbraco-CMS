@@ -65,3 +65,34 @@ test('can remove option', async ({umbracoApi, umbracoUi}) => {
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   expect(dataTypeData.values).toEqual([]);
 });
+
+test('can update option', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const optionName = 'Test option';
+  const updatedOptionName = 'Updated option';
+  const optionValues = [
+    {
+      "alias": "items",
+      "value": [optionName],
+    },
+  ];
+  const expectedOptionValues = [
+    {
+      "alias": "items",
+      "value": [updatedOptionName],
+    },
+  ];
+  // Remove all existing options and add an option to update
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  dataTypeData.values = optionValues;
+  await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);  
+  await umbracoUi.dataType.goToDataType(dataTypeName);
+
+  // Act
+  await umbracoUi.dataType.enterOptionName(updatedOptionName);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toEqual(expectedOptionValues);
+});
