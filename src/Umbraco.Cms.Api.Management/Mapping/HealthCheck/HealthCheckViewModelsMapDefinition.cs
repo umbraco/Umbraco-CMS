@@ -34,6 +34,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
         target.ProvidedValueValidation = source.ProvidedValueValidation;
         target.ProvidedValueValidationRegex = source.ProvidedValueValidationRegex;
         target.ProvidedValue = source.ProvidedValue;
+        target.ActionParameters = source.ActionParameters;
     }
 
     // Umbraco.Code.MapAll
@@ -50,6 +51,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
         target.ProvidedValue = source.ProvidedValue;
         target.ProvidedValueValidation = source.ProvidedValueValidation;
         target.ProvidedValueValidationRegex = source.ProvidedValueValidationRegex;
+        target.ActionParameters = source.ActionParameters;
     }
 
     // Umbraco.Code.MapAll
