@@ -1,10 +1,10 @@
 import { CodeSnippetType } from '../../types.js';
-import { UMB_PARTIAL_VIEW_PICKER_MODAL } from '../partial-view-picker/partial-view-picker-modal.token.js';
 import { UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL } from '../templating-page-field-builder/templating-page-field-builder-modal.token.js';
 import type {
 	UmbTemplatingItemPickerModalData,
 	UmbTemplatingItemPickerModalValue,
 } from './templating-item-picker-modal.token.js';
+import { UMB_PARTIAL_VIEW_PICKER_MODAL } from '@umbraco-cms/backoffice/partial-view';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
