@@ -21,7 +21,7 @@ test('can show open button', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
     "alias": "showOpenButton",
-    "value": true,
+    "value": true
   };
   await umbracoUi.dataType.goToDataType(dataTypeName);
 

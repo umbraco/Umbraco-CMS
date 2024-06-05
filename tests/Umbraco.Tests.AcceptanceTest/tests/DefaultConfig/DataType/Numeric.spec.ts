@@ -18,12 +18,12 @@ test.afterEach(async ({umbracoApi}) => {
   }   
 });
 
-test('can update Minimum value', async ({umbracoApi, umbracoUi}) => {
+test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = -5;
   const expectedDataTypeValues = {
     "alias": "min",
-    "value": minimumValue,
+    "value": minimumValue
   };
 
   // Act
@@ -40,7 +40,7 @@ test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
   const maximumValue = 1000000;
   const expectedDataTypeValues = {
     "alias": "max",
-    "value": maximumValue,
+    "value": maximumValue
   };
 
   // Act
@@ -52,12 +52,12 @@ test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test('can update Step Size value', async ({umbracoApi, umbracoUi}) => {
+test('can update step size value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stepSizeValue = 5;
   const expectedDataTypeValues = {
     "alias": "step",
-    "value": stepSizeValue,
+    "value": stepSizeValue
   };
 
   // Act
@@ -73,7 +73,7 @@ test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
     "alias": "allowDecimals",
-    "value": true,
+    "value": true
   };
 
   // Act

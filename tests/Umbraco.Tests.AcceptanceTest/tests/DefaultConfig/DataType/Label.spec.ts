@@ -26,7 +26,7 @@ for (const labelType of labelTypes) {
         {
           "alias": "umbracoDataValueType",
           "value": "TEXT",
-        },
+        }
       ];
 
       // Act

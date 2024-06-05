@@ -45,7 +45,7 @@ test('can add option', async ({umbracoApi, umbracoUi}) => {
     {
       "alias": "items",
       "value": [optionName],
-    },
+    }
   ];
   // Remove all existing options
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -70,7 +70,7 @@ test('can remove option', async ({umbracoApi, umbracoUi}) => {
     {
       "alias": "items",
       "value": [removedOptionName],
-    },
+    }
   ];
   // Remove all existing options and add an option to remove
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

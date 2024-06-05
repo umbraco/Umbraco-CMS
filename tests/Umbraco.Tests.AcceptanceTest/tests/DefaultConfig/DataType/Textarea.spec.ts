@@ -23,7 +23,7 @@ test('can update Maximum allowed characters value', async ({umbracoApi, umbracoU
   const maxCharsValue = 126;
   const expectedDataTypeValues = {
     "alias": "maxChars",
-    "value": maxCharsValue,
+    "value": maxCharsValue
   };
 
   // Act
@@ -40,7 +40,7 @@ test('can update Number of rows value', async ({umbracoApi, umbracoUi}) => {
   const numberOfRowsValue = 9;
   const expectedDataTypeValues = {
     "alias": "rows",
-    "value": numberOfRowsValue,
+    "value": numberOfRowsValue
   };
 
   // Act
@@ -57,7 +57,7 @@ test('can update Min height (pixels) value', async ({umbracoApi, umbracoUi}) => 
   const minHeightValue = 150;
   const expectedDataTypeValues = {
     "alias": "minHeight",
-    "value": minHeightValue,
+    "value": minHeightValue
   };
 
   // Act
@@ -74,7 +74,7 @@ test('can update Max height (pixels) value', async ({umbracoApi, umbracoUi}) => 
   const maxHeightValue = 300;
   const expectedDataTypeValues = {
     "alias": "maxHeight",
-    "value": maxHeightValue,
+    "value": maxHeightValue
   };
 
   // Act

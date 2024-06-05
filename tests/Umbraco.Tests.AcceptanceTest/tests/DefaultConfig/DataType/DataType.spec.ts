@@ -61,7 +61,7 @@ test('can delete a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) 
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeFalsy();
 });
 
-test('can change Property Editor in a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can change property editor in a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedEditorName = 'Text Area';
   const updatedEditorAlias = 'Umbraco.TextArea';

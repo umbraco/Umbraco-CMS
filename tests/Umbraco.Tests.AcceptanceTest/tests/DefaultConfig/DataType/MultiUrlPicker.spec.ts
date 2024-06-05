@@ -23,7 +23,7 @@ test('can update minimum number of items value', async ({umbracoApi, umbracoUi})
   const minimumValue = 2;
   const expectedDataTypeValues = {
     "alias": "minNumber",
-    "value": minimumValue,
+    "value": minimumValue
   };
 
   // Act
@@ -40,7 +40,7 @@ test('can update maximum number of items value', async ({umbracoApi, umbracoUi})
   const maximumValue = 2;
   const expectedDataTypeValues = {
     "alias": "maxNumber",
-    "value": maximumValue,
+    "value": maximumValue
   };
 
   // Act
@@ -56,7 +56,7 @@ test('can update ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
     "alias": "ignoreUserStartNodes",
-    "value": true,
+    "value": true
   };
 
   // Act
@@ -73,7 +73,7 @@ test('can update overlay size', async ({umbracoApi, umbracoUi}) => {
   const overlaySizeValue = 'large';
   const expectedDataTypeValues = {
     "alias": "overlaySize",
-    "value": overlaySizeValue,
+    "value": overlaySizeValue
   };
 
   // Act
@@ -89,7 +89,7 @@ test('can update hide anchor/query string input', async ({umbracoApi, umbracoUi}
   // Arrange
   const expectedDataTypeValues = {
     "alias": "hideAnchor",
-    "value": true,
+    "value": true
   };
 
   // Act

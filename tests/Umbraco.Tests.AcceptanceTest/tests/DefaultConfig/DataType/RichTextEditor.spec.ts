@@ -21,7 +21,7 @@ test('can select ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
     "alias": "ignoreUserStartNodes",
-    "value": true,
+    "value": true
   };
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -41,8 +41,8 @@ test.skip('can enable all toolbar options', async ({umbracoApi, umbracoUi}) => {
   const expectedDataTypeValues = [
     {
       "alias": "toolbar",
-      "value": toolbarValues,
-    },
+      "value": toolbarValues
+    }
   ];
 
   // Remove all existing values
@@ -96,7 +96,7 @@ test('can add dimensions', async ({umbracoApi, umbracoUi}) => {
     "value": {
       "width": width,
       "height": height
-    },
+    }
   };
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -114,7 +114,7 @@ test('can add maximum size for inserted images', async ({umbracoApi, umbracoUi})
   const maxImageSize = 300;
   const expectedDataTypeValues = {
     "alias": "maxImageSize",
-    "value": maxImageSize,
+    "value": maxImageSize
   };
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -132,7 +132,7 @@ test('can select overlay size', async ({umbracoApi, umbracoUi}) => {
   const overlaySizeValue = 'large';
   const expectedDataTypeValues = {
     "alias": "overlaySize",
-    "value": overlaySizeValue,
+    "value": overlaySizeValue
   };
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -149,7 +149,7 @@ test('can enable hide label', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
     "alias": "hideLabel",
-    "value": true,
+    "value": true
   };
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -169,7 +169,7 @@ test('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
   const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(mediaFolderName);
   const expectedDataTypeValues = {
     "alias": "mediaParentId",
-    "value": mediaFolderId,
+    "value": mediaFolderId
   };
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -190,7 +190,7 @@ test('can select mode', async ({umbracoApi, umbracoUi}) => {
   const mode = 'Inline';
   const expectedDataTypeValues = {
     "alias": "mode",
-    "value": mode,
+    "value": mode
   };
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -213,8 +213,8 @@ test('can add available blocks', async ({umbracoApi, umbracoUi}) => {
     value: [
       {
         contentElementTypeKey: elementTypeId,
-      },
-    ],
+      }
+    ]
   };
   await umbracoUi.dataType.goToDataType(dataTypeName);
 

@@ -23,7 +23,7 @@ test('can update maximum allowed characters value', async ({umbracoApi, umbracoU
   const maxCharsValue = 126;
   const expectedDataTypeValues = {
     "alias": "maxChars",
-    "value": maxCharsValue,
+    "value": maxCharsValue
   };
 
   // Act

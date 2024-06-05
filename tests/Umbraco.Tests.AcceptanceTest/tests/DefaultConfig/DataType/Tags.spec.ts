@@ -23,7 +23,7 @@ test('can update define a tag group', async ({umbracoApi, umbracoUi}) => {
   const tagGroup = 'testTagGroup';
   const expectedDataTypeValues = {
     "alias": "group",
-    "value": tagGroup,
+    "value": tagGroup
   };
 
   // Act
@@ -40,7 +40,7 @@ test('can select storage type', async ({umbracoApi, umbracoUi}) => {
   const storageType = 'Csv';
   const expectedDataTypeValues = {
     "alias": "storageType",
-    "value": storageType,
+    "value": storageType
   };
 
   // Act

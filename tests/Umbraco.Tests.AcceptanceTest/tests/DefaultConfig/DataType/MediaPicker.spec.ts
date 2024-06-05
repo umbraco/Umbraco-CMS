@@ -62,7 +62,7 @@ for (const dataTypeName of dataTypes) {
       // Arrange
       const expectedDataTypeValues = {
         "alias": "enableLocalFocalPoint",
-        "value": true,
+        "value": true
       };
 
       // Act
@@ -110,7 +110,7 @@ for (const dataTypeName of dataTypes) {
       // Arrange
       const expectedDataTypeValues = {
         "alias": "ignoreUserStartNodes",
-        "value": true,
+        "value": true
       };
 
       // Act
@@ -135,7 +135,7 @@ for (const dataTypeName of dataTypes) {
           : mediaTypeData.id;
       const expectedDataTypeValues = {
         "alias": "filter",
-        "value": expectedFilterValue,
+        "value": expectedFilterValue
       };
 
       // Act
@@ -147,7 +147,6 @@ for (const dataTypeName of dataTypes) {
       dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
-
     
     test('can remove accepted types', async ({umbracoApi, umbracoUi}) => {
       // Arrange
@@ -155,11 +154,11 @@ for (const dataTypeName of dataTypes) {
       const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
       const removedDataTypeValues = [{
         "alias": "filter",
-        "value": mediaTypeData.id,
+        "value": mediaTypeData.id
       }];
       const expectedDataTypeValues = [{
         "alias": "filter",
-        "value": "",
+        "value": ""
       }];
 
       // Remove all existing options and add an option to remove
@@ -177,7 +176,6 @@ for (const dataTypeName of dataTypes) {
       expect(dataTypeData.values).toEqual(expectedDataTypeValues);
     });
 
-
     test('can add start node', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       // Create media
@@ -189,7 +187,7 @@ for (const dataTypeName of dataTypes) {
   
       const expectedDataTypeValues = {
         "alias": "startNodeId",
-        "value": mediaId,
+        "value": mediaId
       };
   
       // Act
@@ -217,7 +215,7 @@ for (const dataTypeName of dataTypes) {
 
       const removedDataTypeValues = [{
         "alias": "startNodeId",
-        "value": mediaId,
+        "value": mediaId
       }];
   
       // Remove all existing values and add a start node to remove
