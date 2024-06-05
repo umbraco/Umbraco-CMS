@@ -131,7 +131,7 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
             return ContentTypeOperationStatus.Success;
         }
 
-        // this method should only contain blocking validation, warnings are handles by ...
+        // this method should only contain blocking validation, warnings are handled by WarnDocumentTypeElementSwitchNotificationHandler
 
         // => check whether the element was used in a block structure prior to updating
         if (model.IsElement is false)
