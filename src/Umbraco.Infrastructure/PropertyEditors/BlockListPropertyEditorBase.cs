@@ -93,10 +93,10 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             }
         }
 
-        public override bool HasElementConfigured(Guid elementTypeKey)
+        public override IEnumerable<Guid> ConfiguredElementTypeKeys()
         {
             var configuration = ConfigurationObject as BlockListConfiguration;
-            return configuration?.Blocks?.Any(blockConfig => HasElementConfigured(elementTypeKey, blockConfig)) is true;
+            return configuration?.Blocks.SelectMany(ConfiguredElementTypeKeys) ?? Enumerable.Empty<Guid>();
         }
     }
 

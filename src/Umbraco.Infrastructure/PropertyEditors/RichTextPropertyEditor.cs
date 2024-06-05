@@ -238,10 +238,10 @@ public class RichTextPropertyEditor : DataEditor
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(cleanedUpRichTextEditorValue, _jsonSerializer);
         }
 
-        public override bool HasElementConfigured(Guid elementTypeKey)
+        public override IEnumerable<Guid> ConfiguredElementTypeKeys()
         {
             var configuration = ConfigurationObject as RichTextConfiguration;
-            return configuration?.Blocks?.Any(blockConfig => HasElementConfigured(elementTypeKey, blockConfig)) is true;
+            return configuration?.Blocks?.SelectMany(ConfiguredElementTypeKeys) ?? Enumerable.Empty<Guid>();
         }
 
         private bool TryParseEditorValue(object? value, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)

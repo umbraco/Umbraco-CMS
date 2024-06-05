@@ -153,7 +153,9 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
 
         // check whether any of the configurations on those dataTypes have this element selected as a possible block
         return dataTypes.Any(dataType =>
-            editors.First(editor => editor.Alias == dataType.EditorAlias).GetValueEditor(dataType.ConfigurationObject).HasElementConfigured(contentType.Key))
+            editors.First(editor => editor.Alias == dataType.EditorAlias)
+                .GetValueEditor(dataType.ConfigurationObject)
+                .ConfiguredElementTypeKeys().Contains(contentType.Key))
             ? ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration
             : ContentTypeOperationStatus.Success;
     }

@@ -358,7 +358,7 @@ public class DataValueEditor : IDataValueEditor
 
     // Adding a virtual method that wraps the default implementation allows derived classes
     // to override the default implementation without having to explicitly inherit the interface.
-    public virtual bool HasElementConfigured(Guid elementTypeKey) => false;
+    public virtual IEnumerable<Guid> ConfiguredElementTypeKeys() => Enumerable.Empty<Guid>();
 
     /// <summary>
     ///     Used to try to convert the string value to the correct CLR type based on the <see cref="ValueType" /> specified for

@@ -75,5 +75,5 @@ public interface IDataValueEditor
 
     string ConvertDbToString(IPropertyType propertyType, object? value);
 
-    bool HasElementConfigured(Guid elementTypeKey) => false;
+    IEnumerable<Guid> ConfiguredElementTypeKeys() => Enumerable.Empty<Guid>();
 }
