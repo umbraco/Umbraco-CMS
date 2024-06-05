@@ -1,5 +1,5 @@
 import { UmbDocumentPublicAccessRepository } from '../repository/public-access.repository.js';
-import { UmbDocumentDetailRepository } from '../../../repository/index.js';
+import { UmbDocumentItemRepository } from '../../../repository/index.js';
 import type { UmbInputDocumentElement } from '../../../components/index.js';
 import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from './public-access-modal.token.js';
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
@@ -48,10 +48,10 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	async #getDocumentName() {
 		if (!this.#unique) return;
 		// Should this be done here or in the action file?
-		const { data } = await new UmbDocumentDetailRepository(this).requestByUnique(this.#unique);
+		const { data } = await new UmbDocumentItemRepository(this).requestItems([this.#unique]);
 		if (!data) return;
 		//TODO How do we ensure we get the correct variant?
-		this._documentName = data.variants[0]?.name;
+		this._documentName = data[0].variants[0]?.name;
 	}
 
 	async #getPublicAccessModel() {
