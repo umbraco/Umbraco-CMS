@@ -104,9 +104,9 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 		};
 
 		if (this.#isNew) {
-			this.#publicAccessRepository.create(this.#unique, requestBody);
+			await this.#publicAccessRepository.create(this.#unique, requestBody);
 		} else {
-			this.#publicAccessRepository.update(this.#unique, requestBody);
+			await this.#publicAccessRepository.update(this.#unique, requestBody);
 		}
 
 		this.modalContext?.submit();
