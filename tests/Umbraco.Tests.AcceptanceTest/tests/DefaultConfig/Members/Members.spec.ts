@@ -211,3 +211,43 @@ test('can delete member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.member.isSuccessNotificationVisible();
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
+
+test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const invalidEmail = 'invalidemail';
+  await umbracoUi.member.goToSection(ConstantHelper.sections.members);
+
+  // Act
+  await umbracoUi.member.clickCreateButton();
+  await umbracoUi.member.enterMemberName(memberName);
+  await umbracoUi.member.enterUsername(username);
+  await umbracoUi.member.enterEmail(invalidEmail);
+  await umbracoUi.member.enterPassword(password);
+  await umbracoUi.member.enterConfirmPassword(password);
+  await umbracoUi.member.clickDetailsTab();
+  await umbracoUi.member.enterComments(comment);
+  await umbracoUi.member.clickSaveButton();
+
+  // Assert
+  await umbracoUi.member.isErrorNotificationVisible();
+  expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
+});
+
+// TODO: Remove skip when the front-end is ready. Currently it is possible to update member with invalid email.
+test.skip('cannot edit with invalid email', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const invalidEmail = 'invalidemail';
+  memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
+  memberId = await umbracoApi.member.createDefaultMember(memberName, memberTypeId, email, username, password);
+  await umbracoUi.member.goToSection(ConstantHelper.sections.members);
+
+  // Act
+  await umbracoUi.member.clickMemberLinkByName(memberName);
+  await umbracoUi.member.enterEmail(invalidEmail);
+  await umbracoUi.member.clickSaveButton();
+
+  // Assert
+  await umbracoUi.member.isErrorNotificationVisible();
+  const memberData = await umbracoApi.member.get(memberId);
+  expect(memberData.email).toBe(email);
+});
