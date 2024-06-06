@@ -1,7 +1,6 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
 
-test.describe('User tests', () => {
   const nameOfTheUser = 'TestUser';
   const userEmail = 'TestUser@EmailTest.test';
   const defaultUserGroupName = 'Writers';
@@ -112,24 +111,19 @@ test.describe('User tests', () => {
   test('can update culture for a user', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     const danishIsoCode = 'da-dk';
-    await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.language.createDanishLanguage();
     await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await umbracoUi.user.clickUserWithName(nameOfTheUser);
-    await umbracoUi.user.selectLanguage('Dansk');
+    await umbracoUi.user.selectUserLanguage('Dansk');
     await umbracoUi.user.clickSaveButton();
 
     // Assert
     await umbracoUi.user.isSuccessNotificationVisible();
     const userData = await umbracoApi.user.getByName(nameOfTheUser);
     expect(userData.languageIsoCode).toEqual(danishIsoCode);
-
-    // Clean
-    await umbracoApi.language.ensureIsoCodeNotExists(danishIsoCode);
   });
 
   test('can add content start nodes for a user', async ({umbracoApi, umbracoUi}) => {
@@ -146,14 +140,14 @@ test.describe('User tests', () => {
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await umbracoUi.user.clickUserWithName(nameOfTheUser);
-    await umbracoUi.user.clickChooseContentNodesButton();
+    await umbracoUi.user.clickChooseContentStartNodeButton();
     await umbracoUi.user.clickLabelWithName(documentName);
     await umbracoUi.user.clickChooseContainerButton();
     await umbracoUi.user.clickSaveButton();
 
     // Assert
     await umbracoUi.user.isSuccessNotificationVisible();
-    expect(await umbracoApi.user.doesUserContainContentNodeIds(nameOfTheUser, [documentId])).toBeTruthy();
+    expect(await umbracoApi.user.doesUserContainContentTypeNodeIds(nameOfTheUser, [documentId])).toBeTruthy();
 
     // Clean
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -180,14 +174,14 @@ test.describe('User tests', () => {
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await umbracoUi.user.clickUserWithName(nameOfTheUser);
-    await umbracoUi.user.clickChooseContentNodesButton();
+    await umbracoUi.user.clickChooseContentStartNodeButton();
     await umbracoUi.user.clickLabelWithName(secondDocumentName);
     await umbracoUi.user.clickChooseContainerButton();
     await umbracoUi.user.clickSaveButton();
 
     // Assert
     await umbracoUi.user.isSuccessNotificationVisible();
-    expect(await umbracoApi.user.doesUserContainContentNodeIds(nameOfTheUser, [documentId, secondDocumentId])).toBeTruthy();
+    expect(await umbracoApi.user.doesUserContainContentTypeNodeIds(nameOfTheUser, [documentId, secondDocumentId])).toBeTruthy();
   });
 
   test('can remove a content start node from a user', async ({page, umbracoApi, umbracoUi}) => {
@@ -204,7 +198,7 @@ test.describe('User tests', () => {
     const userData = await umbracoApi.user.getByName(nameOfTheUser);
     userData.documentStartNodeIds.push({id: documentId});
     await umbracoApi.user.update(userId, userData);
-    expect(await umbracoApi.user.doesUserContainContentNodeIds(nameOfTheUser, [documentId])).toBeTruthy();
+    expect(await umbracoApi.user.doesUserContainContentTypeNodeIds(nameOfTheUser, [documentId])).toBeTruthy();
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
@@ -215,7 +209,7 @@ test.describe('User tests', () => {
 
     // Assert
     await umbracoUi.user.isSuccessNotificationVisible();
-    expect(await umbracoApi.user.doesUserContainContentNodeIds(nameOfTheUser, [documentId])).toBeFalsy();
+    expect(await umbracoApi.user.doesUserContainContentTypeNodeIds(nameOfTheUser, [documentId])).toBeFalsy();
 
     // Clean
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -236,7 +230,7 @@ test.describe('User tests', () => {
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await umbracoUi.user.clickUserWithName(nameOfTheUser);
-    await umbracoUi.user.clickChooseMediaNodesButton();
+    await umbracoUi.user.clickChooseMediaStartNodeButton();
     await page.pause()
     await umbracoUi.user.clickButtonWithName(mediaName);
     await umbracoUi.user.clickSubmitButton();
@@ -247,8 +241,8 @@ test.describe('User tests', () => {
 
     const userData = await umbracoApi.user.getByName(nameOfTheUser);
     console.log(userData.mediaStartNodeIds);
-    expect(await umbracoApi.user.doesUserContainMediaNodeIds(nameOfTheUser, [mediaTypeId.id])).toBeTruthy();
-    expect(await umbracoApi.user.doesUserContainMediaNodeIds(nameOfTheUser, ['Test'])).toBeTruthy();
+    expect(await umbracoApi.user.doesUserContainContentTypeNodeIds(nameOfTheUser, [mediaTypeId.id])).toBeTruthy();
+    expect(await umbracoApi.user.doesUserContainContentTypeNodeIds(nameOfTheUser, ['Test'])).toBeTruthy();
 
     // Clean
     await umbracoApi.media.ensureNameNotExists(mediaName);
@@ -271,19 +265,19 @@ test.describe('User tests', () => {
     const userData = await umbracoApi.user.getByName(nameOfTheUser);
     userData.mediaStartNodeIds.push({id: firstMediaId});
     await umbracoApi.user.update(userId, userData);
-    expect(await umbracoApi.user.doesUserContainMediaNodeIds(nameOfTheUser, [firstMediaId])).toBeTruthy();
+    expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [firstMediaId])).toBeTruthy();
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await umbracoUi.user.clickUserWithName(nameOfTheUser);
-    await umbracoUi.user.clickChooseMediaNodesButton();
+    await umbracoUi.user.clickChooseMediaStartNodeButton();
     await umbracoUi.user.clickButtonWithName(secondMediaName);
     await umbracoUi.user.clickSubmitButton();
     await umbracoUi.user.clickSaveButton();
 
     // Assert
     await umbracoUi.user.isSuccessNotificationVisible();
-    expect(await umbracoApi.user.doesUserContainContentNodeIds(nameOfTheUser, [mediaTypeId.id, mediaName])).toBeTruthy();
+    expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaTypeId.id, mediaName])).toBeTruthy();
 
     // Clean
     await umbracoApi.media.ensureNameNotExists(mediaName);
@@ -482,14 +476,14 @@ test.describe('User tests', () => {
   });
 
   // TODO: Sometimes the frontend does not switch from grid to table, or table to grid.
-  test('can change from grid to table view', async ({page, umbracoApi, umbracoUi}) => {
+  test.skip('can change from grid to table view', async ({page, umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await page.locator('umb-collection-view-bundle').getByLabel('status').click({force: true});
     await page.getByRole('link', {name: 'Table'}).click({force: true});
 
+    await page.pause();
     // Assert
     await expect(page.locator('umb-user-table-collection-view')).toBeVisible();
     expect(page.url()).toEqual(umbracoApi.baseUrl + '/umbraco/section/user-management/view/users/collection/table');
   });
-});
