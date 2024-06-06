@@ -229,7 +229,7 @@ test('can create a document type with a composition', {tag: '@smoke'}, async ({u
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
 });
 
-test('can remove a composition form a document type', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove a composition form a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const compositionDocumentTypeName = 'CompositionDocumentType';
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
