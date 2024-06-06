@@ -76,7 +76,7 @@ test.describe('Document Blueprints tests', {tag: '@smoke'}, () => {
 
   test('can create a document blueprint from the Content menu', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const documentTypeName = 'TestDocumentTypeForContent';
+    const documentTypeName = 'DocumentTypeForContent';
     const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
     await umbracoApi.document.createDefaultDocument(documentBlueprintName, documentTypeId);
     await umbracoUi.goToBackOffice();
@@ -92,5 +92,8 @@ test.describe('Document Blueprints tests', {tag: '@smoke'}, () => {
     expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeTruthy();
     await umbracoUi.documentBlueprint.goToSettingsTreeItem('Document Blueprints');
     await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true);
+
+    // Clean
+    await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   });
 });
