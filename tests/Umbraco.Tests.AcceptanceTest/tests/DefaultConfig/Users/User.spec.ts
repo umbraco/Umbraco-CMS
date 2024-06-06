@@ -37,7 +37,7 @@ import {expect} from '@playwright/test';
     const wrongName = 'WrongName';
     await umbracoApi.user.ensureNameNotExists(wrongName);
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.user.createDefaultUser(wrongName, wrongName + userEmail, userGroup.id);
+    await umbracoApi.user.createDefaultUser(wrongName, wrongName + userEmail, [userGroup.id]);
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
 
     // Act
@@ -53,7 +53,7 @@ import {expect} from '@playwright/test';
   test('can delete a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
 
     // Act
@@ -74,7 +74,7 @@ import {expect} from '@playwright/test';
     const secondUserGroupName = 'Translators';
     const userGroupWriters = await umbracoApi.userGroup.getByName(defaultUserGroupName);
     const userGroupTranslators = await umbracoApi.userGroup.getByName(secondUserGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroupWriters.id);
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroupWriters.id]);
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
 
     // Act
@@ -93,7 +93,7 @@ import {expect} from '@playwright/test';
   test('can remove a user group from a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
@@ -108,11 +108,11 @@ import {expect} from '@playwright/test';
     expect(userData.userGroupIds).toEqual([]);
   });
 
-  test('can update culture for a user', async ({page, umbracoApi, umbracoUi}) => {
+  test('can update culture for a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const danishIsoCode = 'da-dk';
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
@@ -129,7 +129,7 @@ import {expect} from '@playwright/test';
   test('can add content start nodes for a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
     const documentTypeName = 'TestDocumentType';
     const documentName = 'TestDocument';
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -147,17 +147,17 @@ import {expect} from '@playwright/test';
 
     // Assert
     await umbracoUi.user.isSuccessNotificationVisible();
-    expect(await umbracoApi.user.doesUserContainContentTypeNodeIds(nameOfTheUser, [documentId])).toBeTruthy();
+    expect(await umbracoApi.user.doesUserContainContentStartNodeIds(nameOfTheUser, [documentId])).toBeTruthy();
 
     // Clean
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
     await umbracoApi.document.ensureNameNotExists(documentTypeName);
   });
 
-  test('can add multiple content start nodes for a user', async ({page, umbracoApi, umbracoUi}) => {
+  test('can add multiple content start nodes for a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
     const documentTypeName = 'TestDocumentType';
     const documentName = 'TestDocument';
     const secondDocumentName = 'SecondDocument';
@@ -181,13 +181,13 @@ import {expect} from '@playwright/test';
 
     // Assert
     await umbracoUi.user.isSuccessNotificationVisible();
-    expect(await umbracoApi.user.doesUserContainContentTypeNodeIds(nameOfTheUser, [documentId, secondDocumentId])).toBeTruthy();
+    expect(await umbracoApi.user.doesUserContainContentStartNodeIds(nameOfTheUser, [documentId, secondDocumentId])).toBeTruthy();
   });
 
-  test('can remove a content start node from a user', async ({page, umbracoApi, umbracoUi}) => {
+  test('can remove a content start node from a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
     const documentTypeName = 'TestDocumentType';
     const documentName = 'TestDocument';
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -198,7 +198,7 @@ import {expect} from '@playwright/test';
     const userData = await umbracoApi.user.getByName(nameOfTheUser);
     userData.documentStartNodeIds.push({id: documentId});
     await umbracoApi.user.update(userId, userData);
-    expect(await umbracoApi.user.doesUserContainContentTypeNodeIds(nameOfTheUser, [documentId])).toBeTruthy();
+    expect(await umbracoApi.user.doesUserContainContentStartNodeIds(nameOfTheUser, [documentId])).toBeTruthy();
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
@@ -209,56 +209,47 @@ import {expect} from '@playwright/test';
 
     // Assert
     await umbracoUi.user.isSuccessNotificationVisible();
-    expect(await umbracoApi.user.doesUserContainContentTypeNodeIds(nameOfTheUser, [documentId])).toBeFalsy();
+    expect(await umbracoApi.user.doesUserContainContentStartNodeIds(nameOfTheUser, [documentId])).toBeFalsy();
 
     // Clean
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
     await umbracoApi.document.ensureNameNotExists(documentTypeName);
   });
 
-  // TODO: Cant add a start node for a file with the file type
-  test.skip('can add media start nodes for a user', async ({page, umbracoApi, umbracoUi}) => {
+  test('can add media start nodes for a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const mediaTypeName = 'File';
     const mediaName= 'TestMediaFile';
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
-    const mediaTypeId = await umbracoApi.mediaType.getByName(mediaTypeName)
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
     await umbracoApi.media.ensureNameNotExists(mediaName);
-    await umbracoApi.media.createDefaultMedia(mediaName, mediaTypeName);
+    const mediaId = await umbracoApi.media.createDefaultMedia(mediaName, mediaTypeName);
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await umbracoUi.user.clickUserWithName(nameOfTheUser);
     await umbracoUi.user.clickChooseMediaStartNodeButton();
-    await page.pause()
-    await umbracoUi.user.clickButtonWithName(mediaName);
+    await umbracoUi.user.clickMediaCardWithName(mediaName);
     await umbracoUi.user.clickSubmitButton();
     await umbracoUi.user.clickSaveButton();
 
     // Assert
     await umbracoUi.user.isSuccessNotificationVisible();
-
-    const userData = await umbracoApi.user.getByName(nameOfTheUser);
-    console.log(userData.mediaStartNodeIds);
-    expect(await umbracoApi.user.doesUserContainContentTypeNodeIds(nameOfTheUser, [mediaTypeId.id])).toBeTruthy();
-    expect(await umbracoApi.user.doesUserContainContentTypeNodeIds(nameOfTheUser, ['Test'])).toBeTruthy();
+    expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaId])).toBeTruthy();
 
     // Clean
     await umbracoApi.media.ensureNameNotExists(mediaName);
   });
 
-  // TODO: Cant add a start node for a file with the file type
-  test.skip('can add multiple media start nodes for a user', async ({page, umbracoApi, umbracoUi}) => {
+  test('can add multiple media start nodes for a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const mediaTypeName = 'File';
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
     const mediaName = 'TestMediaFile';
     const secondMediaName = 'SecondMediaFile';
     await umbracoApi.media.ensureNameNotExists(mediaName);
     await umbracoApi.media.ensureNameNotExists(secondMediaName);
-    const mediaTypeId = await umbracoApi.mediaType.getByName(mediaTypeName);
     const firstMediaId = await umbracoApi.media.createDefaultMedia(mediaName, mediaTypeName);
     const secondMediaId = await umbracoApi.media.createDefaultMedia(secondMediaName, mediaTypeName);
     // Adds the Content Start node to the user
@@ -271,28 +262,46 @@ import {expect} from '@playwright/test';
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await umbracoUi.user.clickUserWithName(nameOfTheUser);
     await umbracoUi.user.clickChooseMediaStartNodeButton();
-    await umbracoUi.user.clickButtonWithName(secondMediaName);
+    await umbracoUi.user.clickMediaCardWithName(secondMediaName);
     await umbracoUi.user.clickSubmitButton();
     await umbracoUi.user.clickSaveButton();
 
     // Assert
     await umbracoUi.user.isSuccessNotificationVisible();
-    expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaTypeId.id, mediaName])).toBeTruthy();
+    expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [firstMediaId, secondMediaId])).toBeTruthy();
 
     // Clean
     await umbracoApi.media.ensureNameNotExists(mediaName);
     await umbracoApi.media.ensureNameNotExists(secondMediaName);
   });
 
-  // TODO: Cant add a start node for a file with the file type
-  test.skip('can remove a media start node from a user', async ({page, umbracoApi, umbracoUi}) => {
+  test.skip('can remove a media start node from a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
+    const mediaTypeName = 'File';
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
+    const mediaName = 'TestMediaFile';
+    await umbracoApi.media.ensureNameNotExists(mediaName);
+    const mediaId = await umbracoApi.media.createDefaultMedia(mediaName, mediaTypeName);
+    // Adds the Content Start node to the user
+    const userData = await umbracoApi.user.getByName(nameOfTheUser);
+    userData.mediaStartNodeIds.push({id: mediaId});
+    await umbracoApi.user.update(userId, userData);
+    expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaId])).toBeTruthy();
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await umbracoUi.user.clickUserWithName(nameOfTheUser);
+    await umbracoUi.user.clickRemoveButtonForMediaNodeWithName(mediaName);
+    await umbracoUi.user.clickConfirmRemoveButton();
+    await umbracoUi.user.clickSaveButton();
+
+    // Assert
+    await umbracoUi.user.isSuccessNotificationVisible();
+    expect(await umbracoApi.user.doesUserContainMediaStartNodeIds(nameOfTheUser, [mediaId])).toBeFalsy();
+
+    // Clean
+    await umbracoApi.media.ensureNameNotExists(mediaName);
   });
 
   //TODO: Frontend does not show the correct access nodes.
@@ -302,7 +311,7 @@ import {expect} from '@playwright/test';
     await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
     console.log(await umbracoApi.userGroup.createSimpleUserGroupWithContentSection(userGroupName));
     const userGroup = await umbracoApi.userGroup.getByName(userGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
@@ -314,7 +323,7 @@ import {expect} from '@playwright/test';
     // Arrange
     const userPassword = 'TestPassword';
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
@@ -330,7 +339,7 @@ import {expect} from '@playwright/test';
     // Arrange
     const disabledStatus = 'Disabled';
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
@@ -345,11 +354,11 @@ import {expect} from '@playwright/test';
     expect(userData.state).toBe(disabledStatus);
   });
 
-  test('can enable a user', async ({page, umbracoApi, umbracoUi}) => {
+  test('can enable a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const inactiveStatus = 'Inactive';
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
 
     await umbracoApi.user.disable([userId]);
 
@@ -370,7 +379,7 @@ import {expect} from '@playwright/test';
   test('can add an avatar to a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
     const filePath = './fixtures/mediaLibrary/Umbraco.png';
 
     // Act
@@ -387,7 +396,7 @@ import {expect} from '@playwright/test';
   test('can remove an avatar from a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
     await umbracoApi.user.addDefaultAvatarImageToUser(userId);
 
     // Act
@@ -416,16 +425,15 @@ import {expect} from '@playwright/test';
     expect(userData.state).toBe(userLabel);
   });
 
-  test('can search for a user', async ({page, umbracoApi, umbracoUi}) => {
+  test('can search for a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await umbracoUi.user.doesUserSectionContainUserAmount(2);
     await umbracoUi.user.searchInUserSection(nameOfTheUser);
-    await page.pause();
 
     // Assert
     // Wait for filtering to be done
@@ -434,16 +442,14 @@ import {expect} from '@playwright/test';
     await umbracoUi.user.doesUserSectionContainUserWithText(nameOfTheUser);
   });
 
-  test('can filter by status', async ({page, umbracoApi, umbracoUi}) => {
+  test('can filter by status', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const inactiveStatus = 'Inactive';
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
-    await page.pause();
-
     await umbracoUi.user.doesUserSectionContainUserAmount(2);
     await umbracoUi.user.filterByStatusName(inactiveStatus);
 
@@ -455,16 +461,13 @@ import {expect} from '@playwright/test';
     await umbracoUi.user.doesUserSectionContainUserWithText(inactiveStatus);
   });
 
-  test('can filter by user groups', async ({page, umbracoApi, umbracoUi}) => {
+  test('can filter by user groups', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
-    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, [userGroup.id]);
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
-    await page.pause();
-
-
     await umbracoUi.user.doesUserSectionContainUserAmount(2);
     await umbracoUi.user.filterByGroupName(defaultUserGroupName);
 
@@ -477,13 +480,4 @@ import {expect} from '@playwright/test';
 
   // TODO: Sometimes the frontend does not switch from grid to table, or table to grid.
   test.skip('can change from grid to table view', async ({page, umbracoApi, umbracoUi}) => {
-    // Act
-    await umbracoUi.user.goToSection(ConstantHelper.sections.users);
-    await page.locator('umb-collection-view-bundle').getByLabel('status').click({force: true});
-    await page.getByRole('link', {name: 'Table'}).click({force: true});
-
-    await page.pause();
-    // Assert
-    await expect(page.locator('umb-user-table-collection-view')).toBeVisible();
-    expect(page.url()).toEqual(umbracoApi.baseUrl + '/umbraco/section/user-management/view/users/collection/table');
   });
