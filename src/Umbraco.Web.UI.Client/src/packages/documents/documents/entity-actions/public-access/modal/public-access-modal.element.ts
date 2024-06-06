@@ -57,7 +57,6 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	async #getPublicAccessModel() {
 		if (!this.#unique) return;
 		const { data } = await this.#publicAccessRepository.read(this.#unique);
-		debugger;
 
 		if (!data) return;
 		this.#isNew = false;
