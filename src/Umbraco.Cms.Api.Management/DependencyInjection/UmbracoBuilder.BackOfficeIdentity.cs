@@ -62,6 +62,7 @@ public static partial class UmbracoBuilderExtensions
         // We also need to register the store as a core-friendly interface that doesn't leak technology.
         services.AddScoped<IBackOfficeUserStore, BackOfficeUserStore>();
         services.AddScoped<ICoreBackOfficeUserManager, BackOfficeUserManager>();
+        services.AddScoped<ICoreBackOfficeSignInManager, BackOfficeSignInManager>();
         services.AddScoped<IInviteUriProvider, InviteUriProvider>();
         services.AddScoped<IForgotPasswordUriProvider, ForgotPasswordUriProvider>();
         services.AddScoped<IBackOfficePasswordChanger, BackOfficePasswordChanger>();

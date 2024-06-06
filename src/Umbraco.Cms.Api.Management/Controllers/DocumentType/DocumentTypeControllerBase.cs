@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -10,7 +11,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DocumentType)]
 [ApiExplorerSettings(GroupName = "Document Type")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
 public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)
@@ -39,6 +40,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 ContentTypeOperationStatus.InvalidPropertyTypeAlias => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid property type alias")
                     .WithDetail("One or more property type aliases are invalid")
+                    .Build()),
+                ContentTypeOperationStatus.PropertyTypeAliasCannotEqualContentTypeAlias => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid property type alias")
+                    .WithDetail("The property type alias cannot be the same as the content type alias")
                     .Build()),
                 ContentTypeOperationStatus.InvalidContainerName => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid container name")
@@ -107,6 +112,31 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .Build()),
                 _ => new ObjectResult("Unknown content type structure operation status") { StatusCode = StatusCodes.Status500InternalServerError }
             });
+
+    protected IActionResult ContentTypeImportOperationStatusResult(ContentTypeImportOperationStatus operationStatus) =>
+        OperationStatusResult(operationStatus, problemDetailsBuilder => operationStatus switch
+        {
+            ContentTypeImportOperationStatus.TemporaryFileNotFound => NotFound(problemDetailsBuilder
+                .WithTitle("Temporary file not found")
+                .Build()),
+            ContentTypeImportOperationStatus.TemporaryFileConversionFailure => BadRequest(problemDetailsBuilder
+                .WithTitle("Failed to convert the specified file")
+                .WithDetail("The import failed due to not being able to convert the file into proper xml")
+                .Build()),
+            ContentTypeImportOperationStatus.DocumentTypeExists => BadRequest(problemDetailsBuilder
+                .WithTitle("Failed to import because document type exits")
+                .WithDetail("The import failed because the document type that was being imported already exits")
+                .Build()),
+            ContentTypeImportOperationStatus.TypeMismatch => BadRequest(problemDetailsBuilder
+                .WithTitle("Type Mismatch")
+                .WithDetail("The import failed because the file contained an entity that is not a content type.")
+                .Build()),
+            ContentTypeImportOperationStatus.IdMismatch => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid Id")
+                .WithDetail("The import failed because the id of the document type you are trying to update did not match the id in the file.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown document type import operation status.")
+        });
 
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status) =>
         OperationStatusResult(status, problemDetailsBuilder => status switch

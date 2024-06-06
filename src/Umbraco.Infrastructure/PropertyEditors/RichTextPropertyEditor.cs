@@ -254,7 +254,8 @@ public class RichTextPropertyEditor : DataEditor
                 handleMapping(blockEditorData.BlockValue);
                 return new RichTextEditorValue
                 {
-                    Markup = richTextEditorValue.Markup, Blocks = blockEditorData.BlockValue
+                    Markup = richTextEditorValue.Markup,
+                    Blocks = blockEditorData.BlockValue,
                 };
             }
 
@@ -263,7 +264,8 @@ public class RichTextPropertyEditor : DataEditor
 
             RichTextEditorValue MarkupWithEmptyBlocks() => new()
             {
-                Markup = richTextEditorValue.Markup, Blocks = new RichTextBlockValue()
+                Markup = richTextEditorValue.Markup,
+                Blocks = new RichTextBlockValue(),
             };
         }
 

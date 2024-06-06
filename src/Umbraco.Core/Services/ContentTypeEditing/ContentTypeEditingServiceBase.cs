@@ -200,6 +200,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             return ContentTypeOperationStatus.InvalidAlias;
         }
 
+        // Validate content type alias is not in use.
+        if (model.Properties.Any(propertyType => propertyType.Alias.Equals(model.Alias, StringComparison.OrdinalIgnoreCase)))
+        {
+            return ContentTypeOperationStatus.PropertyTypeAliasCannotEqualContentTypeAlias;
+        }
+
         // Validate properties for reserved aliases.
         if (ContainsReservedPropertyTypeAlias(model))
         {
@@ -410,8 +416,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             .Union(typeof(IPublishedContent).GetPublicMethods().Select(x => x.Name))
             .ToArray();
 
-        return model.Properties.Any(propertyType => propertyType.Alias.Equals(model.Alias, StringComparison.OrdinalIgnoreCase)
-                                                   || reservedPropertyTypeNames.InvariantContains(propertyType.Alias));
+        return model.Properties.Any(propertyType => reservedPropertyTypeNames.InvariantContains(propertyType.Alias));
     }
 
     private bool IsUnsafeAlias(string alias) => alias.IsNullOrWhiteSpace()
@@ -658,7 +663,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         => model.Properties.Select(property => property.DataTypeKey).Distinct().ToArray();
 
     private async Task<IDataType[]> GetDataTypesAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model)
-        => (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray();
+    {
+        Guid[] dataTypeKeys = GetDataTypeKeys(model);
+        return dataTypeKeys.Any()
+            ? (await _dataTypeService.GetAllAsync(GetDataTypeKeys(model))).ToArray()
+            : Array.Empty<IDataType>();
+    }
 
     private int? GetParentId(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? containerKey)
     {

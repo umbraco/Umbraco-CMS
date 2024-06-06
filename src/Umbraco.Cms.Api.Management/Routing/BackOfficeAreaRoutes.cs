@@ -88,6 +88,6 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
                 Controller = ControllerExtensions.GetControllerName<BackOfficeDefaultController>(),
                 Action = nameof(BackOfficeDefaultController.Index),
             },
-            constraints: new { slug = @"^(section.*|upgrade|install|oauth_complete|logout|error)$" });
+            constraints: new { slug = @"^(section|preview|upgrade|install|oauth_complete|logout|error).*$" });
     }
 }

@@ -7,4 +7,6 @@ public class UserExternalLoginProviderResponseModel
     public bool IsLinkedOnUser { get; set; }
 
     public bool HasManualLinkingEnabled { get; set; }
+
+    public string? ProviderKey { get; set; }
 }

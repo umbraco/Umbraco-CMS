@@ -53,12 +53,16 @@ public class BackOfficeExternalLoginService : IBackOfficeExternalLoginService
                 Enumerable.Empty<UserExternalLoginProviderModel>());
         }
 
+        // The use of SingleOrDefault below is allowed as there is a unique index on the linkedLogins result between user and provider
         IEnumerable<UserExternalLoginProviderModel> providerStatuses = providers.Select(
             providerScheme => new UserExternalLoginProviderModel(
                 providerScheme.ExternalLoginProvider.AuthenticationType,
                 linkedLoginsAttempt.Result.Any(linkedLogin =>
                     linkedLogin.LoginProvider == providerScheme.ExternalLoginProvider.AuthenticationType),
-                providerScheme.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking));
+                providerScheme.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking,
+                linkedLoginsAttempt.Result.SingleOrDefault(linkedLogin =>
+                    linkedLogin.LoginProvider == providerScheme.ExternalLoginProvider.AuthenticationType)
+                    ?.ProviderKey));
 
         return Attempt<IEnumerable<UserExternalLoginProviderModel>, ExternalLoginOperationStatus>.Succeed(
                 ExternalLoginOperationStatus.Success, providerStatuses);
