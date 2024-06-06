@@ -74,6 +74,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				${this.item?.documentType.icon
 					? html`
 							<umb-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></umb-icon>
+							${this.item.isProtected ? this.#renderIsProtectedIcon() : nothing}
 							<!--
 							// TODO: implement correct status symbol
 							<span id="status-symbol"></span>
@@ -88,6 +89,10 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		return html`<span id="label" slot="label" class=${classMap({ draft: this.#isDraft() })}
 			>${this.#getLabel()}</span
 		> `;
+	}
+
+	#renderIsProtectedIcon() {
+		return html`<umb-icon id="icon-lock" slot="icon" name="icon-lock" title="Protected"></umb-icon>`;
 	}
 
 	static styles = [
@@ -111,6 +116,30 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				bottom: 0;
 				right: 0;
 				border-radius: 100%;
+			}
+
+			#icon-lock {
+				position: absolute;
+				bottom: -5px;
+				right: -5px;
+				font-size: 10px;
+				background: var(--uui-color-surface);
+				width: 14px;
+				height: 14px;
+				border-radius: 100%;
+				line-height: 14px;
+			}
+
+			:hover #icon-lock {
+				background: var(--uui-color-surface-emphasis);
+			}
+
+			[active] #icon-lock {
+				background: var(--uui-color-current);
+			}
+
+			[active]:hover #icon-lock {
+				background: var(--uui-color-current-emphasis);
 			}
 
 			.draft {
