@@ -1,6 +1,5 @@
 import type { ManifestRepository, ManifestStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.DataType.Detail';
+import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_DATA_TYPE_DETAIL_STORE_ALIAS } from './constants.js';
 
 const repository: ManifestRepository = {
 	type: 'repository',
@@ -8,8 +7,6 @@ const repository: ManifestRepository = {
 	name: 'Data Type Detail Repository',
 	api: () => import('./data-type-detail.repository.js'),
 };
-
-export const UMB_DATA_TYPE_DETAIL_STORE_ALIAS = 'Umb.Store.DataType.Detail';
 
 const store: ManifestStore = {
 	type: 'store',
