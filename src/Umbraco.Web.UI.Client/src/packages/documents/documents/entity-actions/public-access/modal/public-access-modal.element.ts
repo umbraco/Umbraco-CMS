@@ -64,7 +64,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 		this._startPage = false;
 
 		// Specific or Groups
-		this._specific = data.members.length > 0 ? true : false;
+		this._specific = data.members.length > 0;
 
 		//selection
 		if (data.members.length > 0) {
