@@ -1,7 +1,7 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Numeric';
+const dataTypeName = 'True/false';
 let dataTypeDefaultData = null;
 let dataTypeData = null;
 
@@ -18,66 +18,15 @@ test.afterEach(async ({umbracoApi}) => {
   }   
 });
 
-test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const minimumValue = -5;
-  const expectedDataTypeValues = {
-    "alias": "min",
-    "value": minimumValue
-  };
-
-  // Act
-  await umbracoUi.dataType.enterMinimumValue(minimumValue.toString());
-  await umbracoUi.dataType.clickSaveButton();
-
-  // Assert
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-});
-
-test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const maximumValue = 1000000;
-  const expectedDataTypeValues = {
-    "alias": "max",
-    "value": maximumValue
-  };
-
-  // Act
-  await umbracoUi.dataType.enterMaximumValue(maximumValue.toString());
-  await umbracoUi.dataType.clickSaveButton();
-
-  // Assert
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-});
-
-test('can update step size value', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const stepSizeValue = 5;
-  const expectedDataTypeValues = {
-    "alias": "step",
-    "value": stepSizeValue
-  };
-
-  // Act
-  await umbracoUi.dataType.enterStepSizeValue(stepSizeValue.toString());
-  await umbracoUi.dataType.clickSaveButton();
-
-  // Assert
-  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-});
-
-test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
+test('can update initial state', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
-    "alias": "allowDecimals",
+    "alias": "default",
     "value": true
   };
 
   // Act
-  await umbracoUi.dataType.clickAllowDecimalsSlider();
+  await umbracoUi.dataType.clickInitialStateSlider();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
@@ -85,17 +34,52 @@ test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-// TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
-test.skip('cannot update the minimum greater than the maximum', async ({umbracoUi}) => {
+test('can update show toggle labels', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const minimumValue = 5;
-  const maximumValue = 2;
+  const expectedDataTypeValues = {
+    "alias": "showLabels",
+    "value": true
+  };
 
   // Act
-  await umbracoUi.dataType.enterMinimumValue(minimumValue.toString());
-  await umbracoUi.dataType.enterMaximumValue(maximumValue.toString());
+  await umbracoUi.dataType.clickShowToggleLabelsSlider();
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
-  await umbracoUi.dataType.isErrorNotificationVisible();
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+});
+
+test('can update label on', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const labelOnValue = 'Test Label On';
+  const expectedDataTypeValues = {
+    "alias": "labelOn",
+    "value": labelOnValue
+  };
+
+  // Act
+  await umbracoUi.dataType.enterLabelOnValue(labelOnValue);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+});
+
+test('can update label off', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const labelOffValue = 'Test Label Off';
+  const expectedDataTypeValues = {
+    "alias": "labelOff",
+    "value": labelOffValue
+  };
+
+  // Act
+  await umbracoUi.dataType.enterLabelOffValue(labelOffValue);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });

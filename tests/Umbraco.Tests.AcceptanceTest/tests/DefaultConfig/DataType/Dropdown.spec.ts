@@ -1,8 +1,8 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Radiobox';
-let dataTypeDefaultData = null;
+const dataTypeName = 'Dropdown';
+let dataTypeDefaultData = null; 
 let dataTypeData = null;
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
@@ -13,8 +13,29 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   if (dataTypeDefaultData !== null) {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);
-  }
+    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
+  }   
+});
+
+test('can enable multiple choice', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const expectedDataTypeValues = [{
+    "alias": "multiple",
+    "value": true
+  }];
+  // Remove all existing options
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  dataTypeData.values = [];
+  await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);   
+  await umbracoUi.dataType.goToDataType(dataTypeName);
+
+  // Act
+  await umbracoUi.dataType.clickEnableMultipleChoiceSlider();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toEqual(expectedDataTypeValues);
 });
 
 test('can add option', async ({umbracoApi, umbracoUi}) => {
@@ -29,7 +50,7 @@ test('can add option', async ({umbracoApi, umbracoUi}) => {
   // Remove all existing options
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   dataTypeData.values = [];
-  await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
+  await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);   
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Act
@@ -54,7 +75,7 @@ test('can remove option', async ({umbracoApi, umbracoUi}) => {
   // Remove all existing options and add an option to remove
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   dataTypeData.values = removedOptionValues;
-  await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
+  await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);  
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Act
