@@ -97,8 +97,16 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 		if (this._specific) {
 			// Members
+			// user name is not part of the item model, so we need to look it up from the member detail repository
+			// be aware that the detail repository requires access to the member section.
+			const repo = new UmbMemberDetailRepository(this);
+			const promises = this._selection.map((memberId) => repo.requestByUnique(memberId));
+			const responses = await Promise.all(promises);
+			const memberUserNames = responses
+				.filter((response) => response.data)
+				.map((response) => response.data?.username) as string[];
 
-			console.log('Specific members');
+			requestBody.memberUserNames = memberUserNames;
 		} else {
 			// Groups
 			const repo = new UmbMemberGroupItemRepository(this);
