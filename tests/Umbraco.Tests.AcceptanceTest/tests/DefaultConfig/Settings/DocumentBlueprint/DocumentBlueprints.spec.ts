@@ -70,7 +70,7 @@ test.describe('Document Blueprints tests', () => {
     // Assert
     await umbracoUi.documentBlueprints.isSuccessNotificationVisible();
     expect(await umbracoApi.documentBlueprints.doesNameExist(documentBlueprintName)).toBeFalsy();
-    await umbracoUi.documentBlueprints.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, false);
+    await umbracoUi.documentBlueprints.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, false, false);
   });
 
   test('can create a document blueprint from the Content menu @smoke', async ({umbracoApi, umbracoUi}) => {
