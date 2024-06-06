@@ -68,9 +68,9 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 		//selection
 		if (data.members.length > 0) {
-			this._selection = data.members.map((m: any) => m.id);
+			this._selection = data.members.map((m) => m.id);
 		} else if (data.groups.length > 0) {
-			this._selection = data.groups.map((g: any) => g.id);
+			this._selection = data.groups.map((g) => g.id);
 		}
 
 		this._loginDocumentId = data.loginDocument.id;
