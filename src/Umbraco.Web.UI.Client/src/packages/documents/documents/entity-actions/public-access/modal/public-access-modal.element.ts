@@ -5,7 +5,7 @@ import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from './publ
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbMemberItemRepository, type UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
+import { UmbMemberDetailRepository, type UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 import { UmbMemberGroupItemRepository, type UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -191,7 +191,10 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 				<small>
 					<umb-localize key="publicAccess_paLoginPageHelp"> Choose the page that contains the login form </umb-localize>
 				</small>
-				<umb-input-document max="1" @change=${this.#onChangeLoginPage}></umb-input-document>
+				<umb-input-document
+					.value=${this._loginDocumentId ? this._loginDocumentId : ''}
+					max="1"
+					@change=${this.#onChangeLoginPage}></umb-input-document>
 			</div>
 			<br />
 			<div class="select-item">
@@ -201,7 +204,10 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 						Used when people are logged on, but do not have access
 					</umb-localize>
 				</small>
-				<umb-input-document max="1" @change=${this.#onChangeErrorPage}></umb-input-document>
+				<umb-input-document
+					.value=${this._errorDocumentId ? this._errorDocumentId : ''}
+					max="1"
+					@change=${this.#onChangeErrorPage}></umb-input-document>
 			</div>`;
 	}
 
