@@ -44,7 +44,7 @@ test('can delete a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   expect(await umbracoApi.partialView.doesFolderExist(folderName)).toBeFalsy();
   // Verify the partial view folder is NOT displayed under the Partial Views section
   await umbracoUi.partialView.clickRootFolderCaretButton();
-  await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(folderName, false);
+  await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(folderName, false, false);
 });
 
 test('can place a partial view into folder', async ({umbracoApi, umbracoUi}) => {
@@ -67,9 +67,9 @@ test('can place a partial view into folder', async ({umbracoApi, umbracoUi}) => 
   const childrenData = await umbracoApi.partialView.getChildren(folderPath);
   expect(childrenData[0].name).toEqual(partialViewFileName);
   // Verify the partial view is displayed in the folder under the Partial Views section
-  await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(partialViewFileName, false);
+  await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(partialViewFileName, false, false);
   await umbracoUi.partialView.clickCaretButtonForName(folderName);
-  await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(partialViewFileName);
+  await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(partialViewFileName, true, false);
 });
 
 test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
@@ -89,7 +89,7 @@ test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   const partialViewChildren = await umbracoApi.partialView.getChildren('/' + folderName);
   expect(partialViewChildren[0].path).toBe('/' + folderName + '/' + childFolderName);
   await umbracoUi.partialView.clickCaretButtonForName(folderName);
-  await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(childFolderName);
+  await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(childFolderName, true, false);
 });
 
 test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {

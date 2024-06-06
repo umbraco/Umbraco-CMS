@@ -103,7 +103,7 @@ import {expect} from '@playwright/test';
     // Assert
     await umbracoUi.stylesheet.isSuccessNotificationVisible();
     expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeFalsy();
-    await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName, false);
+    await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName, false, false);
   });
 
   test('can rename a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
