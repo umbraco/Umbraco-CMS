@@ -1,7 +1,7 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Textstring';
+const dataTypeName = 'Tags';
 let dataTypeDefaultData = null;
 let dataTypeData = null;
 
@@ -18,16 +18,33 @@ test.afterEach(async ({umbracoApi}) => {
   }   
 });
 
-test('can update maximum allowed characters value', async ({umbracoApi, umbracoUi}) => {
+test('can update define a tag group', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const maxCharsValue = 126;
+  const tagGroup = 'testTagGroup';
   const expectedDataTypeValues = {
-    "alias": "maxChars",
-    "value": maxCharsValue
+    "alias": "group",
+    "value": tagGroup
   };
 
   // Act
-  await umbracoUi.dataType.enterMaximumAllowedCharactersValue(maxCharsValue.toString());
+  await umbracoUi.dataType.enterDefineTagGroupValue(tagGroup);
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+});
+
+test('can select storage type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const storageType = 'Csv';
+  const expectedDataTypeValues = {
+    "alias": "storageType",
+    "value": storageType
+  };
+
+  // Act
+  await umbracoUi.dataType.selectStorageTypeOption(storageType);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
