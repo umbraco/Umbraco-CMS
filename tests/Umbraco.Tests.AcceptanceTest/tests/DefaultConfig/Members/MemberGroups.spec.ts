@@ -27,6 +27,32 @@ test('can create a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
 });
 
+test('cannot create member group with empty name', async ({umbracoApi, umbracoUi}) => {
+  // Act
+  await umbracoUi.memberGroup.clickMemberGroupsTab();
+  await umbracoUi.memberGroup.clickCreateButton();
+  await umbracoUi.memberGroup.clickSaveButton();
+
+  // Assert
+  await umbracoUi.memberGroup.isErrorNotificationVisible();
+  expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeFalsy();
+});
+
+test('cannot create member group with duplicate name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.memberGroup.create(memberGroupName);
+  expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
+
+  // Act
+  await umbracoUi.memberGroup.clickMemberGroupsTab();
+  await umbracoUi.memberGroup.clickCreateButton();
+  await umbracoUi.memberGroup.enterMemberGroupName(memberGroupName);
+  await umbracoUi.memberGroup.clickSaveButton();
+
+  // Assert
+  await umbracoUi.memberGroup.isErrorNotificationVisible();
+});
+
 // TODO: Remove skip when the front-end is ready. Currently it is impossible to delete a member group.
 test.skip('can delete a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
