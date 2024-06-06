@@ -42,7 +42,6 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	firstUpdated() {
 		this.#unique = this.data?.unique;
 		this.#getDocumentName();
-		this.#getPublicAccessModel();
 	}
 
 	async #getDocumentName() {
@@ -50,8 +49,13 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 		// Should this be done here or in the action file?
 		const { data } = await new UmbDocumentItemRepository(this).requestItems([this.#unique]);
 		if (!data) return;
+		const item = data[0];
 		//TODO How do we ensure we get the correct variant?
-		this._documentName = data[0].variants[0]?.name;
+		this._documentName = item.variants[0]?.name;
+
+		if (item.isProtected) {
+			this.#getPublicAccessModel();
+		}
 	}
 
 	async #getPublicAccessModel() {
