@@ -5,8 +5,8 @@ import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from './publ
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
-import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
+import { UmbMemberItemRepository, type UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
+import { UmbMemberGroupItemRepository, type UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -32,10 +32,10 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	private _selection: Array<string> = [];
 
 	@state()
-	private _loginPageId?: string;
+	private _loginDocumentId?: string;
 
 	@state()
-	private _errorPageId?: string;
+	private _errorDocumentId?: string;
 
 	// Init
 
@@ -56,15 +56,8 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 	async #getPublicAccessModel() {
 		if (!this.#unique) return;
-		//const { data } = (await this.#publicAccessRepository.read(this.#unique));
-		// TODO Currently returning "void". Remove mock data when API is ready. Will it be Response or Request model?
-		const data: any = undefined;
-		/*const data: PublicAccessResponseModel = {
-			members: [{ name: 'Agent', id: '007' }],
-			groups: [],
-			loginPageId: '123',
-			errorPageId: '456',
-		};*/
+		const { data } = await this.#publicAccessRepository.read(this.#unique);
+		debugger;
 
 		if (!data) return;
 		this.#isNew = false;
@@ -80,8 +73,8 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 			this._selection = data.groups.map((g: any) => g.id);
 		}
 
-		this._loginPageId = data.loginPageId;
-		this._errorPageId = data.errorPageId;
+		this._loginDocumentId = data.loginDocument.id;
+		this._errorDocumentId = data.errorDocument.id;
 	}
 
 	// Modal events
@@ -91,17 +84,33 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	}
 
 	async #handleSave() {
-		if (!this._loginPageId || !this._errorPageId || !this.#unique) return;
+		if (!this._loginDocumentId || !this._errorDocumentId || !this.#unique) return;
 
-		const groups = this._specific ? [] : this._selection;
-		const members = this._specific ? this._selection : [];
-
+		// TODO: [v15] Currently the Management API doesn't support passing the member/group ids, only the userNames/names.
+		// This is a temporary solution where we have to look them up until the API is updated to support this.
 		const requestBody: PublicAccessRequestModel = {
-			memberGroupNames: groups,
-			memberUserNames: members,
-			loginDocument: { id: this._loginPageId },
-			errorDocument: { id: this._errorPageId },
+			memberGroupNames: [],
+			memberUserNames: [],
+			loginDocument: { id: this._loginDocumentId },
+			errorDocument: { id: this._errorDocumentId },
 		};
+
+		if (this._specific) {
+			// Members
+
+			console.log('Specific members');
+		} else {
+			// Groups
+			const repo = new UmbMemberGroupItemRepository(this);
+			const { data } = await repo.requestItems(this._selection);
+			if (!data) throw new Error('No Member groups returned');
+
+			const groupNames = data
+				.filter((groupItem) => this._selection.includes(groupItem.unique))
+				.map((groupItem) => groupItem.name);
+
+			requestBody.memberGroupNames = groupNames;
+		}
 
 		if (this.#isNew) {
 			await this.#publicAccessRepository.create(this.#unique, requestBody);
@@ -125,11 +134,11 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	// Change Events
 
 	#onChangeLoginPage(e: CustomEvent) {
-		this._loginPageId = (e.target as UmbInputDocumentElement).selection[0];
+		this._loginDocumentId = (e.target as UmbInputDocumentElement).selection[0];
 	}
 
 	#onChangeErrorPage(e: CustomEvent) {
-		this._errorPageId = (e.target as UmbInputDocumentElement).selection[0];
+		this._errorDocumentId = (e.target as UmbInputDocumentElement).selection[0];
 	}
 
 	#onChangeGroup(e: CustomEvent) {
@@ -220,7 +229,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 					look="primary"
 					color="positive"
 					label=${this.localize.term('buttons_save')}
-					?disabled=${!this._loginPageId || !this._errorPageId || this._selection.length === 0}
+					?disabled=${!this._loginDocumentId || !this._errorDocumentId || this._selection.length === 0}
 					@click="${this.#handleSave}"></uui-button>`
 			: html`<uui-button
 					slot="actions"
