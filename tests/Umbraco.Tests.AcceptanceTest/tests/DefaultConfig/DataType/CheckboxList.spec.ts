@@ -23,8 +23,8 @@ test('can add option', async ({umbracoApi, umbracoUi}) => {
   const expectedDataTypeValues = [
     {
       "alias": "items",
-      "value": [optionName],
-    },
+      "value": [optionName]
+    }
   ];
   // Remove all existing options
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -48,8 +48,8 @@ test('can remove option', async ({umbracoApi, umbracoUi}) => {
   const removedOptionValues = [
     {
       "alias": "items",
-      "value": [removedOptionName],
-    },
+      "value": [removedOptionName]
+    }
   ];
   // Remove all existing options and add an option to remove
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -73,14 +73,14 @@ test('can update option', async ({umbracoApi, umbracoUi}) => {
   const optionValues = [
     {
       "alias": "items",
-      "value": [optionName],
-    },
+      "value": [optionName]
+    }
   ];
   const expectedOptionValues = [
     {
       "alias": "items",
-      "value": [updatedOptionName],
-    },
+      "value": [updatedOptionName]
+    }
   ];
   // Remove all existing options and add an option to update
   dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

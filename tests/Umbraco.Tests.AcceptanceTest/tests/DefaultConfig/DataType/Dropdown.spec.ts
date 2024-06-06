@@ -44,7 +44,7 @@ test('can add option', async ({umbracoApi, umbracoUi}) => {
   const expectedDataTypeValues = [
     {
       "alias": "items",
-      "value": [optionName],
+      "value": [optionName]
     }
   ];
   // Remove all existing options
@@ -69,7 +69,7 @@ test('can remove option', async ({umbracoApi, umbracoUi}) => {
   const removedOptionValues = [
     {
       "alias": "items",
-      "value": [removedOptionName],
+      "value": [removedOptionName]
     }
   ];
   // Remove all existing options and add an option to remove

@@ -17,7 +17,7 @@ test.afterEach(async ({umbracoApi}) => {
   }   
 });
 
-test('can select ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
+test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
     "alias": "ignoreUserStartNodes",
@@ -70,7 +70,7 @@ test.skip('can add stylesheet', async ({umbracoApi, umbracoUi}) => {
 
   const expectedDataTypeValues = {
     "alias": "stylesheets",
-    "value": [stylesheetPath],
+    "value": [stylesheetPath]
   };
 
   await umbracoUi.dataType.goToDataType(dataTypeName);
@@ -185,7 +185,7 @@ test('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
 });
 
-test('can select mode', async ({umbracoApi, umbracoUi}) => {
+test('can enable inline editing mode', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const mode = 'Inline';
   const expectedDataTypeValues = {
@@ -203,7 +203,7 @@ test('can select mode', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test('can add available blocks', async ({umbracoApi, umbracoUi}) => {
+test('can add an available block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementTypeName = 'TestElementType';
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);

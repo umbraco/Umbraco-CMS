@@ -38,7 +38,7 @@ test('can ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
     "alias": "ignoreUserStartNodes",
-    "value": true,
+    "value": true
   };
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -64,7 +64,7 @@ test('can add start node', async ({umbracoApi, umbracoUi}) => {
 
   const expectedDataTypeValues = {
     "alias": "startNodeId",
-    "value": contentId,
+    "value": contentId
   };
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -95,11 +95,11 @@ test('can remove start node', async ({umbracoApi, umbracoUi}) => {
 
   const expectedDataTypeValues = {
     "alias": "startNodeId",
-    "value": "",
+    "value": ""
   }
   const removedDataTypeValues = [{
     "alias": "startNodeId",
-    "value": contentId,
+    "value": contentId
   }];
 
   // Remove all existing values and add a start node to remove

@@ -43,7 +43,7 @@ for (const datePickerType of datePickerTypes) {
               {
                 "alias": "offsetTime",
                 "value": true,
-              },
+              }
             ];
 
       // Act
@@ -61,7 +61,7 @@ for (const datePickerType of datePickerTypes) {
         datePickerType === "Date Picker" ? "DD-MM-YYYY" : "DD-MM-YYYY hh:mm:ss";
       const expectedDataTypeValues = {
         "alias": "format",
-        "value": dateFormatValue,
+        "value": dateFormatValue
       };
       // Act
       await umbracoUi.dataType.enterDateFormatValue(dateFormatValue);

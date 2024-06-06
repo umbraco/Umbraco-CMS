@@ -83,7 +83,7 @@ test('can change property editor in a data type', {tag: '@smoke'}, async ({umbra
   expect(dataTypeData.editorUiAlias).toBe(updatedEditorUiAlias);
 });
 
-test('cannot create a data type without seleting the property editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot create a data type without selecting the property editor', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.clickActionsMenuAtRoot();
   await umbracoUi.dataType.clickCreateButton();
@@ -100,7 +100,7 @@ test('can change settings', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Arrange
   const expectedDataTypeValues = {
     alias: "useLabel",
-    value: true,
+    value: true
   };
   await umbracoApi.dataType.create(dataTypeName, editorAlias, []);
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();

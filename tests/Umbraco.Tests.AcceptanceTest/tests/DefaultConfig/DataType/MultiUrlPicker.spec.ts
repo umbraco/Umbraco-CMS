@@ -52,7 +52,7 @@ test('can update maximum number of items value', async ({umbracoApi, umbracoUi})
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test('can update ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
+test('can enable ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = {
     "alias": "ignoreUserStartNodes",

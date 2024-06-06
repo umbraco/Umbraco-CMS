@@ -18,7 +18,7 @@ test.afterEach(async ({umbracoApi}) => {
   }   
 });
 
-test('can update Maximum allowed characters value', async ({umbracoApi, umbracoUi}) => {
+test('can update maximum allowed characters value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const maxCharsValue = 126;
   const expectedDataTypeValues = {
@@ -35,7 +35,7 @@ test('can update Maximum allowed characters value', async ({umbracoApi, umbracoU
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test('can update Number of rows value', async ({umbracoApi, umbracoUi}) => {
+test('can update number of rows value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const numberOfRowsValue = 9;
   const expectedDataTypeValues = {
@@ -52,7 +52,7 @@ test('can update Number of rows value', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test('can update Min height (pixels) value', async ({umbracoApi, umbracoUi}) => {
+test('can update min height (pixels) value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minHeightValue = 150;
   const expectedDataTypeValues = {
@@ -69,7 +69,7 @@ test('can update Min height (pixels) value', async ({umbracoApi, umbracoUi}) => 
   expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
 });
 
-test('can update Max height (pixels) value', async ({umbracoApi, umbracoUi}) => {
+test('can update max height (pixels) value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const maxHeightValue = 300;
   const expectedDataTypeValues = {

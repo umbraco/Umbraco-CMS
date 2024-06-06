@@ -25,8 +25,8 @@ for (const uploadType of uploadTypes) {
       const expectedDataTypeValues = [
         {
           "alias": "fileExtensions",
-          "value": [fileExtensionValue],
-        },
+          "value": [fileExtensionValue]
+        }
       ];
       // Remove all existing accepted file extensions
       dataTypeData = await umbracoApi.dataType.getByName(uploadType);
@@ -50,8 +50,8 @@ for (const uploadType of uploadTypes) {
       const removedFileExtensionsValues = [
         {
           "alias": "fileExtensions",
-          "value": [removedFileExtensionValue],
-        },
+          "value": [removedFileExtensionValue]
+        }
       ];
       // Remove all existing accepted file extensions and add an file extension to remove
       dataTypeData = await umbracoApi.dataType.getByName(uploadType);

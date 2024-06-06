@@ -24,7 +24,7 @@ for (const listViewType of listViewTypes) {
       const pageSizeValue = 5;
       const expectedDataTypeValues = {
         "alias": "pageSize",
-        "value": pageSizeValue,
+        "value": pageSizeValue
       };
 
       // Act
@@ -43,7 +43,7 @@ for (const listViewType of listViewTypes) {
       const orderDirectionValue = isAscending ? 'asc' : 'desc';
       const expectedDataTypeValues = {
         "alias": "orderDirection",
-        "value": orderDirectionValue,
+        "value": orderDirectionValue
       };
 
       // Act
@@ -70,7 +70,7 @@ for (const listViewType of listViewTypes) {
       const expectedIncludePropertiesValues = {
         "alias": columnData[2],
         "header": columnData[3],
-        "isSystem": 1,
+        "isSystem": 1
       };
 
       // Act
@@ -185,7 +185,7 @@ for (const listViewType of listViewTypes) {
       const orderByValue = 'Last edited';
       const expectedDataTypeValues = {
         "alias": "orderBy",
-        "value": "updateDate",
+        "value": "updateDate"
       };
 
       // Act
@@ -246,7 +246,7 @@ for (const listViewType of listViewTypes) {
       const contentAppName = 'Test Content App Name';
       const expectedDataTypeValues = {
         "alias": "tabName",
-        "value": contentAppName,
+        "value": contentAppName
       };
 
       // Act
@@ -263,7 +263,7 @@ for (const listViewType of listViewTypes) {
       // Arrange
       const expectedDataTypeValues = {
         "alias": "showContentFirst",
-        "value": true,
+        "value": true
       };
 
       // Act
@@ -281,7 +281,7 @@ for (const listViewType of listViewTypes) {
       // Arrange
       const expectedDataTypeValues = {
         "alias": "useInfiniteEditor",
-        "value": true,
+        "value": true
       };
 
       // Act
