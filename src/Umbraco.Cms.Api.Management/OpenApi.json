@@ -37432,6 +37432,11 @@
           "providedValueValidationRegex": {
             "type": "string",
             "nullable": true
+          },
+          "actionParameters": {
+            "type": "object",
+            "additionalProperties": { },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -38041,6 +38046,10 @@
           "name": {
             "minLength": 1,
             "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "nullable": true
           },
           "version": {
             "type": "string",
