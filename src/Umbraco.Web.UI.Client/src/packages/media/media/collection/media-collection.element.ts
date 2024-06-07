@@ -1,3 +1,4 @@
+import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.context-token.js';
 import type { UmbMediaCollectionContext } from './media-collection.context.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
@@ -6,6 +7,8 @@ import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection'
 import type { UmbProgressEvent } from '@umbraco-cms/backoffice/event';
 
 import './media-collection-toolbar.element.js';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 @customElement('umb-media-collection')
 export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
@@ -29,9 +32,16 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		});
 	}
 
-	#onChange() {
+	async #onChange() {
 		this._progress = -1;
 		this.#mediaCollection?.requestCollection();
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadChildrenOfEntityEvent({
+			entityType: this._unique ? UMB_MEDIA_ENTITY_TYPE : UMB_MEDIA_ROOT_ENTITY_TYPE,
+			unique: this._unique,
+		});
+		eventContext.dispatchEvent(event);
 	}
 
 	#onProgress(event: UmbProgressEvent) {
