@@ -212,8 +212,7 @@ test('can delete member', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
 
-// TODO: Remove smoke tag before merging
-test('cannot create member with invalid email', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot create member with invalid email', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const invalidEmail = 'invalidemail';
   await umbracoUi.member.goToSection(ConstantHelper.sections.members);

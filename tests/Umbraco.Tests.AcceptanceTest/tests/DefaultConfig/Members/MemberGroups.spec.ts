@@ -27,8 +27,7 @@ test('can create a member group', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
 });
 
-// TODO: Remove smoke tag before merging
-test('cannot create member group with empty name', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot create member group with empty name', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.memberGroup.clickMemberGroupsTab();
   await umbracoUi.memberGroup.clickCreateButton();
@@ -39,8 +38,7 @@ test('cannot create member group with empty name', {tag: '@smoke'}, async ({umbr
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeFalsy();
 });
 
-// TODO: Remove smoke tag before merging
-test('cannot create member group with duplicate name', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot create member group with duplicate name', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.memberGroup.create(memberGroupName);
   expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
