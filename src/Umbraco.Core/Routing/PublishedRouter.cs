@@ -108,7 +108,7 @@ public class PublishedRouter : IPublishedRouter
         // find domain
         if (builder.Domain == null)
         {
-            FindDomain(builder);
+            FindAndSetDomain(builder);
         }
 
         await RouteRequestInternalAsync(builder);
@@ -185,7 +185,7 @@ public class PublishedRouter : IPublishedRouter
 
     private async Task<IPublishedRequest> TryRouteRequest(IPublishedRequestBuilder request)
     {
-        FindDomain(request);
+        FindAndSetDomain(request);
 
         if (request.IsRedirect())
         {
@@ -274,7 +274,7 @@ public class PublishedRouter : IPublishedRouter
     ///     Finds the site root (if any) matching the http request, and updates the PublishedRequest accordingly.
     /// </summary>
     /// <returns>A value indicating whether a domain was found.</returns>
-    internal bool FindDomain(IPublishedRequestBuilder request)
+    internal bool FindAndSetDomain(IPublishedRequestBuilder request)
     {
         const string tracePrefix = "FindDomain: ";
 
