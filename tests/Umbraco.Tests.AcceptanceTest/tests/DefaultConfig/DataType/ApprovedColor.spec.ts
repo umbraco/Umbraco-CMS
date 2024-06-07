@@ -3,9 +3,9 @@ import {expect} from "@playwright/test";
 
 const dataTypeName = 'Approved Color';
 let dataTypeDefaultData = null;
-let dataTypeData = null;
-const colorValue = '#ffffff';
-const colorLabel = 'TestColor';
+let dataTypeData = null;  
+const colorValue = 'ffffff';
+const colorLabel = '';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
@@ -42,8 +42,7 @@ test('can include label', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toEqual(expectedDataTypeValues);
 });
 
-//TODO: Remove skip when the frontend is ready
-test.skip('can add color', async ({umbracoApi, umbracoUi}) => {
+test('can add color', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedDataTypeValues = [
     {
@@ -63,7 +62,7 @@ test.skip('can add color', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.goToDataType(dataTypeName);
 
   // Act
-  await umbracoUi.dataType.addColor(colorValue, colorLabel);
+  await umbracoUi.dataType.addColor(colorValue);
   await umbracoUi.dataType.clickSaveButton();
 
   // Assert
@@ -71,8 +70,7 @@ test.skip('can add color', async ({umbracoApi, umbracoUi}) => {
   expect(dataTypeData.values).toEqual(expectedDataTypeValues);
 });
 
-// TODO: remove .skip when the frontend is able to display the added color. Currently the added colors are not displayed after reloading page
-test.skip('can remove color', async ({umbracoApi, umbracoUi}) => {
+test('can remove color', async ({umbracoApi, umbracoUi}) => {  
   // Arrange
   const removedDataTypeValues = [
     {
