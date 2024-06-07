@@ -43,7 +43,7 @@ export class UmbStylesheetRuleManager {
 					(rule) => `
 /**umb_name:${rule.name}*/
 ${rule.selector} {
-	${rule.styles}
+	${rule.styles ?? ''}
 }
 `,
 				)

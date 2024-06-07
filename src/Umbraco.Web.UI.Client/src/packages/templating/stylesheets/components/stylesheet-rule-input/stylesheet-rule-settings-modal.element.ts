@@ -75,7 +75,7 @@ export default class UmbStylesheetRuleSettingsModalElement extends UmbModalBaseE
 									</uui-input>
 								</uui-form-layout-item>
 								<uui-form-layout-item>
-									<uui-label for="styles" slot="label" required="">Styles</uui-label>
+									<uui-label for="styles" slot="label">Styles</uui-label>
 									<span slot="description"
 										>The CSS that should be applied in the rich text editor, e.g. "color:red;"</span
 									>
@@ -88,7 +88,7 @@ export default class UmbStylesheetRuleSettingsModalElement extends UmbModalBaseE
 									</uui-textarea>
 								</uui-form-layout-item>
 								<uui-form-layout-item>
-									<uui-label for="styles" slot="label" required="">Preview</uui-label>
+									<uui-label for="styles" slot="label">Preview</uui-label>
 									<span slot="description">How the text will look like in the rich text editor.</span>
 									<div style="${ifDefined(this.value.rule?.styles)}">
 										a b c d e f g h i j k l m n o p q r s t u v w x t z
