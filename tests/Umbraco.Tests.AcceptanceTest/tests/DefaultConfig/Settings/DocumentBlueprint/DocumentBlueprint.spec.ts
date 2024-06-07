@@ -16,7 +16,7 @@ test.describe('Document Blueprints tests', {tag: '@smoke'}, () => {
 
   test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.documentBlueprint.ensureNameNotExists(documentBlueprintName);
-    await umbracoApi.documentType.delete(documentTypeId);
+    await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   });
 
   test('can create a document blueprint from the settings menu', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -36,7 +36,7 @@ test.describe('Document Blueprints tests', {tag: '@smoke'}, () => {
     await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true);
   });
 
-  test('can rename a document blueprint name', async ({umbracoApi, umbracoUi}) => {
+  test('can rename a document blueprint', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongDocumentBlueprintName = 'Wrong Document Blueprint';
     await umbracoApi.documentBlueprint.ensureNameNotExists(wrongDocumentBlueprintName);
@@ -74,12 +74,11 @@ test.describe('Document Blueprints tests', {tag: '@smoke'}, () => {
     await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, false, false);
   });
 
-  test('can create a document blueprint from the Content menu', async ({umbracoApi, umbracoUi}) => {
+  test('can create a document blueprint from the content menu', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const documentTypeName = 'DocumentTypeForContent';
     const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
     await umbracoApi.document.createDefaultDocument(documentBlueprintName, documentTypeId);
-    await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
     // Act
