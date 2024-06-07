@@ -158,7 +158,7 @@ test('can set appearance as label on top for property in a media type', async ({
   // Act
   await umbracoUi.mediaType.goToMediaType(mediaTypeName);
   await umbracoUi.mediaType.clickEditorSettingsButton();
-  await umbracoUi.mediaType.clickLabelOnTopButton();
+  await umbracoUi.mediaType.clickLabelAboveButton();
   await umbracoUi.mediaType.clickUpdateButton();
   await umbracoUi.mediaType.clickSaveButton();
 
