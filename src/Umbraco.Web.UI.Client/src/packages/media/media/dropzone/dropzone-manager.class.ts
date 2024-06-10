@@ -187,8 +187,15 @@ export class UmbDropzoneManager extends UmbControllerBase {
 		fileExtensions: Array<string>,
 		parentUnique: string | null,
 	): Promise<Array<UmbUploadableExtensionModel>> {
-		// Getting all media types allowed in our current position based on parent unique.
-		const { data: allAllowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(parentUnique);
+		let parentMediaType: string | null = null;
+		if (parentUnique) {
+			const { data } = await this.#mediaDetailRepository.requestByUnique(parentUnique);
+			parentMediaType = data?.mediaType.unique ?? null;
+		}
+
+		// Getting all media types allowed in our current position based on parent's media type.
+
+		const { data: allAllowedMediaTypes } = await this.#mediaTypeStructure.requestAllowedChildrenOf(parentMediaType);
 		if (!allAllowedMediaTypes?.items.length) return [];
 
 		const allowedByParent = allAllowedMediaTypes.items;
