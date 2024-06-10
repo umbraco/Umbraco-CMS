@@ -102,7 +102,8 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 		UmbTextStyles,
 		css`
 			uui-box > div {
-				display: grid;
+				display: flex;
+				flex-direction: column;
 				gap: var(--uui-size-space-2);
 			}
 
