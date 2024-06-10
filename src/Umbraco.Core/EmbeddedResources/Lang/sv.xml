@@ -1146,7 +1146,7 @@
     <key alias="duplicateLogin">En användare med detta inlogg existerar redan</key>
     <key alias="passwordRequiresDigit">Lösenordet måste innehålla minst en siffra ('0'-'9')</key>
     <key alias="passwordRequiresLower">Lösenordet måste innehålla minst en liten bokstav ('a'-'z')</key>
-    <key alias="passwordRequiresNonAlphanumeric">Lösenorder måste innehålla minst ett specialtecken</key>
+    <key alias="passwordRequiresNonAlphanumeric">Lösenordet måste innehålla minst ett specialtecken</key>
     <key alias="passwordRequiresUniqueChars">Lösenordet måste innehålla minst %0% unika tecken</key>
     <key alias="passwordRequiresUpper">Lösenordet måste innehålla minst en stor bokstav ('A'-'Z')</key>
     <key alias="passwordTooShort">Lösenordet måste vara minst %0% tecken</key>
