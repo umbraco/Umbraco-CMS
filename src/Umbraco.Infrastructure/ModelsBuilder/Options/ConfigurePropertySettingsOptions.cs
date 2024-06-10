@@ -1,6 +1,4 @@
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
@@ -12,20 +10,9 @@ public class ConfigurePropertySettingsOptions :
     IConfigureOptions<MemberPropertySettings>,
     IConfigureOptions<MediaPropertySettings>
 {
-    private readonly ModelsBuilderSettings _settings;
-
-    public ConfigurePropertySettingsOptions(IOptions<ModelsBuilderSettings> config)
-    {
-        _settings = config.Value;
-    }
 
     public void Configure(ContentPropertySettings options)
     {
-        if (_settings.ModelsMode is ModelsMode.Nothing)
-        {
-            return;
-        }
-
         var reservedProperties = typeof(IPublishedContent).GetPublicProperties().Select(x => x.Name).ToHashSet();
         var reservedMethods = typeof(IPublishedContent).GetPublicMethods().Select(x => x.Name).ToHashSet();
         options.AddReservedFieldNames(reservedProperties);
@@ -34,11 +21,6 @@ public class ConfigurePropertySettingsOptions :
 
     public void Configure(MemberPropertySettings options)
     {
-        if (_settings.ModelsMode is ModelsMode.Nothing)
-        {
-            return;
-        }
-
         var reservedProperties = typeof(IPublishedMember).GetPublicProperties().Select(x => x.Name).ToHashSet();
         var reservedMethods = typeof(IPublishedMember).GetPublicMethods().Select(x => x.Name).ToHashSet();
         options.AddReservedFieldNames(reservedProperties);
@@ -47,11 +29,6 @@ public class ConfigurePropertySettingsOptions :
 
     public void Configure(MediaPropertySettings options)
     {
-        if (_settings.ModelsMode is ModelsMode.Nothing)
-        {
-            return;
-        }
-
         var reservedProperties = typeof(IPublishedContent).GetPublicProperties().Select(x => x.Name).ToHashSet();
         var reservedMethods = typeof(IPublishedContent).GetPublicMethods().Select(x => x.Name).ToHashSet();
         options.AddReservedFieldNames(reservedProperties);
