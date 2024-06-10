@@ -1,5 +1,5 @@
 import { UMB_PARTIAL_VIEW_ITEM_REPOSITORY_ALIAS } from '../../repository/item/index.js';
-import { UMB_PARTIAL_VIEW_PICKER_MODAL } from '../../../modals/partial-view-picker/partial-view-picker-modal.token.js';
+import { UMB_PARTIAL_VIEW_PICKER_MODAL } from '../../partial-view-picker/index.js';
 import type { UmbPartialViewItemModel } from '../../types.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
