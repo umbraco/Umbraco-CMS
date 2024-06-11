@@ -118,9 +118,11 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_create')}>
-				${this._availableBlueprints.length && this.#documentTypeUnique
-					? this.#renderBlueprints()
-					: this.#renderDocumentTypes()}
+				${when(
+					this._availableBlueprints.length === 0 && this.#documentTypeUnique,
+					() => this.#renderBlueprints(),
+					() => this.#renderDocumentTypes(),
+				)}
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
 			</umb-body-layout>
 		`;
@@ -134,8 +136,14 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 					<umb-localize key="create_noDocumentTypes">
 						There are no allowed Document Types available for creating content here. You must enable these in
 						<strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the
-						<strong>Allowed child node types</strong> under <strong>Permissions</strong>
+						<strong>Allowed child node types</strong> under <strong>Permissions</strong><br />
 					</umb-localize>
+					<uui-button
+						id="edit-permissions"
+						look="secondary"
+						@click=${() => this._rejectModal()}
+						href=${`/section/settings/workspace/document-type/edit/${this.data?.documentType?.unique}/view/structure`}
+						label=${this.localize.term('create_noDocumentTypesEditPermissions')}></uui-button>
 				`,
 				() =>
 					repeat(
@@ -145,7 +153,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 							html` <uui-ref-node-document-type
 								data-id=${ifDefined(documentType.unique)}
 								.name=${documentType.name}
-								.alias=${documentType.description}
+								.alias=${documentType.description ?? ''}
 								select-only
 								selectable
 								@selected=${() => this.#onSelectDocumentType(documentType.unique)}>
@@ -182,6 +190,10 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		css`
 			#blank {
 				border-bottom: 1px solid var(--uui-color-border);
+			}
+
+			#edit-permissions {
+				margin-top: var(--uui-size-6);
 			}
 		`,
 	];
