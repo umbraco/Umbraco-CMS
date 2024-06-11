@@ -243,6 +243,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 			paste_data_images: false,
 			language: this.#getLanguage(),
 			promotion: false,
+			convert_unsafe_embeds: true, // [JOV] Workaround for CVE-2024-29881
 
 			// Extend with configuration options
 			...configurationOptions,
