@@ -129,7 +129,8 @@
 		"./src/packages/data-type",
 		"./src/packages/dictionary",
 		"./src/packages/umbraco-news",
-		"./src/packages/webhook"
+		"./src/packages/webhook",
+		"./src/packages/language"
 	],
 	"scripts": {
 		"backoffice:test:e2e": "npx playwright test",
