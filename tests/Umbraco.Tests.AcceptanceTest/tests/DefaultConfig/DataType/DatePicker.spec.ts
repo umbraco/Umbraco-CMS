@@ -20,25 +20,30 @@ for (const datePickerType of datePickerTypes) {
       }
     });
 
+    // This test is out-of-date since currently it is impossible to update offset time in front-end
     test.skip(`can update offset time`, async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const expectedDataTypeValues =
         datePickerType === 'Date Picker'
           ? [
               {
-                alias: "format",
-                value: "YYYY-MM-DD",
+                "alias": "format",
+                "value": "YYYY-MM-DD",
               },
               {
-                alias: "offsetTime",
-                value: true,
+                "alias": "offsetTime",
+                "value": true,
               },
             ]
           : [
               {
-                alias: "offsetTime",
-                value: true,
+                "alias": "format",
+                "value": "YYYY-MM-DD HH:mm:ss",
               },
+              {
+                "alias": "offsetTime",
+                "value": true,
+              }
             ];
 
       // Act
@@ -50,24 +55,21 @@ for (const datePickerType of datePickerTypes) {
       expect(dataTypeData.values).toEqual(expectedDataTypeValues);
     });
 
-    test(`can update date format`, async ({ umbracoApi, umbracoUi }) => {
+    test('can update date format', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dateFormatValue =
-        datePickerType === 'Date Picker' ? 'DD-MM-YYYY' : 'DD-MM-YYYY hh:mm:ss';
-      const expectedDataTypeValues = [
-        {
-          alias: "format",
-          value: dateFormatValue,
-        },
-      ];
-
+        datePickerType === "Date Picker" ? "DD-MM-YYYY" : "DD-MM-YYYY hh:mm:ss";
+      const expectedDataTypeValues = {
+        "alias": "format",
+        "value": dateFormatValue
+      };
       // Act
       await umbracoUi.dataType.enterDateFormatValue(dateFormatValue);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
       dataTypeData = await umbracoApi.dataType.getByName(datePickerType);
-      expect(dataTypeData.values).toEqual(expectedDataTypeValues);
+      expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
   });
 }

@@ -79,7 +79,7 @@ test('can delete a script', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Assert
   await umbracoUi.script.isSuccessNotificationVisible();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeFalsy();
-  await umbracoUi.script.isScriptRootTreeItemVisible(scriptName, false);
+  await umbracoUi.script.isScriptRootTreeItemVisible(scriptName, false, false);
 });
 
 test('can rename a script', async ({umbracoApi, umbracoUi}) => {
