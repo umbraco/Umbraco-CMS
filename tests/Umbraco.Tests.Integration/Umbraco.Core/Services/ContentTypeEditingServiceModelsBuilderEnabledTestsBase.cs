@@ -11,14 +11,5 @@ public class ContentTypeEditingServiceModelsBuilderEnabledTestsBase : ContentTyp
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.Services.ConfigureOptions<ConfigurePropertySettingsOptions>();
-        builder.Services.ConfigureOptions<TestConfigureModelsBuilderSettings>();
-    }
-
-    public class TestConfigureModelsBuilderSettings : IConfigureOptions<ModelsBuilderSettings>
-    {
-        public void Configure(ModelsBuilderSettings options)
-        {
-            options.ModelsMode = ModelsMode.InMemoryAuto;
-        }
     }
 }

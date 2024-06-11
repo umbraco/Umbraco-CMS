@@ -1,24 +1,11 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Options;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
+/// <summary>
+/// Unlike <see cref="ContentTypeEditingServiceModelsBuilderEnabledTestsBase"/> this testbase does not configure the modelsbuilder based <see cref="ConfigurePropertySettingsOptions"/>
+/// which has the same effect as disabling it completely as <see cref="ContentTypeEditingServiceModelsBuilderEnabledTestsBase"/> only loads in that part anyway.
+/// </summary>
 public class ContentTypeEditingServiceModelsBuilderDisabledTestsBase : ContentTypeEditingServiceTestsBase
 {
-    protected override void CustomTestSetup(IUmbracoBuilder builder)
-    {
-        builder.Services.ConfigureOptions<ConfigurePropertySettingsOptions>();
-        builder.Services.ConfigureOptions<TestConfigureModelsBuilderSettings>();
-    }
-
-    public class TestConfigureModelsBuilderSettings : IConfigureOptions<ModelsBuilderSettings>
-    {
-        public void Configure(ModelsBuilderSettings options)
-        {
-            options.ModelsMode = ModelsMode.Nothing;
-        }
-    }
 }
