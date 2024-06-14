@@ -22,15 +22,17 @@
         $scope.page.menu.currentSection = appState.getSectionState("currentSection");
         $scope.page.listViewPath = null;
         $scope.page.isNew = $scope.isNew ? true : false;
+        $scope.page.hideActionsMenu = false;
+        $scope.page.hideChangeVariant = false;
 
         if (infiniteMode) {
             $scope.page.allowInfinitePublishAndClose = $scope.infiniteModel.allowPublishAndClose;
             $scope.page.allowInfiniteSaveAndClose = $scope.infiniteModel.allowSaveAndClose;
+            $scope.page.hideActionsMenu = true;
+            $scope.page.hideChangeVariant = $scope.infiniteModel.hideChangeVariant;
         }
 
         $scope.page.buttonGroupState = "init";
-        $scope.page.hideActionsMenu = infiniteMode ? true : false;
-        $scope.page.hideChangeVariant = false;
         $scope.allowOpen = true;
         $scope.activeApp = null;
 

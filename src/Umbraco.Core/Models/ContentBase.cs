@@ -1,4 +1,4 @@
-﻿using System.Collections.Specialized;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
@@ -77,6 +77,9 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
 
     [IgnoreDataMember]
     public int VersionId { get; set; }
+
+    [DataMember]
+    public bool IsAlternateVersion { get; set; }
 
     /// <summary>
     ///     Integer Id of the default ContentType

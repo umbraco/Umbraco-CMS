@@ -35,6 +35,10 @@ public class ContentItemDisplay<TVariant> :
     [Required]
     public int Id { get; set; }
 
+    [DataMember(Name = "versionId", IsRequired = true)]
+    [Required]
+    public int VersionId { get; set; }
+
     [DataMember(Name = "udi")]
     [ReadOnly(true)]
     public Udi? Udi { get; set; }
@@ -101,6 +105,12 @@ public class ContentItemDisplay<TVariant> :
     /// </summary>
     [DataMember(Name = "isChildOfListView")]
     public bool IsChildOfListView { get; set; }
+
+    /// <summary>
+    ///     Indicates this item is not the current draft
+    /// </summary>
+    [DataMember(Name = "isAlternateVersion")]
+    public bool IsAlternateVersion { get; set; }
 
     /// <summary>
     ///     Property for the entity's individual tree node URL
