@@ -23,7 +23,7 @@ export class UmbWorkspaceElement extends UmbLitElement {
 	}
 }
 
-export default UmbWorkspaceElement;
+export { UmbWorkspaceElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {

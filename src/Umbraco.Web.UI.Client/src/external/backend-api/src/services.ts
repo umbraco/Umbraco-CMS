@@ -1,12 +1,12 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { CultureData, DataTypeData, DictionaryData, DocumentBlueprintData, DocumentTypeData, DocumentVersionData, DocumentData, DynamicRootData, HealthCheckData, HelpData, ImagingData, IndexerData, InstallData, LanguageData, LogViewerData, ManifestData, MediaTypeData, MediaData, MemberGroupData, MemberTypeData, MemberData, ModelsBuilderData, ObjectTypesData, OembedData, PackageData, PartialViewData, PreviewData, ProfilingData, PropertyTypeData, PublishedCacheData, RedirectManagementData, RelationTypeData, RelationData, ScriptData, SearcherData, SecurityData, SegmentData, ServerData, StaticFileData, StylesheetData, TagData, TelemetryData, TemplateData, TemporaryFileData, UpgradeData, UserDataData, UserGroupData, UserData, WebhookData } from './models';
+import type { CultureData, DataTypeData, DictionaryData, DocumentBlueprintData, DocumentTypeData, DocumentVersionData, DocumentData, DynamicRootData, HealthCheckData, HelpData, ImagingData, ImportData, IndexerData, InstallData, LanguageData, LogViewerData, ManifestData, MediaTypeData, MediaData, MemberGroupData, MemberTypeData, MemberData, ModelsBuilderData, ObjectTypesData, OembedData, PackageData, PartialViewData, PreviewData, ProfilingData, PropertyTypeData, PublishedCacheData, RedirectManagementData, RelationTypeData, RelationData, ScriptData, SearcherData, SecurityData, SegmentData, ServerData, StaticFileData, StylesheetData, TagData, TelemetryData, TemplateData, TemporaryFileData, UpgradeData, UserDataData, UserGroupData, UserData, WebhookData } from './models';
 
 export class CultureService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getCulture(data: CultureData['payloads']['GetCulture'] = {}): CancelablePromise<CultureData['responses']['GetCulture']> {
@@ -56,7 +56,7 @@ export class DataTypeService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDataTypeById(data: DataTypeData['payloads']['GetDataTypeById']): CancelablePromise<DataTypeData['responses']['GetDataTypeById']> {
@@ -79,7 +79,7 @@ export class DataTypeService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteDataTypeById(data: DataTypeData['payloads']['DeleteDataTypeById']): CancelablePromise<DataTypeData['responses']['DeleteDataTypeById']> {
@@ -104,7 +104,7 @@ export class DataTypeService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDataTypeById(data: DataTypeData['payloads']['PutDataTypeById']): CancelablePromise<DataTypeData['responses']['PutDataTypeById']> {
@@ -159,7 +159,7 @@ requestBody
 	}
 
 	/**
-	 * @returns boolean Success
+	 * @returns boolean OK
 	 * @throws ApiError
 	 */
 	public static getDataTypeByIdIsUsed(data: DataTypeData['payloads']['GetDataTypeByIdIsUsed']): CancelablePromise<DataTypeData['responses']['GetDataTypeByIdIsUsed']> {
@@ -182,7 +182,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDataTypeByIdMove(data: DataTypeData['payloads']['PutDataTypeByIdMove']): CancelablePromise<DataTypeData['responses']['PutDataTypeByIdMove']> {
@@ -209,7 +209,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDataTypeByIdReferences(data: DataTypeData['payloads']['GetDataTypeByIdReferences']): CancelablePromise<DataTypeData['responses']['GetDataTypeByIdReferences']> {
@@ -232,7 +232,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDataTypeConfiguration(): CancelablePromise<DataTypeData['responses']['GetDataTypeConfiguration']> {
@@ -272,7 +272,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDataTypeFolderById(data: DataTypeData['payloads']['GetDataTypeFolderById']): CancelablePromise<DataTypeData['responses']['GetDataTypeFolderById']> {
@@ -295,7 +295,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteDataTypeFolderById(data: DataTypeData['payloads']['DeleteDataTypeFolderById']): CancelablePromise<DataTypeData['responses']['DeleteDataTypeFolderById']> {
@@ -320,7 +320,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDataTypeFolderById(data: DataTypeData['payloads']['PutDataTypeFolderById']): CancelablePromise<DataTypeData['responses']['PutDataTypeFolderById']> {
@@ -348,7 +348,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getFilterDataType(data: DataTypeData['payloads']['GetFilterDataType'] = {}): CancelablePromise<DataTypeData['responses']['GetFilterDataType']> {
@@ -374,7 +374,7 @@ editorAlias
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemDataType(data: DataTypeData['payloads']['GetItemDataType'] = {}): CancelablePromise<DataTypeData['responses']['GetItemDataType']> {
@@ -390,13 +390,12 @@ editorAlias
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemDataTypeSearch(data: DataTypeData['payloads']['GetItemDataTypeSearch'] = {}): CancelablePromise<DataTypeData['responses']['GetItemDataTypeSearch']> {
@@ -414,13 +413,12 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDataTypeAncestors(data: DataTypeData['payloads']['GetTreeDataTypeAncestors'] = {}): CancelablePromise<DataTypeData['responses']['GetTreeDataTypeAncestors']> {
@@ -442,7 +440,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDataTypeChildren(data: DataTypeData['payloads']['GetTreeDataTypeChildren'] = {}): CancelablePromise<DataTypeData['responses']['GetTreeDataTypeChildren']> {
@@ -467,7 +465,7 @@ foldersOnly
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDataTypeRoot(data: DataTypeData['payloads']['GetTreeDataTypeRoot'] = {}): CancelablePromise<DataTypeData['responses']['GetTreeDataTypeRoot']> {
@@ -495,7 +493,7 @@ foldersOnly
 export class DictionaryService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDictionary(data: DictionaryData['payloads']['GetDictionary'] = {}): CancelablePromise<DictionaryData['responses']['GetDictionary']> {
@@ -544,7 +542,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDictionaryById(data: DictionaryData['payloads']['GetDictionaryById']): CancelablePromise<DictionaryData['responses']['GetDictionaryById']> {
@@ -567,7 +565,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteDictionaryById(data: DictionaryData['payloads']['DeleteDictionaryById']): CancelablePromise<DictionaryData['responses']['DeleteDictionaryById']> {
@@ -592,7 +590,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDictionaryById(data: DictionaryData['payloads']['PutDictionaryById']): CancelablePromise<DictionaryData['responses']['PutDictionaryById']> {
@@ -620,7 +618,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDictionaryByIdExport(data: DictionaryData['payloads']['GetDictionaryByIdExport']): CancelablePromise<DictionaryData['responses']['GetDictionaryByIdExport']> {
@@ -647,7 +645,7 @@ includeChildren
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDictionaryByIdMove(data: DictionaryData['payloads']['PutDictionaryByIdMove']): CancelablePromise<DictionaryData['responses']['PutDictionaryByIdMove']> {
@@ -699,7 +697,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemDictionary(data: DictionaryData['payloads']['GetItemDictionary'] = {}): CancelablePromise<DictionaryData['responses']['GetItemDictionary']> {
@@ -715,13 +713,12 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDictionaryAncestors(data: DictionaryData['payloads']['GetTreeDictionaryAncestors'] = {}): CancelablePromise<DictionaryData['responses']['GetTreeDictionaryAncestors']> {
@@ -743,7 +740,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDictionaryChildren(data: DictionaryData['payloads']['GetTreeDictionaryChildren'] = {}): CancelablePromise<DictionaryData['responses']['GetTreeDictionaryChildren']> {
@@ -767,7 +764,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDictionaryRoot(data: DictionaryData['payloads']['GetTreeDictionaryRoot'] = {}): CancelablePromise<DictionaryData['responses']['GetTreeDictionaryRoot']> {
@@ -818,7 +815,7 @@ export class DocumentBlueprintService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentBlueprintById(data: DocumentBlueprintData['payloads']['GetDocumentBlueprintById']): CancelablePromise<DocumentBlueprintData['responses']['GetDocumentBlueprintById']> {
@@ -841,7 +838,7 @@ export class DocumentBlueprintService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteDocumentBlueprintById(data: DocumentBlueprintData['payloads']['DeleteDocumentBlueprintById']): CancelablePromise<DocumentBlueprintData['responses']['DeleteDocumentBlueprintById']> {
@@ -866,7 +863,7 @@ export class DocumentBlueprintService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentBlueprintById(data: DocumentBlueprintData['payloads']['PutDocumentBlueprintById']): CancelablePromise<DocumentBlueprintData['responses']['PutDocumentBlueprintById']> {
@@ -894,7 +891,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentBlueprintByIdMove(data: DocumentBlueprintData['payloads']['PutDocumentBlueprintByIdMove']): CancelablePromise<DocumentBlueprintData['responses']['PutDocumentBlueprintByIdMove']> {
@@ -945,7 +942,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentBlueprintFolderById(data: DocumentBlueprintData['payloads']['GetDocumentBlueprintFolderById']): CancelablePromise<DocumentBlueprintData['responses']['GetDocumentBlueprintFolderById']> {
@@ -968,7 +965,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteDocumentBlueprintFolderById(data: DocumentBlueprintData['payloads']['DeleteDocumentBlueprintFolderById']): CancelablePromise<DocumentBlueprintData['responses']['DeleteDocumentBlueprintFolderById']> {
@@ -993,7 +990,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentBlueprintFolderById(data: DocumentBlueprintData['payloads']['PutDocumentBlueprintFolderById']): CancelablePromise<DocumentBlueprintData['responses']['PutDocumentBlueprintFolderById']> {
@@ -1044,7 +1041,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemDocumentBlueprint(data: DocumentBlueprintData['payloads']['GetItemDocumentBlueprint'] = {}): CancelablePromise<DocumentBlueprintData['responses']['GetItemDocumentBlueprint']> {
@@ -1060,13 +1057,12 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDocumentBlueprintAncestors(data: DocumentBlueprintData['payloads']['GetTreeDocumentBlueprintAncestors'] = {}): CancelablePromise<DocumentBlueprintData['responses']['GetTreeDocumentBlueprintAncestors']> {
@@ -1088,7 +1084,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDocumentBlueprintChildren(data: DocumentBlueprintData['payloads']['GetTreeDocumentBlueprintChildren'] = {}): CancelablePromise<DocumentBlueprintData['responses']['GetTreeDocumentBlueprintChildren']> {
@@ -1113,7 +1109,7 @@ foldersOnly
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDocumentBlueprintRoot(data: DocumentBlueprintData['payloads']['GetTreeDocumentBlueprintRoot'] = {}): CancelablePromise<DocumentBlueprintData['responses']['GetTreeDocumentBlueprintRoot']> {
@@ -1165,7 +1161,7 @@ export class DocumentTypeService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentTypeById(data: DocumentTypeData['payloads']['GetDocumentTypeById']): CancelablePromise<DocumentTypeData['responses']['GetDocumentTypeById']> {
@@ -1188,7 +1184,7 @@ export class DocumentTypeService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteDocumentTypeById(data: DocumentTypeData['payloads']['DeleteDocumentTypeById']): CancelablePromise<DocumentTypeData['responses']['DeleteDocumentTypeById']> {
@@ -1212,7 +1208,7 @@ export class DocumentTypeService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentTypeById(data: DocumentTypeData['payloads']['PutDocumentTypeById']): CancelablePromise<DocumentTypeData['responses']['PutDocumentTypeById']> {
@@ -1240,7 +1236,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentTypeByIdAllowedChildren(data: DocumentTypeData['payloads']['GetDocumentTypeByIdAllowedChildren']): CancelablePromise<DocumentTypeData['responses']['GetDocumentTypeByIdAllowedChildren']> {
@@ -1268,7 +1264,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentTypeByIdBlueprint(data: DocumentTypeData['payloads']['GetDocumentTypeByIdBlueprint']): CancelablePromise<DocumentTypeData['responses']['GetDocumentTypeByIdBlueprint']> {
@@ -1296,7 +1292,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentTypeByIdCompositionReferences(data: DocumentTypeData['payloads']['GetDocumentTypeByIdCompositionReferences']): CancelablePromise<DocumentTypeData['responses']['GetDocumentTypeByIdCompositionReferences']> {
@@ -1348,7 +1344,58 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns unknown OK
+	 * @throws ApiError
+	 */
+	public static getDocumentTypeByIdExport(data: DocumentTypeData['payloads']['GetDocumentTypeByIdExport']): CancelablePromise<DocumentTypeData['responses']['GetDocumentTypeByIdExport']> {
+		const {
+                    
+                    id
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/document-type/{id}/export',
+			path: {
+				id
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns string OK
+	 * @throws ApiError
+	 */
+	public static putDocumentTypeByIdImport(data: DocumentTypeData['payloads']['PutDocumentTypeByIdImport']): CancelablePromise<DocumentTypeData['responses']['PutDocumentTypeByIdImport']> {
+		const {
+                    
+                    id,
+requestBody
+                } = data;
+		return __request(OpenAPI, {
+			method: 'PUT',
+			url: '/umbraco/management/api/v1/document-type/{id}/import',
+			path: {
+				id
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			responseHeader: 'Umb-Notifications',
+			errors: {
+				400: `Bad Request`,
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentTypeByIdMove(data: DocumentTypeData['payloads']['PutDocumentTypeByIdMove']): CancelablePromise<DocumentTypeData['responses']['PutDocumentTypeByIdMove']> {
@@ -1376,7 +1423,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentTypeAllowedAtRoot(data: DocumentTypeData['payloads']['GetDocumentTypeAllowedAtRoot'] = {}): CancelablePromise<DocumentTypeData['responses']['GetDocumentTypeAllowedAtRoot']> {
@@ -1399,7 +1446,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static postDocumentTypeAvailableCompositions(data: DocumentTypeData['payloads']['PostDocumentTypeAvailableCompositions'] = {}): CancelablePromise<DocumentTypeData['responses']['PostDocumentTypeAvailableCompositions']> {
@@ -1420,7 +1467,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentTypeConfiguration(): CancelablePromise<DocumentTypeData['responses']['GetDocumentTypeConfiguration']> {
@@ -1460,7 +1507,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentTypeFolderById(data: DocumentTypeData['payloads']['GetDocumentTypeFolderById']): CancelablePromise<DocumentTypeData['responses']['GetDocumentTypeFolderById']> {
@@ -1483,7 +1530,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteDocumentTypeFolderById(data: DocumentTypeData['payloads']['DeleteDocumentTypeFolderById']): CancelablePromise<DocumentTypeData['responses']['DeleteDocumentTypeFolderById']> {
@@ -1508,7 +1555,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentTypeFolderById(data: DocumentTypeData['payloads']['PutDocumentTypeFolderById']): CancelablePromise<DocumentTypeData['responses']['PutDocumentTypeFolderById']> {
@@ -1536,7 +1583,31 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns string Created
+	 * @throws ApiError
+	 */
+	public static postDocumentTypeImport(data: DocumentTypeData['payloads']['PostDocumentTypeImport'] = {}): CancelablePromise<DocumentTypeData['responses']['PostDocumentTypeImport']> {
+		const {
+                    
+                    requestBody
+                } = data;
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/umbraco/management/api/v1/document-type/import',
+			body: requestBody,
+			mediaType: 'application/json',
+			responseHeader: 'Umb-Generated-Resource',
+			errors: {
+				400: `Bad Request`,
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemDocumentType(data: DocumentTypeData['payloads']['GetItemDocumentType'] = {}): CancelablePromise<DocumentTypeData['responses']['GetItemDocumentType']> {
@@ -1552,13 +1623,12 @@ requestBody
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemDocumentTypeSearch(data: DocumentTypeData['payloads']['GetItemDocumentTypeSearch'] = {}): CancelablePromise<DocumentTypeData['responses']['GetItemDocumentTypeSearch']> {
@@ -1576,13 +1646,12 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDocumentTypeAncestors(data: DocumentTypeData['payloads']['GetTreeDocumentTypeAncestors'] = {}): CancelablePromise<DocumentTypeData['responses']['GetTreeDocumentTypeAncestors']> {
@@ -1604,7 +1673,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDocumentTypeChildren(data: DocumentTypeData['payloads']['GetTreeDocumentTypeChildren'] = {}): CancelablePromise<DocumentTypeData['responses']['GetTreeDocumentTypeChildren']> {
@@ -1629,7 +1698,7 @@ foldersOnly
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDocumentTypeRoot(data: DocumentTypeData['payloads']['GetTreeDocumentTypeRoot'] = {}): CancelablePromise<DocumentTypeData['responses']['GetTreeDocumentTypeRoot']> {
@@ -1657,7 +1726,7 @@ foldersOnly
 export class DocumentVersionService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentVersion(data: DocumentVersionData['payloads']['GetDocumentVersion']): CancelablePromise<DocumentVersionData['responses']['GetDocumentVersion']> {
@@ -1684,7 +1753,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentVersionById(data: DocumentVersionData['payloads']['GetDocumentVersionById']): CancelablePromise<DocumentVersionData['responses']['GetDocumentVersionById']> {
@@ -1708,7 +1777,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentVersionByIdPreventCleanup(data: DocumentVersionData['payloads']['PutDocumentVersionByIdPreventCleanup']): CancelablePromise<DocumentVersionData['responses']['PutDocumentVersionByIdPreventCleanup']> {
@@ -1737,7 +1806,7 @@ preventCleanup
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postDocumentVersionByIdRollback(data: DocumentVersionData['payloads']['PostDocumentVersionByIdRollback']): CancelablePromise<DocumentVersionData['responses']['PostDocumentVersionByIdRollback']> {
@@ -1770,7 +1839,7 @@ culture
 export class DocumentService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getCollectionDocumentById(data: DocumentData['payloads']['GetCollectionDocumentById']): CancelablePromise<DocumentData['responses']['GetCollectionDocumentById']> {
@@ -1828,7 +1897,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentById(data: DocumentData['payloads']['GetDocumentById']): CancelablePromise<DocumentData['responses']['GetDocumentById']> {
@@ -1851,7 +1920,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteDocumentById(data: DocumentData['payloads']['DeleteDocumentById']): CancelablePromise<DocumentData['responses']['DeleteDocumentById']> {
@@ -1876,7 +1945,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentById(data: DocumentData['payloads']['PutDocumentById']): CancelablePromise<DocumentData['responses']['PutDocumentById']> {
@@ -1904,7 +1973,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentByIdAuditLog(data: DocumentData['payloads']['GetDocumentByIdAuditLog']): CancelablePromise<DocumentData['responses']['GetDocumentByIdAuditLog']> {
@@ -1960,7 +2029,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentByIdDomains(data: DocumentData['payloads']['GetDocumentByIdDomains']): CancelablePromise<DocumentData['responses']['GetDocumentByIdDomains']> {
@@ -1983,7 +2052,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentByIdDomains(data: DocumentData['payloads']['PutDocumentByIdDomains']): CancelablePromise<DocumentData['responses']['PutDocumentByIdDomains']> {
@@ -2012,7 +2081,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentByIdMove(data: DocumentData['payloads']['PutDocumentByIdMove']): CancelablePromise<DocumentData['responses']['PutDocumentByIdMove']> {
@@ -2039,7 +2108,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentByIdMoveToRecycleBin(data: DocumentData['payloads']['PutDocumentByIdMoveToRecycleBin']): CancelablePromise<DocumentData['responses']['PutDocumentByIdMoveToRecycleBin']> {
@@ -2064,7 +2133,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentByIdNotifications(data: DocumentData['payloads']['GetDocumentByIdNotifications']): CancelablePromise<DocumentData['responses']['GetDocumentByIdNotifications']> {
@@ -2087,7 +2156,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentByIdNotifications(data: DocumentData['payloads']['PutDocumentByIdNotifications']): CancelablePromise<DocumentData['responses']['PutDocumentByIdNotifications']> {
@@ -2141,7 +2210,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteDocumentByIdPublicAccess(data: DocumentData['payloads']['DeleteDocumentByIdPublicAccess']): CancelablePromise<DocumentData['responses']['DeleteDocumentByIdPublicAccess']> {
@@ -2165,7 +2234,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentByIdPublicAccess(data: DocumentData['payloads']['GetDocumentByIdPublicAccess']): CancelablePromise<DocumentData['responses']['GetDocumentByIdPublicAccess']> {
@@ -2188,7 +2257,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentByIdPublicAccess(data: DocumentData['payloads']['PutDocumentByIdPublicAccess']): CancelablePromise<DocumentData['responses']['PutDocumentByIdPublicAccess']> {
@@ -2215,7 +2284,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentByIdPublish(data: DocumentData['payloads']['PutDocumentByIdPublish']): CancelablePromise<DocumentData['responses']['PutDocumentByIdPublish']> {
@@ -2243,7 +2312,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentByIdPublishWithDescendants(data: DocumentData['payloads']['PutDocumentByIdPublishWithDescendants']): CancelablePromise<DocumentData['responses']['PutDocumentByIdPublishWithDescendants']> {
@@ -2271,7 +2340,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentByIdReferencedBy(data: DocumentData['payloads']['GetDocumentByIdReferencedBy']): CancelablePromise<DocumentData['responses']['GetDocumentByIdReferencedBy']> {
@@ -2298,7 +2367,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentByIdReferencedDescendants(data: DocumentData['payloads']['GetDocumentByIdReferencedDescendants']): CancelablePromise<DocumentData['responses']['GetDocumentByIdReferencedDescendants']> {
@@ -2325,7 +2394,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentByIdUnpublish(data: DocumentData['payloads']['PutDocumentByIdUnpublish']): CancelablePromise<DocumentData['responses']['PutDocumentByIdUnpublish']> {
@@ -2353,7 +2422,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentByIdValidate(data: DocumentData['payloads']['PutDocumentByIdValidate']): CancelablePromise<DocumentData['responses']['PutDocumentByIdValidate']> {
@@ -2381,7 +2450,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentAreReferenced(data: DocumentData['payloads']['GetDocumentAreReferenced'] = {}): CancelablePromise<DocumentData['responses']['GetDocumentAreReferenced']> {
@@ -2405,7 +2474,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentConfiguration(): CancelablePromise<DocumentData['responses']['GetDocumentConfiguration']> {
@@ -2421,7 +2490,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putDocumentSort(data: DocumentData['payloads']['PutDocumentSort'] = {}): CancelablePromise<DocumentData['responses']['PutDocumentSort']> {
@@ -2445,7 +2514,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getDocumentUrls(data: DocumentData['payloads']['GetDocumentUrls'] = {}): CancelablePromise<DocumentData['responses']['GetDocumentUrls']> {
@@ -2467,7 +2536,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postDocumentValidate(data: DocumentData['payloads']['PostDocumentValidate'] = {}): CancelablePromise<DocumentData['responses']['PostDocumentValidate']> {
@@ -2491,7 +2560,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemDocument(data: DocumentData['payloads']['GetItemDocument'] = {}): CancelablePromise<DocumentData['responses']['GetItemDocument']> {
@@ -2507,13 +2576,12 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemDocumentSearch(data: DocumentData['payloads']['GetItemDocumentSearch'] = {}): CancelablePromise<DocumentData['responses']['GetItemDocumentSearch']> {
@@ -2531,13 +2599,12 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteRecycleBinDocument(): CancelablePromise<DocumentData['responses']['DeleteRecycleBinDocument']> {
@@ -2555,7 +2622,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteRecycleBinDocumentById(data: DocumentData['payloads']['DeleteRecycleBinDocumentById']): CancelablePromise<DocumentData['responses']['DeleteRecycleBinDocumentById']> {
@@ -2580,7 +2647,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getRecycleBinDocumentByIdOriginalParent(data: DocumentData['payloads']['GetRecycleBinDocumentByIdOriginalParent']): CancelablePromise<DocumentData['responses']['GetRecycleBinDocumentByIdOriginalParent']> {
@@ -2604,7 +2671,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putRecycleBinDocumentByIdRestore(data: DocumentData['payloads']['PutRecycleBinDocumentByIdRestore']): CancelablePromise<DocumentData['responses']['PutRecycleBinDocumentByIdRestore']> {
@@ -2632,7 +2699,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getRecycleBinDocumentChildren(data: DocumentData['payloads']['GetRecycleBinDocumentChildren'] = {}): CancelablePromise<DocumentData['responses']['GetRecycleBinDocumentChildren']> {
@@ -2656,7 +2723,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getRecycleBinDocumentRoot(data: DocumentData['payloads']['GetRecycleBinDocumentRoot'] = {}): CancelablePromise<DocumentData['responses']['GetRecycleBinDocumentRoot']> {
@@ -2679,7 +2746,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDocumentAncestors(data: DocumentData['payloads']['GetTreeDocumentAncestors'] = {}): CancelablePromise<DocumentData['responses']['GetTreeDocumentAncestors']> {
@@ -2701,7 +2768,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDocumentChildren(data: DocumentData['payloads']['GetTreeDocumentChildren'] = {}): CancelablePromise<DocumentData['responses']['GetTreeDocumentChildren']> {
@@ -2726,7 +2793,7 @@ dataTypeId
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeDocumentRoot(data: DocumentData['payloads']['GetTreeDocumentRoot'] = {}): CancelablePromise<DocumentData['responses']['GetTreeDocumentRoot']> {
@@ -2754,7 +2821,7 @@ dataTypeId
 export class DynamicRootService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static postDynamicRootQuery(data: DynamicRootData['payloads']['PostDynamicRootQuery'] = {}): CancelablePromise<DynamicRootData['responses']['PostDynamicRootQuery']> {
@@ -2775,7 +2842,7 @@ export class DynamicRootService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static getDynamicRootSteps(): CancelablePromise<DynamicRootData['responses']['GetDynamicRootSteps']> {
@@ -2795,7 +2862,7 @@ export class DynamicRootService {
 export class HealthCheckService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getHealthCheckGroup(data: HealthCheckData['payloads']['GetHealthCheckGroup'] = {}): CancelablePromise<HealthCheckData['responses']['GetHealthCheckGroup']> {
@@ -2818,7 +2885,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getHealthCheckGroupByName(data: HealthCheckData['payloads']['GetHealthCheckGroupByName']): CancelablePromise<HealthCheckData['responses']['GetHealthCheckGroupByName']> {
@@ -2841,7 +2908,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static postHealthCheckGroupByNameCheck(data: HealthCheckData['payloads']['PostHealthCheckGroupByNameCheck']): CancelablePromise<HealthCheckData['responses']['PostHealthCheckGroupByNameCheck']> {
@@ -2864,7 +2931,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static postHealthCheckExecuteAction(data: HealthCheckData['payloads']['PostHealthCheckExecuteAction'] = {}): CancelablePromise<HealthCheckData['responses']['PostHealthCheckExecuteAction']> {
@@ -2890,7 +2957,7 @@ take
 export class HelpService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getHelp(data: HelpData['payloads']['GetHelp'] = {}): CancelablePromise<HelpData['responses']['GetHelp']> {
@@ -2920,7 +2987,7 @@ baseUrl
 export class ImagingService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getImagingResizeUrls(data: ImagingData['payloads']['GetImagingResizeUrls'] = {}): CancelablePromise<ImagingData['responses']['GetImagingResizeUrls']> {
@@ -2946,10 +3013,37 @@ mode
 
 }
 
+export class ImportService {
+
+	/**
+	 * @returns unknown OK
+	 * @throws ApiError
+	 */
+	public static getImportAnalyze(data: ImportData['payloads']['GetImportAnalyze'] = {}): CancelablePromise<ImportData['responses']['GetImportAnalyze']> {
+		const {
+                    
+                    temporaryFileId
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/import/analyze',
+			query: {
+				temporaryFileId
+			},
+			errors: {
+				400: `Bad Request`,
+				401: `The resource is protected and requires an authentication token`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+}
+
 export class IndexerService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getIndexer(data: IndexerData['payloads']['GetIndexer'] = {}): CancelablePromise<IndexerData['responses']['GetIndexer']> {
@@ -2971,7 +3065,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getIndexerByIndexName(data: IndexerData['payloads']['GetIndexerByIndexName']): CancelablePromise<IndexerData['responses']['GetIndexerByIndexName']> {
@@ -2993,7 +3087,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postIndexerByIndexNameRebuild(data: IndexerData['payloads']['PostIndexerByIndexNameRebuild']): CancelablePromise<IndexerData['responses']['PostIndexerByIndexNameRebuild']> {
@@ -3022,7 +3116,7 @@ take
 export class InstallService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getInstallSettings(): CancelablePromise<InstallData['responses']['GetInstallSettings']> {
@@ -3031,13 +3125,13 @@ export class InstallService {
 			method: 'GET',
 			url: '/umbraco/management/api/v1/install/settings',
 			errors: {
-				428: `Client Error`,
+				428: `Precondition Required`,
 			},
 		});
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postInstallSetup(data: InstallData['payloads']['PostInstallSetup'] = {}): CancelablePromise<InstallData['responses']['PostInstallSetup']> {
@@ -3052,13 +3146,13 @@ export class InstallService {
 			mediaType: 'application/json',
 			responseHeader: 'Umb-Notifications',
 			errors: {
-				428: `Client Error`,
+				428: `Precondition Required`,
 			},
 		});
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postInstallValidateDatabase(data: InstallData['payloads']['PostInstallValidateDatabase'] = {}): CancelablePromise<InstallData['responses']['PostInstallValidateDatabase']> {
@@ -3083,7 +3177,7 @@ export class InstallService {
 export class LanguageService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemLanguage(data: LanguageData['payloads']['GetItemLanguage'] = {}): CancelablePromise<LanguageData['responses']['GetItemLanguage']> {
@@ -3099,13 +3193,12 @@ export class LanguageService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemLanguageDefault(): CancelablePromise<LanguageData['responses']['GetItemLanguageDefault']> {
@@ -3115,13 +3208,12 @@ export class LanguageService {
 			url: '/umbraco/management/api/v1/item/language/default',
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getLanguage(data: LanguageData['payloads']['GetLanguage'] = {}): CancelablePromise<LanguageData['responses']['GetLanguage']> {
@@ -3167,7 +3259,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getLanguageByIsoCode(data: LanguageData['payloads']['GetLanguageByIsoCode']): CancelablePromise<LanguageData['responses']['GetLanguageByIsoCode']> {
@@ -3189,7 +3281,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteLanguageByIsoCode(data: LanguageData['payloads']['DeleteLanguageByIsoCode']): CancelablePromise<LanguageData['responses']['DeleteLanguageByIsoCode']> {
@@ -3214,7 +3306,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putLanguageByIsoCode(data: LanguageData['payloads']['PutLanguageByIsoCode']): CancelablePromise<LanguageData['responses']['PutLanguageByIsoCode']> {
@@ -3246,7 +3338,7 @@ requestBody
 export class LogViewerService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getLogViewerLevel(data: LogViewerData['payloads']['GetLogViewerLevel'] = {}): CancelablePromise<LogViewerData['responses']['GetLogViewerLevel']> {
@@ -3269,7 +3361,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getLogViewerLevelCount(data: LogViewerData['payloads']['GetLogViewerLevelCount'] = {}): CancelablePromise<LogViewerData['responses']['GetLogViewerLevelCount']> {
@@ -3293,7 +3385,7 @@ endDate
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getLogViewerLog(data: LogViewerData['payloads']['GetLogViewerLog'] = {}): CancelablePromise<LogViewerData['responses']['GetLogViewerLog']> {
@@ -3321,7 +3413,7 @@ endDate
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getLogViewerMessageTemplate(data: LogViewerData['payloads']['GetLogViewerMessageTemplate'] = {}): CancelablePromise<LogViewerData['responses']['GetLogViewerMessageTemplate']> {
@@ -3347,7 +3439,7 @@ endDate
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getLogViewerSavedSearch(data: LogViewerData['payloads']['GetLogViewerSavedSearch'] = {}): CancelablePromise<LogViewerData['responses']['GetLogViewerSavedSearch']> {
@@ -3393,7 +3485,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getLogViewerSavedSearchByName(data: LogViewerData['payloads']['GetLogViewerSavedSearchByName']): CancelablePromise<LogViewerData['responses']['GetLogViewerSavedSearchByName']> {
@@ -3416,7 +3508,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteLogViewerSavedSearchByName(data: LogViewerData['payloads']['DeleteLogViewerSavedSearchByName']): CancelablePromise<LogViewerData['responses']['DeleteLogViewerSavedSearchByName']> {
@@ -3440,7 +3532,7 @@ take
 	}
 
 	/**
-	 * @returns any Success
+	 * @returns any OK
 	 * @throws ApiError
 	 */
 	public static getLogViewerValidateLogsSize(data: LogViewerData['payloads']['GetLogViewerValidateLogsSize'] = {}): CancelablePromise<LogViewerData['responses']['GetLogViewerValidateLogsSize']> {
@@ -3468,7 +3560,7 @@ endDate
 export class ManifestService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getManifestManifest(): CancelablePromise<ManifestData['responses']['GetManifestManifest']> {
@@ -3484,7 +3576,7 @@ export class ManifestService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getManifestManifestPrivate(): CancelablePromise<ManifestData['responses']['GetManifestManifestPrivate']> {
@@ -3500,7 +3592,7 @@ export class ManifestService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getManifestManifestPublic(): CancelablePromise<ManifestData['responses']['GetManifestManifestPublic']> {
@@ -3516,7 +3608,7 @@ export class ManifestService {
 export class MediaTypeService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemMediaType(data: MediaTypeData['payloads']['GetItemMediaType'] = {}): CancelablePromise<MediaTypeData['responses']['GetItemMediaType']> {
@@ -3532,13 +3624,12 @@ export class MediaTypeService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemMediaTypeAllowed(data: MediaTypeData['payloads']['GetItemMediaTypeAllowed'] = {}): CancelablePromise<MediaTypeData['responses']['GetItemMediaTypeAllowed']> {
@@ -3556,13 +3647,34 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
+	 * @throws ApiError
+	 */
+	public static getItemMediaTypeFolders(data: MediaTypeData['payloads']['GetItemMediaTypeFolders'] = {}): CancelablePromise<MediaTypeData['responses']['GetItemMediaTypeFolders']> {
+		const {
+                    
+                    skip,
+take
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/item/media-type/folders',
+			query: {
+				skip, take
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemMediaTypeSearch(data: MediaTypeData['payloads']['GetItemMediaTypeSearch'] = {}): CancelablePromise<MediaTypeData['responses']['GetItemMediaTypeSearch']> {
@@ -3580,7 +3692,6 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -3610,7 +3721,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMediaTypeById(data: MediaTypeData['payloads']['GetMediaTypeById']): CancelablePromise<MediaTypeData['responses']['GetMediaTypeById']> {
@@ -3633,7 +3744,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteMediaTypeById(data: MediaTypeData['payloads']['DeleteMediaTypeById']): CancelablePromise<MediaTypeData['responses']['DeleteMediaTypeById']> {
@@ -3657,7 +3768,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putMediaTypeById(data: MediaTypeData['payloads']['PutMediaTypeById']): CancelablePromise<MediaTypeData['responses']['PutMediaTypeById']> {
@@ -3685,7 +3796,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMediaTypeByIdAllowedChildren(data: MediaTypeData['payloads']['GetMediaTypeByIdAllowedChildren']): CancelablePromise<MediaTypeData['responses']['GetMediaTypeByIdAllowedChildren']> {
@@ -3713,7 +3824,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMediaTypeByIdCompositionReferences(data: MediaTypeData['payloads']['GetMediaTypeByIdCompositionReferences']): CancelablePromise<MediaTypeData['responses']['GetMediaTypeByIdCompositionReferences']> {
@@ -3765,7 +3876,58 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns unknown OK
+	 * @throws ApiError
+	 */
+	public static getMediaTypeByIdExport(data: MediaTypeData['payloads']['GetMediaTypeByIdExport']): CancelablePromise<MediaTypeData['responses']['GetMediaTypeByIdExport']> {
+		const {
+                    
+                    id
+                } = data;
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/umbraco/management/api/v1/media-type/{id}/export',
+			path: {
+				id
+			},
+			errors: {
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns string OK
+	 * @throws ApiError
+	 */
+	public static putMediaTypeByIdImport(data: MediaTypeData['payloads']['PutMediaTypeByIdImport']): CancelablePromise<MediaTypeData['responses']['PutMediaTypeByIdImport']> {
+		const {
+                    
+                    id,
+requestBody
+                } = data;
+		return __request(OpenAPI, {
+			method: 'PUT',
+			url: '/umbraco/management/api/v1/media-type/{id}/import',
+			path: {
+				id
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			responseHeader: 'Umb-Notifications',
+			errors: {
+				400: `Bad Request`,
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putMediaTypeByIdMove(data: MediaTypeData['payloads']['PutMediaTypeByIdMove']): CancelablePromise<MediaTypeData['responses']['PutMediaTypeByIdMove']> {
@@ -3793,7 +3955,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMediaTypeAllowedAtRoot(data: MediaTypeData['payloads']['GetMediaTypeAllowedAtRoot'] = {}): CancelablePromise<MediaTypeData['responses']['GetMediaTypeAllowedAtRoot']> {
@@ -3816,7 +3978,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static postMediaTypeAvailableCompositions(data: MediaTypeData['payloads']['PostMediaTypeAvailableCompositions'] = {}): CancelablePromise<MediaTypeData['responses']['PostMediaTypeAvailableCompositions']> {
@@ -3861,7 +4023,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMediaTypeFolderById(data: MediaTypeData['payloads']['GetMediaTypeFolderById']): CancelablePromise<MediaTypeData['responses']['GetMediaTypeFolderById']> {
@@ -3884,7 +4046,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteMediaTypeFolderById(data: MediaTypeData['payloads']['DeleteMediaTypeFolderById']): CancelablePromise<MediaTypeData['responses']['DeleteMediaTypeFolderById']> {
@@ -3909,7 +4071,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putMediaTypeFolderById(data: MediaTypeData['payloads']['PutMediaTypeFolderById']): CancelablePromise<MediaTypeData['responses']['PutMediaTypeFolderById']> {
@@ -3937,7 +4099,31 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns string Created
+	 * @throws ApiError
+	 */
+	public static postMediaTypeImport(data: MediaTypeData['payloads']['PostMediaTypeImport'] = {}): CancelablePromise<MediaTypeData['responses']['PostMediaTypeImport']> {
+		const {
+                    
+                    requestBody
+                } = data;
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/umbraco/management/api/v1/media-type/import',
+			body: requestBody,
+			mediaType: 'application/json',
+			responseHeader: 'Umb-Generated-Resource',
+			errors: {
+				400: `Bad Request`,
+				401: `The resource is protected and requires an authentication token`,
+				403: `The authenticated user do not have access to this resource`,
+				404: `Not Found`,
+			},
+		});
+	}
+
+	/**
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeMediaTypeAncestors(data: MediaTypeData['payloads']['GetTreeMediaTypeAncestors'] = {}): CancelablePromise<MediaTypeData['responses']['GetTreeMediaTypeAncestors']> {
@@ -3959,7 +4145,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeMediaTypeChildren(data: MediaTypeData['payloads']['GetTreeMediaTypeChildren'] = {}): CancelablePromise<MediaTypeData['responses']['GetTreeMediaTypeChildren']> {
@@ -3984,7 +4170,7 @@ foldersOnly
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeMediaTypeRoot(data: MediaTypeData['payloads']['GetTreeMediaTypeRoot'] = {}): CancelablePromise<MediaTypeData['responses']['GetTreeMediaTypeRoot']> {
@@ -4012,7 +4198,7 @@ foldersOnly
 export class MediaService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getCollectionMedia(data: MediaData['payloads']['GetCollectionMedia'] = {}): CancelablePromise<MediaData['responses']['GetCollectionMedia']> {
@@ -4042,7 +4228,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemMedia(data: MediaData['payloads']['GetItemMedia'] = {}): CancelablePromise<MediaData['responses']['GetItemMedia']> {
@@ -4058,13 +4244,12 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemMediaSearch(data: MediaData['payloads']['GetItemMediaSearch'] = {}): CancelablePromise<MediaData['responses']['GetItemMediaSearch']> {
@@ -4082,7 +4267,6 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4112,7 +4296,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMediaById(data: MediaData['payloads']['GetMediaById']): CancelablePromise<MediaData['responses']['GetMediaById']> {
@@ -4135,7 +4319,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteMediaById(data: MediaData['payloads']['DeleteMediaById']): CancelablePromise<MediaData['responses']['DeleteMediaById']> {
@@ -4160,7 +4344,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putMediaById(data: MediaData['payloads']['PutMediaById']): CancelablePromise<MediaData['responses']['PutMediaById']> {
@@ -4188,7 +4372,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMediaByIdAuditLog(data: MediaData['payloads']['GetMediaByIdAuditLog']): CancelablePromise<MediaData['responses']['GetMediaByIdAuditLog']> {
@@ -4217,7 +4401,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putMediaByIdMove(data: MediaData['payloads']['PutMediaByIdMove']): CancelablePromise<MediaData['responses']['PutMediaByIdMove']> {
@@ -4244,7 +4428,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putMediaByIdMoveToRecycleBin(data: MediaData['payloads']['PutMediaByIdMoveToRecycleBin']): CancelablePromise<MediaData['responses']['PutMediaByIdMoveToRecycleBin']> {
@@ -4269,7 +4453,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMediaByIdReferencedBy(data: MediaData['payloads']['GetMediaByIdReferencedBy']): CancelablePromise<MediaData['responses']['GetMediaByIdReferencedBy']> {
@@ -4296,7 +4480,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMediaByIdReferencedDescendants(data: MediaData['payloads']['GetMediaByIdReferencedDescendants']): CancelablePromise<MediaData['responses']['GetMediaByIdReferencedDescendants']> {
@@ -4323,7 +4507,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putMediaByIdValidate(data: MediaData['payloads']['PutMediaByIdValidate']): CancelablePromise<MediaData['responses']['PutMediaByIdValidate']> {
@@ -4351,7 +4535,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMediaAreReferenced(data: MediaData['payloads']['GetMediaAreReferenced'] = {}): CancelablePromise<MediaData['responses']['GetMediaAreReferenced']> {
@@ -4375,7 +4559,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMediaConfiguration(): CancelablePromise<MediaData['responses']['GetMediaConfiguration']> {
@@ -4391,7 +4575,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putMediaSort(data: MediaData['payloads']['PutMediaSort'] = {}): CancelablePromise<MediaData['responses']['PutMediaSort']> {
@@ -4415,7 +4599,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMediaUrls(data: MediaData['payloads']['GetMediaUrls'] = {}): CancelablePromise<MediaData['responses']['GetMediaUrls']> {
@@ -4437,7 +4621,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postMediaValidate(data: MediaData['payloads']['PostMediaValidate'] = {}): CancelablePromise<MediaData['responses']['PostMediaValidate']> {
@@ -4461,7 +4645,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteRecycleBinMedia(): CancelablePromise<MediaData['responses']['DeleteRecycleBinMedia']> {
@@ -4479,7 +4663,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteRecycleBinMediaById(data: MediaData['payloads']['DeleteRecycleBinMediaById']): CancelablePromise<MediaData['responses']['DeleteRecycleBinMediaById']> {
@@ -4504,7 +4688,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getRecycleBinMediaByIdOriginalParent(data: MediaData['payloads']['GetRecycleBinMediaByIdOriginalParent']): CancelablePromise<MediaData['responses']['GetRecycleBinMediaByIdOriginalParent']> {
@@ -4528,7 +4712,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putRecycleBinMediaByIdRestore(data: MediaData['payloads']['PutRecycleBinMediaByIdRestore']): CancelablePromise<MediaData['responses']['PutRecycleBinMediaByIdRestore']> {
@@ -4556,7 +4740,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getRecycleBinMediaChildren(data: MediaData['payloads']['GetRecycleBinMediaChildren'] = {}): CancelablePromise<MediaData['responses']['GetRecycleBinMediaChildren']> {
@@ -4580,7 +4764,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getRecycleBinMediaRoot(data: MediaData['payloads']['GetRecycleBinMediaRoot'] = {}): CancelablePromise<MediaData['responses']['GetRecycleBinMediaRoot']> {
@@ -4603,7 +4787,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeMediaAncestors(data: MediaData['payloads']['GetTreeMediaAncestors'] = {}): CancelablePromise<MediaData['responses']['GetTreeMediaAncestors']> {
@@ -4625,7 +4809,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeMediaChildren(data: MediaData['payloads']['GetTreeMediaChildren'] = {}): CancelablePromise<MediaData['responses']['GetTreeMediaChildren']> {
@@ -4650,7 +4834,7 @@ dataTypeId
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeMediaRoot(data: MediaData['payloads']['GetTreeMediaRoot'] = {}): CancelablePromise<MediaData['responses']['GetTreeMediaRoot']> {
@@ -4678,7 +4862,7 @@ dataTypeId
 export class MemberGroupService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemMemberGroup(data: MemberGroupData['payloads']['GetItemMemberGroup'] = {}): CancelablePromise<MemberGroupData['responses']['GetItemMemberGroup']> {
@@ -4694,13 +4878,12 @@ export class MemberGroupService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMemberGroup(data: MemberGroupData['payloads']['GetMemberGroup'] = {}): CancelablePromise<MemberGroupData['responses']['GetMemberGroup']> {
@@ -4746,7 +4929,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMemberGroupById(data: MemberGroupData['payloads']['GetMemberGroupById']): CancelablePromise<MemberGroupData['responses']['GetMemberGroupById']> {
@@ -4769,7 +4952,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteMemberGroupById(data: MemberGroupData['payloads']['DeleteMemberGroupById']): CancelablePromise<MemberGroupData['responses']['DeleteMemberGroupById']> {
@@ -4794,7 +4977,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putMemberGroupById(data: MemberGroupData['payloads']['PutMemberGroupById']): CancelablePromise<MemberGroupData['responses']['PutMemberGroupById']> {
@@ -4822,7 +5005,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeMemberGroupRoot(data: MemberGroupData['payloads']['GetTreeMemberGroupRoot'] = {}): CancelablePromise<MemberGroupData['responses']['GetTreeMemberGroupRoot']> {
@@ -4849,7 +5032,7 @@ take
 export class MemberTypeService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemMemberType(data: MemberTypeData['payloads']['GetItemMemberType'] = {}): CancelablePromise<MemberTypeData['responses']['GetItemMemberType']> {
@@ -4865,13 +5048,12 @@ export class MemberTypeService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemMemberTypeSearch(data: MemberTypeData['payloads']['GetItemMemberTypeSearch'] = {}): CancelablePromise<MemberTypeData['responses']['GetItemMemberTypeSearch']> {
@@ -4889,7 +5071,6 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -4919,7 +5100,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMemberTypeById(data: MemberTypeData['payloads']['GetMemberTypeById']): CancelablePromise<MemberTypeData['responses']['GetMemberTypeById']> {
@@ -4942,7 +5123,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteMemberTypeById(data: MemberTypeData['payloads']['DeleteMemberTypeById']): CancelablePromise<MemberTypeData['responses']['DeleteMemberTypeById']> {
@@ -4966,7 +5147,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putMemberTypeById(data: MemberTypeData['payloads']['PutMemberTypeById']): CancelablePromise<MemberTypeData['responses']['PutMemberTypeById']> {
@@ -4994,7 +5175,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMemberTypeByIdCompositionReferences(data: MemberTypeData['payloads']['GetMemberTypeByIdCompositionReferences']): CancelablePromise<MemberTypeData['responses']['GetMemberTypeByIdCompositionReferences']> {
@@ -5043,7 +5224,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static postMemberTypeAvailableCompositions(data: MemberTypeData['payloads']['PostMemberTypeAvailableCompositions'] = {}): CancelablePromise<MemberTypeData['responses']['PostMemberTypeAvailableCompositions']> {
@@ -5064,7 +5245,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeMemberTypeRoot(data: MemberTypeData['payloads']['GetTreeMemberTypeRoot'] = {}): CancelablePromise<MemberTypeData['responses']['GetTreeMemberTypeRoot']> {
@@ -5091,7 +5272,7 @@ take
 export class MemberService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getFilterMember(data: MemberData['payloads']['GetFilterMember'] = {}): CancelablePromise<MemberData['responses']['GetFilterMember']> {
@@ -5122,7 +5303,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemMember(data: MemberData['payloads']['GetItemMember'] = {}): CancelablePromise<MemberData['responses']['GetItemMember']> {
@@ -5138,13 +5319,12 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemMemberSearch(data: MemberData['payloads']['GetItemMemberSearch'] = {}): CancelablePromise<MemberData['responses']['GetItemMemberSearch']> {
@@ -5162,7 +5342,6 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5192,7 +5371,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMemberById(data: MemberData['payloads']['GetMemberById']): CancelablePromise<MemberData['responses']['GetMemberById']> {
@@ -5215,7 +5394,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteMemberById(data: MemberData['payloads']['DeleteMemberById']): CancelablePromise<MemberData['responses']['DeleteMemberById']> {
@@ -5240,7 +5419,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putMemberById(data: MemberData['payloads']['PutMemberById']): CancelablePromise<MemberData['responses']['PutMemberById']> {
@@ -5268,7 +5447,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putMemberByIdValidate(data: MemberData['payloads']['PutMemberByIdValidate']): CancelablePromise<MemberData['responses']['PutMemberByIdValidate']> {
@@ -5296,7 +5475,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getMemberConfiguration(): CancelablePromise<MemberData['responses']['GetMemberConfiguration']> {
@@ -5312,7 +5491,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postMemberValidate(data: MemberData['payloads']['PostMemberValidate'] = {}): CancelablePromise<MemberData['responses']['PostMemberValidate']> {
@@ -5340,7 +5519,7 @@ requestBody
 export class ModelsBuilderService {
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postModelsBuilderBuild(): CancelablePromise<ModelsBuilderData['responses']['PostModelsBuilderBuild']> {
@@ -5352,13 +5531,13 @@ export class ModelsBuilderService {
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
 				403: `The authenticated user do not have access to this resource`,
-				428: `Client Error`,
+				428: `Precondition Required`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getModelsBuilderDashboard(): CancelablePromise<ModelsBuilderData['responses']['GetModelsBuilderDashboard']> {
@@ -5374,7 +5553,7 @@ export class ModelsBuilderService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getModelsBuilderStatus(): CancelablePromise<ModelsBuilderData['responses']['GetModelsBuilderStatus']> {
@@ -5394,7 +5573,7 @@ export class ModelsBuilderService {
 export class ObjectTypesService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getObjectTypes(data: ObjectTypesData['payloads']['GetObjectTypes'] = {}): CancelablePromise<ObjectTypesData['responses']['GetObjectTypes']> {
@@ -5420,7 +5599,7 @@ take
 export class OEmbedService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getOembedQuery(data: OembedData['payloads']['GetOembedQuery'] = {}): CancelablePromise<OembedData['responses']['GetOembedQuery']> {
@@ -5448,7 +5627,7 @@ maxHeight
 export class PackageService {
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postPackageByNameRunMigration(data: PackageData['payloads']['PostPackageByNameRunMigration']): CancelablePromise<PackageData['responses']['PostPackageByNameRunMigration']> {
@@ -5473,7 +5652,7 @@ export class PackageService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getPackageConfiguration(): CancelablePromise<PackageData['responses']['GetPackageConfiguration']> {
@@ -5489,7 +5668,7 @@ export class PackageService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getPackageCreated(data: PackageData['payloads']['GetPackageCreated'] = {}): CancelablePromise<PackageData['responses']['GetPackageCreated']> {
@@ -5536,7 +5715,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getPackageCreatedById(data: PackageData['payloads']['GetPackageCreatedById']): CancelablePromise<PackageData['responses']['GetPackageCreatedById']> {
@@ -5559,7 +5738,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deletePackageCreatedById(data: PackageData['payloads']['DeletePackageCreatedById']): CancelablePromise<PackageData['responses']['DeletePackageCreatedById']> {
@@ -5583,7 +5762,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putPackageCreatedById(data: PackageData['payloads']['PutPackageCreatedById']): CancelablePromise<PackageData['responses']['PutPackageCreatedById']> {
@@ -5610,7 +5789,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getPackageCreatedByIdDownload(data: PackageData['payloads']['GetPackageCreatedByIdDownload']): CancelablePromise<PackageData['responses']['GetPackageCreatedByIdDownload']> {
@@ -5633,7 +5812,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getPackageMigrationStatus(data: PackageData['payloads']['GetPackageMigrationStatus'] = {}): CancelablePromise<PackageData['responses']['GetPackageMigrationStatus']> {
@@ -5660,7 +5839,7 @@ take
 export class PartialViewService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemPartialView(data: PartialViewData['payloads']['GetItemPartialView'] = {}): CancelablePromise<PartialViewData['responses']['GetItemPartialView']> {
@@ -5676,7 +5855,6 @@ export class PartialViewService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -5706,7 +5884,7 @@ export class PartialViewService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getPartialViewByPath(data: PartialViewData['payloads']['GetPartialViewByPath']): CancelablePromise<PartialViewData['responses']['GetPartialViewByPath']> {
@@ -5729,7 +5907,7 @@ export class PartialViewService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deletePartialViewByPath(data: PartialViewData['payloads']['DeletePartialViewByPath']): CancelablePromise<PartialViewData['responses']['DeletePartialViewByPath']> {
@@ -5754,7 +5932,7 @@ export class PartialViewService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putPartialViewByPath(data: PartialViewData['payloads']['PutPartialViewByPath']): CancelablePromise<PartialViewData['responses']['PutPartialViewByPath']> {
@@ -5834,7 +6012,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getPartialViewFolderByPath(data: PartialViewData['payloads']['GetPartialViewFolderByPath']): CancelablePromise<PartialViewData['responses']['GetPartialViewFolderByPath']> {
@@ -5857,7 +6035,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deletePartialViewFolderByPath(data: PartialViewData['payloads']['DeletePartialViewFolderByPath']): CancelablePromise<PartialViewData['responses']['DeletePartialViewFolderByPath']> {
@@ -5882,7 +6060,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getPartialViewSnippet(data: PartialViewData['payloads']['GetPartialViewSnippet'] = {}): CancelablePromise<PartialViewData['responses']['GetPartialViewSnippet']> {
@@ -5905,7 +6083,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getPartialViewSnippetById(data: PartialViewData['payloads']['GetPartialViewSnippetById']): CancelablePromise<PartialViewData['responses']['GetPartialViewSnippetById']> {
@@ -5928,7 +6106,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreePartialViewAncestors(data: PartialViewData['payloads']['GetTreePartialViewAncestors'] = {}): CancelablePromise<PartialViewData['responses']['GetTreePartialViewAncestors']> {
@@ -5950,7 +6128,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreePartialViewChildren(data: PartialViewData['payloads']['GetTreePartialViewChildren'] = {}): CancelablePromise<PartialViewData['responses']['GetTreePartialViewChildren']> {
@@ -5974,7 +6152,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreePartialViewRoot(data: PartialViewData['payloads']['GetTreePartialViewRoot'] = {}): CancelablePromise<PartialViewData['responses']['GetTreePartialViewRoot']> {
@@ -6001,7 +6179,7 @@ take
 export class PreviewService {
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deletePreview(): CancelablePromise<PreviewData['responses']['DeletePreview']> {
@@ -6010,14 +6188,11 @@ export class PreviewService {
 			method: 'DELETE',
 			url: '/umbraco/management/api/v1/preview',
 			responseHeader: 'Umb-Notifications',
-			errors: {
-				401: `The resource is protected and requires an authentication token`,
-			},
 		});
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postPreview(): CancelablePromise<PreviewData['responses']['PostPreview']> {
@@ -6037,7 +6212,7 @@ export class PreviewService {
 export class ProfilingService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getProfilingStatus(): CancelablePromise<ProfilingData['responses']['GetProfilingStatus']> {
@@ -6053,7 +6228,7 @@ export class ProfilingService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putProfilingStatus(data: ProfilingData['payloads']['PutProfilingStatus'] = {}): CancelablePromise<ProfilingData['responses']['PutProfilingStatus']> {
@@ -6079,7 +6254,7 @@ export class ProfilingService {
 export class PropertyTypeService {
 
 	/**
-	 * @returns boolean Success
+	 * @returns boolean OK
 	 * @throws ApiError
 	 */
 	public static getPropertyTypeIsUsed(data: PropertyTypeData['payloads']['GetPropertyTypeIsUsed'] = {}): CancelablePromise<PropertyTypeData['responses']['GetPropertyTypeIsUsed']> {
@@ -6107,7 +6282,7 @@ propertyAlias
 export class PublishedCacheService {
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postPublishedCacheCollect(): CancelablePromise<PublishedCacheData['responses']['PostPublishedCacheCollect']> {
@@ -6123,7 +6298,7 @@ export class PublishedCacheService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postPublishedCacheRebuild(): CancelablePromise<PublishedCacheData['responses']['PostPublishedCacheRebuild']> {
@@ -6139,7 +6314,7 @@ export class PublishedCacheService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postPublishedCacheReload(): CancelablePromise<PublishedCacheData['responses']['PostPublishedCacheReload']> {
@@ -6155,7 +6330,7 @@ export class PublishedCacheService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static getPublishedCacheStatus(): CancelablePromise<PublishedCacheData['responses']['GetPublishedCacheStatus']> {
@@ -6174,7 +6349,7 @@ export class PublishedCacheService {
 export class RedirectManagementService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getRedirectManagement(data: RedirectManagementData['payloads']['GetRedirectManagement'] = {}): CancelablePromise<RedirectManagementData['responses']['GetRedirectManagement']> {
@@ -6199,7 +6374,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getRedirectManagementById(data: RedirectManagementData['payloads']['GetRedirectManagementById']): CancelablePromise<RedirectManagementData['responses']['GetRedirectManagementById']> {
@@ -6226,7 +6401,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteRedirectManagementById(data: RedirectManagementData['payloads']['DeleteRedirectManagementById']): CancelablePromise<RedirectManagementData['responses']['DeleteRedirectManagementById']> {
@@ -6249,7 +6424,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getRedirectManagementStatus(): CancelablePromise<RedirectManagementData['responses']['GetRedirectManagementStatus']> {
@@ -6265,7 +6440,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postRedirectManagementStatus(data: RedirectManagementData['payloads']['PostRedirectManagementStatus'] = {}): CancelablePromise<RedirectManagementData['responses']['PostRedirectManagementStatus']> {
@@ -6292,7 +6467,7 @@ take
 export class RelationTypeService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemRelationType(data: RelationTypeData['payloads']['GetItemRelationType'] = {}): CancelablePromise<RelationTypeData['responses']['GetItemRelationType']> {
@@ -6308,13 +6483,12 @@ export class RelationTypeService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getRelationType(data: RelationTypeData['payloads']['GetRelationType'] = {}): CancelablePromise<RelationTypeData['responses']['GetRelationType']> {
@@ -6337,7 +6511,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getRelationTypeById(data: RelationTypeData['payloads']['GetRelationTypeById']): CancelablePromise<RelationTypeData['responses']['GetRelationTypeById']> {
@@ -6364,7 +6538,7 @@ take
 export class RelationService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getRelationTypeById(data: RelationData['payloads']['GetRelationTypeById']): CancelablePromise<RelationData['responses']['GetRelationTypeById']> {
@@ -6396,7 +6570,7 @@ take
 export class ScriptService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemScript(data: ScriptData['payloads']['GetItemScript'] = {}): CancelablePromise<ScriptData['responses']['GetItemScript']> {
@@ -6412,7 +6586,6 @@ export class ScriptService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -6442,7 +6615,7 @@ export class ScriptService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getScriptByPath(data: ScriptData['payloads']['GetScriptByPath']): CancelablePromise<ScriptData['responses']['GetScriptByPath']> {
@@ -6465,7 +6638,7 @@ export class ScriptService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteScriptByPath(data: ScriptData['payloads']['DeleteScriptByPath']): CancelablePromise<ScriptData['responses']['DeleteScriptByPath']> {
@@ -6490,7 +6663,7 @@ export class ScriptService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putScriptByPath(data: ScriptData['payloads']['PutScriptByPath']): CancelablePromise<ScriptData['responses']['PutScriptByPath']> {
@@ -6570,7 +6743,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getScriptFolderByPath(data: ScriptData['payloads']['GetScriptFolderByPath']): CancelablePromise<ScriptData['responses']['GetScriptFolderByPath']> {
@@ -6593,7 +6766,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteScriptFolderByPath(data: ScriptData['payloads']['DeleteScriptFolderByPath']): CancelablePromise<ScriptData['responses']['DeleteScriptFolderByPath']> {
@@ -6618,7 +6791,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeScriptAncestors(data: ScriptData['payloads']['GetTreeScriptAncestors'] = {}): CancelablePromise<ScriptData['responses']['GetTreeScriptAncestors']> {
@@ -6640,7 +6813,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeScriptChildren(data: ScriptData['payloads']['GetTreeScriptChildren'] = {}): CancelablePromise<ScriptData['responses']['GetTreeScriptChildren']> {
@@ -6664,7 +6837,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeScriptRoot(data: ScriptData['payloads']['GetTreeScriptRoot'] = {}): CancelablePromise<ScriptData['responses']['GetTreeScriptRoot']> {
@@ -6691,7 +6864,7 @@ take
 export class SearcherService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getSearcher(data: SearcherData['payloads']['GetSearcher'] = {}): CancelablePromise<SearcherData['responses']['GetSearcher']> {
@@ -6713,7 +6886,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getSearcherBySearcherNameQuery(data: SearcherData['payloads']['GetSearcherBySearcherNameQuery']): CancelablePromise<SearcherData['responses']['GetSearcherBySearcherNameQuery']> {
@@ -6745,7 +6918,7 @@ take
 export class SecurityService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getSecurityConfiguration(): CancelablePromise<SecurityData['responses']['GetSecurityConfiguration']> {
@@ -6761,7 +6934,7 @@ export class SecurityService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postSecurityForgotPassword(data: SecurityData['payloads']['PostSecurityForgotPassword'] = {}): CancelablePromise<SecurityData['responses']['PostSecurityForgotPassword']> {
@@ -6808,7 +6981,7 @@ export class SecurityService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static postSecurityForgotPasswordVerify(data: SecurityData['payloads']['PostSecurityForgotPasswordVerify'] = {}): CancelablePromise<SecurityData['responses']['PostSecurityForgotPasswordVerify']> {
@@ -6833,7 +7006,7 @@ export class SecurityService {
 export class SegmentService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getSegment(data: SegmentData['payloads']['GetSegment'] = {}): CancelablePromise<SegmentData['responses']['GetSegment']> {
@@ -6861,7 +7034,7 @@ take
 export class ServerService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getServerConfiguration(): CancelablePromise<ServerData['responses']['GetServerConfiguration']> {
@@ -6876,7 +7049,7 @@ export class ServerService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getServerInformation(): CancelablePromise<ServerData['responses']['GetServerInformation']> {
@@ -6891,7 +7064,7 @@ export class ServerService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getServerStatus(): CancelablePromise<ServerData['responses']['GetServerStatus']> {
@@ -6906,7 +7079,7 @@ export class ServerService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getServerTroubleshooting(): CancelablePromise<ServerData['responses']['GetServerTroubleshooting']> {
@@ -6925,7 +7098,7 @@ export class ServerService {
 export class StaticFileService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemStaticFile(data: StaticFileData['payloads']['GetItemStaticFile'] = {}): CancelablePromise<StaticFileData['responses']['GetItemStaticFile']> {
@@ -6946,7 +7119,7 @@ export class StaticFileService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeStaticFileAncestors(data: StaticFileData['payloads']['GetTreeStaticFileAncestors'] = {}): CancelablePromise<StaticFileData['responses']['GetTreeStaticFileAncestors']> {
@@ -6967,7 +7140,7 @@ export class StaticFileService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeStaticFileChildren(data: StaticFileData['payloads']['GetTreeStaticFileChildren'] = {}): CancelablePromise<StaticFileData['responses']['GetTreeStaticFileChildren']> {
@@ -6990,7 +7163,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeStaticFileRoot(data: StaticFileData['payloads']['GetTreeStaticFileRoot'] = {}): CancelablePromise<StaticFileData['responses']['GetTreeStaticFileRoot']> {
@@ -7016,7 +7189,7 @@ take
 export class StylesheetService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemStylesheet(data: StylesheetData['payloads']['GetItemStylesheet'] = {}): CancelablePromise<StylesheetData['responses']['GetItemStylesheet']> {
@@ -7032,7 +7205,6 @@ export class StylesheetService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7062,7 +7234,7 @@ export class StylesheetService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getStylesheetByPath(data: StylesheetData['payloads']['GetStylesheetByPath']): CancelablePromise<StylesheetData['responses']['GetStylesheetByPath']> {
@@ -7085,7 +7257,7 @@ export class StylesheetService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteStylesheetByPath(data: StylesheetData['payloads']['DeleteStylesheetByPath']): CancelablePromise<StylesheetData['responses']['DeleteStylesheetByPath']> {
@@ -7110,7 +7282,7 @@ export class StylesheetService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putStylesheetByPath(data: StylesheetData['payloads']['PutStylesheetByPath']): CancelablePromise<StylesheetData['responses']['PutStylesheetByPath']> {
@@ -7190,7 +7362,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getStylesheetFolderByPath(data: StylesheetData['payloads']['GetStylesheetFolderByPath']): CancelablePromise<StylesheetData['responses']['GetStylesheetFolderByPath']> {
@@ -7213,7 +7385,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteStylesheetFolderByPath(data: StylesheetData['payloads']['DeleteStylesheetFolderByPath']): CancelablePromise<StylesheetData['responses']['DeleteStylesheetFolderByPath']> {
@@ -7238,7 +7410,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeStylesheetAncestors(data: StylesheetData['payloads']['GetTreeStylesheetAncestors'] = {}): CancelablePromise<StylesheetData['responses']['GetTreeStylesheetAncestors']> {
@@ -7260,7 +7432,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeStylesheetChildren(data: StylesheetData['payloads']['GetTreeStylesheetChildren'] = {}): CancelablePromise<StylesheetData['responses']['GetTreeStylesheetChildren']> {
@@ -7284,7 +7456,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeStylesheetRoot(data: StylesheetData['payloads']['GetTreeStylesheetRoot'] = {}): CancelablePromise<StylesheetData['responses']['GetTreeStylesheetRoot']> {
@@ -7311,7 +7483,7 @@ take
 export class TagService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTag(data: TagData['payloads']['GetTag'] = {}): CancelablePromise<TagData['responses']['GetTag']> {
@@ -7340,7 +7512,7 @@ take
 export class TelemetryService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTelemetry(data: TelemetryData['payloads']['GetTelemetry'] = {}): CancelablePromise<TelemetryData['responses']['GetTelemetry']> {
@@ -7363,7 +7535,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTelemetryLevel(): CancelablePromise<TelemetryData['responses']['GetTelemetryLevel']> {
@@ -7379,7 +7551,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postTelemetryLevel(data: TelemetryData['payloads']['PostTelemetryLevel'] = {}): CancelablePromise<TelemetryData['responses']['PostTelemetryLevel']> {
@@ -7406,7 +7578,7 @@ take
 export class TemplateService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemTemplate(data: TemplateData['payloads']['GetItemTemplate'] = {}): CancelablePromise<TemplateData['responses']['GetItemTemplate']> {
@@ -7422,13 +7594,12 @@ export class TemplateService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemTemplateSearch(data: TemplateData['payloads']['GetItemTemplateSearch'] = {}): CancelablePromise<TemplateData['responses']['GetItemTemplateSearch']> {
@@ -7446,7 +7617,6 @@ take
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -7476,7 +7646,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTemplateById(data: TemplateData['payloads']['GetTemplateById']): CancelablePromise<TemplateData['responses']['GetTemplateById']> {
@@ -7499,7 +7669,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteTemplateById(data: TemplateData['payloads']['DeleteTemplateById']): CancelablePromise<TemplateData['responses']['DeleteTemplateById']> {
@@ -7524,7 +7694,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putTemplateById(data: TemplateData['payloads']['PutTemplateById']): CancelablePromise<TemplateData['responses']['PutTemplateById']> {
@@ -7552,7 +7722,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTemplateConfiguration(): CancelablePromise<TemplateData['responses']['GetTemplateConfiguration']> {
@@ -7568,7 +7738,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static postTemplateQueryExecute(data: TemplateData['payloads']['PostTemplateQueryExecute'] = {}): CancelablePromise<TemplateData['responses']['PostTemplateQueryExecute']> {
@@ -7589,7 +7759,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTemplateQuerySettings(): CancelablePromise<TemplateData['responses']['GetTemplateQuerySettings']> {
@@ -7605,7 +7775,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeTemplateAncestors(data: TemplateData['payloads']['GetTreeTemplateAncestors'] = {}): CancelablePromise<TemplateData['responses']['GetTreeTemplateAncestors']> {
@@ -7627,7 +7797,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeTemplateChildren(data: TemplateData['payloads']['GetTreeTemplateChildren'] = {}): CancelablePromise<TemplateData['responses']['GetTreeTemplateChildren']> {
@@ -7651,7 +7821,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTreeTemplateRoot(data: TemplateData['payloads']['GetTreeTemplateRoot'] = {}): CancelablePromise<TemplateData['responses']['GetTreeTemplateRoot']> {
@@ -7700,7 +7870,7 @@ export class TemporaryFileService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTemporaryFileById(data: TemporaryFileData['payloads']['GetTemporaryFileById']): CancelablePromise<TemporaryFileData['responses']['GetTemporaryFileById']> {
@@ -7723,7 +7893,7 @@ export class TemporaryFileService {
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteTemporaryFileById(data: TemporaryFileData['payloads']['DeleteTemporaryFileById']): CancelablePromise<TemporaryFileData['responses']['DeleteTemporaryFileById']> {
@@ -7747,7 +7917,7 @@ export class TemporaryFileService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getTemporaryFileConfiguration(): CancelablePromise<TemporaryFileData['responses']['GetTemporaryFileConfiguration']> {
@@ -7766,7 +7936,7 @@ export class TemporaryFileService {
 export class UpgradeService {
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postUpgradeAuthorize(): CancelablePromise<UpgradeData['responses']['PostUpgradeAuthorize']> {
@@ -7778,14 +7948,14 @@ export class UpgradeService {
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
 				403: `The authenticated user do not have access to this resource`,
-				428: `Client Error`,
-				500: `Server Error`,
+				428: `Precondition Required`,
+				500: `Internal Server Error`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUpgradeSettings(): CancelablePromise<UpgradeData['responses']['GetUpgradeSettings']> {
@@ -7796,7 +7966,7 @@ export class UpgradeService {
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
 				403: `The authenticated user do not have access to this resource`,
-				428: `Client Error`,
+				428: `Precondition Required`,
 			},
 		});
 	}
@@ -7829,7 +7999,7 @@ export class UserDataService {
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserData(data: UserDataData['payloads']['GetUserData'] = {}): CancelablePromise<UserDataData['responses']['GetUserData']> {
@@ -7853,7 +8023,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putUserData(data: UserDataData['payloads']['PutUserData'] = {}): CancelablePromise<UserDataData['responses']['PutUserData']> {
@@ -7876,7 +8046,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserDataById(data: UserDataData['payloads']['GetUserDataById']): CancelablePromise<UserDataData['responses']['GetUserDataById']> {
@@ -7902,7 +8072,7 @@ take
 export class UserGroupService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getFilterUserGroup(data: UserGroupData['payloads']['GetFilterUserGroup'] = {}): CancelablePromise<UserGroupData['responses']['GetFilterUserGroup']> {
@@ -7928,7 +8098,7 @@ filter
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemUserGroup(data: UserGroupData['payloads']['GetItemUserGroup'] = {}): CancelablePromise<UserGroupData['responses']['GetItemUserGroup']> {
@@ -7944,13 +8114,12 @@ filter
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteUserGroup(data: UserGroupData['payloads']['DeleteUserGroup'] = {}): CancelablePromise<UserGroupData['responses']['DeleteUserGroup']> {
@@ -7996,7 +8165,7 @@ filter
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserGroup(data: UserGroupData['payloads']['GetUserGroup'] = {}): CancelablePromise<UserGroupData['responses']['GetUserGroup']> {
@@ -8019,7 +8188,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserGroupById(data: UserGroupData['payloads']['GetUserGroupById']): CancelablePromise<UserGroupData['responses']['GetUserGroupById']> {
@@ -8042,7 +8211,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteUserGroupById(data: UserGroupData['payloads']['DeleteUserGroupById']): CancelablePromise<UserGroupData['responses']['DeleteUserGroupById']> {
@@ -8066,7 +8235,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putUserGroupById(data: UserGroupData['payloads']['PutUserGroupById']): CancelablePromise<UserGroupData['responses']['PutUserGroupById']> {
@@ -8093,7 +8262,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteUserGroupByIdUsers(data: UserGroupData['payloads']['DeleteUserGroupByIdUsers']): CancelablePromise<UserGroupData['responses']['DeleteUserGroupByIdUsers']> {
@@ -8120,7 +8289,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postUserGroupByIdUsers(data: UserGroupData['payloads']['PostUserGroupByIdUsers']): CancelablePromise<UserGroupData['responses']['PostUserGroupByIdUsers']> {
@@ -8151,7 +8320,7 @@ requestBody
 export class UserService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getFilterUser(data: UserData['payloads']['GetFilterUser'] = {}): CancelablePromise<UserData['responses']['GetFilterUser']> {
@@ -8181,7 +8350,7 @@ filter
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemUser(data: UserData['payloads']['GetItemUser'] = {}): CancelablePromise<UserData['responses']['GetItemUser']> {
@@ -8197,7 +8366,6 @@ filter
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
@@ -8227,7 +8395,7 @@ filter
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteUser(data: UserData['payloads']['DeleteUser'] = {}): CancelablePromise<UserData['responses']['DeleteUser']> {
@@ -8250,7 +8418,7 @@ filter
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUser(data: UserData['payloads']['GetUser'] = {}): CancelablePromise<UserData['responses']['GetUser']> {
@@ -8274,7 +8442,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserById(data: UserData['payloads']['GetUserById']): CancelablePromise<UserData['responses']['GetUserById']> {
@@ -8297,7 +8465,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteUserById(data: UserData['payloads']['DeleteUserById']): CancelablePromise<UserData['responses']['DeleteUserById']> {
@@ -8322,7 +8490,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putUserById(data: UserData['payloads']['PutUserById']): CancelablePromise<UserData['responses']['PutUserById']> {
@@ -8350,7 +8518,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserById2Fa(data: UserData['payloads']['GetUserById2Fa']): CancelablePromise<UserData['responses']['GetUserById2Fa']> {
@@ -8373,7 +8541,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteUserById2FaByProviderName(data: UserData['payloads']['DeleteUserById2FaByProviderName']): CancelablePromise<UserData['responses']['DeleteUserById2FaByProviderName']> {
@@ -8399,7 +8567,7 @@ providerName
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postUserByIdChangePassword(data: UserData['payloads']['PostUserByIdChangePassword']): CancelablePromise<UserData['responses']['PostUserByIdChangePassword']> {
@@ -8427,7 +8595,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static postUserByIdResetPassword(data: UserData['payloads']['PostUserByIdResetPassword']): CancelablePromise<UserData['responses']['PostUserByIdResetPassword']> {
@@ -8451,7 +8619,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteUserAvatarById(data: UserData['payloads']['DeleteUserAvatarById']): CancelablePromise<UserData['responses']['DeleteUserAvatarById']> {
@@ -8476,7 +8644,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postUserAvatarById(data: UserData['payloads']['PostUserAvatarById']): CancelablePromise<UserData['responses']['PostUserAvatarById']> {
@@ -8504,7 +8672,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserConfiguration(): CancelablePromise<UserData['responses']['GetUserConfiguration']> {
@@ -8520,7 +8688,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserCurrent(): CancelablePromise<UserData['responses']['GetUserCurrent']> {
@@ -8535,7 +8703,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserCurrent2Fa(): CancelablePromise<UserData['responses']['GetUserCurrent2Fa']> {
@@ -8550,7 +8718,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteUserCurrent2FaByProviderName(data: UserData['payloads']['DeleteUserCurrent2FaByProviderName']): CancelablePromise<UserData['responses']['DeleteUserCurrent2FaByProviderName']> {
@@ -8578,7 +8746,7 @@ code
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static postUserCurrent2FaByProviderName(data: UserData['payloads']['PostUserCurrent2FaByProviderName']): CancelablePromise<UserData['responses']['PostUserCurrent2FaByProviderName']> {
@@ -8604,7 +8772,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserCurrent2FaByProviderName(data: UserData['payloads']['GetUserCurrent2FaByProviderName']): CancelablePromise<UserData['responses']['GetUserCurrent2FaByProviderName']> {
@@ -8627,7 +8795,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postUserCurrentAvatar(data: UserData['payloads']['PostUserCurrentAvatar'] = {}): CancelablePromise<UserData['responses']['PostUserCurrentAvatar']> {
@@ -8649,7 +8817,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postUserCurrentChangePassword(data: UserData['payloads']['PostUserCurrentChangePassword'] = {}): CancelablePromise<UserData['responses']['PostUserCurrentChangePassword']> {
@@ -8671,7 +8839,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserCurrentConfiguration(): CancelablePromise<UserData['responses']['GetUserCurrentConfiguration']> {
@@ -8687,7 +8855,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserCurrentLoginProviders(): CancelablePromise<UserData['responses']['GetUserCurrentLoginProviders']> {
@@ -8702,7 +8870,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserCurrentPermissions(data: UserData['payloads']['GetUserCurrentPermissions'] = {}): CancelablePromise<UserData['responses']['GetUserCurrentPermissions']> {
@@ -8724,7 +8892,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserCurrentPermissionsDocument(data: UserData['payloads']['GetUserCurrentPermissionsDocument'] = {}): CancelablePromise<UserData['responses']['GetUserCurrentPermissionsDocument']> {
@@ -8746,7 +8914,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getUserCurrentPermissionsMedia(data: UserData['payloads']['GetUserCurrentPermissionsMedia'] = {}): CancelablePromise<UserData['responses']['GetUserCurrentPermissionsMedia']> {
@@ -8768,7 +8936,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postUserDisable(data: UserData['payloads']['PostUserDisable'] = {}): CancelablePromise<UserData['responses']['PostUserDisable']> {
@@ -8792,7 +8960,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postUserEnable(data: UserData['payloads']['PostUserEnable'] = {}): CancelablePromise<UserData['responses']['PostUserEnable']> {
@@ -8840,7 +9008,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postUserInviteCreatePassword(data: UserData['payloads']['PostUserInviteCreatePassword'] = {}): CancelablePromise<UserData['responses']['PostUserInviteCreatePassword']> {
@@ -8863,7 +9031,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postUserInviteResend(data: UserData['payloads']['PostUserInviteResend'] = {}): CancelablePromise<UserData['responses']['PostUserInviteResend']> {
@@ -8887,7 +9055,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static postUserInviteVerify(data: UserData['payloads']['PostUserInviteVerify'] = {}): CancelablePromise<UserData['responses']['PostUserInviteVerify']> {
@@ -8909,7 +9077,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postUserSetUserGroups(data: UserData['payloads']['PostUserSetUserGroups'] = {}): CancelablePromise<UserData['responses']['PostUserSetUserGroups']> {
@@ -8931,7 +9099,7 @@ requestBody
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static postUserUnlock(data: UserData['payloads']['PostUserUnlock'] = {}): CancelablePromise<UserData['responses']['PostUserUnlock']> {
@@ -8958,7 +9126,7 @@ requestBody
 export class WebhookService {
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getItemWebhook(data: WebhookData['payloads']['GetItemWebhook'] = {}): CancelablePromise<WebhookData['responses']['GetItemWebhook']> {
@@ -8974,13 +9142,12 @@ export class WebhookService {
 			},
 			errors: {
 				401: `The resource is protected and requires an authentication token`,
-				403: `The authenticated user do not have access to this resource`,
 			},
 		});
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getWebhook(data: WebhookData['payloads']['GetWebhook'] = {}): CancelablePromise<WebhookData['responses']['GetWebhook']> {
@@ -9026,7 +9193,7 @@ take
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getWebhookById(data: WebhookData['payloads']['GetWebhookById']): CancelablePromise<WebhookData['responses']['GetWebhookById']> {
@@ -9048,7 +9215,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static deleteWebhookById(data: WebhookData['payloads']['DeleteWebhookById']): CancelablePromise<WebhookData['responses']['DeleteWebhookById']> {
@@ -9073,7 +9240,7 @@ take
 	}
 
 	/**
-	 * @returns string Success
+	 * @returns string OK
 	 * @throws ApiError
 	 */
 	public static putWebhookById(data: WebhookData['payloads']['PutWebhookById']): CancelablePromise<WebhookData['responses']['PutWebhookById']> {
@@ -9101,7 +9268,7 @@ requestBody
 	}
 
 	/**
-	 * @returns unknown Success
+	 * @returns unknown OK
 	 * @throws ApiError
 	 */
 	public static getWebhookEvents(data: WebhookData['payloads']['GetWebhookEvents'] = {}): CancelablePromise<WebhookData['responses']['GetWebhookEvents']> {

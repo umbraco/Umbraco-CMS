@@ -102,7 +102,7 @@ export class UmbDocumentTypeWorkspaceContext
 		// Document type specific:
 		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplates);
 		this.defaultTemplate = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
-		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
+		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.cleanup);
 
 		this.routes.setRoutes([
 			{
@@ -191,6 +191,10 @@ export class UmbDocumentTypeWorkspaceContext
 
 	setAllowedContentTypes(allowedContentTypes: Array<UmbContentTypeSortModel>) {
 		this.structure.updateOwnerContentType({ allowedContentTypes });
+	}
+
+	setCleanup(cleanup: UmbDocumentTypeDetailModel['cleanup']) {
+		this.structure.updateOwnerContentType({ cleanup });
 	}
 
 	setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {

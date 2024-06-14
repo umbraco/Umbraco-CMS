@@ -51,7 +51,7 @@ const rootTreeItem: ManifestTreeItem = {
 	type: 'treeItem',
 	kind: 'default',
 	alias: 'Umb.TreeItem.Document.Root',
-	name: 'Document Tree Item',
+	name: 'Document Tree Root',
 	forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE],
 };
 

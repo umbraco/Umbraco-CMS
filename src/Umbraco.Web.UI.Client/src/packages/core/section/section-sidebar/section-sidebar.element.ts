@@ -30,6 +30,8 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 				flex-direction: column;
 				z-index: 10;
 				position: relative;
+				padding-bottom: var(--uui-size-4);
+				box-sizing: border-box;
 			}
 
 			#scroll-container {

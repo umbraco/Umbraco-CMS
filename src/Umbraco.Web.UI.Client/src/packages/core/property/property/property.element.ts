@@ -2,7 +2,7 @@ import { UmbPropertyContext } from './property.context.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -15,6 +15,7 @@ import {
 	UmbFormControlValidator,
 	UmbObserveValidationStateController,
 } from '@umbraco-cms/backoffice/validation';
+import type { UmbPropertyTypeAppearanceModel } from '@umbraco-cms/backoffice/content-type';
 
 /**
  *  @element umb-property
@@ -51,6 +52,17 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 	public get description() {
 		return this.#propertyContext.getDescription();
+	}
+
+	/**
+	 * Appearance: Appearance settings for the property.
+	 */
+	@property({ type: Object, attribute: false })
+	public set appearance(appearance: UmbPropertyTypeAppearanceModel | undefined) {
+		this.#propertyContext.setAppearance(appearance);
+	}
+	public get appearance() {
+		return this.#propertyContext.getAppearance();
 	}
 
 	/**
@@ -137,6 +149,9 @@ export class UmbPropertyElement extends UmbLitElement {
 	@state()
 	private _description?: string;
 
+	@state()
+	private _orientation: 'horizontal' | 'vertical' = 'horizontal';
+
 	#propertyContext = new UmbPropertyContext(this);
 
 	#controlValidator?: UmbFormControlValidator;
@@ -172,6 +187,13 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.variantDifference,
 			(variantDifference) => {
 				this._variantDifference = variantDifference;
+			},
+			null,
+		);
+		this.observe(
+			this.#propertyContext.appearance,
+			(appearance) => {
+				this._orientation = appearance?.labelOnTop ? 'vertical' : 'horizontal';
 			},
 			null,
 		);
@@ -237,8 +259,6 @@ export class UmbPropertyElement extends UmbLitElement {
 					(value) => {
 						// Set the value on the element:
 						this._element!.value = value;
-						// Set the value on the context as well, to ensure that any default values are stored right away:
-						this.#propertyContext.setValue(value);
 						if (this.#validationMessageBinder) {
 							this.#validationMessageBinder.value = value;
 						}
@@ -277,11 +297,12 @@ export class UmbPropertyElement extends UmbLitElement {
 		return html`
 			<umb-property-layout
 				id="layout"
-				alias="${ifDefined(this._alias)}"
-				label="${ifDefined(this._label)}"
-				description="${ifDefined(this._description)}"
+				.alias=${this._alias}
+				.label=${this._label}
+				.description=${this._description}
+				.orientation=${this._orientation ?? 'horizontal'}
 				?invalid=${this._invalid}>
-				${this._renderPropertyActionMenu()}
+				${this.#renderPropertyActionMenu()}
 				${this._variantDifference
 					? html`<uui-tag look="secondary" slot="description">${this._variantDifference}</uui-tag>`
 					: ''}
@@ -290,13 +311,15 @@ export class UmbPropertyElement extends UmbLitElement {
 		`;
 	}
 
-	private _renderPropertyActionMenu() {
-		return this._propertyEditorUiAlias
-			? html`<umb-property-action-menu
-					slot="action-menu"
-					id="action-menu"
-					.propertyEditorUiAlias=${this._propertyEditorUiAlias}></umb-property-action-menu>`
-			: nothing;
+	#renderPropertyActionMenu() {
+		if (!this._propertyEditorUiAlias) return nothing;
+		return html`
+			<umb-property-action-menu
+				slot="action-menu"
+				id="action-menu"
+				.propertyEditorUiAlias=${this._propertyEditorUiAlias}>
+			</umb-property-action-menu>
+		`;
 	}
 
 	static styles = [

@@ -1,6 +1,5 @@
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UMB_LANGUAGE_ENTITY_TYPE } from '../../entity.js';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateLanguageRequestModel,

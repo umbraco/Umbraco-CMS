@@ -1,12 +1,11 @@
 import { UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UMB_DICTIONARY_MENU_ALIAS } from '../menu/manifests.js';
+import { UMB_DICTIONARY_MENU_ALIAS } from '../menu/index.js';
+import { UMB_DICTIONARY_SECTION_ALIAS } from './constants.js';
 import type {
 	ManifestSection,
 	ManifestSectionSidebarApp,
 	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_DICTIONARY_SECTION_ALIAS = 'Umb.Section.Translation';
 
 const section: ManifestSection = {
 	type: 'section',

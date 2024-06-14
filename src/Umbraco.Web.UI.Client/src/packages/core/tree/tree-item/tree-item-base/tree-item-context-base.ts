@@ -1,7 +1,7 @@
 import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
 import { UMB_TREE_CONTEXT, type UmbDefaultTreeContext } from '../../default/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
-import { UmbRequestReloadTreeItemChildrenEvent } from '../../reload-tree-item-children/index.js';
+import { UmbRequestReloadTreeItemChildrenEvent } from '../../entity-actions/reload-tree-item-children/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
@@ -64,6 +64,9 @@ export abstract class UmbTreeItemContextBase<
 
 	#path = new UmbStringState('');
 	readonly path = this.#path.asObservable();
+
+	#foldersOnly = new UmbBooleanState(false);
+	readonly foldersOnly = this.#foldersOnly.asObservable();
 
 	treeContext?: UmbDefaultTreeContext<TreeItemType, TreeRootType>;
 	#sectionContext?: UmbSectionContext;
@@ -175,6 +178,7 @@ export abstract class UmbTreeItemContextBase<
 
 		const skip = loadMore ? this.#paging.skip : 0;
 		const take = loadMore ? this.#paging.take : this.pagination.getCurrentPageNumber() * this.#paging.take;
+		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.treeContext?.getAdditionalRequestArgs();
 
 		const { data } = await repository.requestTreeItemsOf({
@@ -182,6 +186,7 @@ export abstract class UmbTreeItemContextBase<
 				unique: this.unique,
 				entityType: this.entityType,
 			},
+			foldersOnly,
 			skip,
 			take,
 			...additionalArgs,
@@ -240,6 +245,7 @@ export abstract class UmbTreeItemContextBase<
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
+			this.#observeFoldersOnly();
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
@@ -308,6 +314,18 @@ export abstract class UmbTreeItemContextBase<
 				this.#isSelected.setValue(isSelected);
 			},
 			'observeIsSelected',
+		);
+	}
+
+	#observeFoldersOnly() {
+		if (!this.treeContext || this.unique === undefined) return;
+
+		this.observe(
+			this.treeContext.foldersOnly,
+			(foldersOnly) => {
+				this.#foldersOnly.setValue(foldersOnly);
+			},
+			'observeFoldersOnly',
 		);
 	}
 

@@ -1,6 +1,5 @@
+import { UMB_LANGUAGE_COLLECTION_REPOSITORY_ALIAS } from './constants.js';
 import type { ManifestRepository, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_LANGUAGE_COLLECTION_REPOSITORY_ALIAS = 'Umb.Repository.LanguageCollection';
 
 const repository: ManifestRepository = {
 	type: 'repository',

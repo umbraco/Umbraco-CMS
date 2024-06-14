@@ -48,7 +48,8 @@ export class UmbDropzoneElement extends UmbLitElement {
 
 	#handleDragEnter(e: DragEvent) {
 		// Avoid collision with UmbSorterController
-		if (!e.dataTransfer?.types?.length) return;
+		const types = e.dataTransfer?.types;
+		if (!types?.length || !types?.includes('Files')) return;
 		this.toggleAttribute('dragging', true);
 	}
 

@@ -1,4 +1,4 @@
-import type { UmbCollectionColumnConfiguration } from '../../../../core/collection/types.js';
+import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';

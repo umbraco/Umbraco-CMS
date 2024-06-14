@@ -210,19 +210,20 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#renderHeader() {
 		return html`
 			<div id="header" slot="header">
-				<uui-button id="icon" @click=${this.#onIconClick} label="icon" compact>
+				<uui-button id="icon" compact label="icon" look="outline" @click=${this.#onIconClick}>
 					<umb-icon name=${this._icon || ''}></umb-icon>
 				</uui-button>
 
 				<umb-input-with-alias
 					id="name"
-					label=${this.localize.term('general_name')}
+					label=${this.localize.term('placeholders_entername')}
 					.value=${this._name}
 					alias=${ifDefined(this._alias)}
 					?auto-generate-alias=${this._isNew}
 					?alias-readonly=${this._aliasCanBeChanged === false}
 					@change=${this.#onNameAndAliasChange}
-					${umbFocus()}></umb-input-with-alias>
+					${umbFocus()}>
+				</umb-input-with-alias>
 			</div>
 		`;
 	}
@@ -338,9 +339,12 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#renderRightColumn() {
-		return html` <uui-box headline="Actions">
-			<umb-entity-action-list .entityType=${UMB_USER_GROUP_ENTITY_TYPE} .unique=${this._unique}></umb-entity-action-list
-		></uui-box>`;
+		return html`
+			<uui-box headline="Actions">
+				<umb-entity-action-list .entityType=${UMB_USER_GROUP_ENTITY_TYPE} .unique=${this._unique}>
+				</umb-entity-action-list>
+			</uui-box>
+		`;
 	}
 
 	static styles = [
@@ -354,11 +358,14 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 			#header {
 				display: flex;
 				flex: 1 1 auto;
-				gap: var(--uui-size-space-3);
+				gap: var(--uui-size-space-2);
+				align-items: center;
 			}
 
 			#icon {
-				font-size: calc(var(--uui-size-layout-3) / 2);
+				font-size: var(--uui-size-5);
+				height: 30px;
+				width: 30px;
 			}
 
 			#name {

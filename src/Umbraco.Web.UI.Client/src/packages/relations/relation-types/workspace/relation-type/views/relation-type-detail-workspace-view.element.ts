@@ -34,6 +34,9 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 	@state()
 	_totalPages = 1;
 
+	@state()
+	_loading = false;
+
 	#workspaceContext?: typeof UMB_RELATION_TYPE_WORKSPACE_CONTEXT.TYPE;
 	#relationCollectionRepository = new UmbRelationCollectionRepository(this);
 	#paginationManager = new UmbPaginationManager();
@@ -73,6 +76,8 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 	}
 
 	async #requestRelations() {
+		this._loading = true;
+
 		const relationTypeUnique = this.#workspaceContext?.getUnique();
 		if (!relationTypeUnique) throw new Error('Relation type unique is required');
 
@@ -87,6 +92,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 		if (data) {
 			this._relations = data.items;
 			this.#paginationManager.setTotalItems(data.total);
+			this._loading = false;
 		}
 	}
 
@@ -164,6 +170,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 	}
 
 	#renderRelations() {
+		if (this._loading) return html`<uui-loader></uui-loader>`;
 		return html`
 			<div>
 				<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
@@ -205,6 +212,10 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 				gap: var(--uui-size-layout-1);
 				padding: var(--uui-size-layout-1);
 				grid-template-columns: 1fr 350px;
+			}
+
+			uui-loader {
+				text-align: center;
 			}
 
 			uui-pagination {

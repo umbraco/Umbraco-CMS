@@ -3,6 +3,7 @@ import { UMB_LINK_PICKER_MODAL } from '../link-picker-modal/link-picker-modal.to
 import type { UmbLinkPickerLink } from '../link-picker-modal/types.js';
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 type AnchorElementAttributes = {
 	href?: string | null;
@@ -20,6 +21,7 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
+		const localize = new UmbLocalizationController(args.host);
 
 		// const editorEventSetupCallback = (buttonApi: { setEnabled: (state: boolean) => void }) => {
 		// 	const editorEventCallback = (eventApi: { element: Element}) => {
@@ -30,16 +32,24 @@ export default class UmbTinyMceMultiUrlPickerPlugin extends UmbTinyMcePluginBase
 		// 	return () => editor.off('NodeChange', editorEventCallback);
 		// };
 
-		args.editor.ui.registry.addButton('link', {
+		this.editor.ui.registry.addToggleButton('link', {
 			icon: 'link',
-			tooltip: 'Insert/edit link',
+			tooltip: localize.term('general_addEditLink'),
 			onAction: () => this.showDialog(),
+			onSetup: (api) => {
+				const changed = this.editor.selection.selectorChangedWithUnbind('a', (state) => api.setActive(state));
+				return () => changed.unbind();
+			},
 		});
 
-		args.editor.ui.registry.addButton('unlink', {
+		this.editor.ui.registry.addToggleButton('unlink', {
 			icon: 'unlink',
-			tooltip: 'Remove link',
+			tooltip: localize.term('general_removeLink'),
 			onAction: () => args.editor.execCommand('unlink'),
+			onSetup: (api) => {
+				const changed = this.editor.selection.selectorChangedWithUnbind('a', (state) => api.setActive(state));
+				return () => changed.unbind();
+			},
 		});
 	}
 

@@ -64,11 +64,26 @@ export class UmbSearchModalElement extends UmbLitElement {
 		super.connectedCallback();
 
 		this.addEventListener('keydown', this.#onKeydown);
+		document.addEventListener('click', this.#onDocumentClick); //TODO: Temp solution to close the modal on outside click. We need to look into a generic solution for this.
 
 		requestAnimationFrame(() => {
 			this.#focusInput();
 		});
 	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+
+		this.removeEventListener('keydown', this.#onKeydown);
+		document.removeEventListener('click', this.#onDocumentClick);
+	}
+
+	#onDocumentClick = (event: MouseEvent) => {
+		const path = event.composedPath();
+		if (path.includes(this)) return;
+
+		this.modalContext?.reject();
+	};
 
 	#observeProviders() {
 		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'searchProvider', null, async (providers) => {
@@ -276,7 +291,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 						@blur=${() => this.#setShowFakeCursor(true)}
 						@focus=${() => this.#setShowFakeCursor(false)}
 						type="text"
-						placeholder="Search..."
+						placeholder=${this.localize.term('placeholders_search')}
 						autocomplete="off" />
 				</div>
 			</div>
@@ -284,7 +299,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 			${this.#renderSearchTags()}
 			${this._search
 				? html`<div id="main">${this._searchResults.length > 0 ? this.#renderResults() : this.#renderNoResults()}</div>`
-				: nothing}
+				: this.#renderNavigationTips()}
 		`;
 	}
 
@@ -340,6 +355,44 @@ export class UmbSearchModalElement extends UmbLitElement {
 		return this._loading ? nothing : html`<div id="no-results">${this.localize.term('general_searchNoResult')}</div>`;
 	}
 
+	#renderNavigationTips() {
+		return html`<div id="navigation-tips">
+			<div class="navigation-tips-key" style="grid-column: span 2;">Tab</div>
+			<span>${this.localize.term('globalSearch_navigateSearchProviders')}</span>
+			<div class="navigation-tips-key">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="18"
+					height="18"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round">
+					<path d="m5 12 7-7 7 7" />
+					<path d="M12 19V5" />
+				</svg>
+			</div>
+			<div class="navigation-tips-key">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="18"
+					height="18"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round">
+					<path d="M12 5v14" />
+					<path d="m19 12-7 7-7-7" />
+				</svg>
+			</div>
+			<span>${this.localize.term('globalSearch_navigateSearchResults')}</span>
+		</div>`;
+	}
+
 	static styles = [
 		UmbTextStyles,
 		css`
@@ -354,6 +407,29 @@ export class UmbSearchModalElement extends UmbLitElement {
 				color: var(--uui-color-text);
 				font-size: 1rem;
 				padding-bottom: var(--uui-size-space-2);
+			}
+			#navigation-tips {
+				display: grid;
+				grid-template-columns: 50px 50px auto;
+				column-gap: var(--uui-size-space-3);
+				row-gap: var(--uui-size-space-4);
+				align-items: center;
+				color: var(--uui-color-border-emphasis);
+				margin-top: var(--uui-size-layout-3);
+				margin-inline: auto;
+			}
+			.navigation-tips-key {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: var(--uui-border-radius);
+				border: 1px solid var(--uui-color-border);
+				height: 36px;
+				font-size: 0.9rem;
+				font-weight: bold;
+			}
+			#navigation-tips .navigation-tips-key + span {
+				margin-left: var(--uui-size-space-2);
 			}
 			#top {
 				background-color: var(--uui-color-surface);

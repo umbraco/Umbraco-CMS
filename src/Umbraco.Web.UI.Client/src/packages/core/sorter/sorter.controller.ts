@@ -72,16 +72,21 @@ export type resolvePlacementArgs<T, ElementType extends HTMLElement> = {
 	pointerY: number;
 };
 
+type UniqueType = string | symbol | number;
+
+/**
+ * Internal type, which is adjusted to become the public one.
+ * @internal */
 type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	/**
 	 * Define how to retrive the unique identifier of an element. If this method returns undefined, the move will be cancelled.
 	 */
-	getUniqueOfElement: (element: ElementType) => string | null | symbol | number | undefined;
-	getUniqueOfModel: (modeEntry: T) => string | null | symbol | number | undefined;
+	getUniqueOfElement: (element: ElementType) => UniqueType | null | undefined;
+	getUniqueOfModel: (modeEntry: T) => UniqueType | null | undefined;
 	/**
 	 * Optionally define a unique identifier for each sorter experience, all Sorters that uses the same identifier to connect with other sorters.
 	 */
-	identifier: string | symbol;
+	identifier: UniqueType;
 	/**
 	 * A query selector for the item element.
 	 */
@@ -107,6 +112,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	 * The selector to find the draggable element within the item.
 	 */
 	draggableSelector?: string;
+
 	//boundarySelector?: string;
 	dataTransferResolver?: (dataTransfer: DataTransfer | null, currentItem: T) => void;
 	onStart?: (argument: { item: T; element: ElementType }) => void;
@@ -166,7 +172,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	performItemRemove?: (argument: { item: T }) => Promise<boolean> | boolean;
 };
 
-// External type with some properties optional, as they have defaults:
+// External type with some properties optional, as they have fallback values:
 export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = Omit<
 	INTERNAL_UmbSorterConfig<T, ElementType>,
 	'ignorerSelector' | 'containerSelector' | 'identifier'
@@ -178,6 +184,19 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
  * @class UmbSorterController
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
+ * @example
+ *
+ * This example shows how to setup a sorter controller with no special needs.
+ * Assuming your declaring this on a Umbraco Element(UmbControllerHostElement):
+ *
+ * ```ts
+ * const sorter = new UmbSorterController(this, {
+ * 	itemSelector: '.item',
+ * 	containerSelector: '.container',
+ * 	getUniqueOfElement: (element) => element.dataset.id,
+ * 	getUniqueOfModel: (model) => model.id
+ * });
+ * ```
  */
 export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> extends UmbControllerBase {
 	//
@@ -274,16 +293,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	}
 
-	hasItem(unique: string) {
+	hasItem(unique: UniqueType) {
 		return this.#model.find((x) => this.#config.getUniqueOfModel(x) === unique) !== undefined;
 	}
 
-	/*
-	getItem(unique: string) {
-		if (!unique) return undefined;
+	getItem(unique: UniqueType) {
 		return this.#model.find((x) => this.#config.getUniqueOfModel(x) === unique);
 	}
-	*/
 
 	hostConnected() {
 		this.#isConnected = true;
@@ -453,7 +469,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		if (UmbSorterController.activeElement && UmbSorterController.activeElement !== element) {
 			// TODO: Remove this console log at one point.
-			console.log("drag start realized that something was already active, so we'll end it. -------!!!!#€#%#€");
+			console.error('drag start ws cancelled due to another drag was still active');
 			this.#handleDragEnd();
 		}
 
@@ -470,6 +486,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		UmbSorterController.activeItem = this.getItemOfElement(UmbSorterController.activeElement! as ElementType);
 
 		UmbSorterController.originalSorter = this as unknown as UmbSorterController<unknown>;
+		// Notice, it is acceptable here to get index via object reference, but only cause there has been no change at this stage, otherwise we cannot trust the object instance is represented in the model — it could have mutated or been cloned [NL]
 		UmbSorterController.originalIndex = this.#model.indexOf(UmbSorterController.activeItem);
 
 		if (!UmbSorterController.activeItem) {
@@ -478,7 +495,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		// Get the current index of the item:
-		UmbSorterController.activeIndex = this.#model.indexOf(UmbSorterController.activeItem as T);
+		UmbSorterController.activeIndex = UmbSorterController.originalIndex;
 
 		UmbSorterController.activeElement!.style.transform = 'translateZ(0)'; // Solves problem with FireFox and ShadowDom in the drag-image.
 
@@ -804,10 +821,21 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	// TODO: Could get item via attr.
-	public async moveItemInModel(newIndex: number, fromCtrl: UmbSorterController<unknown>) {
-		const item = UmbSorterController.activeItem;
+	public async moveItemInModel(newIndex: number, fromCtrl: UmbSorterController<T, ElementType>) {
+		if (!UmbSorterController.activeItem) {
+			console.error('There is no active item to move');
+			return false;
+		}
+		const itemUnique = this.#config.getUniqueOfModel(UmbSorterController.activeItem);
+		if (!itemUnique) {
+			console.error('Failed to retrieve active item unique');
+			return false;
+		}
+		// We use the getItem method to find the current item/object of this entry, as we cannot trust the object instance(activeItem) to be the same as in the model. [NL]
+		// So notice, item in this method is the real modal entry reference, where in many other cases we use the activeItem which might not be up to date with the real entry of the model. [NL]
+		const item = fromCtrl.getItem(itemUnique);
 		if (!item) {
-			console.error('Could not find item of sync item');
+			console.error('Could not find item of model to move', itemUnique, this.#model);
 			return false;
 		}
 		if (this.notifyRequestDrop({ item }) === false) {
@@ -819,10 +847,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		if (localMove) {
 			// Local move:
 
-			// TODO: Maybe this should be replaceable/configurable:
 			const oldIndex = this.#model.indexOf(item);
 			if (oldIndex === -1) {
-				console.error('Could not find item in model');
+				console.error('Could not find item in model when performing internal move', this.getHostElement(), this.#model);
 				return false;
 			}
 
@@ -847,30 +874,33 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			// Not a local move:
 
 			if ((await fromCtrl.removeItem(item)) !== true) {
-				console.error('Sync could not remove item');
+				console.error('Sync could not remove item when moving to a new container');
 				return false;
 			}
 
 			if (this.#config.performItemInsert) {
 				const result = await this.#config.performItemInsert({ item, newIndex });
 				if (result === false) {
+					console.error('Sync could not insert after a move a new container');
 					return false;
 				}
 			} else {
 				const newModel = [...this.#model];
 				newModel.splice(newIndex, 0, item);
 				this.#model = newModel;
+
 				this.#config.onContainerChange?.({
 					model: newModel,
 					item,
 					from: fromCtrl as unknown as UmbSorterController<T, ElementType>,
 				});
 				this.#config.onChange?.({ model: newModel, item });
-			}
 
-			// If everything went well, we can set new activeSorter to this:
-			UmbSorterController.activeSorter = this as unknown as UmbSorterController<unknown>;
-			UmbSorterController.activeIndex = newIndex;
+				// If everything went well, we can set the new activeSorter (and dropSorter) to this, as we are switching container. [NL]
+				UmbSorterController.activeSorter = this as unknown as UmbSorterController<unknown>;
+				UmbSorterController.dropSorter = this as unknown as UmbSorterController<unknown>;
+				UmbSorterController.activeIndex = newIndex;
+			}
 		}
 
 		return true;

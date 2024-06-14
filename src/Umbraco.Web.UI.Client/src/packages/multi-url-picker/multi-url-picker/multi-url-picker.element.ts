@@ -4,10 +4,11 @@ import { css, customElement, html, property, repeat, state } from '@umbraco-cms/
 import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { umbConfirmModal, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 

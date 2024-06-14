@@ -171,8 +171,8 @@ export class UmbPartialViewWorkspaceContext
 			if (error) {
 				throw new Error(error.message);
 			}
-			this.setIsNew(false);
 			this.#data.setValue(data);
+			this.setIsNew(false);
 
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);

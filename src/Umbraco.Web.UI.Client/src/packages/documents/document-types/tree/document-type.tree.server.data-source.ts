@@ -41,15 +41,24 @@ export class UmbDocumentTypeTreeServerDataSource extends UmbTreeServerDataSource
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentTypeService.getTreeDocumentTypeRoot({ skip: args.skip, take: args.take });
+	DocumentTypeService.getTreeDocumentTypeRoot({
+		foldersOnly: args.foldersOnly,
+		skip: args.skip,
+		take: args.take,
+	});
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parent.unique === null) {
-		return getRootItems({ skip: args.skip, take: args.take });
+		return getRootItems({
+			foldersOnly: args.foldersOnly,
+			skip: args.skip,
+			take: args.take,
+		});
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentTypeService.getTreeDocumentTypeChildren({
 			parentId: args.parent.unique,
+			foldersOnly: args.foldersOnly,
 			skip: args.skip,
 			take: args.take,
 		});

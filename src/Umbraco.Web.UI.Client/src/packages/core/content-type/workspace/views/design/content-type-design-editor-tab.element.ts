@@ -1,18 +1,17 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
-import type { UmbContentTypeWorkspaceViewEditGroupElement } from './content-type-design-editor-group.element.js';
 import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context.js';
+import type { UmbContentTypeWorkspaceViewEditGroupElement } from './content-type-design-editor-group.element.js';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbContentTypeContainerStructureHelper,
-	type UmbContentTypeModel,
-	type UmbPropertyTypeContainerModel,
-} from '@umbraco-cms/backoffice/content-type';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import type { UmbContentTypeModel, UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 
 import './content-type-design-editor-properties.element.js';
 import './content-type-design-editor-group.element.js';
-import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerModel, UmbContentTypeWorkspaceViewEditGroupElement> = {
 	getUniqueOfElement: (element) => element.group?.id,
@@ -119,6 +118,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 					this._editContentTypePath = routeBuilder({});
 				});
 		});
+
 		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
 			this.observe(
 				context.isSorting,
@@ -133,6 +133,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				'_observeIsSorting',
 			);
 		});
+
 		this.observe(
 			this.#groupStructureHelper.mergedContainers,
 			(groups) => {
@@ -141,6 +142,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			},
 			null,
 		);
+
 		this.observe(
 			this.#groupStructureHelper.hasProperties,
 			(hasProperties) => {
@@ -193,13 +195,13 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 
 	#renderAddGroupButton() {
 		if (this._sortModeActive) return;
-		return html`<uui-button
-			label=${this.localize.term('contentTypeEditor_addGroup')}
-			id="add"
-			look="placeholder"
-			@click=${this.#onAddGroup}>
-			${this.localize.term('contentTypeEditor_addGroup')}
-		</uui-button>`;
+		return html`
+			<uui-button
+				id="btn-add"
+				label=${this.localize.term('contentTypeEditor_addGroup')}
+				look="placeholder"
+				@click=${this.#onAddGroup}></uui-button>
+		`;
 	}
 
 	static styles = [
@@ -212,12 +214,9 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				visibility: hidden;
 			}
 
-			#add {
+			#btn-add {
 				width: 100%;
-			}
-
-			#add:first-child {
-				margin-top: var(--uui-size-layout-1);
+				--uui-button-height: var(--uui-size-24);
 			}
 
 			uui-box,

@@ -94,12 +94,6 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 
 	constructor() {
 		super();
-	}
-
-	connectedCallback() {
-		super.connectedCallback();
-
-		if (!this.#pickerContext) return;
 
 		this.addValidator(
 			'rangeUnderflow',

@@ -16,8 +16,6 @@ export class UmbDocumentCollectionRepository extends UmbRepositoryBase implement
 	async requestCollection(query: UmbDocumentCollectionFilterModel) {
 		return this.#collectionSource.getCollection(query);
 	}
-
-	destroy(): void {}
 }
 
 export default UmbDocumentCollectionRepository;

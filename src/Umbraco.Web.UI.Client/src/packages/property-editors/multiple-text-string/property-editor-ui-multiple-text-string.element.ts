@@ -1,10 +1,10 @@
-import { UmbPropertyValueChangeEvent } from '../../core/property-editor/index.js';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbInputMultipleTextStringElement } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbInputMultipleTextStringElement } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-multiple-text-string
@@ -15,8 +15,10 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 	value?: Array<string>;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this._limitMin = config?.getValueByAlias('minNumber');
-		this._limitMax = config?.getValueByAlias('maxNumber');
+		if (!config) return;
+
+		this._min = Number(config.getValueByAlias('min')) || 0;
+		this._max = Number(config.getValueByAlias('max')) || Infinity;
 	}
 
 	/**
@@ -47,10 +49,10 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 	required = false;
 
 	@state()
-	private _limitMin?: number;
+	private _min = 0;
 
 	@state()
-	private _limitMax?: number;
+	private _max = Infinity;
 
 	#onChange(event: UmbChangeEvent) {
 		event.stopPropagation();
@@ -60,14 +62,17 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 	}
 
 	render() {
-		return html`<umb-input-multiple-text-string
-			.items="${this.value ?? []}"
-			min="${ifDefined(this._limitMin)}"
-			max="${ifDefined(this._limitMax)}"
-			@change=${this.#onChange}
-			?disabled=${this.disabled}
-			?readonly=${this.readonly}
-			?required=${this.required}></umb-input-multiple-text-string>`;
+		return html`
+			<umb-input-multiple-text-string
+				max=${this._max}
+				min=${this._min}
+				.items=${this.value ?? []}
+				?disabled=${this.disabled}
+				?readonly=${this.readonly}
+				?required=${this.required}
+				@change=${this.#onChange}>
+			</umb-input-multiple-text-string>
+		`;
 	}
 }
 

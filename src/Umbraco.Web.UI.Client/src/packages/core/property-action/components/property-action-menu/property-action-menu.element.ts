@@ -1,28 +1,31 @@
 import type { UmbPropertyActionArgs } from '../property-action/types.js';
-import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestPropertyAction,
 	ManifestTypes,
 	MetaPropertyAction,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 function ExtensionApiArgsMethod(manifest: ManifestPropertyAction): [UmbPropertyActionArgs<MetaPropertyAction>] {
 	return [{ meta: manifest.meta }];
 }
+
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
 	#actionsInitializer?: UmbExtensionsElementAndApiInitializer<ManifestTypes, 'propertyAction'>;
-	#propertyEditorUiAlias = '';
+
+	@state()
+	private _actions: Array<UmbExtensionElementAndApiInitializer<ManifestPropertyAction, never>> = [];
 
 	@property()
 	set propertyEditorUiAlias(alias: string) {
 		this.#propertyEditorUiAlias = alias;
+
 		// TODO: Stop using string for 'propertyAction', we need to start using Const. [NL]
 		this.#actionsInitializer = new UmbExtensionsElementAndApiInitializer(
 			this,
@@ -30,51 +33,42 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			'propertyAction',
 			ExtensionApiArgsMethod,
 			(propertyAction) => propertyAction.forPropertyEditorUis.includes(alias),
-			(ctrls) => {
-				this._actions = ctrls;
-			},
+			(actions) => (this._actions = actions),
 			'extensionsInitializer',
 		);
 	}
 	get propertyEditorUiAlias() {
 		return this.#propertyEditorUiAlias;
 	}
-
-	@state()
-	private _actions: Array<UmbExtensionElementAndApiInitializer<ManifestPropertyAction, never>> = [];
+	#propertyEditorUiAlias = '';
 
 	render() {
-		return this._actions.length > 0
-			? html`
-					<uui-button
-						id="popover-trigger"
-						popovertarget="property-action-popover"
-						look="secondary"
-						label="Open actions menu"
-						compact>
-						<uui-symbol-more id="more-symbol"></uui-symbol-more>
-					</uui-button>
-					<uui-popover-container id="property-action-popover">
-						<umb-popover-layout>
-							${repeat(
-								this._actions,
-								(action) => action.alias,
-								(action) => action.component,
-							)}
-						</umb-popover-layout>
-					</uui-popover-container>
-			  `
-			: nothing;
+		if (!this._actions?.length) return nothing;
+		return html`
+			<uui-button id="popover-trigger" popovertarget="property-action-popover" label="Open actions menu" compact>
+				<uui-symbol-more id="more-symbol"></uui-symbol-more>
+			</uui-button>
+			<uui-popover-container id="property-action-popover">
+				<umb-popover-layout>
+					${repeat(
+						this._actions,
+						(action) => action.alias,
+						(action) => action.component,
+					)}
+				</umb-popover-layout>
+			</uui-popover-container>
+		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static styles = [
 		UmbTextStyles,
 		css`
 			:host {
 				--uui-menu-item-flat-structure: 1;
 			}
+
 			#more-symbol {
-				font-size: 0.6em;
+				font-size: 1rem;
 			}
 
 			#popover-trigger {

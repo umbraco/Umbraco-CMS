@@ -43,6 +43,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	_label = '';
 
 	@state()
+	_icon?: string;
+
+	@state()
 	_workspaceEditContentPath?: string;
 
 	@state()
@@ -65,10 +68,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			this._hasSettings = !!settingsElementTypeKey;
 		});
 		this.observe(this.#context.label, (label) => {
-			const oldValue = this._label;
-			this._blockViewProps.label = label;
 			this._label = label;
-			this.requestUpdate('label', oldValue);
+			this._blockViewProps.label = label;
+			this.requestUpdate('_blockViewProps');
+		});
+		this.observe(this.#context.contentElementTypeIcon, (icon) => {
+			this._icon = icon;
+			this._blockViewProps.icon = icon;
+			this.requestUpdate('_blockViewProps');
 		});
 		this.observe(this.#context.inlineEditingMode, (inlineEditingMode) => {
 			this._inlineEditingMode = inlineEditingMode;
@@ -115,12 +122,12 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				${this._showContentEdit && this._workspaceEditContentPath
 					? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
 							<uui-icon name="icon-edit"></uui-icon>
-					  </uui-button>`
+						</uui-button>`
 					: ''}
 				${this._hasSettings && this._workspaceEditSettingsPath
 					? html`<uui-button label="Edit settings" compact href=${this._workspaceEditSettingsPath}>
 							<uui-icon name="icon-settings"></uui-icon>
-					  </uui-button>`
+						</uui-button>`
 					: ''}
 				<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
 					<uui-icon name="icon-remove"></uui-icon>

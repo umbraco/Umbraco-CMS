@@ -120,11 +120,13 @@ export class UmbDefaultCollectionContext<
 			this.pagination.setPageSize(this.#config.pageSize);
 		}
 
+		const filterValue = this.#filter.getValue() as FilterModelType;
+
 		this.#filter.setValue({
 			...this.#defaultFilter,
 			...this.#config,
-			...this.#filter.getValue(),
-			skip: 0,
+			...filterValue,
+			skip: filterValue.skip ?? 0,
 			take: this.#config.pageSize,
 		});
 
@@ -150,7 +152,9 @@ export class UmbDefaultCollectionContext<
 		}
 	}
 
-	#observeRepository(repositoryAlias: string) {
+	#observeRepository(repositoryAlias?: string) {
+		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
+
 		new UmbExtensionApiInitializer<ManifestRepository<UmbCollectionRepository>>(
 			this,
 			umbExtensionsRegistry,
@@ -182,25 +186,12 @@ export class UmbDefaultCollectionContext<
 		return this.#config;
 	}
 
-	/**
-	 * Sets the manifest for the collection.
-	 * @param {ManifestCollection} manifest
-	 * @memberof UmbCollectionContext
-	 */
-	public setManifest(manifest: ManifestCollection | undefined) {
+	public set manifest(manifest: ManifestCollection | undefined) {
 		if (this.#manifest === manifest) return;
 		this.#manifest = manifest;
-
-		if (!this.#manifest) return;
-		this.#observeRepository(this.#manifest.meta.repositoryAlias);
+		this.#observeRepository(this.#manifest?.meta.repositoryAlias);
 	}
-
-	/**
-	 * Returns the manifest for the collection.
-	 * @return {ManifestCollection}
-	 * @memberof UmbCollectionContext
-	 */
-	public getManifest() {
+	public get manifest() {
 		return this.#manifest;
 	}
 
@@ -291,5 +282,29 @@ export class UmbDefaultCollectionContext<
 		);
 
 		super.destroy();
+	}
+
+	/**
+	 * Sets the manifest for the collection.
+	 * @param {ManifestCollection} manifest
+	 * @memberof UmbCollectionContext
+	 * @deprecated Use set the `.manifest` property instead.
+	 */
+	public setManifest(manifest: ManifestCollection | undefined) {
+		if (this.#manifest === manifest) return;
+		this.#manifest = manifest;
+
+		if (!this.#manifest) return;
+		this.#observeRepository(this.#manifest.meta.repositoryAlias);
+	}
+
+	/**
+	 * Returns the manifest for the collection.
+	 * @return {ManifestCollection}
+	 * @memberof UmbCollectionContext
+	 * @deprecated Use get the `.manifest` property instead.
+	 */
+	public getManifest() {
+		return this.#manifest;
 	}
 }

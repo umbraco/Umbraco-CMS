@@ -50,7 +50,11 @@ export class UmbDataTypeTreeServerDataSource extends UmbTreeServerDataSourceBase
 
 const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	return DataTypeService.getTreeDataTypeRoot({ skip: args.skip, take: args.take });
+	return DataTypeService.getTreeDataTypeRoot({
+		foldersOnly: args.foldersOnly,
+		skip: args.skip,
+		take: args.take,
+	});
 };
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
@@ -60,6 +64,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DataTypeService.getTreeDataTypeChildren({
 			parentId: args.parent.unique,
+			foldersOnly: args.foldersOnly,
 			skip: args.skip,
 			take: args.take,
 		});

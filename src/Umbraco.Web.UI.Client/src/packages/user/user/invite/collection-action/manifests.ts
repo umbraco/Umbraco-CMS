@@ -10,7 +10,7 @@ export const inviteManifest: ManifestTypes = {
 	api: UmbInviteUserCollectionAction,
 	weight: 100,
 	meta: {
-		label: 'Invite',
+		label: '#user_invite',
 	},
 	conditions: [
 		{

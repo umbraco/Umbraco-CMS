@@ -31,6 +31,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
+	@property({ type: Boolean, attribute: false })
+	foldersOnly?: boolean = false;
+
 	@property({ attribute: false })
 	selectableFilter: (item: UmbTreeItemModelBase) => boolean = () => true;
 
@@ -85,6 +88,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 		if (_changedProperties.has('hideTreeRoot')) {
 			this.#treeContext!.setHideTreeRoot(this.hideTreeRoot);
+		}
+
+		if (_changedProperties.has('foldersOnly')) {
+			this.#treeContext!.setFoldersOnly(this.foldersOnly ?? false);
 		}
 
 		if (_changedProperties.has('selectableFilter')) {

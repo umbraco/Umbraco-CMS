@@ -1,4 +1,6 @@
-import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { localizeAndTransform } from '@umbraco-cms/backoffice/formatting-api';
+import { css, customElement, html, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
@@ -9,7 +11,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
  *  @slot action-menu - Slot for rendering the Property Action Menu
  */
 @customElement('umb-property-layout')
-export class UmbPropertyLayoutElement extends LitElement {
+export class UmbPropertyLayoutElement extends UmbLitElement {
 	/**
 	 * Alias. The technical name of the property.
 	 * @type {string}
@@ -31,11 +33,11 @@ export class UmbPropertyLayoutElement extends LitElement {
 	/**
 	 * Orientation: Horizontal is the default where label goes left and editor right.
 	 * Vertical is where label goes above the editor.
-	 * @type {string}
+	 * @enum ['horizontal', 'vertical']
 	 * @attr
 	 * @default ''
 	 */
-	@property({ type: String })
+	@property({ type: String, reflect: true })
 	public orientation: 'horizontal' | 'vertical' = 'horizontal';
 
 	/**
@@ -60,11 +62,14 @@ export class UmbPropertyLayoutElement extends LitElement {
 		// TODO: Only show alias on label if user has access to DocumentType within settings:
 		return html`
 			<div id="headerColumn">
-				<uui-label title=${this.alias}>
-					${this.label} ${this.invalid ? html`<uui-badge color="danger" attention>!</uui-badge>` : ''}
+				<uui-label id="label" title=${this.alias}>
+					${this.localize.string(this.label)}
+					${when(this.invalid, () => html`<uui-badge color="danger" attention>!</uui-badge>`)}
 				</uui-label>
 				<slot name="action-menu"></slot>
-				<div id="description">${this.description}</div>
+				<uui-scroll-container id="description">
+					${unsafeHTML(localizeAndTransform(this, this.description))}
+				</uui-scroll-container>
 				<slot name="description"></slot>
 			</div>
 			<div id="editorColumn">
@@ -110,10 +115,11 @@ export class UmbPropertyLayoutElement extends LitElement {
 			}
 			/*}*/
 
-			uui-label {
+			#label {
 				position: relative;
+				word-break: break-word;
 			}
-			:host([invalid]) uui-label {
+			:host([invalid]) #label {
 				color: var(--uui-color-danger);
 			}
 			uui-badge {
@@ -122,6 +128,14 @@ export class UmbPropertyLayoutElement extends LitElement {
 
 			#description {
 				color: var(--uui-color-text-alt);
+			}
+
+			#description * {
+				max-width: 100%;
+			}
+
+			#description pre {
+				overflow: auto;
 			}
 
 			#editorColumn {

@@ -1,4 +1,4 @@
-import { UmbRequestReloadTreeItemChildrenEvent } from '../reload-tree-item-children/index.js';
+import { UmbRequestReloadTreeItemChildrenEvent } from '../entity-actions/reload-tree-item-children/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { UmbTreeContext } from '../tree-context.interface.js';
@@ -48,6 +48,9 @@ export class UmbDefaultTreeContext<
 
 	#startNode = new UmbObjectState<UmbTreeStartNode | undefined>(undefined);
 	startNode = this.#startNode.asObservable();
+
+	#foldersOnly = new UmbBooleanState(false);
+	foldersOnly = this.#foldersOnly.asObservable();
 
 	#manifest?: ManifestTree;
 	#repository?: UmbTreeRepository<TreeItemType, TreeRootType>;
@@ -178,6 +181,7 @@ export class UmbDefaultTreeContext<
 
 		// If we have a start node get children of that instead of the root
 		const startNode = this.getStartNode();
+		const foldersOnly = this.#foldersOnly.getValue();
 		const additionalArgs = this.#additionalRequestArgs.getValue();
 
 		const { data } = startNode?.unique
@@ -187,11 +191,13 @@ export class UmbDefaultTreeContext<
 						unique: startNode.unique,
 						entityType: startNode.entityType,
 					},
+					foldersOnly,
 					skip,
 					take,
 				})
 			: await this.#repository!.requestTreeRootItems({
 					...additionalArgs,
+					foldersOnly,
 					skip,
 					take,
 				});
@@ -242,6 +248,36 @@ export class UmbDefaultTreeContext<
 	}
 
 	/**
+	 * Gets the startNode config
+	 * @return {UmbTreeStartNode}
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getStartNode() {
+		return this.#startNode.getValue();
+	}
+
+	/**
+	 * Sets the foldersOnly config
+	 * @param {boolean} foldersOnly
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setFoldersOnly(foldersOnly: boolean) {
+		this.#foldersOnly.setValue(foldersOnly);
+		// we need to reset the tree if this config changes
+		this.#resetTree();
+		this.loadTree();
+	}
+
+	/**
+	 * Gets the foldersOnly config
+	 * @return {boolean}
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getFoldersOnly() {
+		return this.#foldersOnly.getValue();
+	}
+
+	/**
 	 * Updates the requestArgs config and reloads the tree.
 	 */
 	public updateAdditionalRequestArgs(args: Partial<RequestArgsType>) {
@@ -252,15 +288,6 @@ export class UmbDefaultTreeContext<
 
 	public getAdditionalRequestArgs() {
 		return this.#additionalRequestArgs.getValue();
-	}
-
-	/**
-	 * Gets the startNode config
-	 * @return {UmbTreeStartNode}
-	 * @memberof UmbDefaultTreeContext
-	 */
-	getStartNode() {
-		return this.#startNode.getValue();
 	}
 
 	#resetTree() {

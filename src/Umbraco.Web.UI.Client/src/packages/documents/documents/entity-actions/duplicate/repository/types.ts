@@ -1,4 +1,4 @@
-import type { UmbDuplicateToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbDuplicateToRequestArgs } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbDuplicateDocumentRequestArgs extends UmbDuplicateToRequestArgs {
 	relateToOriginal: boolean;

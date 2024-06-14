@@ -9,3 +9,5 @@ export class UmbDictionaryDetailRepository extends UmbDetailRepositoryBase<UmbDi
 		super(host, UmbDictionaryServerDataSource, UMB_DICTIONARY_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export { UmbDictionaryDetailRepository as api };

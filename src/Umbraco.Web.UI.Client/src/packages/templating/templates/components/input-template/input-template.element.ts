@@ -5,11 +5,8 @@ import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { UMB_TEMPLATE_PICKER_MODAL } from '../../modals/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_WORKSPACE_MODAL,
-	UmbModalRouteRegistrationController,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 

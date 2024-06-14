@@ -8,6 +8,7 @@ export { UmbStylesheetTreeRepository } from './tree/index.js';
 // Components
 export { UmbStylesheetRuleInputElement } from './components/index.js';
 export { UmbStylesheetInputElement } from './components/index.js';
+export { UMB_STYLESHEET_PICKER_MODAL } from './components/index.js';
 
 // Utils
 export { UmbStylesheetRuleManager } from './utils/index.js';

@@ -11,13 +11,19 @@ import { html, customElement, state, repeat, css, property, nothing } from '@umb
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../block-grid-entry/index.js';
 import { UmbSorterController, type UmbSorterConfig, type resolvePlacementArgs } from '@umbraco-cms/backoffice/sorter';
+import {
+	UmbFormControlMixin,
+	UmbFormControlValidator,
+	type UmbFormControlValidatorConfig,
+} from '@umbraco-cms/backoffice/validation';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
  */
 function resolvePlacementAsGrid(args: resolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>) {
 	// If this has areas, we do not want to move, unless we are at the edge
-	if (args.relatedModel.areas.length > 0 && isWithinRect(args.pointerX, args.pointerY, args.relatedRect, -10)) {
+	if (args.relatedModel.areas?.length > 0 && isWithinRect(args.pointerX, args.pointerY, args.relatedRect, -10)) {
 		return null;
 	}
 
@@ -98,7 +104,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
  * @element umb-block-grid-entries
  */
 @customElement('umb-block-grid-entries')
-export class UmbBlockGridEntriesElement extends UmbLitElement {
+export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElement) {
 	//
 	// TODO: Make sure Sorter callbacks handles columnSpan when retrieving a new entry.
 
@@ -126,6 +132,7 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 	});
 
 	#context = new UmbBlockGridEntriesContext(this);
+	#controlValidator: UmbFormControlValidator;
 
 	@property({ attribute: false })
 	public set areaKey(value: string | null | undefined) {
@@ -161,27 +168,43 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.observe(this.#context.layoutEntries, (layoutEntries) => {
-			const oldValue = this._layoutEntries;
-			this.#sorter.setModel(layoutEntries);
-			this._layoutEntries = layoutEntries;
-			this.requestUpdate('layoutEntries', oldValue);
-		});
+		this.observe(
+			this.#context.layoutEntries,
+			(layoutEntries) => {
+				//const oldValue = this._layoutEntries;
+				this.#sorter.setModel(layoutEntries);
+				this._layoutEntries = layoutEntries;
+				//this.requestUpdate('layoutEntries', oldValue);
+			},
+			null,
+		);
 
-		this.observe(this.#context.amountOfAllowedBlockTypes, (length) => {
-			this._canCreate = length > 0;
-			if (length === 1) {
-				this.observe(
-					this.#context.firstAllowedBlockTypeName(),
-					(firstAllowedName) => {
-						this._singleBlockTypeName = firstAllowedName;
-					},
-					'observeSingleBlockTypeName',
-				);
-			} else {
-				this.removeUmbControllerByAlias('observeSingleBlockTypeName');
-			}
-		});
+		this.observe(
+			this.#context.amountOfAllowedBlockTypes,
+			(length) => {
+				this._canCreate = length > 0;
+				if (length === 1) {
+					this.observe(
+						this.#context.firstAllowedBlockTypeName(),
+						(firstAllowedName) => {
+							this._singleBlockTypeName = firstAllowedName;
+						},
+						'observeSingleBlockTypeName',
+					);
+				} else {
+					this.removeUmbControllerByAlias('observeSingleBlockTypeName');
+				}
+			},
+			null,
+		);
+
+		this.observe(
+			this.#context.rangeLimits,
+			(rangeLimits) => {
+				this.#setupRangeValidation(rangeLimits);
+			},
+			null,
+		);
 
 		this.#context.getManager().then((manager) => {
 			this.observe(
@@ -195,9 +218,55 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 				'observeStylesheet',
 			);
 		});
+
+		this.#controlValidator = new UmbFormControlValidator(this, this /*, this.#dataPath*/);
 	}
 
-	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type.
+	#rangeUnderflowValidator?: UmbFormControlValidatorConfig;
+	#rangeOverflowValidator?: UmbFormControlValidatorConfig;
+	async #setupRangeValidation(rangeLimit: UmbNumberRangeValueType | undefined) {
+		if (this.#rangeUnderflowValidator) {
+			this.removeValidator(this.#rangeUnderflowValidator);
+			this.#rangeUnderflowValidator = undefined;
+		}
+		if (rangeLimit?.min !== 0) {
+			this.#rangeUnderflowValidator = this.addValidator(
+				'rangeUnderflow',
+				() => {
+					return this.localize.term(
+						'validation_entriesShort',
+						rangeLimit!.min,
+						(rangeLimit!.min ?? 0) - this._layoutEntries.length,
+					);
+				},
+				() => {
+					return this._layoutEntries.length < (rangeLimit?.min ?? 0);
+				},
+			);
+		}
+
+		if (this.#rangeOverflowValidator) {
+			this.removeValidator(this.#rangeOverflowValidator);
+			this.#rangeOverflowValidator = undefined;
+		}
+		if (rangeLimit?.max !== Infinity) {
+			this.#rangeOverflowValidator = this.addValidator(
+				'rangeOverflow',
+				() => {
+					return this.localize.term(
+						'validation_entriesExceed',
+						rangeLimit!.max,
+						this._layoutEntries.length - (rangeLimit!.max ?? this._layoutEntries.length),
+					);
+				},
+				() => {
+					return (this._layoutEntries.length ?? 0) > (rangeLimit?.max ?? Infinity);
+				},
+			);
+		}
+	}
+
+	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type. [NL]
 	render() {
 		return html`
 			${this._styleElement}
@@ -208,12 +277,13 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 					(layoutEntry, index) =>
 						html`<umb-block-grid-entry
 							class="umb-block-grid__layout-item"
-							.index=${index}
+							index=${index}
 							.contentUdi=${layoutEntry.contentUdi}
 							.layout=${layoutEntry}>
 						</umb-block-grid-entry>`,
 				)}
 			</div>
+			<uui-form-validation-message .for=${this}></uui-form-validation-message>
 			${this._canCreate ? this.#renderCreateButton() : nothing}
 		`;
 	}

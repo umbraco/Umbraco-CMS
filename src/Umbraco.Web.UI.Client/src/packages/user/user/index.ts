@@ -5,3 +5,5 @@ export * from './repository/index.js';
 export type * from './types.js';
 export * from './utils/index.js';
 export * from './entity.js';
+
+export { UMB_USER_PICKER_MODAL } from './modals/user-picker/index.js';

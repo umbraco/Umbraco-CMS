@@ -1,14 +1,17 @@
 import { manifest as schemaManifest } from './Umbraco.RichText.js';
 import type { ManifestPropertyEditorUi, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
+export const UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS = 'Umbraco.RichText';
+export const UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS = 'Umb.PropertyEditorUi.TinyMCE';
+
 const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
-	alias: 'Umb.PropertyEditorUi.TinyMCE',
+	alias: UMB_BLOCK_RTE_PROPERTY_EDITOR_UI_ALIAS,
 	name: 'Rich Text Editor Property Editor UI',
 	element: () => import('./property-editor-ui-tiny-mce.element.js'),
 	meta: {
 		label: 'Rich Text Editor',
-		propertyEditorSchemaAlias: 'Umbraco.RichText',
+		propertyEditorSchemaAlias: UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-browser-window',
 		group: 'richText',
 		settings: {

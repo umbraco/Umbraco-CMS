@@ -1,9 +1,9 @@
 import { UmbLanguageCollectionRepository } from '../collection/index.js';
 import type { UmbLanguageDetailModel } from '../types.js';
+import { UMB_APP_LANGUAGE_CONTEXT } from './app-language.context-token.js';
 import { UmbArrayState, UmbObjectState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 
@@ -71,5 +71,3 @@ export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext>
 
 // Default export to enable this as a globalContext extension js:
 export default UmbAppLanguageContext;
-
-export const UMB_APP_LANGUAGE_CONTEXT = new UmbContextToken<UmbAppLanguageContext>('UmbAppLanguageContext');

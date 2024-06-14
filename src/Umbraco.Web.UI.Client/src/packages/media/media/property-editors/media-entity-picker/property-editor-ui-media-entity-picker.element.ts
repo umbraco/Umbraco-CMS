@@ -2,7 +2,7 @@ import { html, customElement, property } from '@umbraco-cms/backoffice/external/
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -25,7 +25,7 @@ export class UmbPropertyEditorUIMediaEntityPickerElement extends UmbLitElement i
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		const minMax = config?.getValueByAlias<NumberRangeValueType>('validationLimit');
+		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		this.#min = minMax?.min ?? 0;
 		this.#max = minMax?.max ?? Infinity;
 	}

@@ -86,6 +86,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			},
 		],
 	},
+	/* TODO: Implement Permissions Entity Action
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -108,6 +109,8 @@ const entityActions: Array<ManifestEntityAction> = [
 			},
 		],
 	},
+	*/
+	/* TODO: Implement Notifications Entity Action
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -130,6 +133,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			},
 		],
 	},
+	*/
 ];
 
 export const manifests: Array<ManifestTypes> = [

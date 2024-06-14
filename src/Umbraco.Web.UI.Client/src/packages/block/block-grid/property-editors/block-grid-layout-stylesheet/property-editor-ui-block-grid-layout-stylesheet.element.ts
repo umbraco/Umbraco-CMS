@@ -27,6 +27,8 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 		return this._value;
 	}
 
+	private _pickableFilter = (item: any) => item.unique.endsWith('css');
+
 	@property({ attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
@@ -40,6 +42,7 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 		return html`
 			<umb-input-static-file
 				@change=${this._onChange}
+				.pickableFilter=${this._pickableFilter}
 				.selection=${this._value}
 				.min=${0}
 				.max=${1}></umb-input-static-file>

@@ -16,7 +16,7 @@ if (!['dev', 'prod'].includes(mode)) {
 export default {
 	rootDir: '.',
 	files: ['./src/**/*.test.ts'],
-	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: true },
+	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: false },
 	browsers: [playwrightLauncher({ product: 'chromium' }), playwrightLauncher({ product: 'webkit' })],
 	coverageConfig: {
 		reporters: ['lcovonly', 'text-summary'],
@@ -34,7 +34,7 @@ export default {
 			},
 		}),
 		commonjs({
-			include: ['node_modules/base64-js/**/*', 'node_modules/tinymce/**/*']
+			include: ['node_modules/base64-js/**/*', 'node_modules/tinymce/**/*'],
 		}),
 		esbuildPlugin({ ts: true, tsconfig: './tsconfig.json', target: 'auto', json: true }),
 	],
@@ -53,6 +53,9 @@ export default {
 				<link rel="stylesheet" href="src/css/user-defined.css">
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
 				<link rel="stylesheet" href="src/css/umb-css.css">
+				<script type="module">
+					import '@umbraco-cms/backoffice/components';
+				</script>
 			</head>
       <body>
         <script type="module" src="${testFramework}"></script>

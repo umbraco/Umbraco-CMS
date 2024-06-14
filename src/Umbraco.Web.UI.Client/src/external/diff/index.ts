@@ -1,1 +1,1 @@
-export { diffWords } from 'diff';
+export { diffWords, type Change } from 'diff';

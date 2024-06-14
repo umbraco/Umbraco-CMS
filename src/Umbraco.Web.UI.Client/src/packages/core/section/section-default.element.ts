@@ -1,4 +1,4 @@
-import type { UmbWorkspaceElement } from '../workspace/workspace.element.js';
+import type { ManifestSectionRoute } from '../extension-registry/models/section-route.model.js';
 import type { UmbSectionMainViewElement } from './section-main-views/section-main-views.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -9,11 +9,16 @@ import type {
 	UmbSectionElement,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import type { IRoute, IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_WORKSPACE_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbExtensionsApiInitializer,
+	UmbExtensionsElementInitializer,
+	UmbExtensionsManifestInitializer,
+	createExtensionApi,
+} from '@umbraco-cms/backoffice/extension-api';
+import { aliasToPath, debounce } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @export
@@ -56,7 +61,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 			this.requestUpdate('_sidebarApps', oldValue);
 		});
 
-		this.#createRoutes();
+		this.#observeRoutes();
 
 		const splitPanelPosition = localStorage.getItem('umb-split-panel-position');
 		if (splitPanelPosition) {
@@ -64,15 +69,50 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		}
 	}
 
-	#createRoutes() {
-		this._routes = [
-			{
-				path: UMB_WORKSPACE_PATH_PATTERN.toString(),
-				component: () => import('../workspace/workspace.element.js'),
-				setup: (element, info) => {
-					(element as UmbWorkspaceElement).entityType = info.match.params.entityType;
-				},
+	#observeRoutes(): void {
+		new UmbExtensionsManifestInitializer<ManifestSectionRoute, 'sectionRoute', ManifestSectionRoute>(
+			this,
+			umbExtensionsRegistry,
+			'sectionRoute',
+			null,
+			async (sectionRouteExtensions) => {
+				// TODO: we only support extensions with an element prop
+				const extensionsWithElement = sectionRouteExtensions.filter((extension) => extension.manifest.element);
+				const extensionsWithoutElement = sectionRouteExtensions.filter((extension) => !extension.manifest.element);
+				if (extensionsWithoutElement.length > 0) throw new Error('sectionRoute extensions must have an element');
+
+				const routes: Array<IRoute> = await Promise.all(
+					extensionsWithElement.map(async (extensionController) => {
+						const api = await createExtensionApi(this, extensionController.manifest);
+
+						return {
+							path:
+								api?.getPath?.() ||
+								extensionController.manifest.meta?.path ||
+								aliasToPath(extensionController.manifest.alias),
+							// TODO: look into removing the "as PageComponent" type hack
+							// be aware that this is kind of a hack to pass the manifest element to the router. But as the two resolve components
+							// in a similar way. I currently find it more safe to let the router do the component resolving instead
+							// of replicating it as a custom resolver here.
+							component: extensionController.manifest.element as PageComponent | PromiseLike<PageComponent>,
+							setup: (element: PageComponent, info: IRoutingInfo) => {
+								api?.setup?.(element, info);
+							},
+						};
+					}),
+				);
+
+				this.#debouncedCreateRoutes(routes);
 			},
+			'umbRouteExtensionApisInitializer',
+		);
+	}
+
+	#debouncedCreateRoutes = debounce(this.#createRoutes, 50);
+
+	#createRoutes(routes: Array<IRoute>) {
+		this._routes = [
+			...routes,
 			{
 				path: '**',
 				component: () => import('./section-main-views/section-main-views.element.js'),

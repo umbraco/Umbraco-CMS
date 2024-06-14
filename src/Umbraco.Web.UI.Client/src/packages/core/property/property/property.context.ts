@@ -7,12 +7,14 @@ import {
 	UmbBasicState,
 	UmbClassState,
 	UmbDeepState,
+	UmbObjectState,
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbPropertyEditorConfigProperty } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyTypeAppearanceModel } from '@umbraco-cms/backoffice/content-type';
 
 export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPropertyContext<ValueType>> {
 	#alias = new UmbStringState(undefined);
@@ -21,6 +23,8 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	public readonly label = this.#label.asObservable();
 	#description = new UmbStringState(undefined);
 	public readonly description = this.#description.asObservable();
+	#appearance = new UmbObjectState<UmbPropertyTypeAppearanceModel | undefined>(undefined);
+	public readonly appearance = this.#appearance.asObservable();
 	#value = new UmbDeepState<ValueType | undefined>(undefined);
 	public readonly value = this.#value.asObservable();
 	#configValues = new UmbArrayState<UmbPropertyEditorConfigProperty>([], (x) => x.alias);
@@ -116,6 +120,12 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	public getDescription(): string | undefined {
 		return this.#description.getValue();
 	}
+	public setAppearance(appearance: UmbPropertyTypeAppearanceModel | undefined): void {
+		this.#appearance.setValue(appearance);
+	}
+	public getAppearance(): UmbPropertyTypeAppearanceModel | undefined {
+		return this.#appearance.getValue();
+	}
 	/**
 	 * Set the value of this property.
 	 * @param value {ValueType} the whole value to be set
@@ -147,10 +157,10 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 	}
 
 	public resetValue(): void {
-		this.setValue(undefined); // TODO: We should get the value from the server aka. the value from the persisted data.
+		this.setValue(undefined); // TODO: We should get the value from the server aka. the value from the persisted data. (Most workspaces holds this data, via dataset) [NL]
 	}
 	public clearValue(): void {
-		this.setValue(undefined); // TODO: We should get the default value from Property Editor maybe even later the DocumentType, as that would hold the default value for the property.
+		this.setValue(undefined); // TODO: We should get the default value from Property Editor maybe even later the DocumentType, as that would hold the default value for the property. (Get it via the dataset) [NL]
 	}
 
 	public destroy(): void {
@@ -158,6 +168,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPrope
 		this.#alias.destroy();
 		this.#label.destroy();
 		this.#description.destroy();
+		this.#appearance.destroy();
 		this.#configValues.destroy();
 		this.#value.destroy();
 		this.#config.destroy();

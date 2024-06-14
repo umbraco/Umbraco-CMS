@@ -24,4 +24,7 @@ export class WorkspaceContextCounter extends UmbControllerBase {
 export const api = WorkspaceContextCounter;
 
 // Declare a Context Token that other elements can use to request the WorkspaceContextCounter:
-export const EXAMPLE_COUNTER_CONTEXT = new UmbContextToken<WorkspaceContextCounter>('example.workspaceContext.counter');
+export const EXAMPLE_COUNTER_CONTEXT = new UmbContextToken<WorkspaceContextCounter>(
+	'UmbWorkspaceContext',
+	'example.workspaceContext.counter',
+);

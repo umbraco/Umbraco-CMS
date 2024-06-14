@@ -19,4 +19,6 @@ export class UmbDictionaryTreeStore extends UmbUniqueTreeStore {
 	}
 }
 
+export { UmbDictionaryTreeStore as api };
+
 export const UMB_DICTIONARY_TREE_STORE_CONTEXT = new UmbContextToken<UmbDictionaryTreeStore>('UmbDictionaryTreeStore');

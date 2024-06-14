@@ -5,7 +5,8 @@ import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.
 import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 
@@ -117,7 +118,9 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	#renderDropdown() {
 		if (!this._allowedMediaTypes.length) return;
 
-		const label = this.manifest?.meta.label ?? this.localize.term('general_create');
+		const label = this.manifest?.meta.label
+			? this.localize.string(this.manifest.meta.label)
+			: this.manifest?.name ?? '';
 
 		return html`
 			<uui-button popovertarget="collection-action-menu-popover" label=${label} color="default" look="outline">

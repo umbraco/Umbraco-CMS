@@ -1,17 +1,14 @@
 import { UmbDocumentPublicAccessRepository } from '../repository/public-access.repository.js';
-import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbDocumentDetailRepository } from '../../../repository/index.js';
+import type { UmbInputDocumentElement } from '../../../components/index.js';
+import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from './public-access-modal.token.js';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import {
-	UmbDocumentDetailRepository,
-	type UmbInputDocumentElement,
-	type UmbPublicAccessModalData,
-	type UmbPublicAccessModalValue,
-} from '@umbraco-cms/backoffice/document';
-import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbInputMemberTypeElement } from '@umbraco-cms/backoffice/member-type';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
+import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
+import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-public-access-modal')
 export class UmbPublicAccessModalElement extends UmbModalBaseElement<
@@ -136,7 +133,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	}
 
 	#onChangeGroup(e: CustomEvent) {
-		this._selection = (e.target as UmbInputMemberTypeElement).selection;
+		this._selection = (e.target as UmbInputMemberGroupElement).selection;
 	}
 
 	#onChangeMember(e: CustomEvent) {
@@ -208,7 +205,9 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 			: html`<umb-localize key="publicAccess_paSelectGroups" .args=${[this._documentName]}>
 						Select the groups who have access to the page <strong>${this._documentName}</strong>
 					</umb-localize>
-					<umb-input-member-type .selection=${this._selection} @change=${this.#onChangeGroup}></umb-input-member-type>`;
+					<umb-input-member-group
+						.selection=${this._selection}
+						@change=${this.#onChangeGroup}></umb-input-member-group>`;
 	}
 
 	// Action buttons

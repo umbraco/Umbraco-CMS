@@ -9,7 +9,7 @@ export interface ServertimeOffset {
 	offset: number;
 }
 
-export interface NumberRangeValueType {
+export interface UmbNumberRangeValueType {
 	min?: number;
 	max?: number;
 }

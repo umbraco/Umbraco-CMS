@@ -71,7 +71,9 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 				@click=${this._onClick}
 				look="outline"
 				color="default"
-				label=${this.manifest?.meta.label || ''}
+				label=${ifDefined(
+					this.manifest?.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest?.name,
+				)}
 				href="${ifDefined(this.manifest?.meta.href)}"
 				.state=${this._buttonState}></uui-button>
 		`;

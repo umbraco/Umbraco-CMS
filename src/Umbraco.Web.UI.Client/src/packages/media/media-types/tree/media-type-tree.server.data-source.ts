@@ -41,7 +41,11 @@ export class UmbMediaTypeTreeServerDataSource extends UmbTreeServerDataSourceBas
 
 const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	MediaTypeService.getTreeMediaTypeRoot({ skip: args.skip, take: args.take });
+	MediaTypeService.getTreeMediaTypeRoot({
+		foldersOnly: args.foldersOnly,
+		skip: args.skip,
+		take: args.take,
+	});
 
 const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parent.unique === null) {
@@ -50,6 +54,7 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return MediaTypeService.getTreeMediaTypeChildren({
 			parentId: args.parent.unique,
+			foldersOnly: args.foldersOnly,
 			skip: args.skip,
 			take: args.take,
 		});

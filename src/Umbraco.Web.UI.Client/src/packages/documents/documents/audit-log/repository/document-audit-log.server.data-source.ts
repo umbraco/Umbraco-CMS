@@ -1,6 +1,6 @@
-import type { UmbAuditLogDataSource, UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbDocumentAuditLogModel } from '../types.js';
 import type { UmbDocumentAuditLogType } from '../utils/index.js';
+import type { UmbAuditLogDataSource, UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';

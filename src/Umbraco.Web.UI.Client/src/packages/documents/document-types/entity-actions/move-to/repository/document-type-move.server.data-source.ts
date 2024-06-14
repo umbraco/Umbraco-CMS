@@ -1,7 +1,7 @@
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/tree';
 
 /**
  * Move DocumentType Server Data Source

@@ -25,7 +25,7 @@ export type Guard<D = any, P = any> = (info: IRoutingInfo<D, P>) => boolean | Pr
 export type Cancel = () => boolean;
 
 export type PageComponent = HTMLElement | undefined;
-export type ModuleResolver = Promise<{ default: any /*PageComponent*/ }>;
+export type ModuleResolver = Promise<{ default?: any /*PageComponent*/; element?: any /*PageComponent*/ }>;
 export type Class<T extends PageComponent = PageComponent> = { new (...args: any[]): T };
 export type Component =
 	| Class

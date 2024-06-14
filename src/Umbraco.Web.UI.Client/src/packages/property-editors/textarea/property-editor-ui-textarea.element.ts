@@ -1,11 +1,10 @@
-import { css, html, customElement, property, state, ifDefined, styleMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { css, customElement, html, property, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UmbPropertyValueChangeEvent,
-	type UmbPropertyEditorConfigCollection,
-} from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -25,34 +24,36 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 	private _minHeight?: number;
 
 	@state()
-	private _css?: any;
+	private _css: StyleInfo = {};
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this._maxChars = config?.getValueByAlias('maxChars');
-		this._rows = config?.getValueByAlias('rows');
-		this._minHeight = config?.getValueByAlias('minHeight');
-		this._maxHeight = config?.getValueByAlias('maxHeight');
+		this._maxChars = Number(config?.getValueByAlias('maxChars')) || undefined;
+		this._rows = Number(config?.getValueByAlias('rows')) || undefined;
+		this._minHeight = Number(config?.getValueByAlias('minHeight')) || undefined;
+		this._maxHeight = Number(config?.getValueByAlias('maxHeight')) || undefined;
 
 		this._css = {
-			'--uui-textarea-min-height': `${this._minHeight ? `${this._minHeight}px` : 'reset'}`,
-			'--uui-textarea-max-height': `${this._maxHeight ? `${this._maxHeight}px` : 'reset'}`,
+			'--uui-textarea-min-height': this._minHeight ? `${this._minHeight}px` : 'reset',
+			'--uui-textarea-max-height': this._maxHeight ? `${this._maxHeight}px` : 'reset',
 		};
 	}
 
-	private onInput(e: InputEvent) {
-		this.value = (e.target as UUITextareaElement).value as string;
+	#onInput(event: InputEvent & { target: UUITextareaElement }) {
+		this.value = event.target.value as string;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html` <uui-textarea
-			label="Textarea"
-			.value=${this.value ?? ''}
-			maxlength="${ifDefined(this._maxChars)}"
-			rows="${ifDefined(this._rows)}"
-			@input=${this.onInput}
-			style="${styleMap(this._css)}"
-			auto-height=${this._rows ? false : true}></uui-textarea>`;
+		return html`
+			<uui-textarea
+				label="Textarea"
+				style=${styleMap(this._css)}
+				.autoHeight=${this._rows ? false : true}
+				.maxlength=${this._maxChars}
+				.rows=${this._rows}
+				.value=${this.value ?? ''}
+				@input=${this.#onInput}></uui-textarea>
+		`;
 	}
 
 	static styles = [

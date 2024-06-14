@@ -51,7 +51,11 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	// close the modal when navigating to data type
-	#onNavigate() {
+	#onNavigate(mediaType: UmbAllowedMediaTypeModel) {
+		const url = `section/media/workspace/media/create/parent/${this.data?.parent.entityType}/${
+			this.data?.parent.unique ?? 'null'
+		}/${mediaType.unique}`;
+		history.pushState({}, '', url);
 		this._submitModal();
 	}
 
@@ -64,15 +68,15 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 						: nothing}
 					${this._allowedMediaTypes.map(
 						(mediaType) => html`
-							<uui-menu-item
+							<uui-ref-node-document-type
 								data-id=${ifDefined(mediaType.unique)}
-								href="${`section/media/workspace/media/create/parent/${this.data?.parent.entityType}/${
-									this.data?.parent.unique ?? 'null'
-								}/${mediaType.unique}`}"
-								label="${mediaType.name}"
-								@click=${this.#onNavigate}>
-								> ${mediaType.icon ? html`<umb-icon slot="icon" name=${mediaType.icon}></umb-icon>` : nothing}
-							</uui-menu-item>
+								.name=${mediaType.name}
+								.alias=${mediaType.description}
+								select-only
+								selectable
+								@selected=${() => this.#onNavigate(mediaType)}>
+								${mediaType.icon ? html`<umb-icon slot="icon" name=${mediaType.icon}></umb-icon>` : nothing}
+							</uui-ref-node-document-type>
 						`,
 					)}
 				</uui-box>

@@ -1,4 +1,4 @@
-import type { UmbCollectionBulkActionPermissions } from '../../../../core/collection/types.js';
+import type { UmbCollectionBulkActionPermissions } from '@umbraco-cms/backoffice/collection';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';

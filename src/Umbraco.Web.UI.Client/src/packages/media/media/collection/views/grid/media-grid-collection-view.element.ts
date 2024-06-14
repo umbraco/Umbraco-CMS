@@ -5,7 +5,8 @@ import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-tok
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
@@ -118,7 +119,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	#renderItem(item: UmbMediaCollectionItemModel) {
 		return html`
 			<uui-card-media
-				.name=${item.name ?? 'Unnamed Media'}
+				.name=${item.name}
 				selectable
 				?select-only=${this._selection && this._selection.length > 0}
 				?selected=${this.#isSelected(item)}
@@ -126,7 +127,11 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}
 				class="media-item">
-				${item.url ? html`<img src=${item.url} alt=${item.name} />` : html`<umb-icon name=${item.icon}></umb-icon>`}
+				${when(
+					item.url,
+					() => html`<img src=${item.url!} alt=${item.name} draggable="false" />`,
+					() => html`<umb-icon name=${item.icon}></umb-icon>`,
+				)}
 				<!-- TODO: [LK] I'd like to indicate a busy state when bulk actions are triggered. -->
 				<!-- <div class="container"><uui-loader></uui-loader></div> -->
 			</uui-card-media>

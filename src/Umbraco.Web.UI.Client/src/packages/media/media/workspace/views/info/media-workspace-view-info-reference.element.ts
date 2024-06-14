@@ -1,26 +1,24 @@
-import { css, html, customElement, state, nothing, repeat, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { isDefaultReference, isDocumentReference, isMediaReference } from '@umbraco-cms/backoffice/relations';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbMediaReferenceRepository } from '@umbraco-cms/backoffice/media';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
-import {
-	isDefaultReference,
-	isDocumentReference,
-	isMediaReference,
-	type UmbReferenceModel,
-} from '@umbraco-cms/backoffice/relations';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import type { UmbReferenceModel } from '@umbraco-cms/backoffice/relations';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-media-workspace-view-info-reference')
 export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	#itemsPerPage = 10;
+
 	#referenceRepository;
+
+	#routeBuilder?: UmbModalRouteBuilder;
 
 	@property()
 	mediaUnique = '';
-
-	@state()
-	private _editMediaPath = '';
 
 	@state()
 	private _currentPage = 1;
@@ -31,17 +29,20 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	@state()
 	private _items?: Array<UmbReferenceModel> = [];
 
+	@state()
+	private _loading = true;
+
 	constructor() {
 		super();
 		this.#referenceRepository = new UmbMediaReferenceRepository(this);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('media')
-			.onSetup(() => {
-				return { data: { entityType: 'media', preset: {} } };
+			.addAdditionalPath(':entityType')
+			.onSetup((params) => {
+				return { data: { entityType: params.entityType, preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this._editMediaPath = routeBuilder({});
+				this.#routeBuilder = routeBuilder;
 			});
 	}
 
@@ -50,15 +51,20 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	}
 
 	async #getReferences() {
+		this._loading = true;
+
 		const { data } = await this.#referenceRepository.requestReferencedBy(
 			this.mediaUnique,
-			this._currentPage - 1 * this.#itemsPerPage,
+			(this._currentPage - 1) * this.#itemsPerPage,
 			this.#itemsPerPage,
 		);
+
 		if (!data) return;
 
 		this._total = data.total;
 		this._items = data.items;
+
+		this._loading = false;
 	}
 
 	#onPageChange(event: UUIPaginationEvent) {
@@ -66,6 +72,11 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 		this._currentPage = event.target.current;
 
 		this.#getReferences();
+	}
+
+	#getEditPath(item: UmbReferenceModel) {
+		const entityType = this.#getEntityType(item);
+		return this.#routeBuilder && entityType ? `${this.#routeBuilder({ entityType })}edit/${item.id}` : '#';
 	}
 
 	#getIcon(item: UmbReferenceModel) {
@@ -95,88 +106,94 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 		if (isDefaultReference(item)) {
 			return item.type;
 		}
-		return '';
+		return null;
 	}
 
-	#getContentType(item: UmbReferenceModel) {
+	#getEntityType(item: UmbReferenceModel) {
 		if (isDocumentReference(item)) {
-			return item.documentType.alias;
+			return 'document';
 		}
 		if (isMediaReference(item)) {
-			return item.mediaType.alias;
+			return 'media';
 		}
 		if (isDefaultReference(item)) {
 			return item.type;
 		}
-		return '';
+		return null;
 	}
 
 	render() {
-		if (this._items && this._items.length > 0) {
-			return html` <uui-box
-					headline=${this.localize.term('references_labelUsedByItems')}
-					style="--uui-box-default-padding:0">
-					<uui-table>
-						<uui-table-head>
-							<uui-table-head-cell></uui-table-head-cell>
-							<uui-table-head-cell><umb-localize key="general_name">Name</umb-localize></uui-table-head-cell>
-							<uui-table-head-cell><umb-localize key="general_status">Status</umb-localize></uui-table-head-cell>
-							<uui-table-head-cell><umb-localize key="general_typeName">Type Name</umb-localize></uui-table-head-cell>
-							<uui-table-head-cell><umb-localize key="general_type">Type</umb-localize></uui-table-head-cell>
-						</uui-table-head>
-
-						${repeat(
-							this._items,
-							(item) => item.id,
-							(item) =>
-								html`<uui-table-row>
-									<uui-table-cell style="text-align:center;">
-										<umb-icon name=${this.#getIcon(item)}></umb-icon>
-									</uui-table-cell>
-									<uui-table-cell class="link-cell">
-										${isDocumentReference(item)
-											? html`
-													<uui-button
-														label="${this.localize.term('general_edit')} ${item.name}"
-														href=${`${this._editMediaPath}edit/${item.id}`}>
-														${item.name}
-													</uui-button>
-												`
-											: item.name}
-									</uui-table-cell>
-									<uui-table-cell>
-										${this.#getPublishedStatus(item)
-											? this.localize.term('content_published')
-											: this.localize.term('content_unpublished')}
-									</uui-table-cell>
-									<uui-table-cell>${this.#getContentTypeName(item)}</uui-table-cell>
-									<uui-table-cell>${this.#getContentType(item)}</uui-table-cell>
-								</uui-table-row>`,
-						)}
-					</uui-table>
-				</uui-box>
-				${this.#renderReferencePagination()}`;
-		} else {
-			return nothing;
-		}
+		return html`
+			<uui-box headline=${this.localize.term('references_labelUsedByItems')}>
+				${when(
+					this._loading,
+					() => html`<uui-loader></uui-loader>`,
+					() => html`${this.#renderItems()} ${this.#renderPagination()}`,
+				)}
+			</uui-box>
+		`;
 	}
 
-	#renderReferencePagination() {
+	#renderItems() {
+		if (!this._items?.length) return html`<p><umb-localize key="references_itemHasNoReferences">This item has no references.</umb-localize></p>`;
+		return html`
+			<uui-table>
+				<uui-table-head>
+					<uui-table-head-cell><umb-localize key="general_name">Name</umb-localize></uui-table-head-cell>
+					<uui-table-head-cell><umb-localize key="general_status">Status</umb-localize></uui-table-head-cell>
+					<uui-table-head-cell><umb-localize key="general_typeName">Type Name</umb-localize></uui-table-head-cell>
+					<uui-table-head-cell><umb-localize key="general_type">Type</umb-localize></uui-table-head-cell>
+				</uui-table-head>
+				${repeat(
+					this._items,
+					(item) => item.id,
+					(item) => html`
+						<uui-table-row>
+							<uui-table-cell>
+								<uui-ref-node name=${item.name!} href=${this.#getEditPath(item)}>
+									<umb-icon slot="icon" name=${this.#getIcon(item)}></umb-icon>
+								</uui-ref-node>
+							</uui-table-cell>
+							<uui-table-cell>
+								${when(
+									this.#getPublishedStatus(item),
+									() =>
+										html`<uui-tag color="positive" look="secondary"
+											>${this.localize.term('content_published')}</uui-tag
+										>`,
+									() =>
+										html`<uui-tag color="default" look="secondary"
+											>${this.localize.term('content_unpublished')}</uui-tag
+										>`,
+								)}
+							</uui-table-cell>
+							<uui-table-cell>${this.#getContentTypeName(item)}</uui-table-cell>
+							<uui-table-cell>${this.#getEntityType(item)}</uui-table-cell>
+						</uui-table-row>
+					`,
+				)}
+			</uui-table>
+		`;
+	}
+
+	#renderPagination() {
 		if (!this._total) return nothing;
 
 		const totalPages = Math.ceil(this._total / this.#itemsPerPage);
 
 		if (totalPages <= 1) return nothing;
 
-		return html`<div class="pagination">
-			<uui-pagination .total=${totalPages} @change="${this.#onPageChange}"></uui-pagination>
-		</div>`;
+		return html`
+			<div class="pagination">
+				<uui-pagination .total=${totalPages} @change=${this.#onPageChange}></uui-pagination>
+			</div>
+		`;
 	}
 
 	static styles = [
 		UmbTextStyles,
 		css`
-			uui-table-cell:not(.link-cell) {
+			uui-table-cell {
 				color: var(--uui-color-text-alt);
 			}
 

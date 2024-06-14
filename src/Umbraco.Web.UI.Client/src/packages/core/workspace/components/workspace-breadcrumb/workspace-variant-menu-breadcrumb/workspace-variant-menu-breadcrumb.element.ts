@@ -128,6 +128,10 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
+				/* TODO: This is a temp solution to handle an issue where long nested breadcrumbs would hide workspace actions */
+				overflow: hidden;
+				display: flex;
+				flex-direction: row-reverse;
 				margin-left: var(--uui-size-layout-1);
 			}
 		`,

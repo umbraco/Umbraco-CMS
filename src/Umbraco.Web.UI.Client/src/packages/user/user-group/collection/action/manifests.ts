@@ -8,7 +8,7 @@ export const createManifest: ManifestTypes = {
 	alias: 'Umb.CollectionAction.UserGroup.Create',
 	weight: 200,
 	meta: {
-		label: 'Create',
+		label: '#general_create',
 		href: 'section/user-management/view/user-groups/user-group/create',
 	},
 	conditions: [

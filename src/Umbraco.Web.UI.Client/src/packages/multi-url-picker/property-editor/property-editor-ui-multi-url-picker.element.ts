@@ -22,10 +22,15 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
-		this._hideAnchor = config.getValueByAlias('hideAnchor') ?? false;
-		this._minNumber = Number(config.getValueByAlias('minNumber')) ?? 0;
-		this._maxNumber = Number(config.getValueByAlias('maxNumber')) ?? Infinity;
+		this._hideAnchor = Boolean(config.getValueByAlias('hideAnchor')) ?? false;
+		this._min = this.#parseInt(config.getValueByAlias('minNumber'), 0);
+		this._max = this.#parseInt(config.getValueByAlias('maxNumber'), Infinity);
 		this._overlaySize = config.getValueByAlias<UUIModalSidebarSize>('overlaySize') ?? 'small';
+	}
+
+	#parseInt(value: unknown, fallback: number): number {
+		const num = Number(value);
+		return num > 0 ? num : fallback;
 	}
 
 	@state()
@@ -35,10 +40,10 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	private _hideAnchor?: boolean;
 
 	@state()
-	private _minNumber? = 0;
+	private _min = 0;
 
 	@state()
-	private _maxNumber? = Infinity;
+	private _max = Infinity;
 
 	@state()
 	private _alias?: string;
@@ -64,8 +69,8 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 		return html`
 			<umb-multi-url-picker
 				.alias=${this._alias}
-				.max=${this._maxNumber}
-				.min=${this._minNumber}
+				.max=${this._max}
+				.min=${this._min}
 				.overlaySize=${this._overlaySize}
 				.urls=${this.value ?? []}
 				.variantId=${this._variantId}

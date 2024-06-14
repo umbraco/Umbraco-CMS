@@ -1,16 +1,28 @@
 import type { UmbImageCropperFocalPoint } from './index.js';
 import { clamp } from '@umbraco-cms/backoffice/utils';
+import { css, customElement, html, nothing, property, query, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { LitElement, css, html, nothing, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-image-cropper-focus-setter')
 export class UmbImageCropperFocusSetterElement extends LitElement {
-	@query('#image') imageElement!: HTMLImageElement;
-	@query('#wrapper') wrapperElement?: HTMLImageElement;
-	@query('#focal-point') focalPointElement!: HTMLImageElement;
+	@query('#image')
+	imageElement!: HTMLImageElement;
 
-	@property({ type: String }) src?: string;
-	@property({ attribute: false }) focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
+	@query('#wrapper')
+	wrapperElement?: HTMLImageElement;
+
+	@query('#focal-point')
+	focalPointElement!: HTMLImageElement;
+
+	@property({ attribute: false })
+	focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
+
+	// TODO: [LK] Temporary fix; to be reviewed.
+	@property({ type: Boolean })
+	hideFocalPoint = false;
+
+	@property({ type: String })
+	src?: string;
 
 	#DOT_RADIUS = 6 as const;
 
@@ -21,6 +33,8 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
+
+		if (this.hideFocalPoint) return;
 
 		if (_changedProperties.has('focalPoint') && this.focalPointElement) {
 			this.focalPointElement.style.left = `calc(${this.focalPoint.left * 100}% - ${this.#DOT_RADIUS}px)`;
@@ -47,8 +61,10 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 	async #initializeImage() {
 		await this.updateComplete; // Wait for the @query to be resolved
 
-		this.focalPointElement.style.left = `calc(${this.focalPoint.left * 100}% - ${this.#DOT_RADIUS}px)`;
-		this.focalPointElement.style.top = `calc(${this.focalPoint.top * 100}% - ${this.#DOT_RADIUS}px)`;
+		if (!this.hideFocalPoint) {
+			this.focalPointElement.style.left = `calc(${this.focalPoint.left * 100}% - ${this.#DOT_RADIUS}px)`;
+			this.focalPointElement.style.top = `calc(${this.focalPoint.top * 100}% - ${this.#DOT_RADIUS}px)`;
+		}
 
 		this.imageElement.onload = () => {
 			if (!this.imageElement || !this.wrapperElement) return;
@@ -67,7 +83,9 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 			this.wrapperElement.style.aspectRatio = `${imageAspectRatio}`;
 		};
 
-		this.#addEventListeners();
+		if (!this.hideFocalPoint) {
+			this.#addEventListeners();
+		}
 	}
 
 	async #addEventListeners() {
@@ -98,6 +116,8 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 
 	#onSetFocalPoint(event: MouseEvent) {
 		event.preventDefault();
+		if (this.hideFocalPoint) return;
+
 		if (!this.focalPointElement || !this.imageElement) return;
 
 		const image = this.imageElement.getBoundingClientRect();
@@ -122,14 +142,14 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 
 	render() {
 		if (!this.src) return nothing;
-
 		return html`
 			<div id="wrapper">
 				<img id="image" @click=${this.#onSetFocalPoint} @keydown=${() => nothing} src=${this.src} alt="" />
-				<div id="focal-point"></div>
+				<div id="focal-point" class=${this.hideFocalPoint ? 'hidden' : ''}></div>
 			</div>
 		`;
 	}
+
 	static styles = css`
 		:host {
 			display: flex;
@@ -164,6 +184,9 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 			border-radius: 50%;
 			pointer-events: none;
 			background-color: white;
+		}
+		#focal-point.hidden {
+			display: none;
 		}
 	`;
 }

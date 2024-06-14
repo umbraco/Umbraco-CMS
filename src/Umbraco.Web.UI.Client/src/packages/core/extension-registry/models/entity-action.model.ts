@@ -122,6 +122,7 @@ export interface MetaEntityActionDuplicateToKind extends MetaEntityActionDefault
 	duplicateRepositoryAlias: string;
 	treeRepositoryAlias: string;
 	treeAlias: string;
+	foldersOnly?: boolean;
 }
 
 // MOVE TO
@@ -134,6 +135,7 @@ export interface MetaEntityActionMoveToKind extends MetaEntityActionDefaultKind 
 	moveRepositoryAlias: string;
 	treeRepositoryAlias: string;
 	treeAlias: string;
+	foldersOnly?: boolean;
 }
 
 // FOLDER

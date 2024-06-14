@@ -1,7 +1,7 @@
-import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES } from '../../user-permissions/index.js';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action.js';
+import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [

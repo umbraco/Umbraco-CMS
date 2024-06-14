@@ -9,7 +9,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		js: () => import('./user-group-section-view.element.js'),
 		weight: 100,
 		meta: {
-			label: 'User Groups',
+			label: '#user_usergroups',
 			pathname: 'user-groups',
 			icon: 'icon-users',
 		},

@@ -1,17 +1,27 @@
-import './content-type-design-editor-property.element.js';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
-import type { UmbContentTypeDesignEditorPropertyElement } from './content-type-design-editor-property.element.js';
 import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context.js';
+import type { UmbContentTypeDesignEditorPropertyElement } from './content-type-design-editor-property.element.js';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	property,
+	repeat,
+	state,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbContentTypePropertyStructureHelper,
 	UMB_PROPERTY_TYPE_SETTINGS_MODAL,
 } from '@umbraco-cms/backoffice/content-type';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+
+import './content-type-design-editor-property.element.js';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeDesignEditorPropertyElement> = {
 	getUniqueOfElement: (element) => {
@@ -201,15 +211,16 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 						)}
 					</div>
 
-					${!this._sortModeActive
-						? html`<uui-button
+					${when(
+						!this._sortModeActive,
+						() => html`
+							<uui-button
+								id="btn-add"
+								href=${ifDefined(this._modalRouteBuilderNewProperty?.({ sortOrder: -1 }))}
 								label=${this.localize.term('contentTypeEditor_addProperty')}
-								id="add"
-								look="placeholder"
-								href=${ifDefined(this._modalRouteBuilderNewProperty?.({ sortOrder: -1 }))}>
-								<umb-localize key="contentTypeEditor_addProperty">Add property</umb-localize>
-							</uui-button> `
-						: ''}
+								look="placeholder"></uui-button>
+						`,
+					)}
 				`
 			: '';
 	}
@@ -217,8 +228,9 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
-			#add {
+			#btn-add {
 				width: 100%;
+				--uui-button-height: var(--uui-size-14);
 			}
 
 			#property-list[sort-mode-active]:not(:has(umb-content-type-design-editor-property)) {

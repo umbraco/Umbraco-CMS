@@ -1,5 +1,5 @@
 import { UmbMediaTypeDetailRepository } from '../../media-types/repository/detail/media-type-detail.repository.js';
-import { UmbMediaPropertyDataContext } from '../property-dataset-context/media-property-dataset-context.js';
+import { UmbMediaPropertyDatasetContext } from '../property-dataset-context/media-property-dataset-context.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
 import type { UmbMediaDetailModel, UmbMediaVariantModel, UmbMediaVariantOptionModel } from '../types.js';
@@ -71,9 +71,7 @@ export class UmbMediaWorkspaceContext
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbMediaTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
-	//#variesByCulture?: boolean;
 	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
-	//#variesBySegment?: boolean;
 	readonly varies = this.structure.ownerContentTypePart((x) =>
 		x ? x.variesByCulture || x.variesBySegment : undefined,
 	);
@@ -250,14 +248,6 @@ export class UmbMediaWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
-		// const oldVariants = this.#currentData.getValue()?.variants || [];
-		// const variants = partialUpdateFrozenArray(
-		// 	oldVariants,
-		// 	{ name },
-		// 	variantId ? (x) => variantId.compare(x) : () => true,
-		// );
-		// this.#currentData.update({ variants });
-
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
@@ -312,6 +302,25 @@ export class UmbMediaWorkspaceContext
 
 			// TODO: We should move this type of logic to the act of saving [NL]
 			this.#updateVariantData(variantId);
+		}
+	}
+
+	#updateLock = 0;
+	initiatePropertyValueChange() {
+		this.#updateLock++;
+		this.#currentData.mute();
+		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
+		/*return {
+			[Symbol.dispose]: this.finishPropertyValueChange,
+		};*/
+	}
+	finishPropertyValueChange = () => {
+		this.#updateLock--;
+		this.#triggerPropertyValueChanges();
+	};
+	#triggerPropertyValueChanges() {
+		if (this.#updateLock === 0) {
+			this.#currentData.unmute();
 		}
 	}
 
@@ -444,8 +453,11 @@ export class UmbMediaWorkspaceContext
 	}
 	*/
 
-	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbMediaPropertyDataContext(host, this, variantId);
+	public createPropertyDatasetContext(
+		host: UmbControllerHost,
+		variantId: UmbVariantId,
+	): UmbMediaPropertyDatasetContext {
+		return new UmbMediaPropertyDatasetContext(host, this, variantId);
 	}
 
 	public destroy(): void {

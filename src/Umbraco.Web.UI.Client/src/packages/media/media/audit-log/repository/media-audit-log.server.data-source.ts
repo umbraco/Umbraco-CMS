@@ -1,6 +1,6 @@
-import type { UmbAuditLogDataSource, UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbMediaAuditLogModel } from '../types.js';
 import type { UmbMediaAuditLogType } from '../utils/index.js';
+import type { UmbAuditLogDataSource, UmbAuditLogRequestArgs } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';

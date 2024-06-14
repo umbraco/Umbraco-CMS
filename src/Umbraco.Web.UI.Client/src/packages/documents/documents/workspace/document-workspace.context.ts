@@ -1,5 +1,5 @@
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
-import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
+import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type {
@@ -117,9 +117,7 @@ export class UmbDocumentWorkspaceContext
 
 	readonly structure = new UmbContentTypeStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
-	//#variesByCulture?: boolean;
 	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
-	//#variesBySegment?: boolean;
 	readonly varies = this.structure.ownerContentTypePart((x) =>
 		x ? x.variesByCulture || x.variesBySegment : undefined,
 	);
@@ -342,15 +340,6 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
-		/*
-		const oldVariants = this.#currentData.getValue()?.variants || [];
-		const variants = partialUpdateFrozenArray(
-			oldVariants,
-			{ name },
-			variantId ? (x) => variantId.compare(x) : () => true,
-		);
-		this.#currentData.update({ variants });
-		*/
 		// TODO: We should move this type of logic to the act of saving [NL]
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
@@ -378,6 +367,7 @@ export class UmbDocumentWorkspaceContext
 		);
 	}
 	// TODO: Re-evaluate if this is begin used, i wrote this as part of a POC... [NL]
+	/*
 	async propertyIndexByAlias(
 		propertyAlias: string,
 		variantId?: UmbVariantId,
@@ -386,6 +376,7 @@ export class UmbDocumentWorkspaceContext
 			data?.values?.findIndex((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true)),
 		);
 	}
+	*/
 
 	/**
 	 * Get the current value of the property with the given alias and variantId.
@@ -418,6 +409,25 @@ export class UmbDocumentWorkspaceContext
 
 			// TODO: We should move this type of logic to the act of saving [NL]
 			this.#updateVariantData(variantId);
+		}
+	}
+
+	#updateLock = 0;
+	initiatePropertyValueChange() {
+		this.#updateLock++;
+		this.#currentData.mute();
+		// TODO: When ready enable this code will enable handling a finish automatically by this implementation 'using myState.initiatePropertyValueChange()' (Relies on TS support of Using) [NL]
+		/*return {
+			[Symbol.dispose]: this.finishPropertyValueChange,
+		};*/
+	}
+	finishPropertyValueChange = () => {
+		this.#updateLock--;
+		this.#triggerPropertyValueChanges();
+	};
+	#triggerPropertyValueChanges() {
+		if (this.#updateLock === 0) {
+			this.#currentData.unmute();
 		}
 	}
 
@@ -666,6 +676,7 @@ export class UmbDocumentWorkspaceContext
 		// Create the validation repository if it does not exist. (we first create this here when we need it) [NL]
 		this.#validationRepository ??= new UmbDocumentValidationRepository(this);
 
+		// We ask the server first to get a concatenated set of validation messages. So we see both front-end and back-end validation messages [NL]
 		if (this.getIsNew()) {
 			const parent = this.#parent.getValue();
 			if (!parent) throw new Error('Parent is not set');
@@ -843,16 +854,11 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	/*
-	concept notes:
-
-	public saveAndPreview() {
-
-	}
-	*/
-
-	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbDocumentPropertyDataContext(host, this, variantId);
+	public createPropertyDatasetContext(
+		host: UmbControllerHost,
+		variantId: UmbVariantId,
+	): UmbDocumentPropertyDatasetContext {
+		return new UmbDocumentPropertyDatasetContext(host, this, variantId);
 	}
 
 	public destroy(): void {

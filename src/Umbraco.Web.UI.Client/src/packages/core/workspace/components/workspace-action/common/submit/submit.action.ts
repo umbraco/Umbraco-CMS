@@ -1,6 +1,7 @@
-import type { UmbSubmittableWorkspaceContext } from '../../../../contexts/tokens/submittable-workspace-context.interface.js';
+import { UMB_SUBMITTABLE_WORKSPACE_CONTEXT } from '../../../../contexts/tokens/index.js';
+import type { UmbSubmittableWorkspaceContext } from '../../../../contexts/tokens/index.js';
+import type { UmbWorkspaceActionArgs } from '../../types.js';
 import { UmbWorkspaceActionBase } from '../../workspace-action-base.controller.js';
-import { UMB_SUBMITTABLE_WORKSPACE_CONTEXT, type UmbWorkspaceActionArgs } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbSubmitWorkspaceAction extends UmbWorkspaceActionBase<UmbSubmittableWorkspaceContext> {

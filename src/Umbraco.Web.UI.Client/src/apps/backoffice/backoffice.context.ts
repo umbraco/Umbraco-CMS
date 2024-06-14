@@ -9,6 +9,7 @@ import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 	#activeSectionAlias = new UmbStringState(undefined);
@@ -23,9 +24,6 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BACKOFFICE_CONTEXT);
-		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'section', null, (sections) => {
-			this.#allowedSections.setValue([...sections]);
-		});
 
 		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
 		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
@@ -34,6 +32,29 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 				this.#getVersion();
 			});
 		});
+
+		this.#init();
+	}
+
+	async #init() {
+		const userContext = await this.getContext(UMB_CURRENT_USER_CONTEXT);
+		this.observe(
+			userContext.allowedSections,
+			(allowedSections) => {
+				if (!allowedSections) return;
+				new UmbExtensionsManifestInitializer(
+					this,
+					umbExtensionsRegistry,
+					'section',
+					(manifest) => allowedSections.includes(manifest.alias),
+					async (sections) => {
+						this.#allowedSections.setValue([...sections]);
+					},
+					'umbAllowedSectionsManifestInitializer',
+				);
+			},
+			'umbAllowedSectionsObserver',
+		);
 	}
 
 	async #getVersion() {

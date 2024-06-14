@@ -2,7 +2,6 @@ import type { UmbDataTypeDetailModel } from '../../types.js';
 import { UmbDataTypeServerDataSource } from './data-type-detail.server.data-source.js';
 import type { UmbDataTypeDetailStore } from './data-type-detail.store.js';
 import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT } from './data-type-detail.store.js';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 export class UmbDataTypeDetailRepository extends UmbDetailRepositoryBase<UmbDataTypeDetailModel> {

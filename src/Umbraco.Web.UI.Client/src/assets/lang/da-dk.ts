@@ -858,6 +858,7 @@ export default {
 		upload: 'Upload',
 		url: 'URL',
 		user: 'Bruger',
+		users: 'Brugere',
 		username: 'Brugernavn',
 		value: 'Værdi',
 		view: 'Vis',
@@ -876,6 +877,10 @@ export default {
 		saving: 'Gemmer...',
 		current: 'nuværende',
 		embed: 'Indlejring',
+		addEditLink: 'Tilføj/Rediger Link',
+		removeLink: 'Fjern Link',
+		mediaPicker: 'Mediebibliotek',
+		viewSourceCode: 'Vis kildekode',
 		selected: 'valgt',
 		other: 'Andet',
 		articles: 'Artikler',
@@ -930,6 +935,10 @@ export default {
 		color: 'Tekstfarve',
 		font: 'Skrifttype',
 		text: 'Tekst',
+	},
+	globalSearch: {
+		navigateSearchProviders: 'Naviger søgeudbydere',
+		navigateSearchResults: 'Naviger søgeresultater',
 	},
 	headers: {
 		page: 'Side',
@@ -1789,6 +1798,7 @@ export default {
 		partialViews: 'Partial Views',
 		partialViewMacros: 'Partial View makrofiler',
 		repositories: 'Installer fra "repository"',
+		relations: 'Relationer',
 		runway: 'Installer Runway',
 		runwayModules: 'Runway-moduler',
 		scripting: 'Scripting filer',
@@ -1839,6 +1849,7 @@ export default {
 		failedPasswordAttempts: 'Fejlede loginforsøg',
 		goToProfile: 'Gå til brugerprofil',
 		groupsHelp: 'Tilføj grupper for at tildele adgang og tilladelser',
+		invite: 'Invitér',
 		inviteAnotherUser: 'Invitér anden bruger',
 		inviteUserHelp:
 			'Invitér nye brugere til at give dem adgang til Umbraco. En invitation vil blive sendt\n      via e-mail til brugeren med oplysninger om, hvordan man logger ind i Umbraco.\n    ',
@@ -1881,6 +1892,9 @@ export default {
 		searchAllChildren: "Søg alle 'børn'",
 		languagesHelp: 'Tilføj sprog for at give brugerne adgang til at redigere',
 		sectionsHelp: 'Tilføj sektioner for at give brugerne adgang',
+		allowAccessToAllLanguages: 'Tillad adgang til alle sprog',
+		allowAccessToAllDocuments: 'Tillad adgang til alle dokumenter',
+		allowAccessToAllMedia: 'Tillad adgang til alle medier',
 		selectUserGroup: (multiple: boolean) => {
 			return multiple ? 'Vælg brugergrupper' : 'Vælg brugergruppe';
 		},
@@ -1898,6 +1912,7 @@ export default {
 		username: 'Navn',
 		userPermissions: 'Brugertilladelser',
 		usergroup: 'Brugergruppe',
+		usergroups: 'Brugergrupper',
 		userInvited: 'er blevet inviteret',
 		userInvitedSuccessHelp:
 			'En invitation er blevet sendt til den nye bruger med oplysninger om, hvordan man\n      logger ind i Umbraco.\n    ',
@@ -1955,7 +1970,6 @@ export default {
 		passwordRequiresUniqueChars: 'The password must use at least %0% different characters',
 		passwordRequiresUpper: "The password must have at least one uppercase ('A'-'Z')",
 		passwordTooShort: 'The password must be at least %0% characters long',
-		allowAccessToAllLanguages: 'Allow access to all languages',
 		userHasPassword: 'The user already has a password set',
 		userHasGroup: "The user is already in group '%0%'",
 		userLockoutNotEnabled: 'Lockout is not enabled for this user',
@@ -2459,6 +2473,8 @@ export default {
 		getStarted: 'To get you started',
 	},
 	settingsDashboard: {
+		documentationHeader: 'Dokumentation',
+		documentationDescription: 'Læs mere om at arbejde med elementerne i Indstillinger i vores Dokumentation.',
 		communityHeader: 'Community',
 		communityDescription: 'Stil et spørgsmål i community forummet eller i vores Discord community',
 		trainingHeader: 'Træning',
@@ -2478,6 +2494,20 @@ export default {
 		fallbackHeadline: 'Welcome to The Friendly CMS',
 		fallbackDescription:
 			"Thank you for choosing Umbraco - we think this could be the beginning of something\n      beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast\n      as possible.\n    ",
+	},
+	welcomeDashboard: {
+		ourUmbracoHeadline: 'Our Umbraco - Det Venligste Fællesskab',
+		ourUmbracoDescription:
+			'Our Umbraco, den officielle fællesskabsplatform, er dit komplette sted for alt, hvad der vedrører Umbraco. Uanset om du har brug for svar på spørgsmål, spændende tilføjelser eller vejledninger til at udføre noget i Umbraco, er verdens bedste og venligste fællesskab kun et klik væk.',
+		ourUmbracoButton: 'Besøg Our Umbraco',
+		documentationHeadline: 'Dokumentation',
+		documentationDescription: 'Find svarene på alle dine Umbraco-spørgsmål',
+		communityHeadline: 'Fællesskab',
+		communityDescription: 'Få support og inspiration fra engagerede Umbraco-eksperter',
+		resourcesHeadline: 'Ressourcer',
+		resourcesDescription: "Gratis video tutorials til at kickstarte din rejse med CMS'et",
+		trainingHeadline: 'Træning',
+		trainingDescription: 'Praktisk træning og officielle certificeringer fra Umbraco',
 	},
 	analytics: {
 		consentForAnalytics: 'Consent for telemetry data',

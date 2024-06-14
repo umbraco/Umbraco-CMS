@@ -128,7 +128,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		return 'block name content element type here...';
 	}
 	setName(name: string | undefined) {
-		alert('You cannot set a name of a block-type.');
+		console.warn('You cannot set a name of a block type.');
 	}
 
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {

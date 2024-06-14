@@ -1,11 +1,10 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestMenuItem, UmbMenuItemElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import type { ManifestMenuItem, UmbMenuItemElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-menu-item-default')
 export class UmbMenuItemDefaultElement extends UmbLitElement implements UmbMenuItemElement {
-	//
 	#pathname?: string;
 
 	@property({ type: Object, attribute: false })
@@ -42,10 +41,13 @@ export class UmbMenuItemDefaultElement extends UmbLitElement implements UmbMenuI
 	}
 
 	render() {
-		return html`<umb-menu-item-layout
-			.label=${this.manifest.meta.label ?? this.manifest.name}
-			.iconName=${this.manifest.meta.icon ?? ''}
-			.href=${this._href}></umb-menu-item-layout>`;
+		return html`
+			<umb-menu-item-layout
+				.href=${this._href}
+				.iconName=${this.manifest.meta.icon ?? ''}
+				.label=${this.localize.string(this.manifest.meta.label ?? this.manifest.name)}>
+			</umb-menu-item-layout>
+		`;
 	}
 }
 

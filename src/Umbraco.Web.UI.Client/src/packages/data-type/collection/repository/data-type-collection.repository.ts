@@ -37,8 +37,6 @@ export class UmbDataTypeCollectionRepository extends UmbRepositoryBase implement
 
 		return { data, error, asObservable: () => this.#itemStore!.items(uniques) };
 	}
-
-	destroy(): void {}
 }
 
 export default UmbDataTypeCollectionRepository;

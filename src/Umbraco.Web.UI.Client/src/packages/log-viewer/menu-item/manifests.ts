@@ -6,7 +6,7 @@ const menuItem: ManifestMenuItem = {
 	name: 'Log Viewer Menu Item',
 	weight: 300,
 	meta: {
-		label: 'Log Viewer',
+		label: '#treeHeaders_logViewer',
 		icon: 'icon-box-alt',
 		entityType: 'logviewer',
 		menus: ['Umb.Menu.AdvancedSettings'],

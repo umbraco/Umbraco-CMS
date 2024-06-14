@@ -69,12 +69,7 @@ export class UmbMediaPickerCreateItemElement extends UmbLitElement {
 									this._allowedMediaTypes,
 									(item) => item.unique,
 									(item) =>
-										html`<uui-menu-item
-											label=${item.name}
-											@click=${() =>
-												alert(
-													'TODO: Open workspace (create) from modal. You can drop the files into this modal for now.',
-												)}>
+										html`<uui-menu-item label=${item.name}>
 											<umb-icon slot="icon" name=${item.icon ?? 'icon-circle-dotted'}></umb-icon>
 										</uui-menu-item>`,
 								)}

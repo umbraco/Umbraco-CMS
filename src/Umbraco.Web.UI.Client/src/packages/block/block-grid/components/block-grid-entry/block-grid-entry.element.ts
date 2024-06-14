@@ -1,6 +1,7 @@
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
@@ -14,7 +15,7 @@ import '../block-scale-handler/index.js';
 @customElement('umb-block-grid-entry')
 export class UmbBlockGridEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
-	@property({ type: Number })
+	@property({ type: Number, reflect: true })
 	public get index(): number | undefined {
 		return this.#context.getIndex();
 	}
@@ -37,6 +38,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	//
 
 	#context = new UmbBlockGridEntryContext(this);
+	#renderTimeout: number | undefined;
 
 	@state()
 	_columnSpan?: number;
@@ -51,10 +53,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	// If _createPath is undefined, its because no blocks are allowed to be created here[NL]
 	@state()
-	_createPath?: string;
+	_createBeforePath?: string;
+	@state()
+	_createAfterPath?: string;
 
 	@state()
 	_label = '';
+
+	@state()
+	_icon?: string;
 
 	@state()
 	_workspaceEditContentPath?: string;
@@ -67,6 +74,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	_canScale?: boolean;
+
+	@state()
+	_showInlineCreateBefore?: boolean;
+	@state()
+	_showInlineCreateAfter?: boolean;
+	@state()
+	_inlineCreateAboveWidth?: string;
 
 	// TODO: use this type on the Element Interface for the Manifest.
 	@state()
@@ -94,6 +108,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#updateBlockViewProps({ label });
 			this._label = label;
 		});
+		this.observe(this.#context.contentElementTypeIcon, (icon) => {
+			this.#updateBlockViewProps({ icon });
+			this._icon = icon;
+		});
 		this.observe(this.#context.inlineEditingMode, (mode) => {
 			this._inlineEditingMode = mode;
 		});
@@ -110,10 +128,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		});
 
 		// Paths:
-		this.observe(this.#context.createPath, (createPath) => {
-			const oldValue = this._createPath;
-			this._createPath = createPath;
-			this.requestUpdate('_createPath', oldValue);
+		this.observe(this.#context.createBeforePath, (createPath) => {
+			//const oldValue = this._createBeforePath;
+			this._createBeforePath = createPath;
+			//this.requestUpdate('_createPath', oldValue);
+		});
+		this.observe(this.#context.createAfterPath, (createPath) => {
+			//const oldValue = this._createAfterPath;
+			this._createAfterPath = createPath;
+			//this.requestUpdate('_createPath', oldValue);
 		});
 		this.observe(this.#context.workspaceEditContentPath, (path) => {
 			this._workspaceEditContentPath = path;
@@ -156,7 +179,51 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				this.setAttribute('data-content-element-type-alias', contentElementTypeAlias);
 			}
 		});
+
+		this.#callUpdateInlineCreateButtons();
 	}
+
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.updated(_changedProperties);
+		if (_changedProperties.has('_blockViewProps') || _changedProperties.has('_columnSpan')) {
+			this.#callUpdateInlineCreateButtons();
+		}
+	}
+
+	#callUpdateInlineCreateButtons() {
+		clearTimeout(this.#renderTimeout);
+		this.#renderTimeout = setTimeout(this.#updateInlineCreateButtons, 100) as unknown as number;
+	}
+
+	#updateInlineCreateButtons = () => {
+		// TODO: Could we optimize this, so it wont break?, cause currently we trust blindly that parentElement is '.umb-block-grid__layout-container' [NL]
+		const layoutContainer = this.parentElement;
+		if (!layoutContainer) return;
+		const layoutContainerRect = layoutContainer.getBoundingClientRect();
+
+		if (layoutContainerRect.width === 0) {
+			this._showInlineCreateBefore = false;
+			this._showInlineCreateAfter = false;
+			this._inlineCreateAboveWidth = undefined;
+			this.#renderTimeout = setTimeout(this.#updateInlineCreateButtons, 100) as unknown as number;
+			return;
+		}
+
+		const layoutItemRect = this.getBoundingClientRect();
+		if (layoutItemRect.right > layoutContainerRect.right - 5) {
+			this._showInlineCreateAfter = false;
+		} else {
+			this._showInlineCreateAfter = true;
+		}
+
+		if (layoutItemRect.left > layoutContainerRect.left + 5) {
+			this._showInlineCreateBefore = false;
+			this._inlineCreateAboveWidth = undefined;
+		} else {
+			this._inlineCreateAboveWidth = getComputedStyle(layoutContainer).width;
+			this._showInlineCreateBefore = true;
+		}
+	};
 
 	#renderInlineEditBlock() {
 		return html`<umb-block-grid-block-inline
@@ -171,8 +238,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#renderBlock() {
 		return this.contentUdi
 			? html`
-					${this._createPath
-						? html`<uui-button-inline-create href=${this._createPath}></uui-button-inline-create>`
+					${this._createBeforePath && this._showInlineCreateBefore
+						? html`<uui-button-inline-create
+								href=${this._createBeforePath}
+								label=${this.localize.term('blockEditor_addBlock')}
+								style=${this._inlineCreateAboveWidth
+									? `width: ${this._inlineCreateAboveWidth}`
+									: ''}></uui-button-inline-create>`
 						: nothing}
 					<div class="umb-block-grid__block" part="umb-block-grid__block">
 						<umb-extension-slot
@@ -204,6 +276,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 								</umb-block-scale-handler>`
 							: nothing}
 					</div>
+					${this._createAfterPath && this._showInlineCreateAfter
+						? html`<uui-button-inline-create
+								vertical
+								label=${this.localize.term('blockEditor_addBlock')}
+								href=${this._createAfterPath}></uui-button-inline-create>`
+						: nothing}
 				`
 			: nothing;
 	}
@@ -222,6 +300,24 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				position: absolute;
 				top: var(--uui-size-2);
 				right: var(--uui-size-2);
+			}
+			uui-button-inline-create {
+				top: 0px;
+				position: absolute;
+
+				// Avoid showing inline-create in dragging-mode
+				--umb-block-grid__block--inline-create-button-display--condition: var(--umb-block-grid--dragging-mode) none;
+				display: var(--umb-block-grid__block--inline-create-button-display--condition);
+			}
+			uui-button-inline-create:not([vertical]) {
+				left: 0;
+				width: var(--umb-block-grid-editor--inline-create-width, 100%);
+			}
+			:host(:not([index='0'])) uui-button-inline-create:not([vertical]) {
+				top: calc(var(--umb-block-grid--row-gap, 0px) * -0.5);
+			}
+			uui-button-inline-create[vertical] {
+				right: calc(1px - (var(--umb-block-grid--column-gap, 0px) * 0.5));
 			}
 
 			:host([drag-placeholder]) {

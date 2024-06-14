@@ -1,7 +1,6 @@
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
 import type { UmbBlockListWorkspaceData } from '../index.js';
 import type { UmbBlockDataType } from '../../block/types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
@@ -40,9 +39,3 @@ export class UmbBlockListManagerContext<
 		return true;
 	}
 }
-
-// TODO: Make discriminator method for this:
-export const UMB_BLOCK_LIST_MANAGER_CONTEXT = new UmbContextToken<
-	UmbBlockListManagerContext,
-	UmbBlockListManagerContext
->('UmbBlockManagerContext');

@@ -69,6 +69,7 @@ import type { ManifestAppEntryPoint } from './app-entry-point.model.js';
 import type { ManifestBackofficeEntryPoint } from './backoffice-entry-point.model.js';
 import type { ManifestEntryPoint } from './entry-point.model.js';
 import type { ManifestMonacoMarkdownEditorAction } from './monaco-markdown-editor-action.model.js';
+import type { ManifestSectionRoute } from './section-route.model.js';
 import type { ManifestBase, ManifestBundle, ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export type * from './app-entry-point.model.js';
@@ -196,6 +197,7 @@ export type ManifestTypes =
 	| ManifestSectionSidebarApp
 	| ManifestSectionSidebarAppMenuKind
 	| ManifestSectionView
+	| ManifestSectionRoute
 	| ManifestStore
 	| ManifestTheme
 	| ManifestTinyMcePlugin

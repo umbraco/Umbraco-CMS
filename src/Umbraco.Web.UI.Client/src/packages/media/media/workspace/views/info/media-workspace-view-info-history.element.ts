@@ -107,11 +107,13 @@ export class UmbMediaWorkspaceViewInfoHistoryElement extends UmbLitElement {
 
 							return html`<umb-history-item
 								.name=${user?.name ?? 'Unknown'}
-								detail=${this.localize.date(item.timestamp, TimeOptions)}>
+								.detail=${this.localize.date(item.timestamp, TimeOptions)}>
 								<uui-avatar slot="avatar" .name="${userName}" img-src=${ifDefined(avatarUrl)}></uui-avatar>
 
 								<span class="log-type">
-									<uui-tag look=${style.look} color=${style.color}> ${this.localize.term(text.label)} </uui-tag>
+									<uui-tag look=${style.look} color=${style.color}>
+										${this.localize.term(text.label, item.parameters)}
+									</uui-tag>
 									${this.localize.term(text.desc, item.parameters)}
 								</span>
 							</umb-history-item>`;

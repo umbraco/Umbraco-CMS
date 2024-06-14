@@ -1,5 +1,5 @@
-import type { UmbInputToggleElement } from '../../core/components/input-toggle/input-toggle.element.js';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbInputToggleElement } from '@umbraco-cms/backoffice/components';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -20,13 +20,14 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	_labelOn?: string;
 
 	@state()
-	_showLabels?: boolean;
+	_showLabels = false;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this.value ??= config?.getValueByAlias('default') ?? false;
-		this._labelOff = config?.getValueByAlias('labelOff');
-		this._labelOn = config?.getValueByAlias('labelOn');
-		this._showLabels = config?.getValueByAlias('showLabels');
+		if (!config) return;
+		this.value ??= config.getValueByAlias('default') ?? false;
+		this._labelOff = config.getValueByAlias('labelOff');
+		this._labelOn = config.getValueByAlias('labelOn');
+		this._showLabels = Boolean(config.getValueByAlias('showLabels')) ?? false;
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputToggleElement }) {
@@ -35,12 +36,15 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	}
 
 	render() {
-		return html`<umb-input-toggle
-			?checked="${this.value}"
-			.labelOn="${this._labelOn}"
-			.labelOff=${this._labelOff}
-			?showLabels="${this._showLabels}"
-			@change="${this.#onChange}"></umb-input-toggle>`;
+		return html`
+			<umb-input-toggle
+				.labelOn=${this._labelOn}
+				.labelOff=${this._labelOff}
+				?checked=${this.value}
+				?showLabels=${this._showLabels}
+				@change=${this.#onChange}>
+			</umb-input-toggle>
+		`;
 	}
 }
 

@@ -26,7 +26,7 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<never> {
 		const documentTypeUnique = modalContext.getValue().documentTypeUnique;
 		if (!documentTypeUnique) return;
 
-		const url = `section/settings/workspace/${UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE}/create/parent/${UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE}/${this.args.unique ?? 'null'}/${documentTypeUnique}`;
+		const url = `section/settings/workspace/${UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE}/create/parent/${this.args.entityType}/${this.args.unique ?? 'null'}/${documentTypeUnique}`;
 		history.pushState(null, '', url);
 	}
 }

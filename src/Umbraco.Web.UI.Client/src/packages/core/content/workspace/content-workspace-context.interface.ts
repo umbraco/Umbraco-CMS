@@ -1,5 +1,6 @@
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
-import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbVariantId, UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 import type {
 	UmbPropertyStructureWorkspaceContext,
 	UmbRoutableWorkspaceContext,
@@ -13,4 +14,10 @@ export interface UmbContentWorkspaceContext<
 		UmbVariantDatasetWorkspaceContext<VariantModelType>,
 		UmbPropertyStructureWorkspaceContext<ContentTypeModel> {
 	readonly IS_CONTENT_WORKSPACE_CONTEXT: true;
+
+	isLoaded(): Promise<unknown> | undefined;
+	variantById(variantId: UmbVariantId): Observable<VariantModelType | undefined>;
+
+	initiatePropertyValueChange(): void;
+	finishPropertyValueChange(): void;
 }

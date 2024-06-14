@@ -24,7 +24,8 @@ import {
 	UMB_PROPERTY_DATASET_CONTEXT,
 	type UmbPropertyDatasetContext,
 } from '@umbraco-cms/backoffice/property';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 interface MappedGroupWithBlockTypes extends UmbBlockGridTypeGroupType {

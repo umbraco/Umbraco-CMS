@@ -63,7 +63,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-button
-				label="Create"
+				label=${this.localize.term('general_create')}
 				@click=${this.#onButtonClick}
 				look="outline"
 				popovertarget="create-popover"></uui-button>

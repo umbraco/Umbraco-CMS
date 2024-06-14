@@ -1,5 +1,5 @@
-import type { UmbCollectionColumnConfiguration } from '../../../../core/collection/types.js';
 import type { UmbInputCollectionContentTypePropertyElement } from './components/index.js';
+import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';

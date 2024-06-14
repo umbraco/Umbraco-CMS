@@ -21,7 +21,6 @@ export * from './input-number-range/index.js';
 export * from './input-radio-button-list/index.js';
 export * from './input-slider/index.js';
 export * from './input-toggle/index.js';
-export * from './input-upload-field/index.js';
 export * from './input-with-alias/input-with-alias.element.js';
 export * from './multiple-color-picker-input/index.js';
 export * from './multiple-text-string-input/index.js';

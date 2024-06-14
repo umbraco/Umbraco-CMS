@@ -1,7 +1,7 @@
-import type { UmbSortChildrenOfArgs } from './types.js';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbSortChildrenOfArgs, UmbSortChildrenOfDataSource } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A server data source for sorting children of a Document
@@ -9,7 +9,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbSortChildrenOfDocumentServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbSortChildrenOfDocumentServerDataSource {
+export class UmbSortChildrenOfDocumentServerDataSource implements UmbSortChildrenOfDataSource {
 	#host: UmbControllerHost;
 
 	/**

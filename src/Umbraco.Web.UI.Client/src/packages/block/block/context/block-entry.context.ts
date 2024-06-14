@@ -9,6 +9,7 @@ import {
 	UmbNumberState,
 	UmbObjectState,
 	UmbStringState,
+	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
 import { encodeFilePath } from '@umbraco-cms/backoffice/utils';
@@ -61,33 +62,16 @@ export abstract class UmbBlockEntryContext<
 		this.#index.setValue(index);
 	}
 
-	#createPath = new UmbStringState(undefined);
-	readonly createPath = this.#createPath.asObservable();
+	#createBeforePath = new UmbStringState(undefined);
+	readonly createBeforePath = this.#createBeforePath.asObservable();
+	#createAfterPath = new UmbStringState(undefined);
+	readonly createAfterPath = this.#createAfterPath.asObservable();
 
-	#contentElementTypeName = new UmbStringState(undefined);
-	public readonly contentElementTypeName = this.#contentElementTypeName.asObservable();
-	#contentElementTypeAlias = new UmbStringState(undefined);
-	public readonly contentElementTypeAlias = this.#contentElementTypeAlias.asObservable();
-
-	// TODO: index state + observable?
-
-	#label = new UmbStringState('');
-	public readonly label = this.#label.asObservable();
-
-	#generateWorkspaceEditContentPath = (path?: string) =>
-		path ? path + 'edit/' + encodeFilePath(this.getContentUdi() ?? '') + '/view/content' : '';
-
-	#generateWorkspaceEditSettingsPath = (path?: string) =>
-		path ? path + 'edit/' + encodeFilePath(this.getContentUdi() ?? '') + '/view/settings' : '';
-
-	#workspacePath = new UmbStringState(undefined);
-	public readonly workspacePath = this.#workspacePath.asObservable();
-	public readonly workspaceEditContentPath = this.#workspacePath.asObservablePart(
-		this.#generateWorkspaceEditContentPath,
-	);
-	public readonly workspaceEditSettingsPath = this.#workspacePath.asObservablePart(
-		this.#generateWorkspaceEditSettingsPath,
-	);
+	#contentElementType = new UmbObjectState<UmbContentTypeModel | undefined>(undefined);
+	public readonly contentElementType = this.#contentElementType.asObservable();
+	public readonly contentElementTypeName = this.#contentElementType.asObservablePart((x) => x?.name);
+	public readonly contentElementTypeAlias = this.#contentElementType.asObservablePart((x) => x?.alias);
+	public readonly contentElementTypeIcon = this.#contentElementType.asObservablePart((x) => x?.icon);
 
 	_blockType = new UmbObjectState<BlockType | undefined>(undefined);
 	public readonly blockType = this._blockType.asObservable();
@@ -101,6 +85,26 @@ export abstract class UmbBlockEntryContext<
 	 */
 	public readonly contentUdi = this._layout.asObservablePart((x) => x?.contentUdi);
 	public readonly unique = this._layout.asObservablePart((x) => x?.contentUdi);
+
+	#label = new UmbStringState('');
+	public readonly label = this.#label.asObservable();
+
+	#generateWorkspaceEditContentPath = (path?: string, contentUdi?: string) =>
+		path && contentUdi ? path + 'edit/' + encodeFilePath(contentUdi) + '/view/content' : '';
+
+	#generateWorkspaceEditSettingsPath = (path?: string, contentUdi?: string) =>
+		path && contentUdi ? path + 'edit/' + encodeFilePath(contentUdi) + '/view/settings' : '';
+
+	#workspacePath = new UmbStringState(undefined);
+	public readonly workspacePath = this.#workspacePath.asObservable();
+	public readonly workspaceEditContentPath = mergeObservables(
+		[this.contentUdi, this.workspacePath],
+		([contentUdi, path]) => this.#generateWorkspaceEditContentPath(path, contentUdi),
+	);
+	public readonly workspaceEditSettingsPath = mergeObservables(
+		[this.contentUdi, this.workspacePath],
+		([contentUdi, path]) => this.#generateWorkspaceEditSettingsPath(path, contentUdi),
+	);
 
 	#content = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
 	public readonly content = this.#content.asObservable();
@@ -142,15 +146,15 @@ export abstract class UmbBlockEntryContext<
 		// Consume block manager:
 		this.consumeContext(blockManagerContextToken, (manager) => {
 			this._manager = manager;
-			this.#gotManager();
 			this._gotManager();
+			this.#gotManager();
 		});
 
 		// Consume block entries:
 		this.consumeContext(blockEntriesContextToken, (entries) => {
 			this._entries = entries;
-			this.#gotEntries();
 			this._gotEntries();
+			this.#gotEntries();
 		});
 
 		// Observe UDI:
@@ -173,7 +177,7 @@ export abstract class UmbBlockEntryContext<
 		});
 
 		this.observe(this.index, () => {
-			this.#updateCreatePath();
+			this.#updateCreatePaths();
 		});
 	}
 
@@ -181,16 +185,18 @@ export abstract class UmbBlockEntryContext<
 		return this._layout.value?.contentUdi;
 	}
 
-	#updateCreatePath() {
+	#updateCreatePaths() {
 		const index = this.#index.value;
 		if (this._entries && index !== undefined) {
 			this.observe(
 				observeMultiple([this._entries.catalogueRouteBuilder, this._entries.canCreate]),
 				([catalogueRouteBuilder, canCreate]) => {
 					if (catalogueRouteBuilder && canCreate) {
-						this.#createPath.setValue(this._entries!.getPathForCreateBlock(index));
+						this.#createBeforePath.setValue(this._entries!.getPathForCreateBlock(index));
+						this.#createAfterPath.setValue(this._entries!.getPathForCreateBlock(index + 1));
 					} else {
-						this.#createPath.setValue(undefined);
+						this.#createBeforePath.setValue(undefined);
+						this.#createAfterPath.setValue(undefined);
 					}
 				},
 				'observeRouteBuilderCreate',
@@ -204,7 +210,7 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._entries.layoutOf(this.#contentUdi),
 			(layout) => {
-				this._layout.setValue(this._gotLayout(layout));
+				this._layout.setValue(layout);
 			},
 			'observeParentLayout',
 		);
@@ -219,10 +225,6 @@ export abstract class UmbBlockEntryContext<
 		);
 	}
 
-	protected _gotLayout(layout: BlockLayoutType | undefined) {
-		return layout;
-	}
-
 	#gotManager() {
 		this.#observeBlockType();
 		this.#observeData();
@@ -231,7 +233,7 @@ export abstract class UmbBlockEntryContext<
 	abstract _gotManager(): void;
 
 	#gotEntries() {
-		this.#updateCreatePath();
+		this.#updateCreatePaths();
 		this.#observeLayout();
 		if (this._entries) {
 			this.observe(
@@ -249,13 +251,11 @@ export abstract class UmbBlockEntryContext<
 	abstract _gotEntries(): void;
 
 	#observeData() {
-		if (!this._manager) return;
-		const contentUdi = this._layout.value?.contentUdi;
-		if (!contentUdi) return;
+		if (!this._manager || !this.#contentUdi) return;
 
 		// observe content:
 		this.observe(
-			this._manager.contentOf(contentUdi),
+			this._manager.contentOf(this.#contentUdi),
 			(content) => {
 				this.#content.setValue(content);
 			},
@@ -302,8 +302,9 @@ export abstract class UmbBlockEntryContext<
 		this.observe(
 			this._manager.contentTypeOf(contentTypeKey),
 			(contentType) => {
-				this.#contentElementTypeAlias.setValue(contentType?.alias);
-				this.#contentElementTypeName.setValue(contentType?.name);
+				//this.#contentElementTypeAlias.setValue(contentType?.alias);
+				//this.#contentElementTypeName.setValue(contentType?.name);
+				this.#contentElementType.setValue(contentType);
 				this._gotContentType(contentType);
 			},
 			'observeContentElementType',
@@ -354,16 +355,18 @@ export abstract class UmbBlockEntryContext<
 
 	//activate
 	public edit() {
-		window.location.href = this.#generateWorkspaceEditContentPath(this.#workspacePath.value);
+		window.location.href = this.#generateWorkspaceEditContentPath(this.#workspacePath.value, this.getContentUdi());
 	}
 	public editSettings() {
-		window.location.href = this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value);
+		window.location.href = this.#generateWorkspaceEditSettingsPath(this.#workspacePath.value, this.getContentUdi());
 	}
 
 	async requestDelete() {
+		const blockName = this.getLabel();
+		// TODO: Localizations missing [NL]
 		await umbConfirmModal(this, {
-			headline: `Delete ${this.getLabel()}`,
-			content: 'Are you sure you want to delete this [INSERT BLOCK TYPE NAME]?',
+			headline: `Delete ${blockName}`,
+			content: `Are you sure you want to delete this ${blockName}?`,
 			confirmLabel: 'Delete',
 			color: 'danger',
 		});

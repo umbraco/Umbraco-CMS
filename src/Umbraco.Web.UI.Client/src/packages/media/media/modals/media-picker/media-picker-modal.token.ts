@@ -7,11 +7,11 @@ export interface UmbMediaPickerModalData<ItemType> {
 	filter?: (item: ItemType) => boolean;
 }
 
-export type UmbMediaPickerModalValue = {
+export interface UmbMediaPickerModalValue {
 	selection: string[];
-};
+}
 
-export const UMB_MEDIA_PICKER_MODAL = new UmbModalToken<UmbMediaPickerModalData<unknown>, UmbMediaPickerModalValue>(
+export const UMB_MEDIA_PICKER_MODAL = new UmbModalToken<UmbMediaPickerModalData<any>, UmbMediaPickerModalValue>(
 	'Umb.Modal.MediaPicker',
 	{
 		modal: {

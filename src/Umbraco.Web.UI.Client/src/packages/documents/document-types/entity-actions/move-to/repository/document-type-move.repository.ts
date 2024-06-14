@@ -1,6 +1,6 @@
 import { UmbMoveDocumentTypeServerDataSource } from './document-type-move.server.data-source.js';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { UmbMoveRepository, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbMoveRepository, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 export class UmbMoveDocumentTypeRepository extends UmbRepositoryBase implements UmbMoveRepository {

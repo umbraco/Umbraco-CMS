@@ -27,14 +27,18 @@ type FlagTypes =
 	| 'valid';
 
 // Acceptable as an internal interface/type, BUT if exposed externally this should be turned into a public interface in a separate file.
-interface UmbFormControlValidatorConfig {
+export interface UmbFormControlValidatorConfig {
 	flagKey: FlagTypes;
 	getMessageMethod: () => string;
 	checkMethod: () => boolean;
 }
 
 export interface UmbFormControlMixinInterface<ValueType> extends HTMLElement {
-	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
+	addValidator: (
+		flagKey: FlagTypes,
+		getMessageMethod: () => string,
+		checkMethod: () => boolean,
+	) => UmbFormControlValidatorConfig;
 	removeValidator: (obj: UmbFormControlValidatorConfig) => void;
 	//static formAssociated: boolean;
 	//protected getFormElement(): HTMLElement | undefined | null; // allows for null as it makes it simpler to just implement a querySelector as that might return null. [NL]
@@ -56,7 +60,11 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
 {
 	protected _internals: ElementInternals;
 	protected _runValidators(): void;
-	addValidator: (flagKey: FlagTypes, getMessageMethod: () => string, checkMethod: () => boolean) => void;
+	addValidator: (
+		flagKey: FlagTypes,
+		getMessageMethod: () => string,
+		checkMethod: () => boolean,
+	) => UmbFormControlValidatorConfig;
 	removeValidator: (obj: UmbFormControlValidatorConfig) => void;
 	protected addFormControlElement(element: UmbNativeFormControlElement): void;
 
@@ -96,7 +104,6 @@ export function UmbFormControlMixin<
 
 		/**
 		 * Value of this form control.
-		 * If you dont want the setFormValue to be called on the ElementInternals, then prevent calling this method, by not calling super.value = newValue in your implementation of the value setter method.
 		 * @type {string}
 		 * @attr value
 		 * @default ''
@@ -210,7 +217,7 @@ export function UmbFormControlMixin<
 				flagKey: flagKey,
 				getMessageMethod: getMessageMethod,
 				checkMethod: checkMethod,
-			};
+			} satisfies UmbFormControlValidatorConfig;
 			this.#validators.push(validator);
 			return validator;
 		}

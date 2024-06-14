@@ -1,11 +1,10 @@
 import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
-import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
 import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from '../../types.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from '../../media-collection.context-token.js';
 import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import type { UmbDefaultCollectionContext, UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -15,8 +14,8 @@ import type {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 import './column-layouts/media-table-column-name.element.js';
 

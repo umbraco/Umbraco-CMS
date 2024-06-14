@@ -80,7 +80,11 @@ const meta: Meta<UmbPropertyEditorUITinyMceElement> = {
 	args: {
 		config: undefined,
 		value: {
-			blocks: {},
+			blocks: {
+				layout: {},
+				contentData: [],
+				settingsData: [],
+			},
 			markup: `
 			<h2>TinyMCE</h2>
 			<p>I am a default value for the TinyMCE text editor story.</p>

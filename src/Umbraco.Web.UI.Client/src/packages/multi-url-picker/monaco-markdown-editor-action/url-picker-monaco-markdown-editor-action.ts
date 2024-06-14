@@ -1,10 +1,10 @@
 import { UMB_LINK_PICKER_MODAL } from '../link-picker-modal/link-picker-modal.token.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
-import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 export class UmbUrlPickerMonacoMarkdownEditorAction extends UmbControllerBase {
 	#localize = new UmbLocalizationController(this);

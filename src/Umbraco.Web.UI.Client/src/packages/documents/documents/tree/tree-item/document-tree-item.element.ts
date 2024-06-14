@@ -1,5 +1,5 @@
 import type { UmbDocumentTreeItemModel, UmbDocumentTreeItemVariantModel } from '../types.js';
-import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, classMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -60,9 +60,17 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		return this._variant?.name ?? `(${fallbackName})`;
 	}
 
+	#isDraft() {
+		if (this.#isInvariant()) {
+			return this._item?.variants[0].state === 'Draft';
+		}
+
+		return this._variant?.state === 'Draft';
+	}
+
 	renderIconContainer() {
 		return html`
-			<span id="icon-container" slot="icon">
+			<span id="icon-container" slot="icon" class=${classMap({ draft: this.#isDraft() })}>
 				${this.item?.documentType.icon
 					? html`
 							<umb-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></umb-icon>
@@ -76,9 +84,10 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		`;
 	}
 
-	// TODO: lower opacity if item is not published
 	renderLabel() {
-		return html`<span id="label" slot="label">${this.#getLabel()}</span> `;
+		return html`<span id="label" slot="label" class=${classMap({ draft: this.#isDraft() })}
+			>${this.#getLabel()}</span
+		> `;
 	}
 
 	static styles = [
@@ -102,6 +111,10 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				bottom: 0;
 				right: 0;
 				border-radius: 100%;
+			}
+
+			.draft {
+				opacity: 0.6;
 			}
 		`,
 	];

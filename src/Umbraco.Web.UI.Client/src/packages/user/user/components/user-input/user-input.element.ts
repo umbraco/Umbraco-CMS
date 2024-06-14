@@ -157,6 +157,7 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		if (!item.unique) return nothing;
 		return html`
 			<uui-ref-node-user name=${item.name} id=${item.unique}>
+				<uui-avatar slot="icon" name=${item.name}></uui-avatar>
 				<uui-action-bar slot="actions">
 					<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#removeItem(item)}></uui-button>
 				</uui-action-bar>
@@ -168,6 +169,10 @@ export class UmbUserInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		css`
 			#btn-add {
 				width: 100%;
+			}
+
+			uui-avatar {
+				font-size: var(--uui-size-4);
 			}
 		`,
 	];

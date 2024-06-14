@@ -1,5 +1,5 @@
 import { closestColumnSpanOption } from '../utils/index.js';
-import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
+import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context-token.js';
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from './block-grid-entries.context-token.js';
 import {
 	type UmbBlockGridScalableContext,
@@ -31,14 +31,18 @@ export class UmbBlockGridEntryContext
 {
 	//
 	readonly columnSpan = this._layout.asObservablePart((x) => x?.columnSpan);
-	readonly rowSpan = this._layout.asObservablePart((x) => x?.rowSpan ?? 1);
+	readonly rowSpan = this._layout.asObservablePart((x) => x?.rowSpan);
+	readonly layoutAreas = this._layout.asObservablePart((x) => x?.areas);
 	readonly columnSpanOptions = this._blockType.asObservablePart((x) => x?.columnSpanOptions ?? []);
 	readonly areaTypeGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);
 	readonly areas = this._blockType.asObservablePart((x) => x?.areas ?? []);
-	readonly minMaxRowSpan = this._blockType.asObservablePart((x) => [x?.rowMinSpan ?? 1, x?.rowMaxSpan ?? 1]);
-	public getMinMaxRowSpan(): [number, number] {
+	readonly minMaxRowSpan = this._blockType.asObservablePart((x) =>
+		x ? [x.rowMinSpan ?? 1, x.rowMaxSpan ?? 1] : undefined,
+	);
+	public getMinMaxRowSpan(): [number, number] | undefined {
 		const x = this._blockType.getValue();
-		return [x?.rowMinSpan ?? 1, x?.rowMaxSpan ?? 1];
+		if (!x) return undefined;
+		return [x.rowMinSpan ?? 1, x.rowMaxSpan ?? 1];
 	}
 	readonly inlineEditingMode = this._blockType.asObservablePart((x) => x?.inlineEditing === true);
 
@@ -65,18 +69,8 @@ export class UmbBlockGridEntryContext
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT, UMB_BLOCK_GRID_ENTRIES_CONTEXT);
 	}
 
-	protected _gotLayout(layout: UmbBlockGridLayoutModel | undefined) {
-		if (layout) {
-			// TODO: Implement size correction to fit with configurations. both for columnSpan and rowSpan.
-			layout = { ...layout };
-			layout.columnSpan ??= 999;
-			layout.areas ??= [];
-		}
-		return layout;
-	}
-
 	layoutsOfArea(areaKey: string) {
-		return this._layout.asObservablePart((x) => x?.areas.find((x) => x.key === areaKey)?.items ?? []);
+		return this._layout.asObservablePart((x) => x?.areas?.find((x) => x.key === areaKey)?.items);
 	}
 
 	areaType(areaKey: string) {
@@ -87,7 +81,7 @@ export class UmbBlockGridEntryContext
 		const frozenValue = this._layout.value;
 		if (!frozenValue) return;
 		const areas = appendToFrozenArray(
-			frozenValue?.areas,
+			frozenValue?.areas ?? [],
 			{
 				key: areaKey,
 				items: layouts,
@@ -97,40 +91,71 @@ export class UmbBlockGridEntryContext
 		this._layout.update({ areas });
 	}
 
+	/**
+	 * Set the column span of this entry.
+	 * @param columnSpan {number} The new column span.
+	 */
 	setColumnSpan(columnSpan: number) {
 		if (!this._entries) return;
 		const layoutColumns = this._entries.getLayoutColumns();
 		if (!layoutColumns) return;
 
-		columnSpan = Math.max(1, Math.min(columnSpan, layoutColumns));
-		this._layout.update({ columnSpan });
+		columnSpan = this.#calcColumnSpan(columnSpan, this.getRelevantColumnSpanOptions(), layoutColumns);
+		if (columnSpan === this.getColumnSpan()) return;
+		const layoutValue = this._layout.getValue();
+		if (!layoutValue) return;
+		this._layout.setValue({
+			...layoutValue,
+			columnSpan,
+		});
 	}
+	/**
+	 * Get the column span of this entry.
+	 * @returns {number} The column span.
+	 */
 	getColumnSpan() {
 		return this._layout.getValue()?.columnSpan;
 	}
 
+	/**
+	 * Set the row span of this entry.
+	 * @param rowSpan {number} The new row span.
+	 */
 	setRowSpan(rowSpan: number) {
-		const blockType = this._blockType.getValue();
-		if (!blockType) return;
-		rowSpan = Math.max(blockType.rowMinSpan, Math.min(rowSpan, blockType.rowMaxSpan));
-		this._layout.update({ rowSpan });
+		const minMax = this.getMinMaxRowSpan();
+		if (!minMax) return;
+		rowSpan = Math.max(minMax[0], Math.min(rowSpan, minMax[1]));
+		if (rowSpan === this.getRowSpan()) return;
+		const layoutValue = this._layout.getValue();
+		if (!layoutValue) return;
+		this._layout.setValue({
+			...layoutValue,
+			rowSpan,
+		});
 	}
-
+	/**
+	 * Get the row span of this entry.
+	 * @returns {number} The row span.
+	 */
 	getRowSpan() {
 		return this._layout.getValue()?.rowSpan;
 	}
 
-	_gotManager() {}
+	_gotManager() {
+		this.#gotEntriesAndManager();
+	}
 
 	_gotEntries() {
 		this.scaleManager.setEntriesContext(this._entries);
-
 		if (!this._entries) return;
 
+		this.#gotEntriesAndManager();
+
+		// Retrieve scale options:
 		this.observe(
 			observeMultiple([this.minMaxRowSpan, this.columnSpanOptions, this._entries.layoutColumns]),
 			([minMaxRowSpan, columnSpanOptions, layoutColumns]) => {
-				if (!layoutColumns) return;
+				if (!layoutColumns || !minMaxRowSpan) return;
 				const relevantColumnSpanOptions = columnSpanOptions
 					? columnSpanOptions
 							.filter((x) => x.columnSpan <= layoutColumns)
@@ -147,6 +172,7 @@ export class UmbBlockGridEntryContext
 			'observeScaleOptions',
 		);
 
+		// Retrieve The Grid Columns for the Areas:
 		this.observe(
 			observeMultiple([this.areaTypeGridColumns, this._entries.layoutColumns]),
 			([areaTypeGridColumns, layoutColumns]) => {
@@ -154,32 +180,90 @@ export class UmbBlockGridEntryContext
 			},
 			'observeAreaGridColumns',
 		);
+	}
 
+	#gotEntriesAndManager() {
+		if (!this._entries || !this._manager) return;
+
+		// Secure areas fits options:
+		this.observe(
+			observeMultiple([this.areas, this.layoutAreas]),
+			([areas, layoutAreas]) => {
+				if (!areas || !layoutAreas) return;
+				const areasAreIdentical =
+					areas.length === layoutAreas.length && areas.every((area) => layoutAreas.some((y) => y.key === area.key));
+				if (areasAreIdentical === false) {
+					const layoutValue = this._layout.getValue();
+					if (!layoutValue) return;
+					this._layout.setValue({
+						...layoutValue,
+						areas: layoutAreas.map((x) => (areas.find((y) => y.key === x.key) ? x : { key: x.key, items: [] })),
+					});
+				}
+			},
+			'observeAreaValidation',
+		);
+
+		// Secure columnSpan fits options:
 		this.observe(
 			observeMultiple([this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
 			([columnSpan, relevantColumnSpanOptions, layoutColumns]) => {
-				if (!columnSpan || !layoutColumns) return;
-				if (relevantColumnSpanOptions.length > 0) {
-					// Correct columnSpan so it fits.
-					const newColumnSpan =
-						closestColumnSpanOption(columnSpan, relevantColumnSpanOptions, layoutColumns) ?? layoutColumns;
-					if (newColumnSpan !== columnSpan) {
-						//this.setColumnSpan(newColumnSpan);
-						this._layout.update({ columnSpan: newColumnSpan });
-					}
-				} else {
-					// Reset to the layoutColumns.
-					if (layoutColumns !== columnSpan) {
-						//this.setColumnSpan(layoutColumns);
-						this._layout.update({ columnSpan: layoutColumns });
-					}
+				if (!layoutColumns) return;
+				const newColumnSpan = this.#calcColumnSpan(
+					columnSpan ?? layoutColumns,
+					relevantColumnSpanOptions,
+					layoutColumns,
+				);
+				if (newColumnSpan !== columnSpan) {
+					const layoutValue = this._layout.getValue();
+					if (!layoutValue) return;
+					this._layout.setValue({
+						...layoutValue,
+						columnSpan: newColumnSpan,
+					});
 				}
 			},
 			'observeColumnSpanValidation',
+		);
+
+		// Secure rowSpan fits options:
+		this.observe(
+			observeMultiple([this.minMaxRowSpan, this.rowSpan]),
+			([minMax, rowSpan]) => {
+				if (minMax) {
+					const newRowSpan = Math.max(minMax[0], Math.min(rowSpan ?? 1, minMax[1]));
+					if (newRowSpan !== rowSpan) {
+						const layoutValue = this._layout.getValue();
+						if (!layoutValue) return;
+						this._layout.setValue({
+							...layoutValue,
+							rowSpan: newRowSpan,
+						});
+					}
+				}
+			},
+			'observeRowSpanValidation',
 		);
 	}
 
 	_gotContentType(contentType: UmbContentTypeModel | undefined) {
 		this.#firstPropertyType.setValue(contentType?.properties[0]);
+	}
+
+	#calcColumnSpan(columnSpan: number, relevantColumnSpanOptions: number[], layoutColumns: number) {
+		if (relevantColumnSpanOptions.length > 0) {
+			// Correct to a columnSpan option.
+			const newColumnSpan =
+				closestColumnSpanOption(columnSpan, relevantColumnSpanOptions, layoutColumns) ?? layoutColumns;
+			if (newColumnSpan !== columnSpan) {
+				return newColumnSpan;
+			}
+		} else {
+			// Reset to the layoutColumns.
+			if (layoutColumns !== columnSpan) {
+				return layoutColumns;
+			}
+		}
+		return columnSpan;
 	}
 }

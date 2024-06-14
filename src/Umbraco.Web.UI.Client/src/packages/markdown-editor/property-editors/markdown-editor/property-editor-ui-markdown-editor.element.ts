@@ -8,10 +8,11 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 import '../../components/input-markdown-editor/index.js';
 
+const elementName = 'umb-property-editor-ui-markdown-editor';
 /**
  * @element umb-property-editor-ui-markdown-editor
  */
-@customElement('umb-property-editor-ui-markdown-editor')
+@customElement(elementName)
 export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property()
 	value = '';
@@ -20,11 +21,13 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 	private _preview?: boolean;
 
 	@state()
-	private _overlaySize?: UUIModalSidebarSize;
+	private _overlaySize: UUIModalSidebarSize = 'small';
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this._preview = config?.getValueByAlias('preview');
-		this._overlaySize = config?.getValueByAlias('overlaySize') ?? undefined;
+		if (!config) return;
+
+		this._preview = config.getValueByAlias('preview');
+		this._overlaySize = config.getValueByAlias('overlaySize') ?? 'small';
 	}
 
 	#onChange(event: Event & { target: UmbInputMarkdownElement }) {
@@ -43,10 +46,10 @@ export class UmbPropertyEditorUIMarkdownEditorElement extends UmbLitElement impl
 	}
 }
 
-export default UmbPropertyEditorUIMarkdownEditorElement;
+export { UmbPropertyEditorUIMarkdownEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-markdown-editor': UmbPropertyEditorUIMarkdownEditorElement;
+		[elementName]: UmbPropertyEditorUIMarkdownEditorElement;
 	}
 }

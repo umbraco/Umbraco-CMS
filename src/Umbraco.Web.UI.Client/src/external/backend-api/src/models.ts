@@ -147,7 +147,7 @@ variants: Array<DocumentVariantRequestModel>
 id?: string | null
 parent?: ReferenceByIdModel | null
 documentType: ReferenceByIdModel
-template?: ReferenceByIdModel | null
+template: ReferenceByIdModel | null
     };
 
 export type CreateDocumentTypePropertyTypeContainerRequestModel = {
@@ -458,6 +458,13 @@ export enum DataTypeChangeModeModel {
     FALSE_WITH_HELP_TEXT = 'FalseWithHelpText'
 }
 
+export type DataTypeContentTypeReferenceModel = {
+        id: string
+type: string | null
+name: string | null
+icon: string | null
+    };
+
 export type DataTypeItemResponseModel = {
         id: string
 name: string
@@ -476,8 +483,7 @@ alias: string
     };
 
 export type DataTypeReferenceResponseModel = {
-        id: string
-type: string
+        contentType: DataTypeContentTypeReferenceModel
 properties: Array<DataTypePropertyReferenceModel>
     };
 
@@ -721,6 +727,7 @@ export type DocumentTypeItemResponseModel = {
 name: string
 isElement: boolean
 icon?: string | null
+description?: string | null
     };
 
 export type DocumentTypePropertyTypeContainerResponseModel = {
@@ -787,7 +794,7 @@ icon: string
     };
 
 export type DocumentUrlInfoModel = {
-        culture?: string | null
+        culture: string | null
 url: string
     };
 
@@ -901,6 +908,12 @@ export type EnableUserRequestModel = {
         userIds: Array<ReferenceByIdModel>
     };
 
+export type EntityImportAnalysisResponseModel = {
+        entityType: string
+alias?: string | null
+key?: string | null
+    };
+
 export enum EventMessageTypeModel {
     DEFAULT = 'Default',
     INFO = 'Info',
@@ -1003,6 +1016,14 @@ export enum ImageCropModeModel {
 export type ImportDictionaryRequestModel = {
         temporaryFile: ReferenceByIdModel
 parent?: ReferenceByIdModel | null
+    };
+
+export type ImportDocumentTypeRequestModel = {
+        file: ReferenceByIdModel
+    };
+
+export type ImportMediaTypeRequestModel = {
+        file: ReferenceByIdModel
     };
 
 export type IndexResponseModel = {
@@ -1231,6 +1252,8 @@ containers: Array<MediaTypePropertyTypeContainerResponseModel>
 id: string
 allowedMediaTypes: Array<MediaTypeSortModel>
 compositions: Array<MediaTypeCompositionModel>
+isDeletable: boolean
+aliasCanBeChanged: boolean
     };
 
 export type MediaTypeSortModel = {
@@ -1245,10 +1268,11 @@ parent?: ReferenceByIdModel | null
 name: string
 isFolder: boolean
 icon: string
+isDeletable: boolean
     };
 
 export type MediaUrlInfoModel = {
-        culture?: string | null
+        culture: string | null
 url: string
     };
 
@@ -2736,77 +2760,77 @@ events: Array<WebhookEventResponseModel>
     };
 
 export type CultureData = {
-        
+
         payloads: {
             GetCulture: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetCulture: PagedCultureReponseModel
-                
+
         }
-        
+
     }
 
 export type DataTypeData = {
-        
+
         payloads: {
             PostDataType: {
                         requestBody?: CreateDataTypeRequestModel
-                        
+
                     };
 GetDataTypeById: {
                         id: string
-                        
+
                     };
 DeleteDataTypeById: {
                         id: string
-                        
+
                     };
 PutDataTypeById: {
                         id: string
 requestBody?: UpdateDataTypeRequestModel
-                        
+
                     };
 PostDataTypeByIdCopy: {
                         id: string
 requestBody?: CopyDataTypeRequestModel
-                        
+
                     };
 GetDataTypeByIdIsUsed: {
                         id: string
-                        
+
                     };
 PutDataTypeByIdMove: {
                         id: string
 requestBody?: MoveDataTypeRequestModel
-                        
+
                     };
 GetDataTypeByIdReferences: {
                         id: string
-                        
+
                     };
 PostDataTypeFolder: {
                         requestBody?: CreateFolderRequestModel
-                        
+
                     };
 GetDataTypeFolderById: {
                         id: string
-                        
+
                     };
 DeleteDataTypeFolderById: {
                         id: string
-                        
+
                     };
 PutDataTypeFolderById: {
                         id: string
 requestBody?: UpdateFolderResponseModel
-                        
+
                     };
 GetFilterDataType: {
                         editorAlias?: string
@@ -2814,38 +2838,38 @@ editorUiAlias?: string
 name?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetItemDataType: {
                         id?: Array<string>
-                        
+
                     };
 GetItemDataTypeSearch: {
                         query?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeDataTypeAncestors: {
                         descendantId?: string
-                        
+
                     };
 GetTreeDataTypeChildren: {
                         foldersOnly?: boolean
 parentId?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeDataTypeRoot: {
                         foldersOnly?: boolean
 skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             PostDataType: string
                 ,GetDataTypeById: DataTypeResponseModel
@@ -2866,73 +2890,73 @@ take?: number
                 ,GetTreeDataTypeAncestors: Array<DataTypeTreeItemResponseModel>
                 ,GetTreeDataTypeChildren: PagedDataTypeTreeItemResponseModel
                 ,GetTreeDataTypeRoot: PagedDataTypeTreeItemResponseModel
-                
+
         }
-        
+
     }
 
 export type DictionaryData = {
-        
+
         payloads: {
             GetDictionary: {
                         filter?: string
 skip?: number
 take?: number
-                        
+
                     };
 PostDictionary: {
                         requestBody?: CreateDictionaryItemRequestModel
-                        
+
                     };
 GetDictionaryById: {
                         id: string
-                        
+
                     };
 DeleteDictionaryById: {
                         id: string
-                        
+
                     };
 PutDictionaryById: {
                         id: string
 requestBody?: UpdateDictionaryItemRequestModel
-                        
+
                     };
 GetDictionaryByIdExport: {
                         id: string
 includeChildren?: boolean
-                        
+
                     };
 PutDictionaryByIdMove: {
                         id: string
 requestBody?: MoveDictionaryRequestModel
-                        
+
                     };
 PostDictionaryImport: {
                         requestBody?: ImportDictionaryRequestModel
-                        
+
                     };
 GetItemDictionary: {
                         id?: Array<string>
-                        
+
                     };
 GetTreeDictionaryAncestors: {
                         descendantId?: string
-                        
+
                     };
 GetTreeDictionaryChildren: {
                         parentId?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeDictionaryRoot: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetDictionary: PagedDictionaryOverviewResponseModel
                 ,PostDictionary: string
@@ -2946,81 +2970,81 @@ take?: number
                 ,GetTreeDictionaryAncestors: Array<NamedEntityTreeItemResponseModel>
                 ,GetTreeDictionaryChildren: PagedNamedEntityTreeItemResponseModel
                 ,GetTreeDictionaryRoot: PagedNamedEntityTreeItemResponseModel
-                
+
         }
-        
+
     }
 
 export type DocumentBlueprintData = {
-        
+
         payloads: {
             PostDocumentBlueprint: {
                         requestBody?: CreateDocumentBlueprintRequestModel
-                        
+
                     };
 GetDocumentBlueprintById: {
                         id: string
-                        
+
                     };
 DeleteDocumentBlueprintById: {
                         id: string
-                        
+
                     };
 PutDocumentBlueprintById: {
                         id: string
 requestBody?: UpdateDocumentBlueprintRequestModel
-                        
+
                     };
 PutDocumentBlueprintByIdMove: {
                         id: string
 requestBody?: MoveDocumentBlueprintRequestModel
-                        
+
                     };
 PostDocumentBlueprintFolder: {
                         requestBody?: CreateFolderRequestModel
-                        
+
                     };
 GetDocumentBlueprintFolderById: {
                         id: string
-                        
+
                     };
 DeleteDocumentBlueprintFolderById: {
                         id: string
-                        
+
                     };
 PutDocumentBlueprintFolderById: {
                         id: string
 requestBody?: UpdateFolderResponseModel
-                        
+
                     };
 PostDocumentBlueprintFromDocument: {
                         requestBody?: CreateDocumentBlueprintFromDocumentRequestModel
-                        
+
                     };
 GetItemDocumentBlueprint: {
                         id?: Array<string>
-                        
+
                     };
 GetTreeDocumentBlueprintAncestors: {
                         descendantId?: string
-                        
+
                     };
 GetTreeDocumentBlueprintChildren: {
                         foldersOnly?: boolean
 parentId?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeDocumentBlueprintRoot: {
                         foldersOnly?: boolean
 skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             PostDocumentBlueprint: string
                 ,GetDocumentBlueprintById: DocumentBlueprintResponseModel
@@ -3036,113 +3060,126 @@ take?: number
                 ,GetTreeDocumentBlueprintAncestors: Array<DocumentBlueprintTreeItemResponseModel>
                 ,GetTreeDocumentBlueprintChildren: PagedDocumentBlueprintTreeItemResponseModel
                 ,GetTreeDocumentBlueprintRoot: PagedDocumentBlueprintTreeItemResponseModel
-                
+
         }
-        
+
     }
 
 export type DocumentTypeData = {
-        
+
         payloads: {
             PostDocumentType: {
                         requestBody?: CreateDocumentTypeRequestModel
-                        
+
                     };
 GetDocumentTypeById: {
                         id: string
-                        
+
                     };
 DeleteDocumentTypeById: {
                         id: string
-                        
+
                     };
 PutDocumentTypeById: {
                         id: string
 requestBody?: UpdateDocumentTypeRequestModel
-                        
+
                     };
 GetDocumentTypeByIdAllowedChildren: {
                         id: string
 skip?: number
 take?: number
-                        
+
                     };
 GetDocumentTypeByIdBlueprint: {
                         id: string
 skip?: number
 take?: number
-                        
+
                     };
 GetDocumentTypeByIdCompositionReferences: {
                         id: string
-                        
+
                     };
 PostDocumentTypeByIdCopy: {
                         id: string
 requestBody?: CopyDocumentTypeRequestModel
-                        
+
+                    };
+GetDocumentTypeByIdExport: {
+                        id: string
+
+                    };
+PutDocumentTypeByIdImport: {
+                        id: string
+requestBody?: ImportDocumentTypeRequestModel
+
                     };
 PutDocumentTypeByIdMove: {
                         id: string
 requestBody?: MoveDocumentTypeRequestModel
-                        
+
                     };
 GetDocumentTypeAllowedAtRoot: {
                         skip?: number
 take?: number
-                        
+
                     };
 PostDocumentTypeAvailableCompositions: {
                         requestBody?: DocumentTypeCompositionRequestModel
-                        
+
                     };
 PostDocumentTypeFolder: {
                         requestBody?: CreateFolderRequestModel
-                        
+
                     };
 GetDocumentTypeFolderById: {
                         id: string
-                        
+
                     };
 DeleteDocumentTypeFolderById: {
                         id: string
-                        
+
                     };
 PutDocumentTypeFolderById: {
                         id: string
 requestBody?: UpdateFolderResponseModel
-                        
+
+                    };
+PostDocumentTypeImport: {
+                        requestBody?: ImportDocumentTypeRequestModel
+
                     };
 GetItemDocumentType: {
                         id?: Array<string>
-                        
+
                     };
 GetItemDocumentTypeSearch: {
                         query?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeDocumentTypeAncestors: {
                         descendantId?: string
-                        
+
                     };
 GetTreeDocumentTypeChildren: {
                         foldersOnly?: boolean
 parentId?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeDocumentTypeRoot: {
                         foldersOnly?: boolean
 skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             PostDocumentType: string
                 ,GetDocumentTypeById: DocumentTypeResponseModel
@@ -3152,6 +3189,8 @@ take?: number
                 ,GetDocumentTypeByIdBlueprint: PagedDocumentTypeBlueprintItemResponseModel
                 ,GetDocumentTypeByIdCompositionReferences: Array<DocumentTypeCompositionResponseModel>
                 ,PostDocumentTypeByIdCopy: string
+                ,GetDocumentTypeByIdExport: Blob | File
+                ,PutDocumentTypeByIdImport: string
                 ,PutDocumentTypeByIdMove: string
                 ,GetDocumentTypeAllowedAtRoot: PagedAllowedDocumentTypeModel
                 ,PostDocumentTypeAvailableCompositions: Array<AvailableDocumentTypeCompositionResponseModel>
@@ -3160,55 +3199,56 @@ take?: number
                 ,GetDocumentTypeFolderById: FolderResponseModel
                 ,DeleteDocumentTypeFolderById: string
                 ,PutDocumentTypeFolderById: string
+                ,PostDocumentTypeImport: string
                 ,GetItemDocumentType: Array<DocumentTypeItemResponseModel>
                 ,GetItemDocumentTypeSearch: PagedModelDocumentTypeItemResponseModel
                 ,GetTreeDocumentTypeAncestors: Array<DocumentTypeTreeItemResponseModel>
                 ,GetTreeDocumentTypeChildren: PagedDocumentTypeTreeItemResponseModel
                 ,GetTreeDocumentTypeRoot: PagedDocumentTypeTreeItemResponseModel
-                
+
         }
-        
+
     }
 
 export type DocumentVersionData = {
-        
+
         payloads: {
             GetDocumentVersion: {
                         culture?: string
 documentId: string
 skip?: number
 take?: number
-                        
+
                     };
 GetDocumentVersionById: {
                         id: string
-                        
+
                     };
 PutDocumentVersionByIdPreventCleanup: {
                         id: string
 preventCleanup?: boolean
-                        
+
                     };
 PostDocumentVersionByIdRollback: {
                         culture?: string
 id: string
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetDocumentVersion: PagedDocumentVersionItemResponseModel
                 ,GetDocumentVersionById: DocumentVersionResponseModel
                 ,PutDocumentVersionByIdPreventCleanup: string
                 ,PostDocumentVersionByIdRollback: string
-                
+
         }
-        
+
     }
 
 export type DocumentData = {
-        
+
         payloads: {
             GetCollectionDocumentById: {
                         dataTypeId?: string
@@ -3219,24 +3259,24 @@ orderCulture?: string
 orderDirection?: DirectionModel
 skip?: number
 take?: number
-                        
+
                     };
 PostDocument: {
                         requestBody?: CreateDocumentRequestModel
-                        
+
                     };
 GetDocumentById: {
                         id: string
-                        
+
                     };
 DeleteDocumentById: {
                         id: string
-                        
+
                     };
 PutDocumentById: {
                         id: string
 requestBody?: UpdateDocumentRequestModel
-                        
+
                     };
 GetDocumentByIdAuditLog: {
                         id: string
@@ -3244,162 +3284,162 @@ orderDirection?: DirectionModel
 sinceDate?: string
 skip?: number
 take?: number
-                        
+
                     };
 PostDocumentByIdCopy: {
                         id: string
 requestBody?: CopyDocumentRequestModel
-                        
+
                     };
 GetDocumentByIdDomains: {
                         id: string
-                        
+
                     };
 PutDocumentByIdDomains: {
                         id: string
 requestBody?: UpdateDomainsRequestModel
-                        
+
                     };
 PutDocumentByIdMove: {
                         id: string
 requestBody?: MoveDocumentRequestModel
-                        
+
                     };
 PutDocumentByIdMoveToRecycleBin: {
                         id: string
-                        
+
                     };
 GetDocumentByIdNotifications: {
                         id: string
-                        
+
                     };
 PutDocumentByIdNotifications: {
                         id: string
 requestBody?: UpdateDocumentNotificationsRequestModel
-                        
+
                     };
 PostDocumentByIdPublicAccess: {
                         id: string
 requestBody?: PublicAccessRequestModel
-                        
+
                     };
 DeleteDocumentByIdPublicAccess: {
                         id: string
-                        
+
                     };
 GetDocumentByIdPublicAccess: {
                         id: string
-                        
+
                     };
 PutDocumentByIdPublicAccess: {
                         id: string
 requestBody?: PublicAccessRequestModel
-                        
+
                     };
 PutDocumentByIdPublish: {
                         id: string
 requestBody?: PublishDocumentRequestModel
-                        
+
                     };
 PutDocumentByIdPublishWithDescendants: {
                         id: string
 requestBody?: PublishDocumentWithDescendantsRequestModel
-                        
+
                     };
 GetDocumentByIdReferencedBy: {
                         id: string
 skip?: number
 take?: number
-                        
+
                     };
 GetDocumentByIdReferencedDescendants: {
                         id: string
 skip?: number
 take?: number
-                        
+
                     };
 PutDocumentByIdUnpublish: {
                         id: string
 requestBody?: UnpublishDocumentRequestModel
-                        
+
                     };
 PutDocumentByIdValidate: {
                         id: string
 requestBody?: UpdateDocumentRequestModel
-                        
+
                     };
 GetDocumentAreReferenced: {
                         id?: Array<string>
 skip?: number
 take?: number
-                        
+
                     };
 PutDocumentSort: {
                         requestBody?: SortingRequestModel
-                        
+
                     };
 GetDocumentUrls: {
                         id?: Array<string>
-                        
+
                     };
 PostDocumentValidate: {
                         requestBody?: CreateDocumentRequestModel
-                        
+
                     };
 GetItemDocument: {
                         id?: Array<string>
-                        
+
                     };
 GetItemDocumentSearch: {
                         query?: string
 skip?: number
 take?: number
-                        
+
                     };
 DeleteRecycleBinDocumentById: {
                         id: string
-                        
+
                     };
 GetRecycleBinDocumentByIdOriginalParent: {
                         id: string
-                        
+
                     };
 PutRecycleBinDocumentByIdRestore: {
                         id: string
 requestBody?: MoveMediaRequestModel
-                        
+
                     };
 GetRecycleBinDocumentChildren: {
                         parentId?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetRecycleBinDocumentRoot: {
                         skip?: number
 take?: number
-                        
+
                     };
 GetTreeDocumentAncestors: {
                         descendantId?: string
-                        
+
                     };
 GetTreeDocumentChildren: {
                         dataTypeId?: string
 parentId?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeDocumentRoot: {
                         dataTypeId?: string
 skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetCollectionDocumentById: PagedDocumentCollectionResponseModel
                 ,PostDocument: string
@@ -3440,64 +3480,64 @@ take?: number
                 ,GetTreeDocumentAncestors: Array<DocumentTreeItemResponseModel>
                 ,GetTreeDocumentChildren: PagedDocumentTreeItemResponseModel
                 ,GetTreeDocumentRoot: PagedDocumentTreeItemResponseModel
-                
+
         }
-        
+
     }
 
 export type DynamicRootData = {
-        
+
         payloads: {
             PostDynamicRootQuery: {
                         requestBody?: DynamicRootRequestModel
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             PostDynamicRootQuery: DynamicRootResponseModel
                 ,GetDynamicRootSteps: Array<string>
-                
+
         }
-        
+
     }
 
 export type HealthCheckData = {
-        
+
         payloads: {
             GetHealthCheckGroup: {
                         skip?: number
 take?: number
-                        
+
                     };
 GetHealthCheckGroupByName: {
                         name: string
-                        
+
                     };
 PostHealthCheckGroupByNameCheck: {
                         name: string
-                        
+
                     };
 PostHealthCheckExecuteAction: {
                         requestBody?: HealthCheckActionRequestModel
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetHealthCheckGroup: PagedHealthCheckGroupResponseModel
                 ,GetHealthCheckGroupByName: HealthCheckGroupPresentationModel
                 ,PostHealthCheckGroupByNameCheck: HealthCheckGroupWithResultResponseModel
                 ,PostHealthCheckExecuteAction: HealthCheckResultResponseModel
-                
+
         }
-        
+
     }
 
 export type HelpData = {
-        
+
         payloads: {
             GetHelp: {
                         baseUrl?: string
@@ -3505,121 +3545,138 @@ section?: string
 skip?: number
 take?: number
 tree?: string
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetHelp: PagedHelpPageResponseModel
-                
+
         }
-        
+
     }
 
 export type ImagingData = {
-        
+
         payloads: {
             GetImagingResizeUrls: {
                         height?: number
 id?: Array<string>
 mode?: ImageCropModeModel
 width?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetImagingResizeUrls: Array<MediaUrlInfoResponseModel>
-                
+
         }
-        
+
+    }
+
+export type ImportData = {
+
+        payloads: {
+            GetImportAnalyze: {
+                        temporaryFileId?: string
+
+                    };
+        }
+
+
+        responses: {
+            GetImportAnalyze: EntityImportAnalysisResponseModel
+
+        }
+
     }
 
 export type IndexerData = {
-        
+
         payloads: {
             GetIndexer: {
                         skip?: number
 take?: number
-                        
+
                     };
 GetIndexerByIndexName: {
                         indexName: string
-                        
+
                     };
 PostIndexerByIndexNameRebuild: {
                         indexName: string
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetIndexer: PagedIndexResponseModel
                 ,GetIndexerByIndexName: IndexResponseModel
                 ,PostIndexerByIndexNameRebuild: string
-                
+
         }
-        
+
     }
 
 export type InstallData = {
-        
+
         payloads: {
             PostInstallSetup: {
                         requestBody?: InstallRequestModel
-                        
+
                     };
 PostInstallValidateDatabase: {
                         requestBody?: DatabaseInstallRequestModel
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetInstallSettings: InstallSettingsResponseModel
                 ,PostInstallSetup: string
                 ,PostInstallValidateDatabase: string
-                
+
         }
-        
+
     }
 
 export type LanguageData = {
-        
+
         payloads: {
             GetItemLanguage: {
                         isoCode?: Array<string>
-                        
+
                     };
 GetLanguage: {
                         skip?: number
 take?: number
-                        
+
                     };
 PostLanguage: {
                         requestBody?: CreateLanguageRequestModel
-                        
+
                     };
 GetLanguageByIsoCode: {
                         isoCode: string
-                        
+
                     };
 DeleteLanguageByIsoCode: {
                         isoCode: string
-                        
+
                     };
 PutLanguageByIsoCode: {
                         isoCode: string
 requestBody?: UpdateLanguageRequestModel
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetItemLanguage: Array<LanguageItemResponseModel>
                 ,GetItemLanguageDefault: LanguageItemResponseModel
@@ -3628,23 +3685,23 @@ requestBody?: UpdateLanguageRequestModel
                 ,GetLanguageByIsoCode: LanguageResponseModel
                 ,DeleteLanguageByIsoCode: string
                 ,PutLanguageByIsoCode: string
-                
+
         }
-        
+
     }
 
 export type LogViewerData = {
-        
+
         payloads: {
             GetLogViewerLevel: {
                         skip?: number
 take?: number
-                        
+
                     };
 GetLogViewerLevelCount: {
                         endDate?: string
 startDate?: string
-                        
+
                     };
 GetLogViewerLog: {
                         endDate?: string
@@ -3654,40 +3711,40 @@ orderDirection?: DirectionModel
 skip?: number
 startDate?: string
 take?: number
-                        
+
                     };
 GetLogViewerMessageTemplate: {
                         endDate?: string
 skip?: number
 startDate?: string
 take?: number
-                        
+
                     };
 GetLogViewerSavedSearch: {
                         skip?: number
 take?: number
-                        
+
                     };
 PostLogViewerSavedSearch: {
                         requestBody?: SavedLogSearchRequestModel
-                        
+
                     };
 GetLogViewerSavedSearchByName: {
                         name: string
-                        
+
                     };
 DeleteLogViewerSavedSearchByName: {
                         name: string
-                        
+
                     };
 GetLogViewerValidateLogsSize: {
                         endDate?: string
 startDate?: string
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetLogViewerLevel: PagedLoggerResponseModel
                 ,GetLogViewerLevelCount: LogLevelCountsReponseModel
@@ -3698,128 +3755,147 @@ startDate?: string
                 ,GetLogViewerSavedSearchByName: SavedLogSearchResponseModel
                 ,DeleteLogViewerSavedSearchByName: string
                 ,GetLogViewerValidateLogsSize: any
-                
+
         }
-        
+
     }
 
 export type ManifestData = {
-        
-        
+
+
         responses: {
             GetManifestManifest: Array<ManifestResponseModel>
                 ,GetManifestManifestPrivate: Array<ManifestResponseModel>
                 ,GetManifestManifestPublic: Array<ManifestResponseModel>
-                
+
         }
-        
+
     }
 
 export type MediaTypeData = {
-        
+
         payloads: {
             GetItemMediaType: {
                         id?: Array<string>
-                        
+
                     };
 GetItemMediaTypeAllowed: {
                         fileExtension?: string
 skip?: number
 take?: number
-                        
+
+                    };
+GetItemMediaTypeFolders: {
+                        skip?: number
+take?: number
+
                     };
 GetItemMediaTypeSearch: {
                         query?: string
 skip?: number
 take?: number
-                        
+
                     };
 PostMediaType: {
                         requestBody?: CreateMediaTypeRequestModel
-                        
+
                     };
 GetMediaTypeById: {
                         id: string
-                        
+
                     };
 DeleteMediaTypeById: {
                         id: string
-                        
+
                     };
 PutMediaTypeById: {
                         id: string
 requestBody?: UpdateMediaTypeRequestModel
-                        
+
                     };
 GetMediaTypeByIdAllowedChildren: {
                         id: string
 skip?: number
 take?: number
-                        
+
                     };
 GetMediaTypeByIdCompositionReferences: {
                         id: string
-                        
+
                     };
 PostMediaTypeByIdCopy: {
                         id: string
 requestBody?: CopyMediaTypeRequestModel
-                        
+
+                    };
+GetMediaTypeByIdExport: {
+                        id: string
+
+                    };
+PutMediaTypeByIdImport: {
+                        id: string
+requestBody?: ImportMediaTypeRequestModel
+
                     };
 PutMediaTypeByIdMove: {
                         id: string
 requestBody?: MoveMediaTypeRequestModel
-                        
+
                     };
 GetMediaTypeAllowedAtRoot: {
                         skip?: number
 take?: number
-                        
+
                     };
 PostMediaTypeAvailableCompositions: {
                         requestBody?: MediaTypeCompositionRequestModel
-                        
+
                     };
 PostMediaTypeFolder: {
                         requestBody?: CreateFolderRequestModel
-                        
+
                     };
 GetMediaTypeFolderById: {
                         id: string
-                        
+
                     };
 DeleteMediaTypeFolderById: {
                         id: string
-                        
+
                     };
 PutMediaTypeFolderById: {
                         id: string
 requestBody?: UpdateFolderResponseModel
-                        
+
+                    };
+PostMediaTypeImport: {
+                        requestBody?: ImportMediaTypeRequestModel
+
                     };
 GetTreeMediaTypeAncestors: {
                         descendantId?: string
-                        
+
                     };
 GetTreeMediaTypeChildren: {
                         foldersOnly?: boolean
 parentId?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeMediaTypeRoot: {
                         foldersOnly?: boolean
 skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetItemMediaType: Array<MediaTypeItemResponseModel>
                 ,GetItemMediaTypeAllowed: PagedModelMediaTypeItemResponseModel
+                ,GetItemMediaTypeFolders: PagedModelMediaTypeItemResponseModel
                 ,GetItemMediaTypeSearch: PagedModelMediaTypeItemResponseModel
                 ,PostMediaType: string
                 ,GetMediaTypeById: MediaTypeResponseModel
@@ -3828,6 +3904,8 @@ take?: number
                 ,GetMediaTypeByIdAllowedChildren: PagedAllowedMediaTypeModel
                 ,GetMediaTypeByIdCompositionReferences: Array<MediaTypeCompositionResponseModel>
                 ,PostMediaTypeByIdCopy: string
+                ,GetMediaTypeByIdExport: Blob | File
+                ,PutMediaTypeByIdImport: string
                 ,PutMediaTypeByIdMove: string
                 ,GetMediaTypeAllowedAtRoot: PagedAllowedMediaTypeModel
                 ,PostMediaTypeAvailableCompositions: Array<AvailableMediaTypeCompositionResponseModel>
@@ -3835,16 +3913,17 @@ take?: number
                 ,GetMediaTypeFolderById: FolderResponseModel
                 ,DeleteMediaTypeFolderById: string
                 ,PutMediaTypeFolderById: string
+                ,PostMediaTypeImport: string
                 ,GetTreeMediaTypeAncestors: Array<MediaTypeTreeItemResponseModel>
                 ,GetTreeMediaTypeChildren: PagedMediaTypeTreeItemResponseModel
                 ,GetTreeMediaTypeRoot: PagedMediaTypeTreeItemResponseModel
-                
+
         }
-        
+
     }
 
 export type MediaData = {
-        
+
         payloads: {
             GetCollectionMedia: {
                         dataTypeId?: string
@@ -3854,34 +3933,34 @@ orderBy?: string
 orderDirection?: DirectionModel
 skip?: number
 take?: number
-                        
+
                     };
 GetItemMedia: {
                         id?: Array<string>
-                        
+
                     };
 GetItemMediaSearch: {
                         query?: string
 skip?: number
 take?: number
-                        
+
                     };
 PostMedia: {
                         requestBody?: CreateMediaRequestModel
-                        
+
                     };
 GetMediaById: {
                         id: string
-                        
+
                     };
 DeleteMediaById: {
                         id: string
-                        
+
                     };
 PutMediaById: {
                         id: string
 requestBody?: UpdateMediaRequestModel
-                        
+
                     };
 GetMediaByIdAuditLog: {
                         id: string
@@ -3889,96 +3968,96 @@ orderDirection?: DirectionModel
 sinceDate?: string
 skip?: number
 take?: number
-                        
+
                     };
 PutMediaByIdMove: {
                         id: string
 requestBody?: MoveMediaRequestModel
-                        
+
                     };
 PutMediaByIdMoveToRecycleBin: {
                         id: string
-                        
+
                     };
 GetMediaByIdReferencedBy: {
                         id: string
 skip?: number
 take?: number
-                        
+
                     };
 GetMediaByIdReferencedDescendants: {
                         id: string
 skip?: number
 take?: number
-                        
+
                     };
 PutMediaByIdValidate: {
                         id: string
 requestBody?: UpdateMediaRequestModel
-                        
+
                     };
 GetMediaAreReferenced: {
                         id?: Array<string>
 skip?: number
 take?: number
-                        
+
                     };
 PutMediaSort: {
                         requestBody?: SortingRequestModel
-                        
+
                     };
 GetMediaUrls: {
                         id?: Array<string>
-                        
+
                     };
 PostMediaValidate: {
                         requestBody?: CreateMediaRequestModel
-                        
+
                     };
 DeleteRecycleBinMediaById: {
                         id: string
-                        
+
                     };
 GetRecycleBinMediaByIdOriginalParent: {
                         id: string
-                        
+
                     };
 PutRecycleBinMediaByIdRestore: {
                         id: string
 requestBody?: MoveMediaRequestModel
-                        
+
                     };
 GetRecycleBinMediaChildren: {
                         parentId?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetRecycleBinMediaRoot: {
                         skip?: number
 take?: number
-                        
+
                     };
 GetTreeMediaAncestors: {
                         descendantId?: string
-                        
+
                     };
 GetTreeMediaChildren: {
                         dataTypeId?: string
 parentId?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeMediaRoot: {
                         dataTypeId?: string
 skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetCollectionMedia: PagedMediaCollectionResponseModel
                 ,GetItemMedia: Array<MediaItemResponseModel>
@@ -4007,48 +4086,48 @@ take?: number
                 ,GetTreeMediaAncestors: Array<MediaTreeItemResponseModel>
                 ,GetTreeMediaChildren: PagedMediaTreeItemResponseModel
                 ,GetTreeMediaRoot: PagedMediaTreeItemResponseModel
-                
+
         }
-        
+
     }
 
 export type MemberGroupData = {
-        
+
         payloads: {
             GetItemMemberGroup: {
                         id?: Array<string>
-                        
+
                     };
 GetMemberGroup: {
                         skip?: number
 take?: number
-                        
+
                     };
 PostMemberGroup: {
                         requestBody?: CreateMemberGroupRequestModel
-                        
+
                     };
 GetMemberGroupById: {
                         id: string
-                        
+
                     };
 DeleteMemberGroupById: {
                         id: string
-                        
+
                     };
 PutMemberGroupById: {
                         id: string
 requestBody?: UpdateMemberGroupRequestModel
-                        
+
                     };
 GetTreeMemberGroupRoot: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetItemMemberGroup: Array<MemberGroupItemResponseModel>
                 ,GetMemberGroup: PagedMemberGroupResponseModel
@@ -4057,61 +4136,61 @@ take?: number
                 ,DeleteMemberGroupById: string
                 ,PutMemberGroupById: string
                 ,GetTreeMemberGroupRoot: PagedNamedEntityTreeItemResponseModel
-                
+
         }
-        
+
     }
 
 export type MemberTypeData = {
-        
+
         payloads: {
             GetItemMemberType: {
                         id?: Array<string>
-                        
+
                     };
 GetItemMemberTypeSearch: {
                         query?: string
 skip?: number
 take?: number
-                        
+
                     };
 PostMemberType: {
                         requestBody?: CreateMemberTypeRequestModel
-                        
+
                     };
 GetMemberTypeById: {
                         id: string
-                        
+
                     };
 DeleteMemberTypeById: {
                         id: string
-                        
+
                     };
 PutMemberTypeById: {
                         id: string
 requestBody?: UpdateMemberTypeRequestModel
-                        
+
                     };
 GetMemberTypeByIdCompositionReferences: {
                         id: string
-                        
+
                     };
 PostMemberTypeByIdCopy: {
                         id: string
-                        
+
                     };
 PostMemberTypeAvailableCompositions: {
                         requestBody?: MemberTypeCompositionRequestModel
-                        
+
                     };
 GetTreeMemberTypeRoot: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetItemMemberType: Array<MemberTypeItemResponseModel>
                 ,GetItemMemberTypeSearch: PagedModelMemberTypeItemResponseModel
@@ -4123,13 +4202,13 @@ take?: number
                 ,PostMemberTypeByIdCopy: string
                 ,PostMemberTypeAvailableCompositions: Array<AvailableMemberTypeCompositionResponseModel>
                 ,GetTreeMemberTypeRoot: PagedMemberTypeTreeItemResponseModel
-                
+
         }
-        
+
     }
 
 export type MemberData = {
-        
+
         payloads: {
             GetFilterMember: {
                         filter?: string
@@ -4141,47 +4220,47 @@ orderBy?: string
 orderDirection?: DirectionModel
 skip?: number
 take?: number
-                        
+
                     };
 GetItemMember: {
                         id?: Array<string>
-                        
+
                     };
 GetItemMemberSearch: {
                         query?: string
 skip?: number
 take?: number
-                        
+
                     };
 PostMember: {
                         requestBody?: CreateMemberRequestModel
-                        
+
                     };
 GetMemberById: {
                         id: string
-                        
+
                     };
 DeleteMemberById: {
                         id: string
-                        
+
                     };
 PutMemberById: {
                         id: string
 requestBody?: UpdateMemberRequestModel
-                        
+
                     };
 PutMemberByIdValidate: {
                         id: string
 requestBody?: UpdateMemberRequestModel
-                        
+
                     };
 PostMemberValidate: {
                         requestBody?: CreateMemberRequestModel
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetFilterMember: PagedMemberResponseModel
                 ,GetItemMember: Array<MemberItemResponseModel>
@@ -4193,101 +4272,101 @@ PostMemberValidate: {
                 ,PutMemberByIdValidate: string
                 ,GetMemberConfiguration: MemberConfigurationResponseModel
                 ,PostMemberValidate: string
-                
+
         }
-        
+
     }
 
 export type ModelsBuilderData = {
-        
-        
+
+
         responses: {
             PostModelsBuilderBuild: string
                 ,GetModelsBuilderDashboard: ModelsBuilderResponseModel
                 ,GetModelsBuilderStatus: OutOfDateStatusResponseModel
-                
+
         }
-        
+
     }
 
 export type ObjectTypesData = {
-        
+
         payloads: {
             GetObjectTypes: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetObjectTypes: PagedObjectTypeResponseModel
-                
+
         }
-        
+
     }
 
 export type OembedData = {
-        
+
         payloads: {
             GetOembedQuery: {
                         maxHeight?: number
 maxWidth?: number
 url?: string
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetOembedQuery: OEmbedResponseModel
-                
+
         }
-        
+
     }
 
 export type PackageData = {
-        
+
         payloads: {
             PostPackageByNameRunMigration: {
                         name: string
-                        
+
                     };
 GetPackageCreated: {
                         skip?: number
 take?: number
-                        
+
                     };
 PostPackageCreated: {
                         requestBody?: CreatePackageRequestModel
-                        
+
                     };
 GetPackageCreatedById: {
                         id: string
-                        
+
                     };
 DeletePackageCreatedById: {
                         id: string
-                        
+
                     };
 PutPackageCreatedById: {
                         id: string
 requestBody?: UpdatePackageRequestModel
-                        
+
                     };
 GetPackageCreatedByIdDownload: {
                         id: string
-                        
+
                     };
 GetPackageMigrationStatus: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             PostPackageByNameRunMigration: string
                 ,GetPackageConfiguration: PackageConfigurationResponseModel
@@ -4298,79 +4377,79 @@ take?: number
                 ,PutPackageCreatedById: string
                 ,GetPackageCreatedByIdDownload: Blob | File
                 ,GetPackageMigrationStatus: PagedPackageMigrationStatusResponseModel
-                
+
         }
-        
+
     }
 
 export type PartialViewData = {
-        
+
         payloads: {
             GetItemPartialView: {
                         path?: Array<string>
-                        
+
                     };
 PostPartialView: {
                         requestBody?: CreatePartialViewRequestModel
-                        
+
                     };
 GetPartialViewByPath: {
                         path: string
-                        
+
                     };
 DeletePartialViewByPath: {
                         path: string
-                        
+
                     };
 PutPartialViewByPath: {
                         path: string
 requestBody?: UpdatePartialViewRequestModel
-                        
+
                     };
 PutPartialViewByPathRename: {
                         path: string
 requestBody?: RenamePartialViewRequestModel
-                        
+
                     };
 PostPartialViewFolder: {
                         requestBody?: CreatePartialViewFolderRequestModel
-                        
+
                     };
 GetPartialViewFolderByPath: {
                         path: string
-                        
+
                     };
 DeletePartialViewFolderByPath: {
                         path: string
-                        
+
                     };
 GetPartialViewSnippet: {
                         skip?: number
 take?: number
-                        
+
                     };
 GetPartialViewSnippetById: {
                         id: string
-                        
+
                     };
 GetTreePartialViewAncestors: {
                         descendantPath?: string
-                        
+
                     };
 GetTreePartialViewChildren: {
                         parentPath?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreePartialViewRoot: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetItemPartialView: Array<PartialViewItemResponseModel>
                 ,PostPartialView: string
@@ -4386,214 +4465,214 @@ take?: number
                 ,GetTreePartialViewAncestors: Array<FileSystemTreeItemPresentationModel>
                 ,GetTreePartialViewChildren: PagedFileSystemTreeItemPresentationModel
                 ,GetTreePartialViewRoot: PagedFileSystemTreeItemPresentationModel
-                
+
         }
-        
+
     }
 
 export type PreviewData = {
-        
-        
+
+
         responses: {
             DeletePreview: string
                 ,PostPreview: string
-                
+
         }
-        
+
     }
 
 export type ProfilingData = {
-        
+
         payloads: {
             PutProfilingStatus: {
                         requestBody?: ProfilingStatusRequestModel
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetProfilingStatus: ProfilingStatusResponseModel
                 ,PutProfilingStatus: string
-                
+
         }
-        
+
     }
 
 export type PropertyTypeData = {
-        
+
         payloads: {
             GetPropertyTypeIsUsed: {
                         contentTypeId?: string
 propertyAlias?: string
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetPropertyTypeIsUsed: boolean
-                
+
         }
-        
+
     }
 
 export type PublishedCacheData = {
-        
-        
+
+
         responses: {
             PostPublishedCacheCollect: string
                 ,PostPublishedCacheRebuild: string
                 ,PostPublishedCacheReload: string
                 ,GetPublishedCacheStatus: string
-                
+
         }
-        
+
     }
 
 export type RedirectManagementData = {
-        
+
         payloads: {
             GetRedirectManagement: {
                         filter?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetRedirectManagementById: {
                         id: string
 skip?: number
 take?: number
-                        
+
                     };
 DeleteRedirectManagementById: {
                         id: string
-                        
+
                     };
 PostRedirectManagementStatus: {
                         status?: RedirectStatusModel
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetRedirectManagement: PagedRedirectUrlResponseModel
                 ,GetRedirectManagementById: PagedRedirectUrlResponseModel
                 ,DeleteRedirectManagementById: string
                 ,GetRedirectManagementStatus: RedirectUrlStatusResponseModel
                 ,PostRedirectManagementStatus: string
-                
+
         }
-        
+
     }
 
 export type RelationTypeData = {
-        
+
         payloads: {
             GetItemRelationType: {
                         id?: Array<string>
-                        
+
                     };
 GetRelationType: {
                         skip?: number
 take?: number
-                        
+
                     };
 GetRelationTypeById: {
                         id: string
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetItemRelationType: Array<RelationTypeItemResponseModel>
                 ,GetRelationType: PagedRelationTypeResponseModel
                 ,GetRelationTypeById: RelationTypeResponseModel
-                
+
         }
-        
+
     }
 
 export type RelationData = {
-        
+
         payloads: {
             GetRelationTypeById: {
                         id: string
 skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetRelationTypeById: PagedRelationResponseModel
-                
+
         }
-        
+
     }
 
 export type ScriptData = {
-        
+
         payloads: {
             GetItemScript: {
                         path?: Array<string>
-                        
+
                     };
 PostScript: {
                         requestBody?: CreateScriptRequestModel
-                        
+
                     };
 GetScriptByPath: {
                         path: string
-                        
+
                     };
 DeleteScriptByPath: {
                         path: string
-                        
+
                     };
 PutScriptByPath: {
                         path: string
 requestBody?: UpdateScriptRequestModel
-                        
+
                     };
 PutScriptByPathRename: {
                         path: string
 requestBody?: RenameScriptRequestModel
-                        
+
                     };
 PostScriptFolder: {
                         requestBody?: CreateScriptFolderRequestModel
-                        
+
                     };
 GetScriptFolderByPath: {
                         path: string
-                        
+
                     };
 DeleteScriptFolderByPath: {
                         path: string
-                        
+
                     };
 GetTreeScriptAncestors: {
                         descendantPath?: string
-                        
+
                     };
 GetTreeScriptChildren: {
                         parentPath?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeScriptRoot: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetItemScript: Array<ScriptItemResponseModel>
                 ,PostScript: string
@@ -4607,190 +4686,190 @@ take?: number
                 ,GetTreeScriptAncestors: Array<FileSystemTreeItemPresentationModel>
                 ,GetTreeScriptChildren: PagedFileSystemTreeItemPresentationModel
                 ,GetTreeScriptRoot: PagedFileSystemTreeItemPresentationModel
-                
+
         }
-        
+
     }
 
 export type SearcherData = {
-        
+
         payloads: {
             GetSearcher: {
                         skip?: number
 take?: number
-                        
+
                     };
 GetSearcherBySearcherNameQuery: {
                         searcherName: string
 skip?: number
 take?: number
 term?: string
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetSearcher: PagedSearcherResponseModel
                 ,GetSearcherBySearcherNameQuery: PagedSearchResultResponseModel
-                
+
         }
-        
+
     }
 
 export type SecurityData = {
-        
+
         payloads: {
             PostSecurityForgotPassword: {
                         requestBody?: ResetPasswordRequestModel
-                        
+
                     };
 PostSecurityForgotPasswordReset: {
                         requestBody?: ResetPasswordTokenRequestModel
-                        
+
                     };
 PostSecurityForgotPasswordVerify: {
                         requestBody?: VerifyResetPasswordTokenRequestModel
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetSecurityConfiguration: SecurityConfigurationResponseModel
                 ,PostSecurityForgotPassword: string
                 ,PostSecurityForgotPasswordReset: string
                 ,PostSecurityForgotPasswordVerify: VerifyResetPasswordResponseModel
-                
+
         }
-        
+
     }
 
 export type SegmentData = {
-        
+
         payloads: {
             GetSegment: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetSegment: PagedSegmentResponseModel
-                
+
         }
-        
+
     }
 
 export type ServerData = {
-        
-        
+
+
         responses: {
             GetServerConfiguration: ServerConfigurationResponseModel
                 ,GetServerInformation: ServerInformationResponseModel
                 ,GetServerStatus: ServerStatusResponseModel
                 ,GetServerTroubleshooting: ServerTroubleshootingResponseModel
-                
+
         }
-        
+
     }
 
 export type StaticFileData = {
-        
+
         payloads: {
             GetItemStaticFile: {
                         path?: Array<string>
-                        
+
                     };
 GetTreeStaticFileAncestors: {
                         descendantPath?: string
-                        
+
                     };
 GetTreeStaticFileChildren: {
                         parentPath?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeStaticFileRoot: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetItemStaticFile: Array<StaticFileItemResponseModel>
                 ,GetTreeStaticFileAncestors: Array<FileSystemTreeItemPresentationModel>
                 ,GetTreeStaticFileChildren: PagedFileSystemTreeItemPresentationModel
                 ,GetTreeStaticFileRoot: PagedFileSystemTreeItemPresentationModel
-                
+
         }
-        
+
     }
 
 export type StylesheetData = {
-        
+
         payloads: {
             GetItemStylesheet: {
                         path?: Array<string>
-                        
+
                     };
 PostStylesheet: {
                         requestBody?: CreateStylesheetRequestModel
-                        
+
                     };
 GetStylesheetByPath: {
                         path: string
-                        
+
                     };
 DeleteStylesheetByPath: {
                         path: string
-                        
+
                     };
 PutStylesheetByPath: {
                         path: string
 requestBody?: UpdateStylesheetRequestModel
-                        
+
                     };
 PutStylesheetByPathRename: {
                         path: string
 requestBody?: RenameStylesheetRequestModel
-                        
+
                     };
 PostStylesheetFolder: {
                         requestBody?: CreateStylesheetFolderRequestModel
-                        
+
                     };
 GetStylesheetFolderByPath: {
                         path: string
-                        
+
                     };
 DeleteStylesheetFolderByPath: {
                         path: string
-                        
+
                     };
 GetTreeStylesheetAncestors: {
                         descendantPath?: string
-                        
+
                     };
 GetTreeStylesheetChildren: {
                         parentPath?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeStylesheetRoot: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetItemStylesheet: Array<StylesheetItemResponseModel>
                 ,PostStylesheet: string
@@ -4804,13 +4883,13 @@ take?: number
                 ,GetTreeStylesheetAncestors: Array<FileSystemTreeItemPresentationModel>
                 ,GetTreeStylesheetChildren: PagedFileSystemTreeItemPresentationModel
                 ,GetTreeStylesheetRoot: PagedFileSystemTreeItemPresentationModel
-                
+
         }
-        
+
     }
 
 export type TagData = {
-        
+
         payloads: {
             GetTag: {
                         culture?: string
@@ -4818,94 +4897,94 @@ query?: string
 skip?: number
 tagGroup?: string
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetTag: PagedTagResponseModel
-                
+
         }
-        
+
     }
 
 export type TelemetryData = {
-        
+
         payloads: {
             GetTelemetry: {
                         skip?: number
 take?: number
-                        
+
                     };
 PostTelemetryLevel: {
                         requestBody?: TelemetryRequestModel
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetTelemetry: PagedTelemetryResponseModel
                 ,GetTelemetryLevel: TelemetryResponseModel
                 ,PostTelemetryLevel: string
-                
+
         }
-        
+
     }
 
 export type TemplateData = {
-        
+
         payloads: {
             GetItemTemplate: {
                         id?: Array<string>
-                        
+
                     };
 GetItemTemplateSearch: {
                         query?: string
 skip?: number
 take?: number
-                        
+
                     };
 PostTemplate: {
                         requestBody?: CreateTemplateRequestModel
-                        
+
                     };
 GetTemplateById: {
                         id: string
-                        
+
                     };
 DeleteTemplateById: {
                         id: string
-                        
+
                     };
 PutTemplateById: {
                         id: string
 requestBody?: UpdateTemplateRequestModel
-                        
+
                     };
 PostTemplateQueryExecute: {
                         requestBody?: TemplateQueryExecuteModel
-                        
+
                     };
 GetTreeTemplateAncestors: {
                         descendantId?: string
-                        
+
                     };
 GetTreeTemplateChildren: {
                         parentId?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetTreeTemplateRoot: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetItemTemplate: Array<TemplateItemResponseModel>
                 ,GetItemTemplateSearch: PagedModelTemplateItemResponseModel
@@ -4919,140 +4998,140 @@ take?: number
                 ,GetTreeTemplateAncestors: Array<NamedEntityTreeItemResponseModel>
                 ,GetTreeTemplateChildren: PagedNamedEntityTreeItemResponseModel
                 ,GetTreeTemplateRoot: PagedNamedEntityTreeItemResponseModel
-                
+
         }
-        
+
     }
 
 export type TemporaryFileData = {
-        
+
         payloads: {
             PostTemporaryFile: {
                         formData?: {
-        Id?: string
-File?: Blob | File
+        Id: string
+File: Blob | File
     }
-                        
+
                     };
 GetTemporaryFileById: {
                         id: string
-                        
+
                     };
 DeleteTemporaryFileById: {
                         id: string
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             PostTemporaryFile: string
                 ,GetTemporaryFileById: TemporaryFileResponseModel
                 ,DeleteTemporaryFileById: string
                 ,GetTemporaryFileConfiguration: TemporaryFileConfigurationResponseModel
-                
+
         }
-        
+
     }
 
 export type UpgradeData = {
-        
-        
+
+
         responses: {
             PostUpgradeAuthorize: string
                 ,GetUpgradeSettings: UpgradeSettingsResponseModel
-                
+
         }
-        
+
     }
 
 export type UserDataData = {
-        
+
         payloads: {
             PostUserData: {
                         requestBody?: CreateUserDataRequestModel
-                        
+
                     };
 GetUserData: {
                         groups?: Array<string>
 identifiers?: Array<string>
 skip?: number
 take?: number
-                        
+
                     };
 PutUserData: {
                         requestBody?: UpdateUserDataRequestModel
-                        
+
                     };
 GetUserDataById: {
                         id: string
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             PostUserData: string
                 ,GetUserData: PagedUserDataResponseModel
                 ,PutUserData: string
                 ,GetUserDataById: UserDataModel
-                
+
         }
-        
+
     }
 
 export type UserGroupData = {
-        
+
         payloads: {
             GetFilterUserGroup: {
                         filter?: string
 skip?: number
 take?: number
-                        
+
                     };
 GetItemUserGroup: {
                         id?: Array<string>
-                        
+
                     };
 DeleteUserGroup: {
                         requestBody?: DeleteUserGroupsRequestModel
-                        
+
                     };
 PostUserGroup: {
                         requestBody?: CreateUserGroupRequestModel
-                        
+
                     };
 GetUserGroup: {
                         skip?: number
 take?: number
-                        
+
                     };
 GetUserGroupById: {
                         id: string
-                        
+
                     };
 DeleteUserGroupById: {
                         id: string
-                        
+
                     };
 PutUserGroupById: {
                         id: string
 requestBody?: UpdateUserGroupRequestModel
-                        
+
                     };
 DeleteUserGroupByIdUsers: {
                         id: string
 requestBody?: Array<ReferenceByIdModel>
-                        
+
                     };
 PostUserGroupByIdUsers: {
                         id: string
 requestBody?: Array<ReferenceByIdModel>
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetFilterUserGroup: PagedUserGroupResponseModel
                 ,GetItemUserGroup: Array<UserGroupItemResponseModel>
@@ -5064,13 +5143,13 @@ requestBody?: Array<ReferenceByIdModel>
                 ,PutUserGroupById: string
                 ,DeleteUserGroupByIdUsers: string
                 ,PostUserGroupByIdUsers: string
-                
+
         }
-        
+
     }
 
 export type UserData = {
-        
+
         payloads: {
             GetFilterUser: {
                         filter?: string
@@ -5080,134 +5159,134 @@ skip?: number
 take?: number
 userGroupIds?: Array<string>
 userStates?: Array<UserStateModel>
-                        
+
                     };
 GetItemUser: {
                         id?: Array<string>
-                        
+
                     };
 PostUser: {
                         requestBody?: CreateUserRequestModel
-                        
+
                     };
 DeleteUser: {
                         requestBody?: DeleteUsersRequestModel
-                        
+
                     };
 GetUser: {
                         skip?: number
 take?: number
-                        
+
                     };
 GetUserById: {
                         id: string
-                        
+
                     };
 DeleteUserById: {
                         id: string
-                        
+
                     };
 PutUserById: {
                         id: string
 requestBody?: UpdateUserRequestModel
-                        
+
                     };
 GetUserById2Fa: {
                         id: string
-                        
+
                     };
 DeleteUserById2FaByProviderName: {
                         id: string
 providerName: string
-                        
+
                     };
 PostUserByIdChangePassword: {
                         id: string
 requestBody?: ChangePasswordUserRequestModel
-                        
+
                     };
 PostUserByIdResetPassword: {
                         id: string
-                        
+
                     };
 DeleteUserAvatarById: {
                         id: string
-                        
+
                     };
 PostUserAvatarById: {
                         id: string
 requestBody?: SetAvatarRequestModel
-                        
+
                     };
 DeleteUserCurrent2FaByProviderName: {
                         code?: string
 providerName: string
-                        
+
                     };
 PostUserCurrent2FaByProviderName: {
                         providerName: string
 requestBody?: EnableTwoFactorRequestModel
-                        
+
                     };
 GetUserCurrent2FaByProviderName: {
                         providerName: string
-                        
+
                     };
 PostUserCurrentAvatar: {
                         requestBody?: SetAvatarRequestModel
-                        
+
                     };
 PostUserCurrentChangePassword: {
                         requestBody?: ChangePasswordCurrentUserRequestModel
-                        
+
                     };
 GetUserCurrentPermissions: {
                         id?: Array<string>
-                        
+
                     };
 GetUserCurrentPermissionsDocument: {
                         id?: Array<string>
-                        
+
                     };
 GetUserCurrentPermissionsMedia: {
                         id?: Array<string>
-                        
+
                     };
 PostUserDisable: {
                         requestBody?: DisableUserRequestModel
-                        
+
                     };
 PostUserEnable: {
                         requestBody?: EnableUserRequestModel
-                        
+
                     };
 PostUserInvite: {
                         requestBody?: InviteUserRequestModel
-                        
+
                     };
 PostUserInviteCreatePassword: {
                         requestBody?: CreateInitialPasswordUserRequestModel
-                        
+
                     };
 PostUserInviteResend: {
                         requestBody?: ResendInviteUserRequestModel
-                        
+
                     };
 PostUserInviteVerify: {
                         requestBody?: VerifyInviteUserRequestModel
-                        
+
                     };
 PostUserSetUserGroups: {
                         requestBody?: UpdateUserGroupsOnUserRequestModel
-                        
+
                     };
 PostUserUnlock: {
                         requestBody?: UnlockUsersRequestModel
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetFilterUser: PagedUserResponseModel
                 ,GetItemUser: Array<UserItemResponseModel>
@@ -5244,48 +5323,48 @@ PostUserUnlock: {
                 ,PostUserInviteVerify: VerifyInviteUserResponseModel
                 ,PostUserSetUserGroups: string
                 ,PostUserUnlock: string
-                
+
         }
-        
+
     }
 
 export type WebhookData = {
-        
+
         payloads: {
             GetItemWebhook: {
                         id?: Array<string>
-                        
+
                     };
 GetWebhook: {
                         skip?: number
 take?: number
-                        
+
                     };
 PostWebhook: {
                         requestBody?: CreateWebhookRequestModel
-                        
+
                     };
 GetWebhookById: {
                         id: string
-                        
+
                     };
 DeleteWebhookById: {
                         id: string
-                        
+
                     };
 PutWebhookById: {
                         id: string
 requestBody?: UpdateWebhookRequestModel
-                        
+
                     };
 GetWebhookEvents: {
                         skip?: number
 take?: number
-                        
+
                     };
         }
-        
-        
+
+
         responses: {
             GetItemWebhook: Array<WebhookItemResponseModel>
                 ,GetWebhook: PagedWebhookResponseModel
@@ -5294,7 +5373,7 @@ take?: number
                 ,DeleteWebhookById: string
                 ,PutWebhookById: string
                 ,GetWebhookEvents: PagedWebhookEventModel
-                
+
         }
-        
+
     }

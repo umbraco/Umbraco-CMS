@@ -22,6 +22,7 @@ export interface UmbBlockViewUrlsPropType {
 
 export interface UmbBlockViewPropsType<BlockLayoutType extends UmbBlockLayoutBaseModel> {
 	label?: string;
+	icon?: string;
 	contentUdi: string;
 	layout?: BlockLayoutType;
 	content?: UmbBlockDataType;

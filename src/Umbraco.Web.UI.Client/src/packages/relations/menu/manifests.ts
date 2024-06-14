@@ -8,7 +8,7 @@ export const manifests: Array<ManifestTypes> = [
 		name: 'Relations Menu Item',
 		weight: 800,
 		meta: {
-			label: 'Relations',
+			label: '#treeHeaders_relations',
 			icon: 'icon-trafic',
 			entityType: UMB_RELATION_TYPE_ROOT_ENTITY_TYPE,
 			menus: ['Umb.Menu.AdvancedSettings'],

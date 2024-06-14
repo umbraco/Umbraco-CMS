@@ -97,13 +97,13 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 
 	#renderModal() {
 		return this._isOpen && this._unique !== undefined && this._entityType
-			? html`<div id="action-modal" @umb:context-request=${this.#proxyContextRequests}>
+			? html`<uui-scroll-container id="action-modal" @umb:context-request=${this.#proxyContextRequests}>
 					${this._headline ? html`<h3>${this.localize.string(this._headline)}</h3>` : nothing}
 					<umb-entity-action-list
 						@action-executed=${this.#onActionExecuted}
 						.entityType=${this._entityType}
 						.unique=${this._unique}></umb-entity-action-list>
-				</div>`
+				</uui-scroll-container>`
 			: nothing;
 	}
 
