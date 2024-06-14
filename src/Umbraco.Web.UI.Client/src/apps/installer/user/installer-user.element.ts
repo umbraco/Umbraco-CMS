@@ -1,15 +1,19 @@
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import type { UmbInstallerContext } from '../installer.context.js';
 import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import {UserSettingsPresentationModel} from "@umbraco-cms/backoffice/external/backend-api";
 
 @customElement('umb-installer-user')
 export class UmbInstallerUserElement extends UmbLitElement {
 	@state()
 	private _userFormData?: { name: string; password: string; email: string; subscribeToNewsletter: boolean };
-
+	@state()
+ 	private _passwordError?: string;
 	private _installerContext?: UmbInstallerContext;
+	private _userSettings?:UserSettingsPresentationModel;
 
 	constructor() {
 		super();
@@ -31,6 +35,9 @@ export class UmbInstallerUserElement extends UmbLitElement {
 				subscribeToNewsletter: user.subscribeToNewsletter ?? false,
 			};
 		});
+		this.observe(this._installerContext.settings, (settings)=>{
+			this._userSettings= settings?.user;
+		})
 	}
 
 	private _handleSubmit = (e: SubmitEvent) => {
@@ -39,7 +46,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 		const form = e.target as HTMLFormElement;
 		if (!form) return;
 
-		const isValid = form.checkValidity();
+		let isValid = form.checkValidity();
 		if (!isValid) return;
 
 		const formData = new FormData(form);
@@ -47,6 +54,13 @@ export class UmbInstallerUserElement extends UmbLitElement {
 		const password = formData.get('password') as string;
 		const email = formData.get('email') as string;
 		const subscribeToNewsletter = formData.has('subscribeToNewsletter');
+
+ 		const minCarLenth = this._userSettings?.minCharLength ?? 10;
+		if (password.length < minCarLenth) {
+			console.log('Len fail');
+			isValid = false;
+			return;
+		}
 
 		this._installerContext?.appendData({ user: { name, password, email, subscribeToNewsletter } });
 		this._installerContext?.nextStep();
@@ -87,6 +101,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 							id="password"
 							name="password"
 							label="password"
+							.minLength=${this._userSettings?.minCharLength}
 							.value=${this._userFormData?.password}
 							required
 							required-message="Password is required"></uui-input-password>
