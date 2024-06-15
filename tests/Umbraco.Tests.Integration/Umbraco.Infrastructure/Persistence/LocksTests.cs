@@ -36,7 +36,7 @@ public class LocksTests : UmbracoIntegrationTest
 
     protected override void ConfigureTestServices(IServiceCollection services) =>
         // SQLite + retry policy makes tests fail, we retry before throwing distributed locking timeout.
-        services.RemoveAll(x => x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
+        services.RemoveAll(x => !x.IsKeyedService && x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
 
     [Test]
     public void SingleReadLockTest()
