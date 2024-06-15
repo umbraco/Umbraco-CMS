@@ -140,9 +140,10 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
             return validate;
         }
 
+        var status = _rebuildStatusManager.GetRebuildingIndexStatus(indexName);
         //if its still there then it's not done
-        return _rebuildStatusManager.GetRebuildingIndexStatus(indexName)
-            ? null
+        return status?.IsRebuilding == true
+            ? CreateModel(index!, status)
             : CreateModel(index!);
     }
 
@@ -191,10 +192,11 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
         }
     }
 
-    private ExamineIndexModel CreateModel(IIndex index)
+    private ExamineIndexModel CreateModel(IIndex index, IndexStatus? status = null)
     {
         var indexName = index.Name;
         IIndexDiagnostics indexDiag = _indexDiagnosticsFactory.Create(index);
+
         Attempt<string?> isHealth = indexDiag.IsHealthy();
         var healthResult = isHealth.Result;
 
@@ -230,7 +232,11 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
             ["DocumentCount"] = documentCount,
             ["FieldCount"] = fieldCount
         };
-
+        if(status is not null)
+        {
+            properties["IsRebuilding"] = status.IsRebuilding;
+            properties["PopulatorStatuses"] = status.PopulatorStatuses;
+        }
         foreach (KeyValuePair<string, object?> p in indexDiag.Metadata)
         {
             properties[p.Key] = p.Value;

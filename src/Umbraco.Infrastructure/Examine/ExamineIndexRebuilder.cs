@@ -162,7 +162,7 @@ public class ExamineIndexRebuilder : IIndexRebuilder
                 {
                     throw new InvalidOperationException($"No index found with name {indexName}");
                 }
-                _indexRebuildStatusManager.SetRebuildingIndexStatus([indexName], true);
+                _indexRebuildStatusManager.SetReindexStatus(index, _populators.Where(x=>x.IsRegistered(index)));
                 index.CreateIndex(); // clear the index
                 foreach (IIndexPopulator populator in _populators)
                 {
@@ -173,7 +173,6 @@ public class ExamineIndexRebuilder : IIndexRebuilder
 
                     populator.Populate(index);
                 }
-                _indexRebuildStatusManager.SetRebuildingIndexStatus([indexName], false);
             }
         }
         finally

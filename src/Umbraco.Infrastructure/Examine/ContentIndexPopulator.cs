@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
 {
     private readonly IContentService _contentService;
     private readonly IValueSetBuilder<IContent> _contentValueSetBuilder;
+    private readonly IIndexRebuildStatusManager _indexRebuildStatusManager;
     private IndexingSettings _indexingSettings;
     private readonly ILogger<ContentIndexPopulator> _logger;
     private readonly int? _parentId;
@@ -78,11 +80,13 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         IContentService contentService,
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
         IValueSetBuilder<IContent> contentValueSetBuilder,
-        IOptionsMonitor<IndexingSettings> indexingSettings)
+        IOptionsMonitor<IndexingSettings> indexingSettings,
+        IIndexRebuildStatusManager indexRebuildStatusManager)
     {
         _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
         _umbracoDatabaseFactory = umbracoDatabaseFactory ?? throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
         _contentValueSetBuilder = contentValueSetBuilder ?? throw new ArgumentNullException(nameof(contentValueSetBuilder));
+        _indexRebuildStatusManager = indexRebuildStatusManager;
         _indexingSettings = indexingSettings.CurrentValue;
         indexingSettings.OnChange(change =>
         {
@@ -134,22 +138,33 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     protected void IndexAllContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes)
     {
         IContent[] content;
-
+        var totalBatches = 0;
         do
         {
-            content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out _).ToArray();
+            content = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out var total).ToArray();
+            if (totalBatches == 0)
+            {
+                totalBatches = (int)Math.Ceiling((decimal)total / pageSize);
+            }
 
             var valueSets = _contentValueSetBuilder.GetValueSets(content).ToArray();
 
             // ReSharper disable once PossibleMultipleEnumeration
             foreach (IIndex index in indexes)
             {
+                _indexRebuildStatusManager.UpdatePopulatorStatus(index.Name, GetType().Name, true, pageIndex, totalBatches);
+
                 index.IndexItems(valueSets);
             }
 
             pageIndex++;
         }
         while (content.Length == pageSize);
+
+        foreach (IIndex index in indexes)
+        {
+            _indexRebuildStatusManager.UpdatePopulatorStatus(index.Name, GetType().Name, false, totalBatches, totalBatches);
+        }
     }
 
     protected void IndexPublishedContent(int contentParentId, int pageIndex, int pageSize, IReadOnlyList<IIndex> indexes)
