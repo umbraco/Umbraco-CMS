@@ -154,9 +154,9 @@ test('can add a min and max amount to a block list editor', async ({page, umbrac
   expect(dataTypeData.values[0].value.max).toBe(2);
 });
 
-test('max can not be less than min', async ({page, umbracoApi, umbracoUi}) => {
+test('max can not be less than min', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.dataType.createBlockListDataTypeWithMinAndMaxAmount(blockListEditorName, 2, 0);
+  await umbracoApi.dataType.createBlockListDataTypeWithMinAndMaxAmount(blockListEditorName, 2, 2);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
@@ -168,8 +168,8 @@ test('max can not be less than min', async ({page, umbracoApi, umbracoUi}) => {
   const dataTypeData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(await umbracoUi.dataType.doesAmountContainErrorMessageWitText('The low value must not be exceed the high value'));
   expect(dataTypeData.values[0].value.min).toBe(2);
-  // The max value should not be defined
-  expect(dataTypeData.values[0].value.max).toBe(undefined);
+  // The max value should not be updated
+  expect(dataTypeData.values[0].value.max).toBe(2);
 });
 
 test('can enable single block mode', async ({page, umbracoApi, umbracoUi}) => {

@@ -49,7 +49,6 @@ test('can update a label for a block', async ({page, umbracoApi, umbracoUi}) => 
   await umbracoApi.dataType.createBlockListWithBlockWithEditorAppearance(blockListEditorName, elementTypeId, labelText);
   expect(await umbracoApi.dataType.doesBlockListBlockContainLabel(blockListEditorName, elementTypeId, labelText)).toBeTruthy();
 
-
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
@@ -59,23 +58,85 @@ test('can update a label for a block', async ({page, umbracoApi, umbracoUi}) => 
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  const block = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(await umbracoApi.dataType.doesBlockListBlockContainLabel(blockListEditorName, elementTypeId, newLabelText)).toBeTruthy();
 });
 
 test('can remove a label from a block', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  const labelText = 'ThisIsALabel';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListWithBlockWithEditorAppearance(blockListEditorName, elementTypeId, labelText);
 
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.enterBlockLabelText("");
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesBlockListBlockContainLabel(blockListEditorName, elementTypeId, "")).toBeTruthy();
 });
 
 test('can update overlay size for a block', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  const overlaySize = 'medium';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListWithBlockWithEditorAppearance(blockListEditorName, elementTypeId, "");
 
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.updateBlockOverlaySize(overlaySize);
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].editorSize).toEqual(overlaySize);
 });
 
-test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
+test('can open content model in a block', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
 
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.openBlockContentModel();
+
+  // Assert
+  await umbracoUi.dataType.isElementWorkspaceOpenInBlock(elementTypeName);
 });
 
-test('can remove a content model from a block', async ({page, umbracoApi, umbracoUi}) => {
+// There is currently frontend issues
+test.skip('can remove a content model from a block', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, elementTypeId);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await page.pause();
+  await umbracoUi.dataType.removeBlockContentModel();
+  await umbracoUi.dataType.clickConfirmRemoveButton();
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+
+  console.log(blockData);
+  console.log(blockData.values[0]);
+  await page.pause();
 
 });
 
@@ -84,7 +145,26 @@ test('can add a settings model to a block', async ({page, umbracoApi, umbracoUi}
 });
 
 test('can remove a settings model from a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlockWithSettingsModel(blockListEditorName, elementTypeId, elementTypeId);
 
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.removeBlockSettingsModel();
+  await umbracoUi.dataType.clickConfirmRemoveButton();
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+
+  console.log(blockData);
+  console.log(blockData.values[0]);
+  await page.pause();
 });
 
 test('can add a background color to a block', async ({page, umbracoApi, umbracoUi}) => {
