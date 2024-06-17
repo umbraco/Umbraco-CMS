@@ -389,8 +389,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	#getDraggableElement(element: HTMLElement) {
 		if (this.#config.draggableSelector) {
-			const queryFromEl = element.shadowRoot ?? element;
-			return (queryFromEl.querySelector(this.#config.draggableSelector) as HTMLElement | undefined) ?? element;
+			// Concept for enabling getting element within ShadowRoot: (But it might need to be configurable, so its still possible to get light dom element(slotted), despite the host is a web-component with shadow-dom.) [NL]
+			//const queryFromEl = element.shadowRoot ?? element;
+			return (element.querySelector(this.#config.draggableSelector) as HTMLElement | undefined) ?? element;
 		}
 		return element;
 	}
