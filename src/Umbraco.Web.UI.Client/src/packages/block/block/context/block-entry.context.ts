@@ -43,18 +43,23 @@ export abstract class UmbBlockEntryContext<
 	getUnique() {
 		return this.getContentUdi();
 	}
-	/*
-	// TODO: Does not make sense as we both need to handle content and settings properties.
-	propertyValueByAlias<ReturnType>(propertyAlias: string) {
+
+	setContentPropertyValue(propertyAlias: string, value: unknown) {
+		if (!this.#contentUdi) throw new Error('No content UDI set.');
+		this._manager?.setOneContentProperty(this.#contentUdi, propertyAlias, value);
+	}
+	setSettingsPropertyValue(propertyAlias: string, value: unknown) {
+		const settingsUdi = this._layout.getValue()?.settingsUdi;
+		if (!settingsUdi) throw new Error('Settings UDI was not available.');
+		this._manager?.setOneSettingsProperty(settingsUdi, propertyAlias, value);
+	}
+
+	contentPropertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return this.#content.asObservablePart((x) => x?.[propertyAlias] as ReturnType | undefined);
 	}
-	setPropertyValue(propertyAlias: string, value: unknown) {
-		this._manager?.setValue({
-			...this.#content.getValue()!,
-			[propertyAlias]: value,
-		});
+	settingsPropertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
+		return this.#settings.asObservablePart((x) => x?.[propertyAlias] as ReturnType | undefined);
 	}
-	*/
 
 	#index = new UmbNumberState(undefined);
 	readonly index = this.#index.asObservable();

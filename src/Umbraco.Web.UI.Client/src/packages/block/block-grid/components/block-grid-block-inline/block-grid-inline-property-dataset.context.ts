@@ -40,7 +40,7 @@ export class UmbBlockGridInlinePropertyDatasetContext extends UmbControllerBase 
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		// TODO: Investigate how I do that with the workspaces..
-		return await this.#entryContext.propertyValueByAlias<ReturnType>(propertyAlias);
+		return await this.#entryContext.contentPropertyValueByAlias<ReturnType>(propertyAlias);
 	}
 
 	/**
@@ -48,6 +48,6 @@ export class UmbBlockGridInlinePropertyDatasetContext extends UmbControllerBase 
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
 		// TODO: Investigate how I do that with the workspaces..
-		return this.#entryContext.setPropertyValue(propertyAlias, value);
+		return this.#entryContext.setContentPropertyValue(propertyAlias, value);
 	}
 }

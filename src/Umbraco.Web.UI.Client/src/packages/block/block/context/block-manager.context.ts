@@ -184,6 +184,20 @@ export abstract class UmbBlockManagerContext<
 		this.#settings.removeOne(settingsUdi);
 	}
 
+	setOneContentProperty(udi: string, propertyAlias: string, value: unknown) {
+		this.#contents.updateOne(udi, { [propertyAlias]: value });
+	}
+	setOneSettingsProperty(udi: string, propertyAlias: string, value: unknown) {
+		this.#settings.updateOne(udi, { [propertyAlias]: value });
+	}
+
+	contentProperty(udi: string, propertyAlias: string) {
+		this.#contents.asObservablePart((source) => source.find((x) => x.udi === udi)?.[propertyAlias]);
+	}
+	settingsProperty(udi: string, propertyAlias: string) {
+		this.#contents.asObservablePart((source) => source.find((x) => x.udi === udi)?.[propertyAlias]);
+	}
+
 	abstract create(
 		contentElementTypeKey: string,
 		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
