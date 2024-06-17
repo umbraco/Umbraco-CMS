@@ -46,7 +46,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 		const form = e.target as HTMLFormElement;
 		if (!form) return;
 
-		let isValid = form.checkValidity();
+		const isValid = form.checkValidity();
 		if (!isValid) return;
 
 		const formData = new FormData(form);
