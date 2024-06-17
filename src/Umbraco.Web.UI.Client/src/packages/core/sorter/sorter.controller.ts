@@ -631,7 +631,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			const elRect = el.getBoundingClientRect();
 			// gather elements on the same row.
 			if (this.#dragY >= elRect.top && this.#dragY <= elRect.bottom) {
-				const dragElement = this.#getDraggableElement(el);
+				const dragElement = this.#getDraggableElement(el as unknown as HTMLElement);
 				if (dragElement) {
 					const dragElementRect = dragElement.getBoundingClientRect();
 					if (el !== UmbSorterController.activeElement) {
