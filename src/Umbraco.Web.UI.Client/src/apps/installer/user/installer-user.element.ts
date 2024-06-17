@@ -11,7 +11,6 @@ export class UmbInstallerUserElement extends UmbLitElement {
 	@state()
 	private _userFormData?: { name: string; password: string; email: string; subscribeToNewsletter: boolean };
 	@state()
- 	private _passwordError?: string;
 	private _installerContext?: UmbInstallerContext;
 	private _userSettings?:UserSettingsPresentationModel;
 
@@ -35,6 +34,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 				subscribeToNewsletter: user.subscribeToNewsletter ?? false,
 			};
 		});
+
 		this.observe(this._installerContext.settings, (settings)=>{
 			this._userSettings= settings?.user;
 		})
@@ -54,13 +54,6 @@ export class UmbInstallerUserElement extends UmbLitElement {
 		const password = formData.get('password') as string;
 		const email = formData.get('email') as string;
 		const subscribeToNewsletter = formData.has('subscribeToNewsletter');
-
- 		const minCarLenth = this._userSettings?.minCharLength ?? 10;
-		if (password.length < minCarLenth) {
-			console.log('Len fail');
-			isValid = false;
-			return;
-		}
 
 		this._installerContext?.appendData({ user: { name, password, email, subscribeToNewsletter } });
 		this._installerContext?.nextStep();
@@ -101,7 +94,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 							id="password"
 							name="password"
 							label="password"
-							.minLength=${this._userSettings?.minCharLength}
+							minlength=${this._userSettings?.minCharLength ?? 10}
 							.value=${this._userFormData?.password}
 							required
 							required-message="Password is required"></uui-input-password>
@@ -165,7 +158,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 			#buttons {
 				display: flex;
 				margin-top: auto;
-			}
+			A
 
 			#button-install {
 				margin-left: auto;
