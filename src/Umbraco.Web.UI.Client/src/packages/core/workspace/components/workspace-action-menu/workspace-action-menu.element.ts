@@ -80,9 +80,10 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		}
 	}
 
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._popoverOpen = event.newState === 'open';
 	}
 
@@ -110,12 +111,12 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 											this._items,
 											(ext) => ext.alias,
 											(ext) => ext.component,
-									  )
+										)
 									: ''}
 							</uui-scroll-container>
 						</umb-popover-layout>
 					</uui-popover-container>
-			  `
+				`
 			: nothing;
 	}
 
