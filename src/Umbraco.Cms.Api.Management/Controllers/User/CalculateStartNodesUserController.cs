@@ -32,7 +32,7 @@ public class CalculatedStartNodesUserController : UserControllerBase
 
     [HttpGet("{id:guid}/calculate-start-nodes")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(UserResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CalculatedUserStartNodesResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CalculatedStartNodes(CancellationToken cancellationToken, Guid id)
     {
