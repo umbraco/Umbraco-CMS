@@ -46,7 +46,7 @@ export default {
 		logout: 'Exit',
 		move: 'Move to',
 		notify: 'Notifications',
-		protect: 'Restrict Public Access',
+		protect: 'Public Access',
 		publish: 'Publish',
 		refreshNode: 'Reload',
 		remove: 'Remove',
