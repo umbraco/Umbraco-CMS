@@ -387,6 +387,14 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	};
 
+	#getDraggableElement(element: HTMLElement) {
+		if (this.#config.draggableSelector) {
+			const queryFromEl = element.shadowRoot ?? element;
+			return (queryFromEl.querySelector(this.#config.draggableSelector) as HTMLElement | undefined) ?? element;
+		}
+		return element;
+	}
+
 	setupItem(element: ElementType) {
 		if (this.#config.ignorerSelector) {
 			setupIgnorerElements(element, this.#config.ignorerSelector);
@@ -394,9 +402,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		if (!this.#config.disabledItemSelector || !element.matches(this.#config.disabledItemSelector)) {
 			// Idea: to make sure on does not get initialized twice: if ((element as HTMLElement).draggable === true) return;
-			const draggableElement = this.#config.draggableSelector
-				? (element.querySelector(this.#config.draggableSelector) as HTMLElement | undefined) ?? element
-				: element;
+			const draggableElement = this.#getDraggableElement(element);
 			(draggableElement as HTMLElement).draggable = true;
 			draggableElement.addEventListener('dragstart', this.#handleDragStart);
 			draggableElement.addEventListener('dragend', this.#handleDragEnd);
@@ -419,9 +425,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			destroyIgnorerElements(element, this.#config.ignorerSelector);
 		}
 
-		const draggableElement = this.#config.draggableSelector
-			? (element.querySelector(this.#config.draggableSelector) as HTMLElement | undefined) ?? element
-			: element;
+		const draggableElement = this.#getDraggableElement(element);
 		draggableElement.removeEventListener('dragstart', this.#handleDragStart);
 		// We are not ready to remove the dragend or drop, as this is might be the active one just moving container:
 		//draggableElement.removeEventListener('dragend', this.#handleDragEnd);
@@ -447,9 +451,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	#setCurrentElement(element: ElementType) {
 		UmbSorterController.activeElement = element;
 
-		UmbSorterController.activeDragElement = this.#config.draggableSelector
-			? element.querySelector(this.#config.draggableSelector) ?? undefined
-			: element;
+		UmbSorterController.activeDragElement = this.#getDraggableElement(element);
 
 		if (!UmbSorterController.activeDragElement) {
 			throw new Error(
@@ -629,7 +631,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			const elRect = el.getBoundingClientRect();
 			// gather elements on the same row.
 			if (this.#dragY >= elRect.top && this.#dragY <= elRect.bottom) {
-				const dragElement = this.#config.draggableSelector ? el.querySelector(this.#config.draggableSelector) : el;
+				const dragElement = this.#getDraggableElement(el);
 				if (dragElement) {
 					const dragElementRect = dragElement.getBoundingClientRect();
 					if (el !== UmbSorterController.activeElement) {
