@@ -12,3 +12,5 @@ export class UmbLanguageCreateEntityAction extends UmbEntityActionBase<never> {
 		history.pushState(null, '', `section/settings/workspace/language/create`);
 	}
 }
+
+export { UmbLanguageCreateEntityAction as api };
