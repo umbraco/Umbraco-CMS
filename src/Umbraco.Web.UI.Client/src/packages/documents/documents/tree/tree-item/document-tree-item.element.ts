@@ -134,12 +134,27 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 				background: var(--uui-color-surface-emphasis);
 			}
 
+			/** Active */
 			[active] #icon-lock {
 				background: var(--uui-color-current);
 			}
 
 			[active]:hover #icon-lock {
 				background: var(--uui-color-current-emphasis);
+			}
+
+			/** Selected */
+			[selected] #icon-lock {
+				background-color: var(--uui-color-selected);
+			}
+
+			[selected]:hover #icon-lock {
+				background-color: var(--uui-color-selected-emphasis);
+			}
+
+			/** Disabled */
+			[disabled] #icon-lock {
+				background-color: var(--uui-color-disabled);
 			}
 
 			.draft {
