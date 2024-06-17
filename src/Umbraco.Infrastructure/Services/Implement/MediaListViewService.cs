@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -19,10 +20,10 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
     public MediaListViewService(
         IMediaService mediaService,
         IMediaTypeService mediaTypeService,
-        IDataTypeService dataTypeService,
         ISqlContext sqlContext,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
         IMediaPermissionAuthorizer mediaPermissionAuthorizer)
-        : base(mediaTypeService, dataTypeService, sqlContext)
+        : base(mediaTypeService, sqlContext, dataTypeConfigurationCache)
     {
         _mediaService = mediaService;
         _mediaPermissionAuthorizer = mediaPermissionAuthorizer;

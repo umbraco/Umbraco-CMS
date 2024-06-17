@@ -35,12 +35,7 @@ public interface IDataEditor : IDiscoverable
     /// <summary>
     ///     Gets a value editor.
     /// </summary>
-    IDataValueEditor GetValueEditor(); // TODO: should be configured?!
-
-    /// <summary>
-    ///     Gets a configured value editor.
-    /// </summary>
-    IDataValueEditor GetValueEditor(object? configurationObject);
+    IDataValueEditor GetValueEditor();
 
     /// <summary>
     ///     Gets an editor to edit the value editor configuration.

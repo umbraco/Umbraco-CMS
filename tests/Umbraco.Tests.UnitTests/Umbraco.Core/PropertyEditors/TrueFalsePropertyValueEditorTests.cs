@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
@@ -83,7 +82,7 @@ public class TrueFalsePropertyValueEditorTests
     }
 
     private static object? FromEditor(object? value)
-        => CreateValueEditor().FromEditor(new ContentPropertyData(value, null), null);
+        => CreateValueEditor().FromEditor(new ContentPropertyData(value, Guid.Empty), null);
 
     private static object? ToEditor(object? value)
     {

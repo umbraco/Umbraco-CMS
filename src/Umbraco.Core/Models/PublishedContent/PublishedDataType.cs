@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
@@ -16,22 +15,14 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 [DebuggerDisplay("{EditorAlias}")]
 public class PublishedDataType
 {
-    private readonly Lazy<object?> _lazyConfiguration;
-
-    [Obsolete("Please use the constructor that accepts editor UI alias too. Scheduled for removal in V16.")]
-    public PublishedDataType(int id, string editorAlias, Lazy<object?> lazyConfiguration)
-        : this(id, editorAlias, editorAlias, lazyConfiguration)
-    {
-    }
-
+    // TODO KJA: constructor breakage
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedDataType" /> class.
     /// </summary>
-    public PublishedDataType(int id, string editorAlias, string? editorUiAlias, Lazy<object?> lazyConfiguration)
+    public PublishedDataType(int id, Guid key, string editorAlias, string? editorUiAlias)
     {
-        _lazyConfiguration = lazyConfiguration;
-
         Id = id;
+        Key = key;
         EditorAlias = editorAlias;
         EditorUiAlias = editorUiAlias ?? editorAlias;
     }
@@ -42,6 +33,11 @@ public class PublishedDataType
     public int Id { get; }
 
     /// <summary>
+    ///     Gets the datatype unique identifier.
+    /// </summary>
+    public Guid Key { get; }
+
+    /// <summary>
     ///     Gets the data type editor alias.
     /// </summary>
     public string EditorAlias { get; }
@@ -50,30 +46,4 @@ public class PublishedDataType
     ///     Gets the data type editor UI alias.
     /// </summary>
     public string EditorUiAlias { get; }
-
-    /// <summary>
-    ///     Gets the data type configuration object.
-    /// </summary>
-    /// <seealso cref="IDataType.ConfigurationObject"/>
-    public object? ConfigurationObject => _lazyConfiguration?.Value;
-
-    /// <summary>
-    ///     Gets the configuration object.
-    /// </summary>
-    /// <typeparam name="T">The expected type of the configuration object.</typeparam>
-    /// <exception cref="InvalidCastException">When the datatype configuration is not of the expected type.</exception>
-    public T? ConfigurationAs<T>()
-        where T : class
-    {
-        switch (ConfigurationObject)
-        {
-            case null:
-                return null;
-            case T configurationAsT:
-                return configurationAsT;
-        }
-
-        throw new InvalidCastException(
-            $"Cannot cast dataType configuration, of type {ConfigurationObject.GetType().Name}, to {typeof(T).Name}.");
-    }
 }

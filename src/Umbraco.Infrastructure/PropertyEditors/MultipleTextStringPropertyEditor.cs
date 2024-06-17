@@ -2,7 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -46,6 +46,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
     /// </summary>
     internal class MultipleTextStringPropertyValueEditor : DataValueEditor
     {
+        private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
         private static readonly string NewLine = "\n";
         private static readonly string[] NewLineDelimiters = { "\r\n", "\r", "\n" };
 
@@ -53,10 +54,10 @@ public class MultipleTextStringPropertyEditor : DataEditor
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
-            DataEditorAttribute attribute)
-            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
-        {
-        }
+            DataEditorAttribute attribute,
+            IDataTypeConfigurationCache dataTypeConfigurationCache)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute) =>
+            _dataTypeConfigurationCache = dataTypeConfigurationCache;
 
         /// <summary>
         ///     A custom FormatValidator is used as for multiple text strings, each string should individually be checked
@@ -81,13 +82,14 @@ public class MultipleTextStringPropertyEditor : DataEditor
                 return null;
             }
 
-            if (!(editorValue.DataTypeConfiguration is MultipleTextStringConfiguration config))
+            MultipleTextStringConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<MultipleTextStringConfiguration>(editorValue.DataTypeKey);
+            if (configuration is null)
             {
-                throw new PanicException(
-                    $"editorValue.DataTypeConfiguration is {editorValue.DataTypeConfiguration?.GetType()} but must be {typeof(MultipleTextStringConfiguration)}");
+                // TODO KJA: log this (was an exception, that's a little over the top)
+                return null;
             }
 
-            var max = config.Max;
+            var max = configuration.Max;
 
             // The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
             // only allow the max if over 0

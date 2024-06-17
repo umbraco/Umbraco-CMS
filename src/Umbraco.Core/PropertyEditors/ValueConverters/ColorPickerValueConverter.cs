@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Text.Json.Serialization;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
@@ -12,10 +13,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 public class ColorPickerValueConverter : PropertyValueConverterBase
 {
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
-    public ColorPickerValueConverter(IJsonSerializer jsonSerializer)
+    // TODO KJA: constructor breakage
+    public ColorPickerValueConverter(IJsonSerializer jsonSerializer, IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _jsonSerializer = jsonSerializer;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType)
@@ -52,8 +56,8 @@ public class ColorPickerValueConverter : PropertyValueConverterBase
         return value;
     }
 
-    private bool UseLabel(IPublishedPropertyType propertyType) => ConfigurationEditor
-        .ConfigurationAs<ColorPickerConfiguration>(propertyType.DataType.ConfigurationObject)?.UseLabel ?? false;
+    private bool UseLabel(IPublishedPropertyType propertyType) =>
+        _dataTypeConfigurationCache.GetConfigurationAs<ColorPickerConfiguration>(propertyType.DataType.Key)?.UseLabel ?? false;
 
     public class PickedColor
     {

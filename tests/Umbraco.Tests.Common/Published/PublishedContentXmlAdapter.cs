@@ -139,6 +139,7 @@ public static class PublishedContentXmlAdapter
                 if (propertyType.Alias == "content")
                 {
                     propertyType.DataTypeId = rteDataType.Id;
+                    propertyType.DataTypeKey = rteDataType.Key;
                 }
 
                 contentType.AddPropertyType(propertyType);

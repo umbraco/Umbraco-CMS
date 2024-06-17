@@ -18,7 +18,7 @@ internal class TemporaryFileUploadValidator : IValueValidator
 
     internal delegate TemporaryFileModel? GetTemporaryFileModel(Guid temporaryFileKey);
 
-    internal delegate bool ValidateFileType(string extension, object? dataTypeConfiguration);
+    internal delegate bool ValidateFileType(string extension, Guid dataTypeKey);
 
     public TemporaryFileUploadValidator(
         GetContentSettings getContentSettings,
@@ -32,7 +32,7 @@ internal class TemporaryFileUploadValidator : IValueValidator
         _validateFileType = validateFileType;
     }
 
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, Guid dataTypeKey)
     {
         Guid? temporaryFileKey = _parseTemporaryFileKey(value);
         if (temporaryFileKey.HasValue == false)
@@ -56,7 +56,7 @@ internal class TemporaryFileUploadValidator : IValueValidator
             }
 
             ContentSettings contentSettings = _getContentSettings();
-            if (contentSettings.IsFileAllowedForUpload(extension) is false || (_validateFileType != null && _validateFileType(extension, dataTypeConfiguration) == false))
+            if (contentSettings.IsFileAllowedForUpload(extension) is false || (_validateFileType != null && _validateFileType(extension, dataTypeKey) == false))
             {
                 yield return new ValidationResult(
                     $"The file type for file name \"{temporaryFile.FileName}\" is not valid for upload",

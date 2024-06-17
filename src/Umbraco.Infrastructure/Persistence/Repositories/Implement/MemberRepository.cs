@@ -53,12 +53,12 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         IPasswordHasher passwordHasher,
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeService dataTypeService,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IOptions<MemberPasswordConfigurationSettings> passwordConfiguration)
         : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository,
-            propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
+            propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, eventAggregator)
     {
         _memberTypeRepository =
             memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));

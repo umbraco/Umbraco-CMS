@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Serialization;
@@ -14,14 +15,20 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 public class TagsValueConverter : PropertyValueConverterBase
 {
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TagsValueConverter" /> class.
     /// </summary>
     /// <param name="jsonSerializer">The JSON serializer.</param>
+    /// <param name="dataTypeConfigurationCache"></param>
     /// <exception cref="System.ArgumentNullException">jsonSerializer</exception>
-    public TagsValueConverter(IJsonSerializer jsonSerializer)
-        => _jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
+    // TODO KJA: constructor breakage
+    public TagsValueConverter(IJsonSerializer jsonSerializer, IDataTypeConfigurationCache dataTypeConfigurationCache)
+    {
+        _jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TagsValueConverter" /> class.
@@ -29,8 +36,8 @@ public class TagsValueConverter : PropertyValueConverterBase
     /// <param name="dataTypeService">The data type service.</param>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     [Obsolete("The IDataTypeService is not used anymore. This constructor will be removed in a future version.")]
-    public TagsValueConverter(IDataTypeService dataTypeService, IJsonSerializer jsonSerializer)
-        : this(jsonSerializer)
+    public TagsValueConverter(IDataTypeService dataTypeService, IJsonSerializer jsonSerializer, IDataTypeConfigurationCache dataTypeConfigurationCache)
+        : this(jsonSerializer, dataTypeConfigurationCache)
     { }
 
     /// <summary>
@@ -66,6 +73,6 @@ public class TagsValueConverter : PropertyValueConverterBase
             : sourceString.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
     }
 
-    private static bool IsJson(IPublishedPropertyType propertyType)
-        => propertyType.DataType.ConfigurationAs<TagConfiguration>()?.StorageType == TagsStorageType.Json;
+    private bool IsJson(IPublishedPropertyType propertyType)
+        => _dataTypeConfigurationCache.GetConfigurationAs<TagConfiguration>(propertyType.DataType.Key)?.StorageType == TagsStorageType.Json;
 }

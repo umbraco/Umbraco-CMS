@@ -38,6 +38,7 @@ public class PropertyTypeBuilder<TParent>
     private string _alias;
     private DateTime? _createDate;
     private int? _dataTypeId;
+    private Guid? _dataTypeKey;
     private string _description;
     private int? _id;
     private Guid? _key;
@@ -126,9 +127,16 @@ public class PropertyTypeBuilder<TParent>
         return this;
     }
 
+    // TODO KJA: ensure that data type ID and data type key are always set in pairs - or even better, remove the data type ID option
     public PropertyTypeBuilder<TParent> WithDataTypeId(int dataTypeId)
     {
         _dataTypeId = dataTypeId;
+        return this;
+    }
+
+    public PropertyTypeBuilder<TParent> WithDataTypeKey(Guid dataTypeKey)
+    {
+        _dataTypeKey = dataTypeKey;
         return this;
     }
 
@@ -176,6 +184,7 @@ public class PropertyTypeBuilder<TParent>
         var updateDate = _updateDate ?? DateTime.Now;
         var sortOrder = _sortOrder ?? 0;
         var dataTypeId = _dataTypeId ?? -88;
+        var dataTypeKey = _dataTypeKey ?? Constants.DataTypes.Guids.TextstringGuid;
         var description = _description ?? string.Empty;
         var propertyGroupId = _propertyGroupId;
         var mandatory = _mandatory ?? false;
@@ -196,6 +205,7 @@ public class PropertyTypeBuilder<TParent>
             Name = name,
             SortOrder = sortOrder,
             DataTypeId = dataTypeId,
+            DataTypeKey = dataTypeKey,
             Description = description,
             CreateDate = createDate,
             UpdateDate = updateDate,

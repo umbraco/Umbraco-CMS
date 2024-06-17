@@ -199,7 +199,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
         Assert.Multiple(() =>
         {
             Assert.IsTrue(dataTypeCreateResult.Success);
-            Assert.IsTrue(dataTypeCreateResult.Result.ConfigurationObject is ListViewConfiguration);
+            Assert.IsNotNull(DataTypeConfigurationCache.GetConfigurationAs<ListViewConfiguration>(dataTypeCreateResult.Result.Key));
         });
 
         var listViewKey = dataTypeCreateResult.Result.Key;
@@ -257,7 +257,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
         Assert.Multiple(() =>
         {
             Assert.IsTrue(dataTypeCreateResult.Success);
-            Assert.IsTrue(dataTypeCreateResult.Result.ConfigurationObject is ListViewConfiguration);
+            Assert.IsNotNull(DataTypeConfigurationCache.GetConfigurationAs<ListViewConfiguration>(dataTypeCreateResult.Result.Key));
         });
 
         var root = await CreateRootContentWithFiveChildrenAsListViewItems(dataTypeCreateResult.Result.Key);
@@ -789,7 +789,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
         Assert.Multiple(() =>
         {
             Assert.IsTrue(result.Success);
-            Assert.IsTrue(result.Result.ConfigurationObject is ListViewConfiguration);
+            Assert.IsNotNull(DataTypeConfigurationCache.GetConfigurationAs<ListViewConfiguration>(result.Result.Key));
         });
 
         return result.Result;
@@ -818,6 +818,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
             .WithAlias("itemName")
             .WithName("Item Name")
             .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithDataTypeKey(Constants.DataTypes.Guids.TextstringGuid)
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
             .WithValueStorageType(ValueStorageType.Nvarchar)
             .WithSortOrder(1)
@@ -826,6 +827,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
             .WithAlias("price")
             .WithName("Price")
             .WithDataTypeId(-51)
+            .WithDataTypeKey(Constants.DataTypes.Guids.NumericGuid)
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Integer)
             .WithValueStorageType(ValueStorageType.Integer)
             .WithSortOrder(2)
@@ -842,6 +844,7 @@ public class ContentListViewServiceTests : ContentListViewServiceTestsBase
             .WithAlias("items")
             .WithName("Items")
             .WithDataTypeId(customListView.Id)
+            .WithDataTypeKey(customListView.Key)
             .WithPropertyEditorAlias(customListView.EditorAlias)
             .Done()
             .Build();

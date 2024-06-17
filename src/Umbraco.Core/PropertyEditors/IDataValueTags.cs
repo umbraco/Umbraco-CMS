@@ -11,8 +11,8 @@ public interface IDataValueTags
     ///     Returns any tags contained in the value
     /// </summary>
     /// <param name="value"></param>
-    /// <param name="dataTypeConfiguration"></param>
+    /// <param name="tagConfiguration"></param>
     /// <param name="languageId"></param>
     /// <returns></returns>
-    IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId);
+    IEnumerable<ITag> GetTags(object? value, TagConfiguration? tagConfiguration, int? languageId);
 }

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -14,7 +15,7 @@ public static class PropertyTagsExtensions
 {
     // gets the tag configuration for a property
     // from the datatype configuration, and the editor tag configuration attribute
-    public static TagConfiguration? GetTagConfiguration(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService)
+    public static TagConfiguration? GetTagConfiguration(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         if (property == null)
         {
@@ -24,10 +25,9 @@ public static class PropertyTagsExtensions
         IDataEditor? editor = propertyEditors[property.PropertyType?.PropertyEditorAlias];
         TagsPropertyEditorAttribute? tagAttribute = editor?.GetTagAttribute();
 
-        var configurationObject = property.PropertyType is null
+        TagConfiguration? configuration = property.PropertyType is null
             ? null
-            : dataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
-        TagConfiguration? configuration = configurationObject as TagConfiguration;
+            : dataTypeConfigurationCache.GetConfigurationAs<TagConfiguration>(property.PropertyType.DataTypeKey);
 
         if (configuration is not null && configuration.Delimiter == default)
         {
@@ -46,15 +46,15 @@ public static class PropertyTagsExtensions
     /// <param name="merge">A value indicating whether to merge the tags with existing tags instead of replacing them.</param>
     /// <param name="culture">A culture, for multi-lingual properties.</param>
     /// <param name="propertyEditors"></param>
-    /// <param name="dataTypeService"></param>
-    public static void AssignTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, IEnumerable<string> tags, bool merge = false, string? culture = null)
+    /// <param name="dataTypeConfigurationCache"></param>
+    public static void AssignTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeConfigurationCache dataTypeConfigurationCache, IJsonSerializer serializer, IEnumerable<string> tags, bool merge = false, string? culture = null)
     {
         if (property == null)
         {
             throw new ArgumentNullException(nameof(property));
         }
 
-        TagConfiguration? configuration = property.GetTagConfiguration(propertyEditors, dataTypeService);
+        TagConfiguration? configuration = property.GetTagConfiguration(propertyEditors, dataTypeConfigurationCache);
         if (configuration == null)
         {
             throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
@@ -71,15 +71,15 @@ public static class PropertyTagsExtensions
     /// <param name="tags">The tags.</param>
     /// <param name="culture">A culture, for multi-lingual properties.</param>
     /// <param name="propertyEditors"></param>
-    /// <param name="dataTypeService"></param>
-    public static void RemoveTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, IEnumerable<string> tags, string? culture = null)
+    /// <param name="dataTypeConfigurationCache"></param>
+    public static void RemoveTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeConfigurationCache dataTypeConfigurationCache, IJsonSerializer serializer, IEnumerable<string> tags, string? culture = null)
     {
         if (property == null)
         {
             throw new ArgumentNullException(nameof(property));
         }
 
-        TagConfiguration? configuration = property.GetTagConfiguration(propertyEditors, dataTypeService);
+        TagConfiguration? configuration = property.GetTagConfiguration(propertyEditors, dataTypeConfigurationCache);
         if (configuration == null)
         {
             throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");
@@ -89,14 +89,14 @@ public static class PropertyTagsExtensions
     }
 
     // used by ContentRepositoryBase
-    public static IEnumerable<string> GetTagsValue(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, string? culture = null)
+    public static IEnumerable<string> GetTagsValue(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeConfigurationCache dataTypeConfigurationCache, IJsonSerializer serializer, string? culture = null)
     {
         if (property == null)
         {
             throw new ArgumentNullException(nameof(property));
         }
 
-        TagConfiguration? configuration = property.GetTagConfiguration(propertyEditors, dataTypeService);
+        TagConfiguration? configuration = property.GetTagConfiguration(propertyEditors, dataTypeConfigurationCache);
         if (configuration == null)
         {
             throw new NotSupportedException($"Property with alias \"{property.Alias}\" does not support tags.");

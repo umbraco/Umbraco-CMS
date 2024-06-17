@@ -36,7 +36,7 @@ public class MemberRepositoryTest : UmbracoIntegrationTest
 {
     private IPasswordHasher PasswordHasher => GetRequiredService<IPasswordHasher>();
 
-    private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+    private IDataTypeConfigurationCache DataTypeConfigurationCache => GetRequiredService<IDataTypeConfigurationCache>();
 
     private IMemberTypeRepository MemberTypeRepository => GetRequiredService<IMemberTypeRepository>();
 
@@ -67,7 +67,7 @@ public class MemberRepositoryTest : UmbracoIntegrationTest
             PasswordHasher,
             propertyEditors,
             dataValueReferences,
-            DataTypeService,
+            DataTypeConfigurationCache,
             JsonSerializer,
             Mock.Of<IEventAggregator>(),
             Options.Create(new MemberPasswordConfigurationSettings()));

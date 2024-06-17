@@ -6,15 +6,6 @@ namespace Umbraco.Cms.Core.Cache;
 public interface IDataTypeConfigurationCache
 {
     /// <summary>
-    /// Gets the data type configuration.
-    /// </summary>
-    /// <param name="key">The data type key.</param>
-    /// <returns>
-    /// The data type configuration.
-    /// </returns>
-    object? GetConfiguration(Guid key) => GetConfigurationAs<object>(key);
-
-    /// <summary>
     /// Gets the data type configuration as <typeparamref name="T" />.
     /// </summary>
     /// <typeparam name="T">The data type configuration type.</typeparam>

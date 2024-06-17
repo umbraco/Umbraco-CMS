@@ -43,7 +43,7 @@ public interface IDataValueEditor
     /// <param name="value">The property value.</param>
     /// <param name="required">A value indicating whether the property value is required.</param>
     /// <param name="format">A specific format (regex) that the property value must respect.</param>
-    IEnumerable<ValidationResult> Validate(object? value, bool required, string? format);
+    IEnumerable<ValidationResult> Validate(object? value, bool required, string? format, IDataType dataType);
 
     /// <summary>
     ///     Converts a value posted by the editor to a property value.

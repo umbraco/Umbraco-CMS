@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -20,10 +21,10 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
     public ContentListViewService(
         IContentService contentService,
         IContentTypeService contentTypeService,
-        IDataTypeService dataTypeService,
         ISqlContext sqlContext,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
         IContentPermissionAuthorizer contentPermissionAuthorizer)
-        : base(contentTypeService, dataTypeService, sqlContext)
+        : base(contentTypeService, sqlContext, dataTypeConfigurationCache)
     {
         _contentService = contentService;
         _contentPermissionAuthorizer = contentPermissionAuthorizer;

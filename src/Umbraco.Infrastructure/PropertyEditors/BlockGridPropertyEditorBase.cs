@@ -55,20 +55,25 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
         {
             BlockEditorValues = new BlockEditorValues<BlockGridValue, BlockGridLayoutItem>(new BlockGridEditorDataConverter(jsonSerializer), contentTypeService, logger);
             Validators.Add(new BlockEditorValidator<BlockGridValue, BlockGridLayoutItem>(propertyValidationService, BlockEditorValues, contentTypeService));
-            Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
+            Validators.Add(new MinMaxValidator(BlockEditorValues, textService, dataTypeConfigurationCache));
         }
 
         private class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockGridValue, BlockGridLayoutItem>
         {
             private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockEditorValues;
+            private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
-            public MinMaxValidator(BlockEditorValues<BlockGridValue, BlockGridLayoutItem> blockEditorValues, ILocalizedTextService textService)
-                : base(textService) =>
-                _blockEditorValues = blockEditorValues;
-
-            public override IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+            public MinMaxValidator(BlockEditorValues<BlockGridValue, BlockGridLayoutItem> blockEditorValues, ILocalizedTextService textService, IDataTypeConfigurationCache dataTypeConfigurationCache)
+                : base(textService)
             {
-                if (dataTypeConfiguration is not BlockGridConfiguration blockConfig)
+                _blockEditorValues = blockEditorValues;
+                _dataTypeConfigurationCache = dataTypeConfigurationCache;
+            }
+
+            public override IEnumerable<ValidationResult> Validate(object? value, string? valueType, Guid dataTypeKey)
+            {
+                var blockConfig = _dataTypeConfigurationCache.GetConfigurationAs<BlockGridConfiguration>(dataTypeKey);
+                if (blockConfig is null)
                 {
                     return Array.Empty<ValidationResult>();
                 }

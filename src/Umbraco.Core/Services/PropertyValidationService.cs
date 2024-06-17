@@ -83,7 +83,7 @@ public class PropertyValidationService : IPropertyValidationService
         var formatDefaultMessages = new[] { Constants.Validation.ErrorMessages.Properties.PatternMismatch };
 
         IDataValueEditor valueEditor = _valueEditorCache.GetValueEditor(editor, dataType);
-        foreach (ValidationResult validationResult in valueEditor.Validate(postedValue, isRequired, validationRegExp))
+        foreach (ValidationResult validationResult in valueEditor.Validate(postedValue, isRequired, validationRegExp, dataType))
         {
             // If we've got custom error messages, we'll replace the default ones that will have been applied in the call to Validate().
             if (isRequired && !string.IsNullOrWhiteSpace(isRequiredMessage) &&
@@ -223,15 +223,16 @@ public class PropertyValidationService : IPropertyValidationService
     private bool IsPropertyValueValid(IPropertyType propertyType, object? value)
     {
         IDataEditor? editor = _propertyEditors[propertyType.PropertyEditorAlias];
-        if (editor == null)
+        // TODO KJA: performance penalty here; can we do this smarter?
+        IDataType? dataType = _dataTypeService.GetDataType(propertyType.DataTypeKey);
+        if (editor == null || dataType == null)
         {
             // nothing much we can do validation wise if the property editor has been removed.
             // the property will be displayed as a label, so flagging it as invalid would be pointless.
             return true;
         }
 
-        var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId)?.ConfigurationObject;
-        IDataValueEditor valueEditor = editor.GetValueEditor(configuration);
-        return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp).Any();
+        IDataValueEditor valueEditor = editor.GetValueEditor();
+        return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp, dataType).Any();
     }
 }

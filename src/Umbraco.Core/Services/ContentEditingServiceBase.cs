@@ -459,8 +459,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return null;
         }
 
-        IDataType? dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey);
-        var data = new ContentPropertyData(value, dataType?.ConfigurationObject)
+        var data = new ContentPropertyData(value, propertyType.DataTypeKey)
         {
             ContentKey = content.Key,
             PropertyTypeKey = propertyType.Key

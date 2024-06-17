@@ -23,7 +23,7 @@ public class ColorListValidatorTest
             validator.Validate(
                 "hello",
                 null,
-                null);
+                Guid.Empty);
         Assert.AreEqual(1, result.Count());
     }
 
@@ -35,7 +35,7 @@ public class ColorListValidatorTest
             validator.Validate(
                 new JsonArray("hello", "world"),
                 null,
-                null);
+                Guid.Empty);
         Assert.AreEqual(1, result.Count());
     }
 
@@ -51,7 +51,7 @@ public class ColorListValidatorTest
                     JsonNode.Parse("""{"value": "ABC", "label": "Three"}"""),
                     JsonNode.Parse("""{"value": "1234567", "label": "Four"}""")),
                 null,
-                null);
+                Guid.Empty);
         Assert.AreEqual(2, result.Count());
     }
 }

@@ -42,8 +42,7 @@ internal static class DataTypeFactory
             dataType.Trashed = dto.NodeDto.Trashed;
             dataType.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
             dataType.EditorUiAlias = dto.EditorUiAlias;
-
-            dataType.SetConfigurationData(editor.GetConfigurationEditor().FromDatabase(dto.Configuration, serializer));
+            dataType.ConfigurationData = editor.GetConfigurationEditor().FromDatabase(dto.Configuration, serializer);
 
             // reset dirty initial properties (U4-1946)
             dataType.ResetDirtyProperties(false);

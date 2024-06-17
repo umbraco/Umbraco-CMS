@@ -314,10 +314,10 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
                     CreatorId = 0
                 };
 
-            dataTypeDefinition.ConfigurationData = dataTypeDefinition.Editor!.GetConfigurationEditor()
-                .FromConfigurationObject(
-                    new LabelConfiguration { ValueType = ValueTypes.Xml },
-                    ConfigurationEditorJsonSerializer);
+            dataTypeDefinition.ConfigurationData = new Dictionary<string, object>
+            {
+                { Constants.PropertyEditors.ConfigurationKeys.DataValueType, ValueTypes.Xml }
+            };
 
             // Act
             DataTypeRepository.Save(dataTypeDefinition);
@@ -330,16 +330,11 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             Assert.That(exists, Is.True);
 
             // cannot compare the configuration objects as they are two different objects
-            TestHelper.AssertPropertyValuesAreEqual(dataTypeDefinition, fetched, ignoreProperties: new[] { nameof(DataType.ConfigurationObject) });
+            TestHelper.AssertPropertyValuesAreEqual(dataTypeDefinition, fetched);
 
             // still, can compare explicitely
-            Assert.IsNotNull(dataTypeDefinition.ConfigurationObject);
-            Assert.IsInstanceOf<LabelConfiguration>(dataTypeDefinition.ConfigurationObject);
-            Assert.IsNotNull(fetched.ConfigurationObject);
-            Assert.IsInstanceOf<LabelConfiguration>(fetched.ConfigurationObject);
-            Assert.AreEqual(
-                ConfigurationEditor.ConfigurationAs<LabelConfiguration>(dataTypeDefinition.ConfigurationObject).ValueType,
-                ConfigurationEditor.ConfigurationAs<LabelConfiguration>(fetched.ConfigurationObject).ValueType);
+            Assert.IsTrue(fetched.ConfigurationData.ContainsKey(Constants.PropertyEditors.ConfigurationKeys.DataValueType));
+            Assert.AreEqual(ValueTypes.Xml, fetched.ConfigurationData[Constants.PropertyEditors.ConfigurationKeys.DataValueType]);
         }
     }
 

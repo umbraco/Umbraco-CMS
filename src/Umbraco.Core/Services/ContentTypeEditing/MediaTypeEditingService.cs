@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Media;
+﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -11,21 +12,23 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IMediaType, IMediaTypeService, MediaTypePropertyTypeModel, MediaTypePropertyContainerModel>, IMediaTypeEditingService
 {
     private readonly IMediaTypeService _mediaTypeService;
-    private readonly IDataTypeService _dataTypeService;
     private readonly IImageUrlGenerator _imageUrlGenerator;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
+    // TODO KJA: constructor breakage
     public MediaTypeEditingService(
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
         IDataTypeService dataTypeService,
         IEntityService entityService,
         IShortStringHelper shortStringHelper,
-        IImageUrlGenerator imageUrlGenerator)
+        IImageUrlGenerator imageUrlGenerator,
+        IDataTypeConfigurationCache dataTypeConfigurationCache)
         : base(contentTypeService, mediaTypeService, dataTypeService, entityService, shortStringHelper)
     {
         _mediaTypeService = mediaTypeService;
-        _dataTypeService = dataTypeService;
         _imageUrlGenerator = imageUrlGenerator;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
     public async Task<Attempt<IMediaType?, ContentTypeOperationStatus>> CreateAsync(MediaTypeCreateModel model, Guid userKey)
@@ -162,8 +165,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
                 continue;
             }
 
-            IDataType? dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey);
-            FileUploadConfiguration? fileUploadConfiguration = dataType?.ConfigurationAs<FileUploadConfiguration>();
+            FileUploadConfiguration? fileUploadConfiguration = _dataTypeConfigurationCache.GetConfigurationAs<FileUploadConfiguration>(propertyType.DataTypeKey);
 
             if (fileUploadConfiguration is null)
             {

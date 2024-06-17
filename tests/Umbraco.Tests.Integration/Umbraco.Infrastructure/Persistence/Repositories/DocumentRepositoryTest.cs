@@ -56,7 +56,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
 
     private IFileService FileService => GetRequiredService<IFileService>();
 
-    private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+    private IDataTypeConfigurationCache DataTypeConfigurationCache => GetRequiredService<IDataTypeConfigurationCache>();
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
@@ -141,7 +141,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             relationTypeRepository,
             propertyEditors,
             dataValueReferences,
-            DataTypeService,
+            DataTypeConfigurationCache,
             ConfigurationEditorJsonSerializer,
             Mock.Of<IEventAggregator>());
         return repository;

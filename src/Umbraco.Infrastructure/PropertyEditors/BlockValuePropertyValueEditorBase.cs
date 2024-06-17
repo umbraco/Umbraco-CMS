@@ -74,7 +74,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
     }
 
     /// <inheritdoc />
-    public abstract IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId);
+    public abstract IEnumerable<ITag> GetTags(object? value, TagConfiguration? tagConfiguration, int? languageId);
 
     protected IEnumerable<ITag> GetBlockValueTags(TValue blockValue, int? languageId)
     {
@@ -93,7 +93,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
                     continue;
                 }
 
-                object? configuration = _dataTypeConfigurationCache.GetConfiguration(prop.Value.PropertyType.DataTypeKey);
+                TagConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<TagConfiguration>(prop.Value.PropertyType.DataTypeKey);
 
                 result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
             }
@@ -141,8 +141,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
                 Guid dataTypeKey = prop.Value.PropertyType.DataTypeKey;
                 if (!valEditors.TryGetValue(dataTypeKey, out IDataValueEditor? valEditor))
                 {
-                    var configuration = _dataTypeConfigurationCache.GetConfiguration(dataTypeKey);
-                    valEditor = propEditor.GetValueEditor(configuration);
+                    valEditor = propEditor.GetValueEditor();
 
                     valEditors.Add(dataTypeKey, valEditor);
                 }
@@ -161,9 +160,6 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
         {
             foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
             {
-                // Fetch the property types prevalue
-                var configuration = _dataTypeConfigurationCache.GetConfiguration(prop.Value.PropertyType.DataTypeKey);
-
                 // Lookup the property editor
                 IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
                 if (propEditor == null)
@@ -172,7 +168,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
                 }
 
                 // Create a fake content property data object
-                var contentPropData = new ContentPropertyData(prop.Value.Value, configuration);
+                var contentPropData = new ContentPropertyData(prop.Value.Value, prop.Value.PropertyType.DataTypeKey);
 
                 // Get the property editor to do it's conversion
                 var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);

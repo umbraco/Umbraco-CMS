@@ -37,7 +37,7 @@ public class MediaRepositoryTest : UmbracoIntegrationTest
 
     private ITemplateRepository TemplateRepository => GetRequiredService<ITemplateRepository>();
 
-    private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+    private IDataTypeConfigurationCache DataTypeConfigurationCache => GetRequiredService<IDataTypeConfigurationCache>();
 
     private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
@@ -78,7 +78,7 @@ public class MediaRepositoryTest : UmbracoIntegrationTest
             propertyEditors,
             mediaUrlGenerators,
             dataValueReferences,
-            DataTypeService,
+            DataTypeConfigurationCache,
             JsonSerializer,
             Mock.Of<IEventAggregator>());
         return repository;

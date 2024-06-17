@@ -12,7 +12,7 @@ public interface IValueValidator
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <param name="valueType">The value type.</param>
-    /// <param name="dataTypeConfiguration">A datatype configuration.</param>
+    /// <param name="dataTypeKey">The key of the data type that sourced the value.</param>
     /// <returns>Validation results.</returns>
     /// <remarks>
     ///     <para>
@@ -20,5 +20,5 @@ public interface IValueValidator
     ///         editor.
     ///     </para>
     /// </remarks>
-    IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration);
+    IEnumerable<ValidationResult> Validate(object? value, string? valueType, Guid dataTypeKey);
 }

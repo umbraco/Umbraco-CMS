@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -43,24 +44,6 @@ public interface IConfigurationEditor
     IDictionary<string, object> ToValueEditor(IDictionary<string, object> configuration);
 
     /// <summary>
-    ///     Creates a configuration object from the configuration data.
-    /// </summary>
-    /// <param name="configuration">The configuration data.</param>
-    /// <param name="configurationEditorJsonSerializer">The configuration serializer.</param>
-    object ToConfigurationObject(
-        IDictionary<string, object> configuration,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
-
-    /// <summary>
-    ///     Creates configuration data from a configuration object.
-    /// </summary>
-    /// <param name="configuration">The configuration object.</param>
-    /// <param name="configurationEditorJsonSerializer">The configuration serializer.</param>
-    IDictionary<string, object> FromConfigurationObject(
-        object configuration,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
-
-    /// <summary>
     ///     Converts configuration data into a serialized database value.
     /// </summary>
     string ToDatabase(
@@ -81,5 +64,5 @@ public interface IConfigurationEditor
     /// </summary>
     /// <param name="configuration">The configuration data to validate.</param>
     /// <returns>One or more <see cref="ValidationResult"/> if the configuration data is invalid, an empty collection otherwise.</returns>
-    IEnumerable<ValidationResult> Validate(IDictionary<string, object> configuration);
+    IEnumerable<ValidationResult> Validate(IDataType dataType);
 }

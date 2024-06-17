@@ -25,7 +25,7 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
         public ColorListValidator(IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
             => _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
 
-        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, Guid dataTypeKey)
         {
             var stringValue = value?.ToString();
             if (stringValue.IsNullOrWhiteSpace())

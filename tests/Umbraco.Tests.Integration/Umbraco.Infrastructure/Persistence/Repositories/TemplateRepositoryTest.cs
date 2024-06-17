@@ -253,7 +253,7 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
         // Arrange
         var provider = ScopeProvider;
         var scopeAccessor = (IScopeAccessor)provider;
-        var dataTypeService = GetRequiredService<IDataTypeService>();
+        var dataTypeConfigurationCache = GetRequiredService<IDataTypeConfigurationCache>();
         var fileService = GetRequiredService<IFileService>();
 
         using (provider.CreateScope())
@@ -286,7 +286,7 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
                 relationTypeRepository,
                 propertyEditors,
                 dataValueReferences,
-                dataTypeService,
+                dataTypeConfigurationCache,
                 serializer,
                 Mock.Of<IEventAggregator>());
 

@@ -4,6 +4,7 @@
 using System.Text.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -34,7 +35,8 @@ public class TagServiceTests : UmbracoIntegrationTest
         _contentType.PropertyGroups.First().PropertyTypes.Add(
             new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "tags")
             {
-                DataTypeId = Constants.DataTypes.Tags
+                DataTypeId = Constants.DataTypes.Tags,
+                DataTypeKey = Constants.DataTypes.Guids.TagsGuid
             });
         ContentTypeService.Save(_contentType);
     }
@@ -47,7 +49,7 @@ public class TagServiceTests : UmbracoIntegrationTest
 
     private ITagService TagService => GetRequiredService<ITagService>();
 
-    private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+    private IDataTypeConfigurationCache DataTypeConfigurationCache => GetRequiredService<IDataTypeConfigurationCache>();
 
     private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
 
@@ -59,22 +61,22 @@ public class TagServiceTests : UmbracoIntegrationTest
     public void TagApiConsistencyTest()
     {
         IContent content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "cow", "pig", "goat" });
         ContentService.Save(content1);
         ContentService.Publish(content1, Array.Empty<string>());
 
         // change
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "elephant" }, true);
-        content1.RemoveTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow" });
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags", new[] { "elephant" }, true);
+        content1.RemoveTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags", new[] { "cow" });
         ContentService.Save(content1);
         ContentService.Publish(content1, Array.Empty<string>());
 
         // more changes
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "mouse" }, true);
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags", new[] { "mouse" }, true);
         ContentService.Save(content1);
         ContentService.Publish(content1, Array.Empty<string>());
-        content1.RemoveTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "mouse" });
+        content1.RemoveTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags", new[] { "mouse" });
         ContentService.Save(content1);
         ContentService.Publish(content1, Array.Empty<string>());
 
@@ -101,18 +103,18 @@ public class TagServiceTests : UmbracoIntegrationTest
     public void TagList_Contains_NodeCount()
     {
         var content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "cow", "pig", "goat" });
         ContentService.Save(content1);
         ContentService.Publish(content1, Array.Empty<string>());
 
         var content2 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 2");
-        content2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow", "pig" });
+        content2.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags", new[] { "cow", "pig" });
         ContentService.Save(content2);
         ContentService.Publish(content2, Array.Empty<string>());
 
         var content3 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 3");
-        content3.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "cow" });
+        content3.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags", new[] { "cow" });
         ContentService.Save(content3);
         ContentService.Publish(content3, Array.Empty<string>());
 

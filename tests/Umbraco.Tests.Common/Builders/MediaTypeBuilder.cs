@@ -45,7 +45,8 @@ public class MediaTypeBuilder
             .WithAlias(Constants.Conventions.Media.File)
             .WithName("File")
             .WithSortOrder(1)
-            .WithDataTypeId(-90)
+            .WithDataTypeId(Constants.DataTypes.Upload)
+            .WithDataTypeKey(Constants.DataTypes.Guids.UploadGuid)
             .Done()
             .AddPropertyType()
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
@@ -54,6 +55,7 @@ public class MediaTypeBuilder
             .WithName("Width")
             .WithSortOrder(2)
             .WithDataTypeId(Constants.System.DefaultLabelDataTypeId)
+            .WithDataTypeKey(Constants.DataTypes.Guids.LabelStringGuid)
             .Done()
             .AddPropertyType()
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
@@ -62,6 +64,7 @@ public class MediaTypeBuilder
             .WithName("Height")
             .WithSortOrder(3)
             .WithDataTypeId(Constants.System.DefaultLabelDataTypeId)
+            .WithDataTypeKey(Constants.DataTypes.Guids.LabelStringGuid)
             .Done()
             .AddPropertyType()
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
@@ -70,6 +73,7 @@ public class MediaTypeBuilder
             .WithName("Bytes")
             .WithSortOrder(4)
             .WithDataTypeId(Constants.System.DefaultLabelDataTypeId)
+            .WithDataTypeKey(Constants.DataTypes.Guids.LabelStringGuid)
             .Done()
             .AddPropertyType()
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
@@ -78,6 +82,7 @@ public class MediaTypeBuilder
             .WithName("File Extension")
             .WithSortOrder(5)
             .WithDataTypeId(Constants.System.DefaultLabelDataTypeId)
+            .WithDataTypeKey(Constants.DataTypes.Guids.LabelStringGuid)
             .Done();
         _propertyGroupBuilders.Add(builder);
         return this;
@@ -155,7 +160,8 @@ public class MediaTypeBuilder
             .WithAlias(RandomAlias("bodyText", randomizeAliases))
             .WithName("Body text")
             .WithSortOrder(2)
-            .WithDataTypeId(-87)
+            .WithDataTypeId(Constants.DataTypes.RichtextEditor)
+            .WithDataTypeKey(Constants.DataTypes.Guids.RichtextEditorGuid)
             .Done()
             .AddPropertyType()
             .WithAlias(RandomAlias("author", randomizeAliases))
@@ -172,12 +178,12 @@ public class MediaTypeBuilder
     }
 
     public static MediaType CreateImageMediaType(string alias = Constants.Conventions.MediaTypes.Image) =>
-        CreateImageMediaType(alias ?? "Image", Constants.PropertyEditors.Aliases.UploadField, -90);
+        CreateImageMediaType(alias ?? "Image", Constants.PropertyEditors.Aliases.UploadField, Constants.DataTypes.Upload, Constants.DataTypes.Guids.UploadGuid);
 
     public static MediaType CreateImageMediaTypeWithCrop(string alias = Constants.Conventions.MediaTypes.Image) =>
-        CreateImageMediaType(alias ?? "Image", Constants.PropertyEditors.Aliases.ImageCropper, 1043);
+        CreateImageMediaType(alias ?? "Image", Constants.PropertyEditors.Aliases.ImageCropper, Constants.DataTypes.ImageCropper, Constants.DataTypes.Guids.ImageCropperGuid);
 
-    private static MediaType CreateImageMediaType(string alias, string imageFieldPropertyEditorAlias, int imageFieldDataTypeId)
+    private static MediaType CreateImageMediaType(string alias, string imageFieldPropertyEditorAlias, int imageFieldDataTypeId, Guid imageFieldDataTypeKey)
     {
         var builder = new MediaTypeBuilder();
         var mediaType = builder
@@ -192,6 +198,7 @@ public class MediaTypeBuilder
             .WithName("File")
             .WithSortOrder(1)
             .WithDataTypeId(imageFieldDataTypeId)
+            .WithDataTypeKey(imageFieldDataTypeKey)
             .Done()
             .AddPropertyType()
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
@@ -199,6 +206,7 @@ public class MediaTypeBuilder
             .WithName("Width")
             .WithSortOrder(2)
             .WithDataTypeId(Constants.System.DefaultLabelDataTypeId)
+            .WithDataTypeKey(Constants.DataTypes.Guids.LabelStringGuid)
             .Done()
             .AddPropertyType()
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
@@ -206,6 +214,7 @@ public class MediaTypeBuilder
             .WithName("Height")
             .WithSortOrder(3)
             .WithDataTypeId(Constants.System.DefaultLabelDataTypeId)
+            .WithDataTypeKey(Constants.DataTypes.Guids.LabelStringGuid)
             .Done()
             .AddPropertyType()
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
@@ -213,6 +222,7 @@ public class MediaTypeBuilder
             .WithName("Bytes")
             .WithSortOrder(4)
             .WithDataTypeId(Constants.System.DefaultLabelDataTypeId)
+            .WithDataTypeKey(Constants.DataTypes.Guids.LabelStringGuid)
             .Done()
             .AddPropertyType()
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
@@ -220,6 +230,7 @@ public class MediaTypeBuilder
             .WithName("File Extension")
             .WithSortOrder(5)
             .WithDataTypeId(Constants.System.DefaultLabelDataTypeId)
+            .WithDataTypeKey(Constants.DataTypes.Guids.LabelStringGuid)
             .Done()
             .Done()
             .Build();

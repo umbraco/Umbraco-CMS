@@ -25,9 +25,9 @@ public abstract class ComplexEditorValidator : IValueValidator
     /// </summary>
     /// <param name="value"></param>
     /// <param name="valueType"></param>
-    /// <param name="dataTypeConfiguration"></param>
+    /// <param name="dataTypeKey"></param>
     /// <returns></returns>
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, Guid dataTypeKey)
     {
         var elementTypeValues = GetElementTypeValidation(value).ToList();
         var rowResults = GetNestedValidationResults(elementTypeValues).ToList();

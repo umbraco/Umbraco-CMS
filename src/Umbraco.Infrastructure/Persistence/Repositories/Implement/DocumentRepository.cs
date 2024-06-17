@@ -51,7 +51,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// <param name="relationRepository"></param>
     /// <param name="relationTypeRepository"></param>
     /// <param name="dataValueReferenceFactories"></param>
-    /// <param name="dataTypeService"></param>
+    /// <param name="dataTypeConfigurationCache"></param>
     /// <param name="serializer"></param>
     /// <param name="eventAggregator"></param>
     /// <param name="propertyEditors">
@@ -71,11 +71,11 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         IRelationTypeRepository relationTypeRepository,
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeService dataTypeService,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator)
         : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository,
-            propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
+            propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, eventAggregator)
     {
         _contentTypeRepository =
             contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));

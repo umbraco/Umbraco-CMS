@@ -164,6 +164,7 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             .WithAlias("blocks")
             .WithName("Blocks")
             .WithDataTypeId(dataType.Id)
+            .WithDataTypeKey(dataType.Key)
             .Done()
             .Build();
         ContentTypeService.Save(contentType);
@@ -266,6 +267,7 @@ public class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             .WithAlias("blocks")
             .WithName("Blocks")
             .WithDataTypeId(dataType.Id)
+            .WithDataTypeKey(dataType.Key)
             .Done()
             .Build();
         ContentTypeService.Save(contentType);

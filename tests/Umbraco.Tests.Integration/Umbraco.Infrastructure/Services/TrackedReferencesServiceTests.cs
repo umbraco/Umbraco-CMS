@@ -36,6 +36,7 @@ public class TrackedReferencesServiceTests : UmbracoIntegrationTest
                 .WithAlias("ContentPicker")
                 .WithName("contentPicker")
                 .WithDataTypeId(1046)
+                .WithDataTypeKey(Constants.DataTypes.Guids.ContentPickerGuid)
                 .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.ContentPicker)
             .Done()
             .Build();

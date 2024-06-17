@@ -38,14 +38,6 @@ public interface IDataType : IUmbracoEntity, IRememberBeingDirty
     IDictionary<string, object> ConfigurationData { get; set; }
 
     /// <summary>
-    /// Gets an object representation of the configuration data.
-    /// </summary>
-    /// <remarks>
-    /// The object type is dictated by the underlying <see cref="IConfigurationEditor"/> implementation of the <see cref="Editor"/>.
-    /// </remarks>
-    object? ConfigurationObject { get; }
-
-    /// <summary>
     /// Creates a deep clone of the current entity with its identity/alias reset
     /// We have the default implementation here to avoid breaking changes for the user
     /// </summary>

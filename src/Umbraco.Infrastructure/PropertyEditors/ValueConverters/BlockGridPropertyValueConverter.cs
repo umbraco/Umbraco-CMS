@@ -1,9 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -22,29 +21,23 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IApiElementBuilder _apiElementBuilder;
         private readonly BlockGridPropertyValueConstructorCache _constructorCache;
+        private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
-        [Obsolete("Please use non-obsolete construtor. This will be removed in Umbraco 15.")]
-        public BlockGridPropertyValueConverter(
-            IProfilingLogger proflog,
-            BlockEditorConverter blockConverter,
-            IJsonSerializer jsonSerializer,
-            IApiElementBuilder apiElementBuilder)
-            : this(proflog, blockConverter, jsonSerializer, apiElementBuilder, StaticServiceProvider.Instance.GetRequiredService<BlockGridPropertyValueConstructorCache>())
-        {
-        }
-
+        // TODO KJA: constructor breakage
         public BlockGridPropertyValueConverter(
             IProfilingLogger proflog,
             BlockEditorConverter blockConverter,
             IJsonSerializer jsonSerializer,
             IApiElementBuilder apiElementBuilder,
-            BlockGridPropertyValueConstructorCache constructorCache)
+            BlockGridPropertyValueConstructorCache constructorCache,
+            IDataTypeConfigurationCache dataTypeConfigurationCache)
         {
             _proflog = proflog;
             _blockConverter = blockConverter;
             _jsonSerializer = jsonSerializer;
             _apiElementBuilder = apiElementBuilder;
             _constructorCache = constructorCache;
+            _dataTypeConfigurationCache = dataTypeConfigurationCache;
         }
 
         /// <inheritdoc />
@@ -126,7 +119,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 }
 
                 // Get configuration
-                BlockGridConfiguration? configuration = propertyType.DataType.ConfigurationAs<BlockGridConfiguration>();
+                BlockGridConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<BlockGridConfiguration>(propertyType.DataType.Key);
                 if (configuration is null)
                 {
                     return null;

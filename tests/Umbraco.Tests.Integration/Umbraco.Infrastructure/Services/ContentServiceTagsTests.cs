@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -39,6 +40,8 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
+    private IDataTypeConfigurationCache DataTypeConfigurationCache => GetRequiredService<IDataTypeConfigurationCache>();
+
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IFileService FileService => GetRequiredService<IFileService>();
@@ -62,14 +65,14 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "another", "one" });
         ContentService.Save(content1);
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
         content1 = ContentService.GetById(content1.Id);
 
-        var enTags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        var enTags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer)
             .ToArray();
         Assert.AreEqual(4, enTags.Length);
         Assert.Contains("one", enTags);
@@ -108,9 +111,9 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.SetCultureName("name-fr", "fr-FR");
         content1.SetCultureName("name-en", "en-US");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "another", "one" }, culture: "en-US");
         ContentService.Save(content1);
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
@@ -118,13 +121,13 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         content1 = ContentService.GetById(content1.Id);
 
         var frTags = content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "fr-FR").ToArray();
+            .GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "fr-FR").ToArray();
         Assert.AreEqual(5, frTags.Length);
         Assert.Contains("plus", frTags);
         Assert.AreEqual(-1, frTags.IndexOf("one"));
 
         var enTags = content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "en-US").ToArray();
+            .GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "en-US").ToArray();
         Assert.AreEqual(4, enTags.Length);
         Assert.Contains("one", enTags);
         Assert.AreEqual(-1, enTags.IndexOf("plus"));
@@ -162,7 +165,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "another", "one" });
         ContentService.Save(content1);
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
@@ -173,7 +176,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // no changes
         content1 = ContentService.GetById(content1.Id);
 
-        var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer)
             .ToArray();
         Assert.AreEqual(4, tags.Length);
         Assert.Contains("one", tags);
@@ -199,11 +202,11 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         content1 = ContentService.GetById(content1.Id);
 
         // property value has been moved from invariant to en-US
-        tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer)
             .ToArray();
         Assert.IsEmpty(tags);
 
-        tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "en-US")
+        tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "en-US")
             .ToArray();
         Assert.AreEqual(4, tags.Length);
         Assert.Contains("one", tags);
@@ -244,9 +247,9 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.SetCultureName("name-fr", "fr-FR");
         content1.SetCultureName("name-en", "en-US");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "another", "one" }, culture: "en-US");
         ContentService.Save(content1);
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
@@ -259,11 +262,11 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // property value has been moved from en-US to invariant, fr-FR tags are gone
         Assert.IsEmpty(content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "fr-FR"));
+            .GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "fr-FR"));
         Assert.IsEmpty(content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "en-US"));
+            .GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "en-US"));
 
-        var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer)
             .ToArray();
         Assert.AreEqual(4, tags.Length);
         Assert.Contains("one", tags);
@@ -304,9 +307,9 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.SetCultureName("name-fr", "fr-FR");
         content1.SetCultureName("name-en", "en-US");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "another", "one" }, culture: "en-US");
         ContentService.Save(content1);
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
@@ -314,9 +317,9 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         IContent content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2");
         content2.SetCultureName("name-fr", "fr-FR");
         content2.SetCultureName("name-en", "en-US");
-        content2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content2.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
-        content2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content2.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "another", "one" }, culture: "en-US");
         ContentService.Save(content2);
         ContentService.Publish(content2, content2.AvailableCultures.ToArray());
@@ -351,9 +354,9 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.SetCultureName("name-fr", "fr-FR");
         content1.SetCultureName("name-en", "en-US");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags", "plus" }, culture: "fr-FR");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "another", "one" }, culture: "en-US");
         ContentService.Save(content1);
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
@@ -366,11 +369,11 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // property value has been moved from en-US to invariant, fr-FR tags are gone
         Assert.IsEmpty(content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "fr-FR"));
+            .GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "fr-FR"));
         Assert.IsEmpty(content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "en-US"));
+            .GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "en-US"));
 
-        var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer)
             .ToArray();
         Assert.AreEqual(4, tags.Length);
         Assert.Contains("one", tags);
@@ -414,9 +417,9 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.SetCultureName("name-fr", "fr-FR");
         content1.SetCultureName("name-en", "en-US");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             frValue, culture: "fr-FR");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             enValue, culture: "en-US");
         ContentService.Save(content1);
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
@@ -444,13 +447,13 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags", "plus" });
         ContentService.Save(content1);
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
         var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2");
-        content2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content2.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags" });
         ContentService.Save(content2);
         ContentService.Publish(content2, content2.AvailableCultures.ToArray());
@@ -476,13 +479,13 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags", "bam" });
         ContentService.Save(content1);
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
         var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2");
-        content2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content2.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags" });
         ContentService.Save(content2);
         ContentService.Publish(content2, content2.AvailableCultures.ToArray());
@@ -510,13 +513,13 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags", "plus" });
         ContentService.Save(content1);
         ContentService.Publish(content1, Array.Empty<string>());
 
         var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2", content1.Id);
-        content2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content2.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags" });
         ContentService.Save(content2);
         ContentService.Publish(content2, Array.Empty<string>());
@@ -587,13 +590,13 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags", "bam" });
         ContentService.Save(content1);
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
         var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2");
-        content2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content2.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags" });
         ContentService.Save(content2);
         ContentService.Publish(content2, content2.AvailableCultures.ToArray());
@@ -615,13 +618,13 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
-        content1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags", "bam" });
         ContentService.Save(content1);
         ContentService.Publish(content1, Array.Empty<string>());
 
         var content2 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 2", content1);
-        content2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content2.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags" });
         ContentService.Save(content2);
         ContentService.Publish(content2, Array.Empty<string>());
@@ -653,10 +656,10 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // Arrange
         // set configuration
         var dataType = DataTypeService.GetDataType(1041);
-        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
-            .FromConfigurationObject(
-                new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv },
-                ConfigurationEditorJsonSerializer);
+        dataType.ConfigurationData = new Dictionary<string, object>
+        {
+            { "group", "test" }, { "storageType", TagsStorageType.Csv }
+        };
 
         // updating the data type with the new configuration
         DataTypeService.Save(dataType);
@@ -672,17 +675,17 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
             new[] { new ContentTypeSort(contentType.Key, 0, contentType.Alias) };
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
-        content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags" });
         ContentService.Save(content);
 
         var child1 = ContentBuilder.CreateSimpleContent(contentType, "child 1 content", content.Id);
-        child1.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        child1.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello1", "world1", "some1" });
         ContentService.Save(child1);
 
         var child2 = ContentBuilder.CreateSimpleContent(contentType, "child 2 content", content.Id);
-        child2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "hello2", "world2" });
+        child2.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags", new[] { "hello2", "world2" });
         ContentService.Save(child2);
 
         // Act
@@ -723,13 +726,13 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // create a content with tags and publish
         var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
-        content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags" });
         ContentService.Save(content);
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
         // edit tags and save
-        content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "another", "world" },
+        content.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags", new[] { "another", "world" },
             true);
         ContentService.Save(content);
 
@@ -762,7 +765,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
 
         // Act
-        content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags" });
         ContentService.Save(content);
         ContentService.Publish(content, Array.Empty<string>());
@@ -792,13 +795,13 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         CreateAndAddTagsPropertyType(contentType);
         ContentTypeService.Save(contentType);
         var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
-        content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags" });
         ContentService.Save(content);
         ContentService.Publish(content, Array.Empty<string>());
 
         // Act
-        content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "another", "world" },
+        content.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags", new[] { "another", "world" },
             true);
         ContentService.Save(content);
         ContentService.Publish(content, Array.Empty<string>());
@@ -828,13 +831,13 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         CreateAndAddTagsPropertyType(contentType);
         ContentTypeService.Save(contentType);
         var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
-        content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello", "world", "some", "tags" });
         ContentService.Save(content);
         ContentService.Publish(content, Array.Empty<string>());
 
         // Act
-        content.RemoveTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "some", "world" });
+        content.RemoveTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags", new[] { "some", "world" });
         ContentService.Save(content);
         ContentService.Publish(content, Array.Empty<string>());
 
@@ -857,10 +860,10 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // Arrange
         // set configuration
         var dataType = DataTypeService.GetDataType(1041);
-        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
-            .FromConfigurationObject(
-                new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv },
-                ConfigurationEditorJsonSerializer);
+        dataType.ConfigurationData = new Dictionary<string, object>
+        {
+            { "group", "test" }, { "storageType", TagsStorageType.Csv }
+        };
 
         // updating the data type with the new configuration
         DataTypeService.Save(dataType);
@@ -875,7 +878,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         IContent content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
-        content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello,world,tags", "new" });
 
         ContentService.Save(content);
@@ -883,7 +886,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // Act
         content = ContentService.GetById(content.Id);
-        var savedTags = content.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        var savedTags = content.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer)
             .ToArray();
 
         // Assert
@@ -896,12 +899,13 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         // Arrange
         // set configuration
         var dataType = DataTypeService.GetDataType(1041);
-        dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
-            .FromConfigurationObject(
-                new TagConfiguration { Group = "test", StorageType = TagsStorageType.Json },
-                ConfigurationEditorJsonSerializer);
+        dataType.ConfigurationData = new Dictionary<string, object>
+        {
+            { "group", "test" }, { "storageType", TagsStorageType.Json }
+        };
+        DataTypeService.Save(dataType);
 
-        var configuration = dataType.ConfigurationObject as TagConfiguration;
+        var configuration = DataTypeConfigurationCache.GetConfigurationAs<TagConfiguration>(dataType.Key);
         Assert.NotNull(configuration);
         Assert.AreEqual("test", configuration.Group);
         Assert.AreEqual(TagsStorageType.Json, configuration.StorageType);
@@ -919,7 +923,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         IContent content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
-        content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags",
+        content.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, "tags",
             new[] { "hello,world,tags", "new" });
 
         ContentService.Save(content);
@@ -927,7 +931,7 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // Act
         content = ContentService.GetById(content.Id);
-        var savedTags = content.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        var savedTags = content.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeConfigurationCache, Serializer)
             .ToArray();
 
         // Assert
@@ -940,7 +944,8 @@ public class ContentServiceTagsTests : UmbracoIntegrationTest
         var propertyType = new PropertyTypeBuilder()
             .WithPropertyEditorAlias("test")
             .WithAlias("tags")
-            .WithDataTypeId(1041)
+            .WithDataTypeId(Constants.DataTypes.Tags)
+            .WithDataTypeKey(Constants.DataTypes.Guids.TagsGuid)
             .WithVariations(variations)
             .Build();
         contentType.PropertyGroups.First().PropertyTypes.Add(propertyType);

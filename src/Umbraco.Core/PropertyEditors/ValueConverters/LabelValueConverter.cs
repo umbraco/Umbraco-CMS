@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -15,13 +16,19 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter]
 public class LabelValueConverter : PropertyValueConverterBase
 {
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
+
+    // TODO KJA: constructor breakage
+    public LabelValueConverter(IDataTypeConfigurationCache dataTypeConfigurationCache)
+        => _dataTypeConfigurationCache = dataTypeConfigurationCache;
+
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => Constants.PropertyEditors.Aliases.Label.Equals(propertyType.EditorAlias);
 
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
     {
         LabelConfiguration? valueType =
-            ConfigurationEditor.ConfigurationAs<LabelConfiguration>(propertyType.DataType.ConfigurationObject);
+            _dataTypeConfigurationCache.GetConfigurationAs<LabelConfiguration>(propertyType.DataType.Key);
         switch (valueType?.ValueType)
         {
             case ValueTypes.DateTime:
@@ -46,7 +53,7 @@ public class LabelValueConverter : PropertyValueConverterBase
     public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         LabelConfiguration? valueType =
-            ConfigurationEditor.ConfigurationAs<LabelConfiguration>(propertyType.DataType.ConfigurationObject);
+            _dataTypeConfigurationCache.GetConfigurationAs<LabelConfiguration>(propertyType.DataType.Key);
         switch (valueType?.ValueType)
         {
             case ValueTypes.DateTime:

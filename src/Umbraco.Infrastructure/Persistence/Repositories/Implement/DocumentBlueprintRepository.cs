@@ -34,7 +34,7 @@ internal class DocumentBlueprintRepository : DocumentRepository, IDocumentBluepr
         IRelationRepository relationRepository,
         IRelationTypeRepository relationTypeRepository,
         PropertyEditorCollection propertyEditorCollection,
-        IDataTypeService dataTypeService,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator)
@@ -51,7 +51,7 @@ internal class DocumentBlueprintRepository : DocumentRepository, IDocumentBluepr
             relationTypeRepository,
             propertyEditorCollection,
             dataValueReferenceFactories,
-            dataTypeService,
+            dataTypeConfigurationCache,
             serializer,
             eventAggregator)
     {

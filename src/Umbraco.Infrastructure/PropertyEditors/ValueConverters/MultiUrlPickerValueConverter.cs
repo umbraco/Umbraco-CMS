@@ -1,8 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -26,7 +26,9 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
     private readonly IApiContentNameProvider _apiContentNameProvider;
     private readonly IApiMediaUrlProvider _apiMediaUrlProvider;
     private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
+    // TODO KJA: constructor breakage
     public MultiUrlPickerValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IProfilingLogger proflog,
@@ -35,7 +37,8 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
         IPublishedUrlProvider publishedUrlProvider,
         IApiContentNameProvider apiContentNameProvider,
         IApiMediaUrlProvider apiMediaUrlProvider,
-        IApiContentRouteBuilder apiContentRouteBuilder)
+        IApiContentRouteBuilder apiContentRouteBuilder,
+        IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
@@ -45,6 +48,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
         _apiContentNameProvider = apiContentNameProvider;
         _apiMediaUrlProvider = apiMediaUrlProvider;
         _apiContentRouteBuilder = apiContentRouteBuilder;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -68,7 +72,8 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
         using (!_proflog.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _proflog.DebugDuration<MultiUrlPickerValueConverter>(
                    $"ConvertPropertyToLinks ({propertyType.DataType.Id})"))
         {
-            var maxNumber = propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>()!.MaxNumber;
+            // TODO KJA: don't use deserialization for simple operations like this - instead, use the datatype config dictionary directly
+            var maxNumber = _dataTypeConfigurationCache.GetConfigurationAs<MultiUrlPickerConfiguration>(propertyType.DataType.Key)!.MaxNumber;
 
             if (string.IsNullOrWhiteSpace(inter?.ToString()))
             {
@@ -189,8 +194,9 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
         return dtos.Select(ToLink).WhereNotNull().ToArray();
     }
 
-    private static bool IsSingleUrlPicker(IPublishedPropertyType propertyType)
-        => propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>()!.MaxNumber == 1;
+    private bool IsSingleUrlPicker(IPublishedPropertyType propertyType)
+        // TODO KJA: don't use deserialization for simple operations like this - instead, use the datatype config dictionary directly
+        => _dataTypeConfigurationCache.GetConfigurationAs<MultiUrlPickerConfiguration>(propertyType.DataType.Key)!.MaxNumber == 1;
 
     private IEnumerable<MultiUrlPickerValueEditor.LinkDto>? ParseLinkDtos(string inter)
         => inter.DetectIsJson() ? _jsonSerializer.Deserialize<IEnumerable<MultiUrlPickerValueEditor.LinkDto>>(inter) : null;

@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -14,6 +15,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public abstract class ContentListViewServiceTestsBase : UmbracoIntegrationTest
 {
     protected IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+
+    protected IDataTypeConfigurationCache DataTypeConfigurationCache => GetRequiredService<IDataTypeConfigurationCache>();
 
     protected IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
@@ -44,10 +47,8 @@ public abstract class ContentListViewServiceTestsBase : UmbracoIntegrationTest
 
     private async Task<ListViewConfiguration> GetListViewConfigurationFromListViewDataType(Guid dataTypeKey)
     {
-        IDataType? dataType = await DataTypeService.GetAsync(dataTypeKey);
-        var listViewConfiguration = dataType.ConfigurationObject;
-        Assert.IsTrue(listViewConfiguration is ListViewConfiguration);
-
-        return listViewConfiguration as ListViewConfiguration;
+        ListViewConfiguration? listViewConfiguration = DataTypeConfigurationCache.GetConfigurationAs<ListViewConfiguration>(dataTypeKey);
+        Assert.IsNotNull(listViewConfiguration);
+        return listViewConfiguration;
     }
 }

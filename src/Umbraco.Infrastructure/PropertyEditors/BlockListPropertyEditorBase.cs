@@ -66,30 +66,32 @@ public abstract class BlockListPropertyEditorBase : DataEditor
         {
             BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(blockEditorDataConverter, contentTypeService, logger);
             Validators.Add(new BlockEditorValidator<BlockListValue, BlockListLayoutItem>(propertyValidationService, BlockEditorValues, contentTypeService));
-            Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
+            Validators.Add(new MinMaxValidator(BlockEditorValues, textService, dataTypeConfigurationCache));
         }
 
         private class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockListValue, BlockListLayoutItem>
         {
             private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockEditorValues;
+            private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
-            public MinMaxValidator(BlockEditorValues<BlockListValue, BlockListLayoutItem> blockEditorValues, ILocalizedTextService textService)
-                : base(textService) =>
-                _blockEditorValues = blockEditorValues;
-
-            public override IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+            public MinMaxValidator(BlockEditorValues<BlockListValue, BlockListLayoutItem> blockEditorValues, ILocalizedTextService textService, IDataTypeConfigurationCache dataTypeConfigurationCache)
+                : base(textService)
             {
-                var blockConfig = (BlockListConfiguration?)dataTypeConfiguration;
+                _blockEditorValues = blockEditorValues;
+                _dataTypeConfigurationCache = dataTypeConfigurationCache;
+            }
 
-                BlockListConfiguration.NumberRange? validationLimit = blockConfig?.ValidationLimit;
-                if (validationLimit == null)
+            public override IEnumerable<ValidationResult> Validate(object? value, string? valueType, Guid dataTypeKey)
+            {
+                var blockConfig = _dataTypeConfigurationCache.GetConfigurationAs<BlockListConfiguration>(dataTypeKey);
+                if (blockConfig is null)
                 {
                     return Array.Empty<ValidationResult>();
                 }
 
                 BlockEditorData<BlockListValue, BlockListLayoutItem>? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
 
-                return ValidateNumberOfBlocks(blockEditorData, validationLimit.Min, validationLimit.Max);
+                return ValidateNumberOfBlocks(blockEditorData, blockConfig.ValidationLimit.Min, blockConfig.ValidationLimit.Max);
             }
         }
     }

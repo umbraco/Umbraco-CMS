@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 public sealed class EmailValidator : IValueValidator
 {
     /// <inheritdoc />
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, Guid dataTypeKey)
     {
         var asString = value == null ? string.Empty : value.ToString();
 

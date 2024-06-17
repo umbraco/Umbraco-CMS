@@ -22,36 +22,6 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
     {
     }
 
-    /// <inheritdoc />
-    public override object ToConfigurationObject(
-        IDictionary<string, object> configuration,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
-    {
-        try
-        {
-            if (configuration.Any() == false)
-            {
-                return new TConfiguration();
-            }
-
-            // TODO: quick fix for now (serialize to JSON, then deserialize to TConfiguration) - see if there is a better/more performant way (reverse of ObjectJsonExtensions.ToObjectDictionary)
-            var json = configurationEditorJsonSerializer.Serialize(configuration);
-            return configurationEditorJsonSerializer.Deserialize<TConfiguration>(json) ?? new TConfiguration();
-        }
-        catch (Exception e)
-        {
-            throw new InvalidOperationException(
-                $"Failed to parse configuration \"{configuration}\" as \"{typeof(TConfiguration).Name}\" (see inner exception).",
-                e);
-        }
-    }
-
-    protected TConfiguration? AsConfigurationObject(IDictionary<string, object> configuration,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer) =>
-        ToConfigurationObject(configuration, configurationEditorJsonSerializer) is TConfiguration configurationObject
-            ? configurationObject
-            : default;
-
     /// <summary>
     ///     Discovers fields from configuration properties marked with the field attribute.
     /// </summary>

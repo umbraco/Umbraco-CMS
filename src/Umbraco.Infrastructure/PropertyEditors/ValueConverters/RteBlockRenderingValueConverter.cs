@@ -7,6 +7,7 @@ using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Blocks;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
@@ -39,13 +40,15 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     private readonly ILogger<RteBlockRenderingValueConverter> _logger;
     private readonly IApiElementBuilder _apiElementBuilder;
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private DeliveryApiSettings _deliveryApiSettings;
 
+    // TODO KJA: constructor breakage
     public RteBlockRenderingValueConverter(HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
         IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
         IPartialViewBlockEngine partialViewBlockEngine, BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer,
         IApiElementBuilder apiElementBuilder, RichTextBlockPropertyValueConstructorCache constructorCache, ILogger<RteBlockRenderingValueConverter> logger,
-        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor, IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _linkParser = linkParser;
         _urlParser = urlParser;
@@ -58,6 +61,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         _apiElementBuilder = apiElementBuilder;
         _constructorCache = constructorCache;
         _logger = logger;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
         deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
     }
@@ -183,7 +187,7 @@ public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDel
 
     private RichTextBlockModel? ParseRichTextBlockModel(RichTextBlockValue blocks, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, bool preview)
     {
-        RichTextConfiguration? configuration = propertyType.DataType.ConfigurationAs<RichTextConfiguration>();
+        RichTextConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<RichTextConfiguration>(propertyType.DataType.Key);
         if (configuration?.Blocks?.Any() is not true)
         {
             return null;

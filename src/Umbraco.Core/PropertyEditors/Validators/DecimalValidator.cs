@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 public sealed class DecimalValidator : IValueValidator
 {
     /// <inheritdoc />
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, Guid dataTypeKey)
     {
         if (value == null || value.ToString() == string.Empty)
         {

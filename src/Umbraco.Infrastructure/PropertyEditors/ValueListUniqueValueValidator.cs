@@ -3,7 +3,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -17,7 +16,7 @@ public class ValueListUniqueValueValidator : IValueValidator
     public ValueListUniqueValueValidator(IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         => _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
 
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, Guid dataTypeKey)
     {
         if (value is null)
         {

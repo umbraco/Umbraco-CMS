@@ -717,7 +717,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 {
                     new ValidationResult($"Data type with editor alias {dataType.EditorAlias} does not have a configuration editor")
                 }
-                : configurationEditor.Validate(dataType.ConfigurationData);
+                : configurationEditor.Validate(dataType);
         }
 
         private async Task<Attempt<IDataType, DataTypeOperationStatus>> SaveAsync(

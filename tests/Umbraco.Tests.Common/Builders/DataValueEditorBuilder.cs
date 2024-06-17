@@ -13,7 +13,6 @@ namespace Umbraco.Cms.Tests.Common.Builders;
 
 public class DataValueEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataValueEditor>
 {
-    private string _configuration;
     private bool? _hideLabel;
     private string _valueType;
     private string _view;
@@ -21,12 +20,6 @@ public class DataValueEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataVa
     public DataValueEditorBuilder(TParent parentBuilder)
         : base(parentBuilder)
     {
-    }
-
-    public DataValueEditorBuilder<TParent> WithConfiguration(string configuration)
-    {
-        _configuration = configuration;
-        return this;
     }
 
     public DataValueEditorBuilder<TParent> WithView(string view)
@@ -49,14 +42,12 @@ public class DataValueEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataVa
 
     public override IDataValueEditor Build()
     {
-        var configuration = _configuration;
         var valueType = _valueType ?? Guid.NewGuid().ToString();
 
         return new DataValueEditor(
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>())
         {
-            ConfigurationObject = configuration,
             ValueType = valueType
         };
     }

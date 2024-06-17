@@ -49,7 +49,7 @@ public sealed class RegexValidator : IValueFormatValidator, IValueValidator
         => _regex = regex;
 
     /// <inheritdoc cref="IValueValidator.Validate" />
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, Guid dataTypeKey)
     {
         if (_regex == null)
         {

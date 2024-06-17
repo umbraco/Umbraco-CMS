@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <param name="relationRepository"></param>
         /// <param name="relationTypeRepository"></param>
         /// <param name="dataValueReferenceFactories"></param>
-        /// <param name="dataTypeService"></param>
+        /// <param name="dataTypeConfigurationCache"></param>
         /// <param name="eventAggregator"></param>
         /// <param name="propertyEditors">
         ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors require services, yet these services require property editors
@@ -62,11 +62,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             IRelationTypeRepository relationTypeRepository,
             PropertyEditorCollection propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IDataTypeService dataTypeService,
+            IDataTypeConfigurationCache dataTypeConfigurationCache,
             IEventAggregator eventAggregator)
             : base(scopeAccessor, cache, logger)
         {
-            DataTypeService = dataTypeService;
+            DataTypeConfigurationCache = dataTypeConfigurationCache;
             LanguageRepository = languageRepository;
             RelationRepository = relationRepository;
             RelationTypeRepository = relationTypeRepository;
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected ILanguageRepository LanguageRepository { get; }
 
-        protected IDataTypeService DataTypeService { get; }
+        protected IDataTypeConfigurationCache DataTypeConfigurationCache { get; }
 
         protected IRelationRepository RelationRepository { get; }
 
@@ -282,7 +282,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 if (editor.GetValueEditor() is not IDataValueTags tagsProvider)
                 {
                     // support for legacy tag editors, everything from here down to the last continue can be removed when TagsPropertyEditorAttribute is removed
-                    TagConfiguration? tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeService);
+                    TagConfiguration? tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeConfigurationCache);
                     if (tagConfiguration == null)
                     {
                         continue;
@@ -293,7 +293,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                         var tags = new List<ITag>();
                         foreach (IPropertyValue pvalue in property.Values)
                         {
-                            IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer, pvalue.Culture);
+                            IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeConfigurationCache, serializer, pvalue.Culture);
                             var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
                             IEnumerable<Tag> cultureTags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x, LanguageId = languageId });
                             tags.AddRange(cultureTags);
@@ -303,7 +303,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     }
                     else
                     {
-                        IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer); // strings
+                        IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeConfigurationCache, serializer); // strings
                         IEnumerable<Tag> tags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x });
                         tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                     }
@@ -311,7 +311,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue; // not implementing IDataValueTags, continue
                 }
 
-                object? configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
+                TagConfiguration? configurationObject = DataTypeConfigurationCache.GetConfigurationAs<TagConfiguration>(property.PropertyType.DataTypeKey);
 
                 if (property.PropertyType.VariesByCulture())
                 {

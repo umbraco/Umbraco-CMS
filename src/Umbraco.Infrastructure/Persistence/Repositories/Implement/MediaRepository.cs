@@ -46,11 +46,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         PropertyEditorCollection propertyEditorCollection,
         MediaUrlGeneratorCollection mediaUrlGenerators,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeService dataTypeService,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator)
         : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository,
-            propertyEditorCollection, dataValueReferenceFactories, dataTypeService, eventAggregator)
+            propertyEditorCollection, dataValueReferenceFactories, dataTypeConfigurationCache, eventAggregator)
     {
         _cache = cache;
         _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));

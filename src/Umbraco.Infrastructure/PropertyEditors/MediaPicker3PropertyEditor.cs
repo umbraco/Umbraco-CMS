@@ -117,7 +117,8 @@ public class MediaPicker3PropertyEditor : DataEditor
                 return base.FromEditor(editorValue, currentValue);
             }
 
-            if (editorValue.DataTypeConfiguration is MediaPicker3Configuration configuration)
+            MediaPicker3Configuration? configuration = _dataTypeReadCache.GetConfigurationAs<MediaPicker3Configuration>(editorValue.DataTypeKey);
+            if (configuration is not null)
             {
                 // handle temporary media uploads
                 mediaWithCropsDtos = HandleTemporaryMediaUploads(mediaWithCropsDtos, configuration);

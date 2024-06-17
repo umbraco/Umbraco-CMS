@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -18,13 +19,16 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedValueFallback _publishedValueFallback;
     private readonly IApiMediaWithCropsBuilder _apiMediaWithCropsBuilder;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
+    // TODO KJA: constructor breakage
     public MediaPickerWithCropsValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedUrlProvider publishedUrlProvider,
         IPublishedValueFallback publishedValueFallback,
         IJsonSerializer jsonSerializer,
-        IApiMediaWithCropsBuilder apiMediaWithCropsBuilder)
+        IApiMediaWithCropsBuilder apiMediaWithCropsBuilder,
+        IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
@@ -32,6 +36,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         _publishedValueFallback = publishedValueFallback;
         _jsonSerializer = jsonSerializer;
         _apiMediaWithCropsBuilder = apiMediaWithCropsBuilder;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -69,7 +74,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         var mediaItems = new List<MediaWithCrops>();
         IEnumerable<MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto> dtos =
             MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.Deserialize(_jsonSerializer, inter);
-        MediaPicker3Configuration? configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
+        MediaPicker3Configuration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<MediaPicker3Configuration>(propertyType.DataType.Key);
         IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
         foreach (MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto dto in dtos)
         {
@@ -130,5 +135,5 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     }
 
     private bool IsMultipleDataType(PublishedDataType dataType) =>
-        dataType.ConfigurationAs<MediaPicker3Configuration>()?.Multiple ?? false;
+        _dataTypeConfigurationCache.GetConfigurationAs<MediaPicker3Configuration>(dataType.Key)?.Multiple ?? false;
 }

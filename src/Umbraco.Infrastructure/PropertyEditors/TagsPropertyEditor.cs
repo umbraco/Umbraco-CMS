@@ -2,13 +2,11 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -49,24 +47,24 @@ public class TagsPropertyEditor : DataEditor
     internal class TagPropertyValueEditor : DataValueEditor, IDataValueTags
     {
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly IDataTypeService _dataTypeService;
+        private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
         public TagPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
-            IDataTypeService dataTypeService)
+            IDataTypeConfigurationCache dataTypeConfigurationCache)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
-            _dataTypeService = dataTypeService;
+            _dataTypeConfigurationCache = dataTypeConfigurationCache;
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
+        public IEnumerable<ITag> GetTags(object? value, TagConfiguration? tagConfiguration, int? languageId)
         {
-            TagConfiguration tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(dataTypeConfiguration) ?? new TagConfiguration();
+            tagConfiguration ??= new TagConfiguration();
 
             var tags = ParseTags(value, tagConfiguration);
             if (tags.Any() is false)
@@ -134,8 +132,7 @@ public class TagsPropertyEditor : DataEditor
                 return null;
             }
 
-            IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
-            TagConfiguration configuration = dataType?.ConfigurationObject as TagConfiguration ?? new TagConfiguration();
+            TagConfiguration configuration = _dataTypeConfigurationCache.GetConfigurationAs<TagConfiguration>(property.PropertyType.DataTypeKey) ?? new TagConfiguration();
             var tags = ParseTags(val, configuration);
 
             return tags.Any() ? tags : null;
@@ -155,7 +152,7 @@ public class TagsPropertyEditor : DataEditor
                 return null;
             }
 
-            TagConfiguration tagConfiguration = editorValue.DataTypeConfiguration as TagConfiguration ?? new TagConfiguration();
+            TagConfiguration tagConfiguration = _dataTypeConfigurationCache.GetConfigurationAs<TagConfiguration>(editorValue.DataTypeKey) ?? new TagConfiguration();
             if (tagConfiguration.Delimiter == default)
             {
                 tagConfiguration.Delimiter = ',';

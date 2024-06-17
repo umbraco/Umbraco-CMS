@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -21,16 +22,19 @@ public class ImageCropperValueConverter : PropertyValueConverterBase, IDeliveryA
     private readonly IJsonSerializer _jsonSerializer;
 
     private readonly ILogger<ImageCropperValueConverter> _logger;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
-    public ImageCropperValueConverter(ILogger<ImageCropperValueConverter> logger, IJsonSerializer jsonSerializer)
+    // TODO KJA: constructor breakage
+    public ImageCropperValueConverter(ILogger<ImageCropperValueConverter> logger, IJsonSerializer jsonSerializer, IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _logger = logger;
         _jsonSerializer = jsonSerializer;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
     [Obsolete("Use the constructor specifying all dependencies, scheduled for removal in V16")]
-    public ImageCropperValueConverter(ILogger<ImageCropperValueConverter> logger)
-        : this(logger, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
+    public ImageCropperValueConverter(ILogger<ImageCropperValueConverter> logger, IDataTypeConfigurationCache dataTypeConfigurationCache)
+        : this(logger, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(), dataTypeConfigurationCache)
     {
     }
 
@@ -68,7 +72,16 @@ public class ImageCropperValueConverter : PropertyValueConverterBase, IDeliveryA
             value = new ImageCropperValue { Src = sourceString };
         }
 
-        value?.ApplyConfiguration(propertyType.DataType.ConfigurationAs<ImageCropperConfiguration>()!);
+        if (value is null)
+        {
+            return null;
+        }
+
+        ImageCropperConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<ImageCropperConfiguration>(propertyType.DataType.Key);
+        if (configuration is not null)
+        {
+            value.ApplyConfiguration(configuration);
+        }
 
         return value;
     }

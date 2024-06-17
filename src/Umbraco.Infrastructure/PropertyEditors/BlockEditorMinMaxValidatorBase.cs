@@ -19,7 +19,7 @@ internal abstract class BlockEditorMinMaxValidatorBase<TValue, TLayout> : IValue
 
     protected ILocalizedTextService TextService { get; }
 
-    public abstract IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration);
+    public abstract IEnumerable<ValidationResult> Validate(object? value, string? valueType, Guid dataTypeKey);
 
     protected IEnumerable<ValidationResult> ValidateNumberOfBlocks(BlockEditorData<TValue, TLayout>? blockEditorData, int? min, int? max)
     {

@@ -1,9 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -26,21 +25,10 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     private readonly IApiElementBuilder _apiElementBuilder;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly BlockListPropertyValueConstructorCache _constructorCache;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
-
-    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V15")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder)
-        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(), StaticServiceProvider.Instance.GetRequiredService<BlockListPropertyValueConstructorCache>())
-    {
-    }
-
-    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V15")]
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder, BlockListPropertyValueConstructorCache constructorCache)
-        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(), constructorCache)
-    {
-    }
-
-    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder, IJsonSerializer jsonSerializer,  BlockListPropertyValueConstructorCache constructorCache)
+    // TODO KJA: constructor breakage
+    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder, IJsonSerializer jsonSerializer,  BlockListPropertyValueConstructorCache constructorCache, IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _proflog = proflog;
         _blockConverter = blockConverter;
@@ -48,6 +36,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
         _apiElementBuilder = apiElementBuilder;
         _jsonSerializer = jsonSerializer;
         _constructorCache = constructorCache;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
     /// <inheritdoc />
@@ -61,7 +50,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
         if (isSingleBlockMode)
         {
             BlockListConfiguration.BlockConfiguration? block =
-                ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(propertyType.DataType.ConfigurationObject)?.Blocks.FirstOrDefault();
+                _dataTypeConfigurationCache.GetConfigurationAs<BlockListConfiguration>(propertyType.DataType.Key)?.Blocks.FirstOrDefault();
 
             ModelType? contentElementType = block?.ContentElementTypeKey is Guid contentElementTypeKey && _contentTypeService.Get(contentElementTypeKey) is IContentType contentType ? ModelType.For(contentType.Alias) : null;
             ModelType? settingsElementType = block?.SettingsElementTypeKey is Guid settingsElementTypeKey && _contentTypeService.Get(settingsElementTypeKey) is IContentType settingsType ? ModelType.For(settingsType.Alias) : null;
@@ -84,8 +73,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
 
     private bool IsSingleBlockMode(PublishedDataType dataType)
     {
-        BlockListConfiguration? config =
-            ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(dataType.ConfigurationObject);
+        BlockListConfiguration? config = _dataTypeConfigurationCache.GetConfigurationAs<BlockListConfiguration>(dataType.Key);
         return (config?.UseSingleBlockMode ?? false) && config?.Blocks.Length == 1 && config?.ValidationLimit?.Min == 1 && config?.ValidationLimit?.Max == 1;
     }
 
@@ -153,7 +141,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
             }
 
             // Get configuration
-            BlockListConfiguration? configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
+            BlockListConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<BlockListConfiguration>(propertyType.DataType.Key);
             if (configuration is null)
             {
                 return null;

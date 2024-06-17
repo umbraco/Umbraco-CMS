@@ -69,7 +69,9 @@ public class RichTextPropertyEditor : DataEditor
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IContentTypeService _contentTypeService;
         private readonly ILogger<RichTextPropertyValueEditor> _logger;
+        private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
+        // TODO KJA: constructor breakage
         public RichTextPropertyValueEditor(
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
@@ -86,7 +88,8 @@ public class RichTextPropertyEditor : DataEditor
             IHtmlSanitizer htmlSanitizer,
             IContentTypeService contentTypeService,
             IPropertyValidationService propertyValidationService,
-            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
+            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection,
+            IDataTypeConfigurationCache dataTypeConfigurationCache)
             : base(attribute, propertyEditors, dataTypeReadCache, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactoryCollection)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -95,32 +98,11 @@ public class RichTextPropertyEditor : DataEditor
             _pastedImages = pastedImages;
             _htmlSanitizer = htmlSanitizer;
             _contentTypeService = contentTypeService;
+            _dataTypeConfigurationCache = dataTypeConfigurationCache;
             _jsonSerializer = jsonSerializer;
             _logger = logger;
 
             Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, CreateBlockEditorValues(), contentTypeService, jsonSerializer, logger));
-        }
-
-        /// <inheritdoc />
-        public override object? ConfigurationObject
-        {
-            get => base.ConfigurationObject;
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-
-                if (!(value is RichTextConfiguration configuration))
-                {
-                    throw new ArgumentException(
-                        $"Expected a {typeof(RichTextConfiguration).Name} instance, but got {value.GetType().Name}.",
-                        nameof(value));
-                }
-
-                base.ConfigurationObject = value;
-            }
         }
 
         /// <summary>
@@ -161,7 +143,7 @@ public class RichTextPropertyEditor : DataEditor
             return references;
         }
 
-        public override IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
+        public override IEnumerable<ITag> GetTags(object? value, TagConfiguration? tagConfiguration, int? languageId)
         {
             if (TryParseEditorValue(value, out RichTextEditorValue? richTextEditorValue) is false || richTextEditorValue.Blocks is null)
             {
@@ -213,7 +195,7 @@ public class RichTextPropertyEditor : DataEditor
             Guid userKey = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ??
                           Constants.Security.SuperUserKey;
 
-            var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
+            RichTextConfiguration? config = _dataTypeConfigurationCache.GetConfigurationAs<RichTextConfiguration>(editorValue.DataTypeKey);
             Guid mediaParentId = config?.MediaParentId ?? Guid.Empty;
 
             if (string.IsNullOrWhiteSpace(richTextEditorValue.Markup))

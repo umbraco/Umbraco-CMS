@@ -58,34 +58,6 @@ public static class DataTypeExtensions
     };
 
     /// <summary>
-    ///     Gets the configuration object.
-    /// </summary>
-    /// <typeparam name="T">The expected type of the configuration object.</typeparam>
-    /// <param name="dataType">This datatype.</param>
-    /// <exception cref="InvalidCastException">When the datatype configuration is not of the expected type.</exception>
-    public static T? ConfigurationAs<T>(this IDataType dataType)
-        where T : class
-    {
-        if (dataType == null)
-        {
-            throw new ArgumentNullException(nameof(dataType));
-        }
-
-        var configuration = dataType.ConfigurationObject;
-
-        switch (configuration)
-        {
-            case null:
-                return null;
-            case T configurationAsT:
-                return configurationAsT;
-        }
-
-        throw new InvalidCastException(
-            $"Cannot cast dataType configuration, of type {configuration.GetType().Name}, to {typeof(T).Name}.");
-    }
-
-    /// <summary>
     ///     Returns true if this data type is build-in/default.
     /// </summary>
     /// <param name="dataType">The data type definition.</param>

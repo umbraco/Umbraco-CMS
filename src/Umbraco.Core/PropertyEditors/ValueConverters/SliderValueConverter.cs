@@ -1,7 +1,7 @@
 using System.Globalization;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -13,19 +13,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter]
 public class SliderValueConverter : PropertyValueConverterBase
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SliderValueConverter" /> class.
-    /// </summary>
-    public SliderValueConverter()
-    { }
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SliderValueConverter" /> class.
     /// </summary>
-    /// <param name="dataTypeService">The data type service.</param>
-    [Obsolete("The IDataTypeService is not used anymore. This constructor will be removed in a future version.")]
-    public SliderValueConverter(IDataTypeService dataTypeService)
-    { }
+    // TODO KJA: constructor breakage
+    public SliderValueConverter(IDataTypeConfigurationCache dataTypeConfigurationCache)
+        => _dataTypeConfigurationCache = dataTypeConfigurationCache;
 
     /// <summary>
     /// Clears the data type configuration caches.
@@ -123,6 +118,6 @@ public class SliderValueConverter : PropertyValueConverterBase
     private static bool TryParseDecimal(string? representation, out decimal value)
         => decimal.TryParse(representation, NumberStyles.Number, CultureInfo.InvariantCulture, out value);
 
-    private static bool IsRange(IPublishedPropertyType propertyType)
-        => propertyType.DataType.ConfigurationAs<SliderConfiguration>()?.EnableRange == true;
+    private bool IsRange(IPublishedPropertyType propertyType)
+        => _dataTypeConfigurationCache.GetConfigurationAs<SliderConfiguration>(propertyType.DataType.Key)?.EnableRange == true;
 }

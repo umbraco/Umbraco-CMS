@@ -1,6 +1,6 @@
 using System.Globalization;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -29,13 +29,16 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IApiContentBuilder _apiContentBuilder;
     private readonly IApiMediaBuilder _apiMediaBuilder;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
+    // TODO KJA: constructor breakage
     public MultiNodeTreePickerValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IUmbracoContextAccessor umbracoContextAccessor,
         IMemberService memberService,
         IApiContentBuilder apiContentBuilder,
-        IApiMediaBuilder apiMediaBuilder)
+        IApiMediaBuilder apiMediaBuilder,
+        IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
@@ -43,6 +46,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
         _memberService = memberService;
         _apiContentBuilder = apiContentBuilder;
         _apiMediaBuilder = apiMediaBuilder;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -220,11 +224,11 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
         };
     }
 
-    private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) =>
-        propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.MaxNumber == 1;
+    private bool IsSingleNodePicker(IPublishedPropertyType propertyType) =>
+        _dataTypeConfigurationCache.GetConfigurationAs<MultiNodePickerConfiguration>(propertyType.DataType.Key)?.MaxNumber == 1;
 
-    private static string GetEntityType(IPublishedPropertyType propertyType) =>
-        propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.TreeSource?.ObjectType ?? Constants.UdiEntityType.Document;
+    private string GetEntityType(IPublishedPropertyType propertyType) =>
+        _dataTypeConfigurationCache.GetConfigurationAs<MultiNodePickerConfiguration>(propertyType.DataType.Key)?.TreeSource?.ObjectType ?? Constants.UdiEntityType.Document;
 
     /// <summary>
     ///     Attempt to get an IPublishedContent instance based on ID and content type

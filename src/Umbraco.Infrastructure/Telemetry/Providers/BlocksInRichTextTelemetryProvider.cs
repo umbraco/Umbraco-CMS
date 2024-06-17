@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
@@ -9,10 +10,12 @@ namespace Umbraco.Cms.Infrastructure.Telemetry.Providers;
 public class BlocksInRichTextTelemetryProvider : IDetailedTelemetryProvider
 {
     private readonly IDataTypeService _dataTypeService;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
-    public BlocksInRichTextTelemetryProvider(IDataTypeService dataTypeService)
+    public BlocksInRichTextTelemetryProvider(IDataTypeService dataTypeService, IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _dataTypeService = dataTypeService;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
     public IEnumerable<UsageInformation> GetInformation()
@@ -23,7 +26,8 @@ public class BlocksInRichTextTelemetryProvider : IDetailedTelemetryProvider
 
         foreach (IDataType richTextDataType in richTextDataTypes)
         {
-            if (richTextDataType.ConfigurationObject is not RichTextConfiguration richTextConfiguration)
+            RichTextConfiguration? richTextConfiguration = _dataTypeConfigurationCache.GetConfigurationAs<RichTextConfiguration>(richTextDataType.Key);
+            if (richTextConfiguration is null)
             {
                 // Might be some custom data type, skip it
                 continue;

@@ -47,6 +47,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+
+    private IDataTypeConfigurationCache DataTypeConfigurationCache => GetRequiredService<IDataTypeConfigurationCache>();
+
     private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
@@ -2241,7 +2244,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         ContentTypeService.Save(contentType);
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Simple Tags Page");
-        content.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, propAlias,
+        content.AssignTags(PropertyEditorCollection, DataTypeConfigurationCache, Serializer, propAlias,
             new[] { "hello", "world" });
         ContentService.Save(content);
 

@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -14,7 +15,7 @@ public static class ContentTagsExtensions
     ///     Assign tags.
     /// </summary>
     /// <param name="content">The content item.</param>
-    /// <param name="dataTypeService"></param>
+    /// <param name="dataTypeConfigurationCache"></param>
     /// <param name="propertyTypeAlias">The property alias.</param>
     /// <param name="tags">The tags.</param>
     /// <param name="merge">A value indicating whether to merge the tags with existing tags instead of replacing them.</param>
@@ -24,7 +25,7 @@ public static class ContentTagsExtensions
     public static void AssignTags(
         this IContentBase content,
         PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
         IJsonSerializer serializer,
         string propertyTypeAlias,
         IEnumerable<string> tags,
@@ -32,13 +33,13 @@ public static class ContentTagsExtensions
         string? culture = null) =>
         content
         .GetTagProperty(propertyTypeAlias)
-        .AssignTags(propertyEditors, dataTypeService, serializer, tags, merge, culture);
+        .AssignTags(propertyEditors, dataTypeConfigurationCache, serializer, tags, merge, culture);
 
     /// <summary>
     ///     Remove tags.
     /// </summary>
     /// <param name="content">The content item.</param>
-    /// <param name="dataTypeService"></param>
+    /// <param name="dataTypeConfigurationCache"></param>
     /// <param name="propertyTypeAlias">The property alias.</param>
     /// <param name="tags">The tags.</param>
     /// <param name="culture">A culture, for multi-lingual properties.</param>
@@ -47,13 +48,13 @@ public static class ContentTagsExtensions
     public static void RemoveTags(
         this IContentBase content,
         PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
         IJsonSerializer serializer,
         string propertyTypeAlias,
         IEnumerable<string> tags,
         string? culture = null) =>
         content.GetTagProperty(propertyTypeAlias)
-        .RemoveTags(propertyEditors, dataTypeService, serializer, tags, culture);
+        .RemoveTags(propertyEditors, dataTypeConfigurationCache, serializer, tags, culture);
 
     // gets and validates the property
     private static IProperty GetTagProperty(this IContentBase content, string propertyTypeAlias)

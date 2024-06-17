@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -16,14 +17,14 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
     where TContentTypeService : IContentTypeBaseService<TContentType>
 {
     private readonly TContentTypeService _contentTypeService;
-    private readonly IDataTypeService _dataTypeService;
     private readonly ISqlContext _sqlContext;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
-    protected ContentListViewServiceBase(TContentTypeService contentTypeService, IDataTypeService dataTypeService, ISqlContext sqlContext)
+    protected ContentListViewServiceBase(TContentTypeService contentTypeService, ISqlContext sqlContext, IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _contentTypeService = contentTypeService;
-        _dataTypeService = dataTypeService;
         _sqlContext = sqlContext;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
     protected abstract Guid DefaultListViewKey { get; }
@@ -171,13 +172,9 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
 
     private async Task<Attempt<ListViewConfiguration?, ContentCollectionOperationStatus>> GetListViewConfigurationFromDataTypeAsync(Guid dataTypeKey, TContentType contentType)
     {
-        IDataType? dataType = await _dataTypeService.GetAsync(dataTypeKey);
-        if (dataType == null)
-        {
-            return Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.DataTypeNotFound, null);
-        }
-
-        if (dataType.ConfigurationObject is not ListViewConfiguration listViewConfiguration)
+        // TODO KJA: don't fetch the configuration up front - the check below should be performed first (for better performance)
+        ListViewConfiguration? listViewConfiguration = _dataTypeConfigurationCache.GetConfigurationAs<ListViewConfiguration>(dataTypeKey);
+        if (listViewConfiguration is null)
         {
             return Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.DataTypeNotCollection, null);
         }
@@ -195,25 +192,19 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
             return Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotCollection, null);
         }
 
-        IDataType? currentListViewDataType = await GetConfiguredListViewDataTypeAsync(contentType);
-
-        return currentListViewDataType?.ConfigurationObject is ListViewConfiguration listViewConfiguration
-            ? Attempt.SucceedWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.Success, listViewConfiguration)
-            : Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.CollectionNotFound, null);
-    }
-
-    private async Task<IDataType?> GetConfiguredListViewDataTypeAsync(TContentType? contentType)
-    {
         // When contentType is not configured as a list view
         if (contentType is not null && contentType.ListView is null)
         {
-            return null;
+            return Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.CollectionNotFound, null);;
         }
 
         // When we don't have a contentType (i.e. when root), we will get the default list view
         Guid configuredListViewKey = contentType?.ListView ?? DefaultListViewKey;
+        ListViewConfiguration? listViewConfiguration = _dataTypeConfigurationCache.GetConfigurationAs<ListViewConfiguration>(configuredListViewKey);
 
-        return await _dataTypeService.GetAsync(configuredListViewKey);
+        return listViewConfiguration is not null
+            ? Attempt.SucceedWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.Success, listViewConfiguration)
+            : Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.CollectionNotFound, null);
     }
 
     private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, int contentId, string? filter, Ordering? ordering, int skip, int take)

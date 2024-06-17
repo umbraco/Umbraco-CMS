@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
@@ -58,17 +59,6 @@ public class ConfigurationEditor : IConfigurationEditor
         => ToConfigurationEditor(configuration);
 
     /// <inheritdoc />
-    public virtual object ToConfigurationObject(
-        IDictionary<string, object> configuration,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer) => configuration;
-
-    /// <inheritdoc />
-    public virtual IDictionary<string, object> FromConfigurationObject(
-        object configuration,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
-        => configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configurationEditorJsonSerializer.Serialize(configuration)) ?? new Dictionary<string, object>();
-
-    /// <inheritdoc />
     public virtual string ToDatabase(
         IDictionary<string, object> configuration,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
@@ -81,11 +71,11 @@ public class ConfigurationEditor : IConfigurationEditor
         => configuration.IsNullOrWhiteSpace() ? new Dictionary<string, object>() : configurationEditorJsonSerializer.Deserialize<Dictionary<string, object>>(configuration) ?? new Dictionary<string, object>();
 
     /// <inheritdoc />
-    public virtual IEnumerable<ValidationResult> Validate(IDictionary<string, object> configuration)
+    public virtual IEnumerable<ValidationResult> Validate(IDataType dataType)
         => Fields
             .SelectMany(field =>
-                configuration.TryGetValue(field.Key, out var value)
-                    ? field.Validators.SelectMany(validator => validator.Validate(value, null, null))
+                dataType.ConfigurationData.TryGetValue(field.Key, out var value)
+                    ? field.Validators.SelectMany(validator => validator.Validate(value, null, dataType.Key))
                     : Enumerable.Empty<ValidationResult>())
             .ToArray();
 
@@ -98,23 +88,4 @@ public class ConfigurationEditor : IConfigurationEditor
     /// </remarks>
     protected ConfigurationField Field(string name)
         => Fields.First(x => x.PropertyName == name);
-
-    /// <summary>
-    ///     Gets the configuration as a typed object.
-    /// </summary>
-    public static TConfiguration? ConfigurationAs<TConfiguration>(object? obj)
-    {
-        if (obj == null)
-        {
-            return default;
-        }
-
-        if (obj is TConfiguration configuration)
-        {
-            return configuration;
-        }
-
-        throw new InvalidCastException(
-            $"Cannot cast configuration of type {obj.GetType().Name} to {typeof(TConfiguration).Name}.");
-    }
 }

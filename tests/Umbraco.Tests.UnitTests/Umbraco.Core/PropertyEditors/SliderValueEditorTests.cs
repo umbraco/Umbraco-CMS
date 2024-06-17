@@ -107,7 +107,7 @@ public class SliderValueEditorTests
     }
 
     private static object? FromEditor(object? value)
-        => CreateValueEditor().FromEditor(new ContentPropertyData(value, null), null);
+        => CreateValueEditor().FromEditor(new ContentPropertyData(value, Guid.Empty), null);
 
     private static object? ToEditor(object? value)
     {

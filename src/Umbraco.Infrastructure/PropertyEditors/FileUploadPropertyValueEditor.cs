@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -28,6 +29,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     private readonly IScopeProvider _scopeProvider;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private ContentSettings _contentSettings;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
     public FileUploadPropertyValueEditor(
         DataEditorAttribute attribute,
@@ -39,7 +41,8 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         IIOHelper ioHelper,
         ITemporaryFileService temporaryFileService,
         IScopeProvider scopeProvider,
-        IFileStreamSecurityValidator fileStreamSecurityValidator)
+        IFileStreamSecurityValidator fileStreamSecurityValidator,
+        IDataTypeConfigurationCache dataTypeConfigurationCache)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
@@ -47,6 +50,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
         _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
         contentSettings.OnChange(x => _contentSettings = x);
 
@@ -134,7 +138,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         }
 
         // process the file
-        var filepath = ProcessFile(file, editorValue.DataTypeConfiguration, contentKey, propertyTypeKey);
+        var filepath = ProcessFile(file, editorValue.DataTypeKey, contentKey, propertyTypeKey);
 
         // remove current file if replaced
         if (currentPath != filepath && currentPath.IsNullOrWhiteSpace() is false)
@@ -173,9 +177,11 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     private TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
         => _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
 
-    private bool IsAllowedInDataTypeConfiguration(string extension, object? dataTypeConfiguration)
+    private bool IsAllowedInDataTypeConfiguration(string extension, Guid dataTypeKey)
     {
-        if (dataTypeConfiguration is FileUploadConfiguration fileUploadConfiguration)
+        FileUploadConfiguration? fileUploadConfiguration = _dataTypeConfigurationCache.GetConfigurationAs<FileUploadConfiguration>(dataTypeKey);
+
+        if (fileUploadConfiguration is not null)
         {
             // If FileExtensions is empty and no allowed extensions have been specified, we allow everything.
             // If there are any extensions specified, we need to check that the uploaded extension is one of them.
@@ -186,7 +192,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         return false;
     }
 
-    private string? ProcessFile(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
+    private string? ProcessFile(TemporaryFileModel file, Guid contentKey, Guid propertyTypeKey, Guid dataTypeKey)
     {
         // process the file
         // no file, invalid file, reject change
@@ -194,7 +200,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         // but we'll retain it here as a last measure in case someone accidentally breaks the validator
         var extension = Path.GetExtension(file.FileName).TrimStart('.');
         if (_contentSettings.IsFileAllowedForUpload(extension) is false ||
-            IsAllowedInDataTypeConfiguration(extension, dataTypeConfiguration) is false)
+            IsAllowedInDataTypeConfiguration(extension, dataTypeKey) is false)
         {
             return null;
         }

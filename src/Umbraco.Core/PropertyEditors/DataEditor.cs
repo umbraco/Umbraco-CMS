@@ -106,43 +106,6 @@ public class DataEditor : IDataEditor
     /// <inheritdoc />
     /// <remarks>
     ///     <para>
-    ///         If an explicit value editor has been assigned, then this explicit
-    ///         instance is returned. Otherwise, a new instance is created by CreateValueEditor,
-    ///         and configured with the configuration.
-    ///     </para>
-    ///     <para>
-    ///         The instance created by CreateValueEditor is not cached, i.e.
-    ///         a new instance is created each time the property value is retrieved. The
-    ///         property editor is a singleton, and the value editor cannot be a singleton
-    ///         since it depends on the datatype configuration.
-    ///     </para>
-    ///     <para>
-    ///         Technically, it could be cached by datatype but let's keep things
-    ///         simple enough for now.
-    ///     </para>
-    /// </remarks>
-    public virtual IDataValueEditor GetValueEditor(object? configurationObject)
-    {
-        // if an explicit value editor has been set (by the manifest parser)
-        // then return it, and ignore the configuration, which is going to be
-        // empty anyways
-        if (ExplicitValueEditor != null)
-        {
-            return ExplicitValueEditor;
-        }
-
-        IDataValueEditor editor = CreateValueEditor();
-        if (configurationObject is not null)
-        {
-            ((DataValueEditor)editor).ConfigurationObject = configurationObject; // TODO: casting is bad
-        }
-
-        return editor;
-    }
-
-    /// <inheritdoc />
-    /// <remarks>
-    ///     <para>
     ///         If an explicit configuration editor has been assigned, then this explicit
     ///         instance is returned. Otherwise, a new instance is created by CreateConfigurationEditor.
     ///     </para>

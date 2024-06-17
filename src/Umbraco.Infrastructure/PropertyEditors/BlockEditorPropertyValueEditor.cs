@@ -67,7 +67,7 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockV
     }
 
     /// <inheritdoc />
-    public override IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
+    public override IEnumerable<ITag> GetTags(object? value, TagConfiguration? tagConfiguration, int? languageId)
     {
         foreach (BlockItemData.BlockPropertyValue propertyValue in GetAllPropertyValues(value))
         {
@@ -77,7 +77,7 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockV
                 continue;
             }
 
-            object? configuration = _dataTypeConfigurationCache.GetConfiguration(propertyValue.PropertyType.DataTypeKey);
+            TagConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<TagConfiguration>(propertyValue.PropertyType.DataTypeKey);
             foreach (ITag tag in dataValueTags.GetTags(propertyValue.Value, configuration, languageId))
             {
                 yield return tag;

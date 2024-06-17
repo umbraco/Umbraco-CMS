@@ -20,7 +20,7 @@ public sealed class RequiredValidator : IValueRequiredValidator, IValueValidator
     }
 
     /// <inheritdoc cref="IValueValidator.Validate" />
-    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration) =>
+    public IEnumerable<ValidationResult> Validate(object? value, string? valueType, Guid dataTypeKey) =>
         ValidateRequired(value, valueType);
 
     /// <inheritdoc cref="IValueRequiredValidator.ValidateRequired" />

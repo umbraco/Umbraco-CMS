@@ -214,7 +214,8 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         xml.Add(new XAttribute("EditorUiAlias", dataType.EditorUiAlias ?? dataType.EditorAlias));
         xml.Add(new XAttribute("Definition", dataType.Key));
         xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
-        xml.Add(new XAttribute("Configuration", _configurationEditorJsonSerializer.Serialize(dataType.ConfigurationObject)));
+        // TODO KJA: re-implement this
+        // xml.Add(new XAttribute("Configuration", _configurationEditorJsonSerializer.Serialize(dataType.ConfigurationObject)));
 
         var folderNames = string.Empty;
         var folderKeys = string.Empty;

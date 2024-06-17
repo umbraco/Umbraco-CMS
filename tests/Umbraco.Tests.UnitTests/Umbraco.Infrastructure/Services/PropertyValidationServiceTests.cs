@@ -26,7 +26,7 @@ public class PropertyValidationServiceTests
     {
         var dataTypeService = new Mock<IDataTypeService>();
         var dataType = Mock.Of<IDataType>(
-            x => x.ConfigurationObject == string.Empty // irrelevant but needs a value
+            x => x.ConfigurationData == new Dictionary<string, object>() // irrelevant but needs a value
                  && x.DatabaseType == ValueStorageType.Nvarchar
                  && x.EditorAlias == Constants.PropertyEditors.Aliases.TextBox);
         dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>())).Returns(() => dataType);
@@ -35,7 +35,7 @@ public class PropertyValidationServiceTests
         // new data editor that returns a TextOnlyValueEditor which will do the validation for the properties
         var dataEditor = Mock.Of<IDataEditor>(
             x => x.Alias == Constants.PropertyEditors.Aliases.TextBox);
-        Mock.Get(dataEditor).Setup(x => x.GetValueEditor(It.IsAny<object>()))
+        Mock.Get(dataEditor).Setup(x => x.GetValueEditor())
             .Returns(new CustomTextOnlyValueEditor(
                 new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox),
                 Mock.Of<IShortStringHelper>(),

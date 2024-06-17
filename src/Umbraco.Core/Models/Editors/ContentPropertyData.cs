@@ -9,10 +9,11 @@ namespace Umbraco.Cms.Core.Models.Editors;
 /// </remarks>
 public class ContentPropertyData
 {
-    public ContentPropertyData(object? value, object? dataTypeConfiguration)
+    // TODO KJA: constructor breakage
+    public ContentPropertyData(object? value, Guid dataTypeKey)
     {
         Value = value;
-        DataTypeConfiguration = dataTypeConfiguration;
+        DataTypeKey = dataTypeKey;
     }
 
     /// <summary>
@@ -21,9 +22,9 @@ public class ContentPropertyData
     public object? Value { get; }
 
     /// <summary>
-    ///     The data type configuration for the property.
+    ///     The unique identifier of the data type defining the property type.
     /// </summary>
-    public object? DataTypeConfiguration { get; }
+    public Guid DataTypeKey { get; }
 
     /// <summary>
     ///     Gets or sets the unique identifier of the content owning the property.
