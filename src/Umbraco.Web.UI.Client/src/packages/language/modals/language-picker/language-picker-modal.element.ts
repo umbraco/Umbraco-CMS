@@ -51,7 +51,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	render() {
 		return html`<umb-body-layout headline="Select languages">
 			<uui-box>
-				${repeat(
+				${this.#filteredLanguages.length > 0 ? repeat(
 					this.#filteredLanguages,
 					(item) => item.unique,
 					(item) => html`
@@ -64,7 +64,9 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 							<uui-icon slot="icon" name="icon-globe"></uui-icon>
 						</uui-menu-item>
 					`,
-				)}
+				) : html`<umb-localize key="language_noFallbackLanguages">
+						There are no other languages to choose from
+				</umb-localize>`}
 			</uui-box>
 			<div slot="actions">
 				<uui-button label="Close" @click=${this.#close}></uui-button>
