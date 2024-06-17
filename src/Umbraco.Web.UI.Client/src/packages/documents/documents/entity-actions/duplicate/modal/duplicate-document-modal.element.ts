@@ -3,7 +3,7 @@ import type {
 	UmbDuplicateDocumentModalData,
 	UmbDuplicateDocumentModalValue,
 } from './duplicate-document-modal.token.js';
-import { html, customElement, nothing, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, nothing, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
@@ -17,11 +17,17 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	UmbDuplicateDocumentModalData,
 	UmbDuplicateDocumentModalValue
 > {
+	@state()
+	_destinationUnique?: string | null;
+
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
 		const selection = target.getSelection();
-		if (selection.length === 0) throw new Error('Selection is required');
-		this.updateValue({ destination: { unique: selection[0] } });
+		this._destinationUnique = selection[0];
+
+		if (this._destinationUnique || this._destinationUnique === null) {
+			this.updateValue({ destination: { unique: this._destinationUnique } });
+		}
 	}
 
 	#onRelateToOriginalChange(event: UUIBooleanInputEvent) {
@@ -72,7 +78,8 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 				color="positive"
 				look="primary"
 				label="Duplicate"
-				@click=${this._submitModal}></uui-button>
+				@click=${this._submitModal}
+				?disabled=${this._destinationUnique === undefined}></uui-button>
 		`;
 	}
 

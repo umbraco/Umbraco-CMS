@@ -1057,6 +1057,7 @@ export default {
 	language: {
 		cultureCode: 'Culture Code',
 		displayName: 'Culture Name',
+		noFallbackLanguages: 'There are no other languages to choose from',
 	},
 	lockout: {
 		lockoutWillOccur: "You've been idle and logout will automatically occur in",
