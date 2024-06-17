@@ -189,14 +189,17 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		return this._variants?.length > 1;
 	}
 
-	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._variantSelectorOpen = event.newState === 'open';
 
 		if (!this._popoverElement) return;
 
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		const isOpen = event.newState === 'open';
 		if (!isOpen) return;
 
