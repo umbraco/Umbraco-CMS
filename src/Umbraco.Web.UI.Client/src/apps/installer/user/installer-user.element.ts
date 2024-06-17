@@ -158,7 +158,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 			#buttons {
 				display: flex;
 				margin-top: auto;
-			A
+			}
 
 			#button-install {
 				margin-left: auto;
