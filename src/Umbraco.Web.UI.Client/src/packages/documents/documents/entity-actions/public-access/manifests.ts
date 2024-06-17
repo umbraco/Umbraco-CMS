@@ -25,6 +25,10 @@ const entityActions: Array<ManifestTypes> = [
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
 			},
+			{
+				alias: 'Umb.Condition.SectionUserPermission',
+				match: 'Umb.Section.Members',
+			},
 		],
 	},
 ];

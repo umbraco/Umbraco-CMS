@@ -85,6 +85,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	async #onFirstActionClick(event: PointerEvent) {
 		event.stopPropagation();
+		this.#sectionSidebarContext?.closeContextMenu();
 		await this._firstActionApi?.execute();
 	}
 

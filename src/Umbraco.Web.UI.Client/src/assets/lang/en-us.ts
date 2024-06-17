@@ -46,7 +46,7 @@ export default {
 		logout: 'Exit',
 		move: 'Move to',
 		notify: 'Notifications',
-		protect: 'Restrict Public Access',
+		protect: 'Public Access',
 		publish: 'Publish',
 		refreshNode: 'Reload',
 		remove: 'Remove',
@@ -1038,6 +1038,7 @@ export default {
 	language: {
 		cultureCode: 'Culture Code',
 		displayName: 'Culture Name',
+		noFallbackLanguages: 'There are no other languages to choose from',
 	},
 	lockout: {
 		lockoutWillOccur: "You've been idle and logout will automatically occur in",
