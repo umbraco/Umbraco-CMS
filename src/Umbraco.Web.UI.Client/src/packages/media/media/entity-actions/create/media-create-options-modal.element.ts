@@ -89,7 +89,11 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	}
 
 	#renderNotAllowed() {
-		return html`<umb-localize key="create_noMediaTypes"></umb-localize><br />
+		return html`<umb-localize key="create_noMediaTypes">
+				There are no allowed Media Types available for creating media here. You must enable these in
+				<strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the
+				<strong>Allowed child node types</strong> under <strong>Permissions</strong>. </umb-localize
+			><br />
 			<uui-button
 				id="edit-permissions"
 				look="secondary"

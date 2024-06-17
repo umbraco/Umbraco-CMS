@@ -123,7 +123,11 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 					() => this.#renderBlueprints(),
 					() => this.#renderDocumentTypes(),
 				)}
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
+				<uui-button
+					slot="actions"
+					id="cancel"
+					label=${this.localize.term('general_cancel')}
+					@click="${this._rejectModal}"></uui-button>
 			</umb-body-layout>
 		`;
 	}
@@ -136,7 +140,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 					<umb-localize key="create_noDocumentTypes">
 						There are no allowed Document Types available for creating content here. You must enable these in
 						<strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the
-						<strong>Allowed child node types</strong> under <strong>Permissions</strong><br />
+						<strong>Allowed child node types</strong> under <strong>Permissions</strong>.<br />
 					</umb-localize>
 					<uui-button
 						id="edit-permissions"
