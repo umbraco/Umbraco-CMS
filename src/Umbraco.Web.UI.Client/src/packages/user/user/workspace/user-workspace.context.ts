@@ -57,6 +57,12 @@ export class UmbUserWorkspaceContext
 		}
 
 		this.observe(asObservable(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
+
+		const { data: calculatedStartNodes } = await this.detailRepository.requestCalculateStartNodes(unique);
+
+		if (calculatedStartNodes) {
+			console.log('calculatedStartNodes', calculatedStartNodes);
+		}
 	}
 
 	/* TODO: some properties are allowed to update without saving.
