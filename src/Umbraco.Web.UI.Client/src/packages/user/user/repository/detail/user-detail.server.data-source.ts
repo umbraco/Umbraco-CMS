@@ -245,7 +245,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 				}),
 			};
 
-			return calculatedStartNodes;
+			return { data: calculatedStartNodes };
 		}
 
 		return { error };
