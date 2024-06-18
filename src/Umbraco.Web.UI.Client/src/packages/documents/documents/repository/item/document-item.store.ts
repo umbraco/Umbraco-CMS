@@ -1,7 +1,7 @@
 import type { UmbDocumentDetailModel } from '../../types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
+import { UMB_DOCUMENT_ITEM_STORE_CONTEXT } from './document-item.store.context-token.js';
 
 /**
  * @export
@@ -22,5 +22,3 @@ export class UmbDocumentItemStore extends UmbItemStoreBase<UmbDocumentDetailMode
 }
 
 export { UmbDocumentItemStore as api };
-
-export const UMB_DOCUMENT_ITEM_STORE_CONTEXT = new UmbContextToken<UmbDocumentItemStore>('UmbDocumentItemStore');
