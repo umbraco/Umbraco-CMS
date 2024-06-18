@@ -1,10 +1,9 @@
-import { UMB_CURRENT_USER_CONTEXT } from '../../../user/current-user/current-user.context.js';
-import { isDocumentUserPermission } from './utils.js';
+import { UMB_CURRENT_USER_CONTEXT } from '../../../../user/current-user/current-user.context.js';
+import { isDocumentUserPermission } from '../utils.js';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {
-	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
@@ -129,9 +128,4 @@ export type UmbDocumentUserPermissionConditionConfig =
 		oneOf?: Array<string>;
 	};
 
-export const manifest: ManifestCondition = {
-	type: 'condition',
-	name: 'Document User Permission Condition',
-	alias: 'Umb.Condition.UserPermission.Document',
-	api: UmbDocumentUserPermissionCondition,
-};
+export { UmbDocumentUserPermissionCondition as api };
