@@ -19,6 +19,8 @@ export class UmbDocumentTypeTreeStore extends UmbUniqueTreeStore {
 	}
 }
 
+export { UmbDocumentTypeTreeStore as api };
+
 export const UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT = new UmbContextToken<UmbDocumentTypeTreeStore>(
 	'UmbDocumentTypeTreeStore',
 );

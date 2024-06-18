@@ -20,3 +20,5 @@ export class UmbDocumentTypeItemStore extends UmbItemStoreBase<UmbDocumentTypeIt
 		super(host, UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT.toString());
 	}
 }
+
+export { UmbDocumentTypeItemStore as api };

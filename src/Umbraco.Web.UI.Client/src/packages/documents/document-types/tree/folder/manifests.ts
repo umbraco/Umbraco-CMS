@@ -1,5 +1,4 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import { UmbDocumentTypeFolderRepository } from './document-type-folder.repository.js';
 import type {
 	ManifestEntityActions,
 	ManifestRepository,
@@ -12,7 +11,7 @@ const folderRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS,
 	name: 'Document Type Folder Repository',
-	api: UmbDocumentTypeFolderRepository,
+	api: () => import('./document-type-folder.repository.js'),
 };
 
 const entityActions: Array<ManifestEntityActions> = [

@@ -29,3 +29,5 @@ export class UmbDocumentTypeTreeRepository
 		return { data };
 	}
 }
+
+export { UmbDocumentTypeTreeRepository as api };

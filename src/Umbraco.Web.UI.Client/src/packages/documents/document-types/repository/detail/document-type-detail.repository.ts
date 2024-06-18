@@ -8,3 +8,5 @@ export class UmbDocumentTypeDetailRepository extends UmbDetailRepositoryBase<Umb
 		super(host, UmbDocumentTypeDetailServerDataSource, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export { UmbDocumentTypeDetailRepository as api };
