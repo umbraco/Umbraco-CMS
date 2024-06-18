@@ -1,4 +1,4 @@
-import type { UmbUserDetailModel } from '../../types.js';
+import type { UmbUserDetailModel, UmbUserStartNodesModel } from '../../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
@@ -219,14 +219,35 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	 * @return {*}
 	 * @memberof UmbUserServerDataSource
 	 */
-	calculateStartNodes(unique: string) {
+	async calculateStartNodes(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			UserService.getUserByIdCalculateStartNodes({
 				id: unique,
 			}),
 		);
+
+		if (data) {
+			const calculatedStartNodes: UmbUserStartNodesModel = {
+				hasDocumentRootAccess: data.hasDocumentRootAccess,
+				documentStartNodeUniques: data.documentStartNodeIds.map((node) => {
+					return {
+						unique: node.id,
+					};
+				}),
+				hasMediaRootAccess: data.hasMediaRootAccess,
+				mediaStartNodeUniques: data.mediaStartNodeIds.map((node) => {
+					return {
+						unique: node.id,
+					};
+				}),
+			};
+
+			return calculatedStartNodes;
+		}
+
+		return { error };
 	}
 }
