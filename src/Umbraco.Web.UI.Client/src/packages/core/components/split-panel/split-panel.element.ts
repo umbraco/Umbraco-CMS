@@ -238,6 +238,12 @@ export class UmbSplitPanelElement extends LitElement {
 
 			this.#setPosition(toPixels);
 		}
+
+		if (event.key === 'Home' || event.key === 'End') {
+			const { width } = this.mainElement.getBoundingClientRect();
+			const newPos = event.key === 'Home' ? 0 : width;
+			this.#setPosition(newPos);
+		}
 	}
 
 	render() {
