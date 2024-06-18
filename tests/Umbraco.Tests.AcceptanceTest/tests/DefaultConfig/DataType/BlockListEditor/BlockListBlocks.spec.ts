@@ -141,18 +141,37 @@ test.skip('can remove a content model from a block', async ({page, umbracoApi, u
 });
 
 test('can add a settings model to a block', async ({page, umbracoApi, umbracoUi}) => {
-
-});
-
-test('can remove a settings model from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
-  const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
-  await umbracoApi.dataType.createBlockListDataTypeWithABlockWithSettingsModel(blockListEditorName, elementTypeId, elementTypeId);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  const secondElementName = 'SecondElementTest';
+  const settingsElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.addBlockSettingsModel(secondElementName);
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeTruthy();
+});
+
+test('can remove a settings model from a block', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  const secondElementName = 'SecondElementTest';
+  const settingsElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListDataTypeWithContentAndSettingsElementType(blockListEditorName, contentElementTypeId, settingsElementTypeId);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await page.pause();
   await umbracoUi.dataType.removeBlockSettingsModel();
   await umbracoUi.dataType.clickConfirmRemoveButton();
   await umbracoUi.dataType.clickSubmitButton();
