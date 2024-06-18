@@ -184,7 +184,7 @@
 		"@types/diff": "^5.2.1",
 		"@types/dompurify": "^3.0.5",
 		"@types/uuid": "^9.0.8",
-		"@umbraco-ui/uui": "1.8.1",
+		"@umbraco-ui/uui": "1.8.2",
 		"@umbraco-ui/uui-css": "1.8.0",
 		"base64-js": "^1.5.1",
 		"diff": "^5.2.0",
