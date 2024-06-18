@@ -30,3 +30,5 @@ export class UmbDocumentCreateBlueprintRepository extends UmbControllerBase impl
 		return { error };
 	}
 }
+
+export { UmbDocumentCreateBlueprintRepository as api };

@@ -31,3 +31,5 @@ export class UmbDocumentRecycleBinTreeRepository
 		return { data };
 	}
 }
+
+export { UmbDocumentRecycleBinTreeRepository as api };

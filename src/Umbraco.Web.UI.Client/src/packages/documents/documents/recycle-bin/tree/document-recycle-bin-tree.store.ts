@@ -19,6 +19,8 @@ export class UmbDocumentRecycleBinTreeStore extends UmbUniqueTreeStore {
 	}
 }
 
+export { UmbDocumentRecycleBinTreeStore as api };
+
 export const UMB_DOCUMENT_RECYCLE_BIN_TREE_STORE_CONTEXT = new UmbContextToken<UmbDocumentRecycleBinTreeStore>(
 	'UmbDocumentRecycleBinTreeStore',
 );
