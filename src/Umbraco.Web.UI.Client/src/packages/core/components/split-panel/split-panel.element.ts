@@ -240,6 +240,7 @@ export class UmbSplitPanelElement extends LitElement {
 		}
 
 		if (event.key === 'Home' || event.key === 'End') {
+			event.preventDefault();
 			const { width } = this.mainElement.getBoundingClientRect();
 			const newPos = event.key === 'Home' ? 0 : width;
 			this.#setPosition(newPos);
