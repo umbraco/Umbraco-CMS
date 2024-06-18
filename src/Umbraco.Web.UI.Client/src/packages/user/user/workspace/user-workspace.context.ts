@@ -1,4 +1,4 @@
-import type { UmbUserDetailModel, UmbUserStateEnum } from '../types.js';
+import type { UmbUserDetailModel, UmbUserStartNodesModel, UmbUserStateEnum } from '../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbUserDetailRepository } from '../repository/index.js';
 import { UmbUserAvatarRepository } from '../repository/avatar/index.js';
@@ -31,6 +31,9 @@ export class UmbUserWorkspaceContext
 	readonly mediaStartNodeUniques = this.#currentData.asObservablePart((data) => data?.mediaStartNodeUniques || []);
 	readonly hasMediaRootAccess = this.#currentData.asObservablePart((data) => data?.hasMediaRootAccess || false);
 
+	#calculatedStartNodes = new UmbObjectState<UmbUserStartNodesModel | undefined>(undefined);
+	readonly calculatedStartNodes = this.#calculatedStartNodes.asObservable();
+
 	readonly routes = new UmbWorkspaceRouteManager(this);
 
 	constructor(host: UmbControllerHost) {
@@ -50,6 +53,7 @@ export class UmbUserWorkspaceContext
 
 	async load(unique: string) {
 		const { data, asObservable } = await this.detailRepository.requestByUnique(unique);
+
 		if (data) {
 			this.setIsNew(false);
 			this.#persistedData.update(data);
@@ -58,11 +62,9 @@ export class UmbUserWorkspaceContext
 
 		this.observe(asObservable(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
 
+		// Get the calculated start nodes
 		const { data: calculatedStartNodes } = await this.detailRepository.requestCalculateStartNodes(unique);
-
-		if (calculatedStartNodes) {
-			console.log('calculatedStartNodes', calculatedStartNodes);
-		}
+		this.#calculatedStartNodes.setValue(calculatedStartNodes);
 	}
 
 	/* TODO: some properties are allowed to update without saving.
