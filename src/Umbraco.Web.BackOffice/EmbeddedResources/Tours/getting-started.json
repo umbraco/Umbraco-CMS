@@ -79,37 +79,38 @@
         "element": "[data-element='global-user']",
         "title": "User profile",
         "content": "Now click on your <b>user avatar</b> to open the user profile dialog.",
-        "event": "click",
+        
         "backdropOpacity": 0.6
       },
       {
-        "element": "[data-element~='overlay-user']",
+        "element": "[data-element='global-user']",
         "elementPreventClick": true,
         "title": "User profile",
         "content": "<p>Here you can see details about your user, change your password and log out of Umbraco.</p><p>In the <b>User section</b> you will be able to do more advanced user management.</p>"
       },
       {
-        "element": "[data-element~='overlay-user'] [data-element='button-overlayClose']",
+        "element": "[data-element='global-user']",
         "title": "User profile",
         "content": "Let's close the user profile again.",
-        "event": "click"
+       
       },
       {
         "element": "[data-element='global-help']",
         "title": "Help",
         "content": "If you ever find yourself in trouble click here to open the Help drawer.",
-        "event": "click",
+     
         "backdropOpacity": 0.6
       },
       {
-        "element": "[data-element='drawer']",
+        "element": "[data-element='global-help']",
         "elementPreventClick": true,
         "title": "Help",
         "content": "<p>In the help drawer you will find articles and videos related to the section you are using.</p><p>This is also where you will find the next tour on how to get started with Umbraco.</p>",
         "backdropOpacity": 0.6
       },
       {
-        "element": "[data-element='drawer'] [data-element='help-tours']",
+        "element": "[data-element='global-help']",
+
         "title": "Tours",
         "content": "To continue your journey on getting started with Umbraco, you can find more tours right here."
       }
