@@ -16,7 +16,7 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableColumns: Array<UmbTableColumn> = [
 		{
-			name: 'Name',
+			name: this.localize.term('general_name'),
 			alias: 'memberName',
 		},
 	];
