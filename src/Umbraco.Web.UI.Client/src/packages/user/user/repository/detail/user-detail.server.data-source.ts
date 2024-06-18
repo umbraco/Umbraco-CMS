@@ -212,4 +212,21 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			}),
 		);
 	}
+
+	/**
+	 * Calculates the start nodes for the User
+	 * @param {string} unique
+	 * @return {*}
+	 * @memberof UmbUserServerDataSource
+	 */
+	calculateStartNodes(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
+
+		return tryExecuteAndNotify(
+			this.#host,
+			UserService.getUserByIdCalculateStartNodes({
+				id: unique,
+			}),
+		);
+	}
 }
