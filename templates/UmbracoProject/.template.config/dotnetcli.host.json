@@ -14,6 +14,10 @@
       "longName": "use-https-redirect",
       "shortName": ""
     },
+    "UseDeliveryApi": {
+      "longName": "use-delivery-api",
+      "shortName": "da"
+    },
     "SkipRestore": {
       "longName": "no-restore",
       "shortName": ""

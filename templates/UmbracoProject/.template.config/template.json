@@ -61,6 +61,13 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
+    "UseDeliveryApi": {
+      "displayName": "Use Delivery API",
+      "description": "Adds code to Startup.cs to enable the Umbraco Delivery API.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true"
+    },
     "SkipRestore": {
       "displayName": "Skip restore",
       "description": "If specified, skips the automatic restore of the project on create.",

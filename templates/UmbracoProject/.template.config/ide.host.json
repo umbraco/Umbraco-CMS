@@ -17,6 +17,11 @@
       "persistenceScope": "templateGroup"
     },
     {
+      "id": "UseDeliveryApi",
+      "isVisible": true,
+      "persistenceScope": "templateGroup"
+    },
+    {
       "id": "ExcludeGitignore",
       "isVisible": true,
       "persistenceScope": "templateGroup"
