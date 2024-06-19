@@ -104,7 +104,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 		return this.#pickerContext.getSelection();
 	}
 
-	@property()
+	@property({ type: String })
 	public set value(uniques: string | undefined) {
 		this.selection = splitStringToArray(uniques);
 	}
