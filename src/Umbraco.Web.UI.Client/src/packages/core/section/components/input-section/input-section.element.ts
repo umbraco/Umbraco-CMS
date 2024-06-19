@@ -1,12 +1,14 @@
 import type { UmbSectionItemModel } from '../../repository/index.js';
 import { UmbSectionPickerContext } from './input-section.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-section')
-export class UmbInputSectionElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputSectionElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -60,15 +62,12 @@ export class UmbInputSectionElement extends UUIFormControlMixin(UmbLitElement, '
 		return this.#pickerContext.getSelection();
 	}
 
-	@property()
-	public set value(selectionString: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		if (typeof selectionString !== 'string') return;
-		if (selectionString === this.value) return;
+	@property({ type: String })
+	public set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
 	}
-	public get value(): string {
-		return this.selection.join(',');
+	public get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
 	@state()
