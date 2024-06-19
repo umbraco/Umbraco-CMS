@@ -3,13 +3,15 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbUniqueItemModel } from '@umbraco-cms/backoffice/models';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-entity')
-export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputEntityElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -68,20 +70,20 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 		this.#pickerContext?.setSelection(uniques);
 		this.#sorter.setModel(uniques);
 	}
-	public get selection(): Array<string> | undefined {
-		return this.#pickerContext?.getSelection();
+	public get selection(): Array<string> {
+		return this.#pickerContext?.getSelection() ?? [];
 	}
 
-	@property()
-	public set value(uniques: string) {
-		this.selection = splitStringToArray(uniques);
+	@property({ type: String })
+	public set value(selectionString: string | undefined) {
+		this.selection = splitStringToArray(selectionString);
 	}
-	public get value(): string {
-		return this.selection?.join(',') ?? '';
+	public get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 
 	@property({ attribute: false })
-	public set pickerContext(ctor: new (host: UmbControllerHost) => UmbPickerInputContext<any>) {
+	public set pickerContext(ctor: new (host: UmbControllerHost) => UmbPickerInputContext<any, any, any, any>) {
 		if (this.#pickerContext) return;
 		this.#pickerContext = new ctor(this);
 		this.#observePickerContext();
@@ -90,7 +92,7 @@ export class UmbInputEntityElement extends UUIFormControlMixin(UmbLitElement, ''
 	@state()
 	private _items?: Array<UmbUniqueItemModel>;
 
-	#pickerContext?: UmbPickerInputContext<any>;
+	#pickerContext?: UmbPickerInputContext;
 
 	constructor() {
 		super();
