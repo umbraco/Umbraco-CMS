@@ -191,16 +191,23 @@ export abstract class UmbBlockEntryContext<
 			this.#observeBlockTypeLabel();
 		});
 
+		// Correct settings data, accordingly to configuration of the BlockType: [NL]
 		this.observe(
 			observeMultiple([this.settingsElementTypeKey, this.settingsDataContentTypeKey]),
 			([settingsElementTypeKey, settingsDataContentTypeKey]) => {
+				// Notice the values are only undefined while we are missing the source of these observables. [NL]
 				if (settingsElementTypeKey === undefined || settingsDataContentTypeKey === undefined) return;
-				if (settingsElementTypeKey !== null && settingsElementTypeKey !== settingsDataContentTypeKey) {
-					// Update the settings model with latest elementTypeKey, so data is up to date with configuration: [NL]
-					const currentSettings = this.#settings.getValue();
-					if (currentSettings) {
-						this._manager?.setOneSettings({ ...currentSettings, contentTypeKey: settingsElementTypeKey });
+				// Is there a difference between configuration and actual data udi:
+				if (settingsElementTypeKey !== settingsDataContentTypeKey) {
+					// We need to update our udi for the settings data [NL]
+					if (settingsElementTypeKey != null) {
+						// Update the settings model with latest elementTypeKey, so data is up to date with configuration: [NL]
+						const currentSettings = this.#settings.getValue();
+						if (currentSettings) {
+							this._manager?.setOneSettings({ ...currentSettings, contentTypeKey: settingsElementTypeKey });
+						}
 					}
+					// We do not need to remove the settings if configuration is gone, cause another observation handles this. [NL]
 				}
 			},
 		);
