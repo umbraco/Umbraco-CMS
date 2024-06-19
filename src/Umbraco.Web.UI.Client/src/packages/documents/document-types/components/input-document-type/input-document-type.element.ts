@@ -8,10 +8,13 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-document-type')
-export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+	undefined,
+) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -102,11 +105,11 @@ export class UmbInputDocumentTypeElement extends UUIFormControlMixin(UmbLitEleme
 	}
 
 	@property()
-	public set value(uniques: string) {
+	public set value(uniques: string | undefined) {
 		this.selection = splitStringToArray(uniques);
 	}
-	public get value(): string {
-		return this.selection.join(',');
+	public get value(): string | undefined {
+		return this.selection.length > 0 ? this.selection.join(',') : undefined;
 	}
 	@state()
 	private _items?: Array<UmbDocumentTypeItemModel>;
