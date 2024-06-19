@@ -1,7 +1,8 @@
 import type { UmbInputStaticFileElement } from '../../components/index.js';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
@@ -21,10 +22,10 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 	}
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		const validationLimit = config?.find((x) => x.alias === 'validationLimit');
+		const validationLimit = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 
-		this._limitMin = (validationLimit?.value as any)?.min;
-		this._limitMax = (validationLimit?.value as any)?.max;
+		this._limitMin = validationLimit?.min;
+		this._limitMax = validationLimit?.max;
 	}
 
 	@state()
