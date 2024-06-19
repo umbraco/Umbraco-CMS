@@ -1,6 +1,6 @@
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_DOCUMENT_BLUEPRINT_TREE_STORE_CONTEXT } from './document-blueprint-tree.store.context-token.js';
 
 /**
  * @export
@@ -20,7 +20,3 @@ export class UmbDocumentBlueprintTreeStore extends UmbUniqueTreeStore {
 }
 
 export { UmbDocumentBlueprintTreeStore as api };
-
-export const UMB_DOCUMENT_BLUEPRINT_TREE_STORE_CONTEXT = new UmbContextToken<UmbDocumentBlueprintTreeStore>(
-	'UmbDocumentBlueprintTreeStore',
-);
