@@ -41,7 +41,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	private _showOpenButton?: boolean;
 
 	#onChange(event: CustomEvent & { target: UmbInputDocumentElement }) {
-		this.value = event.target.selection.join(',');
+		this.value = event.target.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -55,7 +55,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 				.min=${this._min}
 				.max=${this._max}
 				.startNode=${startNode}
-				.value=${this.value ?? ''}
+				.value=${this.value}
 				?showOpenButton=${this._showOpenButton}
 				@change=${this.#onChange}>
 			</umb-input-document>

@@ -203,7 +203,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 					<umb-localize key="publicAccess_paLoginPageHelp"> Choose the page that contains the login form </umb-localize>
 				</small>
 				<umb-input-document
-					.value=${this._loginDocumentId ? this._loginDocumentId : ''}
+					.value=${this._loginDocumentId}
 					max="1"
 					@change=${this.#onChangeLoginPage}></umb-input-document>
 			</div>
@@ -216,7 +216,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 					</umb-localize>
 				</small>
 				<umb-input-document
-					.value=${this._errorDocumentId ? this._errorDocumentId : ''}
+					.value=${this._errorDocumentId}
 					max="1"
 					@change=${this.#onChangeErrorPage}></umb-input-document>
 			</div>`;
