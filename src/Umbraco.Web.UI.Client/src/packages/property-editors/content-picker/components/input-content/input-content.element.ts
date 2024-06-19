@@ -1,6 +1,5 @@
 import type { UmbContentPickerSource } from '../../types.js';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
@@ -8,16 +7,20 @@ import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 const elementName = 'umb-input-content';
 @customElement(elementName)
-export class UmbInputContentElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputContentElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
 	protected getFormElement() {
 		return undefined;
 	}
 
 	private _type: UmbContentPickerSource['type'] = 'content';
-	@property()
+	@property({ type: Object, attribute: false })
 	public set type(newType: UmbContentPickerSource['type']) {
 		const oldType = this._type;
 		if (newType?.toLowerCase() !== this._type) {
@@ -52,13 +55,21 @@ export class UmbInputContentElement extends UUIFormControlMixin(UmbLitElement, '
 
 	#entityTypeLookup = { content: 'document', media: 'media', member: 'member' };
 
+	// TODO: to be consistent with other pickers, this should be named `selection` [NL]
 	@property({ type: Array })
 	public set items(items: Array<UmbReferenceByUniqueAndType>) {
 		this.#selection = items?.map((item) => item.unique) ?? [];
-		this.value = items?.map((item) => item.unique).join(',');
 	}
 	public get items(): Array<UmbReferenceByUniqueAndType> {
 		return this.#selection.map((id) => ({ type: this.#entityTypeLookup[this._type], unique: id }));
+	}
+
+	@property({ type: String })
+	public set value(selectionString: string | undefined) {
+		this.#selection = splitStringToArray(selectionString);
+	}
+	public get value(): string | undefined {
+		return this.#selection.length > 0 ? this.#selection.join(',') : undefined;
 	}
 
 	#selection: Array<string> = [];

@@ -1,7 +1,9 @@
 import type { UmbContentPickerDynamicRoot, UmbContentPickerDynamicRootQueryStep } from '../../types.js';
-import { UMB_CONTENT_PICKER_DOCUMENT_ROOT_ORIGIN_PICKER_MODAL, UMB_CONTENT_PICKER_DOCUMENT_ROOT_QUERY_STEP_PICKER_MODAL } from '../modals/index.js';
+import {
+	UMB_CONTENT_PICKER_DOCUMENT_ROOT_ORIGIN_PICKER_MODAL,
+	UMB_CONTENT_PICKER_DOCUMENT_ROOT_QUERY_STEP_PICKER_MODAL,
+} from '../modals/index.js';
 import { html, css, customElement, property, ifDefined, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -13,10 +15,14 @@ import type {
 	ManifestDynamicRootQueryStep,
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 const elementName = 'umb-input-content-picker-document-root';
 @customElement(elementName)
-export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputContentPickerDocumentRootElement extends UmbFormControlMixin<
+	string | undefined,
+	typeof UmbLitElement
+>(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
