@@ -1,5 +1,4 @@
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
@@ -9,41 +8,34 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 
 @customElement('umb-property-editor-ui-media-entity-picker')
 export class UmbPropertyEditorUIMediaEntityPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	#min: number = 0;
-	#max: number = Infinity;
-
-	@property({ attribute: false })
-	public set value(value: string | null | undefined) {
-		this.#selection = value ? (Array.isArray(value) ? value : splitStringToArray(value)) : [];
-	}
-	public get value() {
-		return this.#selection.length > 0 ? this.#selection.join(',') : null;
-	}
-
-	#selection: Array<string> = [];
+	@property({ type: String })
+	public value: string | undefined;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
 		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
-		this.#min = minMax?.min ?? 0;
-		this.#max = minMax?.max ?? Infinity;
-	}
-	public get config() {
-		return undefined;
+		this._min = minMax?.min ?? 0;
+		this._max = minMax?.max ?? Infinity;
 	}
 
+	@state()
+	_min: number = 0;
+
+	@state()
+	_max: number = Infinity;
+
 	#onChange(event: CustomEvent & { target: UmbInputMediaElement }) {
-		this.value = event.target.selection?.join(',') ?? null;
+		this.value = event.target.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
 		return html`
 			<umb-input-media
-				.min=${this.#min}
-				.max=${this.#max}
-				.selection=${this.#selection}
+				.min=${this._min}
+				.max=${this._max}
+				.value=${this.value}
 				@change=${this.#onChange}></umb-input-media>
 		`;
 	}
