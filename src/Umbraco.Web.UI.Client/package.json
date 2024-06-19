@@ -126,6 +126,7 @@
 		"url": "https://umbraco.com"
 	},
 	"workspaces": [
+		"./src/packages/block",
 		"./src/packages/data-type",
 		"./src/packages/dictionary",
 		"./src/packages/documents",
