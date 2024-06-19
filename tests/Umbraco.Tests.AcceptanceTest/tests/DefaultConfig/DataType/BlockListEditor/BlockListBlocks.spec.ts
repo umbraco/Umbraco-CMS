@@ -167,11 +167,11 @@ test('can remove a settings model from a block', async ({page, umbracoApi, umbra
   const secondElementName = 'SecondElementTest';
   const settingsElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockListDataTypeWithContentAndSettingsElementType(blockListEditorName, contentElementTypeId, settingsElementTypeId);
+  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeTruthy();
 
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await page.pause();
   await umbracoUi.dataType.removeBlockSettingsModel();
   await umbracoUi.dataType.clickConfirmRemoveButton();
   await umbracoUi.dataType.clickSubmitButton();
@@ -179,33 +179,137 @@ test('can remove a settings model from a block', async ({page, umbracoApi, umbra
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-
-  console.log(blockData);
-  console.log(blockData.values[0]);
-  await page.pause();
+  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeFalsy();
 });
 
 test('can add a background color to a block', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  const backgroundColor = 'red';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
 
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.enterBlockBackgroundColor(backgroundColor);
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
 });
 
 test('can update a background color for a block', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  const backgroundColor = 'red';
+  const newBackgroundColor = 'blue';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, backgroundColor);
+  let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
 
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.enterBlockBackgroundColor(newBackgroundColor);
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].backgroundColor).toEqual(newBackgroundColor);
 });
 
 test('can delete a background color from a block', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  const backgroundColor = 'red';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, backgroundColor);
+  let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.enterBlockBackgroundColor("");
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].backgroundColor).toEqual("");
 });
 
 test('can add a icon color to a block', async ({page, umbracoApi, umbracoUi}) => {
+// Arrange
+  const iconColor = 'red';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
 
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.enterBlockIconColor(iconColor);
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
 });
 
 test('can update a icon color for a block', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  const iconColor = 'red';
+  const newIconColor = 'blue';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, "", iconColor);
+  let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
 
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.enterBlockIconColor(newIconColor);
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].iconColor).toEqual(newIconColor);
 });
 
 test('can delete a icon color from a block', async ({page, umbracoApi, umbracoUi}) => {
+  // Arrange
+  const iconColor = 'red';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, "", iconColor);
+  let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.enterBlockIconColor("");
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].iconColor).toEqual("");
 });
 
 test('can add a custom stylesheet to a block', async ({page, umbracoApi, umbracoUi}) => {

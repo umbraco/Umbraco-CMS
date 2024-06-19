@@ -86,7 +86,7 @@ test('can add a block to a block list editor', async ({page, umbracoApi, umbraco
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocks(blockListEditorName, [elementTypeId])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId])).toBeTruthy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
@@ -110,7 +110,7 @@ test('can add multiple blocks to a block list editor', async ({page, umbracoApi,
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocks(blockListEditorName, [elementTypeId, secondElementTypeId])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId, secondElementTypeId])).toBeTruthy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
@@ -131,7 +131,7 @@ test('can remove a block from a block list editor', async ({page, umbracoApi, um
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocks(blockListEditorName, [elementTypeId])).toBeFalsy();
+  expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithContentTypeIds(blockListEditorName, [elementTypeId])).toBeFalsy();
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName)
