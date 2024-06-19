@@ -44,7 +44,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 			<umb-input-document-type
 				.min=${this.min}
 				.max=${this.max}
-				.value=${this.value ?? ''}
+				.value=${this.value}
 				?elementTypesOnly=${this.onlyElementTypes}
 				?showOpenButton=${this.showOpenButton}
 				@change=${this.#onChange}>
