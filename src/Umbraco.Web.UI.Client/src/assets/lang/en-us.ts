@@ -1300,7 +1300,7 @@ export default {
 		packages: 'Packages',
 		marketplace: 'Marketplace',
 		settings: 'Settings',
-		translation: 'Translation',
+		translation: 'Dictionary',
 		users: 'Users',
 	},
 	help: {

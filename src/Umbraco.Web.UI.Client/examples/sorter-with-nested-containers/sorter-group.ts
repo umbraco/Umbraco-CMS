@@ -13,28 +13,8 @@ export type ModelEntryType = {
 
 @customElement('example-sorter-group')
 export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
-	@property({ type: Array, attribute: false })
-	public get initialItems(): ModelEntryType[] {
-		return this.items;
-	}
-	public set initialItems(value: ModelEntryType[]) {
-		// Only want to set the model initially, cause any re-render should not set this again.
-		if (this._items !== undefined) return;
-		this.items = value;
-	}
-
-	@property({ type: Array, attribute: false })
-	public get items(): ModelEntryType[] {
-		return this._items ?? [];
-	}
-	public set items(value: ModelEntryType[]) {
-		const oldValue = this._items;
-		this._items = value;
-		this.#sorter.setModel(this._items);
-		this.requestUpdate('items', oldValue);
-	}
-	private _items?: ModelEntryType[];
-
+	//
+	// Sorter setup:
 	#sorter = new UmbSorterController<ModelEntryType, ExampleSorterItem>(this, {
 		getUniqueOfElement: (element) => {
 			return element.name;
@@ -46,26 +26,45 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 		itemSelector: 'example-sorter-item',
 		containerSelector: '.sorter-container',
 		onChange: ({ model }) => {
-			const oldValue = this._items;
-			this._items = model;
-			this.requestUpdate('items', oldValue);
+			const oldValue = this._value;
+			this._value = model;
+			this.requestUpdate('value', oldValue);
+			// Fire an event for the parent to know that the model has changed.
+			this.dispatchEvent(new CustomEvent('change'));
 		},
 	});
 
+	@property({ type: Array, attribute: false })
+	public get value(): ModelEntryType[] {
+		return this._value ?? [];
+	}
+	public set value(value: ModelEntryType[]) {
+		const oldValue = this._value;
+		this._value = value;
+		this.#sorter.setModel(this._value);
+		this.requestUpdate('value', oldValue);
+	}
+	private _value?: ModelEntryType[];
+
 	removeItem = (item: ModelEntryType) => {
-		this.items = this.items.filter((r) => r.name !== item.name);
+		this.value = this.value.filter((r) => r.name !== item.name);
 	};
 
 	render() {
 		return html`
 			<div class="sorter-container">
 				${repeat(
-					this.items,
+					this.value,
+					// Note: ideally you have an unique identifier for each item, but for this example we use the `name` as identifier.
 					(item) => item.name,
 					(item) =>
 						html`<example-sorter-item name=${item.name}>
 							<button slot="action" @click=${() => this.removeItem(item)}>Delete</button>
-							${item.children ? html`<example-sorter-group .initialItems=${item.children}></example-sorter-group>` : ''}
+							<example-sorter-group
+								.value=${item.children ?? []}
+								@change=${(e: Event) => {
+									item.children = (e.target as ExampleSorterGroup).value;
+								}}></example-sorter-group>
 						</example-sorter-item>`,
 				)}
 			</div>

@@ -46,7 +46,7 @@ export class UmbTemplateQueryBuilderFilterElement extends UmbLitElement {
 	#resetOperator() {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		this.filter = { ...this.filter, operator: undefined };
+		this.filter = { ...this.filter, operator: undefined, constraintValue: undefined };
 	}
 
 	#resetFilter() {
