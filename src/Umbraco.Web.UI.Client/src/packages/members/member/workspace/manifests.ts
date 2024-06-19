@@ -67,7 +67,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		js: () => import('./views/member/member-workspace-view-member.element.js'),
 		weight: 200,
 		meta: {
-			label: 'Member',
+			label: '#treeHeaders_member',
 			pathname: 'member',
 			icon: 'icon-user',
 		},

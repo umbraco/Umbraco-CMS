@@ -40,6 +40,7 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	#renderDocumentStartNodes() {
 		return html` <b><umb-localize key="sections_content">Content</umb-localize></b>
 			<umb-user-document-start-node
+				readonly
 				.uniques=${this._user?.documentStartNodeUniques.map((reference) => reference.unique) ||
 				[]}></umb-user-document-start-node>`;
 	}
@@ -47,6 +48,7 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 	#renderMediaStartNodes() {
 		return html` <b><umb-localize key="sections_media">Media</umb-localize></b>
 			<umb-user-media-start-node
+				readonly
 				.uniques=${this._user?.mediaStartNodeUniques.map((reference) => reference.unique) ||
 				[]}></umb-user-media-start-node>`;
 	}
