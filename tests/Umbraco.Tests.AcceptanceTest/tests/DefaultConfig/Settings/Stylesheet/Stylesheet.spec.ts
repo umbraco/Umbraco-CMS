@@ -16,8 +16,10 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 test('can create a empty stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-  // Act
+  // Arrange
   await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
+
+  // Act
   await umbracoUi.stylesheet.clickActionsMenuAtRoot();
   await umbracoUi.stylesheet.clickCreateButton();
   await umbracoUi.stylesheet.clickNewStylesheetButton();
@@ -33,9 +35,9 @@ test('can create a empty stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbra
 test('can create a stylesheet with content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetContent = 'TestContent';
+  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
 
   //Act
-  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.stylesheet.clickActionsMenuAtRoot();
   await umbracoUi.stylesheet.clickCreateButton();
   await umbracoUi.stylesheet.clickNewStylesheetButton();
@@ -54,9 +56,9 @@ test('can create a stylesheet with content', async ({umbracoApi, umbracoUi}) => 
 test.skip('can create a new Rich Text Editor stylesheet file', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
+  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
 
   //Act
-  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.stylesheet.clickActionsMenuAtRoot();
   await umbracoUi.stylesheet.clickCreateButton();
   await umbracoUi.stylesheet.clickNewRichTextEditorStylesheetButton();
@@ -77,9 +79,9 @@ test.skip('can update a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbrac
   const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
   await umbracoApi.stylesheet.create(stylesheetName, '', '/');
   expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
+  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
 
   //Act
-  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.stylesheet.openStylesheetByNameAtRoot(stylesheetName);
   await umbracoUi.stylesheet.addRTEStyle(styleName, styleSelector, styleStyles);
   await umbracoUi.stylesheet.clickSaveButton();
@@ -93,9 +95,9 @@ test.skip('can update a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbrac
 test('can delete a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.stylesheet.create(stylesheetName, '', '/');
+  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
 
   //Act
-  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetName);
   await umbracoUi.stylesheet.clickDeleteAndConfirmButton();
@@ -111,9 +113,9 @@ test('can rename a stylesheet', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   const wrongStylesheetName = 'WrongStylesheetName.css';
   await umbracoApi.stylesheet.ensureNameNotExists(wrongStylesheetName);
   await umbracoApi.stylesheet.create(wrongStylesheetName, '', '/');
+  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
 
   //Act
-  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.stylesheet.reloadStylesheetTree();
   await umbracoUi.stylesheet.clickActionsMenuForStylesheet(wrongStylesheetName);
   await umbracoUi.stylesheet.rename(stylesheetName);
@@ -133,9 +135,9 @@ test('can edit rich text editor styles', async ({umbracoApi, umbracoUi}) => {
   const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
   await umbracoApi.stylesheet.create(stylesheetName, stylesheetContent, '/');
   expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
+  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
 
   //Act
-  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
   await umbracoUi.stylesheet.openStylesheetByNameAtRoot(stylesheetName);
   await umbracoUi.stylesheet.editRTEStyle(styleName, newStyleName, newStyleSelector, newStyleStyles);
   await umbracoUi.stylesheet.clickSaveButton();
@@ -146,11 +148,12 @@ test('can edit rich text editor styles', async ({umbracoApi, umbracoUi}) => {
   expect(stylesheetData.content).toEqual(newStylesheetContent);
 });
 
-test.skip('can remove rich text editor styles', async ({umbracoApi, umbracoUi}) => {
+test('can remove rich text editor styles', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetContent = '/**umb_name:' + styleName + '*/\n' + styleSelector + ' {\n\t' +  styleStyles + '\n}';
   await umbracoApi.stylesheet.create(stylesheetName, stylesheetContent, '/');
   expect(await umbracoApi.stylesheet.doesExist(stylesheetName)).toBeTruthy();
+  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
 
   //Act
   await umbracoUi.stylesheet.openStylesheetByNameAtRoot(stylesheetName);
@@ -164,8 +167,10 @@ test.skip('can remove rich text editor styles', async ({umbracoApi, umbracoUi}) 
 });
 
 test('cannot create a stylesheet with an empty name', async ({umbracoApi, umbracoUi}) => {
-  // Act
+  // Arrange
   await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
+  
+  // Act
   await umbracoUi.stylesheet.clickActionsMenuAtRoot();
   await umbracoUi.stylesheet.clickCreateButton();
   await umbracoUi.stylesheet.clickNewStylesheetButton();
