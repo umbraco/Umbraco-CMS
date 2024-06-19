@@ -1,8 +1,8 @@
-import { UmbDocumentBlueprintItemServerDataSource } from './document-blueprint-item.server.data-source.js';
-import { UMB_DOCUMENT_BLUEPRINT_ITEM_STORE_CONTEXT } from './document-blueprint-item.store.js';
-import type { UmbDocumentBlueprintItemModel } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbDocumentBlueprintItemServerDataSource } from './document-blueprint-item.server.data-source.js';
+import { UMB_DOCUMENT_BLUEPRINT_ITEM_STORE_CONTEXT } from './document-blueprint-item.store.context-token.js';
+import type { UmbDocumentBlueprintItemModel } from './types.js';
 
 export class UmbDocumentBlueprintItemRepository extends UmbItemRepositoryBase<UmbDocumentBlueprintItemModel> {
 	#dataSource = new UmbDocumentBlueprintItemServerDataSource(this);
