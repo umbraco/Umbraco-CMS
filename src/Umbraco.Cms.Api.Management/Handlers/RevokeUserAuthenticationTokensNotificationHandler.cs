@@ -3,10 +3,8 @@ using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -17,28 +15,21 @@ namespace Umbraco.Cms.Api.Management.Handlers;
 internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         INotificationAsyncHandler<UserSavedNotification>,
         INotificationAsyncHandler<UserDeletedNotification>,
-        INotificationAsyncHandler<UserGroupDeletingNotification>,
         INotificationAsyncHandler<UserLoginSuccessNotification>
 {
     private readonly IUserService _userService;
-    private readonly IUserGroupService _userGroupService;
     private readonly IOpenIddictTokenManager _tokenManager;
-    private readonly AppCaches _appCaches;
     private readonly ILogger<RevokeUserAuthenticationTokensNotificationHandler> _logger;
     private readonly SecuritySettings _securitySettings;
 
     public RevokeUserAuthenticationTokensNotificationHandler(
         IUserService userService,
-        IUserGroupService userGroupService,
         IOpenIddictTokenManager tokenManager,
-        AppCaches appCaches,
         ILogger<RevokeUserAuthenticationTokensNotificationHandler> logger,
         IOptions<SecuritySettings> securitySettingsOptions)
     {
         _userService = userService;
-        _userGroupService = userGroupService;
         _tokenManager = tokenManager;
-        _appCaches = appCaches;
         _logger = logger;
         _securitySettings = securitySettingsOptions.Value;
     }
@@ -49,9 +40,6 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         {
             foreach (IUser user in notification.SavedEntities)
             {
-                // Flush the start node caches when editing a user
-                user.FlushStartNodeCaches(_appCaches);
-
                 if (user.IsSuper())
                 {
                     continue;
@@ -80,24 +68,6 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         }
     }
 
-    public async Task HandleAsync(UserGroupDeletingNotification notification, CancellationToken cancellationToken)
-    {
-        foreach (IUserGroup userGroup in notification.DeletedEntities)
-        {
-            IEnumerable<IUser>? users = await GetUsersByGroupKeyAsync(userGroup.Key);
-            if (users is null)
-            {
-                continue;
-            }
-
-            // Flush the start node caches for all affected users when editing a group
-            foreach (IUser user in users)
-            {
-                user.FlushStartNodeCaches(_appCaches);
-            }
-        }
-    }
-
     public async Task HandleAsync(UserLoginSuccessNotification notification, CancellationToken cancellationToken)
     {
         if (_securitySettings.AllowConcurrentLogins is false)
@@ -112,16 +82,6 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
 
             await RevokeTokensAsync(user);
         }
-    }
-
-    // Get data about the users part of a group before deleting it
-    private async Task<IEnumerable<IUser>?> GetUsersByGroupKeyAsync(Guid userGroupKey)
-    {
-        IUserGroup? userGroup = await _userGroupService.GetAsync(userGroupKey);
-
-        return userGroup is null
-            ? null
-            : _userService.GetAllInGroup(userGroup.Id);
     }
 
     private async Task RevokeTokensAsync(IUser user)

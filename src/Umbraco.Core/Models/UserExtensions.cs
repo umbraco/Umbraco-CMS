@@ -247,15 +247,6 @@ public static class UserExtensions
         return result;
     }
 
-    public static void FlushStartNodeCaches(this IUser user, AppCaches appCaches)
-    {
-        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
-        runtimeCache.Clear(user.UserCacheKey(CacheKeys.UserAllContentStartNodesPrefix));
-        runtimeCache.Clear(user.UserCacheKey(CacheKeys.UserAllMediaStartNodesPrefix));
-        runtimeCache.Clear(user.UserCacheKey(CacheKeys.UserContentStartNodePathsPrefix));
-        runtimeCache.Clear(user.UserCacheKey(CacheKeys.UserMediaStartNodePathsPrefix));
-    }
-
     internal static int[] CombineStartNodes(UmbracoObjectTypes objectType, int[] groupSn, int[] userSn, IEntityService entityService)
     {
         // assume groupSn and userSn each don't contain duplicates
