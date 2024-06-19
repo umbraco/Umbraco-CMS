@@ -136,3 +136,19 @@ test('can create a script in a folder in a folder', async ({umbracoApi, umbracoU
   await umbracoUi.stylesheet.clickCaretButtonForName(childFolderName);
   await umbracoUi.script.isScriptRootTreeItemVisible(scriptName, true, false);
 });
+
+test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const childFolderName = 'ChildFolderName';
+  await umbracoApi.script.createFolder(scriptFolderName);
+  await umbracoApi.script.createFolder(childFolderName, scriptFolderName);
+  await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.script.clickRootFolderCaretButton();
+  await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
+  await umbracoUi.script.deleteFolder();
+
+  // Assert
+  await umbracoUi.script.isErrorNotificationVisible();
+});

@@ -140,3 +140,19 @@ test('can create a stylesheet in a folder in a folder', async ({umbracoApi, umbr
   await umbracoUi.stylesheet.clickCaretButtonForName(childFolderName);
   await umbracoUi.stylesheet.isStylesheetRootTreeItemVisible(stylesheetName, true, false);
 });
+
+test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const childFolderName = 'ChildFolderName';
+  await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
+  await umbracoApi.stylesheet.createFolder(childFolderName, stylesheetFolderName);
+  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.stylesheet.clickRootFolderCaretButton();
+  await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
+  await umbracoUi.stylesheet.deleteFolder();
+
+  //Assert
+  await umbracoUi.stylesheet.isErrorNotificationVisible();
+});

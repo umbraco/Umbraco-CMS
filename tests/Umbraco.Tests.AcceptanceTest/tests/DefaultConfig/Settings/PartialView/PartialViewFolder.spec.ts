@@ -114,3 +114,19 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.partialView.clickCaretButtonForName(childFolderName);
   await umbracoUi.partialView.isPartialViewRootTreeItemVisibile(childOfChildFolderName, true, false);
 });
+
+test('cannot delete non-empty folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const childFolderName = 'ChildFolderName';
+  await umbracoApi.partialView.createFolder(folderName);
+  await umbracoApi.partialView.createFolder(childFolderName, folderName);
+  await umbracoUi.partialView.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.partialView.clickRootFolderCaretButton();
+  await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
+  await umbracoUi.partialView.deleteFolder();
+
+  // Assert
+  await umbracoUi.script.isErrorNotificationVisible();
+});
