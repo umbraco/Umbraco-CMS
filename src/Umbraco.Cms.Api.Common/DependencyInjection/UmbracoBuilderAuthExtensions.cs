@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Server;
 using OpenIddict.Validation;
+using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -132,5 +133,6 @@ public static class UmbracoBuilderAuthExtensions
             });
 
         builder.Services.AddRecurringBackgroundJob<OpenIddictCleanupJob>();
+        builder.Services.ConfigureOptions<PostConfigureOpenIddict>();
     }
 }
