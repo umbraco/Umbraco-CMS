@@ -229,7 +229,7 @@
         "cases": [
           {
             "condition": "(DevelopmentDatabaseType == 'SQLite')",
-            "value": "Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True"
+            "value": "Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Private;Foreign Keys=True;Pooling=True"
           },
           {
             "condition": "(DevelopmentDatabaseType == 'LocalDB')",

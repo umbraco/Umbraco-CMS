@@ -520,7 +520,7 @@ stages:
         condition: eq(${{parameters.sqliteAcceptanceTests}}, True)
         variables:
           # Connection string
-          CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
+          CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Private;Foreign Keys=True;Pooling=True
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
           DatabaseType: SQLite
           additionalEnvironmentVariables: false
