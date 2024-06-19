@@ -163,7 +163,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
             Mode = SqliteOpenMode.Memory,
             ForeignKeys = true,
             Pooling = false, // When pooling true, files kept open after connections closed, bad for cleanup.
-            Cache = SqliteCacheMode.Shared
+            Cache = SqliteCacheMode.Private
         };
 
         return new TestDbMeta(builder.DataSource, empty, builder.ConnectionString, Constants.ProviderName, "InMemory");

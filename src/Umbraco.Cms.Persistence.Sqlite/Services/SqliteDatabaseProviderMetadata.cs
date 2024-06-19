@@ -87,7 +87,7 @@ public class SqliteDatabaseProviderMetadata : IDatabaseProviderMetadata
             DataSource = $"{ConnectionStrings.DataDirectoryPlaceholder}/{databaseModel.DatabaseName}.sqlite.db",
             ForeignKeys = true,
             Pooling = true,
-            Cache = SqliteCacheMode.Shared
+            Cache = SqliteCacheMode.Private
         };
 
         return builder.ConnectionString;
