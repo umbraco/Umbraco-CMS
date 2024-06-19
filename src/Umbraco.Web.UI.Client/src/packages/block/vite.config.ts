@@ -11,6 +11,11 @@ export default defineConfig({
 	...getDefaultConfig({
 		dist,
 		entry: {
+			'block/index': 'block/index.ts',
+			'block-grid/index': 'block-grid/index.ts',
+			'block-list/index': 'block-list/index.ts',
+			'block-rte/index': 'block-rte/index.ts',
+			'block-type/index': 'block-type/index.ts',
 			manifests: 'manifests.ts',
 			'umbraco-package': 'umbraco-package.ts',
 		},
