@@ -168,12 +168,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				// Settings:
 				const settingsUdi = layoutData?.settingsUdi;
 				if (settingsUdi) {
-					console.log(settingsUdi);
-					console.log(this.#blockManager);
 					this.observe(
 						this.#blockManager!.settingsOf(settingsUdi),
 						(settingsData) => {
-							console.log('settingsData', settingsData);
 							this.settings.setData(settingsData);
 						},
 						'observeSettings',
