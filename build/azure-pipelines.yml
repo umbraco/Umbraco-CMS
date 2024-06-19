@@ -434,7 +434,7 @@ stages:
         displayName: E2E Tests (SQLite)
         variables:
           # Connection string
-          CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Shared;Foreign Keys=True;Pooling=True
+          CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=Umbraco;Mode=Memory;Cache=Private;Foreign Keys=True;Pooling=True
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.Sqlite
         strategy:
           matrix:
