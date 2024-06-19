@@ -15,3 +15,5 @@ export class UmbDocumentBlueprintItemRepository extends UmbItemRepositoryBase<Um
 		return this.#dataSource.getItemsByDocumentType(unique);
 	}
 }
+
+export { UmbDocumentBlueprintItemRepository as api };

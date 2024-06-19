@@ -21,6 +21,8 @@ export class UmbDocumentBlueprintItemStore extends UmbItemStoreBase<UmbDocumentB
 	}
 }
 
+export { UmbDocumentBlueprintItemStore as api };
+
 export const UMB_DOCUMENT_BLUEPRINT_ITEM_STORE_CONTEXT = new UmbContextToken<UmbDocumentBlueprintItemStore>(
 	'UmbDocumentBlueprintItemStore',
 );

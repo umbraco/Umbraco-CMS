@@ -9,3 +9,5 @@ export class UmbDocumentBlueprintDetailRepository extends UmbDetailRepositoryBas
 		super(host, UmbDocumentBlueprintServerDataSource, UMB_DOCUMENT_BLUEPRINT_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export { UmbDocumentBlueprintDetailRepository as api };

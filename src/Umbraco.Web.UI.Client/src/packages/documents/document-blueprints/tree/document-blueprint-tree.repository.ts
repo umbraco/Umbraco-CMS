@@ -29,3 +29,5 @@ export class UmbDocumentBlueprintTreeRepository
 		return { data };
 	}
 }
+
+export { UmbDocumentBlueprintTreeRepository as api };

@@ -19,6 +19,8 @@ export class UmbDocumentBlueprintTreeStore extends UmbUniqueTreeStore {
 	}
 }
 
+export { UmbDocumentBlueprintTreeStore as api };
+
 export const UMB_DOCUMENT_BLUEPRINT_TREE_STORE_CONTEXT = new UmbContextToken<UmbDocumentBlueprintTreeStore>(
 	'UmbDocumentBlueprintTreeStore',
 );
