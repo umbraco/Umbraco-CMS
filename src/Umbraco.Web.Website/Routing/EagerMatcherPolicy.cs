@@ -3,12 +3,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
 
@@ -37,6 +40,8 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
     private readonly IRuntimeState _runtimeState;
     private readonly EndpointDataSource _endpointDataSource;
     private readonly UmbracoRequestPaths _umbracoRequestPaths;
+    private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly IPublishedRouter _publishedRouter;
     private GlobalSettings _globalSettings;
     private readonly Lazy<Endpoint> _installEndpoint;
     private readonly Lazy<Endpoint> _renderEndpoint;
@@ -45,11 +50,15 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
         IRuntimeState runtimeState,
         EndpointDataSource endpointDataSource,
         UmbracoRequestPaths umbracoRequestPaths,
-        IOptionsMonitor<GlobalSettings> globalSettings)
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedRouter publishedRouter)
     {
         _runtimeState = runtimeState;
         _endpointDataSource = endpointDataSource;
         _umbracoRequestPaths = umbracoRequestPaths;
+        _umbracoContextAccessor = umbracoContextAccessor;
+        _publishedRouter = publishedRouter;
         _globalSettings = globalSettings.CurrentValue;
         globalSettings.OnChange(settings => _globalSettings = settings);
         _installEndpoint = new Lazy<Endpoint>(GetInstallEndpoint);
@@ -112,9 +121,20 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
             ControllerActionDescriptor? controllerDescriptor = routeEndpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
             TypeInfo? controllerTypeInfo = controllerDescriptor?.ControllerTypeInfo;
             if (controllerTypeInfo is not null &&
-                (controllerTypeInfo.IsType<RenderController>() || controllerTypeInfo.IsType<SurfaceController>()))
+                (controllerTypeInfo.IsType<RenderController>()
+                 || controllerTypeInfo.IsType<SurfaceController>()))
             {
                 return;
+            }
+
+            // If it's an UmbracoPageController we need to do some domain routing.
+            // We need to do this in oder to handle cultures for our Dictionary.
+            // This is because UmbracoPublishedContentCultureProvider is ued to set the Thread.CurrentThread.CurrentCulture
+            // The CultureProvider is run before the actual routing, this means that our UmbracoVirtualPageFilterAttribute is hit AFTER the culture is set.
+            // Meaning we have to route the domain part already now, this is not pretty, but it beats having to look for content we know doesn't exist.
+            if (controllerTypeInfo is not null && controllerTypeInfo.IsType<UmbracoPageController>())
+            {
+                await RouteVirtualRequestAsync(httpContext);
             }
 
             if (routeEndpoint.Order < lowestOrder)
@@ -151,6 +171,22 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
         {
             candidates.SetValidity(dynamicId.Value, false);
         }
+    }
+
+    private async Task RouteVirtualRequestAsync(HttpContext context)
+    {
+        if (_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext) is false)
+        {
+            return;
+        }
+
+        IPublishedRequestBuilder requestBuilder =
+            await _publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
+        _publishedRouter.RouteDomain(requestBuilder);
+        // This is just a temporary RouteValues object just for culture which will be overwritten later
+        // so we can just use a dummy action descriptor.
+        var umbracoRouteValues = new UmbracoRouteValues(requestBuilder.Build(), new ControllerActionDescriptor());
+        context.Features.Set(umbracoRouteValues);
     }
 
     /// <summary>
