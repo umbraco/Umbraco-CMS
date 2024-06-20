@@ -135,7 +135,9 @@
 		"./src/packages/language",
 		"./src/packages/tags",
 		"./src/packages/umbraco-news",
-		"./src/packages/webhook"
+		"./src/packages/webhook",
+		"./src/packages/health-check",
+		"./src/packages/tags"
 	],
 	"scripts": {
 		"backoffice:test:e2e": "npx playwright test",
