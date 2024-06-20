@@ -28,6 +28,7 @@ export default defineConfig({
 			'event/index': './event/index.ts',
 			'extension-registry/index': './extension-registry/index.ts',
 			'icon-registry/index': './icon-registry/index.ts',
+			'icon-registry/icons': './icon-registry/icons.ts',
 			'id/index': './id/index.ts',
 			'lit-element/index': './lit-element/index.ts',
 			'localization/index': './localization/index.ts',
