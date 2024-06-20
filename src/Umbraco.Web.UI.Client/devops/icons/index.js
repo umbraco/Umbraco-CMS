@@ -174,7 +174,7 @@ const generateJS = (icons) => {
 		return `{
 			name: "${icon.name}",
 			${icon.legacy ? 'legacy: true,' : ''}
-			path: import("./icons/${icon.fileName}.js"),
+			path: () => import("./icons/${icon.fileName}.js"),
 		}`.replace(/\t/g, ''); // Regex removes white space [NL]
 	});
 
