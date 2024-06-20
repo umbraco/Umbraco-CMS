@@ -561,11 +561,9 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 			#toolbar {
 				background-color: var(--uui-color-background-alt);
 				display: flex;
+				flex-wrap: wrap;
 				gap: var(--uui-size-2);
-			}
-
-			#toolbar uui-button-group:last-child {
-				margin-left: auto;
+				margin-bottom: var(--uui-size-2);
 			}
 
 			umb-code-editor {

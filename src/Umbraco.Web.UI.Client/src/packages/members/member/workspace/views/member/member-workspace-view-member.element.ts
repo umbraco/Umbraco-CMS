@@ -1,5 +1,6 @@
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context-token.js';
 import type { UmbMemberDetailModel } from '../../../types.js';
+import { TimeFormatOptions } from './utils.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -93,35 +94,38 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		}
 
 		return html`
-			<umb-property-layout label="Change password">
+			<umb-property-layout label=${this.localize.term('general_changePassword')}>
 				${when(
 					this._showChangePasswordForm,
 					() => html`
 						<div slot="editor">
-							<umb-property-layout label="New password">
+							<umb-property-layout label=${this.localize.term('user_newPassword')}>
 								<uui-input
 									slot="editor"
 									name="newPassword"
-									label="New password"
+									label=${this.localize.term('user_newPassword')}
 									type="password"
 									@input=${() => this.#onPasswordUpdate()}></uui-input>
 							</umb-property-layout>
-							<umb-property-layout label="Confirm password">
+							<umb-property-layout label=${this.localize.term('user_confirmNewPassword')}>
 								<uui-input
 									slot="editor"
 									name="confirmPassword"
-									label="Confirm password"
+									label=${this.localize.term('user_confirmNewPassword')}
 									type="password"
 									@input=${() => this.#onPasswordUpdate()}></uui-input>
 							</umb-property-layout>
 							${when(this._newPasswordError, () => html`<p class="validation-error">${this._newPasswordError}</p>`)}
-							<uui-button label="Cancel" look="secondary" @click=${this.#onNewPasswordCancel}></uui-button>
+							<uui-button
+								label=${this.localize.term('general_cancel')}
+								look="secondary"
+								@click=${this.#onNewPasswordCancel}></uui-button>
 						</div>
 					`,
 					() =>
 						html`<uui-button
 							slot="editor"
-							label="Change password"
+							label=${this.localize.term('general_changePassword')}
 							look="secondary"
 							@click=${() => (this._showChangePasswordForm = true)}></uui-button>`,
 				)}
@@ -153,14 +157,14 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 
 				${this.#renderPasswordInput()}
 
-				<umb-property-layout label="Member Group">
+				<umb-property-layout label=${this.localize.term('content_membergroup')}>
 					<umb-input-member-group
 						slot="editor"
 						@change=${this.#onGroupsUpdated}
 						.selection=${this._workspaceContext.memberGroups}></umb-input-member-group>
 				</umb-property-layout>
 
-				<umb-property-layout label="Approved">
+				<umb-property-layout label=${this.localize.term('user_stateApproved')}>
 					<uui-toggle
 						slot="editor"
 						.checked=${this._workspaceContext.isApproved}
@@ -168,7 +172,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 					</uui-toggle>
 				</umb-property-layout>
 
-				<umb-property-layout label="Locked out">
+				<umb-property-layout label=${this.localize.term('user_stateLockedOut')}>
 					<uui-toggle
 						?disabled=${this._isNew || !this._workspaceContext.isLockedOut}
 						slot="editor"
@@ -177,7 +181,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 					</uui-toggle>
 				</umb-property-layout>
 
-				<umb-property-layout label="Two-Factor authentication">
+				<umb-property-layout label=${this.localize.term('member_2fa')}>
 					<uui-toggle
 						?disabled=${this._isNew || !this._workspaceContext.isTwoFactorEnabled}
 						slot="editor"
@@ -196,20 +200,32 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			<div id="right-column">
 				<uui-box>
 					<div class="general-item">
-						<umb-localize class="headline" key="user_failedPasswordAttempts"></umb-localize>
+						<umb-localize class="headline" key="user_failedPasswordAttempts">Failed login attempts</umb-localize>
 						<span>${this._workspaceContext.failedPasswordAttempts}</span>
 					</div>
 					<div class="general-item">
-						<umb-localize class="headline" key="user_lastLockoutDate"></umb-localize>
-						<span>${this._workspaceContext.lastLockOutDate}</span>
+						<umb-localize class="headline" key="user_lastLockoutDate">Last lockout date</umb-localize>
+						<span>
+							${this._workspaceContext.lastLockOutDate
+								? this.localize.date(this._workspaceContext.lastLockOutDate, TimeFormatOptions)
+								: this.localize.term('general_never')}
+						</span>
 					</div>
 					<div class="general-item">
-						<umb-localize class="headline" key="user_lastLogin"></umb-localize>
-						<span>${this._workspaceContext.lastLoginDate}</span>
+						<umb-localize class="headline" key="user_lastLogin">Last login</umb-localize>
+						<span>
+							${this._workspaceContext.lastLoginDate
+								? this.localize.date(this._workspaceContext.lastLoginDate, TimeFormatOptions)
+								: this.localize.term('general_never')}
+						</span>
 					</div>
 					<div class="general-item">
-						<umb-localize class="headline" key="user_passwordChangedGeneric"></umb-localize>
-						<span>${this._workspaceContext.lastPasswordChangeDate}</span>
+						<umb-localize class="headline" key="user_passwordChangedGeneric">Password changed</umb-localize>
+						<span>
+							${this._workspaceContext.lastPasswordChangeDate
+								? this.localize.date(this._workspaceContext.lastPasswordChangeDate, TimeFormatOptions)
+								: this.localize.term('general_never')}
+						</span>
 					</div>
 				</uui-box>
 
