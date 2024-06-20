@@ -1,9 +1,5 @@
+import type { UmbIconDefinition } from './types.js';
 import { type UUIIconHost, UUIIconRegistry } from '@umbraco-cms/backoffice/external/uui';
-
-interface UmbIconDescriptor {
-	name: string;
-	path: string;
-}
 
 /**
  * @export
@@ -17,10 +13,10 @@ export class UmbIconRegistry extends UUIIconRegistry {
 		this.#initResolve = resolve;
 	});
 
-	#icons: UmbIconDescriptor[] = [];
+	#icons: UmbIconDefinition[] = [];
 	#unhandledProviders: Map<string, UUIIconHost> = new Map();
 
-	setIcons(icons: UmbIconDescriptor[]) {
+	setIcons(icons: UmbIconDefinition[]) {
 		const oldIcons = this.#icons;
 		this.#icons = icons;
 		if (this.#initResolve) {
@@ -39,7 +35,7 @@ export class UmbIconRegistry extends UUIIconRegistry {
 			}
 		});
 	}
-	appendIcons(icons: UmbIconDescriptor[]) {
+	appendIcons(icons: UmbIconDefinition[]) {
 		this.#icons = [...this.#icons, ...icons];
 	}
 	/**
@@ -56,7 +52,7 @@ export class UmbIconRegistry extends UUIIconRegistry {
 
 	async #loadIcon(iconName: string, iconProvider: UUIIconHost): Promise<boolean> {
 		await this.#init;
-		const iconManifest = this.#icons.find((i: UmbIconDescriptor) => i.name === iconName);
+		const iconManifest = this.#icons.find((i: UmbIconDefinition) => i.name === iconName);
 		// Icon not found, so lets add it to a list of unhandled requests.
 		if (!iconManifest) {
 			this.#unhandledProviders.set(iconName, iconProvider);
