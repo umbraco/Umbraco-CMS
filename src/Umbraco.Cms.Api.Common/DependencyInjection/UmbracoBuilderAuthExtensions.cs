@@ -133,6 +133,6 @@ public static class UmbracoBuilderAuthExtensions
             });
 
         builder.Services.AddRecurringBackgroundJob<OpenIddictCleanupJob>();
-        builder.Services.ConfigureOptions<PostConfigureOpenIddict>();
+        builder.Services.ConfigureOptions<ConfigureOpenIddict>();
     }
 }
