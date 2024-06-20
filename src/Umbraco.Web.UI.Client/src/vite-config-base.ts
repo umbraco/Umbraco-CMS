@@ -20,5 +20,6 @@ export const getDefaultConfig = (args: UmbViteDefaultConfigArgs): UserConfig => 
 				external: [/^@umbraco/],
 			},
 		},
+		plugins: args.plugins,
 	};
 };
