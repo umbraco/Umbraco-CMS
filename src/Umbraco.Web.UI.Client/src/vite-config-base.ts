@@ -3,7 +3,7 @@ import type { BuildOptions, UserConfig, LibraryOptions } from 'vite';
 interface UmbViteDefaultConfigArgs {
 	dist: BuildOptions['outDir'];
 	entry?: LibraryOptions['entry'];
-	plugins: UserConfig['plugins'];
+	plugins?: UserConfig['plugins'];
 }
 
 export const getDefaultConfig = (args: UmbViteDefaultConfigArgs): UserConfig => {
