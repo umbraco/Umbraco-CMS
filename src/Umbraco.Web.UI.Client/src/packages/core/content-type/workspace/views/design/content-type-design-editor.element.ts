@@ -475,7 +475,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	renderTabInner(tab: UmbPropertyTypeContainerModel, tabActive: boolean, ownedTab: boolean) {
 		// TODO: Localize this:
 		if (this._sortModeActive) {
-			return html`<div class="not-active">
+			return html`<div class="tab">
 				${ownedTab
 					? html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
 							<uui-input
