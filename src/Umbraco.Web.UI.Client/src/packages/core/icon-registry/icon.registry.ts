@@ -1,4 +1,5 @@
-import type { UmbIconDefinition } from './types.js';
+import type { UmbIconDefinition, UmbIconModule } from './types.js';
+import { loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 import { type UUIIconHost, UUIIconRegistry } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -59,15 +60,15 @@ export class UmbIconRegistry extends UUIIconRegistry {
 			return false;
 		}
 
-		const iconPath = iconManifest.path;
+		try {
+			const iconModule = await loadManifestPlainJs<UmbIconModule>(iconManifest.path);
+			if (!iconModule) throw new Error(`Failed to load icon ${iconName}`);
+			if (!iconModule.default) throw new Error(`Icon ${iconName} is missing a default export`);
+			iconProvider.svg = iconModule.default;
+		} catch (error: any) {
+			console.error(`Failed to load icon ${iconName}`, error.message);
+		}
 
-		import(/* @vite-ignore */ iconPath)
-			.then((iconModule) => {
-				iconProvider.svg = iconModule.default;
-			})
-			.catch((err) => {
-				console.error(`Failed to load icon ${iconName} on path ${iconPath}`, err.message);
-			});
 		return true;
 	}
 }
