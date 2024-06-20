@@ -128,7 +128,7 @@ internal class EagerMatcherPolicy : MatcherPolicy, IEndpointSelectorPolicy
 
             // If it's an UmbracoPageController we need to do some domain routing.
             // We need to do this in oder to handle cultures for our Dictionary.
-            // This is because UmbracoPublishedContentCultureProvider is ued to set the Thread.CurrentThread.CurrentCulture
+            // This is because UmbracoPublishedContentCultureProvider is ued to set the Thread.CurrentThread.CurrentUICulture
             // The CultureProvider is run before the actual routing, this means that our UmbracoVirtualPageFilterAttribute is hit AFTER the culture is set.
             // Meaning we have to route the domain part already now, this is not pretty, but it beats having to look for content we know doesn't exist.
             if (controllerTypeInfo is not null && controllerTypeInfo.IsType<UmbracoPageController>())
