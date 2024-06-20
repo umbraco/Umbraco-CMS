@@ -5,7 +5,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'icons',
 		alias: 'Umb.Icons.Backoffice',
 		name: 'Backoffice Icons',
-		js: () => import('./icons.js'),
+		js: () => import('./icons/icons.js'),
 	},
 	{
 		type: 'globalContext',

@@ -168,7 +168,7 @@ const writeIconsToDisk = (icons) => {
 };
 
 const generateJS = (icons) => {
-	const JSPath = `${moduleDirectory}/icons.ts`;
+	const JSPath = `${iconsOutputDirectory}/icons.ts`;
 
 	const iconDescriptors = icons.map((icon) => {
 		return `{
