@@ -1,5 +1,3 @@
-import { UmbDocumentItemStore } from './document-item.store.js';
-import { UmbDocumentItemRepository } from './document-item.repository.js';
 import type { ManifestRepository, ManifestItemStore, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.DocumentItem';
@@ -9,14 +7,14 @@ const itemRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
 	name: 'Document Item Repository',
-	api: UmbDocumentItemRepository,
+	api: () => import('./document-item.repository.js'),
 };
 
 const itemStore: ManifestItemStore = {
 	type: 'itemStore',
 	alias: UMB_DOCUMENT_STORE_ALIAS,
 	name: 'Document Item Store',
-	api: UmbDocumentItemStore,
+	api: () => import('./document-item.store.js'),
 };
 
 export const manifests: Array<ManifestTypes> = [itemRepository, itemStore];

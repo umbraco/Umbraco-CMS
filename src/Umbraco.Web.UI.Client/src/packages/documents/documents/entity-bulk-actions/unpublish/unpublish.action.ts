@@ -117,3 +117,5 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 		}
 	}
 }
+
+export { UmbDocumentUnpublishEntityBulkAction as api };

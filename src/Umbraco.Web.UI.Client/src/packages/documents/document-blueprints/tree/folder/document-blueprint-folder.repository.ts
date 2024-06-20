@@ -7,3 +7,5 @@ export class UmbDocumentBlueprintFolderRepository extends UmbFolderRepositoryBas
 		super(host, UmbDocumentBlueprintFolderServerDataSource);
 	}
 }
+
+export { UmbDocumentBlueprintFolderRepository as api };

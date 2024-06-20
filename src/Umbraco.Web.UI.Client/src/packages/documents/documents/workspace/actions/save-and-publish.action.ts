@@ -3,7 +3,7 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../../user-permissions/constants.js';
-import { UmbDocumentUserPermissionCondition } from '../../user-permissions/document-user-permission.condition.js';
+import { UmbDocumentUserPermissionCondition } from '../../user-permissions/condition/document-user-permission.condition.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
 

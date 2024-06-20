@@ -23,7 +23,7 @@ import {
 	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 } from '../paths.js';
-import { UMB_DOCUMENTS_SECTION_PATH } from '../../paths.js';
+import { UMB_DOCUMENTS_SECTION_PATH } from '../../section/paths.js';
 import { UmbDocumentPreviewRepository } from '../repository/preview/index.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';

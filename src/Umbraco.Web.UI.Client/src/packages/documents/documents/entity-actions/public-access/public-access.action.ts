@@ -39,3 +39,5 @@ export class UmbDocumentPublicAccessEntityAction extends UmbEntityActionBase<nev
 		actionEventContext.dispatchEvent(entityChildrenEvent);
 	}
 }
+
+export { UmbDocumentPublicAccessEntityAction as api };
