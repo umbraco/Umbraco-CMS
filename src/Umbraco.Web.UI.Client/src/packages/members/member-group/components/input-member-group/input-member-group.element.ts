@@ -182,6 +182,7 @@ export class UmbInputMemberGroupElement extends UUIFormControlMixin(UmbLitElemen
 					${this.#renderOpenButton(item)}
 					<uui-button @click=${() => this.#removeItem(item)} label=${this.localize.term('general_remove')}></uui-button>
 				</uui-action-bar>
+				<umb-icon slot="icon" name="icon-users"></umb-icon>
 			</uui-ref-node>
 		`;
 	}
