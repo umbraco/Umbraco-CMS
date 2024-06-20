@@ -17,3 +17,5 @@ export class UmbDocumentCultureAndHostnamesEntityAction extends UmbEntityActionB
 		await modalContext.onSubmit();
 	}
 }
+
+export { UmbDocumentCultureAndHostnamesEntityAction as api };

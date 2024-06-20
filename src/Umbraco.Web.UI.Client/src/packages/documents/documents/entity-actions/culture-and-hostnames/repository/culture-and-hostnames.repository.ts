@@ -40,3 +40,5 @@ export class UmbDocumentCultureAndHostnamesRepository extends UmbControllerBase 
 		return { error };
 	}
 }
+
+export { UmbDocumentCultureAndHostnamesRepository as api };

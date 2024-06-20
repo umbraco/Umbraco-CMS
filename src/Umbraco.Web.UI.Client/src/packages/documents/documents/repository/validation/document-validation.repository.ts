@@ -40,3 +40,5 @@ export class UmbDocumentValidationRepository extends UmbRepositoryBase {
 		return this.#validationDataSource.validateUpdate(model);
 	}
 }
+
+export { UmbDocumentValidationRepository as api };

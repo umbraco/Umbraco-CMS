@@ -18,3 +18,5 @@ export class UmbDuplicateDocumentTypeRepository extends UmbRepositoryBase implem
 		return { error };
 	}
 }
+
+export { UmbDuplicateDocumentTypeRepository as api };

@@ -63,3 +63,5 @@ export class UmbDocumentPublicAccessRepository extends UmbControllerBase impleme
 		return { error };
 	}
 }
+
+export { UmbDocumentPublicAccessRepository as api };

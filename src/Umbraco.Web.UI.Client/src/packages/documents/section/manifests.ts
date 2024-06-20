@@ -1,15 +1,14 @@
-import { UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_CONTENT_MENU_ALIAS } from './documents/index.js';
+import { UMB_CONTENT_SECTION_ALIAS } from './constants.js';
+import { UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_CONTENT_MENU_ALIAS } from '@umbraco-cms/backoffice/document';
 import type {
 	ManifestSection,
 	ManifestSectionSidebarAppMenuWithEntityActionsKind,
 	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-const sectionAlias = 'Umb.Section.Content';
-
 const section: ManifestSection = {
 	type: 'section',
-	alias: sectionAlias,
+	alias: UMB_CONTENT_SECTION_ALIAS,
 	name: 'Content Section',
 	weight: 1000,
 	meta: {
@@ -19,7 +18,7 @@ const section: ManifestSection = {
 	conditions: [
 		{
 			alias: 'Umb.Condition.SectionUserPermission',
-			match: sectionAlias,
+			match: UMB_CONTENT_SECTION_ALIAS,
 		},
 	],
 };
@@ -38,7 +37,7 @@ const menuSectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind 
 	conditions: [
 		{
 			alias: 'Umb.Condition.SectionAlias',
-			match: sectionAlias,
+			match: UMB_CONTENT_SECTION_ALIAS,
 		},
 	],
 };
