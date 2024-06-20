@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { rmSync } from 'fs';
 import { getDefaultConfig } from '../../vite-config-base';
 
@@ -57,5 +58,15 @@ export default defineConfig({
 			//'settings/index': './settings/index.ts', // currently no index file so it is left out
 			manifests: 'manifests.ts',
 		},
+		plugins: [
+			viteStaticCopy({
+				targets: [
+					{
+						src: 'icon-registry/icons/*.js',
+						dest: 'icon-registry/icons',
+					},
+				],
+			}),
+		],
 	}),
 });
