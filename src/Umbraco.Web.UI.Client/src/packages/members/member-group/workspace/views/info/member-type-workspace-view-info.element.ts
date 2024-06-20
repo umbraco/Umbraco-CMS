@@ -23,17 +23,19 @@ export class UmbMemberTypeWorkspaceViewMemberInfoElement extends UmbLitElement i
 
 	render() {
 		return html` <div id="left-column">
-				<uui-box headline="Member Group">
+				<uui-box headline=${this.localize.term('content_membergroup')}>
 					<div id="no-properties">
-						<umb-localize key="member_memberGroupNoProperties"></umb-localize>
+						<umb-localize key="member_memberGroupNoProperties">
+							Member groups have no additional properties for editing.
+						</umb-localize>
 					</div>
 				</uui-box>
 			</div>
 
 			<div id="right-column">
-				<uui-box headline="General">
+				<uui-box headline=${this.localize.term('general_general')}>
 					<div class="property">
-						<b>Id</b>
+						<b><umb-localize key="general_id">Id</umb-localize></b>
 						<span>${this._unique}</span>
 					</div>
 				</uui-box>
