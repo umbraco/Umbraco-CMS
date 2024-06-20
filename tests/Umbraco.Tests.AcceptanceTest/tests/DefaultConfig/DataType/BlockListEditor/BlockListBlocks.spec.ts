@@ -2,10 +2,6 @@
 import {expect} from "@playwright/test";
 
 const blockListEditorName = 'TestBlockListEditor';
-const blockListLocatorName = 'Block List';
-const blockListEditorAlias = 'Umbraco.BlockList';
-const blockListEditorUiAlias = 'Umb.PropertyEditorUi.BlockList';
-
 const elementTypeName = 'BlockListElement';
 const dataTypeName = 'Textstring';
 const groupName = 'testGroup';
@@ -20,7 +16,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockListEditorName);
 });
 
-test('can add a label to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a label to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const labelText = 'ThisIsALabel';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -36,11 +32,10 @@ test('can add a label to a block', async ({page, umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
-  const block = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(await umbracoApi.dataType.doesBlockListBlockContainLabel(blockListEditorName, elementTypeId, labelText)).toBeTruthy();
 });
 
-test('can update a label for a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can update a label for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const labelText = 'ThisIsALabel';
   const newLabelText = 'ThisIsANewLabel';
@@ -61,7 +56,7 @@ test('can update a label for a block', async ({page, umbracoApi, umbracoUi}) => 
   expect(await umbracoApi.dataType.doesBlockListBlockContainLabel(blockListEditorName, elementTypeId, newLabelText)).toBeTruthy();
 });
 
-test('can remove a label from a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove a label from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const labelText = 'ThisIsALabel';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -79,7 +74,7 @@ test('can remove a label from a block', async ({page, umbracoApi, umbracoUi}) =>
   expect(await umbracoApi.dataType.doesBlockListBlockContainLabel(blockListEditorName, elementTypeId, "")).toBeTruthy();
 });
 
-test('can update overlay size for a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can update overlay size for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const overlaySize = 'medium';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -99,7 +94,7 @@ test('can update overlay size for a block', async ({page, umbracoApi, umbracoUi}
   expect(blockData.values[0].value[0].editorSize).toEqual(overlaySize);
 });
 
-test('can open content model in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can open content model in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -114,6 +109,7 @@ test('can open content model in a block', async ({page, umbracoApi, umbracoUi}) 
   await umbracoUi.dataType.isElementWorkspaceOpenInBlock(elementTypeName);
 });
 
+// TODO: Is this an issue? should you be able to remove the contentModel so you have none?
 // There is currently frontend issues
 test.skip('can remove a content model from a block', async ({page, umbracoApi, umbracoUi}) => {
   // Arrange
@@ -124,7 +120,6 @@ test.skip('can remove a content model from a block', async ({page, umbracoApi, u
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await page.pause();
   await umbracoUi.dataType.removeBlockContentModel();
   await umbracoUi.dataType.clickConfirmRemoveButton();
   await umbracoUi.dataType.clickSubmitButton();
@@ -133,14 +128,9 @@ test.skip('can remove a content model from a block', async ({page, umbracoApi, u
   // Assert
   await umbracoUi.dataType.isSuccessNotificationVisible();
   const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
-
-  console.log(blockData);
-  console.log(blockData.values[0]);
-  await page.pause();
-
 });
 
-test('can add a settings model to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a settings model to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -160,7 +150,7 @@ test('can add a settings model to a block', async ({page, umbracoApi, umbracoUi}
   expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeTruthy();
 });
 
-test('can remove a settings model from a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can remove a settings model from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -182,7 +172,7 @@ test('can remove a settings model from a block', async ({page, umbracoApi, umbra
   expect(await umbracoApi.dataType.doesBlockListEditorContainBlocksWithSettingsTypeIds(blockListEditorName, [settingsElementTypeId])).toBeFalsy();
 });
 
-test('can add a background color to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a background color to a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const backgroundColor = 'red';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -202,7 +192,7 @@ test('can add a background color to a block', async ({page, umbracoApi, umbracoU
   expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
 });
 
-test('can update a background color for a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can update a background color for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const backgroundColor = 'red';
   const newBackgroundColor = 'blue';
@@ -225,7 +215,7 @@ test('can update a background color for a block', async ({page, umbracoApi, umbr
   expect(blockData.values[0].value[0].backgroundColor).toEqual(newBackgroundColor);
 });
 
-test('can delete a background color from a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can delete a background color from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const backgroundColor = 'red';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -247,8 +237,8 @@ test('can delete a background color from a block', async ({page, umbracoApi, umb
   expect(blockData.values[0].value[0].backgroundColor).toEqual("");
 });
 
-test('can add a icon color to a block', async ({page, umbracoApi, umbracoUi}) => {
-// Arrange
+test('can add a icon color to a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
   const iconColor = 'red';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
@@ -267,7 +257,7 @@ test('can add a icon color to a block', async ({page, umbracoApi, umbracoUi}) =>
   expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
 });
 
-test('can update a icon color for a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can update a icon color for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconColor = 'red';
   const newIconColor = 'blue';
@@ -290,7 +280,7 @@ test('can update a icon color for a block', async ({page, umbracoApi, umbracoUi}
   expect(blockData.values[0].value[0].iconColor).toEqual(newIconColor);
 });
 
-test('can delete a icon color from a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconColor = 'red';
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
@@ -312,23 +302,136 @@ test('can delete a icon color from a block', async ({page, umbracoApi, umbracoUi
   expect(blockData.values[0].value[0].iconColor).toEqual("");
 });
 
-test('can add a custom stylesheet to a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can add a custom stylesheet to a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const stylesheetName = 'TestStylesheet.css'
+  const stylesheetPath = '/wwwroot/css/' + stylesheetName;
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
+  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
 
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.chooseBlockCustomStylesheetWithName(stylesheetName);
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath)
+  const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedStylesheetPath);
+
+  // Clean
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });
 
-test('can update a custom stylesheet for a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const stylesheetName = 'TestStylesheet.css'
+  const stylesheetPath = '/wwwroot/css/' + stylesheetName;
+  const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath);
+  const secondStylesheetName = 'SecondStylesheet.css';
+  const secondStylesheetPath = '/wwwroot/css/' + secondStylesheetName;
+  const encodedSecondStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(secondStylesheetPath);
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
+  await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
+  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
+  await umbracoApi.stylesheet.createDefaultStylesheet(secondStylesheetName);
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, '', '', encodedStylesheetPath);
+  let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedStylesheetPath);
 
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  // Removes first stylesheet
+  await umbracoUi.dataType.chooseBlockCustomStylesheetWithName(stylesheetName);
+  // Adds second stylesheet
+  await umbracoUi.dataType.chooseBlockCustomStylesheetWithName(secondStylesheetName);
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedSecondStylesheetPath);
+
+  // Clean
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
+  await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
 });
 
-test('can delete a custom stylesheet from a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const stylesheetName = 'TestStylesheet.css'
+  const stylesheetPath = '/wwwroot/css/' + stylesheetName;
+  const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath);
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
+  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, contentElementTypeId, '', '', encodedStylesheetPath);
+  let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].stylesheet[0]).toEqual(encodedStylesheetPath);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.clickRemoveCustomStylesheetWithName(stylesheetName);
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].stylesheet[0]).toBeUndefined();
+
+  // Clean
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });
 
+test('can enable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListEditorName, contentElementTypeId);
 
-test('can enable hide content editor in a block', async ({page, umbracoApi, umbracoUi}) => {
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.clickBlockHideContentEditorButton();
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  const blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(true);
 });
 
-test('can disable hide content editor in a block', async ({page, umbracoApi, umbracoUi}) => {
+test('can disable hide content editor in a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const contentElementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockListWithBlockWithHideContentEditor(blockListEditorName, contentElementTypeId, true);
+  let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(true);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockListEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.clickBlockHideContentEditorButton();
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.dataType.isSuccessNotificationVisible();
+  blockData = await umbracoApi.dataType.getByName(blockListEditorName);
+  expect(blockData.values[0].value[0].forceHideContentEditorInOverlay).toEqual(false);
 });
-
-
-
