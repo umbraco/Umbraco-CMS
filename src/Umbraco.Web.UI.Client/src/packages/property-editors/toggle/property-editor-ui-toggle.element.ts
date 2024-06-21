@@ -13,6 +13,15 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	@property({ type: Boolean })
 	value: undefined | boolean = undefined;
 
+	/**
+	 * Sets the input to readonly mode, meaning value cannot be changed but still able to read and select its content.
+	 * @type {boolean}
+	 * @attr
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@state()
 	_labelOff?: string;
 
@@ -42,7 +51,8 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 				.labelOff=${this._labelOff}
 				?checked=${this.value}
 				?showLabels=${this._showLabels}
-				@change=${this.#onChange}>
+				@change=${this.#onChange}
+				?readonly=${this.readonly}>
 			</umb-input-toggle>
 		`;
 	}
