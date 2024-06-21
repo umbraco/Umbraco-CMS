@@ -41,7 +41,7 @@ export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElem
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -23,7 +23,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	@state()
 	private _buttonStateCollect: UUIButtonState = undefined;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this._getPublishedStatus();
 	}
@@ -178,7 +178,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

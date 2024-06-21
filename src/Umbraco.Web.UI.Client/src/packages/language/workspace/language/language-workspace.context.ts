@@ -55,7 +55,7 @@ export class UmbLanguageWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -131,7 +131,7 @@ export class UmbLanguageWorkspaceContext
 		}
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#data.destroy();
 		super.destroy();
 	}

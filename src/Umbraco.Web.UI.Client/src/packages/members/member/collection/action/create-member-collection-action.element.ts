@@ -73,7 +73,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#popover-content {

@@ -122,7 +122,7 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 			${this._renderPagination()} `;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-pagination {
 				display: block;

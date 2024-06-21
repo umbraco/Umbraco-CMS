@@ -213,7 +213,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 		}
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box {

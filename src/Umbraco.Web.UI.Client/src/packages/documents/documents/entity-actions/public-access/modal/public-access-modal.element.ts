@@ -39,7 +39,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 	// Init
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#unique = this.data?.unique;
 		this.#getDocumentName();
 	}
@@ -274,7 +274,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 			>${remove}${confirm}`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box,

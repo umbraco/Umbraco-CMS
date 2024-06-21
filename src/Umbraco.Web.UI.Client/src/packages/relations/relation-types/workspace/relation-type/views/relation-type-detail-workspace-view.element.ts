@@ -204,7 +204,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

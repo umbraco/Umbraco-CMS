@@ -29,7 +29,7 @@ export class UmbPropertyEditorUIOrderDirectionElement extends UmbLitElement impl
 		</uui-radio-group>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-radio-group {

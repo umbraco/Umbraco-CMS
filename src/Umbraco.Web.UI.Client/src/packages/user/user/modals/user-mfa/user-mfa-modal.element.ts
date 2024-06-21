@@ -24,7 +24,7 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 	#unique = '';
 	#userRepository = new UmbUserRepository(this);
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#unique = this.modalContext?.data.unique ?? '';
 		this.#loadProviders();
 	}
@@ -149,7 +149,7 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 		this.#loadProviders();
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box {

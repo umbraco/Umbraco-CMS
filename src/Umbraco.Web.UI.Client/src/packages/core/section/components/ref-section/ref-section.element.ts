@@ -18,7 +18,7 @@ export class UmbRefSectionElement extends UmbElementMixin(UUIRefElement) {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		...UUIRefElement.styles,
 		css`
 			#name {

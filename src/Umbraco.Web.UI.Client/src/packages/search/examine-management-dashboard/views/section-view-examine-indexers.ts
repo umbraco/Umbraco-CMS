@@ -23,7 +23,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	@state()
 	private _loading = true;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#loadData();
 	}
@@ -169,7 +169,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#health-status {

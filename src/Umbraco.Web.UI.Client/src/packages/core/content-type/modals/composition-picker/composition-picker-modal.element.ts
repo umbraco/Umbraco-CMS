@@ -35,7 +35,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _selection: Array<string> = [];
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		const alias = this.data?.compositionRepositoryAlias;
@@ -57,7 +57,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		this.#requestAvailableCompositions();
 	}
 
-	protected async _submitModal() {
+	protected override async _submitModal() {
 		const initSelection = this.data?.selection ?? [];
 		const newSelection = this._selection;
 
@@ -208,7 +208,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-input {
 				margin: var(--uui-size-6) 0;

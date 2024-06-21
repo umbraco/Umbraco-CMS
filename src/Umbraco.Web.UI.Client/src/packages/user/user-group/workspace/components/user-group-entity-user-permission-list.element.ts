@@ -64,7 +64,7 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbUserGroupEntityUserPermissionListElement;

@@ -107,7 +107,7 @@ export class UmbValidationContext extends UmbContextBase<UmbValidationContext> i
 		this.#validators = [];
 	}
 
-	destroy(): void {
+	override destroy(): void {
 		this.#destroyValidators();
 		super.destroy();
 	}

@@ -106,7 +106,7 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 			: '';
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

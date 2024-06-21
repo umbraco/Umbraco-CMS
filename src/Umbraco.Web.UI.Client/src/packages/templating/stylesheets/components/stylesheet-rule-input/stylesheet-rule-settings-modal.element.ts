@@ -112,7 +112,7 @@ export default class UmbStylesheetRuleSettingsModalElement extends UmbModalBaseE
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -23,7 +23,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 		this.#packageRepository = new UmbPackageRepository(this);
 	}
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#loadInstalledPackages();
 	}
 
@@ -110,7 +110,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

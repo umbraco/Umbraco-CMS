@@ -293,7 +293,7 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 	*/
 
-	public hostDisconnected(): void {
+	public override hostDisconnected(): void {
 		super.hostDisconnected();
 		this._isConditionsPositive = false;
 		if (this.#isPermitted === true) {
@@ -311,7 +311,7 @@ export abstract class UmbBaseExtensionInitializer<
 		}
 	}
 
-	public destroy(): void {
+	public override destroy(): void {
 		if (!this.#extensionRegistry) return;
 		this.#manifest = undefined;
 		this.#promiseResolvers = [];

@@ -79,7 +79,7 @@ export class UmbMediaPickerCreateItemElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#not-allowed {
 				padding: var(--uui-size-space-3);

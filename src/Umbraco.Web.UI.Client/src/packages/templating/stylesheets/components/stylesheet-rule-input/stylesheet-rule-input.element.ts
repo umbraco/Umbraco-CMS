@@ -68,7 +68,7 @@ export class UmbStylesheetRuleInputElement extends UUIFormControlMixin(UmbLitEle
 		this.dispatchEvent(new UmbChangeEvent());
 	};
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#sorter.setModel(this.rules);
 	}
 
@@ -96,7 +96,7 @@ export class UmbStylesheetRuleInputElement extends UUIFormControlMixin(UmbLitEle
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

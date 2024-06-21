@@ -81,7 +81,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			#main {

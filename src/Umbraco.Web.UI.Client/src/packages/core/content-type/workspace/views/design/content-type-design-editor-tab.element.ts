@@ -204,7 +204,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			[drag-placeholder] {
 				opacity: 0.5;

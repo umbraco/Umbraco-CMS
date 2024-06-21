@@ -100,7 +100,7 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		css`
 			:host,
 			#container {

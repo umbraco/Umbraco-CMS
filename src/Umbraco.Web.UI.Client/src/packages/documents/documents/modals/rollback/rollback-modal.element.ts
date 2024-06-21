@@ -320,7 +320,7 @@ export class UmbRollbackModalElement extends UmbModalBaseElement<UmbRollbackModa
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

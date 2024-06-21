@@ -533,7 +533,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		</uui-button>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

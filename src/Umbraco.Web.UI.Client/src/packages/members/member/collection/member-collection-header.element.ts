@@ -99,7 +99,7 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 			</umb-dropdown>
 		`;
 	}
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				height: 100%;

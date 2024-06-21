@@ -15,7 +15,7 @@ export abstract class UmbFolderModalElementBase<
 
 	folderRepository?: UmbFolderRepository;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#observeRepository();
 	}
@@ -95,7 +95,7 @@ export abstract class UmbFolderModalElementBase<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#name {

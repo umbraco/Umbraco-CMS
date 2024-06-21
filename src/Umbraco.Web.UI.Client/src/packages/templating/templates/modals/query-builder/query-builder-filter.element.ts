@@ -67,7 +67,7 @@ export class UmbTemplateQueryBuilderFilterElement extends UmbLitElement {
 		return Object.keys(this.filter).length === 3 && Object.values(this.filter).every((v) => !!v);
 	}
 
-	protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('filter')) {
 			if (this.isFilterValid) {
 				this.dispatchEvent(new Event('update-query'));
@@ -145,7 +145,7 @@ export class UmbTemplateQueryBuilderFilterElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

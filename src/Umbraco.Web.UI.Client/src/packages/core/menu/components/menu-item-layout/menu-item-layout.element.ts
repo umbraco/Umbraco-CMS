@@ -40,7 +40,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 	@state()
 	private _isActive = false;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
 	}
@@ -76,7 +76,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 		</uui-menu-item>`;
 	}
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
 	}

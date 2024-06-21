@@ -62,7 +62,7 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-ref-node {

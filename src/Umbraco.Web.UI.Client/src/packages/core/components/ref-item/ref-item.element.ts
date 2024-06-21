@@ -42,7 +42,7 @@ export class UmbRefItemElement extends UmbElementMixin(UUIRefElement) {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		...UUIRefElement.styles,
 		...UUIRefNodeElement.styles,
 		UmbTextStyles,

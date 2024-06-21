@@ -195,7 +195,7 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: grid;

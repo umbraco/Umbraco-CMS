@@ -64,11 +64,11 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	@property()
-	public set value(idsString: string) {
+	public override set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selection = splitStringToArray(idsString);
 	}
-	public get value(): string {
+	public override get value(): string {
 		return this.selection.join(',');
 	}
 
@@ -138,7 +138,7 @@ export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement,
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

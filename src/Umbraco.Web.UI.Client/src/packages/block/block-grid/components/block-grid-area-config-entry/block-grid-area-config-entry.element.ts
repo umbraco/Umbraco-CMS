@@ -46,7 +46,7 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 		});
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
 		this.observe(
@@ -94,7 +94,7 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 	}
 
 	// TODO: Update UUI, as it is missing proper colors to be used for this case:
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				position: relative;

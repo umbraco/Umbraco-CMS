@@ -56,7 +56,7 @@ export class UmbBodyLayoutElement extends LitElement {
 		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
 	};
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		if (this.headerTransparent) {
 			requestAnimationFrame(() => {
@@ -65,7 +65,7 @@ export class UmbBodyLayoutElement extends LitElement {
 		}
 	}
 
-	disconnectedCallback(): void {
+	override disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this._scrollContainer?.removeEventListener('scroll', this.#onScroll);
 	}
@@ -136,7 +136,7 @@ export class UmbBodyLayoutElement extends LitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

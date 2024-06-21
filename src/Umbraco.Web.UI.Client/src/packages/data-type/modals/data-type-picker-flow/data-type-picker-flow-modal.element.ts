@@ -32,7 +32,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 > {
 	#initPromise!: Promise<unknown>;
 
-	public set data(value: UmbDataTypePickerFlowModalData) {
+	public override set data(value: UmbDataTypePickerFlowModalData) {
 		super.data = value;
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 	}
@@ -354,7 +354,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		</ul>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#filter {

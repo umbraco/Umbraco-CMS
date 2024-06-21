@@ -71,7 +71,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 		this._showOpenButton = config.getValueByAlias('showOpenButton');
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#setPickerRootUnique();
 	}

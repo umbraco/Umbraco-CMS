@@ -19,7 +19,7 @@ export class UmbFooterLayoutElement extends LitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

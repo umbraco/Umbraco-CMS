@@ -105,7 +105,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		</uui-popover-container>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

@@ -25,7 +25,7 @@ export class UmbBlockGridScaleHandlerElement extends UmbLitElement implements Um
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				position: absolute;

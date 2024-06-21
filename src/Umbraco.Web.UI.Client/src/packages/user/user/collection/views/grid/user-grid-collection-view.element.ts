@@ -155,7 +155,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

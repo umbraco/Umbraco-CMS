@@ -34,7 +34,7 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 		}).asPromise();
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('file') && this.file) {
 			this.extension = this.#getExtensionFromMime(this.file.type) ?? '';
@@ -83,7 +83,7 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#main {
 				display: grid;

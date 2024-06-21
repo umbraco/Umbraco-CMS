@@ -18,7 +18,7 @@ export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseEle
 		this.#documentPickerContext.max = 1;
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		if (this.data) {

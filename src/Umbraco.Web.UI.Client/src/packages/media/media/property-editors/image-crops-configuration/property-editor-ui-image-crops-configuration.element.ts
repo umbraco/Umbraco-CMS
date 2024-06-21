@@ -188,7 +188,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

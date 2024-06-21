@@ -29,7 +29,7 @@ export class UmbMediaTableColumnNameElement extends UmbLitElement implements Umb
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-button {
 				text-align: left;

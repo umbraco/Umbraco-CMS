@@ -87,7 +87,7 @@ export class UmbPropertyEditorUICollectionPermissionsElement
 				label="Allow bulk delete"></uui-toggle>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

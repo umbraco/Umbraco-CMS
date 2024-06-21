@@ -63,7 +63,7 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 			<uui-button id="choose" look="placeholder" label=${this.localize.term('general_choose')} @click=${this.#openModal}></uui-button>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

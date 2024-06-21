@@ -25,7 +25,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	@state()
 	private _url = '';
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		if (this.data?.width) this._width = this.data.width;
 		if (this.data?.height) this._height = this.data.height;
@@ -145,7 +145,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input {

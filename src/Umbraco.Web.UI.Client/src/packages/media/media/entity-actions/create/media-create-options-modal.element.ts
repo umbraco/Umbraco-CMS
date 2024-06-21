@@ -31,7 +31,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	@state()
 	private _headline: string = this.localize.term('general_create');
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		const mediaUnique = this.data?.parent.unique;
 		const mediaTypeUnique = this.data?.mediaType?.unique || null;
 
@@ -119,7 +119,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#edit-permissions {

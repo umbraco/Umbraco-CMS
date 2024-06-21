@@ -51,7 +51,7 @@ export class ExampleDatasetDashboard extends UmbElementMixin(LitElement) {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

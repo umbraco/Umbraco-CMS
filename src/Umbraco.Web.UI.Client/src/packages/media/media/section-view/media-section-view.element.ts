@@ -77,7 +77,7 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				height: 100%;

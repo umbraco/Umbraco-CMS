@@ -116,7 +116,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 	multiple = false;
 
 	@property()
-	public get value() {
+	public override get value() {
 		return this.items?.map((item) => item.mediaKey).join(',');
 	}
 
@@ -391,7 +391,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		`;
 	}
 
-	static styles = UmbInputMediaElement.styles;
+	static override styles = UmbInputMediaElement.styles;
 }
 
 export default UmbInputRichMediaElement;

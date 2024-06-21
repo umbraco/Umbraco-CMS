@@ -42,7 +42,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		this.#manager = new UmbTemporaryFileManager(this);
 	}
 
-	protected firstUpdated(): void {
+	protected override firstUpdated(): void {
 		this.#mergeCrops();
 	}
 

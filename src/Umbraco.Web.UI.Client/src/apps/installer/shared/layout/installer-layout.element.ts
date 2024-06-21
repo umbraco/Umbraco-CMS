@@ -22,7 +22,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		css`
 			:host {
 				display: flex;

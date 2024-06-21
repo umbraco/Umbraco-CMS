@@ -24,7 +24,7 @@ export class UmbImageCropperPreviewElement extends LitElement {
 
 	#focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#initializeCrop();
 	}
@@ -154,7 +154,7 @@ export class UmbImageCropperPreviewElement extends LitElement {
 				: nothing}
 		`;
 	}
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: flex;
 			flex-direction: column;

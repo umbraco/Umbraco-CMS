@@ -18,7 +18,7 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 	@state()
 	_name = '';
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#observeRepository();
 	}
@@ -52,7 +52,9 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 		]);
 	}
 
-	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
+	protected override async firstUpdated(
+		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
+	): Promise<void> {
 		super.firstUpdated(_changedProperties);
 		if (!this.data?.unique) throw new Error('Unique identifier is not available');
 		await this.#init;
@@ -118,7 +120,7 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#name {

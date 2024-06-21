@@ -60,7 +60,7 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 		</umb-workspace-editor>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#header {

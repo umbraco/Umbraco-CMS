@@ -13,7 +13,7 @@ export class UmbBackofficeHeaderElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				width: 100%;

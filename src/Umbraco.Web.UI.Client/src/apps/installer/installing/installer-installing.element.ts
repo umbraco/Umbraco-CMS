@@ -10,7 +10,7 @@ export class UmbInstallerInstallingElement extends LitElement {
 		</div>`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		css`
 			h1 {
 				text-align: center;

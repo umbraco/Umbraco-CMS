@@ -21,7 +21,7 @@ export class UmbPreviewExitElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

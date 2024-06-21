@@ -17,7 +17,7 @@ export class UmbWorkspaceModalElement extends UmbLitElement {
 		return this.data ? html`<umb-workspace .entityType=${this.data.entityType}></umb-workspace>` : '';
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			:host {

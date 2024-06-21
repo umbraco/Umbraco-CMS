@@ -56,7 +56,7 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			#notifications {

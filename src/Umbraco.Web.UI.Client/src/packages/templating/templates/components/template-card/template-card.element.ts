@@ -13,18 +13,18 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-template-card')
 export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ type: String })
-	name = '';
+	override name = '';
 
 	@property({ type: Boolean, reflect: true })
 	default = false;
 
 	_id = '';
 	@property({ type: String })
-	public set id(newId: string) {
+	public override set id(newId: string) {
 		this._id = newId;
 		super.value = newId;
 	}
-	public get id() {
+	public override get id() {
 		return this._id;
 	}
 
@@ -61,7 +61,7 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				box-sizing: border-box;

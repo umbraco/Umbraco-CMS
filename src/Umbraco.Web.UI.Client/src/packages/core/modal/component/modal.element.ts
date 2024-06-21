@@ -167,7 +167,7 @@ export class UmbModalElement extends UmbLitElement {
 		return html`${this.element}`;
 	}
 
-	disconnectedCallback(): void {
+	override disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this.destroy();
 	}
@@ -176,7 +176,7 @@ export class UmbModalElement extends UmbLitElement {
 		this.destroy();
 	};
 
-	destroy() {
+	override destroy() {
 		this.#innerElement.destroy();
 		this.#modalExtensionObserver?.destroy();
 		this.#modalExtensionObserver = undefined;
@@ -188,7 +188,7 @@ export class UmbModalElement extends UmbLitElement {
 		super.destroy();
 	}
 
-	static styles: CSSResultGroup = [UmbTextStyles];
+	static override styles: CSSResultGroup = [UmbTextStyles];
 }
 
 declare global {

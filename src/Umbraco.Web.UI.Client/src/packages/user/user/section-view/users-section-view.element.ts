@@ -40,7 +40,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 		return html` <umb-router-slot id="router-slot" .routes=${this.#routes}></umb-router-slot> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

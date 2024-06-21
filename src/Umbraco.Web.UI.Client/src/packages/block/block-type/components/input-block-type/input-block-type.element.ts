@@ -176,7 +176,7 @@ export class UmbInputBlockTypeElement<
 			: null;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			div {
 				display: grid;

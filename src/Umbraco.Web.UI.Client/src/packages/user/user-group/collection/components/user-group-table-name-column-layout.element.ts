@@ -15,7 +15,7 @@ export class UmbUserGroupTableNameColumnLayoutElement extends LitElement {
 		return html`<a href=${href}>${this.value.name}</a>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			a {

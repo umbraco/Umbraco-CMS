@@ -12,7 +12,7 @@ export class UmbInputUploadFieldImageElement extends UmbLitElement {
 		return html`<img src=${this.path} alt="" />`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

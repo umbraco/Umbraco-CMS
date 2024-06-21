@@ -9,7 +9,7 @@ export class UmbLanguageDetailRepository extends UmbDetailRepositoryBase<UmbLang
 		super(host, UmbLanguageServerDataSource, UMB_LANGUAGE_DETAIL_STORE_CONTEXT);
 	}
 
-	async create(model: UmbLanguageDetailModel) {
+	override async create(model: UmbLanguageDetailModel) {
 		return super.create(model, null);
 	}
 }

@@ -10,14 +10,14 @@ const initialLanguage = 'en-us';
 
 @customElement('umb-localize-controller-host')
 class UmbLocalizeControllerHostElement extends UmbElementMixin(LitElement) {
-	@property() lang = initialLanguage;
+	@property() override lang = initialLanguage;
 }
 
 @customElement('umb-localization-render-count')
 class UmbLocalizationRenderCountElement extends UmbElementMixin(LitElement) {
 	amountOfUpdates = 0;
 
-	requestUpdate() {
+	override requestUpdate() {
 		super.requestUpdate();
 		this.amountOfUpdates++;
 	}

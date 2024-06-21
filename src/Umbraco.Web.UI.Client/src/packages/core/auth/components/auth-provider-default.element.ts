@@ -13,7 +13,7 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 	@property({ attribute: false })
 	onSubmit!: (manifestOrProviderName: string | ManifestAuthProvider, loginHint?: string) => void;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.setAttribute('part', 'auth-provider-default');
 	}
@@ -41,7 +41,7 @@ export class UmbAuthProviderDefaultElement extends UmbLitElement implements UmbA
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

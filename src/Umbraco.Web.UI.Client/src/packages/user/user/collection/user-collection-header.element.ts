@@ -63,7 +63,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		);
 	}
 
-	protected firstUpdated() {
+	protected override firstUpdated() {
 		this.#requestUserGroups();
 	}
 
@@ -234,7 +234,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		return html` <umb-collection-view-bundle></umb-collection-view-bundle> `;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				height: 100%;

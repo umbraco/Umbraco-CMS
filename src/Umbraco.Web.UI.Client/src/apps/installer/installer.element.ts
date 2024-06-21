@@ -21,7 +21,7 @@ export class UmbInstallerElement extends UmbLitElement {
 		this.provideContext(UMB_INSTALLER_CONTEXT, this._umbInstallerContext);
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this._observeCurrentStep();
 	}

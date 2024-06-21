@@ -232,7 +232,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 			.join(', ');
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

@@ -24,7 +24,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		this.observe(this.#selectionManager.selectable, (selectable) => (this._selectable = selectable));
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.value?.selection ?? []);

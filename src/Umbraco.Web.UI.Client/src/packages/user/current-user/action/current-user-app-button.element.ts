@@ -54,7 +54,7 @@ export class UmbCurrentUserAppButtonElement<
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbCurrentUserAppButtonElement;

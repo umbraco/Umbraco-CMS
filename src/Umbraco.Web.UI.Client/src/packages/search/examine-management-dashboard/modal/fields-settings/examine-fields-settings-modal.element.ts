@@ -50,7 +50,7 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 		</span>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -246,7 +246,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		</umb-body-layout>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input {

@@ -94,7 +94,7 @@ export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#settings-dashboard {

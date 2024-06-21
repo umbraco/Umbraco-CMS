@@ -105,7 +105,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

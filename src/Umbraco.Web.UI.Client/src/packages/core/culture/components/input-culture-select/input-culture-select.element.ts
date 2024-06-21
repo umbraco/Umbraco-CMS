@@ -40,7 +40,7 @@ export class UmbInputCultureSelectElement extends UUIFormControlMixin(UmbLitElem
 		return undefined;
 	}
 
-	protected async firstUpdated() {
+	protected override async firstUpdated() {
 		const { data } = await this.#cultureRepository.requestCultures();
 		if (data) {
 			this._cultures = data.items;

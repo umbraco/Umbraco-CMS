@@ -10,10 +10,10 @@ export class UmbInputObjectTypeElement extends UUIFormControlMixin(UmbLitElement
 	private select!: UUISelectElement;
 
 	@property()
-	public set value(value: UUISelectElement['value']) {
+	public override set value(value: UUISelectElement['value']) {
 		this.select.value = value;
 	}
-	public get value(): UUISelectElement['value'] {
+	public override get value(): UUISelectElement['value'] {
 		return this.select.value;
 	}
 
@@ -46,7 +46,7 @@ export class UmbInputObjectTypeElement extends UUIFormControlMixin(UmbLitElement
 		return html`<uui-select .options=${this._options} @change=${this.#onChange}></uui-select> `;
 	}
 
-	static styles = [];
+	static override styles = [];
 }
 
 export default UmbInputObjectTypeElement;

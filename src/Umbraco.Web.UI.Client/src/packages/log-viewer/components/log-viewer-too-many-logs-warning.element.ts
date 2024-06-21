@@ -10,7 +10,7 @@ export class UmbLogViewerTooManyLogsWarningElement extends LitElement {
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				text-align: center;

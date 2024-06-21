@@ -19,14 +19,14 @@ export class UmbMemberGroupPickerModalElement extends UmbModalBaseElement<
 	#collectionRepository = new UmbMemberGroupCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
 	}
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		const { data } = await this.#collectionRepository.requestCollection({});
 		this._memberGroups = data?.items ?? [];
 	}

@@ -42,7 +42,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 		});
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('entityType') && _changedProperties.has('unique')) {
 			this.#entityContext.setEntityType(this.entityType);
 			this.#entityContext.setUnique(this.unique);

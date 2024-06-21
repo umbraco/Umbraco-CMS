@@ -5,7 +5,7 @@ import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbExportDictionaryEntityAction extends UmbEntityActionBase<object> {
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);

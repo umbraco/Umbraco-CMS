@@ -190,7 +190,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			</uui-button-group>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 
 		css`

@@ -63,7 +63,7 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-input {
 				width: 100%;

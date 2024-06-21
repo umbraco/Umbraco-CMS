@@ -83,10 +83,10 @@ export class UmbInputMediaTypeElement extends UUIFormControlMixin(UmbLitElement,
 	}
 
 	@property()
-	public set value(uniques: string) {
+	public override set value(uniques: string) {
 		this.selection = splitStringToArray(uniques);
 	}
-	public get value(): string {
+	public override get value(): string {
 		return this.selection.join(',');
 	}
 
@@ -187,7 +187,7 @@ export class UmbInputMediaTypeElement extends UUIFormControlMixin(UmbLitElement,
 		return html`<umb-icon slot="icon" name=${item.icon}></umb-icon>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

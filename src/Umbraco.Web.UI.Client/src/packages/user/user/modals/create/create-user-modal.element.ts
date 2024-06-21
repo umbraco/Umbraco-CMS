@@ -111,7 +111,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		</uui-form>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input,

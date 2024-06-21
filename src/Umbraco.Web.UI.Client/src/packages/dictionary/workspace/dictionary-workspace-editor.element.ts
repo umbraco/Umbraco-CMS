@@ -51,7 +51,7 @@ export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#header {
 				display: flex;

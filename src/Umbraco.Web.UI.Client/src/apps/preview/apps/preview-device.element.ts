@@ -69,7 +69,7 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 	@property({ attribute: false, type: Object })
 	device = this.#devices[0];
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#changeDevice(this.device);
 	}
@@ -115,7 +115,7 @@ export class UmbPreviewDeviceElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 		:host {
 				display: flex;

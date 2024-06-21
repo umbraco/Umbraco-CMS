@@ -91,7 +91,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		});
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		// eslint-disable-next-line wc/no-self-class
@@ -136,7 +136,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return this.#renderBlock();
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				position: relative;

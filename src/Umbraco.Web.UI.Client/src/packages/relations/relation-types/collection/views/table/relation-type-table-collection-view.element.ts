@@ -63,7 +63,7 @@ export class UmbRelationTypeTableCollectionViewElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -135,7 +135,7 @@ export class UmbInputContentElement extends UUIFormControlMixin(UmbLitElement, '
 			@change=${this.#onChange}></umb-input-member>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			p {
 				margin: 0;

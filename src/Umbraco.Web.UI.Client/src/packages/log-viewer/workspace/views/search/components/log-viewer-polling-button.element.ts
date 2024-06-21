@@ -75,7 +75,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#polling-enabled-icon {
 				margin-right: var(--uui-size-space-3);

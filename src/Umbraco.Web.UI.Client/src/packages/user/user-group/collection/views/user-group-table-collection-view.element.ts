@@ -176,7 +176,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbUserGroupCollectionTableViewElement;

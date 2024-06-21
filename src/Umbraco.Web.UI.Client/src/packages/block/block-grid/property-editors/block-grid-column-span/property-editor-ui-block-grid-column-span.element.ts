@@ -60,7 +60,7 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 		return html`<div id="wrapper">${template}</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#wrapper {

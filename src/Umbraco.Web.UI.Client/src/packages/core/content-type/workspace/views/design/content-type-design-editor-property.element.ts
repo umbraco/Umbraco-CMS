@@ -337,7 +337,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host(:not([sort-mode-active])) {

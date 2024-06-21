@@ -46,7 +46,7 @@ export class UmbDocumentBlueprintRootWorkspaceElement extends UmbLitElement {
 		</umb-workspace-editor> `;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#wrapper {
 				margin: var(--uui-size-layout-1);

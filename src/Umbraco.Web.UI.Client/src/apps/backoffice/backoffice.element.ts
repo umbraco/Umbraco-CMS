@@ -79,7 +79,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

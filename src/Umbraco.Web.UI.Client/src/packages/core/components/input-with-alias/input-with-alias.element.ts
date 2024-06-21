@@ -22,11 +22,11 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	@state()
 	private _aliasLocked = true;
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.shadowRoot?.querySelectorAll<UUIInputElement>('uui-input').forEach((x) => this.addFormControlElement(x));
 	}
 
-	focus() {
+	override focus() {
 		return this.shadowRoot?.querySelector<UUIInputElement>('uui-input')?.focus();
 	}
 
@@ -103,7 +103,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		`;
 	}
 
-	static styles = css`
+	static override styles = css`
 		#name {
 			width: 100%;
 			flex: 1 1 auto;

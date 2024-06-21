@@ -87,7 +87,7 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 			</uui-form>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -29,7 +29,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	@state()
 	_hasUnpublishPermission = true;
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#configureSelectionManager();
 		this.#getReferences();
 	}
@@ -137,7 +137,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		</umb-body-layout> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

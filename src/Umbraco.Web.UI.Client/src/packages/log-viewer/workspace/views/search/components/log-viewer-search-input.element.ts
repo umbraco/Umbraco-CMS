@@ -193,7 +193,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

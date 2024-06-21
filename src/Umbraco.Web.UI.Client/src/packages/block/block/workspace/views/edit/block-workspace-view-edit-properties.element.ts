@@ -61,7 +61,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		);
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			umb-property-type-based-property {

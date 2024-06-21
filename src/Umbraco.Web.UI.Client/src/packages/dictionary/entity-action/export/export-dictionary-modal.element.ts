@@ -46,7 +46,7 @@ export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 		</umb-body-layout>`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbExportDictionaryModalElement;

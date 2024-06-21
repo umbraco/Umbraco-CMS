@@ -67,7 +67,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 		this._isCurrentUser = await this.#currentUserContext.isUserCurrentUser(this.data.user.unique);
 	}
 
-	protected async firstUpdated(): Promise<void> {
+	protected override async firstUpdated(): Promise<void> {
 		if (!this.data?.user.unique) return;
 		const { data } = await this.#userItemRepository.requestItems([this.data.user.unique]);
 
@@ -129,7 +129,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			uui-input-password {

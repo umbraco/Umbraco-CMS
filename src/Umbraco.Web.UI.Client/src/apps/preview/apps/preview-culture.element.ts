@@ -16,7 +16,7 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 	@state()
 	private _cultures: Array<UmbLanguageDetailModel> = [];
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#getCultures();
 	}
@@ -69,7 +69,7 @@ export class UmbPreviewCultureElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

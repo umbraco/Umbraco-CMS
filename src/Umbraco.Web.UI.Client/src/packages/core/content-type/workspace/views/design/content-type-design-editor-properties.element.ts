@@ -225,7 +225,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			: '';
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#btn-add {

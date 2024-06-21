@@ -84,10 +84,10 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 	}
 
 	@property()
-	public set value(uniques: string) {
+	public override set value(uniques: string) {
 		this.selection = splitStringToArray(uniques);
 	}
-	public get value(): string {
+	public override get value(): string {
 		return this.selection.join(',');
 	}
 
@@ -170,7 +170,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

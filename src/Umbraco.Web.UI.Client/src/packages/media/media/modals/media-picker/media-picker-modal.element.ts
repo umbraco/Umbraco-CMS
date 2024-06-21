@@ -61,7 +61,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	async connectedCallback(): Promise<void> {
+	override async connectedCallback(): Promise<void> {
 		super.connectedCallback();
 
 		if (this.data?.filter) this._filter = this.data?.filter;
@@ -255,7 +255,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 			@change=${this.#onPathChange}></umb-media-picker-folder-path>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#toolbar {
 				display: flex;

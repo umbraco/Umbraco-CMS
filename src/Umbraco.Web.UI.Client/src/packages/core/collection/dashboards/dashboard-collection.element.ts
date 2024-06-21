@@ -11,7 +11,7 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 		return html`<umb-collection></umb-collection>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

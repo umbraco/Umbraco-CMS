@@ -21,7 +21,7 @@ export class UmbWebhookEventsModalElement extends UmbModalBaseElement<
 
 	#eventsRequest?: Promise<any>;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		this.#selectionManager.setSelectable(true);
@@ -92,7 +92,7 @@ export class UmbWebhookEventsModalElement extends UmbModalBaseElement<
 		</umb-body-layout> `;
 	}
 
-	static styles = [UmbTextStyles, css``];
+	static override styles = [UmbTextStyles, css``];
 }
 
 export default UmbWebhookEventsModalElement;

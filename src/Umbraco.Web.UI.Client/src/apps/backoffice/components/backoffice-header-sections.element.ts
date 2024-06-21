@@ -73,7 +73,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		css`
 			:host {
 				display: contents;

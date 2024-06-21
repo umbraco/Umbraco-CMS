@@ -70,7 +70,7 @@ export class UmbBlockRteTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

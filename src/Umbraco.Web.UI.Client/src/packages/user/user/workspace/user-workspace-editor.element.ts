@@ -93,7 +93,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

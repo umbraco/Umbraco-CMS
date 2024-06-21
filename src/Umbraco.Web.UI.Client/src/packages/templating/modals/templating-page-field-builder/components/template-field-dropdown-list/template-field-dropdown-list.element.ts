@@ -187,7 +187,7 @@ export class UmbTemplateFieldDropdownListElement extends UmbLitElement {
 			</uui-combobox>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-combobox {
 				width: 100%;

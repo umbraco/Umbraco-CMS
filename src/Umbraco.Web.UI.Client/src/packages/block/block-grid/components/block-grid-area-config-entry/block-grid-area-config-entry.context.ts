@@ -105,7 +105,7 @@ export class UmbBlockGridAreaConfigEntryContext
 		this.#propertyContext.setValue(value.filter((x) => x.key !== this.#areaKey));
 	}
 
-	destroy() {
+	override destroy() {
 		super.destroy();
 		this.#area.destroy();
 	}

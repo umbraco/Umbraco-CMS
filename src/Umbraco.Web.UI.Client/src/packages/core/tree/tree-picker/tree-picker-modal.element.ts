@@ -24,7 +24,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	_createLabel?: string;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		// TODO: We should make a nicer way to observe the value..  [NL]

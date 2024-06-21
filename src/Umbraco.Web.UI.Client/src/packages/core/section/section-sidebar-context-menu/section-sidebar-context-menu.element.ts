@@ -107,7 +107,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

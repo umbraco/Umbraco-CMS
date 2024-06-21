@@ -11,7 +11,7 @@ export class UmbLanguageTableNameColumnLayoutElement extends LitElement {
 		return html`<a href=${'section/settings/workspace/language/edit/' + this.value.unique}>${this.value.name}</a>`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 declare global {

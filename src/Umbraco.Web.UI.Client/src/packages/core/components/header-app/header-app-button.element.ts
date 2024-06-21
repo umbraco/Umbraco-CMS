@@ -37,7 +37,7 @@ export class UmbHeaderAppButtonElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			uui-button {

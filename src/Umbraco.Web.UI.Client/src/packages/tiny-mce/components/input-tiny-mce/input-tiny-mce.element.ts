@@ -61,7 +61,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		return this._editorElement?.querySelector('iframe') ?? undefined;
 	}
 
-	set value(newValue: FormDataEntryValue | FormData) {
+	override set value(newValue: FormDataEntryValue | FormData) {
 		super.value = newValue;
 		const newContent = newValue?.toString() ?? '';
 
@@ -70,7 +70,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		}
 	}
 
-	get value(): FormDataEntryValue | FormData {
+	override get value(): FormDataEntryValue | FormData {
 		return super.value;
 	}
 
@@ -103,7 +103,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		});
 	}
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 
 		this.#editorRef?.destroy();
@@ -360,7 +360,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 		return html`<div class="editor"></div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			.tox-tinymce {
 				position: relative;

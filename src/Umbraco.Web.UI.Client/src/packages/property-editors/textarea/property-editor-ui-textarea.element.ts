@@ -56,7 +56,7 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-textarea {
 				width: 100%;

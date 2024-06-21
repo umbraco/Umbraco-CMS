@@ -1,3 +1,5 @@
+// Notice: This script is not perfect and may not work in all cases. ex. it places the override term wrong for async and setter/getter methods. But its a help any way. [NL]
+
 import ts from 'typescript';
 import path from 'node:path';
 import fs from 'node:fs/promises';

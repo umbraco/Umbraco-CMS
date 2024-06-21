@@ -109,7 +109,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 		</div>`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		css`
 			:host,
 			#container {

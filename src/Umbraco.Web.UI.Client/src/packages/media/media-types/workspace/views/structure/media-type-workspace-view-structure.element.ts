@@ -113,7 +113,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

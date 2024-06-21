@@ -69,7 +69,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		});
 	}
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		this.#retrieveAllowedMediaTypesOf(this._mediaTypeUnique ?? '');
 	}
 

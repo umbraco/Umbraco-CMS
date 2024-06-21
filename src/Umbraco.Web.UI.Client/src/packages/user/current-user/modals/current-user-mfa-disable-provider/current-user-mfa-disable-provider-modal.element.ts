@@ -137,7 +137,7 @@ export class UmbCurrentUserMfaDisableProviderModalElement extends UmbModalBaseEl
 		});
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#authForm {

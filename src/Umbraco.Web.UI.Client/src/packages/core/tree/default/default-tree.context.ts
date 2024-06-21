@@ -352,7 +352,7 @@ export class UmbDefaultTreeContext<
 		this.loadTree();
 	};
 
-	destroy(): void {
+	override destroy(): void {
 		this.#actionEventContext?.removeEventListener(
 			UmbRequestReloadTreeItemChildrenEvent.TYPE,
 			this.#onReloadRequest as EventListener,

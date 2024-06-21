@@ -42,13 +42,13 @@ export class UmbImageCropperElement extends LitElement {
 		return lerp(this.#minImageScale, this.#maxImageScale, this._zoom);
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#initializeCrop();
 		this.#addEventListeners();
 	}
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#removeEventListeners();
 	}
@@ -64,7 +64,7 @@ export class UmbImageCropperElement extends LitElement {
 		this.removeEventListener('wheel', this.#onWheel);
 	}
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('value')) {
@@ -339,7 +339,7 @@ export class UmbImageCropperElement extends LitElement {
 		`;
 	}
 
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: grid;
 			grid-template-rows: 1fr auto auto;

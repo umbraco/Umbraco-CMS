@@ -97,7 +97,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box {

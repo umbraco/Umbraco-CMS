@@ -55,7 +55,7 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-select {
 				width: 100%;

@@ -36,7 +36,7 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 			<umb-collection-view-bundle></umb-collection-view-bundle>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				height: 100%;

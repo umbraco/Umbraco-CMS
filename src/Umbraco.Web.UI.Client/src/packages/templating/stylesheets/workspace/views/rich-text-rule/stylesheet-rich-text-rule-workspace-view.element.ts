@@ -65,7 +65,7 @@ export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -97,7 +97,7 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 	/**
 	 * Disable the Shadow DOM for this element. This is needed because this is a wrapper element and should not stop the event propagation.
 	 */
-	protected createRenderRoot() {
+	protected override createRenderRoot() {
 		return this;
 	}
 }

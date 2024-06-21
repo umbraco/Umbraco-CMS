@@ -256,7 +256,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input:not(:hover, :focus) {

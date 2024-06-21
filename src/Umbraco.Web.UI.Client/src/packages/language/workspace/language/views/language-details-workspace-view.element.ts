@@ -171,7 +171,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

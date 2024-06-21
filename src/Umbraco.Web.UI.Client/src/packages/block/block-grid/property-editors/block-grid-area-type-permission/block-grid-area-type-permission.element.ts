@@ -180,7 +180,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 		);
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#permissions {

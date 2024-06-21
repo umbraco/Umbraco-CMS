@@ -159,7 +159,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

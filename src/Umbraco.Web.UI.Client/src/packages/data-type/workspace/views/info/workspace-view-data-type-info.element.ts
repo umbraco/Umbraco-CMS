@@ -73,7 +73,7 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

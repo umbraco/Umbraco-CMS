@@ -229,7 +229,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		</umb-workspace-editor>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

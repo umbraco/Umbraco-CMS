@@ -56,7 +56,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 			: html`<div>No configuration</div>`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorConfigElement;

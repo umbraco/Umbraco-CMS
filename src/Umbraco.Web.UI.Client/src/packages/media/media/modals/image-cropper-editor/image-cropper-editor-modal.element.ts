@@ -60,7 +60,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 			});
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		this._key = this.data?.key ?? '';
@@ -149,7 +149,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#layout {
 				height: 100%;

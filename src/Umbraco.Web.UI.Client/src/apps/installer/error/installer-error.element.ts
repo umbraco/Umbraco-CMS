@@ -12,7 +12,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 
 	private _installerContext?: UmbInstallerContext;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		this.consumeContext(UMB_INSTALLER_CONTEXT, (installerContext) => {
@@ -74,7 +74,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 		</div>`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		css`
 			:host,
 			#container {

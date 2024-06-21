@@ -84,7 +84,7 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UUISelectElement.styles,
 		css`
 			#native {

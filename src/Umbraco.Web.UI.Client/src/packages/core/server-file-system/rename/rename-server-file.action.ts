@@ -5,7 +5,7 @@ import type { MetaEntityActionRenameServerFileKind } from '@umbraco-cms/backoffi
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbRenameEntityAction extends UmbEntityActionBase<MetaEntityActionRenameServerFileKind> {
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is required to rename an entity');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);

@@ -11,7 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbStoryNotificationDefaultExampleElement extends UmbLitElement {
 	private _notificationContext?: UmbNotificationContext;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {

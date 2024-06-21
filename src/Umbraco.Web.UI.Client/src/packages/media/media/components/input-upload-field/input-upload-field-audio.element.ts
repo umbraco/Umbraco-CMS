@@ -12,7 +12,7 @@ export class UmbInputUploadFieldAudioElement extends UmbLitElement {
 		return html`<audio controls src=${this.path}></audio>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

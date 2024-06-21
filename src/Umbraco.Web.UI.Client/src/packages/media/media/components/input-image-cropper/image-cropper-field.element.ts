@@ -63,7 +63,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		return '';
 	}
 
-	updated(changedProperties: Map<string | number | symbol, unknown>) {
+	override updated(changedProperties: Map<string | number | symbol, unknown>) {
 		super.updated(changedProperties);
 
 		if (changedProperties.has('file')) {
@@ -176,7 +176,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 					.src=${this.source}></umb-image-cropper-preview>`,
 		);
 	}
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: flex;
 			width: 100%;

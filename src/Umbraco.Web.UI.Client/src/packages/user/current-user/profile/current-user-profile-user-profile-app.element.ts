@@ -12,7 +12,7 @@ export class UmbCurrentUserProfileUserProfileAppElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#actions {

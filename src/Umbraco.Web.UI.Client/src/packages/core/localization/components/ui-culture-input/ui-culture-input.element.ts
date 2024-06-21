@@ -20,10 +20,10 @@ export class UmbUiCultureInputElement extends UUIFormControlMixin(UmbLitElement,
 	private _selectElement!: HTMLInputElement;
 
 	@property({ type: String })
-	get value() {
+	override get value() {
 		return super.value;
 	}
-	set value(value: FormDataEntryValue | FormData) {
+	override set value(value: FormDataEntryValue | FormData) {
 		if (typeof value === 'string') {
 			const oldValue = super.value;
 			super.value = value.toLowerCase();
@@ -79,7 +79,7 @@ export class UmbUiCultureInputElement extends UUIFormControlMixin(UmbLitElement,
 		</uui-combobox>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

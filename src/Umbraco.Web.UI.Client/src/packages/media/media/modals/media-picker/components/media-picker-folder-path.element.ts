@@ -38,7 +38,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 	@state()
 	private _typingNewFolder = false;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#loadPath();
 	}
@@ -143,7 +143,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#path {
 				display: flex;

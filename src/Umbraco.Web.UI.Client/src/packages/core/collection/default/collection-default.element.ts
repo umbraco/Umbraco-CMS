@@ -71,7 +71,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		return html`<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

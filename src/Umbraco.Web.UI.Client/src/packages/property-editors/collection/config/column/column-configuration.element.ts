@@ -150,7 +150,7 @@ export class UmbPropertyEditorUICollectionColumnConfigurationElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#layout-wrapper {

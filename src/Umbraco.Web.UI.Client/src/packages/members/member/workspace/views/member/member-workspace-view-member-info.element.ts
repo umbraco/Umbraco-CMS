@@ -94,7 +94,7 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			.general-item {

@@ -27,12 +27,12 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 	#userNewPasswordRepository = new UmbNewUserPasswordRepository(this);
 	#notificationContext?: UmbNotificationContext;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => (this.#notificationContext = instance));
 	}
 
-	protected async firstUpdated(): Promise<void> {
+	protected override async firstUpdated(): Promise<void> {
 		const unique = this.data?.user.unique;
 		if (!unique) throw new Error('No user unique is provided');
 
@@ -102,7 +102,7 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 		</uui-dialog-layout>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			p {

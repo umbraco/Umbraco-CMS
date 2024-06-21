@@ -17,7 +17,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#configureSelectionManager();
 	}
 
@@ -66,7 +66,7 @@ export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
 		</umb-body-layout> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

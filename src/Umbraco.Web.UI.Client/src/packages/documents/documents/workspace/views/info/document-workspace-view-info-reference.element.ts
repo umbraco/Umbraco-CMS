@@ -46,7 +46,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 			});
 	}
 
-	protected firstUpdated(): void {
+	protected override firstUpdated(): void {
 		this.#getReferences();
 	}
 
@@ -172,7 +172,7 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-table-cell:not(.link-cell) {

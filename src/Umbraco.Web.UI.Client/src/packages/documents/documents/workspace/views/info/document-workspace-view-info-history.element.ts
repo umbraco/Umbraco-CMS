@@ -160,7 +160,7 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-loader-circle {

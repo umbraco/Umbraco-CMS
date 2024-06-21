@@ -152,7 +152,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		else return nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

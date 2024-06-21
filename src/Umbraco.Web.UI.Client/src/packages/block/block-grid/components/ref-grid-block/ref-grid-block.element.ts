@@ -6,7 +6,7 @@ import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
  */
 @customElement('umb-ref-grid-block')
 export class UmbRefGridBlockElement extends UUIRefNodeElement {
-	render() {
+	override render() {
 		return html`
 			${super.render()}
 			<div class="break"></div>
@@ -14,7 +14,7 @@ export class UmbRefGridBlockElement extends UUIRefNodeElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		...UUIRefNodeElement.styles,
 		css`
 			:host {

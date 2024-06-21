@@ -53,7 +53,7 @@ export class UmbUserWorkspaceAccessElement extends UmbLitElement {
 				[]}></umb-user-media-start-node>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#access {

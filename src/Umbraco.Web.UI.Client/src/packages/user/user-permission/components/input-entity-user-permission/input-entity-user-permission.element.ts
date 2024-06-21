@@ -101,7 +101,7 @@ export class UmbInputEntityUserPermissionElement extends UUIFormControlMixin(Umb
 				this.#onChangeUserPermission(event, manifest.meta.verbs)}></umb-input-user-permission-verb>`;
 	}
 
-	disconnectedCallback() {
+	override disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#manifestObserver?.destroy();
 	}

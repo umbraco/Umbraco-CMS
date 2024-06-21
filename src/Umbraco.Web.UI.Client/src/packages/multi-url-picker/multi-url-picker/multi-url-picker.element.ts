@@ -285,7 +285,7 @@ export class UmbMultiUrlPickerElement extends UUIFormControlMixin(UmbLitElement,
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

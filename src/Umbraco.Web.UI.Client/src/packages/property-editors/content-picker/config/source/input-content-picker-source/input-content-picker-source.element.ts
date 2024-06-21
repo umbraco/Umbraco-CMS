@@ -49,7 +49,7 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 		{ value: 'member', name: 'Members' },
 	];
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		// HACK: Workaround consolidating the old content-picker and dynamic-root. [LK:2024-01-24]
@@ -120,7 +120,7 @@ export class UmbInputContentPickerSourceElement extends UUIFormControlMixin(UmbL
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

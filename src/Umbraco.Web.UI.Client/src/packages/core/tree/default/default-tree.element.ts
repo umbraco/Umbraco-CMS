@@ -70,7 +70,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		]);
 	}
 
-	protected async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
+	protected override async updated(
+		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
+	): Promise<void> {
 		super.updated(_changedProperties);
 		await this.#init;
 

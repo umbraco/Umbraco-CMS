@@ -17,7 +17,7 @@ export class UmbPopoverLayoutElement extends UmbLitElement {
 		return html`<slot></slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

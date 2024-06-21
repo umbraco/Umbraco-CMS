@@ -44,8 +44,6 @@ export class UmbTemplateWorkspaceContext
 	#isCodeEditorReady = new UmbBooleanState(false);
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
-	readonly routes = new UmbWorkspaceRouteManager(this);
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TEMPLATE_WORKSPACE_ALIAS);
 		this.#loadCodeEditor();
@@ -77,7 +75,7 @@ export class UmbTemplateWorkspaceContext
 		]);
 	}
 
-	protected resetState(): void {
+	protected override resetState(): void {
 		super.resetState();
 		this.#data.setValue(undefined);
 	}
@@ -223,7 +221,7 @@ ${currentContent}`;
 		}
 	}
 
-	public destroy() {
+	public override destroy() {
 		this.#data.destroy();
 		super.destroy();
 	}

@@ -32,7 +32,7 @@ export class UmbUserPermissionVerbElement extends UmbLitElement {
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#setting {

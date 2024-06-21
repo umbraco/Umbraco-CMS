@@ -37,7 +37,7 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 		></uui-ref-node>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-ref-node {
 				min-height: var(--uui-size-16);

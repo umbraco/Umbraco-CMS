@@ -7,7 +7,7 @@ export class UmbBackofficeHeaderAppsElement extends LitElement {
 		return html` <umb-extension-slot id="apps" type="headerApp"></umb-extension-slot> `;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		css`
 			#apps {
 				display: flex;

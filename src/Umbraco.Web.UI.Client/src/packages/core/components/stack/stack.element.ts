@@ -32,7 +32,7 @@ export class UmbStackElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			div {
 				display: block;

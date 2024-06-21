@@ -65,7 +65,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#header {
 				display: flex;

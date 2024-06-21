@@ -12,7 +12,7 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 > {
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		if (!this.data?.parent) throw new Error('A parent unique is required to create a folder');
 

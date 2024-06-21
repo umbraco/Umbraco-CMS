@@ -22,7 +22,7 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 	@state()
 	private _blueprintName = '';
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#documentUnique = this.data?.unique ?? '';
 		this.#getDocumentData();
 	}
@@ -76,7 +76,7 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			strong,

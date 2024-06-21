@@ -72,7 +72,7 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

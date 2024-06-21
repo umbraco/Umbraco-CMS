@@ -53,7 +53,7 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-input {
 				width: 100%;

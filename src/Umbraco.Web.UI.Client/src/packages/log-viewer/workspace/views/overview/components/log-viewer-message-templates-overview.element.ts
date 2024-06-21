@@ -95,7 +95,7 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-pagination {

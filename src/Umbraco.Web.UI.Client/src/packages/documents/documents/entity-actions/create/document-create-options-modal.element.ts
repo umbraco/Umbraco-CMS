@@ -42,7 +42,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 	@state()
 	private _availableBlueprints: Array<UmbDocumentBlueprintItemBaseModel> = [];
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		const parentUnique = this.data?.parent.unique;
 		const documentTypeUnique = this.data?.documentType?.unique || null;
 
@@ -189,7 +189,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#blank {

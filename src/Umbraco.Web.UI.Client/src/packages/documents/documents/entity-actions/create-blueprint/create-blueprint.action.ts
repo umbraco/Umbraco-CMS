@@ -12,7 +12,7 @@ export class UmbCreateDocumentBlueprintEntityAction extends UmbEntityActionBase<
 		super(host, args);
 	}
 
-	async execute() {
+	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is required');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);

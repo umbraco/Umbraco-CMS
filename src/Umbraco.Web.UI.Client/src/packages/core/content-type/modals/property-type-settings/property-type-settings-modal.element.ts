@@ -60,7 +60,7 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 	@state()
 	private _contentTypeVariesBySegment?: boolean;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
@@ -385,7 +385,7 @@ export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
 			label=${this.localize.term('contentTypeEditor_cultureVariantLabel')}></uui-toggle> `;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

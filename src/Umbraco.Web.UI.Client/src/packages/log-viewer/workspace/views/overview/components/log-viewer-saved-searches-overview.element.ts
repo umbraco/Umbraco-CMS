@@ -73,7 +73,7 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box {

@@ -28,7 +28,7 @@ export class UmbTemporaryFileBadgeElement extends UmbLitElement {
 		</uui-badge>`;
 	}
 
-	static styles = css`
+	static override styles = css`
 		:host {
 			display: block;
 		}

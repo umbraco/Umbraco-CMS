@@ -157,7 +157,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

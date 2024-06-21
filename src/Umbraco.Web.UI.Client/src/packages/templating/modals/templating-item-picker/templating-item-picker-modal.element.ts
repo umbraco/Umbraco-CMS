@@ -135,7 +135,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#main uui-button:not(:last-of-type) {

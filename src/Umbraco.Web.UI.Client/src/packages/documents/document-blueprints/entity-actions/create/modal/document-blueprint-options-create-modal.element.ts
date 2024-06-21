@@ -16,7 +16,7 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 > {
 	#createFolderAction?: UmbCreateFolderEntityAction;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
@@ -76,7 +76,7 @@ export class UmbDocumentBlueprintOptionsCreateModalElement extends UmbModalBaseE
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box:first-child {

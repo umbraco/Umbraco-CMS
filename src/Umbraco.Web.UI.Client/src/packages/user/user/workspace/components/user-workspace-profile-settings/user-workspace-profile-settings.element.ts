@@ -65,7 +65,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-input {

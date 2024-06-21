@@ -58,7 +58,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 		);
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		this.#updateDynamicRootOrigin(this.data);
@@ -245,7 +245,7 @@ export class UmbInputContentPickerDocumentRootElement extends UUIFormControlMixi
 			look="placeholder"></uui-button>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			.add-button {
 				width: 100%;

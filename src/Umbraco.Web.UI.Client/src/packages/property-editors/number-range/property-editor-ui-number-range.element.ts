@@ -25,12 +25,12 @@ export class UmbPropertyEditorUINumberRangeElement
 	_validationRange?: UmbNumberRangeValueType;
 
 	@property({ type: Object })
-	public set value(value: UmbNumberRangeValueType | undefined) {
+	public override set value(value: UmbNumberRangeValueType | undefined) {
 		this.#value = value || { min: undefined, max: undefined };
 		this._minValue = value?.min;
 		this._maxValue = value?.max;
 	}
-	public get value() {
+	public override get value() {
 		return this.#value;
 	}
 	#value: UmbNumberRangeValueType = { min: undefined, max: undefined };
@@ -45,11 +45,11 @@ export class UmbPropertyEditorUINumberRangeElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-number-range')!);
 	}
 
-	focus(): void {
+	override focus(): void {
 		this.shadowRoot!.querySelector('umb-input-number-range')!.focus();
 	}
 

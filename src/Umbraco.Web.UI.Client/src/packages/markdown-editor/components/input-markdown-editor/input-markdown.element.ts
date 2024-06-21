@@ -550,7 +550,7 @@ export class UmbInputMarkdownElement extends UUIFormControlMixin(UmbLitElement, 
 		return html`<uui-scroll-container id="preview">${unsafeHTML(sanitizedHtml)}</uui-scroll-container>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -17,7 +17,7 @@ export class UmbInputUploadFieldVideoElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

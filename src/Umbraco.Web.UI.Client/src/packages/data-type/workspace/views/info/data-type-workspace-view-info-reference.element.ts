@@ -37,7 +37,7 @@ export class UmbDataTypeWorkspaceViewInfoReferenceElement extends UmbLitElement 
 			});
 	}
 
-	protected firstUpdated() {
+	protected override firstUpdated() {
 		this.#getReferences();
 	}
 
@@ -100,7 +100,7 @@ export class UmbDataTypeWorkspaceViewInfoReferenceElement extends UmbLitElement 
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-table-cell {

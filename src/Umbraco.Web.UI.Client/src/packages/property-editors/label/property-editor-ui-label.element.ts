@@ -22,7 +22,7 @@ export class UmbPropertyEditorUILabelElement extends UmbLitElement implements Um
 		return html`${this.value ?? ''}`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUILabelElement;

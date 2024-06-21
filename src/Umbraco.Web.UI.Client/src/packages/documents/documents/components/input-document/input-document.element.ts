@@ -92,10 +92,10 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 	showOpenButton?: boolean;
 
 	@property()
-	public set value(idsString: string) {
+	public override set value(idsString: string) {
 		this.selection = splitStringToArray(idsString);
 	}
-	public get value() {
+	public override get value() {
 		return this.selection.join(',');
 	}
 
@@ -224,7 +224,7 @@ export class UmbInputDocumentElement extends UUIFormControlMixin(UmbLitElement, 
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#btn-add {
 				width: 100%;

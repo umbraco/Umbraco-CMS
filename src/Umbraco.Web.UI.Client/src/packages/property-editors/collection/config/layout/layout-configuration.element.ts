@@ -185,7 +185,7 @@ export class UmbPropertyEditorUICollectionLayoutConfigurationElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#layout-wrapper {

@@ -216,7 +216,7 @@ export class UmbMultipleColorPickerInputElement extends UUIFormControlMixin(UmbL
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#action {
 				display: block;

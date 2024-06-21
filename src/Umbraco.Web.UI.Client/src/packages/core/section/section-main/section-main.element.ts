@@ -11,7 +11,7 @@ export class UmbSectionMainElement extends LitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

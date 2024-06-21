@@ -128,7 +128,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

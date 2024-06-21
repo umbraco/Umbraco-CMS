@@ -301,13 +301,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		return this.#model.find((x) => this.#config.getUniqueOfModel(x) === unique);
 	}
 
-	hostConnected() {
+	override hostConnected() {
 		this.#isConnected = true;
 		if (this.#enabled) {
 			requestAnimationFrame(this.#initialize);
 		}
 	}
-	hostDisconnected() {
+	override hostDisconnected() {
 		this.#isConnected = false;
 		if (this.#enabled) {
 			this.#uninitialize();
@@ -1015,7 +1015,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		return true;
 	}
 
-	destroy() {
+	override destroy() {
 		super.destroy();
 
 		// Do something when host element is destroyed.

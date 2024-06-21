@@ -41,7 +41,7 @@ export class UmbPackagesMarketplaceSectionViewElement extends UmbLitElement impl
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				height: 100%;

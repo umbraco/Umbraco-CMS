@@ -143,7 +143,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

@@ -21,7 +21,7 @@ import type { UUIColorPickerElement, UUIInputElement, UUIInputEvent } from '@umb
 @customElement('umb-multiple-color-picker-item-input')
 export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(UmbLitElement, '') {
 	@property({ type: String })
-	public set value(value: string) {
+	public override set value(value: string) {
 		if (value.startsWith('#')) {
 			this._valueHex = value;
 			super.value = value.substring(1);
@@ -30,7 +30,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 			this._valueHex = `#${value}`;
 		}
 	}
-	public get value() {
+	public override get value() {
 		return super.value as string;
 	}
 
@@ -118,7 +118,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 		event.stopPropagation();
 	}
 
-	public async focus() {
+	public override async focus() {
 		await this.updateComplete;
 		this._input?.focus();
 	}
@@ -187,7 +187,7 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlMixin(
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

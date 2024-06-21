@@ -33,7 +33,7 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 		return undefined;
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#updateLabel();
 	}
@@ -55,7 +55,7 @@ export class UmbInputToggleElement extends UUIFormControlMixin(UmbLitElement, ''
 			@change=${this.#onChange}></uui-toggle>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-toggle {
 				width: 100%;

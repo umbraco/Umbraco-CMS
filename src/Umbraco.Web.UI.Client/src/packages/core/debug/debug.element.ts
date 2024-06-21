@@ -148,7 +148,7 @@ export class UmbDebugElement extends UmbLitElement {
 		}
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				float: right;

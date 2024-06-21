@@ -336,7 +336,7 @@ export class UmbInputCollectionContentTypePropertyElement extends UUIFormControl
 			@click=${this.#onClick}></uui-button>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

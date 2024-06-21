@@ -38,7 +38,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		});
 	}
 
-	protected firstUpdated() {
+	protected override firstUpdated() {
 		this.#registerHealthChecks();
 	}
 

@@ -59,7 +59,7 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 			@change=${this.#onChange}></uui-pagination>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

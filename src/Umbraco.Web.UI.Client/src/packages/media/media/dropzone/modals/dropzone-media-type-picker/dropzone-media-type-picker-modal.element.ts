@@ -19,7 +19,7 @@ export class UmbDropzoneMediaTypePickerModalElement extends UmbModalBaseElement<
 	@query('#auto')
 	private _buttonAuto!: UUIButtonElement;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this._options = this.data?.options ?? [];
 		requestAnimationFrame(() => this._buttonAuto.focus());
@@ -55,7 +55,7 @@ export class UmbDropzoneMediaTypePickerModalElement extends UmbModalBaseElement<
 		</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#options {

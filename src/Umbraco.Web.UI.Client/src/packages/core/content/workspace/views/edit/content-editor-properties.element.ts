@@ -80,7 +80,7 @@ export class UmbContentWorkspaceViewEditPropertiesElement extends UmbLitElement 
 			: '';
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			.property {

@@ -56,7 +56,7 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

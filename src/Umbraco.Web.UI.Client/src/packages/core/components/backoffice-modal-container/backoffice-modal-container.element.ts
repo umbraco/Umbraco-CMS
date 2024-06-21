@@ -103,7 +103,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		`;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			:host {

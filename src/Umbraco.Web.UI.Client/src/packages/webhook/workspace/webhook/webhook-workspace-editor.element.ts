@@ -13,7 +13,7 @@ export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
 			back-path="section/settings/workspace/webhook-root"></umb-workspace-editor>`;
 	}
 
-	static styles = [UmbTextStyles, css``];
+	static override styles = [UmbTextStyles, css``];
 }
 
 export default UmbWebhookWorkspaceEditorElement;

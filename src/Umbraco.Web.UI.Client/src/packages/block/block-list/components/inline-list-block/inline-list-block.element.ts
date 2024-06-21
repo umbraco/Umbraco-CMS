@@ -77,7 +77,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		</uui-box>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#accordion-button {

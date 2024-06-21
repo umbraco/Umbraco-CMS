@@ -16,7 +16,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 	#mediaUnique?: string;
 	#mediaDetailRepository = new UmbMediaDetailRepository(this);
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		this.#mediaUnique = this.data?.mediaUnique;
 		this.#getMediaDetail();
@@ -64,7 +64,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-input {
 				margin-bottom: var(--uui-size-layout-1);

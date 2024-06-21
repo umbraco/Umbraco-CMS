@@ -12,7 +12,7 @@ export class UmbWebhookTableNameColumnLayoutElement extends LitElement {
 		return html`<a href=${'section/settings/workspace/webhook/edit/' + this.value.unique}>${this.value.name}</a>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

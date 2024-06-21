@@ -48,7 +48,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	@query('#link-title-input')
 	private _linkTitleInput!: UUIInputElement;
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		if (!this.data) return;
 
@@ -214,7 +214,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			hr {
 				border: none;

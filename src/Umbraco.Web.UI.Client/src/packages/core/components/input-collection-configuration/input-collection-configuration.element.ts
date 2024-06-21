@@ -11,7 +11,7 @@ import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-input-collection-configuration')
 export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(UmbLitElement) {
-	protected getFormElement() {
+	protected override getFormElement() {
 		return undefined;
 	}
 
@@ -111,7 +111,7 @@ export class UmbInputCollectionConfigurationElement extends UmbFormControlMixin(
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#create-button {
 				width: 100%;

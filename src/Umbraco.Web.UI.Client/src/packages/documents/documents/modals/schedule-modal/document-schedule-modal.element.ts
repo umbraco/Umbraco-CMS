@@ -33,7 +33,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#configureSelectionManager();
 	}
 
@@ -159,7 +159,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

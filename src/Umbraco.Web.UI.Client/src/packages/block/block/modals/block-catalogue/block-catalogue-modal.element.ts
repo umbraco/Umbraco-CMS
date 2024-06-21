@@ -49,7 +49,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 		if (!this.data) return;
 
@@ -158,7 +158,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#search {
 				width: 100%;

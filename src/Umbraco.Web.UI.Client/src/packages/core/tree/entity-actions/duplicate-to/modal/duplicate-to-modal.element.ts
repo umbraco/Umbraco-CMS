@@ -54,7 +54,7 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export { UmbDuplicateToModalElement as element };

@@ -40,7 +40,7 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 		this.modalContext?.submit();
 	}
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		if (!this.data) return;
@@ -92,7 +92,7 @@ export class UmbItemPickerModalElement extends UmbModalBaseElement<UmbItemPicker
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#main {

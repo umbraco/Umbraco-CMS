@@ -29,7 +29,7 @@ export class UmbDocumentTableColumnNameElement extends UmbLitElement implements 
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-button {
 				text-align: left;

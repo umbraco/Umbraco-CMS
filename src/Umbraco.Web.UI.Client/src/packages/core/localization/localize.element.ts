@@ -57,7 +57,7 @@ export class UmbLocalizeElement extends UmbLitElement {
 			: html`<slot></slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: contents;

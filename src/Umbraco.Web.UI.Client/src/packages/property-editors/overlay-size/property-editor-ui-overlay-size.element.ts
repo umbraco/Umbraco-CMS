@@ -26,7 +26,7 @@ export class UmbPropertyEditorUIOverlaySizeElement extends UmbLitElement impleme
 	@property({ attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	firstUpdated() {
+	override firstUpdated() {
 		if (!this.value) return;
 		this._list = this._list.map((option) => ({
 			...option,

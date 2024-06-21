@@ -30,7 +30,7 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 	@state()
 	_errorMessage = '';
 
-	firstUpdated() {
+	override firstUpdated() {
 		this.#getReferences();
 	}
 
@@ -125,7 +125,7 @@ export class UmbDocumentReferenceTableElement extends UmbLitElement {
 		return nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#error {

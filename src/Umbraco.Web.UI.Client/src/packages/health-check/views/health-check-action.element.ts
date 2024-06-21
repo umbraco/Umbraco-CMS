@@ -95,7 +95,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 		return nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

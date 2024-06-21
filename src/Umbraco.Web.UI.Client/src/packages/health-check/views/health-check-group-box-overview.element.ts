@@ -117,7 +117,7 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 		return tags;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			.group-box {

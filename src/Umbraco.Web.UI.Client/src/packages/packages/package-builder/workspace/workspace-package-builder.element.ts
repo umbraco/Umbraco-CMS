@@ -64,7 +64,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		});
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#getPackageCreated();
 	}
@@ -425,7 +425,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

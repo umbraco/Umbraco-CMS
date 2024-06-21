@@ -22,7 +22,7 @@ export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
 		return html`<div>umb-property-editor-ui-block-type-group-configuration</div>`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIBlockGridGroupConfigurationElement;

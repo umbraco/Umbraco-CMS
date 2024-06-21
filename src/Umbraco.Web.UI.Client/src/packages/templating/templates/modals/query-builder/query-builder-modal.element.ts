@@ -273,7 +273,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

@@ -112,7 +112,7 @@ export class UmbAppAuthModalElement extends UmbModalBaseElement<UmbModalAppAuthC
 		}
 	};
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

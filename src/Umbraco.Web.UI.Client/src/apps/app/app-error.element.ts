@@ -203,7 +203,7 @@ export class UmbAppErrorElement extends UmbLitElement {
 		</div>
 	`;
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#background {

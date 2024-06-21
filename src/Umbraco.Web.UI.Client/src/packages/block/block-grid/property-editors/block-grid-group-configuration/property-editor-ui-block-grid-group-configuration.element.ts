@@ -39,7 +39,7 @@ export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-button {

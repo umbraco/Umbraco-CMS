@@ -43,7 +43,9 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
+	protected override async firstUpdated(
+		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
+	): Promise<void> {
 		super.firstUpdated(_changedProperties);
 		this.#requestChildren();
 	}
@@ -181,7 +183,7 @@ export class UmbSortChildrenOfModalElement extends UmbModalBaseElement<
 		return html`<uui-ref-node .name=${item.name} data-unique=${item.unique}></uui-ref-node>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#loadMoreButton {

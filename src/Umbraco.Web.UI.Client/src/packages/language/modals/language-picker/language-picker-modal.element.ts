@@ -16,7 +16,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	#collectionRepository = new UmbLanguageCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
@@ -27,7 +27,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	async firstUpdated() {
+	override async firstUpdated() {
 		const { data } = await this.#collectionRepository.requestCollection({});
 		this._languages = data?.items ?? [];
 	}
@@ -51,22 +51,24 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	render() {
 		return html`<umb-body-layout headline="Select languages">
 			<uui-box>
-				${this.#filteredLanguages.length > 0 ? repeat(
-					this.#filteredLanguages,
-					(item) => item.unique,
-					(item) => html`
-						<uui-menu-item
-							label=${item.name ?? ''}
-							selectable
-							@selected=${() => this.#selectionManager.select(item.unique)}
-							@deselected=${() => this.#selectionManager.deselect(item.unique)}
-							?selected=${this.value.selection.includes(item.unique)}>
-							<uui-icon slot="icon" name="icon-globe"></uui-icon>
-						</uui-menu-item>
-					`,
-				) : html`<umb-localize key="language_noFallbackLanguages">
-						There are no other languages to choose from
-				</umb-localize>`}
+				${this.#filteredLanguages.length > 0
+					? repeat(
+							this.#filteredLanguages,
+							(item) => item.unique,
+							(item) => html`
+								<uui-menu-item
+									label=${item.name ?? ''}
+									selectable
+									@selected=${() => this.#selectionManager.select(item.unique)}
+									@deselected=${() => this.#selectionManager.deselect(item.unique)}
+									?selected=${this.value.selection.includes(item.unique)}>
+									<uui-icon slot="icon" name="icon-globe"></uui-icon>
+								</uui-menu-item>
+							`,
+						)
+					: html`<umb-localize key="language_noFallbackLanguages">
+							There are no other languages to choose from
+						</umb-localize>`}
 			</uui-box>
 			<div slot="actions">
 				<uui-button label="Close" @click=${this.#close}></uui-button>

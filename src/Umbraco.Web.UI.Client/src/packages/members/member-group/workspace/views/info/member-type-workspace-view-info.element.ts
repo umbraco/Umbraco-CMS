@@ -42,7 +42,7 @@ export class UmbMemberTypeWorkspaceViewMemberInfoElement extends UmbLitElement i
 			</div>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#no-properties {

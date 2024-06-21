@@ -63,7 +63,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 
 	#selectedValues: string[] = [];
 
-	protected async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
+	protected override async firstUpdated(_changedProperties: PropertyValueMap<unknown>) {
 		super.firstUpdated(_changedProperties);
 
 		this.config?.getValueByAlias<ToolbarConfig[]>('toolbar')?.forEach((v) => {
@@ -128,7 +128,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 		</ul>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			ul {

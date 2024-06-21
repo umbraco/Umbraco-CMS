@@ -51,7 +51,7 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIBlockGridLayoutStylesheetElement;

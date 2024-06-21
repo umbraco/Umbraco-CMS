@@ -18,7 +18,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 
 	private _propertyEditorUiAlias!: string;
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		if (!this.data) return;
@@ -103,7 +103,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box {

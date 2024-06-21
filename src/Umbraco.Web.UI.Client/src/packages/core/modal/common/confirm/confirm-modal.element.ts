@@ -41,7 +41,7 @@ export class UmbConfirmModalElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 export default UmbConfirmModalElement;

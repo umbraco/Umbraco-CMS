@@ -40,7 +40,7 @@ export class UmbEntityActionDefaultElement<
 	@state()
 	_href?: string;
 
-	async focus() {
+	override async focus() {
 		await this.updateComplete;
 		this.shadowRoot?.querySelector('uui-menu-item')?.focus();
 	}

@@ -12,7 +12,7 @@ export class UmbInputUploadFieldSvgElement extends UmbLitElement {
 		return html`<img src=${this.path} alt="svg" />`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: flex;

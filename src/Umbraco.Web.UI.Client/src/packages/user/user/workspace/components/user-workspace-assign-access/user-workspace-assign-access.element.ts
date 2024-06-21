@@ -185,7 +185,7 @@ export class UmbUserWorkspaceAssignAccessElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 declare global {

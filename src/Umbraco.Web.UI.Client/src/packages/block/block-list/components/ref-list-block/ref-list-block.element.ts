@@ -36,7 +36,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 			href=${this._workspaceEditPath ?? '#'}></uui-ref-node>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			uui-ref-node {
 				min-height: var(--uui-size-16);

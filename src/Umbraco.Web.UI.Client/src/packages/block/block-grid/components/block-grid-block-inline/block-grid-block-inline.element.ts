@@ -47,7 +47,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		</umb-ref-grid-block>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			umb-block-grid-areas-container {
 				margin-top: calc(var(--uui-size-2) + 1px);

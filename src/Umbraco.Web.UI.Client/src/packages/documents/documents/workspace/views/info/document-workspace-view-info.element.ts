@@ -310,7 +310,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		this.#workspaceContext?.setTemplate(templateUnique);
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

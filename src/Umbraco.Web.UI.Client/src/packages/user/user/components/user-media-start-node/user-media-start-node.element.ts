@@ -16,7 +16,7 @@ export class UmbUserMediaStartNodeElement extends UmbLitElement {
 
 	#itemRepository = new UmbMediaItemRepository(this);
 
-	protected async firstUpdated(): Promise<void> {
+	protected override async firstUpdated(): Promise<void> {
 		if (this.uniques.length === 0) return;
 		const { data } = await this.#itemRepository.requestItems(this.uniques);
 		this._displayValue = data || [];

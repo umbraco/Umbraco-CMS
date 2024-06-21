@@ -98,7 +98,7 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			uui-box > div {

@@ -20,7 +20,7 @@ export default class UmbContextDebuggerModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			summary {

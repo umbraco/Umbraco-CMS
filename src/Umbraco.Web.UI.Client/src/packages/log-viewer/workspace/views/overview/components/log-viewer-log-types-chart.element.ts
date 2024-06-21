@@ -25,7 +25,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	@state()
 	private _logLevelCountFilter: string[] = [];
 
-	protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
+	protected override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('_logLevelCountFilter')) {
 			this.setLogLevelCount();
 		}
@@ -97,7 +97,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			#log-types-container {
 				display: flex;

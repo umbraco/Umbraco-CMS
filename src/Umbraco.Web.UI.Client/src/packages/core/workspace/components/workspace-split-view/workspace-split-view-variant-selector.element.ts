@@ -290,7 +290,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			#name-input {

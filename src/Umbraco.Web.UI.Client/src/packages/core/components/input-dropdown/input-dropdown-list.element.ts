@@ -37,7 +37,7 @@ export class UmbInputDropdownListElement extends UUIFormControlMixin(UmbLitEleme
 			@change=${this.#onChange}></uui-select>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

@@ -120,7 +120,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles: CSSResultGroup = [
+	static override styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
 			:host {

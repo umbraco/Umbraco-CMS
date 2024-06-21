@@ -121,7 +121,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: block;

@@ -58,7 +58,7 @@ export class UmbPackageStore extends UmbStoreBase {
 	/**
 	 * Append items to the store
 	 */
-	appendItems(packages: Array<UmbPackage>) {
+	override appendItems(packages: Array<UmbPackage>) {
 		this.#packages.next(packages);
 		this.isPackagesLoaded = true;
 	}

@@ -21,7 +21,7 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 		this._profilingStatus = value;
 	}
 
-	firstUpdated() {
+	override firstUpdated() {
 		this._getProfilingStatus();
 	}
 
@@ -72,7 +72,7 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			:host {

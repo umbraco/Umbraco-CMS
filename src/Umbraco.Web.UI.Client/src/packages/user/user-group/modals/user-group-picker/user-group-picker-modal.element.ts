@@ -18,7 +18,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManager(this);
 	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
@@ -28,7 +28,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		this.observe(this.#selectionManager.selection, (selection) => this.updateValue({ selection }), 'selectionObserver');
 	}
 
-	protected firstUpdated(): void {
+	protected override firstUpdated(): void {
 		this.#observeUserGroups();
 	}
 

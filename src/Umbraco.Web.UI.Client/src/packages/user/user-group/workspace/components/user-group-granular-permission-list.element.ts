@@ -100,7 +100,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 		`;
 	}
 
-	disconnectedCallback(): void {
+	override disconnectedCallback(): void {
 		this._extensionElements.forEach((element) => element.removeEventListener(UmbChangeEvent.TYPE, this.#onValueChange));
 		super.disconnectedCallback();
 	}

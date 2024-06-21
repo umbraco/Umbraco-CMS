@@ -151,7 +151,7 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 		</uui-button>`;
 	}
 
-	static styles = [
+	static override styles = [
 		UmbTextStyles,
 		css`
 			code {

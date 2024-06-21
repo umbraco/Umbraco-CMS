@@ -33,7 +33,7 @@ export class UmbLocalizeDateElement extends UmbLitElement {
 		return this.date ? html`${unsafeHTML(this.text)}` : html`<slot></slot>`;
 	}
 
-	static styles = [
+	static override styles = [
 		css`
 			:host {
 				display: contents;

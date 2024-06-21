@@ -13,7 +13,7 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 
 	#documentTypePickerContext = new UmbDocumentTypePickerContext(this);
 
-	connectedCallback() {
+	override connectedCallback() {
 		super.connectedCallback();
 
 		if (this.data) {

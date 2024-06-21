@@ -20,7 +20,7 @@ export class UmbNotificationLayoutDefaultElement extends LitElement {
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static override styles = [UmbTextStyles];
 }
 
 declare global {
