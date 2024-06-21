@@ -49,12 +49,12 @@ export class UmbLocalizeElement extends UmbLitElement {
 		return localizedValue;
 	}
 
-	protected render() {
+	override render() {
 		return this.text.trim()
 			? html`${unsafeHTML(this.text)}`
 			: this.debug
-			? html`<span style="color:red">${this.key}</span>`
-			: html`<slot></slot>`;
+				? html`<span style="color:red">${this.key}</span>`
+				: html`<slot></slot>`;
 	}
 
 	static override styles = [

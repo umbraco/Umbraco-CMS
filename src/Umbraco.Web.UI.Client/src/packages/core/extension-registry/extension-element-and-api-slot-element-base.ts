@@ -86,11 +86,10 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 
 	/**
 	 * Render the element.
-	 * @protected
 	 * @return {*}
 	 * @memberof UmbExtensionElementAndApiSlotElementBase
 	 */
-	protected render() {
+	override render() {
 		return this._element;
 	}
 

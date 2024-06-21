@@ -8,7 +8,7 @@ export class UmbRefSectionElement extends UmbElementMixin(UUIRefElement) {
 	@property({ type: Object, attribute: false })
 	item?: UmbSectionItemModel;
 
-	public render() {
+	override render() {
 		return html`
 			<div id="info">
 				<div id="name">${this.item?.meta.label ? this.localize.string(this.item.meta.label) : this.item?.name}</div>

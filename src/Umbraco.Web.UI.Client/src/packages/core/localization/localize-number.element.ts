@@ -29,7 +29,7 @@ export class UmbLocalizeNumberElement extends UmbLitElement {
 		return this.localize.number(this.number, this.options);
 	}
 
-	protected render() {
+	override render() {
 		return this.number ? html`${unsafeHTML(this.text)}` : html`<slot></slot>`;
 	}
 
