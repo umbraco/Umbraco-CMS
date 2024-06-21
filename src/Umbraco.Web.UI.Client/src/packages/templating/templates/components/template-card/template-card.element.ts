@@ -44,7 +44,7 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 		this.dispatchEvent(new CustomEvent('open', { bubbles: false, composed: true }));
 	}
 
-	render() {
+	override render() {
 		return html`<div id="card">
 			<button id="open-part" aria-label="Open ${this.name}" @click="${this.#openTemplate}">
 				<uui-icon class="logo" name="icon-layout"></uui-icon>

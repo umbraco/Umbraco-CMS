@@ -53,7 +53,7 @@ export class UmbPropertyEditorUINumberRangeElement
 		this.shadowRoot!.querySelector('umb-input-number-range')!.focus();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-number-range
 				.minValue=${this._minValue}

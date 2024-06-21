@@ -42,7 +42,7 @@ export class UmbInputObjectTypeElement extends UUIFormControlMixin(UmbLitElement
 		this.dispatchEvent(new CustomEvent('change'));
 	}
 
-	render() {
+	override render() {
 		return html`<uui-select .options=${this._options} @change=${this.#onChange}></uui-select> `;
 	}
 

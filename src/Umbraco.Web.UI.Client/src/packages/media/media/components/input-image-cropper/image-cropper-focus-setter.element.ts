@@ -140,7 +140,7 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		if (!this.src) return nothing;
 		return html`
 			<div id="wrapper">

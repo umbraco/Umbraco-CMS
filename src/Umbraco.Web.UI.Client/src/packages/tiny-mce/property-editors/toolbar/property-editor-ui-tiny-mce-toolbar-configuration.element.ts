@@ -112,7 +112,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<ul>
 			${repeat(
 				this._toolbarConfig,

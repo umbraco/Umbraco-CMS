@@ -18,7 +18,7 @@ export class UmbMediaTableColumnNameElement extends UmbLitElement implements Umb
 		window.history.pushState(null, '', event.target.href);
 	}
 
-	render() {
+	override render() {
 		if (!this.value) return nothing;
 		return html`
 			<uui-button

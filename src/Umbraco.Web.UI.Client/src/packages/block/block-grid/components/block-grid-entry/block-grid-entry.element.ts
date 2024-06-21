@@ -286,7 +286,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			: nothing;
 	}
 
-	render() {
+	override render() {
 		return this.#renderBlock();
 	}
 

@@ -31,7 +31,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout header-transparent header-fit-height>
 				<div id="header" slot="header">

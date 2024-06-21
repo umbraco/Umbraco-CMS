@@ -38,7 +38,7 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 	}
 
 	// TODO: Implement mandatory?
-	render() {
+	override render() {
 		return html`
 			<umb-input-static-file
 				@change=${this._onChange}

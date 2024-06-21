@@ -264,7 +264,7 @@ export class UmbDonutChartElement extends LitElement {
         `;
 	}
 
-	render() {
+	override render() {
 		return html` <div id="container" @mousemove=${this.#calculateDetailsBoxPosition}>
 				<svg viewBox="0 0 ${this.viewBox} ${this.viewBox}" role="list">${this.#renderCircles()}</svg>
 				<div

@@ -38,7 +38,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div id="logviewer-layout">
 				<div id="info">

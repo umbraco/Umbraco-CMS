@@ -39,7 +39,7 @@ export class UmbPropertyEditorUIOverlaySizeElement extends UmbLitElement impleme
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-select .options=${this._list} @change=${this.#onChange}></uui-select>`;
 	}
 }

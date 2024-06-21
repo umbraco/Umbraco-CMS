@@ -45,7 +45,7 @@ export class UmbInputCheckboxListElement extends UUIFormControlMixin(UmbLitEleme
 		this.selection = values;
 	}
 
-	render() {
+	override render() {
 		if (!this.list) return nothing;
 		return html`
 			<form>

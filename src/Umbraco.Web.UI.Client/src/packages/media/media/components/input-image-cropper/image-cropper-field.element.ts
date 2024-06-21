@@ -122,7 +122,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		this.#updateValue();
 	};
 
-	render() {
+	override render() {
 		return html`
 			<div id="main">${this.#renderMain()}</div>
 			<div id="side">${this.#renderSide()}</div>

@@ -196,7 +196,7 @@ export class UmbInputMediaElement extends UUIFormControlMixin(UmbLitElement, '')
 		this.#pickerContext.requestRemoveItem(item.unique);
 	}
 
-	render() {
+	override render() {
 		return html`<div class="container">${this.#renderItems()} ${this.#renderAddButton()}</div>`;
 	}
 

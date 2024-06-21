@@ -324,7 +324,7 @@ export class UmbInputRichMediaElement extends UUIFormControlMixin(UmbLitElement,
 		this.#addItems(uploaded);
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderDropzone()}
 			<div class="container">${this.#renderItems()} ${this.#renderAddButton()}</div>

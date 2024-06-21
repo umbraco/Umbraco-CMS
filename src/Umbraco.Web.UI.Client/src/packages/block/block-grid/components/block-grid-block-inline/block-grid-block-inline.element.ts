@@ -38,7 +38,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`<umb-ref-grid-block standalone .name=${this.label ?? ''} href=${this.urls?.editContent ?? ''}>
 			<umb-property-type-based-property
 				.property=${this._inlineProperty}

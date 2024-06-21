@@ -59,7 +59,7 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 		</li>`;
 	};
 
-	render() {
+	override render() {
 		return html` <uui-box id="saved-searches" headline="Saved searches">
 			<ul>
 				${this.#renderSearchItem({ name: 'All logs', query: '' })} ${this._savedSearches.map(this.#renderSearchItem)}

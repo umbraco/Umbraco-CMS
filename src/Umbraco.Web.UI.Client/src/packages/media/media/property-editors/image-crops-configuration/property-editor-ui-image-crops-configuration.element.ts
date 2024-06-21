@@ -126,7 +126,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		this.#oldInputValue = value;
 	}
 
-	render() {
+	override render() {
 		if (!this.value) this.value = [];
 
 		return html`

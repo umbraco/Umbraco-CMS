@@ -79,7 +79,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.setDescription(event.target.value.toString() ?? '');
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.MediaType">
 				<div id="header" slot="header">

@@ -99,7 +99,7 @@ export class UmbPropertyEditorUIBlockGridElement
 		});
 	}
 
-	render() {
+	override render() {
 		return html` <umb-block-grid-entries
 			.areaKey=${null}
 			.layoutColumns=${this._layoutColumns}></umb-block-grid-entries>`;

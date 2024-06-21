@@ -47,7 +47,7 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		if (!this.value) return nothing;
 
 		return html`<umb-input-image-cropper

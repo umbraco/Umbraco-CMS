@@ -30,7 +30,7 @@ export class UmbDropzoneMediaTypePickerModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html` <div id="options">
 			<uui-button
 				id="auto"

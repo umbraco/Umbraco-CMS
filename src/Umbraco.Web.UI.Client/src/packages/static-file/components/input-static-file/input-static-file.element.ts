@@ -104,7 +104,7 @@ export class UmbInputStaticFileElement extends UUIFormControlMixin(UmbLitElement
 		return undefined;
 	}
 
-	render() {
+	override render() {
 		if (!this._items) return nothing;
 		return html`
 			<uui-ref-list>

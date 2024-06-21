@@ -85,11 +85,11 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 					<umb-block-scale-handler @mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
 						${this._columnSpan}x${this._rowSpan}
 					</umb-block-scale-handler>
-			  `
+				`
 			: '';
 	}
 
-	render() {
+	override render() {
 		return this.#renderBlock();
 	}
 

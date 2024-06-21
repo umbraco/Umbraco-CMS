@@ -34,7 +34,7 @@ export class UmbPropertyEditorUIContentPickerSourceElement extends UmbLitElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<umb-input-content-picker-source
 			@change=${this.#onChange}
 			.type=${this.value?.type ?? 'content'}

@@ -56,7 +56,7 @@ export class UmbPropertyEditorUITextBoxElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<uui-input
 			.value=${this.value ?? ''}
 			.type=${this._type}

@@ -100,7 +100,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 		}
 	}
 
-	render() {
+	override render() {
 		if (!this._webhook) return nothing;
 
 		return html`

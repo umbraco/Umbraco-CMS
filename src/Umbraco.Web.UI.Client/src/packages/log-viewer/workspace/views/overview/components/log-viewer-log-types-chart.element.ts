@@ -55,7 +55,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	}
 
 	// TODO: Stop using this complex code in render methods, instead changes to _logLevelCount should trigger a state prop containing the keys. And then try to make use of the repeat LIT method:
-	render() {
+	override render() {
 		return html`
 			<uui-box id="types" headline="Log types">
 				<div id="log-types-container">

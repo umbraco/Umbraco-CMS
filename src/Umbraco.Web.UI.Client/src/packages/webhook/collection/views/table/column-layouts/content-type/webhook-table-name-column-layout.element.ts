@@ -36,7 +36,7 @@ export class UmbWebhookTableContentTypeColumnLayoutElement extends UmbLitElement
 		}
 	}
 
-	render() {
+	override render() {
 		if (!this.value) return nothing;
 
 		return html`${this._contentTypes}`;

@@ -66,7 +66,7 @@ export class UmbWebhookEventsModalElement extends UmbModalBaseElement<
 		return selectedEvents[0].eventType !== item.eventType;
 	}
 
-	render() {
+	override render() {
 		return html`<umb-body-layout headline="Select events">
 			<uui-box>
 				${repeat(

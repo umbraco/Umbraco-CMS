@@ -112,7 +112,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		this.value = { key: this._key, unique: this._unique, crops: value.crops, focalPoint: value.focalPoint };
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
 				${this.#renderBody()}

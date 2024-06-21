@@ -237,7 +237,7 @@ export class UmbMultiUrlPickerElement extends UUIFormControlMixin(UmbLitElement,
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 

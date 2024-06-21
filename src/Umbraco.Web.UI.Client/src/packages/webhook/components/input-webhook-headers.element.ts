@@ -116,7 +116,7 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			${this.#renderGrid()}
 			<uui-button id="add" look="placeholder" @click=${this.#addHeader}>Add</uui-button>

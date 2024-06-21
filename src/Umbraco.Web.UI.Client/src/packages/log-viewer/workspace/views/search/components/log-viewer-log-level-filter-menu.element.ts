@@ -86,7 +86,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 		`;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-dropdown label="Select log levels">
 				<span slot="label">

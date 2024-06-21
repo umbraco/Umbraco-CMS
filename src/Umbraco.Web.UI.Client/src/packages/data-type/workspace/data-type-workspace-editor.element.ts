@@ -48,7 +48,7 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.DataType">
 				<uui-input

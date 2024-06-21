@@ -31,7 +31,7 @@ export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button label=${this.localize.term('blockEditor_addBlockGroup')} look="placeholder" @click=${this.#addGroup}>
 				${this.localize.term('blockEditor_addBlockGroup')}

@@ -131,7 +131,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 		this.open = (event.target as HTMLDetailsElement).open;
 	}
 
-	render() {
+	override render() {
 		return html`
 			<details @open=${this.#setOpen}>
 				<summary>

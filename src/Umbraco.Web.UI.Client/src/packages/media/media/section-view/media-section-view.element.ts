@@ -72,7 +72,7 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 		};
 	}
 
-	render() {
+	override render() {
 		if (!this._routes) return;
 		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
 	}

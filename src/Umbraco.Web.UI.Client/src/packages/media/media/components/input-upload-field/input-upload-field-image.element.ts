@@ -6,7 +6,7 @@ export class UmbInputUploadFieldImageElement extends UmbLitElement {
 	@property({ type: String })
 	path = '';
 
-	render() {
+	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
 
 		return html`<img src=${this.path} alt="" />`;

@@ -106,7 +106,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		this.modalContext?.updateValue({ link: { ...this._link, ...linkObject } });
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline="Select Link">
 				<uui-box>

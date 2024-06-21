@@ -52,15 +52,21 @@ export class UmbInputWebhookEventsElement extends UmbLitElement {
 				(item) => item.alias,
 				(item) => html`
 					<span>${item.eventName}</span>
-					<uui-button label=${this.localize.term('general_remove')} @click=${() => this.#removeEvent(item.alias)}></uui-button>
+					<uui-button
+						label=${this.localize.term('general_remove')}
+						@click=${() => this.#removeEvent(item.alias)}></uui-button>
 				`,
 			)}
 		`;
 	}
 
-	render() {
+	override render() {
 		return html`${this.#renderEvents()}
-			<uui-button id="choose" look="placeholder" label=${this.localize.term('general_choose')} @click=${this.#openModal}></uui-button>`;
+			<uui-button
+				id="choose"
+				look="placeholder"
+				label=${this.localize.term('general_choose')}
+				@click=${this.#openModal}></uui-button>`;
 	}
 
 	static override styles = [

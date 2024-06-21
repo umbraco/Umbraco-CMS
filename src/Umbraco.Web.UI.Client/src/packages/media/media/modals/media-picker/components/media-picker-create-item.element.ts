@@ -47,7 +47,7 @@ export class UmbMediaPickerCreateItemElement extends UmbLitElement {
 		this._popoverOpen = event.newState === 'open';
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-button
 				popovertarget="collection-action-menu-popover"

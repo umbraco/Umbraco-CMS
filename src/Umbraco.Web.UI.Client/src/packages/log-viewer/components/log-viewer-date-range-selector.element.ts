@@ -66,7 +66,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 		window.history.pushState({}, '', `${path()}?${qs}`);
 	}
 
-	render() {
+	override render() {
 		return html`
 			<div class="input-container">
 				<uui-label for="start-date">From:</uui-label>

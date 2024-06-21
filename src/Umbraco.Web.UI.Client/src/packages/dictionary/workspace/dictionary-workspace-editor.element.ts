@@ -36,7 +36,7 @@ export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.Dictionary" back-path="section/dictionary/dashboard">
 				<div id="header" slot="header">

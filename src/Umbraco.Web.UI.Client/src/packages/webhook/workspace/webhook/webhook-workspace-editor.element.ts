@@ -3,7 +3,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 @customElement('umb-webhook-workspace-editor')
 export class UmbWebhookWorkspaceEditorElement extends UmbLitElement {
-	render() {
+	override render() {
 		return html`<umb-workspace-editor
 			alias="Umb.Workspace.Webhook"
 			back-path="section/settings/workspace/webhook-root"></umb-workspace-editor>`;

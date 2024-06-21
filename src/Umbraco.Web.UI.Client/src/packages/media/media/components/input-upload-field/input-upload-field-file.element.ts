@@ -72,7 +72,7 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 		return html`<span id="label">${this.label}</span>`;
 	}
 
-	render() {
+	override render() {
 		if (!this.label && !this.extension) return html`<uui-loader></uui-loader>`;
 
 		return html`

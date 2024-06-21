@@ -315,7 +315,7 @@ export class UmbImageCropperElement extends LitElement {
 		this.#updateImageScale(event.deltaY * -this.#SCROLL_ZOOM_SPEED, event.clientX, event.clientY);
 	};
 
-	render() {
+	override render() {
 		return html`
 			<div id="viewport">
 				<img id="image" src=${this.src} alt="" />

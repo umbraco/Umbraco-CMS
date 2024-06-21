@@ -267,7 +267,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 	}
 
 	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type. [NL]
-	render() {
+	override render() {
 		return html`
 			${this._styleElement}
 			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>

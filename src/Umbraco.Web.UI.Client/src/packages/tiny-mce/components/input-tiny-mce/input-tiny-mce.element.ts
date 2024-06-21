@@ -356,7 +356,7 @@ export class UmbInputTinyMceElement extends UUIFormControlMixin(UmbLitElement, '
 	 * Nothing rendered by default - TinyMCE initialization creates
 	 * a target div and binds the RTE to that element
 	 */
-	render() {
+	override render() {
 		return html`<div class="editor"></div>`;
 	}
 

@@ -173,7 +173,7 @@ export class UmbMediaPickerModalElement extends UmbModalBaseElement<
 		this.#loadMediaFolder();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_selectMedia')}>
 				${this.#renderBody()} ${this.#renderPath()}

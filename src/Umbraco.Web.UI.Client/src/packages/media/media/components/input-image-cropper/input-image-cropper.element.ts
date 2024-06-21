@@ -95,7 +95,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		};
 	}
 
-	render() {
+	override render() {
 		if (this.value.src || this.file) {
 			return this.#renderImageCropper();
 		}

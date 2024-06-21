@@ -212,7 +212,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		);
 	}
 
-	render() {
+	override render() {
 		return html`<div id="groups">
 			${this._notGroupedBlockTypes
 				? html`<umb-input-block-type

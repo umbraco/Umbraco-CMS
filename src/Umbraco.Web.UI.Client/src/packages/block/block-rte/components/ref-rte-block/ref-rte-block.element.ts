@@ -31,7 +31,7 @@ export class UmbRefRteBlockElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`<uui-ref-node standalone .name=${this.label ?? ''} href=${this._workspaceEditPath ?? '#'}
 			><uui-icon slot="icon" .name=${this.icon ?? null}></uui-icon
 		></uui-ref-node>`;

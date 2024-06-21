@@ -53,7 +53,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		);
 	}
 
-	render() {
+	override render() {
 		return repeat(
 			this._propertyStructure,
 			(property) => property.alias,

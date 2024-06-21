@@ -63,7 +63,7 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 		this.#logViewerContext?.setFilterExpression(query);
 	};
 
-	render() {
+	override render() {
 		return html`
 			<uui-box headline="Common Log Messages" id="saved-searches">
 				<p style="font-style: italic;">Total Unique Message types: ${this._total}</p>

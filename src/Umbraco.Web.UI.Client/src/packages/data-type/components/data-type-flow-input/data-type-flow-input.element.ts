@@ -68,7 +68,7 @@ export class UmbInputDataTypeElement extends UUIFormControlMixin(UmbLitElement, 
 			});
 	}
 
-	render() {
+	override render() {
 		return this._ids && this._ids.length > 0
 			? html`
 					<umb-ref-data-type

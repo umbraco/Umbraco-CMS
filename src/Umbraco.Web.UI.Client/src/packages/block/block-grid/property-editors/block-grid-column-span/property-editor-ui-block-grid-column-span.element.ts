@@ -36,7 +36,7 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		const template = repeat(
 			this._columnsArray,
 			(index) => index,

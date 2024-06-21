@@ -132,7 +132,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		`;
 	}
 
-	render() {
+	override render() {
 		return this.#renderBlock();
 	}
 

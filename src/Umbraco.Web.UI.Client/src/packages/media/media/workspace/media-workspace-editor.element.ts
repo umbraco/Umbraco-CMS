@@ -100,7 +100,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.splitView.setWorkspaceRoute(e.target.absoluteRouterPath);
 	};
 
-	render() {
+	override render() {
 		return this._routes && this._routes.length > 0
 			? html`<umb-router-slot .routes=${this._routes} @init=${this._gotWorkspaceRoute}></umb-router-slot>`
 			: '';

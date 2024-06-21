@@ -69,7 +69,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-body-layout headline=${this._headline ?? ''}>
 				<uui-box>

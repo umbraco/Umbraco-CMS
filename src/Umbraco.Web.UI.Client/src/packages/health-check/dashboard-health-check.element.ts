@@ -71,7 +71,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 }

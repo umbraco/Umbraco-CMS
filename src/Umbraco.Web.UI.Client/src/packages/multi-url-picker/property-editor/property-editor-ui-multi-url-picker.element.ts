@@ -65,7 +65,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-multi-url-picker
 				.alias=${this._alias}

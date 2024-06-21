@@ -138,7 +138,7 @@ export class UmbImageCropperPreviewElement extends LitElement {
 		this.imageElement.style.left = `${imageLeft}%`;
 	}
 
-	render() {
+	override render() {
 		if (!this.crop) {
 			return nothing;
 		}

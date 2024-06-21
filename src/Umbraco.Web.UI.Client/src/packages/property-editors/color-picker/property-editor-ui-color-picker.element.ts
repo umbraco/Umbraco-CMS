@@ -52,7 +52,7 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`<umb-input-color
 			value=${this.value?.value ?? ''}
 			.swatches=${this._swatches}

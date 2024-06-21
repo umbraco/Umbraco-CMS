@@ -144,7 +144,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		});
 	}
 
-	render() {
+	override render() {
 		return html`
 			<uui-input
 				id="search-input"

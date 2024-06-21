@@ -93,7 +93,7 @@ export class UmbDropzoneElement extends UmbLitElement {
 		}
 	}
 
-	render() {
+	override render() {
 		return html`<uui-file-dropzone
 			id="dropzone"
 			.accept=${this.accept?.join(',')}

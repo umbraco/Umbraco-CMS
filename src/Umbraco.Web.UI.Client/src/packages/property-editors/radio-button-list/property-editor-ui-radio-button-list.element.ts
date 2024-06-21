@@ -34,7 +34,7 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	render() {
+	override render() {
 		return html`
 			<umb-input-radio-button-list
 				.list=${this._list}
