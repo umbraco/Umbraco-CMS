@@ -46,7 +46,7 @@ const collectDictionaryIcons = async () => {
 					legacy: iconDef.legacy,
 					fileName: iconFileName,
 					svg,
-					output: `${iconsOutputDirectory}/${iconFileName}.js`,
+					output: `${iconsOutputDirectory}/${iconFileName}.ts`,
 				};
 
 				icons.push(icon);
@@ -77,7 +77,7 @@ const collectDictionaryIcons = async () => {
 					legacy: iconDef.legacy,
 					fileName: iconFileName,
 					svg,
-					output: `${iconsOutputDirectory}/${iconFileName}.js`,
+					output: `${iconsOutputDirectory}/${iconFileName}.ts`,
 				};
 
 				icons.push(icon);
@@ -102,7 +102,7 @@ const collectDictionaryIcons = async () => {
 					legacy: iconDef.legacy,
 					fileName: iconFileName,
 					svg,
-					output: `${iconsOutputDirectory}/${iconFileName}.js`,
+					output: `${iconsOutputDirectory}/${iconFileName}.ts`,
 				};
 
 				icons.push(icon);
@@ -141,7 +141,7 @@ const collectDiskIcons = async (icons) => {
 				legacy: true,
 				fileName: iconFileName,
 				svg,
-				output: `${iconsOutputDirectory}/${iconFileName}.js`,
+				output: `${iconsOutputDirectory}/${iconFileName}.ts`,
 			};
 
 			icons.push(icon);
@@ -168,13 +168,13 @@ const writeIconsToDisk = (icons) => {
 };
 
 const generateJS = (icons) => {
-	const JSPath = `${iconsOutputDirectory}/icons.ts`;
+	const JSPath = `${moduleDirectory}/icons.ts`;
 
 	const iconDescriptors = icons.map((icon) => {
 		return `{
 			name: "${icon.name}",
 			${icon.legacy ? 'legacy: true,' : ''}
-			path: "./icons/${icon.fileName}.js",
+			path: () => import("./icons/${icon.fileName}.js"),
 		}`.replace(/\t/g, ''); // Regex removes white space [NL]
 	});
 
