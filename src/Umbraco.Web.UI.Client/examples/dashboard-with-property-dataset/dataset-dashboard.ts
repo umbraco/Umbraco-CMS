@@ -39,7 +39,7 @@ export class ExampleDatasetDashboard extends UmbElementMixin(LitElement) {
 							},
 							{
 								alias: 'items',
-								value: [ 'First Option' , 'Second Option', 'Third Option' ],
+								value: ['First Option', 'Second Option', 'Third Option'],
 							},
 						]}
 						property-editor-ui-alias="Umb.PropertyEditorUi.Dropdown"></umb-property>
